@@ -85,6 +85,25 @@ describe "Sequel::Plugins::AssociationPks" do
     @db.sqls.must_equal ["SELECT tag_id FROM albums_tags WHERE (album_id = 3)"]
   end
 
+  it "should not affect one_to_one or one_through_one associations" do
+    @Artist.one_to_one :foo, :clone => :albums
+    @Artist.instance_methods.wont_include :foo_pks_dataset
+    @Album.one_through_one :bar, :clone => :tags
+    @Album.instance_methods.wont_include :bar_pks_dataset
+  end
+
+  it "should not add setter methods for :read_only associations" do
+    @Artist.one_to_many :foos, :clone => :albums, :read_only=>true
+    @Artist.instance_methods.must_include :foo_pks_dataset
+    @Artist.instance_methods.must_include :foo_pks
+    @Artist.instance_methods.wont_include :foo_pks=
+
+    @Album.many_to_many :bars, :clone => :tags, :read_only=>true
+    @Album.instance_methods.must_include :bar_pks_dataset
+    @Album.instance_methods.must_include :bar_pks
+    @Album.instance_methods.wont_include :bar_pks=
+  end
+
   it "should return correct associated pks for many_to_many associations using :association_pks_use_associated_table" do
     @Album.many_to_many :tags, :class=>@Tag, :join_table=>:albums_tags, :left_key=>:album_id, :delay_pks=>false, :association_pks_use_associated_table=>true
     @Album.load(:id=>1).tag_pks.must_equal [1, 2]
@@ -343,6 +362,41 @@ describe "Sequel::Plugins::AssociationPks" do
     match = sqls[4].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"12", "last"=>"12", "album_id"=>"2")
     sqls.length.must_equal 6
+  end
+
+  it "should not automatically convert keys to numbers for for mixed key types for composite key associations" do
+    @Hit.db_schema[:year][:type] = :integer
+    @Hit.db_schema[:week][:type] = :string
+    @Vocalist.many_to_many :hits, :class=>@Hit, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :delay_pks=>false
+    @Vocalist.load(:first=>'F2', :last=>'L2').hit_pks = [['1997', '1'], [1997, 2]]
+    sqls = @db.sqls
+    sqls[0].must_equal "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN (('1997', '1'), (1997, 2))))"
+    sqls[1].must_equal "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
+    match = sqls[3].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'F2'", "last"=>"'L2'", "year"=>"'1997'", "week"=>"'1'")
+    sqls.length.must_equal 5
+
+    @Vocalist.db_schema[:first][:type] = :integer
+    @Vocalist.db_schema[:last][:type] = :string
+    @Album.one_to_many :vocalists, :class=>@Vocalist, :key=>:album_id, :delay_pks=>false
+    @Album.load(:id=>1).vocalist_pks = [["11", "11"], ["12", "12"]]
+    @db.sqls.must_equal ["UPDATE vocalists SET album_id = 1 WHERE ((first, last) IN (('11', '11'), ('12', '12')))",
+      "UPDATE vocalists SET album_id = NULL WHERE ((vocalists.album_id = 1) AND ((first, last) NOT IN (('11', '11'), ('12', '12'))))"]
+
+    @Album.many_to_many :vocalists, :class=>@Vocalist, :join_table=>:albums_vocalists, :left_key=>:album_id, :right_key=>[:first, :last], :delay_pks=>false
+    @Album.load(:id=>2).vocalist_pks = [["11", "11"], ["12", "12"]]
+    sqls = @db.sqls
+    sqls[0].must_equal "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first, last) NOT IN (('11', '11'), ('12', '12'))))"
+    sqls[1].must_equal 'SELECT first, last FROM albums_vocalists WHERE (album_id = 2)'
+    match = sqls[3].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'11'", "last"=>"'11'", "album_id"=>"2")
+    match = sqls[4].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'12'", "last"=>"'12'", "album_id"=>"2")
+    sqls.length.must_equal 6
+  end
+
+  it "should support saving without setting associated pks" do
+    @Artist.new.save.must_be_instance_of @Artist
   end
 
   it "should handle delaying setting of association pks until after saving for existing objects, if :delay_pks=>:always association option is used" do

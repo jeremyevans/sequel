@@ -57,4 +57,25 @@ describe "Sequel::Plugins::PgRow" do
   it "should allow inserting just this model value" do
     @c2.dataset.insert_sql(@c.load(:street=>'123', :city=>'Bar')).must_equal "INSERT INTO company VALUES (ROW('123', 'Bar')::address)"
   end
+
+  it "should work when loaded into models without a dataset" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @db.extension(:pg_array)
+    @c = Class.new(Sequel::Model(@db))
+    @c.plugin :pg_row
+    @c.set_dataset(@db[:address])
+    @c.columns :street, :city
+    @c.db_schema[:street][:type] = :string
+    @c.db_schema[:city][:type] = :string
+    @db.fetch = [[{:oid=>1098, :typrelid=>2, :typarray=>3}], [{:attname=>'street', :atttypid=>1324}, {:attname=>'city', :atttypid=>1324}]]
+    @c.register_row_type
+
+    @c2 = Class.new(Sequel::Model(@db[:company]))
+    @c2.columns :address
+    @c2.db_schema[:address].merge!(:type=>:pg_row_address)
+    @c2.new.send(:schema_type_class, :address).must_equal @c
+    @db.conversion_procs[1098].call('(123 Foo St,Bar City)').must_equal @c.load(:street=>'123 Foo St', :city=>'Bar City')
+  end
+
 end

@@ -42,7 +42,7 @@ describe Sequel::Model, "many_through_many" do
     khs.must_equal [[{:id=>{1=>[Artist.load(:x=>1, :id=>1)]}}, {1=>[Artist.load(:x=>1, :id=>1)]}]]
 
     khs.clear
-    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:id, :left_primary_key_column=>:i, :eager_loader=>pr
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :left_primary_key=>:id, :left_primary_key_column=>:i, :eager_loader=>pr, :eager_loader_key=>:id
     @c1.eager(:tags).all
     khs.must_equal [[{:id=>{1=>[Artist.load(:x=>1, :id=>1)]}}, {1=>[Artist.load(:x=>1, :id=>1)]}]]
   end

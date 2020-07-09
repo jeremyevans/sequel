@@ -44,6 +44,14 @@ describe "pg_interval extension" do
     cp[1187].call("{1 sec}").must_equal [ActiveSupport::Duration.new(1, [[:seconds, 1]])]
   end
 
+  it "should setup conversion proc without array conversion proc if pg_array extension is not loaded" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extension(:pg_interval, :pg_array)
+    cp = @db.conversion_procs
+    cp[1186].call("1 sec").must_equal ActiveSupport::Duration.new(1, [[:seconds, 1]])
+    cp[1187].must_be_nil
+  end
+
   it "should not affect literalization of custom objects" do
     o = Object.new
     def o.sql_literal(ds) 'v' end
@@ -78,9 +86,13 @@ describe "pg_interval extension" do
 
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").is_a?(ActiveSupport::Duration).must_equal true
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").must_equal d
+    @db.typecast_value(:interval, "1 year 2 mons 25 days -05:06:07").is_a?(ActiveSupport::Duration).must_equal true
+    @db.typecast_value(:interval, "1 year 2 mons 25 days -05:06:07").must_equal(d-10*3600-12*60-14)
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07").parts.sort_by{|k,v| k.to_s}.must_equal d.parts.sort_by{|k,v| k.to_s}
     @db.typecast_value(:interval, "1 year 2 mons 25 days 05:06:07.0").parts.sort_by{|k,v| k.to_s}.must_equal d.parts.sort_by{|k,v| k.to_s}
 
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins").is_a?(ActiveSupport::Duration).must_equal true
+    @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins").must_equal(d-7)
     @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").is_a?(ActiveSupport::Duration).must_equal true
     @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").must_equal d
     @db.typecast_value(:interval, "1 year 2 mons 25 days 5 hours 6 mins 7 secs").parts.sort_by{|k,v| k.to_s}.must_equal d.parts.sort_by{|k,v| k.to_s}

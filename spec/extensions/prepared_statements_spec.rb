@@ -66,6 +66,13 @@ describe "prepared_statements plugin" do
       end
       @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
       @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') RETURNING #{@columns}"]
+
+      c = Class.new(@c)
+      c.dataset = c.dataset.returning(:id, :name)
+      c.columns :id, :name, :i
+      @db.sqls
+      c.create(:name=>'foo').must_equal c.load(:id=>1, :name=>'foo', :i => 2)
+      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') RETURNING id, name"]
     end
   end
 
@@ -80,6 +87,11 @@ describe "prepared_statements plugin" do
     end
 
     include prepared_statements_spec
+
+    it "should correctly create instance" do
+      @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
+      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo')", "SELECT * FROM people WHERE id = 1"]
+    end
 
     it "should correctly create instance" do
       @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)

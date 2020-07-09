@@ -37,6 +37,18 @@ describe "Serialization plugin" do
     o.valid?.must_equal true
   end
 
+  it "should offer serialize_attributes class method for configuring serialization" do
+    @c.plugin :serialization
+    @c.serialize_attributes :yaml, :abc
+    o = @c.new
+    def o.validate
+      errors.add(:abc, "not present") unless self[:abc]
+    end
+    o.valid?.must_equal false
+    o.abc = {}
+    o.valid?.must_equal true
+  end
+
   it "should set column values even when not validating" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc
@@ -74,6 +86,12 @@ describe "Serialization plugin" do
       "INSERT INTO items (ghi) VALUES ('[1]')", \
       "INSERT INTO items (ghi) VALUES ('#{x}')", \
     ]
+  end
+
+  it "should not attempt to serialize nil attributes" do
+    @c.plugin :serialization, :marshal, :abc
+    @c.create(:abc => nil)
+    DB.sqls.must_equal ["INSERT INTO items (abc) VALUES (NULL)"]
   end
 
   it "should allow serializing attributes using arbitrary callable" do
@@ -242,6 +260,14 @@ describe "Serialization plugin" do
     o.deserialized_values.length.must_equal 0
   end
   
+  it "should handle case where there are no deserialized columns when refreshing" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, :yaml, :abc, :def
+    o = @c.load(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
+    o.refresh
+    o.deserialized_values.length.must_equal 0
+  end
+  
   it "should not clear the deserialized columns when refreshing after saving a new object" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
@@ -361,5 +387,17 @@ describe "Serialization plugin" do
     @c.freeze
     @c.serialization_map.frozen?.must_equal true
     @c.deserialization_map.frozen?.must_equal true
+  end
+
+  it "should handle freezing model class without defining any serializers" do
+    @c.plugin :serialization
+    @c.freeze
+    @c.serialization_map.frozen?.must_equal true
+    @c.deserialization_map.frozen?.must_equal true
+  end
+
+  it "should raise error when calling serialize_attributes without any columns" do
+    @c.plugin :serialization
+    proc{@c.serialize_attributes :yaml}.must_raise Sequel::Error
   end
 end

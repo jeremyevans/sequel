@@ -42,4 +42,14 @@ describe "server_logging extension" do
     @db.send(:log_connection_execute, c, "SELECT * FROM a")
     @o.log.must_include "server: ) SELECT * FROM a"
   end
+
+  it "should not automatically enable logging connection info if explicitly disabled when extension is loaded" do
+    @db = Sequel::mock(:test=>false, :servers=>{:read_only=>{}, :b=>{}}, :logger=>@o)
+    @db.log_connection_info = false
+    @db.extension(:server_logging)
+    @db[:a].all
+    log = @o.log
+    log.wont_include "server: read_only) SELECT * FROM a"
+    log.must_include "SELECT * FROM a"
+  end
 end

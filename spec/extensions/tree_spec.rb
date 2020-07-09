@@ -72,6 +72,12 @@ describe Sequel::Model, "tree plugin" do
     @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL))"
   end
 
+  it "should have roots_dataset include an order if the tree has an order" do
+    @c.tree_order = :id
+    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE (parent_id IS NULL) ORDER BY id"
+    @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL)) ORDER BY id"
+  end
+
   it "should have ancestors return the ancestors of the current node" do
     @c.dataset = @c.dataset.with_fetch([[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]])
     @o.ancestors.must_equal [@c.load(:id=>1, :parent_id=>5, :name=>'r'), @c.load(:id=>5, :parent_id=>nil, :name=>'r2')]
@@ -323,6 +329,12 @@ describe Sequel::Model, "tree plugin with composite keys" do
       @c.root.update(:name => 'fdsa') 
       @c.dataset = @c.dataset.with_fetch(:id=>1, :id2=>6, :parent_id=>nil, :parent_id2=>2, :name=>'r')
       @c.root.update(:name => 'fdsa') 
+    end
+
+    it "handles case where tree_order is not an array when freezing" do
+      @c.tree_order = :id
+      @c.freeze
+      @c.tree_order.must_equal :id
     end
 
     it "freezes tree_order if it is an array" do

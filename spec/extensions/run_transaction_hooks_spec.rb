@@ -7,11 +7,46 @@ describe "run_transaction_hooks extension" do
 
   it "should support #run_after_{commit,rollback} hooks to run the hooks early" do
     @db.transaction do
+      @db.sqls.must_equal ["BEGIN"]
+      @db.run_after_commit_hooks
+      @db.run_after_rollback_hooks
+      @db.after_commit{@db.run "C"}
+      @db.after_commit{@db.run "C2"}
+      @db.after_rollback{@db.run "R"}
+      @db.after_rollback{@db.run "R2"}
+      @db.sqls.must_equal []
+      @db.run_after_commit_hooks
+      @db.sqls.must_equal ["C", "C2"]
+      @db.run_after_rollback_hooks
+      @db.sqls.must_equal ["R", "R2"]
+    end
+    @db.sqls.must_equal ["COMMIT"]
+
+    @db.transaction(:rollback=>:always) do
       @db.after_commit{@db.run "C"}
       @db.after_commit{@db.run "C2"}
       @db.after_rollback{@db.run "R"}
       @db.after_rollback{@db.run "R2"}
       @db.sqls.must_equal ["BEGIN"]
+      @db.run_after_commit_hooks
+      @db.sqls.must_equal ["C", "C2"]
+      @db.run_after_rollback_hooks
+      @db.sqls.must_equal ["R", "R2"]
+    end
+    @db.sqls.must_equal ["ROLLBACK"]
+  end
+
+  it "should support #run_after_{commit,rollback} hooks to run the hooks early when savepoints are not supported" do
+    def @db.supports_savepoints?; false end
+    @db.transaction do
+      @db.sqls.must_equal ["BEGIN"]
+      @db.run_after_commit_hooks
+      @db.run_after_rollback_hooks
+      @db.after_commit{@db.run "C"}
+      @db.after_commit{@db.run "C2"}
+      @db.after_rollback{@db.run "R"}
+      @db.after_rollback{@db.run "R2"}
+      @db.sqls.must_equal []
       @db.run_after_commit_hooks
       @db.sqls.must_equal ["C", "C2"]
       @db.run_after_rollback_hooks

@@ -158,6 +158,20 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds.sql.must_equal "SELECT * FROM artists WHERE coalesce((tag_ids && (SELECT array_agg(tags.id) FROM tags)), false)"
   end
 
+  it "should remove order for current dataset" do
+    ds = @Artist.order(:name).albums
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Album
+    ds.sql.must_equal "SELECT * FROM albums WHERE (albums.artist_id IN (SELECT artists.id FROM artists))"
+  end
+
+  it "should not remove order for current dataset if the dataset is limited" do
+    ds = @Artist.order(:name).limit(2).albums
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Album
+    ds.sql.must_equal "SELECT * FROM albums WHERE (albums.artist_id IN (SELECT artists.id FROM artists ORDER BY name LIMIT 2))"
+  end
+
   it "should have an associated method that takes an association symbol" do
     ds = @Album.associated(:artist)
     ds.must_be_kind_of(Sequel::Dataset)

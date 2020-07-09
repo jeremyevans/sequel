@@ -124,6 +124,10 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.from_xml(@album.to_xml(:dasherize=>true), :underscore=>true).must_equal @album
   end
 
+  it "should support a block when serializing" do
+     @artist.to_xml{|x| x.foo "bar"}.gsub(/\n */m, '').must_equal "<?xml version=\"1.0\"?><artist><id>2</id><name>YJM</name><foo>bar</foo></artist>"
+  end
+
   it "should support an :encoding option when serializing" do
      @artist.to_xml(:encoding=>'UTF-8').gsub(/\n */m, '').must_equal "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>"
   end

@@ -32,9 +32,14 @@ describe "accessed_columns plugin" do
   end
 
   it "should work when duping and cloning instances" do
+    o = @o.dup
+    o.accessed_columns.must_be_empty
+
     @o.name
     o = @o.dup
     @o.accessed_columns.must_equal [:name]
+    o.accessed_columns.must_equal [:name]
+
     @o.b
     @o.accessed_columns.sort_by{|s| s.to_s}.must_equal [:b, :name]
     o.accessed_columns.must_equal [:name]

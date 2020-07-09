@@ -100,6 +100,13 @@ describe "Dataset#range" do
     @db.sqls.must_equal ["SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test WHERE (price > 100) LIMIT 1"]
   end
   
+  it "should return nil if no row matches" do
+    @db.fetch = []
+    5.times do
+      @ds.range(:tryme).must_be_nil
+    end
+  end
+
   it "should return a range object" do
     5.times do
       @ds.range(:tryme).must_equal(1..10)

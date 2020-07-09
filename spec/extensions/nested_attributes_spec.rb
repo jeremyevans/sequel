@@ -808,13 +808,26 @@ describe "NestedAttributes plugin" do
     proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags2, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.must_raise(Sequel::Error)
   end
 
-  it "should have set_nested_attributes method raise error if called with an association that doesn't support nested attributes" do
+  it "should have set_nested_attributes method raise error if there is no existing object with the given primary key" do
     @Tag.columns :id, :name, :number
     proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.must_raise(Sequel::Error)
   end
 
-  it "should not allow modifying ensted attributes after freezing" do
+  it "should have set_nested_attributes method raise error if called with an association that doesn't support nested attributes" do
+    @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
+    proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.must_raise(Sequel::Error)
+  end
+
+  it "should not allow adding nested attributes after freezing" do
     @Artist.freeze
-    proc{@Artist.nested_attributes :albums}.must_raise RuntimeError, TypeError
+    proc{@Artist.nested_attributes :albums}.must_raise RuntimeError
+  end
+
+  it "should not adding modifying nested attributes after freezing if none were present before" do
+    @c = Class.new(Sequel::Model(@db))
+    @c.plugin :nested_attributes
+    @Artist = Class.new(@c).set_dataset(:artists)
+    @Artist.freeze
+    proc{@Artist.nested_attributes :albums}.must_raise RuntimeError
   end
 end

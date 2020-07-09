@@ -65,6 +65,11 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.from_json(@album.to_json(:include=>:artist), :associations=>:artist).artist.must_equal @artist
   end
 
+  it "should have from_json handle associations not present" do
+    Artist.from_json(@artist.to_json, :associations=>:albums).associations.must_be_empty
+    Album.from_json(@album.to_json, :associations=>:artist).associations.must_be_empty
+  end
+
   it "should have #to_json support blocks for transformations" do
     values = {}
     @artist.values.each{|k,v| values[k.to_s] = v}
@@ -298,8 +303,13 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should store the default options in json_serializer_opts" do
     Album.json_serializer_opts.must_equal(:naked=>true)
     c = Class.new(Album)
-    c.plugin :json_serializer, :naked=>false
-    c.json_serializer_opts.must_equal(:naked=>false)
+    a = [:artist]
+    c.plugin :json_serializer, :naked=>false, :include=>a
+    c.json_serializer_opts.must_equal(:naked=>false, :include=>a)
+    c.json_serializer_opts[:include].must_be_same_as a
+    c = Class.new(c)
+    c.json_serializer_opts.must_equal(:naked=>false, :include=>a)
+    c.json_serializer_opts[:include].wont_be_same_as a
   end
 
   it "should work correctly when subclassing" do
@@ -331,6 +341,43 @@ describe "Sequel::Plugins::JsonSerializer" do
 
   it "should raise an error if using array_from_json and JSON parsing does not return an array" do
     proc{Artist.array_from_json(@artist.to_json)}.must_raise(Sequel::Error)
+  end
+
+  it "should raise an error if using array_from_json and JSON parsing does returns an array containing a non-hash" do
+    proc{Artist.array_from_json('[[]]')}.must_raise(Sequel::Error)
+  end
+
+  it "should handle case in array_from_json where JSON parsing yields array of model instances" do
+    begin
+      Sequel.singleton_class.class_eval do
+        alias parse_json_old parse_json
+        define_method(:parse_json) do |json|
+          case json
+          when '[artists]'
+            [Artist.load(:id=>1)]
+          when 'artist'
+            {:id=>1, 'albums'=>[Album.load(:id=>2)]}
+          when 'album'
+            {:id=>2, 'artist'=>Artist.load(:id=>1)}
+          else raise
+          end
+        end
+      end
+      Artist.array_from_json('[artists]').must_equal [Artist.load(:id=>1)]
+
+      artist = Artist.new.from_json('artist', :associations=>:albums)
+      artist.must_equal Artist.load(:id=>1)
+      artist.associations[:albums].must_equal [Album.load(:id=>2)]
+
+      album = Album.new.from_json('album', :associations=>:artist)
+      album.must_equal Album.load(:id=>2)
+      album.associations[:artist].must_equal Artist.load(:id=>1)
+    ensure
+      Sequel.singleton_class.class_eval do
+        alias parse_json parse_json_old
+        remove_method(:parse_json_old)
+      end
+    end
   end
 
   it "should raise an error if using an unsupported :associations option" do

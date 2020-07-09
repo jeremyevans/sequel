@@ -134,6 +134,16 @@ describe "Sequel::Plugins::DefaultsSetter" do
     c.new.a.must_equal 2
   end
 
+  it "should set default value upon initialization when plugin loaded without dataset" do
+    db = @db
+    @c = c = Class.new(Sequel::Model)
+    @c.plugin :defaults_setter
+    @c.instance_variable_set(:@db_schema, {:a=>{}})
+    @c.dataset = @db[:foo]
+    @c.columns :a
+    proc{|x| db.define_singleton_method(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}; c.dataset = c.dataset; c}.call(2).new.a.must_equal 2
+  end
+
   it "should work correctly on a model without a dataset" do
     @pr.call(2)
     c = Class.new(Sequel::Model(@db[:bar]))

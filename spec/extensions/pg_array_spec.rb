@@ -375,14 +375,16 @@ describe "pg_array extension" do
     @db.conversion_procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
   end
 
-  it "should set appropriate timestamp conversion procs when adding conversion procs" do
-    @db.fetch = [[{:oid=>2222}], [{:oid=>2222, :typarray=>2223}]]
-    @db.add_named_conversion_proc(:foo){|v| v*2}
-    procs = @db.conversion_procs
-    procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
-    procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
-    procs[2222].call('1').must_equal '11'
-    procs[2223].call('{"2"}').must_equal ['22']
+  ['foo', :foo].each do |arg|
+    it "should set appropriate timestamp conversion procs when adding conversion procs with a #{arg.class}" do
+      @db.fetch = [[{:oid=>2222}], [{:oid=>2222, :typarray=>2223}]]
+      @db.add_named_conversion_proc(arg){|v| v*2}
+      procs = @db.conversion_procs
+      procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
+      procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
+      procs[2222].call('1').must_equal '11'
+      procs[2223].call('{"2"}').must_equal ['22']
+    end
   end
 
   it "should return correct results for Database#schema_type_class" do

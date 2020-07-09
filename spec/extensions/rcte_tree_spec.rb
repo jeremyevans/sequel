@@ -71,6 +71,22 @@ describe Sequel::Model, "rcte_tree" do
     @o.descendants_dataset.sql.must_equal 'WITH t AS (SELECT * FROM nodes WHERE ((parent_id = 2) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
   end
   
+  it "should use the correct SQL for lazy associations with :conditions option as an array that is a conditions specifier" do
+    @c.plugin :rcte_tree, :conditions => [[:i, 1]]
+    @o.parent_dataset.sql.must_equal 'SELECT * FROM nodes WHERE ((i = 1) AND (nodes.id = 1)) LIMIT 1'
+    @o.children_dataset.sql.must_equal 'SELECT * FROM nodes WHERE ((i = 1) AND (nodes.parent_id = 2))'
+    @o.ancestors_dataset.sql.must_equal 'WITH t AS (SELECT * FROM nodes WHERE ((id = 1) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
+    @o.descendants_dataset.sql.must_equal 'WITH t AS (SELECT * FROM nodes WHERE ((parent_id = 2) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
+  end
+  
+  it "should use the correct SQL for lazy associations with :conditions option as an array that is not a conditions specifier" do
+    @c.plugin :rcte_tree, :conditions => [{:i => 1}]
+    @o.parent_dataset.sql.must_equal 'SELECT * FROM nodes WHERE ((i = 1) AND (nodes.id = 1)) LIMIT 1'
+    @o.children_dataset.sql.must_equal 'SELECT * FROM nodes WHERE ((i = 1) AND (nodes.parent_id = 2))'
+    @o.ancestors_dataset.sql.must_equal 'WITH t AS (SELECT * FROM nodes WHERE ((id = 1) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
+    @o.descendants_dataset.sql.must_equal 'WITH t AS (SELECT * FROM nodes WHERE ((parent_id = 2) AND (i = 1)) UNION ALL SELECT nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)'
+  end
+  
   it "should add all parent associations when lazily loading ancestors" do
     @c.plugin :rcte_tree
     @c.dataset = @c.dataset.with_fetch([[{:id=>1, :name=>'A', :parent_id=>3}, {:id=>4, :name=>'B', :parent_id=>nil}, {:id=>3, :name=>'?', :parent_id=>4}]])
@@ -79,6 +95,14 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:parent].associations[:parent].must_equal @c.load(:id=>3, :name=>'?', :parent_id=>4)
     @o.associations[:parent].associations[:parent].associations[:parent].must_equal @c.load(:id=>4, :name=>'B', :parent_id=>nil)
     @o.associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_be_nil
+  end
+  
+  it "should handle case where ancestors is called on value without a parent" do
+    @c.plugin :rcte_tree
+    @c.dataset = @c.dataset.with_fetch([])
+    @o.parent_id = nil
+    @o.ancestors.must_equal []
+    @o.associations[:parent].must_be_nil
   end
   
   it "should add all parent associations when lazily loading ancestors and giving options" do
@@ -102,6 +126,19 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:parent]}}.must_equal [[@o.children.first], []]
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.must_equal [[[[]]], []]
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:parent]}}}.must_equal [[[@o.children.first.children.first]], []]
+  end
+  
+  it "should add all parent and children associations when lazily loading descendants when descendant value has no matching ancestor" do
+    @c.plugin :rcte_tree
+    @c.dataset = @c.dataset.with_fetch([[{:id=>3, :name=>'??', :parent_id=>1}, {:id=>1, :name=>'A', :parent_id=>2}, {:id=>nil, :name=>'B', :parent_id=>nil}, {:id=>5, :name=>'?', :parent_id=>3}]])
+    @o.descendants.must_equal [@c.load(:id=>3, :name=>'??', :parent_id=>1), @c.load(:id=>1, :name=>'A', :parent_id=>2), @c.load(:id=>nil, :name=>'B', :parent_id=>nil), @c.load(:id=>5, :name=>'?', :parent_id=>3)]
+    @o.associations[:children].must_equal [@c.load(:id=>1, :name=>'A', :parent_id=>2)]
+    @o.associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@c.load(:id=>3, :name=>'??', :parent_id=>1)]]
+    @o.associations[:children].map{|c1| c1.associations[:parent]}.must_equal [@o]
+    @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[[@c.load(:id=>5, :name=>'?', :parent_id=>3)]]]
+    @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:parent]}}.must_equal [[@o.children.first]]
+    @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.must_equal [[[[]]]]
+    @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:parent]}}}.must_equal [[[@o.children.first.children.first]]]
   end
   
   it "should add all children associations when lazily loading descendants and giving options" do
@@ -135,15 +172,42 @@ describe Sequel::Model, "rcte_tree" do
     @db.sqls.must_equal []
   end
   
+  it "should eagerly load ancestors on oracle when root column is a BigDecimal value" do
+    def (@c.dataset.db).database_type; :oracle; end
+    @c.dataset = @c.dataset.with_extend{def recursive_cte_requires_column_aliases?; true end}
+    @c.plugin :rcte_tree, :ancestors=>{:read_only=>true}, :descendants=>{:read_only=>true}
+    @ds = @c.dataset = @c.dataset.with_fetch([[
+       {:id=>2, :parent_id=>1, :name=>'AA'},
+       {:id=>6, :parent_id=>2, :name=>'C'},
+       {:id=>7, :parent_id=>1, :name=>'D'},
+       {:id=>9, :parent_id=>nil, :name=>'E'}],
+      [{:id=>2, :name=>'AA', :parent_id=>1, :x_root_x=>BigDecimal('2')},
+       {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>BigDecimal('1')}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>BigDecimal('2')},
+       {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>BigDecimal('2')}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>BigDecimal('1')}]])
+    os = @ds.eager(:ancestors).all
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      "WITH t(x_root_x, id, name, parent_id, i, pi) AS (SELECT id AS x_root_x, nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi FROM nodes WHERE (id IN (1, 2)) UNION ALL SELECT t.x_root_x, nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi FROM nodes INNER JOIN t ON (t.parent_id = nodes.id)) SELECT * FROM t AS nodes"]
+    os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D'), @c.load(:id=>9, :parent_id=>nil, :name=>'E')]
+    os.map{|o| o.ancestors}.must_equal [[@c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil)],
+      [@c.load(:id=>2, :name=>'AA', :parent_id=>1), @c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil)],
+      [@c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil)],
+      []]
+    os.map{|o| o.parent}.must_equal [@c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>2, :name=>'AA', :parent_id=>1), @c.load(:id=>1, :name=>'00', :parent_id=>8), nil]
+    os.map{|o| o.parent.parent if o.parent}.must_equal [@c.load(:id=>8, :name=>'?', :parent_id=>nil), @c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil), nil]
+    os.map{|o| o.parent.parent.parent if o.parent and o.parent.parent}.must_equal [nil, @c.load(:id=>8, :name=>'?', :parent_id=>nil), nil, nil]
+    os.map{|o| o.parent.parent.parent.parent if o.parent and o.parent.parent and o.parent.parent.parent}.must_equal [nil, nil, nil, nil]
+    @db.sqls.must_equal []
+  end
+  
   it "should eagerly load ancestors when giving options" do
-    @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :cte_name=>:cte, :ancestors=>{:name=>:as}, :parent=>{:name=>:p}
+    @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :cte_name=>:cte, :ancestors=>{:name=>:as, :select=>[:i, :name, :pi]}, :parent=>{:name=>:p}
     @ds = @c.dataset = @c.dataset.with_fetch([[{:i=>2, :pi=>1, :name=>'AA'}, {:i=>6, :pi=>2, :name=>'C'}, {:i=>7, :pi=>1, :name=>'D'}, {:i=>9, :pi=>nil, :name=>'E'}],
       [{:i=>2, :name=>'AA', :pi=>1, :kal=>2},
        {:i=>1, :name=>'00', :pi=>8, :kal=>1}, {:i=>1, :name=>'00', :pi=>8, :kal=>2},
        {:i=>8, :name=>'?', :pi=>nil, :kal=>2}, {:i=>8, :name=>'?', :pi=>nil, :kal=>1}]])
     os = @ds.eager(:as).all
     @db.sqls.must_equal ["SELECT * FROM nodes",
-      'WITH cte AS (SELECT i AS kal, nodes.* FROM nodes WHERE (i IN (1, 2)) UNION ALL SELECT cte.kal, nodes.* FROM nodes INNER JOIN cte ON (cte.pi = nodes.i)) SELECT * FROM cte AS nodes']
+      'WITH cte AS (SELECT i AS kal, nodes.* FROM nodes WHERE (i IN (1, 2)) UNION ALL SELECT cte.kal, nodes.* FROM nodes INNER JOIN cte ON (cte.pi = nodes.i)) SELECT i, name, pi, kal FROM cte AS nodes']
     os.must_equal [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D'), @c.load(:i=>9, :pi=>nil, :name=>'E')]
     os.map{|o| o.as}.must_equal [[@c.load(:i=>1, :name=>'00', :pi=>8), @c.load(:i=>8, :name=>'?', :pi=>nil)],
       [@c.load(:i=>2, :name=>'AA', :pi=>1), @c.load(:i=>1, :name=>'00', :pi=>8), @c.load(:i=>8, :name=>'?', :pi=>nil)],
@@ -157,6 +221,17 @@ describe Sequel::Model, "rcte_tree" do
 
   it "should eagerly load ancestors respecting association option :conditions" do
     @c.plugin :rcte_tree, :conditions => {:i => 1}
+    @ds = @c.dataset = @c.dataset.with_fetch([[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}, {:id=>9, :parent_id=>nil, :name=>'E'}],
+      [{:id=>2, :name=>'AA', :parent_id=>1, :x_root_x=>2},
+       {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
+       {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>2}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>1}]])
+    @ds.eager(:ancestors).all
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT id AS x_root_x, nodes.* FROM nodes WHERE ((id IN (1, 2)) AND (i = 1)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)']
+  end
+
+  it "should eagerly load ancestors respecting association option :conditions as an array that is not a conditions specifier" do
+    @c.plugin :rcte_tree, :conditions => [{:i => 1}]
     @ds = @c.dataset = @c.dataset.with_fetch([[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}, {:id=>9, :parent_id=>nil, :name=>'E'}],
       [{:id=>2, :name=>'AA', :parent_id=>1, :x_root_x=>2},
        {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
@@ -187,15 +262,36 @@ describe Sequel::Model, "rcte_tree" do
     @db.sqls.must_equal []
   end
   
+  it "should eagerly load descendants when eagerly loaded descendant doesn't match initial object" do
+    @c.plugin :rcte_tree
+    @ds = @c.dataset = @c.dataset.with_fetch([[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}],
+      [{:id=>6, :parent_id=>2, :name=>'C', :x_root_x=>2}, {:id=>9, :parent_id=>2, :name=>'E', :x_root_x=>2},
+       {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
+       {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>17}]])
+    os = @ds.eager(:descendants).all
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x, nodes.* FROM nodes WHERE (parent_id IN (2, 6, 7)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id)) SELECT * FROM t AS nodes']
+    os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
+    os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E'), @c.load(:id=>3, :name=>'00', :parent_id=>6)],
+      [@c.load(:id=>3, :name=>'00', :parent_id=>6)],
+      [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
+    os.map{|o| o.children}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
+    os.map{|o1| o1.children.map{|o2| o2.children}}.must_equal [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
+    os.map{|o1| o1.children.map{|o2| o2.parent}}.must_equal [[os[0], os[0]], [os[1]], [os[2]]]
+    os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.children}}}.must_equal [[[[]], []], [[]], [[[]]]]
+    os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.parent}}}.must_equal [[[os[0].children[0]], []], [[]], [[os[2].children[0]]]]
+    @db.sqls.must_equal []
+  end
+  
   it "should eagerly load descendants when giving options" do
-    @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :cte_name=>:cte, :children=>{:name=>:cs}, :descendants=>{:name=>:ds}
+    @c.plugin :rcte_tree, :primary_key=>:i, :key=>:pi, :key_alias=>:kal, :cte_name=>:cte, :children=>{:name=>:cs}, :descendants=>{:name=>:ds, :select=>[:i, :name, :pi]}
     @ds = @c.dataset = @c.dataset.with_fetch([[{:i=>2, :pi=>1, :name=>'AA'}, {:i=>6, :pi=>2, :name=>'C'}, {:i=>7, :pi=>1, :name=>'D'}],
       [{:i=>6, :pi=>2, :name=>'C', :kal=>2}, {:i=>9, :pi=>2, :name=>'E', :kal=>2},
        {:i=>3, :name=>'00', :pi=>6, :kal=>6}, {:i=>3, :name=>'00', :pi=>6, :kal=>2},
        {:i=>4, :name=>'?', :pi=>7, :kal=>7}, {:i=>5, :name=>'?', :pi=>4, :kal=>7}]])
     os = @ds.eager(:ds).all
     @db.sqls.must_equal ["SELECT * FROM nodes",
-      'WITH cte AS (SELECT pi AS kal, nodes.* FROM nodes WHERE (pi IN (2, 6, 7)) UNION ALL SELECT cte.kal, nodes.* FROM nodes INNER JOIN cte ON (cte.i = nodes.pi)) SELECT * FROM cte AS nodes']
+      'WITH cte AS (SELECT pi AS kal, nodes.* FROM nodes WHERE (pi IN (2, 6, 7)) UNION ALL SELECT cte.kal, nodes.* FROM nodes INNER JOIN cte ON (cte.i = nodes.pi)) SELECT i, name, pi, kal FROM cte AS nodes']
     os.must_equal [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D')]
     os.map{|o| o.ds}.must_equal [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E'), @c.load(:i=>3, :name=>'00', :pi=>6)],
       [@c.load(:i=>3, :name=>'00', :pi=>6)],
@@ -215,6 +311,26 @@ describe Sequel::Model, "rcte_tree" do
     os = @ds.eager(:descendants=>2).all
     @db.sqls.must_equal ["SELECT * FROM nodes",
       'WITH t AS (SELECT parent_id AS x_root_x, nodes.*, CAST(0 AS integer) AS x_level_x FROM nodes WHERE (parent_id IN (2, 6, 7)) UNION ALL SELECT t.x_root_x, nodes.*, (t.x_level_x + 1) AS x_level_x FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (t.x_level_x < 1)) SELECT * FROM t AS nodes']
+    os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
+    os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E'), @c.load(:id=>3, :name=>'00', :parent_id=>6)],
+      [@c.load(:id=>3, :name=>'00', :parent_id=>6)],
+      [@c.load(:id=>4, :name=>'?', :parent_id=>7), @c.load(:id=>5, :name=>'?', :parent_id=>4)]]
+    os.map{|o| o.associations[:children]}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
+    os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children]}}.must_equal [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
+    os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children].map{|o3| o3.associations[:children]}}}.must_equal [[[[]], []], [[]], [[nil]]]
+    @db.sqls.must_equal []
+  end
+  
+  it "should eagerly load descendants to a given level when CTEs require column aliases" do
+    @c.dataset = @c.dataset.with_extend{def recursive_cte_requires_column_aliases?; true end}
+    @c.plugin :rcte_tree
+    @ds = @c.dataset = @c.dataset.with_fetch([[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}],
+      [{:id=>6, :parent_id=>2, :name=>'C', :x_root_x=>2, :x_level_x=>0}, {:id=>9, :parent_id=>2, :name=>'E', :x_root_x=>2, :x_level_x=>0},
+       {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6, :x_level_x=>0}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2, :x_level_x=>1},
+       {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7, :x_level_x=>0}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7, :x_level_x=>1}]])
+    os = @ds.eager(:descendants=>2).all
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      "WITH t(x_root_x, id, name, parent_id, i, pi, x_level_x) AS (SELECT parent_id AS x_root_x, nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi, CAST(0 AS integer) AS x_level_x FROM nodes WHERE (parent_id IN (2, 6, 7)) UNION ALL SELECT t.x_root_x, nodes.id, nodes.name, nodes.parent_id, nodes.i, nodes.pi, (t.x_level_x + 1) AS x_level_x FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (t.x_level_x < 1)) SELECT * FROM t AS nodes"]
     os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
     os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E'), @c.load(:id=>3, :name=>'00', :parent_id=>6)],
       [@c.load(:id=>3, :name=>'00', :parent_id=>6)],
@@ -246,6 +362,17 @@ describe Sequel::Model, "rcte_tree" do
 
   it "should eagerly load descendants respecting association option :conditions" do
     @c.plugin :rcte_tree, :conditions => {:i => 1}
+    @ds = @c.dataset = @c.dataset.with_fetch([[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}],
+      [{:id=>6, :parent_id=>2, :name=>'C', :x_root_x=>2}, {:id=>9, :parent_id=>2, :name=>'E', :x_root_x=>2},
+       {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
+       {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7}]])
+    @ds.eager(:descendants).all
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x, nodes.* FROM nodes WHERE ((parent_id IN (2, 6, 7)) AND (i = 1)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)']
+  end
+
+  it "should eagerly load descendants respecting association option :conditions as an array that is not a conditions specifier" do
+    @c.plugin :rcte_tree, :conditions => [{:i => 1}]
     @ds = @c.dataset = @c.dataset.with_fetch([[{:id=>2, :parent_id=>1, :name=>'AA'}, {:id=>6, :parent_id=>2, :name=>'C'}, {:id=>7, :parent_id=>1, :name=>'D'}],
       [{:id=>6, :parent_id=>2, :name=>'C', :x_root_x=>2}, {:id=>9, :parent_id=>2, :name=>'E', :x_root_x=>2},
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},

@@ -49,6 +49,11 @@ describe "prepared_statements_safe plugin" do
     @db.sqls.must_equal ["UPDATE people SET name = 'foo', i = 3 WHERE (id = 1)"]
   end
 
+  it "should have save_changes return nil without saving if the object has not been modified" do
+    @p.save_changes.must_be_nil
+    @db.sqls.must_equal []
+  end
+
   it "should work with abstract classes" do
     c = Class.new(Sequel::Model)
     c.plugin :prepared_statements_safe
@@ -63,5 +68,12 @@ describe "prepared_statements_safe plugin" do
   it "should freeze prepared statement column defaults when freezing model class" do
     @c.freeze
     @c.prepared_statements_column_defaults.frozen?.must_equal true
+  end
+
+  it "should handle freezing a class without a dataset" do
+    c = Class.new(Sequel::Model)
+    c.plugin :prepared_statements_safe
+    c.freeze
+    c.prepared_statements_column_defaults.must_be_nil
   end
 end

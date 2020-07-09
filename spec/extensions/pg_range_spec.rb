@@ -74,6 +74,8 @@ describe "pg_range extension" do
     @db.literal(@R.new(nil, 2)).must_equal "'[,2]'"
     @db.literal(@R.new(1, nil)).must_equal "'[1,]'"
     @db.literal(@R.new(1, 2, :db_type=>'int8range')).must_equal "int8range(1,2,'[]')"
+    @db.literal(@R.new(1, 2, :exclude_begin=>true, :db_type=>'int8range')).must_equal "int8range(1,2,'(]')"
+    @db.literal(@R.new(1, 2, :exclude_end=>true, :db_type=>'int8range')).must_equal "int8range(1,2,'[)')"
     @db.literal(@R.new(nil, nil, :empty=>true)).must_equal "'empty'"
     @db.literal(@R.new(nil, nil, :empty=>true, :db_type=>'int8range')).must_equal "'empty'::int8range"
     @db.literal(@R.new("", 2)).must_equal "'[\"\",2]'"
@@ -131,9 +133,12 @@ describe "pg_range extension" do
   end
 
   it "should set :ruby_default schema entries if default value is recognized" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:oid=>3904, :name=>'t', :db_type=>'int4range', :default=>"'[1,5)'::int4range"}]
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'},
+      {:oid=>3904, :name=>'t', :db_type=>'int4range', :default=>"'[1,5)'::int4range"},
+      {:oid=>113904, :name=>'t', :db_type=>'int4range', :default=>"'[1,5)'::int4range"}]
     s = @db.schema(:items)
     s[1][1][:ruby_default].must_equal Sequel::Postgres::PGRange.new(1, 5, :exclude_end=>true, :db_type=>'int4range')
+    s[2][1][:ruby_default].must_be_nil
   end
 
   it "should work correctly in hashes" do
@@ -235,6 +240,10 @@ describe "pg_range extension" do
 
   it "should raise an error if using :subtype_oid option and a block argument" do
     proc{@db.register_range_type('fooirange', :subtype_oid=>16){}}.must_raise(Sequel::Error)
+  end
+
+  it "should raise an error if using :converter option and a block argument" do
+    proc{@db.register_range_type('fooirange', :converter=>proc{}){}}.must_raise(Sequel::Error)
   end
 
   it "should support registering custom types with :oid option" do

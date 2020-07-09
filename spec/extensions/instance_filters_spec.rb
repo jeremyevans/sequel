@@ -50,6 +50,34 @@ describe "instance_filters plugin" do
     @c.create.must_be_kind_of(@c)
   end 
   
+  it "should work when using the prepared_statements plugin when loading the prepared_statements plugin first" do
+    @c = Class.new(Sequel::Model(:people))
+    @c.columns :id, :name, :num
+    @c.plugin :prepared_statements
+    @c.plugin :instance_filters
+    @p = @c.load(:id=>1, :name=>'John', :num=>1)
+    DB.sqls
+
+    @p.update(:name=>'Bob')
+    DB.sqls.must_equal ["UPDATE people SET name = 'Bob' WHERE (id = 1)"]
+    @p.instance_filter(:name=>'Jim')
+    @p.instance_variable_set(:@this, @p.this.with_numrows(0))
+    proc{@p.update(:name=>'Joe')}.must_raise(Sequel::Plugins::InstanceFilters::Error)
+    DB.sqls.must_equal ["UPDATE people SET name = 'Joe' WHERE ((id = 1) AND (name = 'Jim'))"]
+
+    @p = @c.load(:id=>1, :name=>'John', :num=>1)
+    @p.instance_variable_set(:@this, @p.this.with_numrows(1))
+    @c.instance_variable_set(:@fast_instance_delete_sql, nil)
+    @p.destroy
+    DB.sqls.must_equal ["DELETE FROM people WHERE (id = 1)"]
+    @p.instance_filter(:name=>'Jim')
+    @p.instance_variable_set(:@this, @p.this.with_numrows(0))
+    proc{@p.destroy}.must_raise(Sequel::Plugins::InstanceFilters::Error)
+    DB.sqls.must_equal ["DELETE FROM people WHERE ((id = 1) AND (name = 'Jim'))"]
+    
+    @c.create.must_be_kind_of(@c)
+  end 
+  
   it "should apply all instance filters" do
     @p.instance_filter(:name=>'Jim')
     @p.instance_filter{num > 2}

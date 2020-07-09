@@ -253,7 +253,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     end
 
     it "should work with custom hashes" do
-      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>:StiTest3, 2=>'StiTest4'}, :key_map=>{StiTest2=>4, 'StiTest3'=>5, 'StiTest4'=>6}
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>:StiTest3, 2=>'StiTest4'}, :key_map=>{'StiTest2'=>7, StiTest2=>4, 'StiTest3'=>5, 'StiTest4'=>6}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
       StiTest2.dataset.row_proc.call(:kind=>0).must_be_instance_of(StiTest2)

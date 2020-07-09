@@ -16,6 +16,7 @@ describe "string_agg extension" do
     @sa2 = Sequel.string_agg(:c, '-')
     @sa3 = Sequel.string_agg(:c, '-').order(:o)
     @sa4 = Sequel.string_agg(:c).order(:o).distinct
+    @sa5 = Sequel.string_agg(:c).distinct.order(:o)
   end
 
   it "should use existing method" do
@@ -35,6 +36,7 @@ describe "string_agg extension" do
     ds.literal(@sa2).must_equal "string_agg(c, '-')"
     ds.literal(@sa3).must_equal "string_agg(c, '-' ORDER BY o)"
     ds.literal(@sa4).must_equal "string_agg(DISTINCT c, ',' ORDER BY o)"
+    ds.literal(@sa5).must_equal "string_agg(DISTINCT c, ',' ORDER BY o)"
   end
 
   it "should correctly literalize on SQLAnywhere" do
@@ -43,6 +45,7 @@ describe "string_agg extension" do
     ds.literal(@sa2).must_equal "list(c, '-')"
     ds.literal(@sa3).must_equal "list(c, '-' ORDER BY o)"
     ds.literal(@sa4).must_equal "list(DISTINCT c, ',' ORDER BY o)"
+    ds.literal(@sa5).must_equal "list(DISTINCT c, ',' ORDER BY o)"
   end
 
   it "should correctly literalize on MySQL, H2, HSQLDB" do
@@ -54,6 +57,7 @@ describe "string_agg extension" do
       ds.literal(@sa2).upcase.must_equal "GROUP_CONCAT(C SEPARATOR '-')"
       ds.literal(@sa3).upcase.must_equal "GROUP_CONCAT(C ORDER BY O SEPARATOR '-')"
       ds.literal(@sa4).upcase.must_equal "GROUP_CONCAT(DISTINCT C ORDER BY O SEPARATOR ',')"
+      ds.literal(@sa5).upcase.must_equal "GROUP_CONCAT(DISTINCT C ORDER BY O SEPARATOR ',')"
     end
   end
 
@@ -64,6 +68,7 @@ describe "string_agg extension" do
       ds.literal(@sa2).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY 1)"
       ds.literal(@sa3).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY o)"
       proc{ds.literal(@sa4)}.must_raise Sequel::Error
+      proc{ds.literal(@sa5)}.must_raise Sequel::Error
     end
   end
 

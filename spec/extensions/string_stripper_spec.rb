@@ -65,4 +65,15 @@ describe "Sequel::Plugins::StringStripper" do
     o.b.must_be_kind_of(Sequel::SQL::Blob)
     o.b.must_equal Sequel.blob(' name ')
   end
+
+  it "should handle classes without datasets" do
+    @db = Sequel.mock
+    @c = Class.new(Sequel::Model)
+    @c.plugin :string_stripper
+    @c.dataset = @db[:test]
+    @c.columns :name, :b
+    @o = @c.new
+    @o.name = ' name '
+    @o.name.must_equal 'name'
+  end
 end

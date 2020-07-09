@@ -8,6 +8,11 @@ describe String do
     "egg_and_hams".camelize(false).must_equal "eggAndHams"
     "post".camelize.must_equal "Post"
     "post".camelcase.must_equal "Post"
+
+    "foo/bar".camelize.must_equal "Foo::Bar"
+    "foo/".camelize.must_equal "Foo::"
+    "foo//bar".camelize.must_equal "Foo::/bar"
+    "foo///bar".camelize.must_equal "Foo::/::Bar"
   end
 
   it "#constantize should eval the string to get a constant" do

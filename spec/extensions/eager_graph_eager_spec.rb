@@ -97,4 +97,15 @@ describe "eager_graph_eager plugin" do
     a.map(&:parent).map(&:parent).must_equal [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>1, :parent_id=>nil)]
     @c.db.sqls.must_equal []
   end
+
+  it "should not affect eager_graph usage without eager_graph_eager" do
+    a = @c.eager_graph(:children).
+      with_fetch([{:id=>1, :parent_id=>nil, :children_id=>3, :children_parent_id=>1}, {:id=>2, :parent_id=>nil}]).
+      all
+    @c.db.sqls.must_equal ["SELECT items.id, items.parent_id, children.id AS children_id, children.parent_id AS children_parent_id FROM items LEFT OUTER JOIN items AS children ON (children.parent_id = items.id)"]
+
+    a.must_equal [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>2, :parent_id=>nil)]
+    a.map(&:children).must_equal [[@c.load(:id=>3, :parent_id=>1)], []]
+    @c.db.sqls.must_equal []
+  end
 end

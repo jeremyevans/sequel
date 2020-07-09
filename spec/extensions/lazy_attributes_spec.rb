@@ -124,10 +124,35 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.values}.must_equal [{:id=>1}, {:id=>2}]
     ms.map{|m| m.name}.must_equal %w'1 2'
     ms.map{|m| m.values}.must_equal [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-    sqls = @db.sqls
-    ['SELECT la.id, la.name FROM la WHERE (la.id IN (1, 2))',
-     'SELECT la.id, la.name FROM la WHERE (la.id IN (2, 1))'].must_include(sqls.pop)
-    sqls.must_equal ['SELECT la.id FROM la']
+    @db.sqls.must_equal ['SELECT la.id FROM la', 'SELECT la.id, la.name FROM la WHERE (la.id IN (1, 2))']
+  end
+
+  it "should not have eager loading modify values of rows if it returns unexpected values" do
+    @c.dataset = @c.dataset.with_fetch([{:id=>1}, {:id=>2}, {:id=>3}])
+    @db.sqls
+    ms = @c.all
+    @db.sqls.must_equal ['SELECT la.id FROM la']
+    ms.map{|m| m.values}.must_equal [{:id=>1}, {:id=>2}, {:id=>3}]
+    ms[2].name = 'foo'
+
+    @c.dataset = @c.dataset.with_fetch([{:id=>1, :name=>'b'}, {:id=>2, :name=>'ba'}, {:id=>3, :name=>'bar'}, {:id=>4, :name=>'bar2'}])
+    @db.sqls
+    ms.map{|m| m.name}.must_equal %w'b ba foo'
+    ms.map{|m| m.values}.must_equal [{:id=>1, :name=>'b'}, {:id=>2, :name=>'ba'}, {:id=>3, :name=>'foo'}]
+    @db.sqls.must_equal ['SELECT la.id, la.name FROM la WHERE (la.id IN (1, 2))']
+  end
+
+  it "should raise Error if trying to load a lazy attribute for a model without a primary key" do
+    @c.no_primary_key
+    m = @c.first
+    @db.sqls.must_equal ["SELECT la.id FROM la LIMIT 1"]
+    m.values.must_equal(:id=>1)
+    proc{m.name}.must_raise Sequel::Error
+
+    ms = @c.all
+    @db.sqls.must_equal [ "SELECT la.id FROM la"]
+    proc{ms[0].name}.must_raise Sequel::Error
+    @db.sqls.must_equal []
   end
 
   it "should not eagerly load the attribute if model instance is frozen, and deal with other frozen instances if not frozen" do
@@ -181,3 +206,66 @@ describe "Sequel::Plugins::LazyAttributes" do
     proc{@c.lazy_attributes :name}.must_raise RuntimeError, TypeError
   end
 end
+
+describe "Sequel::Plugins::LazyAttributes with composite keys" do
+  before do
+    @db = Sequel.mock
+    def @db.supports_schema_parsing?() true end
+    def @db.schema(*a) [[:id, {:type=>:integer}], [:id2, {:type=>:integer}], [:name,{:type=>:string}]] end
+    class ::LazyAttributesModel < Sequel::Model(@db[:la])
+      plugin :lazy_attributes
+      set_columns([:id, :id2, :name])
+      def self.columns; [:id, :id2, :name] end
+      lazy_attributes :name
+      def self.columns; [:id, :id2] end
+      set_primary_key [:id, :id2]
+      set_dataset dataset.with_fetch(proc do |sql|
+        if sql !~ /WHERE/
+          if sql =~ /name/
+            [{:id=>1, :id2=>2, :name=>'1'}, {:id=>1, :id2=>3, :name=>'2'}]
+          else
+            [{:id=>1, :id2=>2}, {:id=>1, :id2=>3}]
+          end
+        else
+          case sql
+          when /\((?:la.)?id, (?:la.)?id2\) IN \(((?:\(\d, \d\)(?:, )?)+)/
+            $1.gsub(/\D/, '|').split('|').delete_if(&:empty?).each_slice(2)
+          when /id = (\d)\) AND \(id2 = (\d)/
+            [[$1, $2]]
+          when /id = (\d), id2 = (\d)/
+            [[$1, $2]]
+          end.map do |x, y|
+            if sql =~ /SELECT (la.)?name FROM/
+              {:name=>"#{x}-#{y}"}
+            else
+              {:id=>x.to_i, :id2=>y.to_i, :name=>"#{x}-#{y}"}
+            end
+          end
+        end
+      end)
+    end
+    @c = ::LazyAttributesModel
+    @ds = LazyAttributesModel.dataset
+    @db.sqls
+  end
+  after do
+    Object.send(:remove_const, :LazyAttributesModel)
+  end
+
+  it "should lazily load the attribute for a single model object" do
+    m = @c.first
+    m.values.must_equal(:id=>1, :id2=>2)
+    m.name.must_equal '1-2'
+    m.values.must_equal(:id=>1, :id2=>2, :name=>'1-2')
+    @db.sqls.must_equal ["SELECT la.id, la.id2 FROM la LIMIT 1", "SELECT la.name FROM la WHERE ((id = 1) AND (id2 = 2)) LIMIT 1"]
+  end
+
+  it "should eagerly load the attribute for all model objects reteived with it" do
+    ms = @c.all
+    ms.map{|m| m.values}.must_equal [{:id=>1, :id2=>2}, {:id=>1, :id2=>3}]
+    @db.sqls.must_equal ["SELECT la.id, la.id2 FROM la"]
+    ms.map{|m| m.name}.must_equal %w'1-2 1-3'
+    ms.map{|m| m.values}.must_equal [{:id=>1, :id2=>2, :name=>'1-2'}, {:id=>1, :id2=>3, :name=>'1-3'}]
+    @db.sqls.must_equal ["SELECT la.id, la.id2, la.name FROM la WHERE ((la.id, la.id2) IN ((1, 2), (1, 3)))"]
+  end
+end 

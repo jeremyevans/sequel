@@ -9,6 +9,9 @@ describe Sequel::Model, ".finder" do
       def foo(a, b)
         where(:bar=>a).order(b)
       end
+      def foo_bar(a, b=1)
+        where(:bar=>a).order(b)
+      end
     end
     @c.plugin :finder
     @o = @c.load(@h)
@@ -20,6 +23,18 @@ describe Sequel::Model, ".finder" do
     @c.first_foo(1, 2).must_equal @o
     @c.first_foo(3, 4).must_equal @o
     @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+  end
+
+  it "should create a method that calls the method given and returns the first instance when method has negative arity and only required arguments are given" do
+    @c.finder :foo_bar
+    @c.first_foo_bar(2).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 2) ORDER BY 1 LIMIT 1"]
+  end
+
+  it "should not allow calling a finder and providing values for the optional arguments" do
+    @c.finder :foo_bar
+    proc{@c.first_foo_bar(3, 4)}.must_raise Sequel::Error
+    @db.sqls.must_equal []
   end
 
   it "should work correctly when subclassing" do
@@ -52,6 +67,14 @@ describe Sequel::Model, ".finder" do
 
   it "should raise an error if two option hashes are provided" do
     proc{@c.finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
+  end
+
+  it "should raise an error if block is provide without a name" do
+    proc{@c.finder{|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
+  end
+
+  it "should raise an error if invalid :type option is used" do
+    proc{@c.finder(:name=>:foo_foo, :type=>:foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
   end
 
   it "should support :type option" do

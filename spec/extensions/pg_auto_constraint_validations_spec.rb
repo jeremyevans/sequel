@@ -17,7 +17,7 @@ describe "pg_auto_constraint_validations plugin" do
     @set_error = lambda{|ec, ei| @db.fetch = @db.autoid = @db.numrows = ec; info.merge!(ei)}
     @db.define_singleton_method(:error_info){|e| info}
     @metadata_results = [
-     [{:constraint=>'items_i_check', :column=>'i', :definition=>'CHECK i'}, {:constraint=>'items_i_id_check', :column=>'i', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_id_check', :column=>'id', :definition=>'CHECK i + id < 20'}],
+     [{:constraint=>'items_i_check', :column=>'i', :definition=>'CHECK i'}, {:constraint=>'items_i_id_check', :column=>'i', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_id_check', :column=>'id', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_foo_check', :column=>nil, :definition=>'CHECK foo() < 20'}],
      [{:name=>'items_i_uidx', :unique=>true, :column=>'i', :deferrable=>false}, {:name=>'items_i2_idx', :unique=>false, :column=>'i', :deferrable=>false}],
      [{:name=>'items_i_fk', :column=>'i', :on_update=>'a', :on_delete=>'a', :table=>'items2', :refcolumn=>'id', :schema=>'public'}],
      [{:name=>'items2_i_fk', :column=>'id', :on_update=>'a', :on_delete=>'a', :table=>'items2', :refcolumn=>'i', :schema=>'public'}],
@@ -121,6 +121,19 @@ describe "pg_auto_constraint_validations plugin" do
     o = @c.new(:i=>12)
     @set_error[Sequel::NotNullConstraintViolation, {}]
     proc{o.save}.must_raise Sequel::NotNullConstraintViolation
+    @set_error[Sequel::CheckConstraintViolation, {}]
+    proc{o.save}.must_raise Sequel::CheckConstraintViolation
+    @set_error[Sequel::UniqueConstraintViolation, {}]
+    proc{o.save}.must_raise Sequel::UniqueConstraintViolation
+
+    @set_error[Sequel::ForeignKeyConstraintViolation, {}]
+    proc{o.save}.must_raise Sequel::ForeignKeyConstraintViolation
+    @set_error[Sequel::ForeignKeyConstraintViolation, :constraint=>'items_i_fk', :message_primary=>'foo']
+    proc{o.save}.must_raise Sequel::ForeignKeyConstraintViolation
+    @set_error[Sequel::ForeignKeyConstraintViolation, :constraint=>'items_i_fk', :message_primary=>'update or']
+    proc{o.save}.must_raise Sequel::ForeignKeyConstraintViolation
+    @set_error[Sequel::ForeignKeyConstraintViolation, :constraint=>'items_x_fk', :message_primary=>'insert or']
+    proc{o.save}.must_raise Sequel::ForeignKeyConstraintViolation
   end
 
   it "should reraise original exception if there is an error" do
@@ -205,5 +218,11 @@ describe "pg_auto_constraint_validations plugin" do
 
   it "should raise error if attempting to dump cached metadata when not using caching" do
     proc{@c.dump_pg_auto_constraint_validations_cache}.must_raise Sequel::Error
+  end
+
+  it "should allow loading into models without a dataset" do
+    c = Class.new(Sequel::Model)
+    c.plugin :pg_auto_constraint_validations
+    c.pg_auto_constraint_validations.must_be_nil
   end
 end

@@ -67,6 +67,16 @@ describe "column_conflicts plugin" do
     o.object_id.wont_equal 3
   end
 
+  it "should work correctly if loaded before dataset is set" do
+    @c = Class.new(Sequel::Model)
+    @c.plugin :column_conflicts
+    @c.columns :model, :use_transactions, :foo
+    @c.dataset = @db[:test]
+    @o = @c.load(:model=>1, :use_transactions=>2, :foo=>4)
+    @o.set_fields({:use_transactions=>3}, [:use_transactions])
+    @o.get_column_value(:use_transactions).must_equal 3
+  end
+
   it "should freeze column conflict information when freezing model class" do
     @c.freeze
     @c.get_column_conflicts.frozen?.must_equal true

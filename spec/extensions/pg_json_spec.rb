@@ -19,6 +19,16 @@ describe "pg_json extension" do
     @db.extension(:pg_array, :pg_json)
   end
 
+  it "should only add array conversion procs if pg_array is loaded" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extension(:pg_json, :pg_array)
+    cp = @db.conversion_procs
+    cp[114].call("{}").must_equal @hc.new({})
+    cp[3802].call("{}").must_equal @bhc.new({})
+    cp[199].must_be_nil
+    cp[3807].must_be_nil
+  end
+
   it "should set up conversion procs correctly" do
     cp = @db.conversion_procs
     cp[114].call("{}").must_equal @hc.new({})
@@ -101,7 +111,7 @@ describe "pg_json extension" do
       proc{cp.call('a')}.must_raise(Sequel::InvalidValue)
 
       begin
-        Sequel.instance_eval do
+        Sequel.singleton_class.class_eval do
           alias pj parse_json
           def parse_json(v)
             {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new, '[one]'=>[1]}.fetch(v){pj(v)}
@@ -115,9 +125,47 @@ describe "pg_json extension" do
         proc{cp.call('o')}.must_raise(Sequel::InvalidValue)
         cp.call('one').must_equal 1
       ensure
-        Sequel.instance_eval do
+        Sequel.singleton_class.class_eval do
           alias parse_json pj
+          remove_method(:pj)
         end
+      end
+    end
+  end
+
+  it "should handle case where JSON parsing in conversion procs raises Sequel::InvalidValue for non-String" do
+    begin
+      Sequel.singleton_class.class_eval do
+        alias parse_json_old parse_json
+        define_method(:parse_json) do |json|
+          raise Sequel::InvalidValue
+        end
+      end
+      cp = @db.conversion_procs
+      proc{cp[114].call(1)}.must_raise Sequel::InvalidValue
+      proc{cp[3802].call(1)}.must_raise Sequel::InvalidValue
+    ensure
+      Sequel.singleton_class.class_eval do
+        alias parse_json parse_json_old
+        remove_method(:parse_json_old)
+      end
+    end
+  end
+
+  deprecated "should handle case where deprecated JSON parsing methods raise Sequel::InvalidValue for non-String" do
+    begin
+      Sequel.singleton_class.class_eval do
+        alias parse_json_old parse_json
+        define_method(:parse_json) do |json|
+          raise Sequel::InvalidValue
+        end
+      end
+      proc{@m.db_parse_json(1)}.must_raise Sequel::InvalidValue
+      proc{@m.db_parse_jsonb(1)}.must_raise Sequel::InvalidValue
+    ensure
+      Sequel.singleton_class.class_eval do
+        alias parse_json parse_json_old
+        remove_method(:parse_json_old)
       end
     end
   end

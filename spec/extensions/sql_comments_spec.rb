@@ -25,6 +25,14 @@ describe "sql_comments extension" do
     ds.where(:id=>ds).select_sql.must_equal "SELECT * FROM t WHERE (id IN (SELECT * FROM t -- Some Comment Here\n)) -- Some Comment Here\n"
   end
 
+  it "should allow overriding comments" do
+    ds = @ds.comment("Foo").comment("Some\nComment\r\n Here").select_sql.must_equal "SELECT * FROM t -- Some Comment Here\n"
+  end
+
+  it "should allow disabling comments by overridding with nil" do
+    ds = @ds.comment("Foo").comment(nil).select_sql.must_equal "SELECT * FROM t"
+  end
+
   it "should handle frozen SQL strings" do
     @ds = Sequel.mock[:t].with_extend{def select_sql; super.freeze; end}.extension(:sql_comments)
     ds = @ds.comment("Some\nComment\r\n Here")

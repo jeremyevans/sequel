@@ -30,6 +30,20 @@ describe "pg_row extension" do
     @db.literal(as).must_equal "ARRAY[ROW('a', 'b', 'c'),ROW('d', 'e', 'f')]::record[]"
   end
 
+  it "should not parse arrays of record objects as arrays of arrays if pg_array extension not loaded" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @db.extension(:pg_row, :pg_array)
+    @db.conversion_procs[2287].must_be_nil
+    a = @db.conversion_procs[2249].call("(a,b,c)")
+    a.class.must_equal(@m::ArrayRow)
+    a.to_a.must_be_kind_of(Array)
+    a[0].must_equal 'a'
+    a.must_equal %w'a b c'
+    a.db_type.must_be_nil
+    @db.literal(a).must_equal "ROW('a', 'b', 'c')"
+  end
+
   it "should be able to register custom parsing of row types as array-like objects" do
     klass = @m::ArrayRow.subclass(:foo)
     parser = @m::Parser.new(:converter=>klass)
@@ -53,6 +67,19 @@ describe "pg_row extension" do
     a.db_type.must_equal :foo
     a.columns.must_equal [:a, :b, :c]
     @db.literal(a).must_equal "ROW('a', 'b', 'c')::foo"
+  end
+
+  it "should be able to register custom parsing of row types as hash-like objects without a database type" do
+    klass = @m::HashRow.subclass(nil, [:a, :b, :c])
+    parser = @m::Parser.new(:converter=>klass, :columns=>[:a, :b, :c])
+    a = parser.call("(a,b,c)")
+    a.class.must_equal(klass)
+    a.to_hash.must_be_kind_of(Hash)
+    a[:a].must_equal 'a'
+    a.must_equal(:a=>'a', :b=>'b', :c=>'c')
+    a.db_type.must_be_nil
+    a.columns.must_equal [:a, :b, :c]
+    @db.literal(a).must_equal "ROW('a', 'b', 'c')"
   end
 
   it "should raise an error if attempting to literalize a HashRow without column information" do
@@ -288,6 +315,18 @@ describe "pg_row extension" do
     p3.call('{"(1,b)"}').must_equal [{:bar=>1, :baz=>'bb'}]
     @db.literal(p3.call('{"(1,b)"}')).must_equal "ARRAY[ROW(1, 'bb')::foo]::foo[]"
     @db.typecast_value(:foo_array, [{:bar=>'1', :baz=>'b'}]).must_equal [{:bar=>1, :baz=>'bb'}]
+  end
+
+  it "should not register array type for row type if type has an array oid and pg_array extension not loaded" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @db.extension(:pg_row)
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
+    @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
+    @db.register_row_type(:foo, :typecaster=>proc{|h| {:bar=>(h[:bar]||0).to_i, :baz=>(h[:baz] || 'a')*2}})
+    @db.conversion_procs[1].call("(1,b)").must_equal(:bar=>1, :baz=>'bb')
+    @db.conversion_procs[3].must_be_nil
   end
 
   it "should allow creating unregisted row types via Database#row_type" do

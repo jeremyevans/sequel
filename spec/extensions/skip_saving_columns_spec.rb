@@ -26,6 +26,29 @@ describe "Skip Saving Generated Columns" do
     @db.sqls.must_equal ["UPDATE t SET user_id = 1, name = 'a' WHERE (id = 2)"]
   end
 
+  it "should not include generated columns by default when saving if loaded into class without dataset" do
+    @db = Sequel.mock
+    @db.numrows = 1
+    @db.autoid = 1
+    def @db.schema(*)
+      {
+        :id=>{:type=>:integer},
+        :user_id=>{:type=>:integer},
+        :name=>{:type=>:string},
+        :search=>{:type=>:string, :generated=>true}
+      }
+    end
+    @c = Class.new(Sequel::Model)
+    @c.plugin :skip_saving_columns
+    def @c.db_schema; @db.schema; end
+    @c.dataset = @db[:t]
+    @c.columns :id, :user_id, :name, :search
+    @o = @c.load(id: 2, user_id: 1, name: 'a', search: 's')
+    @db.sqls
+    @o.save
+    @db.sqls.must_equal ["UPDATE t SET user_id = 1, name = 'a' WHERE (id = 2)"]
+  end
+
   it "should allow overriding which columns to skip" do
     @c.skip_saving_columns = @c.skip_saving_columns + [:name]
     @o.save

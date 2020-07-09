@@ -37,6 +37,19 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     sqls.must_equal ["SELECT * FROM a LIMIT 1", "SELECT * FROM a"]
   end
 
+  it "should handle updating the primary key field with another field when using composite keys" do
+    @c = Class.new(Sequel::Model(:a))
+    @c.plugin :update_primary_key
+    @c.columns :a, :b, :c
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3, :c=>5}], [{:a=>2, :b=>4, :c=>6}]])
+    @c.set_primary_key [:a, :b]
+    @c.unrestrict_primary_key
+    DB.reset
+    @c.first.update(:a=>2, :b=>4, :c=>6)
+    @c.all.must_equal [@c.load(:a=>2, :b=>4, :c=>6)]
+    DB.sqls.must_equal ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2, b = 4, c = 6 WHERE ((a = 1) AND (b = 3))", "SELECT * FROM a"]
+  end
+
   it "should handle updating just the primary key field when saving changes" do
     @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>3}], [{:a=>2, :b=>3}], [{:a=>3, :b=>3}]])
     @c.first.update(:a=>2)
@@ -84,6 +97,41 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
 
     @c.create(:a=>3)
     DB.sqls.must_equal ["INSERT INTO a (a) VALUES (3)", "SELECT * FROM a WHERE a = 3"]
+  end
+
+  it "should work correctly when loading the prepared_statements plugin first" do
+    @c = Class.new(Sequel::Model(:a))
+    @c.plugin :prepared_statements
+    @c.plugin :update_primary_key
+    @c.columns :a, :b
+    def @c.set_dataset(*)
+      super
+      set_primary_key :a
+    end
+    @c.set_primary_key :a
+    @c.unrestrict_primary_key
+    @ds = @c.dataset
+    DB.reset
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>4}], [{:a=>3}]])
+    o = @c.first
+    o.update(:a=>2, :b=>4)
+    @c.all.must_equal [@c.load(:a=>2, :b=>4)]
+    sqls = DB.sqls
+    ["UPDATE a SET a = 2, b = 4 WHERE (a = 1)", "UPDATE a SET b = 4, a = 2 WHERE (a = 1)"].must_include(sqls.slice!(1))
+    sqls.must_equal ["SELECT * FROM a LIMIT 1", "SELECT * FROM a"]
+
+    @c.create(:a=>3)
+    DB.sqls.must_equal ["INSERT INTO a (a) VALUES (3)", "SELECT * FROM a WHERE a = 3"]
+  end
+
+  it "should clear the associations cache of non-many_to_one associations when changing the primary key" do
+    @c.one_to_many :cs, :class=>@c
+    @c.many_to_one :c, :class=>@c
+    o = @c.new(:a=>1)
+    o.associations[:cs] = @c.new
+    o.associations[:c] = o2 = @c.new
+    o.a = 2
+    o.associations.must_equal(:c=>o2)
   end
 
   it "should clear the associations cache of non-many_to_one associations when changing the primary key" do

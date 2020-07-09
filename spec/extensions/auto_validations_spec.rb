@@ -158,6 +158,18 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal true
   end
 
+  it "should default to skipping all auto validations if no arguments given to instance method" do
+    @c = Class.new(@c)
+    @m = @c.new
+    @m.skip_auto_validations do
+      @m.valid?.must_equal true
+      @m.set(:d=>'/', :num=>'a', :name=>'1')
+      @m.valid?.must_equal true
+      @m.set(:name=>'a'*51)
+      @m.valid?.must_equal true
+    end
+  end
+
   it "should work correctly in subclasses" do
     @c = Class.new(@c)
     @m = @c.new

@@ -254,6 +254,28 @@ describe "forbid_lazy_load plugin" do
     @o1.oto_t(:reload=>true).must_equal @o2
   end
 
+  it "should work correctly if loading an associated object for a class that does not use the forbid_lazy_load plugin" do
+    c = Class.new(Sequel::Model)
+    c.set_dataset Sequel::Model.db[:ts].with_fetch({:id=>2, :t_id=>3})
+    @c.one_to_one :otoo_t, :class=>c, :key=>:t_id
+    @o1.otoo_t.must_equal c.load(@o2.values)
+  end
+
+  it "should not allow lazy load for associations to static cache models not using forbid_lazy_load plugin" do
+    c = Class.new(Sequel::Model)
+    c.set_dataset Sequel::Model.db[:ts].with_fetch({:id=>2, :t_id=>3})
+    @c.one_to_many :ts, :class=>c, :key=>:t_id
+    @c.plugin :static_cache
+    @c.finalize_associations
+    @o1.forbid_lazy_load
+
+    @o1.t.must_equal @o2
+    proc{@o1.ts}.must_raise Sequel::Plugins::ForbidLazyLoad::Error
+    @o1.mtm_ts.must_equal [@o2]
+    @o1.otoo_t.must_equal @o2
+    @o1.oto_t.must_equal @o2
+  end
+
   it "should allow lazy load when forbidden when using :forbid_lazy_load false association option" do
     @o1.forbid_lazy_load
     @o1.t(:forbid_lazy_load=>false).must_equal @o2

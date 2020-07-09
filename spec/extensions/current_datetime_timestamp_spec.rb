@@ -24,4 +24,11 @@ describe "current_datetime_timestamp extension" do
     Sequel.datetime_class = DateTime
     @ds.literal(@ds.current_datetime).must_equal 'CURRENT_TIMESTAMP'
   end
+
+
+  it "should have other Date/Time values literalized normally" do
+    t = Time.at(1594239778).getutc
+    @ds.literal(t).must_equal "'2020-07-08 20:22:58.000000'"
+    @ds.literal(t.to_datetime).must_equal "'2020-07-08 20:22:58.000000'"
+  end
 end

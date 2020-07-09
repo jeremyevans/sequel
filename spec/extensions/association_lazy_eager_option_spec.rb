@@ -66,4 +66,12 @@ describe "association_lazy_eager_option plugin" do
     @o1.oto_t(:eager=>:t).must_equal @o2
     @db.sqls.must_equal []
   end
+
+  it "should work normally if the :eager option is not passed to the association method" do
+    @db.fetch = {:id=>2, :t_id=>3}
+    o = @o1.mtm_ts{|ds| ds}
+    @db.sqls.must_equal ["SELECT ts.* FROM ts INNER JOIN ts ON (ts.t_id = ts.id) WHERE (ts.id = 2)"]
+    o.must_equal [@o2]
+    o.first.associations.must_be_empty
+  end
 end

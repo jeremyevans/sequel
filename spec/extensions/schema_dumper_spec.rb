@@ -47,6 +47,17 @@ describe "Sequel::Schema::CreateTableGenerator dump methods" do
     g.columns.must_equal g2.columns
   end
 
+  it "should respect :keep_order option to primary_key with primary key type" do
+    g = @g.new(@d) do
+      Integer :a
+      primary_key :c, :keep_order=>true, :type=>:Bignum
+    end
+    g2 = @g.new(@d) do
+      instance_eval(g.dump_columns, __FILE__, __LINE__)
+    end
+    g.columns.must_equal g2.columns
+  end
+
   it "should allow dumping indexes as separate add_index and drop_index methods" do
     g = @g.new(@d) do
       index :a
@@ -211,13 +222,20 @@ OUTPUT
     @d.dump_table_schema(:t1).must_equal "create_table(:t1) do\n  Integer :c1\n  Integer :c2\n  \n  foreign_key [:c1, :c2], :t2, :key=>[:c3, :c4]\nend"
   end
 
+  it "should use a composite foreign_key calls with options" do
+    def @d.schema(*s) [[:c1, {:db_type=>'integer'}], [:c2, {:db_type=>'integer'}]] end
+    def @d.supports_foreign_key_parsing?; true end
+    def @d.foreign_key_list(*s) [{:columns=>[:c1, :c2], :table=>:t2, :key=>[:c3, :c4], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>true}] end
+    @d.dump_table_schema(:t1).must_equal "create_table(:t1) do\n  Integer :c1\n  Integer :c2\n  \n  foreign_key [:c1, :c2], :t2, :key=>[:c3, :c4], :deferrable=>true\nend"
+  end
+
   it "should include index information if available" do
     def @d.supports_index_parsing?; true end
     def @d.indexes(t)
       {:i1=>{:columns=>[:c1], :unique=>false},
-       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
+       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true, :deferrable=>true}}
     end
-    @d.dump_table_schema(:t1).must_equal "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true\nend"
+    @d.dump_table_schema(:t1).must_equal "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true, :deferrable=>true\nend"
   end
 
   it "should support dumping the whole database as a migration with a :schema option" do
@@ -820,13 +838,15 @@ END_MIG
   it "should convert mysql types to ruby types" do
     def @d.schema(t, *o)
       i = 0
-      ['float unsigned', 'double(15,2)', 'double(7,1) unsigned'].map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
+      ['float unsigned', 'double(15,2)', 'double(7,1) unsigned', 'tinyint', 'char(3)'].map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true, :type=>:boolean, :size=>10}]}
     end
     @d.dump_table_schema(:x).must_equal((<<END_MIG).chomp)
 create_table(:x) do
   Float :c1
   Float :c2
   Float :c3
+  TrueClass :c4
+  String :c5, :size=>3, :fixed=>true
   
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c1), 0)
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c3), 0)

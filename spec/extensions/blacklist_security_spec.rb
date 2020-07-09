@@ -71,8 +71,67 @@ describe Sequel::Model, ".restricted_columns " do
     DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
   end
 
+  it "should not set restricted primary keys when restricting columns unless primary key setting is restricted" do
+    @c.set_restricted_columns :z
+    i = @c.new(:id => 10, :x => 1, :y => 2, :z => 3)
+    i.values.must_equal(:x => 1, :y => 2)
+    i.set(:id => 10, :x => 4, :y => 5, :z => 6)
+    i.values.must_equal(:x => 4, :y => 5)
+    i.set_except({:id => 10, :x => 4, :y => 5, :z => 6}, [:z])
+    i.values.must_equal(:x => 4, :y => 5)
+
+    @c.dataset = @c.dataset.with_fetch(:x => 7)
+    i = @c.new
+    i.update(:id => 10, :x => 7, :z => 9)
+    i.values.must_equal(:x => 7)
+    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
+  end
+
+  it "should set unrestricted primary keys when restricting columns if primary key setting is unrestricted" do
+    @c.unrestrict_primary_key
+    @c.set_restricted_columns :z
+    i = @c.new(:id => 10, :x => 1, :y => 2, :z => 3)
+    i.values.must_equal(:id => 10, :x => 1, :y => 2)
+    i.set(:id => 10, :x => 4, :y => 5, :z => 6)
+    i.values.must_equal(:id => 10, :x => 4, :y => 5)
+    i.set_except({:id => 10, :x => 4, :y => 5, :z => 6}, [:z])
+    i.values.must_equal(:id => 10, :x => 4, :y => 5)
+
+    @c.dataset = @c.dataset.with_fetch(:id => 10, :x => 7)
+    i = @c.new
+    i.update(:id => 10, :x => 7, :z => 9)
+    i.values.must_equal(:id => 10, :x => 7)
+    DB.sqls.must_equal ["INSERT INTO blahblah (id, x) VALUES (10, 7)", "SELECT * FROM blahblah WHERE id = 10"]
+  end
+
   it "should have allowed take precedence over restricted" do
     @c.plugin :whitelist_security
+    @c.set_allowed_columns :x, :y
+    @c.set_restricted_columns :y, :z
+    i = @c.new(:x => 1, :y => 2, :z => 3)
+    i.values.must_equal(:x => 1, :y => 2)
+    i.set(:x => 4, :y => 5, :z => 6)
+    i.values.must_equal(:x => 4, :y => 5)
+
+    @c.dataset = @c.dataset.with_fetch(:y => 7)
+    i = @c.new
+    i.update(:y => 7, :z => 9)
+    i.values.must_equal(:y => 7)
+    DB.sqls.must_equal ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
+  end
+
+  it "should have allowed take precedence over restricted when whitelist_security plugin is added first" do
+    @c = Class.new(Sequel::Model(:blahblah))
+    @c.class_eval do
+      plugin :whitelist_security
+      plugin :blacklist_security
+      set_primary_key :id
+      columns :x, :y, :z, :id
+      set_restricted_columns :y
+      self.strict_param_setting = false
+    end
+    @o1 = @c.new
+    DB.reset
     @c.set_allowed_columns :x, :y
     @c.set_restricted_columns :y, :z
     i = @c.new(:x => 1, :y => 2, :z => 3)

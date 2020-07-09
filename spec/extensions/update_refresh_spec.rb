@@ -50,6 +50,19 @@ describe "Sequel::Plugins::UpdateRefresh" do
     o.name.must_equal 'b'
   end
 
+  it "should raise error without refreshing when updating when returning specific columns modifies multiple rows" do
+    @db.fetch = [{:id=>1, :name=>'b'}, {:id=>1, :name=>'c'}]
+    @db.extend_datasets{def supports_returning?(x) true end; def update_sql(*); sql = super; update_returning_sql(sql); sql end}
+    @c.plugin :insert_returning_select
+    @c.dataset = @db[:test].select(:id, :name)
+    @db.sqls
+    o = @c.load(:id=>1, :name=>'a')
+    o.instance_variable_set(:@this, o.this.returning(:id, :name))
+    proc{o.save}.must_raise Sequel::NoExistingObject
+    o.values.must_equal(:id=>1, :name=>'a')
+    @db.sqls.must_equal ["UPDATE test SET name = 'a' WHERE (id = 1) RETURNING id, name"]
+  end
+
   it "should freeze update refresh columns when freezing model class" do
     @db.extend_datasets{def supports_returning?(x) true end; def update_sql(*); sql = super; update_returning_sql(sql); sql end}
     @c.plugin :update_refresh, :columns => [ :a ]

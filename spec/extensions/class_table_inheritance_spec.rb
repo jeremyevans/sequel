@@ -97,6 +97,15 @@ describe "class_table_inheritance plugin" do
     Staff.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)) AS employees'
     Intern.dataset.sql.must_equal 'SELECT * FROM employees WHERE (employees.kind IN (\'Intern\'))'
   end
+
+  it "should use a empty empty string for class name for anonymous subclasses" do
+    Class.new(Employee).dataset.sql.must_equal "SELECT * FROM employees WHERE (employees.kind IN (''))"
+    Class.new(Manager).dataset.sql.must_equal "SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (employees.kind IN (''))) AS employees"
+    Class.new(Executive).dataset.sql.must_equal "SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (employees.kind IN (''))) AS employees"
+    Class.new(Ceo).dataset.sql.must_equal "SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (employees.kind IN (''))) AS employees"
+    Class.new(Staff).dataset.sql.must_equal "SELECT * FROM (SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id) WHERE (employees.kind IN (''))) AS employees"
+    Class.new(Intern).dataset.sql.must_equal "SELECT * FROM (SELECT * FROM employees WHERE (employees.kind IN (''))) AS employees"
+  end
   
   it "should return rows with the correct class based on the polymorphic_key value" do
     @ds.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}, {:kind=>'Intern'}]).all.collect{|x| x.class}.must_equal [Employee, Manager, Executive, Ceo, Staff, Intern]
@@ -214,6 +223,21 @@ describe "class_table_inheritance plugin" do
   it "should set the type column field even when not validating" do
     Employee.new.save(:validate=>false)
     @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]
+  end
+
+  it "should handle type field matching current class when saving" do
+    Employee.create(:kind=>'Employee')
+    @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]
+  end
+
+  it "should convert type field matching subclass using different table when saving" do
+    Employee.create(:kind=>'Manager')
+    @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]
+  end
+
+  it "should keep type field matching subclass using same table when saving" do
+    Employee.create(:kind=>'Intern')
+    @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Intern')"]
   end
 
   it "should allow specifying a map of names to tables to override implicit mapping" do
@@ -350,6 +374,12 @@ describe "class_table_inheritance plugin" do
   it "should update the correct rows in all tables when updating" do
     Ceo.load(:id=>2).update(:num_managers=>3, :num_staff=>2, :name=>'E')
     @db.sqls.must_equal ["UPDATE employees SET name = 'E' WHERE (id = 2)", "UPDATE managers SET num_staff = 2 WHERE (id = 2)", "UPDATE executives SET num_managers = 3 WHERE (id = 2)"]
+  end
+
+  it "should update only tables with changes when updating" do
+    obj = Ceo.load(:id=>2, :num_managers=>3, :num_staff=>2, :name=>'E')
+    obj.update(:num_staff=>3)
+    @db.sqls.must_equal ["UPDATE managers SET num_staff = 3 WHERE (id = 2)"]
   end
 
   it "should raise error if one of the updates does not update a single row" do

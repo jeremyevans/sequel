@@ -96,12 +96,28 @@ describe "constraint_validations extension" do
     sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
+  it "should allow adding constraint validations using generator directly" do
+    gen = @db.create_table_generator
+    gen.String :name
+    gen.validate{presence :name}
+    @db.create_table(:foo, :generator=>gen)
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+  end
+
   it "should allow adding constraint validations via alter_table validate" do
     @db.schema = [[:name, {:type=>:string}]]
     @db.alter_table(:foo){validate{presence :name}}
     sqls = @db.sqls
     parse_insert(sqls.slice!(2)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
     sqls.must_equal ["parse schema for foo", "BEGIN", "COMMIT", "ALTER TABLE foo ADD CHECK ((name IS NOT NULL) AND (trim(name) != ''))"]
+  end
+
+  it "should allow altering the table without validation" do
+    @db.schema = [[:name, {:type=>:string}]]
+    @db.alter_table(:foo){rename_column :a, :b}
+    @db.sqls.must_equal ["ALTER TABLE foo RENAME COLUMN a TO b"]
   end
 
   it "should handle :message option when adding validations" do

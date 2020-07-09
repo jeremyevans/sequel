@@ -96,5 +96,12 @@ describe Sequel::Model, ".subset" do
     @c.subset(:active, :active)
     @c.active.must_equal true
   end
-end
 
+  it "should raise Error if called without arguments" do
+    proc{@c.def_dataset_method}.must_raise Sequel::Error
+  end
+
+  it "should raise Error if called with a block and more than one argument" do
+    proc{@c.def_dataset_method(:a, :b){}}.must_raise Sequel::Error
+  end
+end

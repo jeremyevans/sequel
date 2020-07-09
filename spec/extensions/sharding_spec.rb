@@ -63,6 +63,14 @@ describe "sharding plugin" do
     @db.sqls.must_equal ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s1"]
   end 
 
+  it "should use current dataset's shard when eager loading with eager block if eagerly loaded dataset doesn't have its own shard" do
+    albums = @Album.server(:s1).eager(:artist=>proc{|ds| ds.where(:x)}).all
+    @db.sqls.must_equal ["SELECT * FROM albums -- s1", "SELECT * FROM artists WHERE ((artists.id IN (2)) AND x) -- s1"]
+    albums.length.must_equal 1
+    albums.first.artist.save
+    @db.sqls.must_equal ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s1"]
+  end 
+
   it "should not use current dataset's shard when eager loading if eagerly loaded dataset has its own shard" do
     @Artist.dataset = @Artist.dataset.server(:s2)
     albums = @Album.server(:s1).eager(:artist).all
@@ -70,6 +78,14 @@ describe "sharding plugin" do
     albums.length.must_equal 1
     albums.first.artist.save
     @db.sqls.must_equal ["UPDATE artists SET name = 'YJM' WHERE (id = 2) -- s2"]
+  end 
+
+  it "should use not use a shard when eager loading if the dataset doesn't have a shard associated with it" do
+    albums = @Album.eager(:artist).all
+    @db.sqls.must_equal ["SELECT * FROM albums", "SELECT * FROM artists WHERE (artists.id IN (2))"]
+    albums.length.must_equal 1
+    albums.first.artist.save
+    @db.sqls.must_equal ["UPDATE artists SET name = 'YJM' WHERE (id = 2)"]
   end 
 
   it "should use current dataset's shard when eager graphing if eagerly graphed dataset doesn't have its own shard" do
@@ -123,6 +139,21 @@ describe "sharding plugin" do
     sqls = @db.sqls
     ["INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3) -- s1", "INSERT INTO albums_tags (tag_id, album_id) VALUES (3, 1) -- s1"].must_include(sqls.pop)
     sqls.must_equal ["INSERT INTO tags (name) VALUES ('SR') -- s1", "SELECT * FROM tags WHERE (id = 1) LIMIT 1 -- s1", ]
+  end 
+
+  it "should have objects retrieved from a specific shard add associated objects when associated object doesn't use sharding plugin" do
+    @Album = Class.new(Sequel::Model(@db[:albums].with_fetch(:id=>1, :name=>'RF', :artist_id=>2)))
+    @Album.columns :id, :artist_id, :name
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
+    @db.sqls
+
+    album = @Album.server(:s1).first
+    artist = @Artist.server(:s2).first
+    @db.sqls.must_equal ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM artists LIMIT 1 -- s2"]
+
+    artist.add_album(:name=>'MO')
+    sqls = @db.sqls
+    sqls.must_equal ["INSERT INTO albums (name, artist_id) VALUES ('MO', 2)", "SELECT * FROM albums WHERE (id = 1) LIMIT 1"]
   end 
 
   it "should have objects retrieved from a specific shard remove associated objects from that shard" do

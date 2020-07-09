@@ -3,24 +3,38 @@ require_relative "spec_helper"
 Sequel.extension :migration
 
 describe "pg_enum extension" do
+  mod = Module.new do
+    private
+    def schema_parse_table(*)
+      [[:a, {:oid=>1}], [:b, {:oid=>1234}]]
+    end
+    def _metadata_dataset
+      super.with_fetch([[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}], [{:typname=>'enum1', :v=>212389}]])
+    end
+  end
   before do
     @db = Sequel.connect('mock://postgres')
     @db.extend_datasets{def quote_identifiers?; false end}
-    @db.extend(Module.new do
-      private
-      def schema_parse_table(*)
-        [[:a, {:oid=>1}]]
-      end
-      def _metadata_dataset
-        super.with_fetch([[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}], [{:typname=>'enum1', :v=>212389}]])
-      end
-    end)
+    @db.extend(mod)
     @db.extension(:pg_array, :pg_enum)
     @db.sqls
   end
 
-  it "should include enum information in the schema entry" do
-    @db.schema(:a).must_equal [[:a, {:oid=>1, :ruby_default=>nil, :type=>:enum, :enum_values=>%w'a b c'}]]
+  it "should parse enum labels respecting the sort order" do
+    @db.send(:parse_enum_labels)
+    @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+  end
+
+  it "should parse enum labels without the sort order on PostgreSQL < 9.1" do
+    def @db.server_version(_=nil); 90000; end
+    @db.send(:parse_enum_labels)
+    @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid",
+    "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+  end
+
+  it "should add enum values to parsed schema columns" do
+    @db.schema(:foo).must_equal [[:a, {:oid=>1, :ruby_default=>nil, :type=>:enum, :enum_values=>["a", "b", "c"]}], [:b, {:oid=>1234, :ruby_default=>nil}]]
   end
 
   it "should typecast objects to string" do
@@ -29,6 +43,27 @@ describe "pg_enum extension" do
 
   it "should add array parsers for enum values" do
     @db.conversion_procs[212389].call('{a,b,c}').must_equal %w'a b c'
+  end
+
+  it "should not add array parser if there is already a conversion proc" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @db.extend(mod)
+    pr = proc{}
+    @db.conversion_procs[212389] = pr
+    @db.extension(:pg_array, :pg_enum)
+    @db.conversion_procs[212389].must_equal pr
+    @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((oid IN (1)) AND (typarray != 0))"]
+  end
+
+  it "should not add array parsers for enum values if pg_array extension is not used" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @db.extend(mod)
+    @db.extension(:pg_enum)
+    @db.conversion_procs[212389].must_be_nil
+    @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder"]
   end
 
   it "should support #create_enum method for adding a new enum" do

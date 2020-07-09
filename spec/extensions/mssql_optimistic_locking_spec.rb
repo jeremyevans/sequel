@@ -17,6 +17,13 @@ describe "MSSSQL optimistic locking plugin" do
     @db.sqls.must_equal ["UPDATE TOP (1) items SET name = 'a' OUTPUT inserted.timestamp WHERE ((id = 1) AND (timestamp = 0x31323334))"]
   end
 
+  it "should include the primary key column when updating if it has changed" do
+    @db.fetch = [[{:timestamp=>'2345'}]]
+    @o.id = 2
+    @o.save
+    @db.sqls.must_equal ["UPDATE TOP (1) items SET id = 2, name = 'a' OUTPUT inserted.timestamp WHERE ((id = 2) AND (timestamp = 0x31323334))"]
+  end
+
   it "should automatically update lock column using new value from database" do
     @db.fetch = [[{:timestamp=>'2345'}]]
     @o.save

@@ -295,6 +295,11 @@ describe "Model#before_save && Model#after_save" do
     @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
+
+  it "should raise if calling without block or method" do
+    proc{@c.before_save}.must_raise Sequel::Error
+    proc{@c.after_save}.must_raise Sequel::Error
+  end
 end
 
 describe "Model#before_destroy && Model#after_destroy" do

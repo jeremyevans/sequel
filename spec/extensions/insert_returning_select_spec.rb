@@ -5,7 +5,7 @@ describe "Sequel::Plugins::InsertReturningSelect" do
     @db = Sequel.mock(:fetch=>{:id=>1, :x=>2}, :autoid=>1)
     @db.extend_datasets do
       def supports_returning?(_) true end
-      def insert_select(*v) with_sql_first("#{insert_sql(*v)} RETURNING #{opts[:returning].map{|x| literal(x)}.join(', ')}") end
+      def insert_select(*v) with_sql_first("#{insert_sql(*v)}#{" RETURNING #{opts[:returning].map{|x| literal(x)}.join(', ')}" if opts[:returning]}") end
     end
     @Album = Class.new(Sequel::Model(@db[:albums].select(:id, :x)))
     @Album.columns :id, :x
@@ -36,6 +36,14 @@ describe "Sequel::Plugins::InsertReturningSelect" do
     @Album.plugin :insert_returning_select
     @Album.create(:x=>2).must_equal @Album.load(:id=>1, :x=>2)
     @db.sqls.must_equal ['INSERT INTO albums (x) VALUES (2) RETURNING id, x']
+  end
+
+  it "should not add a returning clause if no columns are selected" do
+    @Album.plugin :insert_returning_select
+    @Album.dataset = @Album.dataset.select_all
+    @db.sqls.clear
+    @Album.create(:x=>2).must_equal @Album.load(:id=>1, :x=>2)
+    @db.sqls.must_equal ['INSERT INTO albums (x) VALUES (2)']
   end
 
   it "should not add a returning clause if selection does not consist of just columns" do

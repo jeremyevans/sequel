@@ -81,6 +81,13 @@ describe "Composition plugin" do
     DB.sqls.must_equal ['UPDATE items SET year = 4, month = 8, day = 12 WHERE (id = 1)']
   end
 
+  it "should work with custom :composer and :decomposer options when :mapping option provided" do
+    @c.composition :date, :composer=>proc{Date.new(year+1, month+2, day+3)}, :decomposer=>proc{[:year, :month, :day].each{|s| self.send("#{s}=", date.send(s) * 2)}}, :mapping=>[:year, :month, :day]
+    @o.date.must_equal Date.new(2, 4, 6)
+    @o.save
+    DB.sqls.must_equal ['UPDATE items SET year = 4, month = 8, day = 12 WHERE (id = 1)']
+  end
+
   it "should allow call super in composition getter and setter method definition in class" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @c.class_eval do
@@ -120,6 +127,12 @@ describe "Composition plugin" do
   it "should clear compositions cache when refreshing" do
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
     @o.date = Date.new(3, 4, 5)
+    @o.refresh
+    @o.compositions.must_equal({})
+  end
+
+  it "should handle case when no compositions are cached when refreshing" do
+    @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
     @o.refresh
     @o.compositions.must_equal({})
   end

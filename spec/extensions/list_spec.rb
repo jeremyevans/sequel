@@ -250,6 +250,11 @@ describe "List plugin" do
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 5) ORDER BY position LIMIT 1"]
   end
 
+  it "should have next return receiver if given zero" do
+    @o.next(0).must_be_same_as @o
+    @db.sqls.must_equal []
+  end
+
   it "should have next return a previous entry if given a negative argument" do
     @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>2)
     @o.next(-1).must_equal @c.load(:id=>9, :position=>2)

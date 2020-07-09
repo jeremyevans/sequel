@@ -279,16 +279,15 @@ describe "Sequel::IntegerMigrator" do
       def version; versions.values.first || 0; end
       def creates; @tables_created.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact; end
       def drop_table(*a); super; @drops.concat(a.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact); end
-
       def create_table(name, opts={}, &block)
         super
         @columns_created << / \(?(\w+) integer.*\)?\z/.match(@sqls.last)[1].to_sym
-        @tables_created << name.to_sym
+        @tables_created << (name.is_a?(String) ? name.to_sym : name)
       end
       
       def dataset
         super.with_extend do
-          def count; 1; end
+          def count; @opts[:from] == ["count2"] ? 2 : 1; end
           def columns; db.columns_created end
           def insert(h); db.versions.merge!(h); db.run insert_sql(h) end
           def update(h); db.versions.merge!(h); db.run update_sql(h) end
@@ -297,7 +296,7 @@ describe "Sequel::IntegerMigrator" do
       end
 
       def table_exists?(name)
-        @tables_created.include?(name.to_sym)
+        @tables_created.include?(name.is_a?(String) ? name.to_sym : name)
       end
     end
     @db = dbc.new
@@ -309,6 +308,11 @@ describe "Sequel::IntegerMigrator" do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
   end
 
+  it "should raise an error if directory given is not a directory or does not exist" do
+    proc{Sequel::IntegerMigrator.new(@db, "spec/files/integer_migrations/001_create_sessions.rb")}.must_raise(Sequel::Migrator::Error)
+    proc{Sequel::IntegerMigrator.new(@db, "spec/files/integer_migrations-does-not-exist")}.must_raise(Sequel::Migrator::Error)
+  end
+  
   it "should raise an error if there is a missing integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
@@ -356,6 +360,18 @@ describe "Sequel::IntegerMigrator" do
     Sequel::Migrator.run(@db, @dirname, :target=>0, :table=>:si, :column=>:sic)
     @db.table_exists?(:si).must_equal true
     @db.dataset.columns.must_equal [:sic]
+  end
+  
+  it "should allow specifying a qualified table" do
+    @db.table_exists?(:si).must_equal false
+    Sequel::Migrator.run(@db, @dirname, :target=>0, :table=>Sequel[:sch]["si"], :column=>:sic)
+    @db.table_exists?(Sequel[:sch]["si"]).must_equal true
+    @db.dataset.columns.must_equal [:sic]
+  end
+  
+  it "should raise error if there is more than 1 row in the migrator table" do
+    @db.table_exists?(:si).must_equal false
+    proc{Sequel::Migrator.run(@db, @dirname, :target=>0, :table=>:count2)}.must_raise(Sequel::Migrator::Error)
   end
   
   it "should support :relative option for running relative migrations" do
@@ -568,7 +584,7 @@ describe "Sequel::TimestampMigrator" do
         tables[name.to_sym] = true
       end
       define_method(:drop_table){|*names| super(*names); names.each{|n| tables.delete(n.to_sym)}}
-      define_method(:table_exists?){|name| super(name); tables.has_key?(name.to_sym)}
+      define_method(:table_exists?){|name| super(name); tables.has_key?(name.is_a?(String) ? name.to_sym : name)}
     end
     @db = dbc.new
     @db.dataset_class = dsc

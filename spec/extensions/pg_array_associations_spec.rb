@@ -114,6 +114,11 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.filter(:artists=>@c1.load(:tag_ids=>[])).sql.must_equal 'SELECT * FROM tags WHERE false'
     @c2.exclude(:artists=>@c1.load(:tag_ids=>[])).sql.must_equal 'SELECT * FROM tags WHERE true'
 
+    @c1.filter(:tags=>[@c2.new]).sql.must_equal 'SELECT * FROM artists WHERE false'
+    @c1.exclude(:tags=>[@c2.new]).sql.must_equal 'SELECT * FROM artists WHERE true'
+    @c2.filter(:artists=>[@c1.load(:tag_ids=>[])]).sql.must_equal 'SELECT * FROM tags WHERE false'
+    @c2.exclude(:artists=>[@c1.load(:tag_ids=>[])]).sql.must_equal 'SELECT * FROM tags WHERE true'
+
     @c1.filter(:tags=>[@c2.new, @c2.load(:id=>2)]).sql.must_equal "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2]::integer[])"
     @c2.filter(:artists=>[@c1.load(:tag_ids=>Sequel.pg_array([3, 4])), @c1.new]).sql.must_equal "SELECT * FROM tags WHERE (tags.id IN (3, 4))"
   end
@@ -245,6 +250,29 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.association_reflection(:artists).reciprocal.must_equal :tags
   end
 
+  it "should eagerly load correctly when key values are missing or do not match" do
+    @c1.dataset = @c1.dataset.with_fetch([{:id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}, {:id=>4, :tag_ids=>nil}])
+    @c2.dataset = @c2.dataset.with_fetch([{:id=>2}, {:id=>4}])
+    @db.sqls
+
+    a = @c1.eager(:tags).all
+    a.must_equal [@o1, @c1.load(:id=>4, :tag_ids=>nil)]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))']
+    a.first.tags.must_equal [@o2]
+    @db.sqls.must_equal []
+
+    @c2.dataset = @c2.dataset.with_fetch([{:id=>2}])
+    @c1.dataset = @c1.dataset.with_fetch([{:id=>3, :tag_ids=>nil}, {:id=>2, :tag_ids=>Sequel.pg_array([1,3])}, {:id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}])
+    @db.sqls
+
+    a = @c2.eager(:artists).all
+    a.must_equal [@o2]
+    @db.sqls.must_equal ['SELECT * FROM tags', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2]::integer[])"]
+    a.first.artists.must_equal [@o1]
+    @db.sqls.must_equal []
+  end
+  
   it "should eagerly load correctly" do
     a = @c1.eager(:tags).all
     a.must_equal [@o1]
@@ -424,6 +452,22 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls.must_equal []
 
     a = @c2.eager_graph(:artists).all
+    @db.sqls.must_equal ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"]
+    a.must_equal [@o2]
+    a.first.artists.must_equal [@o1]
+    @db.sqls.must_equal []
+  end
+
+  it "should eagerly graph associations with limits" do
+    @c1.pg_array_to_many :tags, :limit=>1
+    a = @c1.eager_graph(:tags).with_fetch([{:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}, {:id=>1, :tags_id=>3, :tag_ids=>Sequel.pg_array([1,2,3])}]).all
+    @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]
+    a.must_equal [@o1]
+    a.first.tags.must_equal [@o2]
+    @db.sqls.must_equal []
+
+    @c2.many_to_pg_array :artists, :limit=>1
+    a = @c2.eager_graph(:artists).with_fetch([{:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}, {:id=>2, :artists_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}]).all
     @db.sqls.must_equal ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"]
     a.must_equal [@o2]
     a.first.artists.must_equal [@o1]
@@ -706,9 +750,6 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls.must_equal ["UPDATE artists SET tag_ids = ARRAY[1]::int8[] WHERE (id = 1)"]
   end
 
-  it "should automatically determine the array type by looking at the schema" do
-  end
-
   it "should not validate the current/associated object in add_ and remove_ if the :validate=>false option is used" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :validate=>false, :save_after_modify=>true
     @c2.many_to_pg_array :artists, :clone=>:artists, :validate=>false
@@ -798,5 +839,45 @@ describe "Sequel::Model.finalize_associations" do
     r[:predicate_keys].must_equal [Sequel.qualify(:items, :foo_ids)]
     r[:reciprocal].must_equal :foos
     r[:array_type].must_equal :integer
+  end
+end
+
+describe Sequel::Model, "pg_array_associations with :read_only" do
+  before do
+    @db = Sequel.mock(:host=>'postgres', :numrows=>1)
+    @db.extend_datasets{def quote_identifiers?; false end}
+    class ::Artist < Sequel::Model(@db)
+      attr_accessor :yyy
+      columns :id, :tag_ids
+      plugin :pg_array_associations
+      pg_array_to_many :tags, :read_only=>true
+    end
+    class ::Tag < Sequel::Model(@db)
+      columns :id
+      plugin :pg_array_associations
+      many_to_pg_array :artists, :read_only=>true
+      def id3
+        id*3
+      end
+    end
+  end
+  after do
+    Object.send(:remove_const, :Artist)
+    Object.send(:remove_const, :Tag)
+  end
+
+  it "should not define an add_ method for adding associated objects" do
+    Artist.new.respond_to?(:add_tag).must_equal false
+    Tag.new.respond_to?(:add_artist).must_equal false
+  end
+
+  it "should not define a remove_ method for removing associated objects" do
+    Artist.new.respond_to?(:remove_tag).must_equal false
+    Tag.new.respond_to?(:remove_artist).must_equal false
+  end
+
+  it "should not define a remove_all_ method for removing all associated objects" do
+    Artist.new.respond_to?(:remove_all_tags).must_equal false
+    Tag.new.respond_to?(:remove_all_artists).must_equal false
   end
 end

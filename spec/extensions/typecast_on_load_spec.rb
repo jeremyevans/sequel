@@ -23,6 +23,15 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
     o.bset.must_equal true
   end
 
+  it "should not call setter method with value when loading the object if value is not present or nil" do
+    @c.plugin :typecast_on_load, :b
+    o = @c.load(:id=>1, :y=>"0")
+    o.values.must_equal(:id=>1, :y=>"0")
+    o = @c.load(:id=>1, :b=>nil, :y=>"0")
+    o.values.must_equal(:id=>1, :b=>nil, :y=>"0")
+    o.bset.must_be_nil
+  end
+
   it "should call setter method with value when reloading the object, for all given columns" do
     @c.plugin :typecast_on_load, :b
     o = @c.load(:id=>1, :b=>"1", :y=>"0")
