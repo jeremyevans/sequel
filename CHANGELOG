@@ -1,5 +1,7 @@
 === master
 
+* Make validation_class_methods consider all :if, :allow_missing, :allow_nil, and :allow_blank settings, instead of just the first (jeremyevans)
+
 * Include hash entries with nil keys in Dataset#to_dot output in to_dot extension (jeremyevans)
 
 * Remove unneeded conditionals from plugins and extensions (jeremyevans)

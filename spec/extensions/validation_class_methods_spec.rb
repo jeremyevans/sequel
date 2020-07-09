@@ -260,6 +260,15 @@ describe Sequel::Model do
     @m.wont_be :valid?
   end
 
+  it "should validate acceptance_of with allow_blank => true" do
+    @c.validates_acceptance_of :value, :allow_blank => true
+    @m.must_be :valid?
+    @m.value = ''
+    @m.must_be :valid?
+    @m.value = '0'
+    @m.wont_be :valid?
+  end
+
   it "should validate acceptance_of with if => true" do
     @c.validates_acceptance_of :value, :if => :dont_skip
     @m.value = '0'
@@ -319,7 +328,7 @@ describe Sequel::Model do
 
   it "should validate confirmation_of with allow_missing => true" do
     @c.send(:attr_accessor, :value_confirmation)
-    @c.validates_acceptance_of :value, :allow_missing => true
+    @c.validates_confirmation_of :value, :allow_missing => true
     @m.must_be :valid?
     @m.value_confirmation = 'blah'
     @m.must_be :valid?
@@ -395,6 +404,17 @@ describe Sequel::Model do
 
   it "should validate length_of with within" do
     @c.validates_length_of :value, :within => 2..5
+    @m.wont_be :valid?
+    @m.value = '12345'
+    @m.must_be :valid?
+    @m.value = '1'
+    @m.wont_be :valid?
+    @m.value = '123456'
+    @m.wont_be :valid?
+  end
+
+  it "should validate length_of with within" do
+    @c.validates_length_of :value, :within => [2,3,4,5]
     @m.wont_be :valid?
     @m.value = '12345'
     @m.must_be :valid?
@@ -652,6 +672,31 @@ describe "Superclass validations" do
     o.value = 'abcde'
     o.valid?.must_equal true
   end
+
+  it "should handle case where superclass validation has already been deleted" do
+    @c1.class_eval do
+      validates_length_of :foo, :minimum => 5
+    end
+    
+    @c2 = Class.new(@c1)
+    @c2.class_eval do
+      columns :value
+      validates_format_of :value, :with => /^[a-z]+$/
+    end
+    @c2.validations.delete(:foo)
+    @c2.skip_superclass_validations
+
+    o = @c2.new
+    o.value = 'ab'
+    o.valid?.must_equal true
+
+    o.value = '12'
+    o.valid?.must_equal false
+    o.errors.full_messages.must_equal ['value is invalid']
+
+    o.value = 'abcde'
+    o.valid?.must_equal true
+  end
 end
 
 describe ".validates with block" do
@@ -784,11 +829,12 @@ describe Sequel::Model, "Validations" do
   
   it "should validate that a column has the correct type for the schema column" do
     p = model_class.call Sequel::Model do
-      columns :age, :d
+      columns :age, :d, :b
       self.raise_on_typecast_failure = false
       validates_schema_type :age
       validates_schema_type :d, :message=>'is a bad choice'
-      @db_schema = {:age=>{:type=>:integer}, :d=>{:type=>:date}}
+      validates_schema_type :b
+      @db_schema = {:age=>{:type=>:integer}, :d=>{:type=>:date}, :b=>{:type=>:datetime}}
     end
     
     @person = p.new
@@ -804,6 +850,12 @@ describe Sequel::Model, "Validations" do
     @person.wont_be :valid?
     @person.errors.full_messages.must_equal ['d is a bad choice']
     @person.d = Date.today
+    @person.must_be :valid?
+
+    @person.b = 'XX'
+    @person.wont_be :valid?
+    @person.errors.full_messages.must_equal ['b is not a valid time or datetime']
+    @person.b = DateTime.now
     @person.must_be :valid?
   end
 

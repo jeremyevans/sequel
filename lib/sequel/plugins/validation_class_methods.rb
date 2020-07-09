@@ -194,7 +194,11 @@ module Sequel
         def validates_each(*atts, &block)
           opts = extract_options!(atts)
           blank_meth = db.method(:blank_object?).to_proc
-          blk = if (i = opts[:if]) || (am = opts[:allow_missing]) || (an = opts[:allow_nil]) || (ab = opts[:allow_blank])
+          i = opts[:if]
+          am = opts[:allow_missing]
+          an = opts[:allow_nil]
+          ab = opts[:allow_blank]
+          blk = if i || am || an || ab
             if i.is_a?(Proc)
               i = Plugins.def_sequel_method(self, "validation_class_methods_if", 0, &i)
             end
