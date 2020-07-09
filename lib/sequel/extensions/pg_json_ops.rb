@@ -554,7 +554,9 @@ module Sequel
       end
     end
 
+    # :nocov:
     if defined?(JSONArray)
+    # :nocov:
       class JSONArray
         # Wrap the JSONArray instance in an JSONOp, allowing you to easily use
         # the PostgreSQL json functions and operators with literal jsons.

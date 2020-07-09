@@ -49,7 +49,9 @@ module Sequel::S
     Sequel.expr(*a, &block)
   end
 
+  # :nocov:
   if RUBY_VERSION >= '2.0.0'
+  # :nocov:
     refine Object do
       include Sequel::S
     end

@@ -41,7 +41,9 @@ module Sequel
         db.instance_exec do
           extend_datasets(InetDatasetMethods)
 
+          # :nocov:
           if !defined?(SEQUEL_PG_VERSION_INTEGER) || SEQUEL_PG_VERSION_INTEGER >= 11300
+          # :nocov:
             # sequel_pg 1.13.0+ will use inet/cidr conversion procs, but doing so is
             # slower, so don't add the conversion procs if using sequel_pg 1.13.0+.
             meth = IPAddr.method(:new)

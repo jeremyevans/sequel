@@ -116,7 +116,9 @@ module Sequel
       end
     end
 
+    # :nocov:
     if defined?(PGRange)
+    # :nocov:
       class PGRange
         # Wrap the PGRange instance in an RangeOp, allowing you to easily use
         # the PostgreSQL range functions and operators with literal ranges.

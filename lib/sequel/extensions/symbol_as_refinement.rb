@@ -23,7 +23,9 @@
 #
 # Related module: Sequel::SymbolAs
 
+# :nocov:
 raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VERSION >= '2.0.0'
+# :nocov:
 
 module Sequel::SymbolAs
   refine Symbol do

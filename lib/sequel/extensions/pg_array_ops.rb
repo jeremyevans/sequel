@@ -157,7 +157,9 @@ module Sequel
         else
           Sequel.function(:hstore, self, wrap_array(arg))
         end
+        # :nocov:
         if Sequel.respond_to?(:hstore_op)
+        # :nocov:
           v = Sequel.hstore_op(v)
         end
         v
@@ -283,7 +285,9 @@ module Sequel
       end
     end
 
+    # :nocov:
     if defined?(PGArray)
+    # :nocov:
       class PGArray
         # Wrap the PGArray instance in an ArrayOp, allowing you to easily use
         # the PostgreSQL array functions and operators with literal arrays.

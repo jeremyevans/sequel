@@ -10,7 +10,9 @@
 #
 #   using Sequel::CoreRefinements
 
+# :nocov:
 raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VERSION >= '2.0.0'
+# :nocov:
 
 module Sequel::CoreRefinements
   refine Array do

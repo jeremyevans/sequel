@@ -111,7 +111,9 @@ module Sequel
         # an association, allow lazy loading that association, since the
         # lazy association load will use a hash table lookup and not a query.
         def allow_lazy_load_for_static_cache_associations
+          # :nocov:
           if defined?(::Sequel::Plugins::StaticCache::ClassMethods)
+          # :nocov:
             @association_reflections.each_value do |ref|
               if ref.associated_class.is_a?(::Sequel::Plugins::StaticCache::ClassMethods)
                 ref[:forbid_lazy_load] = false

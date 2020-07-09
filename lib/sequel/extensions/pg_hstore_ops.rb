@@ -312,7 +312,9 @@ module Sequel
       end
     end
 
+    # :nocov:
     if defined?(HStore)
+    # :nocov:
       class HStore
         # Wrap the receiver in an HStoreOp so you can easily use the PostgreSQL
         # hstore functions and operators with it.
