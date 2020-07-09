@@ -632,8 +632,7 @@ module Sequel
   
       # Cache of setter methods to allow by default, in order to speed up mass assignment.
       def setter_methods
-        return @setter_methods if @setter_methods
-        @setter_methods = get_setter_methods
+        @setter_methods || (@setter_methods = get_setter_methods)
       end
 
       # Returns name of primary table for the dataset. If the table for the dataset
