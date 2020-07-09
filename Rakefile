@@ -93,7 +93,7 @@ spec_task = proc do |description, name, file, coverage, visibility|
   if coverage
     desc "#{description} with coverage"
     task :"#{name}_cov" do
-      ENV['COVERAGE'] = '1'
+      ENV['COVERAGE'] = coverage == true ? '1' : coverage
       run_spec.call(file)
       ENV.delete('COVERAGE')
     end
@@ -114,10 +114,10 @@ task :default => :spec
 desc "Run the core, model, and extension/plugin specs"
 task :spec => [:spec_core, :spec_model, :spec_plugin]
 
-spec_task.call("Run core and model specs together", :spec_core_model, 'spec/core_model_spec.rb', true, false)
+spec_task.call("Run core and model specs together", :spec_core_model, 'spec/core_model_spec.rb', "core-model", false)
 spec_task.call("Run core specs", :spec_core, 'spec/core_spec.rb', false, false)
 spec_task.call("Run model specs", :spec_model, 'spec/model_spec.rb', false, false)
-spec_task.call("Run plugin/extension specs", :spec_plugin, 'spec/plugin_spec.rb', true, true)
+spec_task.call("Run plugin/extension specs", :spec_plugin, 'spec/plugin_spec.rb', "plugin-extension", true)
 spec_task.call("Run bin/sequel specs", :spec_bin, 'spec/bin_spec.rb', false, false)
 spec_task.call("Run core extensions specs", :spec_core_ext, 'spec/core_extensions_spec.rb', true, true)
 spec_task.call("Run integration tests", :spec_integration, 'spec/adapter_spec.rb none', true, true)
@@ -131,6 +131,13 @@ desc "Run model specs without the associations code"
 task :spec_model_no_assoc do
   ENV['SEQUEL_NO_ASSOCIATIONS'] = '1'
   Rake::Task['_spec_model_no_assoc'].invoke
+end
+
+desc "Run core/model/extension/plugin specs with coverage"
+task :spec_cov do
+  ENV['SEQUEL_MERGE_COVERAGE'] = '1'
+  Rake::Task['spec_core_model_cov'].invoke
+  Rake::Task['spec_plugin_cov'].invoke
 end
 
 task :spec_travis=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
