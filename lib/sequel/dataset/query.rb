@@ -81,7 +81,7 @@ module Sequel
       # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
       # columns are deleted.  This method should generally not be called
       # directly by user code.
-      def clone(opts = (return self; nil))
+      def clone(opts = nil || (return self))
         # return self used above because clone is called by almost all
         # other query methods, and it is the fastest approach
         c = super(:freeze=>false)
