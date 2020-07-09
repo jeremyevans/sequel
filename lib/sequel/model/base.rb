@@ -1987,7 +1987,6 @@ module Sequel
 
       # Get the ruby class or classes related to the given column's type.
       def schema_type_class(column)
-        # SEQUEL6: Remove
         if (sch = db_schema[column]) && (type = sch[:type])
           db.schema_type_class(type)
         end
