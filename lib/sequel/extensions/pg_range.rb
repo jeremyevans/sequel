@@ -158,7 +158,7 @@ module Sequel
             procs = conversion_procs
             add_conversion_proc(3908, Parser.new("tsrange", procs[1114]))
             add_conversion_proc(3910, Parser.new("tstzrange", procs[1184]))
-            if defined?(PGArray::Creator)
+            if respond_to?(:register_array_type) && defined?(PGArray::Creator)
               add_conversion_proc(3909, PGArray::Creator.new("tsrange", procs[3908]))
               add_conversion_proc(3911, PGArray::Creator.new("tstzrange", procs[3910]))
             end
