@@ -26,9 +26,30 @@ END
 
   it "should handle WITH" do
     a = dot(@ds.with_extend{def supports_cte?(*) true end}.with(:a, @ds))
-    a[0..3].must_equal ["1 -> 2 [label=\"with\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Hash\"];"]
-    [["3 -> 4 [label=\"dataset\"];", "4 [label=\"Dataset\"];", "3 -> 5 [label=\"name\"];", "5 [label=\":a\"];"],
-     ["3 -> 4 [label=\"name\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"dataset\"];", "5 [label=\"Dataset\"];"]].must_include(a[4..-1])
+    a.must_equal [
+      "1 -> 2 [label=\"with\"];",
+      "2 [label=\"Array\"];",
+      "2 -> 3 [label=\"0\"];",
+      "3 [label=\"Hash\"];",
+      "3 -> 4 [label=\"name\"];",
+      "4 [label=\":a\"];",
+      "3 -> 5 [label=\"dataset\"];",
+      "5 [label=\"Dataset\"];"]
+  end
+
+  it "should handle WITH with nil key option" do
+    a = dot(@ds.with_extend{def supports_cte?(*) true end}.with(:a, @ds, nil=>:a))
+    a.must_equal [
+      "1 -> 2 [label=\"with\"];",
+      "2 [label=\"Array\"];",
+      "2 -> 3 [label=\"0\"];",
+      "3 [label=\"Hash\"];",
+      "3 -> 4 [label=\"<nil>\"];",
+      "4 [label=\":a\"];",
+      "3 -> 5 [label=\"name\"];",
+      "5 [label=\":a\"];",
+      "3 -> 6 [label=\"dataset\"];",
+      "6 [label=\"Dataset\"];"]
   end
 
   it "should handle DISTINCT" do
@@ -100,6 +121,7 @@ END
   end
 
   it "should handle SQL::OrderedExpressions" do
+    dot(@ds.order(Sequel.asc(:a))).must_equal ["1 -> 2 [label=\"order\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"OrderedExpression: ASC\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];"]
     dot(@ds.order(Sequel.desc(:a, :nulls=>:last))).must_equal ["1 -> 2 [label=\"order\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"OrderedExpression: DESC NULLS LAST\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];"]
   end
 
@@ -112,6 +134,7 @@ END
   end
 
   it "should handle SQL::CaseExpressions" do
+    dot(@ds.select(Sequel.case({:a=>:b}, :c))).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"CaseExpression\"];", "3 -> 4 [label=\"conditions\"];", "4 [label=\"Array\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\":a\"];", "5 -> 7 [label=\"1\"];", "7 [label=\":b\"];", "3 -> 8 [label=\"default\"];", "8 [label=\":c\"];"]
     dot(@ds.select(Sequel.case({:a=>:b}, :c, :d))).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"CaseExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":d\"];", "3 -> 5 [label=\"conditions\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"Array\"];", "6 -> 7 [label=\"0\"];", "7 [label=\":a\"];", "6 -> 8 [label=\"1\"];", "8 [label=\":b\"];", "3 -> 9 [label=\"default\"];", "9 [label=\":c\"];"]
   end
 
@@ -133,6 +156,7 @@ END
 
   it "should handle SQL::PlaceholderLiteralString" do
     dot(@ds.where(Sequel.lit("?", true))).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"PlaceholderLiteralString: \\\"(?)\\\"\"];", "2 -> 3 [label=\"args\"];", "3 [label=\"Array\"];", "3 -> 4 [label=\"0\"];", "4 [label=\"true\"];"]
+    dot(@ds.select(Sequel::SQL::PlaceholderLiteralString.new("(?)", [true]))).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"PlaceholderLiteralString: \\\"(?)\\\"\"];", "3 -> 4 [label=\"args\"];", "4 [label=\"Array\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"true\"];"]
   end
 
   it "should handle JOIN ON" do

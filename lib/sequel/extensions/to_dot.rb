@@ -53,7 +53,13 @@ module Sequel
     # is given, it is used directly as the node or transition.  Otherwise
     # a node is created for the current object.
     def dot(label, j=nil)
-      @dot << "#{j||@i} [label=#{label.to_s.inspect}];"
+      label = case label
+      when nil
+        "<nil>"
+      else
+        label.to_s
+      end
+      @dot << "#{j||@i} [label=#{label.inspect}];"
     end
 
     # Recursive method that parses all of Sequel's internal datastructures,
@@ -61,7 +67,7 @@ module Sequel
     # structure.
     def v(e, l)
       @i += 1
-      dot(l, "#{@stack.last} -> #{@i}") if l
+      dot(l, "#{@stack.last} -> #{@i}")
       @stack.push(@i)
       case e
       when LiteralString
@@ -144,7 +150,7 @@ module Sequel
         dot "Dataset"
         TO_DOT_OPTIONS.each do |k|
           if val = e.opts[k]
-            v(val, k.to_s) 
+            v(val, k) 
           end
         end
       else

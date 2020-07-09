@@ -1,5 +1,7 @@
 === master
 
+* Include hash entries with nil keys in Dataset#to_dot output in to_dot extension (jeremyevans)
+
 * Remove unneeded conditionals from plugins and extensions (jeremyevans)
 
 * Fix exception class in run_transaction_hooks extension if calling run_after_{commit,rollback}_hooks outside of a transaction (jeremyevans)
