@@ -16,6 +16,7 @@ module Sequel
         c = TinyTds::Client.new(opts)
         c.query_options.merge!(:cache_rows=>false)
 
+        # SEQUEL6: Default to ansi: true
         if opts[:ansi]
           sql = %w(
             ANSI_NULLS
