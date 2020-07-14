@@ -39,7 +39,7 @@ module Sequel
     # Print the message and possibly backtrace to the output.
     def self.deprecate(method, instead=nil)
       return unless output
-      message = instead ? "#{method} is deprecated and will be removed in Sequel 5.1.  #{instead}." : method
+      message = instead ? "#{method} is deprecated and will be removed in Sequel 6.  #{instead}." : method
       message = "#{prefix}#{message}" if prefix
       output.puts(message)
       case b = backtrace_filter
