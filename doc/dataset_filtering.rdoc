@@ -36,8 +36,8 @@ Ranges (both inclusive and exclusive) can also be used:
 
 If you need to select multiple items from a dataset, you can supply an array:
 
-	items.where(id: [1, 38, 47, 99]).sql
-	# "SELECT * FROM items WHERE (id IN (1, 38, 47, 99))"
+  items.where(id: [1, 38, 47, 99]).sql
+  # "SELECT * FROM items WHERE (id IN (1, 38, 47, 99))"
 
 == Filtering using expressions
 
