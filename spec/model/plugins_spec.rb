@@ -64,6 +64,16 @@ describe Sequel::Model, ".plugin" do
     @c.plugins.reject{|m| m != @t}.length.must_equal 1
   end
 
+  deprecated "should warn if loading the plugin with an argument" do
+    @c.plugin @t, 1
+    @c.plugins.must_include(@t)
+  end
+  
+  deprecated "should warn if loading the plugin with a block" do
+    @c.plugin(@t){}
+    @c.plugins.must_include(@t)
+  end
+
   it "should call apply and configure if the plugin responds to it, with the args and block used" do
     m = Module.new do
       def self.args; @args; end

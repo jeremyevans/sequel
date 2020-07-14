@@ -491,6 +491,11 @@ module Sequel
       # the module using a the camelized plugin name under Sequel::Plugins.
       def plugin(plugin, *args, &block)
         m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
+
+        if !m.respond_to?(:apply) && !m.respond_to?(:configure) && (!args.empty? || block)
+          Deprecation.deprecate("Plugin #{plugin} accepts no arguments or block, and passing arguments/block to it", "Remove arguments and block when loading the plugin")
+        end
+
         unless @plugins.include?(m)
           @plugins << m
           m.apply(self, *args, &block) if m.respond_to?(:apply)
@@ -500,6 +505,7 @@ module Sequel
             dataset_extend(m::DatasetMethods, :create_class_methods=>false)
           end
         end
+
         m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
 
