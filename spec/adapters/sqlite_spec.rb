@@ -25,6 +25,42 @@ describe "An SQLite database" do
     @db.sqlite_version.must_be_kind_of(Integer)
   end
   
+  it "should keep composite unique constraint when changing a column default" do
+    @db.create_table(:fk) do
+      Bignum :id, null: false, unique: true
+      Bignum :another_id, null: false
+      String :name, size: 50, null: false
+      String :test
+
+      unique [:another_id, :name], :name=>:fk_uidx
+    end
+    @db.alter_table(:fk) do
+      set_column_default :test, 'test'
+    end
+    @db[:fk].insert(:id=>1, :another_id=>2, :name=>'a')
+    @db[:fk].insert(:id=>2, :another_id=>3, :name=>'a')
+    @db[:fk].insert(:id=>3, :another_id=>2, :name=>'b')
+    proc{@db[:fk].insert(:id=>4, :another_id=>2, :name=>'a')}.must_raise Sequel::ConstraintViolation
+  end
+  
+  it "should keep composite primary key when changing a column default" do
+    @db.create_table(:fk) do
+      Bignum :id, null: false, unique: true
+      Bignum :another_id, null: false
+      String :name, size: 50, null: false
+      String :test
+
+      primary_key [:another_id, :name]
+    end
+    @db.alter_table(:fk) do
+      set_column_default :test, 'test'
+    end
+    @db[:fk].insert(:id=>1, :another_id=>2, :name=>'a')
+    @db[:fk].insert(:id=>2, :another_id=>3, :name=>'a')
+    @db[:fk].insert(:id=>3, :another_id=>2, :name=>'b')
+    proc{@db[:fk].insert(:id=>4, :another_id=>2, :name=>'a')}.must_raise Sequel::ConstraintViolation
+  end
+  
   it "should allow setting current_timestamp_utc to keep CURRENT_* in UTC" do
     begin
       v = @db.current_timestamp_utc

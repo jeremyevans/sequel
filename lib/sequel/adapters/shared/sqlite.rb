@@ -269,6 +269,8 @@ module Sequel
             else
               duplicate_table(table, :no_foreign_keys=>true)
             end
+          when :unique
+            duplicate_table(table, :no_unique=>true)
           else
             duplicate_table(table)
           end
@@ -422,8 +424,12 @@ module Sequel
         skip_indexes = []
         indexes(table, :only_autocreated=>true).each do |name, h|
           skip_indexes << name
-          if h[:columns].length == 1 && h[:unique]
-            unique_columns.concat(h[:columns])
+          if h[:unique]
+            if h[:columns].length == 1
+              unique_columns.concat(h[:columns])
+            elsif h[:columns].map(&:to_s) != pks && !opts[:no_unique]
+              constraints << {:type=>:unique, :columns=>h[:columns]}
+            end
           end
         end
         unique_columns -= pks

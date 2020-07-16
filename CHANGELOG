@@ -1,5 +1,7 @@
 === master
 
+* Copy composite unique constraints when emulating alter table operations on SQLite (jeremyevans) (#1704)
+
 * Add instance_specific_default plugin for setting default association :instance_specific value, or warning/raising for cases where it is not specified (jeremyevans)
 
 * Make Model.finalize_associations not affect instance-specific associations (jeremyevans)
