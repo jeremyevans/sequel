@@ -801,7 +801,7 @@ module Sequel
 
         # Whether the placeholder loader can be used to load the association.
         def use_placeholder_loader?
-          !self[:instance_specific] && !self[:eager_graph]
+          self[:use_placeholder_loader]
         end
       end
     
@@ -1810,6 +1810,7 @@ module Sequel
             raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})")
           end
 
+          opts[:use_placeholder_loader] = !opts[:instance_specific] && !opts[:eager_graph] && !orig_opts[:dataset]
           opts[:eager_block] = opts[:block] unless opts.include?(:eager_block)
           opts[:graph_join_type] ||= :left_outer
           opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)

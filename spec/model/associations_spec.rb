@@ -1099,6 +1099,32 @@ describe Sequel::Model, "one_to_one" do
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE ((nodes.id = 100) AND (x = 100)) LIMIT 1"]
   end
 
+  it "should handle associations with :dataset option that are marked as instance specific" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :instance_specific=>true, :dataset=>proc{|r| r.associated_dataset.where(:x=>100)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (x = 100) LIMIT 1"]
+  end
+
+  it "should handle associations with :dataset option that are marked as not-instance specific" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :instance_specific=>false, :dataset=>proc{|r| r.associated_dataset.where(:x=>100)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (x = 100) LIMIT 1"]
+  end
+
+  it "should handle associations with :dataset option that are marked as instance specific when finalizing associations" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :instance_specific=>true, :dataset=>proc{|r| r.associated_dataset.where(:x=>100)}
+    @c2.finalize_associations
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (x = 100) LIMIT 1"]
+  end
+
+  it "should handle associations with :dataset option that are marked as not-instance specific when finalizing associations" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :instance_specific=>false, :dataset=>proc{|r| r.associated_dataset.where(:x=>100)}
+    @c2.finalize_associations
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (x = 100) LIMIT 1"]
+  end
+
   it "should handle associations with blocks that are marked as not-instance specific and use Sequel.delay" do
     x = 100
     @c2.one_to_one :child_20, :class => @c2, :key=>:id, :instance_specific=>false do |ds| ds.where(:x=>Sequel.delay{x}) end
