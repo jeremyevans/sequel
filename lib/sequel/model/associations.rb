@@ -433,7 +433,11 @@ module Sequel
           if use_placeholder_loader?
             cached_fetch(:placeholder_loader) do
               Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
-                ds.where(Sequel.&(*predicate_keys.map{|k| SQL::BooleanExpression.new(:'=', k, pl.arg)}))
+                ds = ds.where(Sequel.&(*predicate_keys.map{|k| SQL::BooleanExpression.new(:'=', k, pl.arg)}))
+                if self[:block]
+                  ds = self[:block].call(ds)
+                end
+                ds
               end
             end
           end

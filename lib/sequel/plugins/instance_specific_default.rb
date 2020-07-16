@@ -11,8 +11,9 @@ module Sequel
     # :instance_specific to false for associations that are not instance specific
     # can improve performance.
     #
-    # Associations are instance-specific if their block or dataset option calls
-    # an instance method.  For example, with the following two associations:
+    # Associations are instance-specific if their block or :dataset option calls
+    # an instance method, where the value of the block or :dataset option varies
+    # based on runtime state.  For example, with the following three associations:
     #
     #   Album.one_to_one :first_track, class: :Track do |ds|
     #     ds.where(number: 1)
@@ -22,10 +23,15 @@ module Sequel
     #     ds.where(number: num_tracks)
     #   end
     #
-    # +first_track+ is not instance specific, but +last_track+ is, because the
-    # +num_tracks+ call in the block is calling <tt>Album#num_tracks</tt>.  This
-    # plugin allows you to find these cases, and set the :instance_specific option
-    # appropriately for them:
+    #   Album.one_to_many :recent_tracks, class: :Track do |ds|
+    #     ds.where{date_updated > Date.today - 10}
+    #   end
+    #
+    # +first_track+ is not instance specific, but +last_track+ and +recent_tracks+ are.
+    # +last_trac+ is because the +num_tracks+ call in the block is calling
+    # <tt>Album#num_tracks</tt>.  +recent_tracks+ is because the value will change over
+    # time. This plugin allows you to find these cases, and set the :instance_specific
+    # option appropriately for them:
     #
     #   Album.one_to_one :first_track, class: :Track, instance_specific: false do |ds|
     #     ds.where(number: 1)
@@ -33,6 +39,10 @@ module Sequel
     #
     #   Album.one_to_one :last_track, class: :Track, instance_specific: true do |ds|
     #     ds.where(number: num_tracks)
+    #   end
+    #
+    #   Album.one_to_many :recent_tracks, class: :Track, instance_specific: true do |ds|
+    #     ds.where{date_updated > Date.today - 10}
     #   end
     #
     # Possible arguments to provide when loading the plugin:
