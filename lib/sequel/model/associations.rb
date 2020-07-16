@@ -1798,7 +1798,7 @@ module Sequel
             # It's possible the association is instance specific, in that it depends on
             # values other than the foreign key value.  This needs to be checked for
             # in certain places to disable optimizations.
-            opts[:instance_specific] = true
+            opts[:instance_specific] = _association_instance_specific_default(name)
           end
           opts = assoc_class.new.merge!(opts)
 
@@ -1902,6 +1902,12 @@ module Sequel
         Plugins.def_dataset_methods(self, [:eager, :eager_graph, :eager_graph_with_options, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         
         private
+
+        # The default value for the instance_specific option, if the association
+        # could be instance specific and the :instance_specific option is not specified.
+        def _association_instance_specific_default(_)
+          true
+        end
       
         # The module to use for the association's methods.  Defaults to
         # the overridable_methods_module.
