@@ -355,6 +355,7 @@ module Sequel
         # so that a mutex is not needed to get the value.
         def finalize
           return unless cache = self[:cache]
+          return if self[:instance_specific]
 
           finalize_settings.each do |meth, key|
             next if has_key?(key)

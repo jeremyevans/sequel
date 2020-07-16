@@ -1060,6 +1060,19 @@ describe Sequel::Model, "one_to_one" do
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100)"]
   end
 
+  it "should support instance specific behavior in association block" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id do |ds| ds.where(:x=>pk) end
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE ((nodes.id = 100) AND (x = 100)) LIMIT 1"]
+  end
+
+  it "should support instance specific behavior in association block when finalizing associations" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id do |ds| ds.where(:x=>pk) end
+    @c2.load(:id => 100).child_20
+    @c2.finalize_associations
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE ((nodes.id = 100) AND (x = 100)) LIMIT 1"]
+  end
+
   it "should return nil if primary_key value is nil" do
     @c2.one_to_one :parent, :class => @c2, :primary_key=>:node_id
 

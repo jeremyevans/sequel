@@ -1,6 +1,8 @@
 === master
 
-* Make Sequel::Model.plugin issue deprecation warning if loading plugin with arguments and block if plugin does not accept arguments/block (jeremyevans)
+* Make Model.finalize_associations not affect instance-specific associations (jeremyevans)
+
+* Make Model.plugin issue deprecation warning if loading plugin with arguments and block if plugin does not accept arguments/block (jeremyevans)
 
 * Make validation_class_methods consider all :if, :allow_missing, :allow_nil, and :allow_blank settings, instead of just the first (jeremyevans)
 
