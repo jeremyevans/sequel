@@ -1,5 +1,7 @@
 === master
 
+* Consider all associations with :dataset options as instance-specific associations (jeremyevans)
+
 * Make Model.finalize_associations not break with instance-specific associations (jeremyevans)
 
 * Make association placeholder loader consider block if instance_specific: false association option is used (jeremyevans)

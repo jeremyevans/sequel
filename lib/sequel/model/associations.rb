@@ -1802,7 +1802,8 @@ module Sequel
           opts.merge!(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
 
           opts[:block] = block if block
-          if !opts.has_key?(:instance_specific) && (block || orig_opts[:block] || orig_opts[:dataset])
+          opts[:instance_specific] = true if orig_opts[:dataset]
+          if !opts.has_key?(:instance_specific) && (block || orig_opts[:block])
             # It's possible the association is instance specific, in that it depends on
             # values other than the foreign key value.  This needs to be checked for
             # in certain places to disable optimizations.
@@ -1814,7 +1815,7 @@ module Sequel
             raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})")
           end
 
-          opts[:use_placeholder_loader] = !opts[:instance_specific] && !opts[:eager_graph] && !orig_opts[:dataset]
+          opts[:use_placeholder_loader] = !opts[:instance_specific] && !opts[:eager_graph]
           opts[:eager_block] = opts[:block] unless opts.include?(:eager_block)
           opts[:graph_join_type] ||= :left_outer
           opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)

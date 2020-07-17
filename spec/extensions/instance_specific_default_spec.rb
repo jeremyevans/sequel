@@ -53,4 +53,17 @@ describe "instance_specific_default plugin" do
     c.many_to_one :c, :class=>@c do |ds| ds end
     c.association_reflection(:c)[:instance_specific].must_equal false
   end
+
+  it "should be ignored for associations with a :dataset option" do
+    @c.plugin :instance_specific_default, false
+    @c.many_to_one :c, :class=>@c, :dataset=>proc{|r| r.associated_class.where(:id=>id)}
+    @c.association_reflection(:c)[:instance_specific].must_equal true
+  end
+
+  it "should be considered for when cloning association with block" do
+    @c.plugin :instance_specific_default, false
+    @c.many_to_one :c, :class=>@c do |ds| ds end
+    @c.many_to_one :c, :clone=>:c
+    @c.association_reflection(:c)[:instance_specific].must_equal false
+  end
 end

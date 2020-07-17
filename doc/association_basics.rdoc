@@ -1676,14 +1676,16 @@ instances.
 ==== :instance_specific
 
 This allows you to override the setting of whether the dataset contains instance
-specific code.  For example, if you are passing a block to the association,
+specific code.  If you are passing a block to the association,
 Sequel sets this to true by default, which disables some optimizations that
 would be invalid if the association is instance specific.  If you know that the
 block does not contain instance specific code, you can set this to false to
 reenable the optimizations.  Instance specific code is mostly commonly calling
-model instance methods inside an association block or :dataset proc, but also
+model instance methods inside an association block, but also
 includes cases where the association block can return different values based
 on the runtime environment, such as calls to <tt>Time.now</tt> in the block.
+Associations that use the :dataset option are always considered instance specific,
+even if explicitly specified otherwise.
 
 ==== :cartesian_product_number 
 

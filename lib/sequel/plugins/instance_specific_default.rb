@@ -11,9 +11,10 @@ module Sequel
     # :instance_specific to false for associations that are not instance specific
     # can improve performance.
     #
-    # Associations are instance-specific if their block or :dataset option calls
-    # an instance method, where the value of the block or :dataset option varies
-    # based on runtime state.  For example, with the following three associations:
+    # Associations are instance-specific if their block calls
+    # a model instance method, or where the value of the block varies
+    # based on runtime state, and the variance is outside of a delayed evaluation.
+    # For example, with the following three associations:
     #
     #   Album.one_to_one :first_track, class: :Track do |ds|
     #     ds.where(number: 1)
@@ -45,6 +46,14 @@ module Sequel
     #     ds.where{date_updated > Date.today - 10}
     #   end
     #
+    # For the +recent_tracks+ association, instead of marking it instance_specific, you
+    # could also use a delayed evaluation, since it doesn't actually contain
+    # instance-specific code:
+    #
+    #   Album.one_to_many :recent_tracks, class: :Track, instance_specific: false do |ds|
+    #     ds.where{date_updated > Sequel.delay{Date.today - 10}}
+    #   end
+    #
     # Possible arguments to provide when loading the plugin:
     #
     # true :: Set the :instance_specific option to true
@@ -55,8 +64,8 @@ module Sequel
     #           an association could be instance-specific.
     #
     # Note that this plugin only affects associations which could be instance
-    # specific, such as those with blocks or with the :dataset option used, where
-    # the :instance_specific option was not specified when the association was created.
+    # specific (those with blocks), where the :instance_specific option was not
+    # specified when the association was created.
     #
     # Usage:
     #
