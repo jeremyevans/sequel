@@ -355,14 +355,20 @@ module Sequel
         # so that a mutex is not needed to get the value.
         def finalize
           return unless cache = self[:cache]
-          return if self[:instance_specific]
 
-          finalize_settings.each do |meth, key|
+          finalizer = proc do |meth, key|
             next if has_key?(key)
 
             # Allow calling private methods to make sure caching is done appropriately
             send(meth)
             self[key] = cache.delete(key) if cache.has_key?(key)
+          end
+
+          finalize_settings.each(&finalizer)
+
+          unless self[:instance_specific]
+            finalizer.call(:associated_eager_dataset, :associated_eager_dataset)
+            finalizer.call(:filter_by_associations_conditions_dataset, :filter_by_associations_conditions_dataset)
           end
 
           nil
@@ -372,9 +378,7 @@ module Sequel
         FINALIZE_SETTINGS = {
           :associated_class=>:class,
           :associated_dataset=>:_dataset,
-          :associated_eager_dataset=>:associated_eager_dataset,
           :eager_limit_strategy=>:_eager_limit_strategy,
-          :filter_by_associations_conditions_dataset=>:filter_by_associations_conditions_dataset,
           :placeholder_loader=>:placeholder_loader,
           :predicate_key=>:predicate_key,
           :predicate_keys=>:predicate_keys,

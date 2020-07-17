@@ -1,12 +1,12 @@
 === master
 
+* Make Model.finalize_associations not break with instance-specific associations (jeremyevans)
+
 * Make association placeholder loader consider block if instance_specific: false association option is used (jeremyevans)
 
 * Copy composite unique constraints when emulating alter table operations on SQLite (jeremyevans) (#1704)
 
 * Add instance_specific_default plugin for setting default association :instance_specific value, or warning/raising for cases where it is not specified (jeremyevans)
-
-* Make Model.finalize_associations not affect instance-specific associations (jeremyevans)
 
 * Make Model.plugin issue deprecation warning if loading plugin with arguments and block if plugin does not accept arguments/block (jeremyevans)
 
