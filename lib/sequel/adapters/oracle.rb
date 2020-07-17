@@ -14,7 +14,8 @@ module Sequel
       # ORA-02396: exceeded maximum idle time, please connect again
       # ORA-03113: end-of-file on communication channel
       # ORA-03114: not connected to ORACLE
-      CONNECTION_ERROR_CODES = [ 28, 1012, 2396, 3113, 3114 ].freeze
+      # ORA-03135: connection lost contact
+      CONNECTION_ERROR_CODES = [ 28, 1012, 2396, 3113, 3114, 3135 ].freeze
       
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
