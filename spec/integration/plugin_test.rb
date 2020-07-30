@@ -2129,9 +2129,11 @@ describe "Sequel::Plugins::ConstraintValidations" do
         proc{@ds.insert(try.merge(:m1=>'', :m2=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
       end
 
-      # Test for dropping of constraint
-      @db.alter_table(:cv_test){validate{drop :maxl2}}
-      @ds.insert(@valid_row.merge(:minlen=>'1234567'))
+      unless @db.database_type == :mysql && @db.mariadb? && @db.server_version >= 10500
+        # Test for dropping of constraint
+        @db.alter_table(:cv_test){validate{drop :maxl2}}
+        @ds.insert(@valid_row.merge(:minlen=>'1234567'))
+      end
     end
 
     it "should set up automatic validations inside the model" do 
