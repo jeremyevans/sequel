@@ -1,4 +1,4 @@
-=== master
+=== 5.35.0 (2020-08-01)
 
 * Recognize another disconnect error in the oracle adapter (sterlzbd) (#1705)
 

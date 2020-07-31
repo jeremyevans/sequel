@@ -1,0 +1,56 @@
+= New Features
+
+* An instance_specific_default plugin has been added for setting the
+  default for the :instance_specific association option, or
+  warning/raises in cases where it is not specified.  This allows
+  you to easily find associations that would be considering instance
+  specific by default, and mark them as not instance specific for
+  better performance.
+
+= Other Improvements
+
+* Setting the :instance_specific association option to false now
+  works correctly if the association uses a block.  Associations
+  that set the :dataset option are now always considered instance
+  specific, even if the :instance_specific option is explicitly
+  passed.
+
+* The validation_class_methods plugin now considers all :if,
+  :allow_missing, :allow_nil, and :allow_blank options.  Previously,
+  it only considered the first of those options that was set.
+
+* Model.finalize_associations no longer breaks if you have
+  instance-specific associations.
+
+* Model.plugin now warns if you load the plugin with arguments or a
+  block if the plugin does not accept arguments or block.  This is
+  because a future change to Sequel could break the call.
+
+* When emulating unsupported alter table operations on SQLite, Sequel
+  now copies composite unique constraints unless the alter table
+  operation is the dropping of a unique constraint.
+
+* Sequel now recognizes an additional disconnect error in the oracle
+  adapter.
+
+* In the run_transaction_hooks extension, calling
+  run_after_{commit,rollback}_hooks now raises the correct exception
+  class.
+
+* In the pg_range extension, conversion procs for the tsrange[] and
+  tstzrange[] types are not added unless the Database uses the
+  pg_array extension.
+
+* Multiple unnecessary conditionals in plugins and extensions have
+  been removed.
+
+* Sequel plugin and extension code now have 100% branch coverage.
+
+* Sequel now avoids a statement not reached verbose warning in
+  Dataset#clone.
+
+= Backwards Compatibility
+
+* The output of Dataset#to_dot in the to_dot extension has changed
+  slightly, including hash entries with nil keys.  These entries
+  were previously ignored.
