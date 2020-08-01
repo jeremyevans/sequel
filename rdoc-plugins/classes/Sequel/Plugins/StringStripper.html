@@ -95,7 +95,7 @@ Sequel::Plugins::StringStripper
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-identifier">set_skipped_string_stripping_columns</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>}&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_skipped_string_stripping_columns</span>)&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

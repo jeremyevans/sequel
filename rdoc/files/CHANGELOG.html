@@ -30,12 +30,37 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-07-01 07:39:06 -0700</span>
+<span class='datetime'>2020-07-31 11:53:36 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.35.0+-282020-08-01-29">5.35.0 (2020-08-01)<span><a href="#label-5.35.0+-282020-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize another disconnect error in the oracle adapter (sterlzbd) (#1705)</p>
+</li><li>
+<p>Consider all associations with :dataset options as instance-specific associations (jeremyevans)</p>
+</li><li>
+<p>Make Model.finalize_associations not break with instance-specific associations (jeremyevans)</p>
+</li><li>
+<p>Make association placeholder loader consider block if instance_specific: false association option is used (jeremyevans)</p>
+</li><li>
+<p>Copy composite unique constraints when emulating alter table operations on SQLite (jeremyevans) (#1704)</p>
+</li><li>
+<p>Add instance_specific_default plugin for setting default association :instance_specific value, or warning/raising for cases where it is not specified (jeremyevans)</p>
+</li><li>
+<p>Make Model.plugin issue deprecation warning if loading plugin with arguments and block if plugin does not accept arguments/block (jeremyevans)</p>
+</li><li>
+<p>Make validation_class_methods consider all :if, :allow_missing, :allow_nil, and :allow_blank settings, instead of just the first (jeremyevans)</p>
+</li><li>
+<p>Include hash entries with nil keys in Dataset#to_dot output in to_dot extension (jeremyevans)</p>
+</li><li>
+<p>Remove unneeded conditionals from plugins and extensions (jeremyevans)</p>
+</li><li>
+<p>Fix exception class in run_transaction_hooks extension if calling run_after_{commit,rollback}_hooks outside of a transaction (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.34.0+-282020-07-01-29">5.34.0 (2020-07-01)<span><a href="#label-5.34.0+-282020-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make eager_graph work correctly if called with no associations (jeremyevans)</p>

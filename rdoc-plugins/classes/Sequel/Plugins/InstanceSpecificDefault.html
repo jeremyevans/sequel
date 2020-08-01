@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::InstanceSpecificDefault</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::InstanceSpecificDefault
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/instance_specific_default_rb.html">lib/sequel/plugins/instance_specific_default.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The instance_specific_default plugin exists to make it easier to use a global :instance_specific association option, or to warn or raise when <a href="../../Sequel.html"><code>Sequel</code></a> has to guess which value to use :instance_specific option (<a href="../../Sequel.html"><code>Sequel</code></a> defaults to guessing true as that is the conservative setting).  It is helpful to use this plugin, particularly with the :warn or :raise settings, to determine which associations should have :instance_specific set.  Setting the :instance_specific to false for associations that are not instance specific can improve performance.</p>
+
+<p>Associations are instance-specific if their block calls a model instance method, or where the value of the block varies based on runtime state, and the variance is outside of a delayed evaluation. For example, with the following three associations:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:last_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-identifier">num_tracks</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p><code>first_track</code> is not instance specific, but <code>last_track</code> and <code>recent_tracks</code> are. <code>last_trac</code> is because the <code>num_tracks</code> call in the block is calling <code>Album#num_tracks</code>.  <code>recent_tracks</code> is because the value will change over time. This plugin allows you to find these cases, and set the :instance_specific option appropriately for them:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:last_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-identifier">num_tracks</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>For the <code>recent_tracks</code> association, instead of marking it instance_specific, you could also use a delayed evaluation, since it doesn&#39;t actually contain instance-specific code:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>Possible arguments to provide when loading the plugin:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>true </td><td>
+<p>Set the :instance_specific option to true</p>
+</td></tr><tr><td class='label'>false </td><td>
+<p>Set the :instance_specific option to false</p>
+</td></tr><tr><td class='label'>:default </td><td>
+<p>Call super to set the :instance_specific option</p>
+</td></tr><tr><td class='label'>:warn </td><td>
+<p>Emit a warning before calling super to set the :instance_specific option</p>
+</td></tr><tr><td class='label'>:raise </td><td>
+<p>Raise a Sequel::Error if an :instance_specific option is not provided and an association could be instance-specific.</p>
+</td></tr></tbody></table>
+
+<p>Note that this plugin only affects associations which could be instance specific (those with blocks), where the :instance_specific option was not specified when the association was created.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Set how to handle associations that could be instance specific</span>&#x000A;<span class="ruby-comment"># but did not specify an :instance_specific option, for all subclasses</span>&#x000A;<span class="ruby-comment"># (set before creating subclasses).</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_specific_default</span>, <span class="ruby-value">:warn</span>&#x000A;&#x000A;<span class="ruby-comment"># Set how to handle associations that could be instance specific</span>&#x000A;<span class="ruby-comment"># but did not specify an :instance_specific option, for the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_specific_default</span>, <span class="ruby-value">:warn</span></pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="InstanceSpecificDefault/ClassMethods.html">Sequel::Plugins::InstanceSpecificDefault::ClassMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model, default)</span>
+
+</div>
+<div class='description'>
+
+<p>Set how to handle associations that could be instance specific but did not specify an :instance_specific value.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_specific_default.rb</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">default</span>)&#x000A;<span class="line-num">84</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@instance_specific_default</span>, <span class="ruby-identifier">default</span>)&#x000A;<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

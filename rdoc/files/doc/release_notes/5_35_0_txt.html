@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.35.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.35.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.35.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-07-31 11:53:36 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An instance_specific_default plugin has been added for setting the default for the :instance_specific association option, or warning/raises in cases where it is not specified.  This allows you to easily find associations that would be considering instance specific by default, and mark them as not instance specific for better performance.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Setting the :instance_specific association option to false now works correctly if the association uses a block.  Associations that set the :dataset option are now always considered instance specific, even if the :instance_specific option is explicitly passed.</p>
+</li><li>
+<p>The validation_class_methods plugin now considers all :if, :allow_missing, :allow_nil, and :allow_blank options.  Previously, it only considered the first of those options that was set.</p>
+</li><li>
+<p>Model.finalize_associations no longer breaks if you have instance-specific associations.</p>
+</li><li>
+<p>Model.plugin now warns if you load the plugin with arguments or a block if the plugin does not accept arguments or block.  This is because a future change to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> could break the call.</p>
+</li><li>
+<p>When emulating unsupported alter table operations on SQLite, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now copies composite unique constraints unless the alter table operation is the dropping of a unique constraint.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes an additional disconnect error in the oracle adapter.</p>
+</li><li>
+<p>In the run_transaction_hooks extension, calling run_after_{commit,rollback}_hooks now raises the correct exception class.</p>
+</li><li>
+<p>In the pg_range extension, conversion procs for the tsrange[] and tstzrange[] types are not added unless the Database uses the pg_array extension.</p>
+</li><li>
+<p>Multiple unnecessary conditionals in plugins and extensions have been removed.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> plugin and extension code now have 100% branch coverage.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids a statement not reached verbose warning in Dataset#clone.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The output of Dataset#to_dot in the to_dot extension has changed slightly, including hash entries with nil keys.  These entries were previously ignored.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

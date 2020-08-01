@@ -30,7 +30,7 @@ doc/association_basics.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-04-01 09:49:55 -0700</span>
+<span class='datetime'>2020-07-17 08:42:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -921,7 +921,7 @@ Last Update:
 
 <h4 id="label-3Ainstance_specific">:instance_specific<span><a href="#label-3Ainstance_specific">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>This allows you to override the setting of whether the dataset contains instance specific code.  For example, if you are passing a block to the association, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets this to true by default, which disables some optimizations that would be invalid if the association is instance specific.  If you know that the block does not contain instance specific code, you can set this to false to reenable the optimizations.</p>
+<p>This allows you to override the setting of whether the dataset contains instance specific code.  If you are passing a block to the association, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets this to true by default, which disables some optimizations that would be invalid if the association is instance specific.  If you know that the block does not contain instance specific code, you can set this to false to reenable the optimizations.  Instance specific code is mostly commonly calling model instance methods inside an association block, but also includes cases where the association block can return different values based on the runtime environment, such as calls to <code>Time.now</code> in the block. Associations that use the :dataset option are always considered instance specific, even if explicitly specified otherwise.</p>
 
 <h4 id="label-3Acartesian_product_number+">:cartesian_product_number <span><a href="#label-3Acartesian_product_number+">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
