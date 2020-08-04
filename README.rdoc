@@ -172,7 +172,7 @@ Datasets are the primary way records are retrieved and manipulated.  They are ge
   posts = DB.from(:posts)
   posts = DB[:posts] # same
 
-Datasets will only fetch records when you tell them to. They can be manipulated to filter records, change ordering, join tables, etc..  Datasets are always frozen, and they safe to use by multiple threads concurrently.
+Datasets will only fetch records when you tell them to. They can be manipulated to filter records, change ordering, join tables, etc..  Datasets are always frozen, and they are safe to use by multiple threads concurrently.
 
 === Retrieving Records
 
