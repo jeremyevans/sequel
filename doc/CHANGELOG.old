@@ -6602,7 +6602,7 @@
 
 * Fixed Model.method_missing (thanks snok.)
 
-* Model.method_missing now creates stubs for calling Model.dataset methods. Methods like Model.each etc are removed.
+* Model.method_missing now creates stubs for calling Model.dataset methods. Methods like Model.each etc. are removed.
 
 * Changed default join type to INNER JOIN (thanks snok.)
 
@@ -6783,7 +6783,7 @@
 
 * Changed Model.db and Model.db= to allow different databases for different model classes.
 
-* Fixed bug in aggregate methods (max, min, etc) for datasets using record classes.
+* Fixed bug in aggregate methods (max, min, etc.) for datasets using record classes.
 
 === 0.0.13
 

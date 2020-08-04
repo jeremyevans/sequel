@@ -159,7 +159,7 @@ New Features
     /a/.like(:x, 'b') # (('a' ~ x) OR ('a' ~ 'b'))
 
 * The Dataset#dataset_alias private method was added.  It can be
-  overridden if you have tables named t0, t1, etc and want to make
+  overridden if you have tables named t0, t1, etc., and want to make
   sure the default dataset aliases that Sequel uses do not clash
   with existing table names.
   

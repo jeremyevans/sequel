@@ -79,7 +79,7 @@ module Sequel
     def_Model(::Sequel)
 
     # The setter methods (methods ending with =) that are never allowed
-    # to be called automatically via +set+/+update+/+new+/etc..
+    # to be called automatically via +set+/+update+/+new+/etc.
     RESTRICTED_SETTER_METHODS = instance_methods.map(&:to_s).select{|l| l.end_with?('=')}.freeze
   end
 end
