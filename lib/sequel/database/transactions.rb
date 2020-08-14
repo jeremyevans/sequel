@@ -154,7 +154,7 @@ module Sequel
     #              Note that this should not be used unless the entire transaction
     #              block is idempotent, as otherwise it can cause non-idempotent
     #              behavior to execute multiple times.
-    # :rollback :: Can the set to :reraise to reraise any Sequel::Rollback exceptions
+    # :rollback :: Can be set to :reraise to reraise any Sequel::Rollback exceptions
     #              raised, or :always to always rollback even if no exceptions occur
     #              (useful for testing).
     # :server :: The server to use for the transaction. Set to :default, :read_only, or
