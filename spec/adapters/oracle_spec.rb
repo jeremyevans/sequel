@@ -65,15 +65,19 @@ describe "An Oracle database" do
   it "should have working view_exists?" do
     begin
       DB.view_exists?(:cats).must_equal false
+      DB.view_exists?(:cats, :current_schema=>true).must_equal false
       DB.create_view(:cats, DB[:categories])
       DB.view_exists?(:cats).must_equal true
+      DB.view_exists?(:cats, :current_schema=>true).must_equal true
       if IDENTIFIER_MANGLING && !DB.frozen?
         om = DB.identifier_output_method
         im = DB.identifier_input_method
         DB.identifier_output_method = :reverse
         DB.identifier_input_method = :reverse
         DB.view_exists?(:STAC).must_equal true
+        DB.view_exists?(:STAC, :current_schema=>true).must_equal true
         DB.view_exists?(:cats).must_equal false
+        DB.view_exists?(:cats, :current_schema=>true).must_equal false
       end
     ensure
       if IDENTIFIER_MANGLING && !DB.frozen?

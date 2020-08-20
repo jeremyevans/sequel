@@ -1,5 +1,7 @@
 === master
 
+* Add a :current_schema option to Database#view_exists? (only defined on Oracle) to look in the current schema instead of non-system schemas (jeremyevans) (#1710)
+
 * Recognize another disconnect error in the mysql and mysql2 adapters (jeremyevans) (#1706)
 
 === 5.35.0 (2020-08-01)

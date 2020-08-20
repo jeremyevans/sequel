@@ -103,12 +103,18 @@ module Sequel
           map{|r| m.call(r[:view_name])}
       end 
  
-      def view_exists?(name) 
-        m = input_identifier_meth
-        metadata_dataset.from(:all_views).
-          exclude(:owner=>IGNORE_OWNERS).
-          where(:view_name=>m.call(name)).
-          count > 0
+      # Whether a view with a given name exists.  By default, looks in all schemas other than system
+      # schemas.  If the :current_schema option is given, looks in the schema for the current user.
+      def view_exists?(name, opts=OPTS) 
+        ds = metadata_dataset.from(:all_views).where(:view_name=>input_identifier_meth.call(name))
+        
+        if opts[:current_schema]
+          ds = ds.where(:owner=>Sequel.function(:SYS_CONTEXT, 'userenv', 'current_schema'))
+        else
+          ds = ds.exclude(:owner=>IGNORE_OWNERS)
+        end
+
+        ds.count > 0
       end 
 
       # The version of the Oracle server, used for determining capability.
