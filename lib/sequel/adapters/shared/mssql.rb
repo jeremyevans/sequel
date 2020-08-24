@@ -659,11 +659,11 @@ module Sequel
       # case by default, and that also adds a default order, so it's better to just
       # avoid the subquery.
       def select_sql
-        if @opts[:offset] && !@opts[:order] && is_2012_or_later?
-          order(1).select_sql
-        else
-          super
+        if @opts[:offset]
+          raise(Error, "Using with_ties is not supported with an offset on Microsoft SQL Server") if @opts[:limit_with_ties]
+          return order(1).select_sql if is_2012_or_later? && !@opts[:order]
         end
+        super
       end
 
       # The version of the database server.
@@ -755,6 +755,12 @@ module Sequel
         false
       end
       
+      # Use WITH TIES when limiting the result set to also include additional
+      # rows matching the last row.
+      def with_ties
+        clone(:limit_with_ties=>true)
+      end
+
       protected
       
       # If returned primary keys are requested, use OUTPUT unless already set on the
@@ -958,6 +964,10 @@ module Sequel
         else
           sql << " TOP "
           literal_append(sql, l)
+        end
+
+        if @opts[:limit_with_ties]
+          sql << " WITH TIES"
         end
       end
 

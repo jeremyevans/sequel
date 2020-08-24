@@ -329,6 +329,18 @@ describe "Offset support" do
     @ds.limit(2, 2).all
     @hs.must_equal [{:id=>3, :parent_id=>1}, {:id=>4, :parent_id=>1}]
   end
+
+  it "should support returning limited results with ties" do
+    @ds.delete
+    @ds.insert(:id => 1)
+    @ds.insert(:id => 1)
+    @ds.insert(:id => 2)
+    @ds.insert(:id => 2)
+    @ds.order(:id).select(:id).limit(1).select_order_map(:id).must_equal [1]
+    @ds.order(:id).select(:id).limit(1).with_ties.select_order_map(:id).must_equal [1, 1]
+    @ds.order(:id).select(:id).limit(2, 1).select_order_map(:id).must_equal [1, 2]
+    proc{@ds.order(:id).select(:id).limit(2, 1).with_ties.select_order_map(:id)}.must_raise Sequel::Error
+  end
 end
 
 describe "Update/Delete on limited datasets" do

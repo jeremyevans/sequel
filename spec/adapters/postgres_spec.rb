@@ -735,6 +735,17 @@ describe "A PostgreSQL dataset" do
     @db.drop_table?(:test)
   end
 
+  it "should support returning limited results with ties" do
+    @d.insert(:value => 1)
+    @d.insert(:value => 1)
+    @d.insert(:value => 2)
+    @d.insert(:value => 2)
+    @d.order(:value).select(:value).limit(1).select_order_map(:value).must_equal [1]
+    @d.order(:value).select(:value).limit(1).with_ties.select_order_map(:value).must_equal [1, 1]
+    @d.order(:value).select(:value).limit(2, 1).select_order_map(:value).must_equal [1, 2]
+    @d.order(:value).select(:value).limit(2, 1).with_ties.select_order_map(:value).must_equal [1, 2, 2]
+  end if DB.server_version >= 130000
+
   it "should support regexps" do
     @d.insert(:name => 'abc', :value => 1)
     @d.insert(:name => 'bcd', :value => 2)

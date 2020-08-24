@@ -1885,6 +1885,13 @@ module Sequel
         end
       end
 
+      # Use WITH TIES when limiting the result set to also include additional
+      # rules that have the same results for the order column as the final row.
+      # Requires PostgreSQL 13.
+      def with_ties
+        clone(:limit_with_ties=>true)
+      end
+
       protected
 
       # If returned primary keys are requested, use RETURNING unless already set on the
@@ -2069,6 +2076,37 @@ module Sequel
       # and using ESCAPE can break LIKE ANY() usage.
       def requires_like_escape?
         false
+      end
+
+      # Support FETCH FIRST WITH TIES on PostgreSQL 13+.
+      def select_limit_sql(sql)
+        l = @opts[:limit]
+        o = @opts[:offset]
+
+        return unless l || o
+
+        if @opts[:limit_with_ties]
+          if o
+            sql << " OFFSET "
+            literal_append(sql, o)
+          end
+
+          if l
+            sql << " FETCH FIRST "
+            literal_append(sql, l)
+            sql << " ROWS WITH TIES"
+          end
+        else
+          if l
+            sql << " LIMIT "
+            literal_append(sql, l)
+          end
+
+          if o
+            sql << " OFFSET "
+            literal_append(sql, o)
+          end
+        end
       end
 
       # Support FOR SHARE locking when using the :share lock style.
