@@ -73,7 +73,10 @@
 #   j.pretty                  # jsonb_pretty(jsonb_column)
 #   j.set(%w'0 a', :h)        # jsonb_set(jsonb_column, ARRAY['0','a'], h, true)
 #
-# On PostgreSQL 12+ SQL/JSON functions and operators are supported:
+#   j.set_lax(%w'0 a', :h, false, 'raise_exception')
+#   # jsonb_set_lax(jsonb_column, ARRAY['0','a'], h, false, 'raise_exception')
+#
+# On PostgreSQL 12+ SQL/JSON path functions and operators are supported:
 #
 #   j.path_exists('$.foo')      # (jsonb_column @? '$.foo')
 #   j.path_match('$.foo')       # (jsonb_column @@ '$.foo')
@@ -84,7 +87,15 @@
 #   j.path_query_array('$.foo') # jsonb_path_query_array(jsonb_column, '$.foo')
 #   j.path_query_first('$.foo') # jsonb_path_query_first(jsonb_column, '$.foo')
 #
-# For the PostgreSQL 12+ SQL/JSON functions, one argument is required (+path+) and
+# On PostgreSQL 13+ timezone-aware SQL/JSON path functions and operators are supported:
+#
+#   j.path_exists_tz!('$.foo')     # jsonb_path_exists_tz(jsonb_column, '$.foo')
+#   j.path_match_tz!('$.foo')      # jsonb_path_match_tz(jsonb_column, '$.foo')
+#   j.path_query_tz('$.foo')       # jsonb_path_query_tz(jsonb_column, '$.foo')
+#   j.path_query_array_tz('$.foo') # jsonb_path_query_array_tz(jsonb_column, '$.foo')
+#   j.path_query_first_tz('$.foo') # jsonb_path_query_first_tz(jsonb_column, '$.foo')
+#
+# For the PostgreSQL 12+ SQL/JSON path functions, one argument is required (+path+) and
 # two more arguments are optional (+vars+ and +silent+).  +path+ specifies the JSON path.
 # +vars+ specifies a hash or a string in JSON format of named variables to be
 # substituted in +path+. +silent+ specifies whether errors are suppressed. By default,
@@ -402,6 +413,11 @@ module Sequel
         Sequel::SQL::BooleanExpression.new(:NOOP, _path_function(:jsonb_path_exists, path, vars, silent))
       end
 
+      # The same as #path_exists!, except that timezone-aware conversions are used for date/time values.
+      def path_exists_tz!(path, vars=nil, silent=nil)
+        Sequel::SQL::BooleanExpression.new(:NOOP, _path_function(:jsonb_path_exists_tz, path, vars, silent))
+      end
+
       # Returns the first item of the result of JSON path predicate check for the json object.
       # Returns nil if the first item is not true or false.
       #
@@ -425,6 +441,11 @@ module Sequel
         Sequel::SQL::BooleanExpression.new(:NOOP, _path_function(:jsonb_path_match, path, vars, silent))
       end
 
+      # The same as #path_match!, except that timezone-aware conversions are used for date/time values.
+      def path_match_tz!(path, vars=nil, silent=nil)
+        Sequel::SQL::BooleanExpression.new(:NOOP, _path_function(:jsonb_path_match_tz, path, vars, silent))
+      end
+
       # Returns a set of all jsonb values specified by the JSON path
       # for the json object.
       #
@@ -438,6 +459,11 @@ module Sequel
       #   # jsonb_path_query(json, '$.foo ? ($ > $x)', '{"x":2}', true)
       def path_query(path, vars=nil, silent=nil)
         _path_function(:jsonb_path_query, path, vars, silent)
+      end
+
+      # The same as #path_query, except that timezone-aware conversions are used for date/time values.
+      def path_query_tz(path, vars=nil, silent=nil)
+        _path_function(:jsonb_path_query_tz, path, vars, silent)
       end
 
       # Returns a jsonb array of all values specified by the JSON path
@@ -455,6 +481,11 @@ module Sequel
         JSONBOp.new(_path_function(:jsonb_path_query_array, path, vars, silent))
       end
 
+      # The same as #path_query_array, except that timezone-aware conversions are used for date/time values.
+      def path_query_array_tz(path, vars=nil, silent=nil)
+        JSONBOp.new(_path_function(:jsonb_path_query_array_tz, path, vars, silent))
+      end
+
       # Returns the first item of the result specified by the JSON path
       # for the json object.
       #
@@ -468,6 +499,11 @@ module Sequel
       #   # jsonb_path_query_first(json, '$.foo ? ($ > $x)', '{"x":2}', true)
       def path_query_first(path, vars=nil, silent=nil)
         JSONBOp.new(_path_function(:jsonb_path_query_first, path, vars, silent))
+      end
+
+      # The same as #path_query_first, except that timezone-aware conversions are used for date/time values.
+      def path_query_first_tz(path, vars=nil, silent=nil)
+        JSONBOp.new(_path_function(:jsonb_path_query_first_tz, path, vars, silent))
       end
 
       # Return the receiver, since it is already a JSONBOp.
@@ -490,6 +526,12 @@ module Sequel
       #   jsonb_op.set(['a', 'b'], h, false) # jsonb_set(jsonb, ARRAY['a', 'b'], h, false)
       def set(path, other, create_missing=true)
         self.class.new(function(:set, wrap_input_array(path), wrap_input_jsonb(other), create_missing))
+      end
+
+      # The same as #set, except if +other+ is +nil+, then behaves according to +null_value_treatment+,
+      # which can be one of 'raise_exception', 'use_json_null' (default), 'delete_key', or 'return_target'.
+      def set_lax(path, other, create_missing=true, null_value_treatment='use_json_null')
+        self.class.new(function(:set_lax, wrap_input_array(path), wrap_input_jsonb(other), create_missing, null_value_treatment))
       end
 
       private
