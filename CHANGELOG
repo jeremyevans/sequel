@@ -1,8 +1,10 @@
 === master
 
+* Stream result sets in the odbc adapter for better performance and lower memory usage (sparrovv) (#1711)
+
 * Add Postgres::JSONBOp#set_lax and #path_*_tz methods to the pg_json_ops extension for new jsonb functions added in PostgreSQL 13 (jeremyevans)
 
-* Add Dataset#with_ties on PostgreSQL 13 and Microsoft SQL Server to include rows with same order as final row (jeremyevans)
+* Add Dataset#with_ties on PostgreSQL 13+ and Microsoft SQL Server to include rows with same order as final row (jeremyevans)
 
 * Add a :current_schema option to Database#view_exists? (only defined on Oracle) to look in the current schema instead of non-system schemas (jeremyevans) (#1710)
 
