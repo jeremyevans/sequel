@@ -92,12 +92,10 @@ module Sequel
           cols = s.columns(true).map{|c| [output_identifier(c.name), c.type, i+=1]}
           columns = cols.map{|c| c[0]}
           self.columns = columns
-          if rows = s.fetch_all
-            rows.each do |row|
-              hash = {}
-              cols.each{|n,t,j| hash[n] = convert_odbc_value(row[j], t)}
-              yield hash
-            end
+          s.each do |row|
+            hash = {}
+            cols.each{|n,t,j| hash[n] = convert_odbc_value(row[j], t)}
+            yield hash
           end
         end
         self
