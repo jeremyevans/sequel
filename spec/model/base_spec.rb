@@ -413,6 +413,11 @@ describe Sequel::Model, ".dataset_module" do
   it "should raise error if called with both an argument and a block" do
     proc{@c.dataset_module(Module.new{def return_3() 3 end}){}}.must_raise(Sequel::Error)
   end
+
+  it "should have dataset_module support a method with keyword arguments" do
+    @c.dataset_module { eval('def with_foo(name: (raise)); end') }
+    proc{@c.with_foo}.must_raise(StandardError)
+  end if RUBY_VERSION >= '2.0'
 end
 
 describe "A model class with implicit table name" do

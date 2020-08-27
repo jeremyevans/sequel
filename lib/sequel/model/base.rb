@@ -756,6 +756,7 @@ module Sequel
         else
           define_singleton_method(meth){|*args, &block| dataset.public_send(meth, *args, &block)}
         end
+        singleton_class.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
       end
 
       # Get the schema from the database, fall back on checking the columns
