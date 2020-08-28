@@ -68,6 +68,7 @@ module Sequel
       # Allow calling private methods for backwards compatibility
       @db.send(method_sym, *args, &block)
     end
+    ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
     # This object responds to all methods the database responds to.
     def respond_to_missing?(meth, include_private)

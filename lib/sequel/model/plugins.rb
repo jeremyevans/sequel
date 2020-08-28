@@ -31,6 +31,7 @@ module Sequel
     def self.def_dataset_methods(mod, meths)
       Array(meths).each do |meth|
         mod.class_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
+        mod.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
       end
     end
 

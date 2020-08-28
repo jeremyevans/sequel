@@ -91,4 +91,13 @@ describe "Dataset#query" do
     proc {@d.query {row_proc}}.must_raise(Sequel::Error)
     proc {@d.query {all}}.must_raise(Sequel::Error)
   end
+  
+  if RUBY_VERSION >= '2.7'
+    it "should handle keywords when delegating" do
+      eval '@d = @d.with_extend{def foo(name: (raise)) clone(:name=>name) end}'
+      @d.query do
+        foo(name: '1')
+      end.opts[:name].must_equal '1'
+    end
+  end
 end

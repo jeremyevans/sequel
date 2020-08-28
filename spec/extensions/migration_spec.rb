@@ -63,6 +63,13 @@ describe "Migration.apply" do
     m.respond_to?(:foo).must_equal false
     m.respond_to?(:execute).must_equal true
   end
+  
+  if RUBY_VERSION >= '2.7'
+    it "should handle keywords when delegating" do
+      eval 'def @db.foo(name: (raise)) name end'
+      Sequel::Migration.new(@db).foo(:name=>1).must_equal 1
+    end
+  end
 end
 
 describe "SimpleMigration#apply" do

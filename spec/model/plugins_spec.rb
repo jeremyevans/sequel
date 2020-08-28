@@ -159,6 +159,25 @@ describe Sequel::Model, ".plugin" do
     m.args.must_equal [:apply, :cm, :im, :dm, :configure, :configure]
   end
 
+  if RUBY_VERSION >= '2.7'
+    it "should handle keywords calling apply and configure" do
+      m = Module.new do
+        eval <<-END
+          def self.apply(model, name: (raise), &block)
+            model.instance_variable_set(:@apply, name)
+          end
+          def self.configure(model, name: (raise), &block)
+            model.instance_variable_set(:@configure, name)
+          end
+        END
+      end
+      
+      @c.plugin(m, name: 1)
+      @c.instance_variable_get(:@apply).must_equal 1
+      @c.instance_variable_get(:@configure).must_equal 1
+    end
+  end
+
   it "should include an InstanceMethods module in the class if the plugin includes it" do
     @c.plugin @t
     m = @c.new
@@ -257,6 +276,26 @@ describe Sequel::Plugins do
     @c.one.must_equal 1
   end
   
+  
+  if RUBY_VERSION >= '2.7'
+    it "should handle keywords when delegating" do
+      m = Module.new do
+        module self::ClassMethods
+          Sequel::Plugins.def_dataset_methods(self, :one)
+        end
+        module self::DatasetMethods
+          eval <<-END
+            def one(name: (raise))
+              name
+            end
+          END
+        end
+      end
+      @c.plugin m
+      @c.one(name: 1).must_equal 1
+    end
+  end
+
   it "should have def_dataset_methods accept an array with multiple methods" do
     m = Module.new do
       module self::ClassMethods

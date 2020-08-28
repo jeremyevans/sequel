@@ -97,4 +97,12 @@ describe "Sequel::Plugins::AssociationProxies" do
     i.tags.where(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
   end
   
+  if RUBY_VERSION >= '2.7'
+    it "should handle keywords when delegating" do
+      Tag.send(:define_method, :to_int){1}
+      s = String.new
+      @t.pack('i', buffer: s)
+      s.wont_be_empty
+    end
+  end
 end

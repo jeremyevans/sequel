@@ -508,6 +508,7 @@ module Sequel
 
         m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
+      ruby2_keywords(:plugin) if respond_to?(:ruby2_keywords, true)
 
       # Returns primary key attribute hash.  If using a composite primary key
       # value such be an array with values for each primary key in the correct

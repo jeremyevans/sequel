@@ -1,5 +1,17 @@
 === master
 
+* Handle passing keyword arguments through class methods defined via Plugins.def_dataset_method on Ruby 2.7+ (jeremyevans)
+
+* Handle passing keyword arguments through when loading plugins on Ruby 2.7+ (jeremyevans)
+
+* Handle passing keyword arguments through migrations when defining custom Database methods that accept keywords on Ruby 2.7+ (jeremyevans)
+
+* Handle passing keyword arguments through Dataset#query when using the query extension on Ruby 2.7+ (jeremyevans)
+
+* Handle passing keyword arguments through the association proxy when using the association_proxies plugin on Ruby 2.7+ (jeremyevans)
+
+* Handle passing keyword arguments through the class method to a method defined in dataset_module on Ruby 2.7+ (adam12) (#1713)
+
 * Stream result sets in the odbc adapter for better performance and lower memory usage (sparrovv) (#1711)
 
 * Add Postgres::JSONBOp#set_lax and #path_*_tz methods to the pg_json_ops extension for new jsonb functions added in PostgreSQL 13 (jeremyevans)
