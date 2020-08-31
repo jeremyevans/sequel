@@ -212,7 +212,7 @@ In general you should only require plugin arguments if you absolutely must have 
 
 == Handling Subclasses
 
-Sequel::Model uses a copy-on-subclassing approach to model state.  So instead of model subclasses asking their parent class for a value if they don't have it defined, the value is automatically copied from the parent class to the subclass when the subclass is created.  While you can do this by overriding the inherited class method, there is a available shortcut that handles most cases:
+Sequel::Model uses a copy-on-subclassing approach to model state.  So instead of having a model subclass ask its superclass for a value if the subclass don't have the value defined, the value should be copied from the parent class to the subclass when the subclass is created.  While this can be implemented by overriding the +inherited+ class method, there is an available shortcut that handles most cases:
 
   module Sequel::Plugins::Foo
     module ClassMethods
