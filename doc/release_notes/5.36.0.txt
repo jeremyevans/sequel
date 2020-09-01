@@ -1,0 +1,60 @@
+= New Features
+
+* Dataset#with_ties has been added on PostgreSQL 13+ and Microsoft
+  SQL Server, which will have a limited dataset also return all
+  rows with the same order as the final row.
+
+* In the pg_json_ops extension, the following methods have been
+  added to Postgres::JSONBOp, all of which require PostgreSQL 13+:
+  
+  * #set_lax
+  * #path_exists_tz!
+  * #path_match_tz!
+  * #path_query_tz
+  * #path_query_array_tz
+  * #path_query_first_tz
+
+* On Oracle, the Database#view_exists? method now accepts a
+  :current_schema option to limit the views returned to the
+  current schema, instead of all non-system schemas.
+
+= Other Improvements
+
+* Sequel will now pass keyword arguments through in the following
+  cases:
+
+  * When loading plugins (Model.plugin)
+
+  * Class methods automically defined for methods defined in a
+    Model.dataset_module block
+
+  * Methods defined by Plugins.def_dataset_method
+
+  * Database methods called inside migrations
+
+  * Methods called via an association proxy when using the
+    association_proxies plugin.
+
+  * Dataset methods called inside a Dataset#query block when using
+    the query extension.
+
+  Previously, keywords were not handled in these cases, which would
+  cause deprecation warnings in Ruby 2.7 and ArgumentErrors in Ruby
+  3.0.  Note that Sequel itself does not use keyword arguments at
+  all, so all of these changes only affect cases where external
+  methods are defined that accept keywords, and Sequel methods are
+  called with keywords that end up being delegated to the external
+  methods.
+
+* The odbc adapter will now stream result sets instead of loading
+  the entire result set in memory and then iterating over it.
+
+* Sequel now recognizes another disconnect error in the mysql and
+  mysql2 adapters.
+
+= Backwards Compatibility
+
+* Due to the odbc adapter change to use streaming, issuing queries
+  inside a Dataset#each block will no longer work unless a different
+  shard or thread is used.  The behavior of such code is considered
+  undefined on all Sequel adapters.

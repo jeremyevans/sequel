@@ -1,4 +1,4 @@
-=== master
+=== 5.36.0 (2020-09-01)
 
 * Handle passing keyword arguments through class methods defined via Plugins.def_dataset_method on Ruby 2.7+ (jeremyevans)
 
