@@ -30,12 +30,37 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-07-31 11:53:36 -0700</span>
+<span class='datetime'>2020-09-01 08:06:13 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.36.0+-282020-09-01-29">5.36.0 (2020-09-01)<span><a href="#label-5.36.0+-282020-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Handle passing keyword arguments through class methods defined via Plugins.def_dataset_method on Ruby 2.7+ (jeremyevans)</p>
+</li><li>
+<p>Handle passing keyword arguments through when loading plugins on Ruby 2.7+ (jeremyevans)</p>
+</li><li>
+<p>Handle passing keyword arguments through migrations when defining custom Database methods that accept keywords on Ruby 2.7+ (jeremyevans)</p>
+</li><li>
+<p>Handle passing keyword arguments through Dataset#query when using the query extension on Ruby 2.7+ (jeremyevans)</p>
+</li><li>
+<p>Handle passing keyword arguments through the association proxy when using the association_proxies plugin on Ruby 2.7+ (jeremyevans)</p>
+</li><li>
+<p>Handle passing keyword arguments through the class method to a method defined in dataset_module on Ruby 2.7+ (adam12) (#1713)</p>
+</li><li>
+<p>Stream result sets in the odbc adapter for better performance and lower memory usage (sparrovv) (#1711)</p>
+</li><li>
+<p>Add Postgres::JSONBOp#set_lax and path_*_tz methods to the pg_json_ops extension for new jsonb functions added in PostgreSQL 13 (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#with_ties on PostgreSQL 13+ and Microsoft SQL Server to include rows with same order as final row (jeremyevans)</p>
+</li><li>
+<p>Add a :current_schema option to Database#view_exists? (only defined on Oracle) to look in the current schema instead of non-system schemas (jeremyevans) (#1710)</p>
+</li><li>
+<p>Recognize another disconnect error in the mysql and mysql2 adapters (jeremyevans) (#1706)</p>
+</li></ul>
+
 <h3 id="label-5.35.0+-282020-08-01-29">5.35.0 (2020-08-01)<span><a href="#label-5.35.0+-282020-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Recognize another disconnect error in the oracle adapter (sterlzbd) (#1705)</p>

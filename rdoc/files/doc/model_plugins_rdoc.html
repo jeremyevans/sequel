@@ -30,7 +30,7 @@ doc/model_plugins.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2020-08-31 08:10:12 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -162,7 +162,7 @@ Last Update:
 
 <h2 id="label-Handling+Subclasses">Handling Subclasses<span><a href="#label-Handling+Subclasses">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses a copy-on-subclassing approach to model state.  So instead of model subclasses asking their parent class for a value if they don&#39;t have it defined, the value is automatically copied from the parent class to the subclass when the subclass is created.  While you can do this by overriding the inherited class method, there is a available shortcut that handles most cases:</p>
+<p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses a copy-on-subclassing approach to model state.  So instead of having a model subclass ask its superclass for a value if the subclass don&#39;t have the value defined, the value should be copied from the parent class to the subclass when the subclass is created.  While this can be implemented by overriding the <code>inherited</code> class method, there is an available shortcut that handles most cases:</p>
 
 <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>&#x000A;  <span class="ruby-keyword">module</span> <span class="ruby-constant">ClassMethods</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span>.<span class="ruby-identifier">inherited_instance_variables</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:@foo_states</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:dup</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 

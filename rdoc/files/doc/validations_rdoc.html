@@ -30,7 +30,7 @@ doc/validations.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-11-15 08:53:33 -0800</span>
+<span class='datetime'>2020-08-04 18:11:34 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -149,7 +149,7 @@ Last Update:
 
 <h3 id="label-validates_operator"><code>validates_operator</code><span><a href="#label-validates_operator">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p><code>validates_operator</code> checks that a given <code>operator</code> method returns a truthy value when called on attribute with a specified value for comparison.  Generally, this is used for inequality checks (&gt;, &gt;=, etc) but any method that can be called on the attribute that accepts an argument and returns a truthy value may be used.</p>
+<p><code>validates_operator</code> checks that a given <code>operator</code> method returns a truthy value when called on attribute with a specified value for comparison.  Generally, this is used for inequality checks (&gt;, &gt;=, etc.) but any method that can be called on the attribute that accepts an argument and returns a truthy value may be used.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&gt;</span>, <span class="ruby-value">3</span>, <span class="ruby-value">:tracks</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 

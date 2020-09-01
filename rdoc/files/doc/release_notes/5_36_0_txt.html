@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.36.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.36.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.36.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-09-01 08:06:13 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#with_ties has been added on PostgreSQL 13+ and Microsoft SQL Server, which will have a limited dataset also return all rows with the same order as the final row.</p>
+</li><li>
+<p>In the pg_json_ops extension, the following methods have been added to Postgres::JSONBOp, all of which require PostgreSQL 13+:</p>
+<ul><li>
+<p>set_lax</p>
+</li><li>
+<p>path_exists_tz!</p>
+</li><li>
+<p>path_match_tz!</p>
+</li><li>
+<p>path_query_tz</p>
+</li><li>
+<p>path_query_array_tz</p>
+</li><li>
+<p>path_query_first_tz</p>
+</li></ul>
+</li><li>
+<p>On Oracle, the Database#view_exists? method now accepts a :current_schema option to limit the views returned to the current schema, instead of all non-system schemas.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now pass keyword arguments through in the following cases:</p>
+<ul><li>
+<p>When loading plugins (Model.plugin)</p>
+</li><li>
+<p>Class methods automically defined for methods defined in a Model.dataset_module block</p>
+</li><li>
+<p>Methods defined by Plugins.def_dataset_method</p>
+</li><li>
+<p>Database methods called inside migrations</p>
+</li><li>
+<p>Methods called via an association proxy when using the association_proxies plugin.</p>
+</li><li>
+<p>Dataset methods called inside a Dataset#query block when using the query extension.</p>
+</li></ul>
+
+<p>Previously, keywords were not handled in these cases, which would cause deprecation warnings in Ruby 2.7 and ArgumentErrors in Ruby 3.0.  Note that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> itself does not use keyword arguments at all, so all of these changes only affect cases where external methods are defined that accept keywords, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> methods are called with keywords that end up being delegated to the external methods.</p>
+</li><li>
+<p>The odbc adapter will now stream result sets instead of loading the entire result set in memory and then iterating over it.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes another disconnect error in the mysql and mysql2 adapters.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Due to the odbc adapter change to use streaming, issuing queries inside a Dataset#each block will no longer work unless a different shard or thread is used.  The behavior of such code is considered undefined on all <a href="../../../classes/Sequel.html"><code>Sequel</code></a> adapters.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

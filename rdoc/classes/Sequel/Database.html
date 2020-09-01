@@ -2536,7 +2536,7 @@ Superclass:
 </td></tr><tr><td class='label'>:retry_on </td><td>
 <p>An exception class or array of exception classes for which to automatically retry the transaction.  Can only be set if not inside an existing transaction. Note that this should not be used unless the entire transaction block is idempotent, as otherwise it can cause non-idempotent behavior to execute multiple times.</p>
 </td></tr><tr><td class='label'>:rollback </td><td>
-<p>Can the set to :reraise to reraise any Sequel::Rollback exceptions raised, or :always to always rollback even if no exceptions occur (useful for testing).</p>
+<p>Can be set to :reraise to reraise any Sequel::Rollback exceptions raised, or :always to always rollback even if no exceptions occur (useful for testing).</p>
 </td></tr><tr><td class='label'>:server </td><td>
 <p>The server to use for the transaction. Set to :default, :read_only, or whatever symbol you used in the connect string when naming your servers.</p>
 </td></tr><tr><td class='label'>:savepoint </td><td>

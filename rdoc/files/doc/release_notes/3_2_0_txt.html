@@ -30,7 +30,7 @@ doc/release_notes/3.2.0.txt
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+<span class='datetime'>2020-08-04 18:11:34 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -112,7 +112,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">String</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringMethods</span>)&#x000A;<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringMethods</span>)&#x000A;&#x000A;<span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>)  <span class="ruby-comment"># (&#39;a&#39; LIKE x)</span>&#x000A;<span class="ruby-regexp">/a/</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>)  <span class="ruby-comment"># (&#39;a&#39; ~ x)</span>&#x000A;<span class="ruby-regexp">/a/i</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>) <span class="ruby-comment"># (&#39;a&#39; ~* x)</span>&#x000A;<span class="ruby-regexp">/a/</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># ((&#39;a&#39; ~ x) OR (&#39;a&#39; ~ &#39;b&#39;))</span></pre>
 </li><li>
-<p>The Dataset#dataset_alias private method was added.  It can be overridden if you have tables named t0, t1, etc and want to make sure the default dataset aliases that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses do not clash with existing table names.</p>
+<p>The Dataset#dataset_alias private method was added.  It can be overridden if you have tables named t0, t1, etc., and want to make sure the default dataset aliases that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses do not clash with existing table names.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an Error if you call Sequel.connect with something that is not a Hash or String.</p>
 </li><li>
