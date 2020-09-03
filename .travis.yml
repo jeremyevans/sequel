@@ -11,7 +11,6 @@ rvm:
   - jruby-9.2.9.0
   - jruby-head
   - ruby-head
-  - truffleruby
   - truffleruby-head
 matrix:
   include:
@@ -27,7 +26,6 @@ matrix:
     - rvm: jruby-head
     - rvm: ruby-head
     - rvm: jruby-9.0.5.0
-    - rvm: truffleruby
     - rvm: truffleruby-head
 before_install:
   - gem install bundler || gem install bundler --version '< 2'
