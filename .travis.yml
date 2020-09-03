@@ -12,6 +12,7 @@ rvm:
   - jruby-head
   - ruby-head
   - truffleruby
+  - truffleruby-head
 matrix:
   include:
     - rvm: 1.9.3
@@ -27,6 +28,7 @@ matrix:
     - rvm: ruby-head
     - rvm: jruby-9.0.5.0
     - rvm: truffleruby
+    - rvm: truffleruby-head
 before_install:
   - gem install bundler || gem install bundler --version '< 2'
 script: bundle exec rake spec_travis
