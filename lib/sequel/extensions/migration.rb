@@ -330,7 +330,8 @@ module Sequel
   # schema_migrations for timestamped migrations). in the database to keep track
   # of the current migration version. If no migration version is stored in the
   # database, the version is considered to be 0. If no target version is 
-  # specified, the database is migrated to the latest version available in the
+  # specified, or the target version specified is greater than the latest
+  # version available, the database is migrated to the latest version available in the
   # migration directory.
   #
   # For example, to migrate the database to the latest version:
