@@ -1,3 +1,7 @@
+=== master
+
+* Raise Migrator::Error if attempting to migrate down to a version where there are necessary migration files missing (jeremyevans) (#1716)
+
 === 5.36.0 (2020-09-01)
 
 * Handle passing keyword arguments through class methods defined via Plugins.def_dataset_method on Ruby 2.7+ (jeremyevans)

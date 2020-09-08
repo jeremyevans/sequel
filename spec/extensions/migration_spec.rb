@@ -324,6 +324,12 @@ describe "Sequel::IntegerMigrator" do
     proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
   
+  it "should raise an error if there is a missing integer migration version greater than equal to schema version" do
+    proc{Sequel::Migrator.run(@db, "spec/files/integer_migrations", :target=>3, :current=>4)}.must_raise(Sequel::Migrator::Error)
+    proc{Sequel::Migrator.run(@db, "spec/files/integer_migrations", :target=>4, :current=>4)}.must_raise(Sequel::Migrator::Error)
+    proc{Sequel::Migrator.run(@db, "spec/files/integer_migrations", :target=>5, :current=>4)}.must_raise(Sequel::Migrator::Error)
+  end
+
   it "should not raise an error if there is a missing integer migration version and allow_missing_migration_files is true" do
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true)
     @db.sqls.last.must_equal "UPDATE schema_info SET version = 3"

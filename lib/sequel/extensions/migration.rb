@@ -538,6 +538,11 @@ module Sequel
       end
 
       @direction = current < target ? :up : :down
+
+      if @direction == :down && @current >= @files.length
+        raise Migrator::Error, "Missing migration version(s) needed to migrate down to target version (current: #{current}, target: #{target})"
+      end
+
       @migrations = get_migrations
     end
 
