@@ -211,6 +211,54 @@ describe "Sequel::Plugins::Dirty" do
       @o.previous_changes.must_equal(:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2'])
     end
 
+    it "column_previously_was should show the previous value of the column" do
+      @o.save
+      @o.column_previously_was(:initial_changed).must_equal 'ic'
+      @o.column_previously_was(:missing_changed).must_be_nil
+    end
+
+    it "column_previously_was should be nil if there were no previous changes" do
+      @o.save
+      @o.column_previously_was(:initial).must_be_nil
+      @o.column_previously_was(:missing).must_be_nil
+    end
+
+    it "column_previously_changed? should include whether the column previously changed" do
+      @o.save
+      @o.column_previously_changed?(:initial_changed).must_equal true
+      @o.column_previously_changed?(:missing_changed).must_equal true
+      @o.column_previously_changed?(:initial).must_equal false
+      @o.column_previously_changed?(:missing).must_equal false
+    end
+
+    it "column_previously_changed? should accept :from and :to options" do
+      @o.save
+      @o.column_previously_changed?(:initial_changed, :from=>'ic').must_equal true
+      @o.column_previously_changed?(:initial_changed, :from=>'ic2').must_equal false
+      @o.column_previously_changed?(:missing_changed, :from=>nil).must_equal true
+      @o.column_previously_changed?(:missing_changed, :from=>'mc2').must_equal false
+      @o.column_previously_changed?(:initial, :from=>nil).must_equal false
+      @o.column_previously_changed?(:missing, :from=>nil).must_equal false
+
+      @o.column_previously_changed?(:initial_changed, :to=>'ic').must_equal false
+      @o.column_previously_changed?(:initial_changed, :to=>'ic2').must_equal true
+      @o.column_previously_changed?(:missing_changed, :to=>nil).must_equal false
+      @o.column_previously_changed?(:missing_changed, :to=>'mc2').must_equal true
+      @o.column_previously_changed?(:initial, :to=>nil).must_equal false
+      @o.column_previously_changed?(:missing, :to=>nil).must_equal false
+
+      @o.column_previously_changed?(:initial_changed, :from=>'ic', :to=>'ic2').must_equal true
+      @o.column_previously_changed?(:initial_changed, :from=>'ic2', :to=>'ic2').must_equal false
+      @o.column_previously_changed?(:initial_changed, :from=>'ic', :to=>'ic').must_equal false
+      @o.column_previously_changed?(:initial_changed, :from=>'ic2', :to=>'ic').must_equal false
+      @o.column_previously_changed?(:missing_changed, :from=>nil, :to=>'mc2').must_equal true
+      @o.column_previously_changed?(:missing_changed, :from=>'mc2', :to=>'mc2').must_equal false
+      @o.column_previously_changed?(:missing_changed, :from=>'mc', :to=>'mc').must_equal false
+      @o.column_previously_changed?(:missing_changed, :from=>'mc2', :to=>nil).must_equal false
+      @o.column_previously_changed?(:initial, :from=>'', :to=>'').must_equal false
+      @o.column_previously_changed?(:missing, :from=>'', :to=>'').must_equal false
+    end
+
     it "should work when freezing objects after saving" do
       @o.initial = 'a'
       @o.save

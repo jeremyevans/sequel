@@ -1,5 +1,7 @@
 === master
 
+* Add Model#column_previously_was and #column_previously_changed? to the dirty plugin (jeremyevans)
+
 * Raise Migrator::Error if attempting to migrate down to a version where there are necessary migration files missing (jeremyevans) (#1716)
 
 === 5.36.0 (2020-09-01)

@@ -41,6 +41,15 @@ module Sequel
     #   artist.column_changes        # => {}
     #   artist.previous_changes      # => {:name=>['Foo', 'Bar']}
     #
+    #   artist.column_previously_was(:name)
+    #   # => 'Foo'
+    #   artist.column_previously_changed?(:name)
+    #   # => true
+    #   artist.column_previously_changed?(:name, from: 'Foo', to: 'Bar')
+    #   # => true
+    #   artist.column_previously_changed?(:name, from: 'Foo', to: 'Baz')
+    #   # => false
+    #
     # There is one caveat; when used with a column that also uses the
     # serialization plugin, setting the column back to its original value
     # after changing it is not correctly detected and will leave an entry
@@ -105,6 +114,41 @@ module Sequel
           initial_values.has_key?(column)
         end
 
+        # Whether the column was previously changed.
+        # Options:
+        # :from :: If given, the previous initial value of the column must match this
+        # :to :: If given, the previous changed value of the column must match this
+        #
+        #   update(name: 'Current')
+        #   previous_changes                  # => {:name=>['Initial', 'Current']}
+        #   column_previously_changed?(:name) # => true
+        #   column_previously_changed?(:id)   # => false
+        #   column_previously_changed?(:name, from: 'Initial', to: 'Current') # => true
+        #   column_previously_changed?(:name, from: 'Foo', to: 'Current')     # => false
+        def column_previously_changed?(column, opts=OPTS)
+          return false unless (pc = @previous_changes) && (val = pc[column])
+
+          if opts.has_key?(:from)
+            return false unless val[0] == opts[:from]
+          end
+
+          if opts.has_key?(:to)
+            return false unless val[1] == opts[:to]
+          end
+
+          true
+        end
+
+        # The previous value of the column, which is the initial value of
+        # the column before the object was previously saved.
+        #
+        #   initial_value(:name) # => 'Initial'
+        #   update(name: 'Current')
+        #   column_previously_was(:name) # => 'Initial'
+        def column_previously_was(column)
+          (pc = @previous_changes) && (val = pc[column]) && val[0]
+        end
+
         # Freeze internal data structures
         def freeze
           initial_values.freeze
@@ -143,6 +187,7 @@ module Sequel
           end
         end
 
+        # Manually specify that a column will change.  This should only be used
         # Manually specify that a column will change.  This should only be used
         # if you plan to modify a column value in place, which is not recommended.
         #
