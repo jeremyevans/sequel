@@ -158,6 +158,30 @@ module Sequel
         end
       end
     end
+
+    # :nocov:
+    if defined?(PGRow::ArrayRow)
+    # :nocov:
+      class PGRow::ArrayRow
+        # Wrap the PGRow::ArrayRow instance in an PGRowOp, allowing you to easily use
+        # the PostgreSQL row functions and operators with literal rows.
+        def op
+          Sequel.pg_row_op(self)
+        end
+      end
+    end
+
+    # :nocov:
+    if defined?(PGRow::HashRow)
+    # :nocov:
+      class PGRow::HashRow
+        # Wrap the PGRow::ArrayRow instance in an PGRowOp, allowing you to easily use
+        # the PostgreSQL row functions and operators with literal rows.
+        def op
+          Sequel.pg_row_op(self)
+        end
+      end
+    end
   end
 
   module SQL::Builders

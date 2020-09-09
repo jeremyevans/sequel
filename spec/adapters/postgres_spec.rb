@@ -4263,6 +4263,12 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:street]).must_equal '123 Sesame St'
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:city]).must_equal 'Somewhere'
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:zip]).must_equal '12345'
+
+    @db.get(@ds.get(Sequel.pg_row(:company)[:employees][1][:address]).op[:street]).must_equal '123 Sesame St'
+
+    if DB.server_version >= 130000
+      @db.get(Sequel.pg_row([1,2,3]).op[:f1]).must_equal 1
+    end
   end
 
   describe "#splat and #*" do

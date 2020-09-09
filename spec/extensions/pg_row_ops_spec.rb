@@ -58,4 +58,12 @@ describe "Sequel::Postgres::PGRowOp" do
   it "Sequel.pg_row should work as well if the pg_row extension is loaded" do
     @db.literal(Sequel.pg_row(Sequel.function(:a))[:b]).must_equal "(a()).b"
   end
+
+  it "Sequel.pg_row(array).op should work" do
+    @db.literal(Sequel.pg_row([1, 2, 3]).op[:f1]).must_equal "(ROW(1, 2, 3)).f1"
+  end
+
+  it "Sequel.pg_row(array).op should work" do
+    @db.literal(Sequel::Postgres::PGRow::HashRow.subclass(:rowx, [:a]).new(:a=>1).op[:a]).must_equal "(ROW(1)::rowx).a"
+  end
 end

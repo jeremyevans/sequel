@@ -1,5 +1,7 @@
 === master
 
+* Add Postgres::PGRow::{Array,Hash}Row#op to the pg_row_ops extension if the pg_row extension is loaded (jeremyevans)
+
 * Add Model#column_previously_was and #column_previously_changed? to the dirty plugin (jeremyevans)
 
 * Raise Migrator::Error if attempting to migrate down to a version where there are necessary migration files missing (jeremyevans) (#1716)
