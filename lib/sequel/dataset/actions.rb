@@ -607,14 +607,16 @@ module Sequel
     # as_hash, it accepts an optional :hash parameter, into which entries will
     # be merged. 
     #
-    #   DB[:table].select_hash(:id, :name) # SELECT id, name FROM table
+    #   DB[:table].select_hash(:id, :name)
+    #   # SELECT id, name FROM table
     #   # => {1=>'a', 2=>'b', ...}
     #
     # You can also provide an array of column names for either the key_column,
     # the value column, or both:
     #
-    #   DB[:table].select_hash([:id, :foo], [:name, :bar]) # SELECT * FROM table
-    #   # {[1, 3]=>['a', 'c'], [2, 4]=>['b', 'd'], ...}
+    #   DB[:table].select_hash([:id, :foo], [:name, :bar])
+    #   # SELECT id, foo, name, bar FROM table
+    #   # => {[1, 3]=>['a', 'c'], [2, 4]=>['b', 'd'], ...}
     #
     # When using this method, you must be sure that each expression has an alias
     # that Sequel can determine.
@@ -626,14 +628,16 @@ module Sequel
     # Similar to to_hash_groups, but only selects the columns given.  Like to_hash_groups,
     # it accepts an optional :hash parameter, into which entries will be merged. 
     #
-    #   DB[:table].select_hash_groups(:name, :id) # SELECT id, name FROM table
+    #   DB[:table].select_hash_groups(:name, :id)
+    #   # SELECT id, name FROM table
     #   # => {'a'=>[1, 4, ...], 'b'=>[2, ...], ...}
     #
     # You can also provide an array of column names for either the key_column,
     # the value column, or both:
     #
-    #   DB[:table].select_hash_groups([:first, :middle], [:last, :id]) # SELECT * FROM table
-    #   # {['a', 'b']=>[['c', 1], ['d', 2], ...], ...}
+    #   DB[:table].select_hash_groups([:first, :middle], [:last, :id])
+    #   # SELECT first, middle, last, id FROM table
+    #   # => {['a', 'b']=>[['c', 1], ['d', 2], ...], ...}
     #
     # When using this method, you must be sure that each expression has an alias
     # that Sequel can determine.
