@@ -559,6 +559,13 @@ describe "A PostgreSQL database" do
     @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
   end
 
+  it "should correctly handle various numbers of columns" do
+    [1, 2, 15, 16, 17, 63, 64, 65, 255, 256, 257, 1663, 1664].each do |i|
+      DB.get((1..i).map{|j| Sequel.as(j, "c#{j}")}).must_equal((1..i).to_a)
+    end
+    proc{DB.get((1..1665).map{|j| Sequel.as(j, "c#{j}")})}.must_raise Sequel::DatabaseError
+  end
+
   it "should support ordering in aggregate functions" do
     @db.from(@db.values([['1'], ['2']]).as(:t, [:a])).get{string_agg(:a, '-').order(Sequel.desc(:a)).as(:c)}.must_equal '2-1'
   end if DB.server_version >= 90000
