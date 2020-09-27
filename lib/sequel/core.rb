@@ -52,13 +52,12 @@ module Sequel
     #
     #   Sequel.datetime_class = DateTime
     #
-    # Note that +Time+ and +DateTime+ objects
-    # have a different API, and in cases where they implement the same methods,
-    # they often implement them differently (e.g. + using seconds on +Time+ and
-    # days on +DateTime+).
+    # Note that +Time+ and +DateTime+ objects have a different API, and in
+    # cases where they implement the same methods, they often implement them
+    # differently (e.g. + using seconds on +Time+ and days on +DateTime+).
     attr_accessor :datetime_class
 
-    # Set whether Sequel is being used in single threaded mode. by default,
+    # Set whether Sequel is being used in single threaded mode. By default,
     # Sequel uses a thread-safe connection pool, which isn't as fast as the
     # single threaded connection pool, and also has some additional thread
     # safety checks.  If your program will only have one thread,
@@ -67,7 +66,7 @@ module Sequel
     #   Sequel.single_threaded = true
     attr_accessor :single_threaded
 
-    # Alias of original require method, as Sequel.require is does a relative
+    # Alias of original require method, as Sequel.require does a relative
     # require for backwards compatibility.
     alias orig_require require
     private :orig_require
