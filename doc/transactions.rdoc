@@ -143,14 +143,6 @@ If you want the current savepoint to be rolled back when the savepoint block exi
     end # RELEASE SAVEPOINT
   end # COMMIT
 
-If you want the current savepoint to be rolled back when the savepoint block exits (even if an exception is not raised), use <tt>Database#rollback_on_exit(:savepoint=>true)</tt>
-
-  DB.transaction do # BEGIN
-    DB.transaction(savepoint: true) do # SAVEPOINT
-      DB.rollback_on_exit(:savepoint=>true)
-    end # ROLLBACK TO SAVEPOINT
-  end # COMMIT
-
 If you want the current savepoint and potentially enclosing savepoints to be rolled back when the savepoint blocks exit  (even if an exception is not raised), use <tt>Database#rollback_on_exit(:savepoint=>integer)</tt>
 
   DB.transaction do # BEGIN
