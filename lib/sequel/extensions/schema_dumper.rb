@@ -37,7 +37,7 @@ module Sequel
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/
         {:type=>:Bignum}
-      when /\A(?:real|float(?: unsigned)?|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/
+      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\))(?: unsigned)?\z/
         {:type=>Float}
       when 'boolean', 'bit', 'bool'
         {:type=>TrueClass}
@@ -57,7 +57,7 @@ module Sequel
         {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money\z/
         {:type=>BigDecimal, :size=>[19,2]}
-      when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?\z/
+      when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?(?: unsigned)?\z/
         s = [($1.to_i if $1), ($2.to_i if $2)].compact
         {:type=>BigDecimal, :size=>(s.empty? ? nil : s)}
       when /\A(?:bytea|(?:tiny|medium|long)?blob|(?:var)?binary)(?:\((\d+)\))?\z/
