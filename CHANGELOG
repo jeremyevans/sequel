@@ -1,5 +1,7 @@
 === master
 
+* Recognize more unsigned decimal/float types in the schema dumper (akimd, jeremyevans) (#1720)
+
 * Add Postgres::PGRow::{Array,Hash}Row#op to the pg_row_ops extension if the pg_row extension is loaded (jeremyevans)
 
 * Add Model#column_previously_was and #column_previously_changed? to the dirty plugin (jeremyevans)
