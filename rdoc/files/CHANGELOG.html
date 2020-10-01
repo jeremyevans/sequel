@@ -30,12 +30,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-09-01 08:06:13 -0700</span>
+<span class='datetime'>2020-10-01 07:33:48 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.37.0+-282020-10-01-29">5.37.0 (2020-10-01)<span><a href="#label-5.37.0+-282020-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize more unsigned decimal/float types in the schema dumper (akimd, jeremyevans) (#1720)</p>
+</li><li>
+<p>Add Postgres::PGRow::{Array,Hash}Row#op to the pg_row_ops extension if the pg_row extension is loaded (jeremyevans)</p>
+</li><li>
+<p>Add Model#column_previously_was and column_previously_changed? to the dirty plugin (jeremyevans)</p>
+</li><li>
+<p>Raise Migrator::Error if attempting to migrate down to a version where there are necessary migration files missing (jeremyevans) (#1716)</p>
+</li></ul>
+
 <h3 id="label-5.36.0+-282020-09-01-29">5.36.0 (2020-09-01)<span><a href="#label-5.36.0+-282020-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Handle passing keyword arguments through class methods defined via Plugins.def_dataset_method on Ruby 2.7+ (jeremyevans)</p>

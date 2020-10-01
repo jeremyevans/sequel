@@ -30,6 +30,12 @@ Sequel::Postgres::PGRow::ArrayRow
 <li>
 <a href="../../../../files/lib/sequel/extensions/pg_row_rb.html">lib/sequel/extensions/pg_row.rb</a>
 </li>
+<li class='other'>
+<a href="../../../../files/lib/sequel/extensions/pg_row_ops_rb.html">lib/sequel/extensions/pg_row_ops.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
 </ol>
 <div class='parent'>
 Superclass:
@@ -39,7 +45,9 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Class for row-valued/composite types that are treated as arrays. By default, this is only used for generic PostgreSQL record types, as registered types use <a href="HashRow.html"><code>HashRow</code></a> by default.</p>
+<p>Class for row-valued/composite types that are treated as arrays. By default, this is only used for generic PostgreSQL record types, as registered types use HashRow by default.</p>
+
+<p>:nocov:</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -52,6 +60,7 @@ Superclass:
 <ol>
 <li><a href="#method-i-db_type">db_type</a></li>
 <li><a href="#attribute-i-db_type">db_type</a></li>
+<li><a href="#method-i-op">op</a></li>
 <li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
 </ol>
 </div>
@@ -126,6 +135,24 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-db_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>&#x000A;<span class="line-num">127</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-op'>
+<a name='method-i-op'></a>
+<div class='synopsis'>
+<span class='name'>op</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Wrap the <a href="ArrayRow.html"><code>PGRow::ArrayRow</code></a> instance in an <a href="../PGRowOp.html"><code>PGRowOp</code></a>, allowing you to easily use the PostgreSQL row functions and operators with literal rows.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-op-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;<span class="line-num">169</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>

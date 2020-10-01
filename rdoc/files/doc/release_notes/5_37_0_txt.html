@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.37.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.37.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.37.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-10-01 07:33:48 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Model#column_previously_was and column_previously_changed? have been added to the dirty plugin, for getting the previous values of the column before saving and for whether there were changes before saving.</p>
+
+<p>Model#column_previously_changed? accepts :from and :to options to allow you to more easily determine if the value changed from and/or to specific values.</p>
+
+<p>This information was previously obtainable via Model#previous_changes, but these new methods offer a friendlier interface.</p>
+</li><li>
+<p>Postgres::PGRow::{Array,Hash}Row#op has been added to the pg_row_ops extension if the pg_row extension is loaded.  This is similar to how the pg_array_ops, pg_hstore_ops, and pg_json_ops and op method to their objects.  This makes it easier to perform row operations on literal rows.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The schema_dumper extension now supports more unsigned numeric types, such as “decimal(7,2) unsigned” and “real unsigned”.</p>
+</li><li>
+<p>IntegerMigrator now raises an Migrator::Error if attempting to migrate down when there are migration files missing and needed for the down migration.  Previously, IntegerMigrator would not raise an exception and would make no database changes in this case.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
