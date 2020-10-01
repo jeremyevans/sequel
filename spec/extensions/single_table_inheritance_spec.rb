@@ -50,6 +50,16 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTestSub1.simple_table.must_be_nil
   end
   
+  it "should not attempt to use prepared statements" do
+    StiTestSub1.plugin :prepared_statements
+    StiTestSub1.load(:id=>1, :kind=>'StiTestSub1').save
+    DB.sqls.must_equal ["UPDATE sti_tests SET kind = 'StiTestSub1' WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 1))"]
+
+    StiTest.plugin :prepared_statements
+    StiTest.load(:id=>2, :kind=>'StiTest').save
+    DB.sqls.must_equal ["UPDATE sti_tests SET kind = 'StiTest' WHERE (id = 2)"]
+  end
+
   it "should allow changing the inheritance column via a plugin :single_table_inheritance call" do
     StiTest.plugin :single_table_inheritance, :blah
     Object.send(:remove_const, :StiTestSub1)

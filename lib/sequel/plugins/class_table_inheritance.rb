@@ -433,11 +433,6 @@ module Sequel
             end
           end
         end
-
-        # Don't allow use of prepared statements.
-        def use_prepared_statements_for?(type)
-          false
-        end
       end
     end
   end
