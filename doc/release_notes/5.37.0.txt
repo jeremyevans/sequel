@@ -1,0 +1,30 @@
+= New Features
+
+* Model#column_previously_was and #column_previously_changed? have
+  been added to the dirty plugin, for getting the previous values
+  of the column before saving and for whether there were changes
+  before saving.
+  
+  Model#column_previously_changed? accepts :from and :to options
+  to allow you to more easily determine if the value changed from
+  and/or to specific values.
+
+  This information was previously obtainable via
+  Model#previous_changes, but these new methods offer a friendlier
+  interface.
+
+* Postgres::PGRow::{Array,Hash}Row#op has been added to the
+  pg_row_ops extension if the pg_row extension is loaded.  This
+  is similar to how the pg_array_ops, pg_hstore_ops, and
+  pg_json_ops and #op method to their objects.  This makes it
+  easier to perform row operations on literal rows.
+
+= Other Improvements
+
+* The schema_dumper extension now supports more unsigned numeric
+  types, such as "decimal(7,2) unsigned" and "real unsigned".
+
+* IntegerMigrator now raises an Migrator::Error if attempting to
+  migrate down when there are migration files missing and needed for
+  the down migration.  Previously, IntegerMigrator would not raise an
+  exception and would make no database changes in this case.

@@ -1,4 +1,4 @@
-=== master
+=== 5.37.0 (2020-10-01)
 
 * Recognize more unsigned decimal/float types in the schema dumper (akimd, jeremyevans) (#1720)
 
