@@ -188,7 +188,6 @@ module Sequel
         end
 
         # Manually specify that a column will change.  This should only be used
-        # Manually specify that a column will change.  This should only be used
         # if you plan to modify a column value in place, which is not recommended.
         #
         #   will_change_column(:name)
