@@ -1,5 +1,7 @@
 === master
 
+* Only rescue non-disconnect Sequel::DatabaseErrors in Postgres::Database#server_version (jeremyevans) (#1724)
+
 * Make the single_table_inheritance and prepared_statements plugins work if loaded into the same class (jeremyevans) (#1721)
 
 === 5.37.0 (2020-10-01)
