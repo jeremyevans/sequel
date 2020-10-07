@@ -184,7 +184,7 @@ module Sequel
 
       def create_table_from_generator(name, generator, options)
         drop_statement, create_statements = create_table_sql_list(name, generator, options)
-        (execute_ddl(drop_statement) rescue nil) if drop_statement
+        swallow_database_error{execute_ddl(drop_statement)} if drop_statement
         create_statements.each{|sql| execute_ddl(sql)}
       end
 

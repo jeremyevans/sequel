@@ -240,7 +240,7 @@ module Sequel
       if supports_create_or_replace_view?
         options = options.merge(:replace=>true)
       else
-        drop_view(name) rescue nil
+        swallow_database_error{drop_view(name)}
       end
 
       create_view(name, source, options)

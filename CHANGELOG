@@ -1,5 +1,7 @@
 === master
 
+* Do not swallow disconnect errors in Database#create_or_replace_view or Database#create_table* on Oracle (jeremyevans)
+
 * Only rescue non-disconnect Sequel::DatabaseErrors in Postgres::Database#server_version (jeremyevans) (#1724)
 
 * Make the single_table_inheritance and prepared_statements plugins work if loaded into the same class (jeremyevans) (#1721)

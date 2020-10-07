@@ -781,18 +781,7 @@ module Sequel
         return @server_version if @server_version
         ds = dataset
         ds = ds.server(server) if server
-        begin
-          @server_version = ds.with_sql("SELECT CAST(current_setting('server_version_num') AS integer) AS v").single_value
-        rescue Sequel::DatabaseDisconnectError
-          # Always raise disconnect errors
-          raise
-        rescue Sequel::DatabaseError
-          # Don't raise other database errors.  This could be a database that speaks the PostgreSQL
-          # protocol but does handle handle CAST(current_setting('server_version_num') AS integer).
-          @server_version = 0
-        # else
-        #   Don't rescue other exceptions, they will be raised normally.
-        end
+        @server_version = swallow_database_error{ds.with_sql("SELECT CAST(current_setting('server_version_num') AS integer) AS v").single_value} || 0
       end
 
       # PostgreSQL supports CREATE TABLE IF NOT EXISTS on 9.1+

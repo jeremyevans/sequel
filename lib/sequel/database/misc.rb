@@ -446,6 +446,19 @@ module Sequel
       end
     end
 
+    # Swallow database errors, unless they are connect/disconnect errors.
+    def swallow_database_error
+      yield
+    rescue Sequel::DatabaseDisconnectError, DatabaseConnectionError
+      # Always raise disconnect errors
+      raise
+    rescue Sequel::DatabaseError
+      # Don't raise other database errors.
+      nil
+    # else
+    #   Don't rescue other exceptions, they will be raised normally.
+    end
+
     # Typecast the value to an SQL::Blob
     def typecast_value_blob(value)
       value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)

@@ -1607,6 +1607,24 @@ describe "Database#create_view" do
     @db.sqls.must_equal ['DROP VIEW test', 'CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
   end
 
+  it "should handle create_or_replace_view when DROP VIEW raises a database error" do
+    def @db.drop_view(*) super; raise Sequel::DatabaseError end
+    @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
+    @db.sqls.must_equal ['DROP VIEW test', 'CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
+  end
+
+  it "should raise in create_or_replace_view when DROP VIEW raises a disconnect error" do
+    def @db.drop_view(*) super; raise Sequel::DatabaseDisconnectError end
+    proc{@db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)}.must_raise Sequel::DatabaseDisconnectError
+    @db.sqls.must_equal ['DROP VIEW test']
+  end
+
+  it "should raise in create_or_replace_view when DROP VIEW raises a connect error" do
+    def @db.drop_view(*) super; raise Sequel::DatabaseConnectionError end
+    proc{@db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)}.must_raise Sequel::DatabaseConnectionError
+    @db.sqls.must_equal ['DROP VIEW test']
+  end
+
   it "should use CREATE OR REPLACE VIEW if such syntax is supported" do
     def @db.supports_create_or_replace_view?() true end
     @db.create_or_replace_view :test, @db[:items]
