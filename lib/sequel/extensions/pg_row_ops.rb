@@ -88,10 +88,10 @@ module Sequel
   module Postgres
     # This class represents a composite type expression reference.
     class PGRowOp < SQL::PlaceholderLiteralString
-      ROW = ['(', '.*)'].freeze.each(&:freeze)
-      ROW_CAST = ['(', '.*)::'].freeze.each(&:freeze)
-      QUALIFY = ['(', ').'].freeze.each(&:freeze)
-      WRAP = [""].freeze.each(&:freeze)
+      ROW = ['(', '.*)'].freeze
+      ROW_CAST = ['(', '.*)::'].freeze
+      QUALIFY = ['(', ').'].freeze
+      WRAP = [""].freeze
 
       # Wrap the expression in a PGRowOp, without changing the
       # SQL it would use.

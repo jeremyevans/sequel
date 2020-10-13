@@ -28,10 +28,10 @@ module Sequel
       SYNCHRONOUS = [:off, :normal, :full].freeze
       TEMP_STORE = [:default, :file, :memory].freeze
       TRANSACTION_MODE = {
-        :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
-        :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
-        :exclusive => "BEGIN EXCLUSIVE TRANSACTION".freeze,
-        nil => "BEGIN".freeze
+        :deferred => "BEGIN DEFERRED TRANSACTION",
+        :immediate => "BEGIN IMMEDIATE TRANSACTION",
+        :exclusive => "BEGIN EXCLUSIVE TRANSACTION",
+        nil => "BEGIN"
       }.freeze
 
       # Whether to use integers for booleans in the database.  SQLite recommends
@@ -552,9 +552,9 @@ module Sequel
       include UnmodifiedIdentifiers::DatasetMethods
 
       # The allowed values for insert_conflict
-      INSERT_CONFLICT_RESOLUTIONS = %w'ROLLBACK ABORT FAIL IGNORE REPLACE'.each(&:freeze).freeze
+      INSERT_CONFLICT_RESOLUTIONS = %w'ROLLBACK ABORT FAIL IGNORE REPLACE'.freeze
 
-      CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}.freeze
+      CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')", :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')", :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')"}.freeze
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}.freeze
       EXTRACT_MAP.each_value(&:freeze)
 

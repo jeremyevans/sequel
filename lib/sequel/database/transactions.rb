@@ -9,10 +9,10 @@ module Sequel
     # them do.
     # ---------------------
 
-    TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ UNCOMMITTED'.freeze,
-      :committed=>'READ COMMITTED'.freeze,
-      :repeatable=>'REPEATABLE READ'.freeze,
-      :serializable=>'SERIALIZABLE'.freeze}.freeze
+    TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ UNCOMMITTED',
+      :committed=>'READ COMMITTED',
+      :repeatable=>'REPEATABLE READ',
+      :serializable=>'SERIALIZABLE'}.freeze
     
     # The default transaction isolation level for this database,
     # used for all future transactions.  For MSSQL, this should be set

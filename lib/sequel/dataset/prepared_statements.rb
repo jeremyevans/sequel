@@ -10,11 +10,11 @@ module Sequel
     
     PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze
 
-    DEFAULT_PREPARED_STATEMENT_MODULE_METHODS = %w'execute execute_dui execute_insert'.freeze.each(&:freeze)
+    DEFAULT_PREPARED_STATEMENT_MODULE_METHODS = %w'execute execute_dui execute_insert'.freeze
     PREPARED_STATEMENT_MODULE_CODE = {
-      :bind => "opts = Hash[opts]; opts[:arguments] = bind_arguments".freeze,
-      :prepare => "sql = prepared_statement_name".freeze,
-      :prepare_bind => "sql = prepared_statement_name; opts = Hash[opts]; opts[:arguments] = bind_arguments".freeze
+      :bind => "opts = Hash[opts]; opts[:arguments] = bind_arguments",
+      :prepare => "sql = prepared_statement_name",
+      :prepare_bind => "sql = prepared_statement_name; opts = Hash[opts]; opts[:arguments] = bind_arguments"
     }.freeze
 
     def self.prepared_statements_module(code, mods, meths=DEFAULT_PREPARED_STATEMENT_MODULE_METHODS, &block)

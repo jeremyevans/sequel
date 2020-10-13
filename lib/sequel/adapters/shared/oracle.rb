@@ -250,10 +250,10 @@ module Sequel
         super
       end
       
-      TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ COMMITTED'.freeze,
-        :committed=>'READ COMMITTED'.freeze,
-        :repeatable=>'SERIALIZABLE'.freeze,
-        :serializable=>'SERIALIZABLE'.freeze}.freeze
+      TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ COMMITTED',
+        :committed=>'READ COMMITTED',
+        :repeatable=>'SERIALIZABLE',
+        :serializable=>'SERIALIZABLE'}.freeze
       # Oracle doesn't support READ UNCOMMITTED OR REPEATABLE READ transaction
       # isolation levels, so upgrade to the next highest level in those cases.
       def set_transaction_isolation_sql(level)
