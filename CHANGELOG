@@ -1,5 +1,7 @@
 === master
 
+* Support the newer com.mysql.cj.jdbc.Driver in the jdbc/mysql adapter (jeremyevans)
+
 * Do not swallow disconnect errors in Database#create_or_replace_view or Database#create_table* on Oracle (jeremyevans)
 
 * Only rescue non-disconnect Sequel::DatabaseErrors in Postgres::Database#server_version (jeremyevans) (#1724)

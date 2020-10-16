@@ -51,7 +51,19 @@ module Sequel
     # Raise a Sequel::AdapterNotFound if evaluating the class name raises a NameError.
     def self.load_driver(drv, gem=nil)
       load_gem(gem) if gem
-      eval drv
+      if drv.is_a?(String)
+        eval drv
+      else
+        *try, last = drv
+        try.each do |try_drv|
+          begin
+            return eval(try_drv)
+          rescue NameError
+          end
+        end
+
+        eval last
+      end
     rescue NameError
       raise Sequel::AdapterNotFound, "#{drv} not loaded#{", try installing jdbc-#{gem.to_s.downcase} gem" if gem}"
     end

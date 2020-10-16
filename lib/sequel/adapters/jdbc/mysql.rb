@@ -1,15 +1,15 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('com.mysql.jdbc.Driver', :MySQL)
-require_relative '../shared/mysql'
-
 module Sequel
   module JDBC
+    driver = Sequel::JDBC.load_driver(%w'com.mysql.cj.jdbc.Driver com.mysql.jdbc.Driver', :MySQL)
+    require_relative '../shared/mysql'
+
     Sequel.synchronize do
       DATABASE_SETUP[:mysql] = proc do |db|
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
         db.extend_datasets Sequel::MySQL::DatasetMethods
-        com.mysql.jdbc.Driver
+        driver
       end
     end
 
