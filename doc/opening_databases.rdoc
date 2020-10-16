@@ -208,7 +208,7 @@ Example connection strings:
 
   jdbc:sqlite::memory:
   jdbc:postgresql://localhost/database?user=username
-  jdbc:mysql://localhost/test?user=root&password=root
+  jdbc:mysql://localhost/test?user=root&password=root&serverTimezone=UTC
   jdbc:h2:mem:
   jdbc:hsqldb:mem:mymemdb
   jdbc:derby:memory:myDb;create=true
@@ -240,6 +240,10 @@ The following additional options are supported:
 There are a few issues with specific jdbc driver gems:
 
 jdbc-h2 :: jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working correctly in some cases.
+jdbc-mysql :: Depending on the configuration of the MySQL server, jdbc-mysql versions greater 8 may complain
+              about the server time zone being unrecognized.  You can either use an older jdbc-mysql version,
+              or you can specify the +serverTimezone+ option in the connection string, as shown in the example
+              jdbc:mysql connection string above.
 
 === mysql 
 
