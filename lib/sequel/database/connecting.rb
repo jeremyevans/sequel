@@ -55,7 +55,6 @@ module Sequel
 
       begin
         db = c.new(opts)
-        db.test_connection if db.send(:typecast_value_boolean, opts.fetch(:test, true))
         if block_given?
           return yield(db)
         end

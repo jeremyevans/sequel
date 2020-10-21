@@ -1,5 +1,7 @@
 === master
 
+* Do not add new Database instances to Sequel::DATABASES if the test connection fails (jeremyevans) (#1727)
+
 * Support the newer com.mysql.cj.jdbc.Driver in the jdbc/mysql adapter (jeremyevans)
 
 * Do not swallow disconnect errors in Database#create_or_replace_view or Database#create_table* on Oracle (jeremyevans)

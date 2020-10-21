@@ -166,6 +166,7 @@ module Sequel
         end
 
         initialize_load_extensions(:extensions)
+        test_connection if typecast_value_boolean(@opts.fetch(:test, true)) && respond_to?(:connect, true)
       rescue
         Sequel.synchronize{::Sequel::DATABASES.delete(self)} if keep_reference
         raise

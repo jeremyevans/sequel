@@ -65,6 +65,19 @@ describe "A new Database" do
     cc.must_equal 1234
   end
 
+  it "should not add the instance to Sequel::DATABASES if testing the connection during initialization fails" do
+    c = Class.new(Sequel::Database) do
+      def connect(*) raise end
+    end
+    num_dbs = Sequel::DATABASES.size
+    proc{c.new}.must_raise Sequel::DatabaseConnectionError
+    Sequel::DATABASES.size.must_equal num_dbs
+
+    db = c.new(:test=>false)
+    Sequel::DATABASES.size.must_equal(num_dbs+1)
+    Sequel::DATABASES[-1].must_equal db
+  end
+
   it "should respect the :single_threaded option" do
     db = Sequel::Database.new(:single_threaded=>true){123}
     db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
