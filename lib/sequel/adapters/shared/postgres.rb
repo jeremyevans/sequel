@@ -846,7 +846,7 @@ module Sequel
       # :schema :: The schema to search
       # :server :: The server to use
       def tables(opts=OPTS, &block)
-        pg_class_relname('r', opts, &block)
+        pg_class_relname(['r', 'p'], opts, &block)
       end
 
       # Check whether the given type name string/symbol (e.g. :hstore) is supported by

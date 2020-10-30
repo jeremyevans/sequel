@@ -12,6 +12,32 @@ rescue LoadError
 end
 DB.extension :pg_hstore if DB.type_supported?('hstore')
 
+describe 'A PostgreSQL database' do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table(:test)
+  end
+
+  it "should provide a list of existing ordinary tables" do
+    @db.create_table(:test){Integer :id}
+    @db.tables.must_equal [:test]
+  end
+
+  it "should provide a list of existing partitioned tables" do
+    @db.create_table(:test, :partition_by => :id, :partition_type => :range){Integer :id}
+    @db.tables.must_equal [:test]
+  end if DB.server_version >= 100000
+
+  it "should provide a list of existing ordinary and partitioned tables" do
+    @db.create_table(:test, :partition_by => :id, :partition_type => :range){Integer :id}
+    @db.create_table(:test_1, :partition_of => :test){from 1; to 3}
+    @db.create_table(:test_2, :partition_of => :test){from 3; to 4}
+    @db.tables.sort_by{|t| t.to_s}.must_equal [:test, :test_1, :test_2]
+  end if DB.server_version >= 100000
+end
+
 describe "PostgreSQL", '#create_table' do
   before do
     @db = DB
