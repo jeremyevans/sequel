@@ -1,0 +1,28 @@
+= New Features
+
+* The jdbc/mysql adapter now supports the newer
+  com.mysql.cj.jdbc.Driver driver.  The adapter will still attempt to
+  load the older com.mysql.jdbc.Driver if the com.mysql.cj.jdbc.Driver
+  is not found.
+
+= Other Improvements
+
+* When testing a connection after creating a new Database instance
+  raises an exception, the Database instance is removed from
+  Sequel::DATABASES.
+
+* The single_table_inheritance and prepared_statements plugins now
+  work correctly if loaded into the same class.
+
+* Database connect and disconnect errors are no longer swallowed when
+  calling Database#create_or_replace_view, Database#server_version
+  on PostgreSQL, or Database#create_table* on Oracle.
+
+= Backwards Compatibility
+
+* Previously, instantiating a new Database instance directly using
+  Sequel::Database.new did not test the connection by default.  That
+  was instead handled by Sequel::Database.connect.  The test
+  connection now happens inside Database#initialize.  This should only
+  affect backwards compatibility for code that is calling
+  Sequel::Database.new directly.
