@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-07-05 09:50:06 -0700</span>
+<span class='datetime'>2020-10-16 09:55:57 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -203,7 +203,7 @@ Last Update:
 
 <p>Example connection strings:</p>
 
-<pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
+<pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&amp;serverTimezone=UTC&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <p>You can also use JNDI connection strings:</p>
 
@@ -223,6 +223,8 @@ Last Update:
 <p>There are a few issues with specific jdbc driver gems:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>jdbc-h2 </td><td>
 <p>jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working correctly in some cases.</p>
+</td></tr><tr><td class='label'>jdbc-mysql </td><td>
+<p>Depending on the configuration of the MySQL server, jdbc-mysql versions greater 8 may complain about the server time zone being unrecognized.  You can either use an older jdbc-mysql version, or you can specify the <code>serverTimezone</code> option in the connection string, as shown in the example jdbc:mysql connection string above.</p>
 </td></tr></tbody></table>
 
 <h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#top">&uarr;</a></span></h3>

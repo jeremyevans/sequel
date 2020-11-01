@@ -1,4 +1,4 @@
-Thu, 01 Oct 2020 07:51:09 -0700
+Sun, 01 Nov 2020 09:37:33 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -96,7 +96,7 @@ lib/sequel/plugins/blacklist_security.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/boolean_readers.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_subsets.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/plugins/caching.rb	Fri, 25 Oct 2019 08:54:59 -0700
-lib/sequel/plugins/class_table_inheritance.rb	Thu, 09 Jul 2020 12:21:33 -0700
+lib/sequel/plugins/class_table_inheritance.rb	Thu, 01 Oct 2020 08:09:24 -0700
 lib/sequel/plugins/column_conflicts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/column_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/columns_updated.rb	Tue, 28 Mar 2017 16:44:29 -0700
@@ -107,7 +107,7 @@ lib/sequel/plugins/dataset_associations.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/def_dataset_method.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/defaults_setter.rb	Wed, 10 Oct 2018 16:08:59 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/dirty.rb	Wed, 09 Sep 2020 16:07:51 -0700
+lib/sequel/plugins/dirty.rb	Mon, 05 Oct 2020 18:05:43 -0700
 lib/sequel/plugins/eager_each.rb	Fri, 16 Jun 2017 12:40:57 -0700
 lib/sequel/plugins/eager_graph_eager.rb	Mon, 06 Aug 2018 08:40:06 -0700
 lib/sequel/plugins/empty_failure_backtraces.rb	Wed, 08 Jan 2020 16:27:45 -0800
@@ -140,7 +140,7 @@ lib/sequel/plugins/rcte_tree.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/serialization.rb	Sat, 20 Jan 2018 09:42:41 -0800
 lib/sequel/plugins/serialization_modification_detection.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/sharding.rb	Mon, 02 Sep 2019 15:03:40 -0700
-lib/sequel/plugins/single_table_inheritance.rb	Thu, 16 Apr 2020 13:01:31 -0700
+lib/sequel/plugins/single_table_inheritance.rb	Thu, 01 Oct 2020 08:09:24 -0700
 lib/sequel/plugins/singular_table_names.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/skip_saving_columns.rb	Wed, 11 Mar 2020 16:32:40 -0700

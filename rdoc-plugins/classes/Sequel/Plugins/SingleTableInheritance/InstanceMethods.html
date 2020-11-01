@@ -40,6 +40,7 @@ Sequel::Plugins::SingleTableInheritance::InstanceMethods
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-before_validation">before_validation</a></li>
+<li><a href="#method-i-use_prepared_statements_for-3F">use_prepared_statements_for?</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -63,6 +64,24 @@ Sequel::Plugins::SingleTableInheritance::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">247</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;<span class="line-num">248</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>[<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span>]&#x000A;<span class="line-num">249</span>     <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{model.sti_key}=&quot;</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key_chooser</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>))&#x000A;<span class="line-num">250</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">251</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">252</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-use_prepared_statements_for-3F'>
+<a name='method-i-use_prepared_statements_for-3F'></a>
+<div class='synopsis'>
+<span class='name'>use_prepared_statements_for?</span><span class='arguments'>(type)</span>
+
+</div>
+<div class='description'>
+
+<p>Don&#39;t allow use of prepared statements.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-use_prepared_statements_for-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-use_prepared_statements_for-3F-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">255</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use_prepared_statements_for?</span>(<span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">256</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">257</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

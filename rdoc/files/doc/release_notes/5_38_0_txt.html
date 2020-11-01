@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.38.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.38.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.38.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-10-30 11:01:43 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The jdbc/mysql adapter now supports the newer com.mysql.cj.jdbc.Driver driver.  The adapter will still attempt to load the older com.mysql.jdbc.Driver if the com.mysql.cj.jdbc.Driver is not found.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When testing a connection after creating a new Database instance raises an exception, the Database instance is removed from Sequel::DATABASES.</p>
+</li><li>
+<p>The single_table_inheritance and <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugins now work correctly if loaded into the same class.</p>
+</li><li>
+<p>Database connect and disconnect errors are no longer swallowed when calling Database#create_or_replace_view, Database#server_version on PostgreSQL, or Database#create_table* on Oracle.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Previously, instantiating a new Database instance directly using <a href="../../../classes/Sequel/Database.html#method-c-new"><code>Sequel::Database.new</code></a> did not test the connection by default.  That was instead handled by <a href="../../../classes/Sequel/Database.html#method-c-connect"><code>Sequel::Database.connect</code></a>.  The test connection now happens inside Database#initialize.  This should only affect backwards compatibility for code that is calling <a href="../../../classes/Sequel/Database.html#method-c-new"><code>Sequel::Database.new</code></a> directly.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

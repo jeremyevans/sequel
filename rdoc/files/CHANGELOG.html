@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-10-01 07:33:48 -0700</span>
+<span class='datetime'>2020-10-30 11:01:43 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.38.0+-282020-11-01-29">5.38.0 (2020-11-01)<span><a href="#label-5.38.0+-282020-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Do not add new Database instances to Sequel::DATABASES if the test connection fails (jeremyevans) (#1727)</p>
+</li><li>
+<p>Support the newer com.mysql.cj.jdbc.Driver in the jdbc/mysql adapter (jeremyevans)</p>
+</li><li>
+<p>Do not swallow disconnect errors in Database#create_or_replace_view or Database#create_table* on Oracle (jeremyevans)</p>
+</li><li>
+<p>Only rescue non-disconnect Sequel::DatabaseErrors in Postgres::Database#server_version (jeremyevans) (#1724)</p>
+</li><li>
+<p>Make the single_table_inheritance and <a href="doc/prepared_statements_rdoc.html">prepared_statements</a> plugins work if loaded into the same class (jeremyevans) (#1721)</p>
+</li></ul>
+
 <h3 id="label-5.37.0+-282020-10-01-29">5.37.0 (2020-10-01)<span><a href="#label-5.37.0+-282020-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Recognize more unsigned decimal/float types in the schema dumper (akimd, jeremyevans) (#1720)</p>

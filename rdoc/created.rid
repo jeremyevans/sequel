@@ -1,6 +1,6 @@
-Thu, 01 Oct 2020 07:49:36 -0700
+Sun, 01 Nov 2020 09:36:01 -0800
 README.rdoc	Tue, 04 Aug 2020 18:11:34 -0700
-CHANGELOG	Thu, 01 Oct 2020 07:33:48 -0700
+CHANGELOG	Fri, 30 Oct 2020 11:01:43 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 08 Jan 2020 19:52:18 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,20 +14,20 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Fri, 17 Apr 2020 11:52:37 -0700
-lib/sequel/version.rb	Thu, 01 Oct 2020 07:33:48 -0700
+lib/sequel/version.rb	Fri, 30 Oct 2020 11:01:43 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
-lib/sequel/database/connecting.rb	Fri, 26 Jun 2020 14:43:12 -0700
+lib/sequel/database/connecting.rb	Wed, 21 Oct 2020 16:41:13 -0700
 lib/sequel/database/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
-lib/sequel/database/misc.rb	Fri, 26 Jun 2020 14:43:12 -0700
+lib/sequel/database/misc.rb	Wed, 21 Oct 2020 16:41:13 -0700
 lib/sequel/database/query.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/database/schema_generator.rb	Fri, 26 Jun 2020 14:43:12 -0700
-lib/sequel/database/schema_methods.rb	Fri, 26 Jun 2020 14:43:12 -0700
+lib/sequel/database/schema_methods.rb	Wed, 07 Oct 2020 15:45:35 -0700
 lib/sequel/database/transactions.rb	Fri, 14 Aug 2020 07:43:42 -0700
 lib/sequel/dataset/actions.rb	Thu, 10 Sep 2020 07:57:41 -0700
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
@@ -62,7 +62,7 @@ doc/model_hooks.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/opening_databases.rdoc	Fri, 05 Jul 2019 09:50:06 -0700
+doc/opening_databases.rdoc	Fri, 16 Oct 2020 09:55:57 -0700
 doc/postgresql.rdoc	Mon, 30 Mar 2020 09:21:48 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Thu, 22 Mar 2018 21:49:57 -0700
@@ -225,6 +225,7 @@ doc/release_notes/5.34.0.txt	Wed, 01 Jul 2020 07:39:06 -0700
 doc/release_notes/5.35.0.txt	Fri, 31 Jul 2020 11:53:36 -0700
 doc/release_notes/5.36.0.txt	Tue, 01 Sep 2020 08:06:13 -0700
 doc/release_notes/5.37.0.txt	Thu, 01 Oct 2020 07:33:48 -0700
+doc/release_notes/5.38.0.txt	Fri, 30 Oct 2020 11:01:43 -0700
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
