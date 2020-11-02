@@ -1,3 +1,7 @@
+=== master
+
+* Make Database#tables return partitioned tables on PostgreSQL 10+ (epoberezhny) (#1729, #1730)
+
 === 5.38.0 (2020-11-01)
 
 * Do not add new Database instances to Sequel::DATABASES if the test connection fails (jeremyevans) (#1727)
