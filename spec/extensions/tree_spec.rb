@@ -47,6 +47,11 @@ describe Sequel::Model, "tree plugin" do
     klass(:key=>:p_id).parent_column.must_equal :p_id
   end
 
+  it "should have qualified_parent_column give a qualified identifier for the parent column" do
+    @c.qualified_parent_column.must_equal Sequel.qualify(:nodes, :parent_id)
+    klass(:key=>:p_id).qualified_parent_column.must_equal Sequel.qualify(:nodes, :p_id)
+  end
+
   it "should have tree_order give the order of the association" do
     @c.tree_order.must_be_nil
     klass(:order=>:name).tree_order.must_equal :name
@@ -62,20 +67,20 @@ describe Sequel::Model, "tree plugin" do
   it "should have roots return an array of the tree's roots" do
     @c.dataset = @c.dataset.with_fetch([{:id=>1, :parent_id=>nil, :name=>'r'}])
     @c.roots.must_equal [@c.load(:id=>1, :parent_id=>nil, :name=>'r')]
-    @db.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id IS NULL)"]
+    @db.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.parent_id IS NULL)"]
     @c.exclude(id: 2).roots.must_equal [@c.load(:id=>1, :parent_id=>nil, :name=>'r')]
-    @db.sqls.must_equal ["SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL))"]
+    @db.sqls.must_equal ["SELECT * FROM nodes WHERE ((id != 2) AND (nodes.parent_id IS NULL))"]
   end
 
   it "should have roots_dataset be a dataset representing the tree's roots" do
-    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE (parent_id IS NULL)"
-    @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL))"
+    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE (nodes.parent_id IS NULL)"
+    @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (nodes.parent_id IS NULL))"
   end
 
   it "should have roots_dataset include an order if the tree has an order" do
     @c.tree_order = :id
-    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE (parent_id IS NULL) ORDER BY id"
-    @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL)) ORDER BY id"
+    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE (nodes.parent_id IS NULL) ORDER BY id"
+    @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (nodes.parent_id IS NULL)) ORDER BY id"
   end
 
   it "should have ancestors return the ancestors of the current node" do
@@ -121,7 +126,7 @@ describe Sequel::Model, "tree plugin" do
     h = {:id=>2, :parent_id=>nil, :name=>'AA'}
     @c.dataset = @c.dataset.with_fetch(h)
     @c.load(h).self_and_siblings.must_equal [@c.load(h)]
-    @db.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id IS NULL)"]
+    @db.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.parent_id IS NULL)"]
   end
 
   it "should have siblings return the children of the current node's parent, except for the current node" do
@@ -236,11 +241,11 @@ describe Sequel::Model, "tree plugin with composite keys" do
   it "should have roots return an array of the tree's roots" do
     @c.dataset = @c.dataset.with_fetch([{:id=>1, :parent_id=>nil, :parent_id2=>nil, :name=>'r'}])
     @c.roots.must_equal [@c.load(:id=>1, :parent_id=>nil, :parent_id2=>nil, :name=>'r')]
-    @db.sqls.must_equal ["SELECT * FROM nodes WHERE ((parent_id IS NULL) OR (parent_id2 IS NULL))"]
+    @db.sqls.must_equal ["SELECT * FROM nodes WHERE ((nodes.parent_id IS NULL) OR (nodes.parent_id2 IS NULL))"]
   end
 
   it "should have roots_dataset be a dataset representing the tree's roots" do
-    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((parent_id IS NULL) OR (parent_id2 IS NULL))"
+    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((nodes.parent_id IS NULL) OR (nodes.parent_id2 IS NULL))"
   end
 
   it "should have ancestors return the ancestors of the current node" do

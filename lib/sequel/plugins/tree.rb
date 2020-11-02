@@ -45,6 +45,7 @@ module Sequel
 
         model.instance_exec do
           @parent_column = opts[:key]
+          @qualified_parent_column = Sequel.deep_qualify(table_name, opts[:key])
           @tree_order = opts[:order]
           @parent_association_name = parent
           @children_association_name = children
@@ -59,9 +60,13 @@ module Sequel
         # The column symbol or array of column symbols on which to order the tree.
         attr_accessor :tree_order
         
-        # The symbol for the column containing the value pointing to the
-        # parent of the leaf.
+        # The symbol or array of symbols for the column containing the value pointing to the
+        # parent of the node.
         attr_accessor :parent_column
+
+        # The qualified identifier or array of qualified identifiers for the column
+        # containing the value pointing to the parent of the node.
+        attr_accessor :qualified_parent_column
 
         # The association name for the parent association
         attr_reader :parent_association_name
@@ -69,7 +74,7 @@ module Sequel
         # The association name for the children association
         attr_reader :children_association_name
 
-        Plugins.inherited_instance_variables(self, :@parent_column=>nil, :@tree_order=>nil, :@parent_association_name=>nil, :@children_association_name=>nil)
+        Plugins.inherited_instance_variables(self, :@parent_column=>nil, :@qualified_parent_column=>nil, :@tree_order=>nil, :@parent_association_name=>nil, :@children_association_name=>nil)
         Plugins.def_dataset_methods(self, [:roots, :roots_dataset])
 
         # Should freeze tree order if it is an array when freezing the model class.
@@ -151,7 +156,7 @@ module Sequel
         #
         #   TreeClass.roots_dataset # => Sequel::Dataset instance
         def roots_dataset
-          ds = where(Sequel.or(Array(model.parent_column).zip([])))
+          ds = where(Sequel.or(Array(model.qualified_parent_column).zip([])))
           ds = ds.order(*model.tree_order) if model.tree_order
           ds
         end
