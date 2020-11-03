@@ -883,7 +883,7 @@ raise an error by default:
 == Sequel Release Policy
 
 New major versions of Sequel do not have a defined release policy, but historically have
-occurred once ever few years.
+occurred once every few years.
 
 New minor versions of Sequel are released around once a month near the start of the month.
 
