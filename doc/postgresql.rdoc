@@ -213,7 +213,7 @@ other tables.  Support may be added in the future.
 === Creating Unlogged Tables
 
 PostgreSQL allows users to create unlogged tables, which are faster but not crash safe.  Sequel
-allows you do create an unlogged table by specifying the <tt>unlogged: true</tt> option to +create_table+:
+allows you to create an unlogged table by specifying the <tt>unlogged: true</tt> option to +create_table+:
 
   DB.create_table(:table, unlogged: true){Integer :i}
   # CREATE UNLOGGED TABLE "table" ("i" integer)
