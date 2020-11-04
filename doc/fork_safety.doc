@@ -1,10 +1,10 @@
 = Fork Safety
 
-If you are forking or using a library that forks after your Sequel code is
-loaded, then you must disconnect database connections before forking. If you
+If you are forking or using a library that forks after you have created a
+Sequel::Database instance, then you must disconnect database connections before forking. If you
 don't do this, you can end up with child processes sharing database connections
-and all sorts of weird behavior.  Sequel will automatically reconnect on an as
-needed basis in the child processes, so you only need to do the following in
+and all sorts of weird behavior, including crashes.  Sequel will automatically create new
+connections on an as needed basis in the child processes, so you only need to do the following in
 the parent process:
 
   DB.disconnect
@@ -15,19 +15,18 @@ Or if you have connections to multiple databases:
 
 == Puma
 
-In Puma web server, you can disconnect inside the `before_fork` hook in your
+When using the Puma web server in clustered mode (which is the default behavior in Puma 5+ when
+using multiple processes), you should disconnect inside the +before_fork+ hook in your
 Puma config:
 
   before_fork do
     Sequel::DATABASES.each(&:disconnect)
   end
 
-Note that you only need this if you're using Puma's clustered mode.
-
 == Unicorn
 
-In Unicorn web server, you can disconnect inside the `before_fork` hook in your
-Unicorn config:
+When using the Unicorn web server and preloading the application (+preload_app true+ in the Unicorn
+config), you should disconnect inside the +before_fork+ hook in the Unicorn config:
 
   before_fork do
     Sequel::DATABASES.each(&:disconnect)
@@ -35,8 +34,8 @@ Unicorn config:
 
 == Passenger
 
-In Passenger web server, you can disconnect inside the
-`starting_worker_process` event hook:
+In Passenger web server, you should disconnect inside the
++starting_worker_process+ event hook:
 
   if defined?(PhusionPassenger)
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
@@ -44,10 +43,12 @@ In Passenger web server, you can disconnect inside the
     end
   end
 
+Note that this disconnects after forking instead of before forking.  Passenger does not
+offer a before fork hook.
+
 == Spring
 
-In Spring application preloader, you can disconnect inside the `after_fork`
-hook:
+In Spring application preloader, you should disconnect inside the +after_fork+ hook:
 
   if defined?(Spring)
     Spring.after_fork do
@@ -55,9 +56,12 @@ hook:
     end
   end
 
+As the method indicates, this disconnects after forking instead of before forking.
+Spring does not offer a before fork hook.
+
 == Resque
 
-In Resque, you can disconnect inside the `before_fork` hook:
+In Resque, you should disconnect inside the +before_fork+ hook:
 
   Resque.before_fork do |job|
     Sequel::DATABASES.each(&:disconnect)
@@ -65,8 +69,16 @@ In Resque, you can disconnect inside the `before_fork` hook:
 
 == Parallel
 
-If you're using the Parallel gem with processes, you can disconnect before
+If you're using the Parallel gem with processes, you should disconnect before
 calling it:
 
   Sequel::DATABASES.each(&:disconnect)
-  Parallel.map(['a','b','c'], in_processes: 3) { |one_letter| ... }
+  Parallel.map(['a','b','c'], in_processes: 3) { |one_letter| }
+
+== Other Libraries Calling fork
+
+For any other library that calls fork, you should disconnect before calling
+a method that forks:
+
+  Sequel::DATABASES.each(&:disconnect)
+  SomeLibrary.method_that_forks
