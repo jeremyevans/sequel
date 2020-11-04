@@ -1,0 +1,72 @@
+= Fork Safety
+
+If you are forking or using a library that forks after your Sequel code is
+loaded, then you must disconnect database connections before forking. If you
+don't do this, you can end up with child processes sharing database connections
+and all sorts of weird behavior.  Sequel will automatically reconnect on an as
+needed basis in the child processes, so you only need to do the following in
+the parent process:
+
+  DB.disconnect
+
+Or if you have connections to multiple databases:
+
+  Sequel::DATABASES.each(&:disconnect)
+
+== Puma
+
+In Puma web server, you can disconnect inside the `before_fork` hook in your
+Puma config:
+
+  before_fork do
+    Sequel::DATABASES.each(&:disconnect)
+  end
+
+Note that you only need this if you're using Puma's clustered mode.
+
+== Unicorn
+
+In Unicorn web server, you can disconnect inside the `before_fork` hook in your
+Unicorn config:
+
+  before_fork do
+    Sequel::DATABASES.each(&:disconnect)
+  end
+
+== Passenger
+
+In Passenger web server, you can disconnect inside the
+`starting_worker_process` event hook:
+
+  if defined?(PhusionPassenger)
+    PhusionPassenger.on_event(:starting_worker_process) do |forked|
+      Sequel::DATABASES.each(&:disconnect) if forked
+    end
+  end
+
+== Spring
+
+In Spring application preloader, you can disconnect inside the `after_fork`
+hook:
+
+  if defined?(Spring)
+    Spring.after_fork do
+      Sequel::DATABASES.each(&:disconnect)
+    end
+  end
+
+== Resque
+
+In Resque, you can disconnect inside the `before_fork` hook:
+
+  Resque.before_fork do |job|
+    Sequel::DATABASES.each(&:disconnect)
+  end
+
+== Parallel
+
+If you're using the Parallel gem with processes, you can disconnect before
+calling it:
+
+  Sequel::DATABASES.each(&:disconnect)
+  Parallel.map(['a','b','c'], in_processes: 3) { |one_letter| ... }
