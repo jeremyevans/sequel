@@ -186,7 +186,7 @@ module Sequel
 
           CsvSerializer.csv_call(:generate, opts) do |csv|
             items.each do |object|
-              csv << headers.map{|header| object.public_send(header)}
+              csv << headers.map{|header| object[header]}
             end
           end
         end
