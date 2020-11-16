@@ -1,6 +1,8 @@
 language: ruby
 rvm:
   - 2.0.0
+  - 2.1
+  - 2.3
 matrix:
   include:
     - rvm: 1.9.3
