@@ -146,8 +146,7 @@ end
 
 task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
   mysql_host = "localhost"
-
-  database = "/sequel_test" unless ENV["DEFAULT_DATABASE"]
+  pg_database = "/sequel_test" unless ENV["DEFAULT_DATABASE"]
 
   if ENV["MYSQL_ROOT_PASSWORD"]
     mysql_password = "&password=root"
@@ -156,12 +155,12 @@ task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
 
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
     ENV['SEQUEL_SQLITE_URL'] = "jdbc:sqlite::memory:"
-    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost#{database}?user=postgres"
-    ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://#{mysql_host}#{database}?user=root#{mysql_password}"
+    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost#{pg_database}?user=postgres"
+    ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://#{mysql_host}/sequel_test?user=root#{mysql_password}"
   else
     ENV['SEQUEL_SQLITE_URL'] = "sqlite:/"
-    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost#{database}?user=postgres"
-    ENV['SEQUEL_MYSQL_URL'] = "mysql2://#{mysql_host}#{database}?user=root#{mysql_password}"
+    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost#{pg_database}?user=postgres"
+    ENV['SEQUEL_MYSQL_URL'] = "mysql2://#{mysql_host}/sequel_test?user=root#{mysql_password}"
   end
 
   Rake::Task['spec_sqlite'].invoke
