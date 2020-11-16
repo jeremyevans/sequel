@@ -1,36 +1,14 @@
 language: ruby
 rvm:
   - 2.0.0
-  - 2.1
-  - 2.2
-  - 2.3
-  - 2.4
-  - 2.5
-  - 2.6
-  - 2.7
-  - jruby-9.2.9.0
-  - jruby-head
-  - ruby-head
-  - truffleruby-head
 matrix:
   include:
     - rvm: 1.9.3
       dist: trusty
-    - rvm: jruby-19mode
-      dist: trusty
-    - rvm: jruby-9.0.5.0
-      dist: trusty
-    - rvm: jruby-9.1.17.0
-      dist: trusty
-  allow_failures:
-    - rvm: jruby-head
-    - rvm: ruby-head
-    - rvm: jruby-9.0.5.0
-    - rvm: truffleruby-head
 before_install:
-  - gem install bundler || gem install bundler --version '< 2'
-script: bundle exec rake spec_travis
-gemfile: .travis.gemfile
+  - gem install bundler --version '< 2'
+script: bundle exec rake spec_ci
+gemfile: .ci.gemfile
 before_script:
   - mysql -e 'create database sequel_test;'
   - psql -c 'create database sequel_test;' -U postgres
