@@ -1,5 +1,7 @@
 === master
 
+* Do not modify the size of binary columns when using set_column_allow_null on Microsoft SQL Server (jeremyevans) (#1736)
+
 * Add a fork safety guide with more detail on how to use Sequel with libraries that fork (janko) (#1733)
 
 * Make the roots_dataset method in the tree plugin work with queries using joins (jeremyevans) (#1731)

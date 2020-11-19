@@ -22,7 +22,7 @@ describe "A MSSQL database" do
     @db.dataset.server_version
   end
 end
-  
+
 describe "A MSSQL database" do
   before do
     @db = DB
@@ -37,6 +37,29 @@ describe "A MSSQL database" do
 
   it "should work with NOLOCK" do
     @db.transaction{@db[:test3].nolock.all.must_equal []}
+  end
+end
+
+describe "A MSSQL database" do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table?(:test3)
+  end
+
+  it "should not modify column type when adding primary key" do
+    @db.create_table(:test3) do
+      column :row_id,   "int",              null: false, auto_increment: true
+      column :deviceid, "binary", size: 7,  null: false
+
+      index [:row_id], type: :clustered, unique: true
+    end
+    @db.alter_table(:test3) do
+      add_primary_key [:deviceid]
+    end
+    @db[:test3].insert(:deviceid=>Sequel.blob('abcdefg'))
+    @db[:test3].get(:deviceid).must_equal 'abcdefg'
   end
 end
 
