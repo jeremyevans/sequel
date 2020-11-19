@@ -61,6 +61,49 @@ describe "A MSSQL database" do
     @db[:test3].insert(:deviceid=>Sequel.blob('abcdefg'))
     @db[:test3].get(:deviceid).must_equal 'abcdefg'
   end
+
+  it "should allow creating clustered and non-clustered primary keys" do
+    [true, false].each do |clustered|
+      @db.create_table!(:test3) do
+        primary_key :row_id, :clustered=>clustered
+        String :name
+      end
+    end
+  end
+
+  it "should allow creating clustered and non-clustered unique constraints" do
+    [true, false].each do |clustered|
+      @db.create_table!(:test3) do
+        Integer :row_id
+        String :name
+        unique [:name], :clustered=>clustered
+      end
+    end
+  end
+
+  it "should allow adding clustered and non-clustered primary keys" do
+    [true, false].each do |clustered|
+      @db.create_table!(:test3) do
+        Integer :row_id, :null=>false
+        String :name
+      end
+      @db.alter_table(:test3) do
+        add_primary_key [:row_id], :clustered=>clustered
+      end
+    end
+  end
+
+  it "should allow adding clustered and non-clustered unique constraints" do
+    [true, false].each do |clustered|
+      @db.create_table!(:test3) do
+        Integer :row_id, :null=>false
+        String :name
+      end
+      @db.alter_table(:test3) do
+        add_unique_constraint [:row_id], :clustered=>clustered
+      end
+    end
+  end
 end
 
 describe "MSSQL decimal locale handling" do

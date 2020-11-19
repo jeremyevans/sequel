@@ -244,6 +244,16 @@ module Sequel
       
       private
       
+      # Add CLUSTERED or NONCLUSTERED as needed
+      def add_clustered_sql_fragment(sql, opts)
+        clustered = opts[:clustered]
+        unless clustered.nil?
+          sql += " #{'NON' unless clustered}CLUSTERED"
+        end
+
+        sql
+      end
+    
       # Add dropping of the default constraint to the list of SQL queries.
       # This is necessary before dropping the column or changing its type.
       def add_drop_default_constraint_sql(sqls, table, column)
@@ -396,6 +406,11 @@ module Sequel
         super.with_quote_identifiers(true)
       end
       
+      # Handle clustered and nonclustered primary keys
+      def primary_key_constraint_sql_fragment(opts)
+        add_clustered_sql_fragment(super, opts)
+      end
+      
       # Use sp_rename to rename the table
       def rename_table_sql(name, new_name)
         "sp_rename #{literal(quote_schema_table(name))}, #{quote_identifier(schema_and_table(new_name).pop)}"
@@ -492,6 +507,11 @@ module Sequel
         :'varbinary(max)'
       end
       
+      # Handle clustered and nonclustered unique constraints
+      def unique_constraint_sql_fragment(opts)
+        add_clustered_sql_fragment(super, opts)
+      end
+
       # MSSQL supports views with check option, but not local.
       def view_with_check_option_support
         true

@@ -580,14 +580,14 @@ module Sequel
         sql << ' NULL'
       end
     end
-    
+
     # Add primary key SQL fragment to column creation SQL.
     def column_definition_primary_key_sql(sql, column)
       if column[:primary_key]
         if name = column[:primary_key_constraint_name]
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
-        sql << ' PRIMARY KEY'
+        sql << " " << primary_key_constraint_sql_fragment(column)
         constraint_deferrable_sql_append(sql, column[:primary_key_deferrable])
       end
     end
@@ -608,7 +608,7 @@ module Sequel
         if name = column[:unique_constraint_name]
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
-        sql << ' UNIQUE'
+        sql << ' ' << unique_constraint_sql_fragment(column)
         constraint_deferrable_sql_append(sql, column[:unique_deferrable])
       end
     end
@@ -656,11 +656,11 @@ module Sequel
         check = "(#{check})" unless check[0..0] == '(' && check[-1..-1] == ')'
         sql << "CHECK #{check}"
       when :primary_key
-        sql << "PRIMARY KEY #{literal(constraint[:columns])}"
+        sql << "#{primary_key_constraint_sql_fragment(constraint)} #{literal(constraint[:columns])}"
       when :foreign_key
         sql << column_references_table_constraint_sql(constraint.merge(:deferrable=>nil))
       when :unique
-        sql << "UNIQUE #{literal(constraint[:columns])}"
+        sql << "#{unique_constraint_sql_fragment(constraint)} #{literal(constraint[:columns])}"
       else
         raise Error, "Invalid constraint type #{constraint[:type]}, should be :check, :primary_key, :foreign_key, or :unique"
       end
@@ -892,6 +892,11 @@ module Sequel
       on_delete_clause(action)
     end
     
+    # Add fragment for primary key specification, separated for easier overridding.
+    def primary_key_constraint_sql_fragment(_)
+      'PRIMARY KEY'
+    end
+    
     # Proxy the quote_schema_table method to the dataset
     def quote_schema_table(table)
       schema_utility_dataset.quote_schema_table(table)
@@ -1047,6 +1052,11 @@ module Sequel
       "#{type}#{literal(Array(elements)) if elements}#{' UNSIGNED' if column[:unsigned]}"
     end
 
+    # Add fragment for unique specification, separated for easier overridding.
+    def unique_constraint_sql_fragment(_)
+      'UNIQUE'
+    end
+    
     # Whether clob should be used for String text: true columns.
     def uses_clob_for_text?
       false

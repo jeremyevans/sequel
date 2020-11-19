@@ -143,8 +143,14 @@ module Sequel
       # :identity :: Create an identity column.
       #
       # MySQL specific options:
+      #
       # :generated_type :: Set the type of column when using :generated_always_as,
       #                    should be :virtual or :stored to force a type.
+      #
+      # Microsoft SQL Server specific options:
+      #
+      # :clustered :: When using :primary_key or :unique, marks the primary key or unique
+      #               constraint as CLUSTERED (if true), or NONCLUSTERED (if false).
       def column(name, type, opts = OPTS)
         columns << {:name => name, :type => type}.merge!(opts)
         if index_opts = opts[:index]
