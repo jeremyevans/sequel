@@ -82,7 +82,7 @@ module Sequel
     # :server :: The server/shard the transaction is being executed on.
     def rollback_on_exit(opts=OPTS)
       synchronize(opts[:server]) do |conn|
-        raise Error, "Cannot call Sequel:: Database#rollback_on_exit! unless inside a transaction" unless h = _trans(conn)
+        raise Error, "Cannot call Sequel:: Database#rollback_on_exit unless inside a transaction" unless h = _trans(conn)
         rollback = !opts[:cancel]
 
         if supports_savepoints?
