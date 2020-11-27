@@ -26,6 +26,8 @@ jobs:
       matrix:
         ruby: [ 2.4, 2.5, 2.6, 2.7, jruby-9.1.17.0, jruby-9.2.13.0 ]
     name: ${{ matrix.ruby }}
+    env:
+      BUNDLE_GEMFILE: .ci.gemfile
     steps:
     - uses: actions/checkout@v2
     - run: sudo apt-get -yqq install libpq-dev mysql-client libmysqlclient-dev
@@ -33,10 +35,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-      env:
-        BUNDLE_GEMFILE: .ci.gemfile
     - run: bundle exec rake spec_ci
       env:
-        BUNDLE_GEMFILE: .ci.gemfile
         DEFAULT_DATABASE: 1
         MYSQL_ROOT_PASSWORD: 1
