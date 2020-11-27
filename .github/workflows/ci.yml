@@ -31,6 +31,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: sudo apt-get -yqq install libpq-dev mysql-client libmysqlclient-dev
+    - run: sudo apt-get -yqq install libxml2-dev libxslt-dev
+      if: startsWith(matrix.ruby, 'truffleruby')
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
