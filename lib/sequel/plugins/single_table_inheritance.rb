@@ -251,6 +251,8 @@ module Sequel
           super
         end
 
+        private
+
         # Don't allow use of prepared statements.
         def use_prepared_statements_for?(type)
           false
