@@ -11,8 +11,13 @@ module Sequel
   Deprecation.deprecate_constant(self, :Timezones)
   
   # Sequel doesn't pay much attention to timezones by default, but you can set it to
-  # handle timezones if you want.  There are three separate timezone settings: application_timezone,
-  # database_timezone, and typecast_timezone.  All three timezones have getter and setter methods.
+  # handle timezones if you want.  There are three separate timezone settings:
+  #
+  # * application_timezone
+  # * database_timezone
+  # * typecast_timezone
+  #
+  # All three timezones have getter and setter methods.
   # You can set all three timezones to the same value at once via <tt>Sequel.default_timezone=</tt>.
   #
   # The only timezone values that are supported by default are <tt>:utc</tt> (convert to UTC),
