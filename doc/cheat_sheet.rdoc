@@ -95,18 +95,18 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 === AND/OR/NOT
 
-  DB[:items].where{(x > 5) & (y > 10)}.sql 
+  DB[:items].where{(x > 5) & (y > 10)} 
   # SELECT * FROM items WHERE ((x > 5) AND (y > 10))
 
-  DB[:items].where(Sequel.or(x: 1, y: 2) & Sequel.~(z: 3)).sql 
+  DB[:items].where(Sequel.or(x: 1, y: 2) & Sequel.~(z: 3)) 
   # SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))
 
 === Mathematical operators
 
-  DB[:items].where{x + y > z}.sql 
+  DB[:items].where{x + y > z} 
   # SELECT * FROM items WHERE ((x + y) > z)
 
-  DB[:items].where{price - 100 < avg(price)}.sql 
+  DB[:items].where{price - 100 < avg(price)} 
   # SELECT * FROM items WHERE ((price - 100) < avg(price))
 
 === Raw SQL Fragments
@@ -130,7 +130,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Joins
 
-  DB[:items].left_outer_join(:categories, id: :category_id).sql 
+  DB[:items].left_outer_join(:categories, id: :category_id) 
   # SELECT * FROM items
   # LEFT OUTER JOIN categories ON categories.id = items.category_id
 
