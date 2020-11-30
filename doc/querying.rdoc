@@ -746,7 +746,7 @@ shortcuts for all common (and most uncommon) join types. For example
 
   Album.join(:artists, id: :artist_id)
   # SELECT * FROM albums
-  # INNER JOIN artists ON (artists.id = albums.artist_id))))
+  # INNER JOIN artists ON (artists.id = albums.artist_id)
 
 And +left_join+ does a LEFT JOIN:
 
@@ -870,14 +870,14 @@ In this case, you don't even need to specify any conditions.
 ==== Join Blocks
 
 You can provide a block to any of the join methods that accept
-conditions.  This block should accept 3 arguments, the table alias
+conditions.  This block should accept 3 arguments: the table alias
 for the table currently being joined, the table alias for the last
 table joined (or first table), and an array of previous
 <tt>Sequel::SQL::JoinClause</tt>s.
 
 This allows you to qualify columns similar to how the implicit
 qualification works, without worrying about the specific aliases
-being used.  For example, lets say you wanted to join the albums
+being used.  For example, let's say you wanted to join the albums
 and artists tables, but only want albums where the artist's name
 comes before the album's name.
 
