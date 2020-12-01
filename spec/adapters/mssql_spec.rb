@@ -48,7 +48,7 @@ describe "A MSSQL database" do
     @db.drop_table?(:test3)
   end
 
-  it "should not modify column type when adding primary key" do
+  cspecify "should not modify column type when adding primary key", [:odbc] do
     @db.create_table(:test3) do
       column :row_id,   "int",              null: false, auto_increment: true
       column :deviceid, "binary", size: 7,  null: false
