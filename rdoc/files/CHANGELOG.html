@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-10-30 11:01:43 -0700</span>
+<span class='datetime'>2020-12-01 08:05:35 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.39.0+-282020-12-01-29">5.39.0 (2020-12-01)<span><a href="#label-5.39.0+-282020-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support :clustered option for primary key and unique constraints on Microsoft SQL Server (jeremyevans)</p>
+</li><li>
+<p>Do not modify the size of binary columns when using set_column_allow_null on Microsoft SQL Server (jeremyevans) (#1736)</p>
+</li><li>
+<p>Add a fork safety guide with more detail on how to use <a href="../classes/Sequel.html"><code>Sequel</code></a> with libraries that fork (janko) (#1733)</p>
+</li><li>
+<p>Make the roots_dataset method in the tree plugin work with queries using joins (jeremyevans) (#1731)</p>
+</li><li>
+<p>Make Database#tables return partitioned tables on PostgreSQL 10+ (epoberezhny) (#1729, #1730)</p>
+</li></ul>
+
 <h3 id="label-5.38.0+-282020-11-01-29">5.38.0 (2020-11-01)<span><a href="#label-5.38.0+-282020-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Do not add new Database instances to Sequel::DATABASES if the test connection fails (jeremyevans) (#1727)</p>

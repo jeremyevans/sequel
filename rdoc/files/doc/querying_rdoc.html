@@ -30,7 +30,7 @@ doc/querying.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-03-22 21:49:57 -0700</span>
+<span class='datetime'>2020-11-30 09:37:49 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -526,7 +526,7 @@ Last Update:
 
 <p>In most cases, you won&#39;t call <code>join_table</code> directly, as <a href="../../classes/Sequel.html"><code>Sequel</code></a> provides shortcuts for all common (and most uncommon) join types. For example <code>join</code> does an inner join:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id))))</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id)</span></pre>
 
 <p>And <code>left_join</code> does a LEFT JOIN:</p>
 
@@ -596,9 +596,9 @@ Last Update:
 
 <h4 id="label-Join+Blocks">Join Blocks<span><a href="#label-Join+Blocks">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>You can provide a block to any of the join methods that accept conditions.  This block should accept 3 arguments, the table alias for the table currently being joined, the table alias for the last table joined (or first table), and an array of previous <code>Sequel::SQL::JoinClause</code>s.</p>
+<p>You can provide a block to any of the join methods that accept conditions.  This block should accept 3 arguments: the table alias for the table currently being joined, the table alias for the last table joined (or first table), and an array of previous <code>Sequel::SQL::JoinClause</code>s.</p>
 
-<p>This allows you to qualify columns similar to how the implicit qualification works, without worrying about the specific aliases being used.  For example, lets say you wanted to join the albums and artists tables, but only want albums where the artist&#39;s name comes before the album&#39;s name.</p>
+<p>This allows you to qualify columns similar to how the implicit qualification works, without worrying about the specific aliases being used.  For example, let&#39;s say you wanted to join the albums and artists tables, but only want albums where the artist&#39;s name comes before the album&#39;s name.</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:artist_id</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">j</span>, <span class="ruby-identifier">lj</span>, <span class="ruby-identifier">js</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">j</span>][<span class="ruby-value">:name</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">lj</span>][<span class="ruby-value">:name</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment"># ON ((artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment"># AND (artists.name &lt; albums.name))</span></pre>
 

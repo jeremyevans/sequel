@@ -30,7 +30,7 @@ doc/postgresql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-03-30 09:21:48 -0700</span>
+<span class='datetime'>2020-11-04 10:39:50 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -163,7 +163,7 @@ Last Update:
 
 <h3 id="label-Creating+Unlogged+Tables">Creating Unlogged Tables<span><a href="#label-Creating+Unlogged+Tables">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>PostgreSQL allows users to create unlogged tables, which are faster but not crash safe.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> allows you do create an unlogged table by specifying the <code>unlogged: true</code> option to <code>create_table</code>:</p>
+<p>PostgreSQL allows users to create unlogged tables, which are faster but not crash safe.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> allows you to create an unlogged table by specifying the <code>unlogged: true</code> option to <code>create_table</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">unlogged:</span> <span class="ruby-keyword">true</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:i</span>}&#x000A;<span class="ruby-comment"># CREATE UNLOGGED TABLE &quot;table&quot; (&quot;i&quot; integer)</span></pre>
 

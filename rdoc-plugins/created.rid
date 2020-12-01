@@ -1,4 +1,4 @@
-Sun, 01 Nov 2020 09:37:33 -0800
+Tue, 01 Dec 2020 08:15:35 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -36,7 +36,7 @@ lib/sequel/extensions/integer64.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/extensions/looser_typecasting.rb	Thu, 24 May 2018 16:51:22 -0700
 lib/sequel/extensions/migration.rb	Tue, 08 Sep 2020 14:29:41 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
-lib/sequel/extensions/named_timezones.rb	Tue, 02 Jul 2019 15:10:53 -0700
+lib/sequel/extensions/named_timezones.rb	Mon, 30 Nov 2020 08:40:14 -0800
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/null_dataset.rb	Fri, 08 Dec 2017 12:55:50 -0800
 lib/sequel/extensions/pagination.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -140,7 +140,7 @@ lib/sequel/plugins/rcte_tree.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/serialization.rb	Sat, 20 Jan 2018 09:42:41 -0800
 lib/sequel/plugins/serialization_modification_detection.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/sharding.rb	Mon, 02 Sep 2019 15:03:40 -0700
-lib/sequel/plugins/single_table_inheritance.rb	Thu, 01 Oct 2020 08:09:24 -0700
+lib/sequel/plugins/single_table_inheritance.rb	Mon, 30 Nov 2020 08:01:43 -0800
 lib/sequel/plugins/singular_table_names.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/skip_saving_columns.rb	Wed, 11 Mar 2020 16:32:40 -0700
@@ -155,7 +155,7 @@ lib/sequel/plugins/tactical_eager_loading.rb	Mon, 03 Sep 2018 12:02:47 -0700
 lib/sequel/plugins/throw_failures.rb	Tue, 21 Jan 2020 16:47:15 -0800
 lib/sequel/plugins/timestamps.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/touch.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/tree.rb	Thu, 04 Oct 2018 07:42:37 -0700
+lib/sequel/plugins/tree.rb	Mon, 02 Nov 2020 12:46:04 -0800
 lib/sequel/plugins/typecast_on_load.rb	Wed, 09 Oct 2019 09:00:49 -0700
 lib/sequel/plugins/unlimited_update.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/update_or_create.rb	Tue, 01 Aug 2017 08:12:01 -0700

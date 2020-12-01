@@ -30,7 +30,7 @@ doc/code_order.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-05-01 07:43:18 -0700</span>
+<span class='datetime'>2020-11-04 10:39:50 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -99,12 +99,6 @@ Last Update:
 <p>The `subclasses` plugin can be used to keep track of all model classes that have been setup in your application. Finalizing their associations and freezing them can easily be achieved through the plugin:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Register the plugin before setting up the models</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="ruby-comment"># ... setup models</span>&#x000A;<span class="ruby-comment"># Now finalize associations &amp; freeze models by calling the plugin:</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendents</span></pre>
-
-<h2 id="label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">Disconnect If Using Forking Webserver with Code Preloading<span><a href="#label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">&para;</a> <a href="#top">&uarr;</a></span></h2>
-
-<p>If you are using a forking webserver such as unicorn or passenger, with a feature that loads your <a href="../../classes/Sequel.html"><code>Sequel</code></a> code before forking connections (code preloading), then you must disconnect your database connections before forking.  If you don&#39;t do this, you can end up with child processes sharing database connections and all sorts of weird behavior.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically reconnect on an as needed basis in the child processes, so you only need to do the following in the parent process:</p>
-
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span></pre>
 </div>
 <div id='context'>
 </div>
