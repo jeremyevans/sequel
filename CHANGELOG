@@ -1,4 +1,4 @@
-=== master
+=== 5.39.0 (2020-12-01)
 
 * Support :clustered option for primary key and unique constraints on Microsoft SQL Server (jeremyevans)
 

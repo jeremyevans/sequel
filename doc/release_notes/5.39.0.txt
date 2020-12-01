@@ -1,0 +1,19 @@
+= New Features
+
+* On Microsoft SQL Server, the :clustered option is now supported
+  for primary key and unique constraints.  You can use a true value
+  for CLUSTERED and a false value for NONCLUSTERED.
+
+= Other Improvements
+
+* Partitioned tables are now included in the result of
+  Database#tables on PostgreSQL.
+
+* alter_table set_column_allow_null no longer drops the size of
+  binary columns on Microsoft SQL Server.
+
+* In the tree plugin, the roots_dataset method now works correctly
+  with queries using joins by qualifying the parent column.
+
+* A fork safety guide has been added, discussing fork safety issues
+  when using Sequel.
