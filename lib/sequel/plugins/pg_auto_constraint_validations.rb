@@ -250,7 +250,9 @@ module Sequel
             messages = model.pg_auto_constraint_validations_messages
 
             unless override
+              # :nocov:
               case e
+              # :nocov:
               when Sequel::NotNullConstraintViolation
                 if column = info[:column]
                   add_pg_constraint_validation_error([m.call(column)], messages[:not_null])

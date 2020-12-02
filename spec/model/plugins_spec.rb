@@ -442,6 +442,12 @@ describe "Sequel::Plugins.def_sequel_method" do
     proc{@scope.send(m1, 1)}.must_raise ArgumentError
   end
 
+  it "should raise if an invalid arg type is used" do
+    o = Object.new
+    def o.parameters; [[:foo]] end
+    proc{Sequel::Plugins.send(:_define_sequel_method_arg_numbers, o)}.must_raise Sequel::Error
+  end
+
   if RUBY_VERSION > '2.1'
     it "should raise for required keyword arguments for expected_arity 0 or 1" do
       proc{eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|b:| [b, 1]}", binding)}.must_raise Sequel::Error

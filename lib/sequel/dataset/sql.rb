@@ -971,7 +971,9 @@ module Sequel
     # operators unsupported by some databases. Used by adapters for databases
     # that don't support the operators natively.
     def complex_expression_emulate_append(sql, op, args)
+      # :nocov:
       case op
+      # :nocov:
       when :%
         complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:MOD, a, b)}
       when :>>

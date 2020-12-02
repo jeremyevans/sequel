@@ -3547,6 +3547,12 @@ describe "Filtering by associations" do
     @Album.filter(:b_tags=>@Tag.load(:id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'B') AND (albums_tags.album_id IS NOT NULL) AND (tags.id = 3))))"
   end
 
+  it "should not use an eager limit strategy if the strategy is not specified and the model defaults to not using one" do
+    @Album.default_eager_limit_strategy = nil
+    @Album.one_to_many :l_tracks2, :clone=>:l_tracks
+    @Album.filter(:l_tracks2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id = 5))))"
+  end
+
   it "should be able to filter on one_to_many associations with :limit" do
     @Album.filter(:l_tracks=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tracks.id = 5))))"
   end

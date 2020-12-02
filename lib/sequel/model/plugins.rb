@@ -31,7 +31,9 @@ module Sequel
     def self.def_dataset_methods(mod, meths)
       Array(meths).each do |meth|
         mod.class_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
+        # :nocov:
         mod.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
+        # :nocov:
       end
     end
 
@@ -141,6 +143,8 @@ module Sequel
           keyword = :required
         when :key, :keyrest
           keyword ||= true
+        else
+          raise Error, "invalid arg_type passed to _define_sequel_method_arg_numbers: #{arg_type}"
         end
       end
       arity = callable.arity

@@ -2741,6 +2741,7 @@ describe "Database#column_schema_to_ruby_default" do
   it "should handle converting many default formats" do
     db = Sequel::Database.new
     p = lambda{|d,t| db.send(:column_schema_to_ruby_default, d, t)}
+    p['any', :unknown].must_be_nil
     p[nil, :integer].must_be_nil
     p[1, :integer].must_equal 1
     p['1', :integer].must_equal 1
@@ -2758,6 +2759,7 @@ describe "Database#column_schema_to_ruby_default" do
     p['false', :boolean].must_equal false
     p["'t'", :boolean].must_equal true
     p["'f'", :boolean].must_equal false
+    p["'x'", :boolean].must_be_nil
     p["'a'", :string].must_equal 'a'
     p["'a'", :blob].must_equal Sequel.blob('a')
     p["'a'", :blob].must_be_kind_of(Sequel::SQL::Blob)
@@ -2948,6 +2950,8 @@ describe "Database specific exception classes" do
     proc{@db.get(:a)}.must_raise(Sequel::CheckConstraintViolation)
     @db.sql_state = '40001'
     proc{@db.get(:a)}.must_raise(Sequel::SerializationFailure)
+    @db.sql_state = '41245'
+    proc{@db.get(:a)}.must_raise(Sequel::DatabaseError)
     def @db.database_specific_error_class_from_sqlstate(_) end
     (@db.get(:a) rescue $!.class).must_equal(Sequel::DatabaseError)
     @db.sql_state = nil

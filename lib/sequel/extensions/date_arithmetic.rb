@@ -113,12 +113,12 @@ module Sequel
             end
           when :mssql, :h2, :access, :sqlanywhere
             units = case db_type
-            when :mssql, :sqlanywhere
-              MSSQL_DURATION_UNITS
             when :h2
               H2_DURATION_UNITS
             when :access
               ACCESS_DURATION_UNITS
+            else
+              MSSQL_DURATION_UNITS
             end
             each_valid_interval_unit(h, units) do |value, sql_unit|
               expr = Sequel.function(:DATEADD, sql_unit, value, expr)

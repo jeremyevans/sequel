@@ -508,7 +508,9 @@ module Sequel
 
         m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
+      # :nocov:
       ruby2_keywords(:plugin) if respond_to?(:ruby2_keywords, true)
+      # :nocov:
 
       # Returns primary key attribute hash.  If using a composite primary key
       # value such be an array with values for each primary key in the correct
@@ -757,7 +759,9 @@ module Sequel
         else
           define_singleton_method(meth){|*args, &block| dataset.public_send(meth, *args, &block)}
         end
+        # :nocov:
         singleton_class.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
+        # :nocov:
       end
 
       # Get the schema from the database, fall back on checking the columns

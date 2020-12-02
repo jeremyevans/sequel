@@ -220,7 +220,8 @@ module Sequel
               '%'
             when '%'
               '.*'
-            when '_'
+            else
+            #when '_'
               '.'
             end
           end

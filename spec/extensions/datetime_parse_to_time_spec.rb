@@ -34,6 +34,10 @@ describe "datetime_parse_to_time extension" do
     Sequel.database_timezone = :utc
     Sequel.database_to_application_timestamp("2017-03-26 02:30:00").getutc.hour.must_equal 2
     Sequel.database_to_application_timestamp("2017-03-12 02:30:00").getutc.hour.must_equal 2
+
+    Sequel.application_timezone = :utc
+    Sequel.database_to_application_timestamp("2017-03-26 02:30:00").getutc.hour.must_equal 2
+    Sequel.database_to_application_timestamp("2017-03-12 02:30:00").getutc.hour.must_equal 2
   end
 
   it "should handle an database timezone of :utc when literalizing values" do

@@ -52,6 +52,11 @@ describe "columns_introspection extension" do
     @db.sqls.length.must_equal 0
   end
 
+  it "should handle LiteralStrings in FROM tables by issuing a query" do
+    @ds.from(Sequel.lit('x')).columns.must_equal []
+    @db.sqls.must_equal ["SELECT * FROM x LIMIT 1"]
+  end
+
   it "should handle selecting * from a single subselect with no joins without a database query if the subselect's columns can be handled" do
     @ds.select(:x).from_self.columns.must_equal [:x]
     @db.sqls.length.must_equal 0

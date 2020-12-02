@@ -520,7 +520,9 @@ module Sequel
         def many_to_pg_array_association_filter_expression(op, ref, obj)
           pk = ref.qualify(model.table_name, ref.primary_key)
           key = ref[:key]
+          # :nocov:
           expr = case obj
+          # :nocov:
           when Sequel::Model
             if (assoc_pks = obj.get_column_value(key)) && !assoc_pks.empty?
               Sequel[pk=>assoc_pks.to_a]
@@ -540,7 +542,9 @@ module Sequel
         # Support filtering by pg_array_to_many associations using a subquery.
         def pg_array_to_many_association_filter_expression(op, ref, obj)
           key = ref.qualify(model.table_name, ref[:key_column])
+          # :nocov:
           expr = case obj
+          # :nocov:
           when Sequel::Model
             if pkv = obj.get_column_value(ref.primary_key_method)
               Sequel.pg_array_op(key).contains(Sequel.pg_array([pkv], ref.array_type))

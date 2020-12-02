@@ -35,7 +35,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Track.plugin :many_through_many
     @Artist.plugin :pg_array_associations
     @Tag.plugin :pg_array_associations
-    @Artist.one_to_many :albums, :class=>@Album
+    @Artist.one_to_many :albums, :class=>@Album, :dataset_associations_join=>true
     @Artist.one_to_one :first_album, :class=>@Album
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag

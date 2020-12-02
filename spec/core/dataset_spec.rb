@@ -2892,6 +2892,11 @@ describe "Dataset #first and #last" do
     @d.order(:c, :d).last.must_equal(:s=>'SELECT * FROM test ORDER BY c DESC, d DESC LIMIT 1')
     @d.order(Sequel.desc(:e), :f).last.must_equal(:s=>'SELECT * FROM test ORDER BY e ASC, f DESC LIMIT 1')
   end
+
+  it "should raise an error for multiple arguments" do
+    proc{@d.first(1, :z=>10)}.must_raise Sequel::Error
+    proc{@d.last(1, :z=>10)}.must_raise Sequel::Error
+  end
 end
 
 describe "Dataset #first!" do

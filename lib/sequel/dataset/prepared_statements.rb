@@ -201,7 +201,9 @@ module Sequel
         when :insert_pk
           fetch_rows(prepared_sql){|r| return r.values.first}
         when Array
+          # :nocov:
           case prepared_type[0]
+          # :nocov:
           when :map, :as_hash, :to_hash, :to_hash_groups
             public_send(*prepared_type, &block) 
           end
