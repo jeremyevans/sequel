@@ -60,6 +60,7 @@ describe "pg_json extension" do
         def parse_json(v)
           {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new, '[one]'=>[1]}.fetch(v){pj(v)}
         end
+          alias parse_json parse_json
       end
       proc{@m.parse_json('o')}.must_raise(Sequel::InvalidValue)
     ensure
@@ -116,6 +117,7 @@ describe "pg_json extension" do
           def parse_json(v)
             {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new, '[one]'=>[1]}.fetch(v){pj(v)}
           end
+          alias parse_json parse_json
         end
         cp.call('1').must_equal 1
         cp.call("'a'").must_equal 'a'
@@ -140,6 +142,7 @@ describe "pg_json extension" do
         define_method(:parse_json) do |json|
           raise Sequel::InvalidValue
         end
+        alias parse_json parse_json
       end
       cp = @db.conversion_procs
       proc{cp[114].call(1)}.must_raise Sequel::InvalidValue
@@ -159,6 +162,7 @@ describe "pg_json extension" do
         define_method(:parse_json) do |json|
           raise Sequel::InvalidValue
         end
+        alias parse_json parse_json
       end
       proc{@m.db_parse_json(1)}.must_raise Sequel::InvalidValue
       proc{@m.db_parse_jsonb(1)}.must_raise Sequel::InvalidValue

@@ -62,7 +62,10 @@ module Sequel
           ret = super
           r = association_reflection(name)
           meth = r.returns_array? ? name : pluralize(name).to_sym
-          dataset_module{define_method(meth){associated(name)}}
+          dataset_module do
+            define_method(meth){associated(name)}
+            alias_method(meth, meth)
+          end
           ret
         end
 

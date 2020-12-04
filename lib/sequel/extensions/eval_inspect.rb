@@ -55,6 +55,8 @@ module Sequel
 
   module SQL
     class Expression
+      alias inspect inspect
+
       # Attempt to produce a string suitable for eval, such that:
       #
       #   eval(obj.inspect) == obj

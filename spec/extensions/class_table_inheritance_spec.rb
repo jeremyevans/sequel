@@ -633,6 +633,7 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
        Sequel[:hr][:executives]=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
       }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
     end
+    @db.singleton_class.send(:alias_method, :schema, :schema)
     @db.extend_datasets do
       def columns
         {[Sequel[:hr][:employees]]=>[:id, :name, :kind],

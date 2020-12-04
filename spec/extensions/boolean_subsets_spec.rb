@@ -12,6 +12,7 @@ describe "boolean_subsets plugin" do
     @p = proc do
       @columns = [:asdaf9898as, :active]
       def columns; @columns; end
+      singleton_class.send(:alias_method, :columns, :columns)
     end
     @c.instance_eval(&@p)
   end 

@@ -229,7 +229,7 @@ describe Sequel::Model, ".dataset_module" do
   end
 
   it "should only have a single dataset_module per class" do
-    @c.dataset_module{def return_3() 3 end}
+    @c.dataset_module{def return_3() 3 end; alias return_3 return_3}
     @c.dataset_module{def return_3() 3 + (begin; super; rescue NoMethodError; 1; end) end}
     @c.return_3.must_equal 4
   end

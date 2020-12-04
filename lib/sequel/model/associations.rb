@@ -1930,6 +1930,7 @@ module Sequel
         # super to be called.
         def association_module_def(name, opts=OPTS, &block)
           association_module(opts).send(:define_method, name, &block)
+          association_module(opts).send(:alias_method, name, name)
         end
       
         # Add a private method to the module included in the class.

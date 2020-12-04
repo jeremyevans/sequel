@@ -12,6 +12,7 @@ describe Sequel::Model, "BooleanReaders plugin" do
     @p = proc do
       @columns = [:id, :b, :z]
       def columns; @columns; end
+      alias columns columns
     end
     @c.instance_eval(&@p)
   end 

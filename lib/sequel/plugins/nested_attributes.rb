@@ -145,9 +145,11 @@ module Sequel
         # class.
         def def_nested_attribute_method(reflection)
           @nested_attributes_module.class_eval do
-            define_method("#{reflection[:name]}_attributes=") do |v|
+            meth = :"#{reflection[:name]}_attributes="
+            define_method(meth) do |v|
               set_nested_attributes(reflection[:name], v)
             end
+            alias_method meth, meth
           end
         end
       end

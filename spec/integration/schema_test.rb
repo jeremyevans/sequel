@@ -850,6 +850,7 @@ describe "Database#tables and #views" do
       def xxxxx
         "xxxxx#{@@xxxxx += 1}"
       end
+      alias xxxxx xxxxx
     end
     @db = DB
     @db.drop_view(:sequel_test_view) rescue nil

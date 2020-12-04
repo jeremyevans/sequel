@@ -14,11 +14,13 @@ describe "Sequel::Plugins::AutoValidations" do
        [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :default=>'nnd'}]]
     end
     def db.supports_index_parsing?() true end
+    db.singleton_class.send(:alias_method, :supports_index_parsing?, :supports_index_parsing?)
     def db.indexes(t, *)
       raise if t.is_a?(Sequel::Dataset)
       return [] if t != :test
       {:a=>{:columns=>[:name, :num], :unique=>true}, :b=>{:columns=>[:num], :unique=>false}}
     end
+    db.singleton_class.send(:alias_method, :indexes, :indexes)
     @c = Class.new(Sequel::Model(db[:test]))
     @c.send(:def_column_accessor, :id, :name, :num, :d, :nnd)
     @c.raise_on_typecast_failure = false

@@ -745,6 +745,7 @@ describe "Database#test_connection" do
   end
 
   it "should raise an error if the attempting to connect raises an error" do
+    @db.singleton_class.send(:alias_method, :connect, :connect)
     def @db.connect(*) raise Sequel::Error end
     proc{@db.test_connection}.must_raise(Sequel::DatabaseConnectionError)
   end

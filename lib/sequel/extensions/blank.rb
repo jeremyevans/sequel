@@ -6,6 +6,12 @@
 #
 #   Sequel.extension :blank
 
+[FalseClass, Object, NilClass, Numeric, String, TrueClass].each do |klass|
+  if klass.method_defined?(:blank?)
+    klass.send(:alias_method, :blank?, :blank?)
+  end
+end
+
 class FalseClass
   # false is always blank
   def blank?

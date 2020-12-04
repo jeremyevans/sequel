@@ -43,6 +43,7 @@ class << Sequel::Model
   def columns(*cols)
     return super if cols.empty?
     define_method(:columns){cols}
+    alias_method(:columns, :columns)
     @dataset.send(:columns=, cols) if @dataset
     def_column_accessor(*cols)
     @columns = cols

@@ -7,6 +7,7 @@ describe "Sequel::Plugins::Timestamps" do
       def now
         '2009-08-01'
       end
+      singleton_class.send(:alias_method, :now, :now)
     end
     Sequel.datetime_class = dc
     @c = Class.new(Sequel::Model(:t))

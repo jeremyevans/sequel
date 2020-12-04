@@ -92,6 +92,7 @@ describe "Sequel::Plugins::JsonSerializer" do
         def parse_json(v)
           v
         end
+        alias parse_json parse_json
       end
       proc{Album.from_json('1')}.must_raise(Sequel::Error)
     ensure
@@ -108,6 +109,7 @@ describe "Sequel::Plugins::JsonSerializer" do
         def parse_json(v)
           Album.load(:id=>3)
         end
+        alias parse_json parse_json
       end
       ::Album.from_json('1').must_equal Album.load(:id=>3)
     ensure
@@ -362,6 +364,7 @@ describe "Sequel::Plugins::JsonSerializer" do
           else raise
           end
         end
+        alias parse_json parse_json
       end
       Artist.array_from_json('[artists]').must_equal [Artist.load(:id=>1)]
 

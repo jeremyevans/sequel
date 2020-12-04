@@ -213,6 +213,7 @@ module Sequel
             scalar_typecast_method = :"typecast_value_#{opts.fetch(:scalar_typecast, type)}"
             define_method(meth){|v| typecast_value_pg_array(v, creator, scalar_typecast_method)}
             private meth
+            alias_method(meth, meth)
           end
 
           @schema_type_classes[:"#{type}_array"] = PGArray

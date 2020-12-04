@@ -21,6 +21,7 @@ describe "constraint_validations extension" do
     @db = Sequel.mock
     @db.extend(Module.new{attr_writer :schema; def schema(table, *) execute("parse schema for #{table}"); @schema; end})
     def @db.table_exists?(_) true; end
+    @db.singleton_class.send(:alias_method, :table_exists?, :table_exists?)
     @db.extension(:constraint_validations)
   end
 

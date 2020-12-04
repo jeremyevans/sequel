@@ -797,6 +797,7 @@ describe "Model.db_schema" do
   end
   
   it "should not call database's schema if it isn't supported" do
+    @db.singleton_class.send(:remove_method, :supports_schema_parsing?)
     def @db.supports_schema_parsing?() false end
     def @db.schema(table, opts = {})
       raise Sequel::Error
@@ -827,6 +828,7 @@ describe "Model.db_schema" do
   end
 
   it "should not restrict the schema for datasets with a :select option" do
+    @c.singleton_class.send(:remove_method, :columns)
     def @c.columns; [:x, :z]; end
     def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]

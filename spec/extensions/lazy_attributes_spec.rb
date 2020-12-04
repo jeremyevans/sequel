@@ -10,6 +10,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       plugin :lazy_attributes
       set_columns([:id, :name])
       def self.columns; [:id, :name] end
+      singleton_class.send(:alias_method, :columns, :columns)
       lazy_attributes :name
       def self.columns; [:id] end
       set_dataset dataset.with_fetch(proc do |sql|
@@ -217,6 +218,7 @@ describe "Sequel::Plugins::LazyAttributes with composite keys" do
       set_columns([:id, :id2, :name])
       def self.columns; [:id, :id2, :name] end
       lazy_attributes :name
+      singleton_class.send(:alias_method, :columns, :columns)
       def self.columns; [:id, :id2] end
       set_primary_key [:id, :id2]
       set_dataset dataset.with_fetch(proc do |sql|

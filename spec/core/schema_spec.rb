@@ -854,6 +854,7 @@ describe "DB#create_table?" do
     @db.create_table?(:cats){|*a| Integer :a, :index=>true}
     @db.sqls.must_equal ['CREATE TABLE cats (a integer)', 'CREATE INDEX cats_a_index ON cats (a)']
 
+    @db.singleton_class.send(:alias_method, :table_exists?, :table_exists?)
     @db.define_singleton_method(:table_exists?){|a| true}
     @db.create_table?(:cats){|*a| Integer :a, :index=>true}
     @db.sqls.must_equal []
@@ -931,6 +932,7 @@ describe "DB#create_join_table?" do
     @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs)
     @db.sqls.must_equal ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
 
+    @db.singleton_class.send(:alias_method, :table_exists?, :table_exists?)
     @db.define_singleton_method(:table_exists?){|a| true}
     @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs)
     @db.sqls.must_equal []

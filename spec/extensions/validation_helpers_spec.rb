@@ -5,6 +5,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c = Class.new(Sequel::Model) do
       def self.set_validations(&block)
         define_method(:validate, &block)
+        alias_method(:validate, :validate)
       end
       columns :value
     end
@@ -221,11 +222,13 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '123'
     @m.must_be :valid?
     def @m.db_schema; {:value=>{:type=>:integer}} end
+    @m.singleton_class.send(:alias_method, :db_schema, :db_schema)
     @m.wont_be :valid?
     @m.errors.full_messages.must_equal ['value is not a valid integer']
 
     @c.set_validations{validates_schema_types(:value)}
     def @m.db_schema; {:value=>{:type=>:integer}} end
+    @m.singleton_class.send(:alias_method, :db_schema, :db_schema)
     @m.wont_be :valid?
     @m.errors.full_messages.must_equal ['value is not a valid integer']
 

@@ -105,6 +105,12 @@ class String
     yield Inflections if block_given?
     Inflections
   end
+  
+  %w'classify constantize dasherize demodulize foreign_key humanize pluralize singularize tableize underscore'.each do |m|
+    if method_defined?(m)
+      alias_method(m, m)
+    end
+  end
 
   # By default, camelize converts the string to UpperCamelCase. If the argument to camelize
   # is set to :lower then camelize produces lowerCamelCase.

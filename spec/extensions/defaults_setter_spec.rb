@@ -5,11 +5,16 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @db = db = Sequel.mock
     def db.supports_schema_parsing?() true end
     def db.schema(*) [] end
+    db.singleton_class.send(:alias_method, :schema, :schema)
     @c = c = Class.new(Sequel::Model(db[:foo]))
     @c.instance_variable_set(:@db_schema, {:a=>{}})
     @c.plugin :defaults_setter
     @c.columns :a
-    @pr = proc{|x| db.define_singleton_method(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}; c.dataset = c.dataset; c}
+    @pr = proc do |x|
+      db.define_singleton_method(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}
+      db.singleton_class.send(:alias_method, :schema, :schema)
+      c.dataset = c.dataset; c
+    end
   end
   after do
     Sequel.datetime_class = Time

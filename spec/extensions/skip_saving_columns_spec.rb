@@ -13,6 +13,7 @@ describe "Skip Saving Generated Columns" do
         :search=>{:type=>:string, :generated=>true}
       }
     end
+    @db.singleton_class.send(:alias_method, :schema, :schema)
     @c = Class.new(Sequel::Model(@db[:t]))
     def @c.db_schema; @db.schema; end
     @c.columns :id, :user_id, :name, :search

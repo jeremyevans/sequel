@@ -87,6 +87,7 @@ describe "Sequel::Database dump methods" do
   before do
     @d = Sequel::Database.new.extension(:schema_dumper)
     def @d.tables(o) o[:schema] ? [o[:schema]] : [:t1, :t2] end
+    @d.singleton_class.send(:alias_method, :tables, :tables)
     def @d.schema(t, *o)
       v = case t
       when :t1, 't__t1', Sequel.identifier(:t__t1)
@@ -112,6 +113,7 @@ describe "Sequel::Database dump methods" do
 
       v
     end
+    @d.singleton_class.send(:alias_method, :schema, :schema)
   end
 
   it "should support dumping table with :schema option" do
@@ -877,6 +879,7 @@ END_MIG
     def @d.database_type; :mysql end
     def @d.schema(*s) [[:c1, {:db_type=>'timestamp', :primary_key=>true, :allow_null=>true}]] end
     @d.dump_table_schema(:t3, :same_db=>true).must_equal "create_table(:t3) do\n  column :c1, \"timestamp\", :null=>true\n  \n  primary_key [:c1]\nend"
+    @d.singleton_class.send(:alias_method, :schema, :schema)
 
     def @d.schema(*s) [[:c1, {:db_type=>'timestamp', :primary_key=>true, :allow_null=>false}]] end
     @d.dump_table_schema(:t3, :same_db=>true).must_equal "create_table(:t3) do\n  column :c1, \"timestamp\", :null=>false\n  \n  primary_key [:c1]\nend"

@@ -122,6 +122,7 @@ module Sequel
 
       model.send(:define_method, meth, &block)
       model.send(:private, meth)
+      model.send(:alias_method, meth, meth)
       call_meth
     end
 

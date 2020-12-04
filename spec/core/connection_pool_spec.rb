@@ -366,6 +366,7 @@ ThreadedConnectionPoolSpecs = shared_description do
     j = 0
     q, q1, q2, q3, q4 = Queue.new, Queue.new, Queue.new, Queue.new, Queue.new
     m = @m
+    @pool.db.singleton_class.send(:alias_method, :connect, :connect)
     @pool.db.define_singleton_method(:connect) do |server|
       q1.pop
       m.synchronize{q3.push(j += 1)}
@@ -470,6 +471,7 @@ ThreadedConnectionPoolSpecs = shared_description do
     exceptions = []
     q, q1, q2, q3 = Queue.new, Queue.new, Queue.new, Queue.new
     b = @icpp
+    @pool.db.singleton_class.send(:alias_method, :connect, :connect)
     @pool.db.define_singleton_method(:connect) do |server|
       b.call
       Object.new

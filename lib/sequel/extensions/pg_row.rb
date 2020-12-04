@@ -482,6 +482,7 @@ module Sequel
               row_type(db_type, v)
             end
             private meth
+            alias_method(meth, meth)
           end
 
           nil
