@@ -24,13 +24,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: [ 2.4, 2.5, 2.6, 2.7, jruby-9.1.17.0, jruby-9.2.13.0 ]
+        ruby: [ 2.4, 2.5, 2.6, 2.7, jruby-9.1.17.0, jruby-9.2.13.0, truffleruby-head ]
     name: ${{ matrix.ruby }}
     env:
       BUNDLE_GEMFILE: .ci.gemfile
     steps:
     - uses: actions/checkout@v2
     - run: sudo apt-get -yqq install libpq-dev mysql-client libmysqlclient-dev
+    - run: sudo apt-get -yqq install libxml2-dev libxslt-dev
+      if: startsWith(matrix.ruby, 'truffleruby')
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
@@ -39,3 +41,4 @@ jobs:
       env:
         DEFAULT_DATABASE: 1
         MYSQL_ROOT_PASSWORD: 1
+      continue-on-error: ${{ startsWith(matrix.ruby, 'truffleruby') }}
