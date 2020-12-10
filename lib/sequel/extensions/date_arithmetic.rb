@@ -49,7 +49,10 @@ module Sequel
       # Options:
       # :cast :: Cast to the specified type instead of the default if casting
       def date_sub(expr, interval, opts=OPTS)
-        interval = if interval.is_a?(Hash)
+        if defined?(ActiveSupport::Duration) && interval.is_a?(ActiveSupport::Duration)
+          interval = interval.parts
+        end
+        interval = if interval.is_a?(Enumerable)
           h = {}
           interval.each{|k,v| h[k] = -v unless v.nil?}
           h

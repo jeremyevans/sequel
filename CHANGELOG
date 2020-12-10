@@ -1,5 +1,7 @@
 === master
 
+* Have date_arithmetic extension work with ActiveSupport 6.1 (jeremyevans)
+
 * Avoid method redefinition warnings in verbose warning mode (jeremyevans)
 
 === 5.39.0 (2020-12-01)
