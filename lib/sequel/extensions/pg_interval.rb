@@ -61,50 +61,93 @@ module Sequel
 
       # Creates callable objects that convert strings into ActiveSupport::Duration instances.
       class Parser
-        # Parse the interval input string into an ActiveSupport::Duration instance.
-        def call(string)
-          raise(InvalidValue, "invalid or unhandled interval format: #{string.inspect}") unless matches = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/.match(string)
+        if defined?(ActiveSupport::VERSION::STRING) && ActiveSupport::VERSION::STRING >= '6.1'
+          # Parse the interval input string into an ActiveSupport::Duration instance.
+          def call(string)
+            raise(InvalidValue, "invalid or unhandled interval format: #{string.inspect}") unless matches = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/.match(string)
 
-          value = 0
-          parts = []
+            value = 0
 
-          if v = matches[1]
-            v = v.to_i
-            value += 31557600 * v
-            parts << [:years, v]
-          end
-          if v = matches[2]
-            v = v.to_i
-            value += 2592000 * v
-            parts << [:months, v]
-          end
-          if v = matches[3]
-            v = v.to_i
-            value += 86400 * v
-            parts << [:days, v]
-          end
-          if matches[5]
-            seconds = matches[5].to_i * 3600 + matches[6].to_i * 60
-            seconds += matches[8] ? matches[7].to_f : matches[7].to_i
-            seconds *= -1 if matches[4] == '-'
-            value += seconds
-            parts << [:seconds, seconds]
-          elsif matches[9] || matches[10] || matches[11]
-            seconds = 0
-            if v = matches[9]
-              seconds += v.to_i * 3600
+            if v = matches[1]
+              v = v.to_i
+              value += 31557600 * v
             end
-            if v = matches[10]
-              seconds += v.to_i * 60
+            if v = matches[2]
+              v = v.to_i
+              value += 2592000 * v
             end
-            if v = matches[11]
-              seconds += matches[12] ? v.to_f : v.to_i
+            if v = matches[3]
+              v = v.to_i
+              value += 86400 * v
             end
-            value += seconds
-            parts << [:seconds, seconds]
-          end
+            if matches[5]
+              seconds = matches[5].to_i * 3600 + matches[6].to_i * 60
+              seconds += matches[8] ? matches[7].to_f : matches[7].to_i
+              seconds *= -1 if matches[4] == '-'
+              value += seconds
+            elsif matches[9] || matches[10] || matches[11]
+              seconds = 0
+              if v = matches[9]
+                seconds += v.to_i * 3600
+              end
+              if v = matches[10]
+                seconds += v.to_i * 60
+              end
+              if v = matches[11]
+                seconds += matches[12] ? v.to_f : v.to_i
+              end
+              value += seconds
+            end
 
-          ActiveSupport::Duration.new(value, parts)
+            ActiveSupport::Duration.build(value)
+          end
+        else
+          # :nocov:
+          def call(string)
+            raise(InvalidValue, "invalid or unhandled interval format: #{string.inspect}") unless matches = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/.match(string)
+
+            value = 0
+            parts = []
+
+            if v = matches[1]
+              v = v.to_i
+              value += 31557600 * v
+              parts << [:years, v]
+            end
+            if v = matches[2]
+              v = v.to_i
+              value += 2592000 * v
+              parts << [:months, v]
+            end
+            if v = matches[3]
+              v = v.to_i
+              value += 86400 * v
+              parts << [:days, v]
+            end
+            if matches[5]
+              seconds = matches[5].to_i * 3600 + matches[6].to_i * 60
+              seconds += matches[8] ? matches[7].to_f : matches[7].to_i
+              seconds *= -1 if matches[4] == '-'
+              value += seconds
+              parts << [:seconds, seconds]
+            elsif matches[9] || matches[10] || matches[11]
+              seconds = 0
+              if v = matches[9]
+                seconds += v.to_i * 3600
+              end
+              if v = matches[10]
+                seconds += v.to_i * 60
+              end
+              if v = matches[11]
+                seconds += matches[12] ? v.to_f : v.to_i
+              end
+              value += seconds
+              parts << [:seconds, seconds]
+            end
+
+            ActiveSupport::Duration.new(value, parts)
+          end
+          # :nocov:
         end
       end
 
