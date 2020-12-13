@@ -101,10 +101,10 @@ describe "Sequel::IBMDB::Database#convert_smallint_to_bool" do
   
   it "should consider smallint datatypes as boolean if set, but not larger smallints" do
     @db.schema(:booltest, :reload=>true).first.last[:type].must_equal :boolean
-    @db.schema(:booltest, :reload=>true).first.last[:db_type].must_match /smallint/i
+    @db.schema(:booltest, :reload=>true).first.last[:db_type].must_match(/smallint/i)
     @db.convert_smallint_to_bool = false
     @db.schema(:booltest, :reload=>true).first.last[:type].must_equal :integer
-    @db.schema(:booltest, :reload=>true).first.last[:db_type].must_match /smallint/i
+    @db.schema(:booltest, :reload=>true).first.last[:db_type].must_match(/smallint/i)
   end
   
   it "should return smallints as bools and integers as integers when set" do
