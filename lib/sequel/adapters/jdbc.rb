@@ -71,11 +71,11 @@ module Sequel
     class TypeConvertor
       CONVERTORS = convertors = {}
       %w'Boolean Float Double Int Long Short'.each do |meth|
-        x = convertors[meth.to_sym] = Object.new
+        x = x = convertors[meth.to_sym] = Object.new
         class_eval("def x.call(r, i) v = r.get#{meth}(i); v unless r.wasNull end", __FILE__, __LINE__)
       end
       %w'Object Array String Time Date Timestamp BigDecimal Blob Bytes Clob'.each do |meth|
-        x = convertors[meth.to_sym] = Object.new
+        x = x = convertors[meth.to_sym] = Object.new
         class_eval("def x.call(r, i) r.get#{meth}(i) end", __FILE__, __LINE__)
       end
       x = convertors[:RubyTime] = Object.new
