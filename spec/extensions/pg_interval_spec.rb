@@ -6,6 +6,10 @@ begin
     require 'active_support/gem_version'
   rescue LoadError
   end
+  begin
+    require 'active_support/version'
+  rescue LoadError
+  end
 rescue LoadError
   warn "Skipping test of pg_interval plugin: can't load active_support/duration"
 else
@@ -84,15 +88,11 @@ describe "pg_interval extension" do
     seconds = 31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7
     parts = {:years => 1, :months => 2, :days => 25, :seconds => 18367}
 
-    if defined?(ActiveSupport::VERSION::STRING) && ActiveSupport::VERSION::STRING < '5.1'
+    if !defined?(ActiveSupport::VERSION::STRING) || ActiveSupport::VERSION::STRING < '5.1'
       parts = parts.to_a
     end
 
-    d = if defined?(ActiveSupport::VERSION::STRING) && ActiveSupport::VERSION::STRING >= '6.1'
-      ActiveSupport::Duration.build(seconds)
-    else
-      ActiveSupport::Duration.new(seconds, parts)
-    end
+    d = ActiveSupport::Duration.new(seconds, parts)
 
     @db.typecast_value(:interval, d).object_id.must_equal d.object_id
 

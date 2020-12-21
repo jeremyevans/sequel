@@ -4156,6 +4156,22 @@ describe 'PostgreSQL interval types' do
     @db.schema(:items)[1][1][:ruby_default].must_equal ActiveSupport::Duration.new(3*86400, :days=>3)
   end
 
+  it 'correctly handles round tripping interval values' do
+    @db.create_table!(:items) do
+      interval :i
+      interval :j
+    end
+    d = Sequel.cast(Date.new(2020, 2, 1), Date)
+    {'30 days'=>Date.new(2020, 3, 2), '1 month'=>Date.new(2020, 3, 1)}.each do |interval, result|
+      @ds.insert(:i=>interval)
+      @ds.update(:j=>@ds.get(:i))
+      @ds.where(:i=>:j).count.must_equal 1
+      @ds.get{(d+:i).cast(Date).as(:v)}.must_equal result
+      @ds.get{(d+:j).cast(Date).as(:v)}.must_equal result
+      @ds.delete
+    end
+  end
+
   it 'with models' do
     @db.create_table!(:items) do
       primary_key :id

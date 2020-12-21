@@ -1,6 +1,6 @@
 === master
 
-* Use of ActiveSupport::Duration.build instead of ActiveSupport::Duration.new on ActiveSupport 6.1+ (jeremyevans)
+* Have pg_interval extension work with ActiveSupport 6.1 (jeremyevans)
 
 * Have date_arithmetic extension work with ActiveSupport 6.1 (jeremyevans)
 
