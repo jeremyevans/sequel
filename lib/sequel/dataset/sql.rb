@@ -22,7 +22,7 @@ module Sequel
     def insert_sql(*values)
       return static_sql(@opts[:sql]) if @opts[:sql]
 
-      check_modification_allowed!
+      check_insert_allowed!
 
       columns = []
 
@@ -172,7 +172,7 @@ module Sequel
     # than one table.
     def update_sql(values = OPTS)
       return static_sql(opts[:sql]) if opts[:sql]
-      check_modification_allowed!
+      check_update_allowed!
       check_not_limited!(:update)
 
       case values
@@ -215,7 +215,7 @@ module Sequel
       lines << "def #{'_' if priv}#{type}_sql"
       lines << 'if sql = opts[:sql]; return static_sql(sql) end' unless priv
       lines << "if sql = cache_get(:_#{type}_sql); return sql end" if cacheable
-      lines << 'check_modification_allowed!' << 'check_not_limited!(:delete)' if type == :delete
+      lines << 'check_delete_allowed!' << 'check_not_limited!(:delete)' if type == :delete
       lines << 'sql = @opts[:append_sql] || sql_string_origin'
 
       if clauses.all?{|c| c.is_a?(Array)}
@@ -918,21 +918,41 @@ module Sequel
       !@opts[:no_cache_sql] && !cache_get(:_no_cache_sql)
     end
 
-    # Raise an InvalidOperation exception if deletion is not allowed for this dataset.
+    # Raise an InvalidOperation exception if modification is not allowed for this dataset.
+    # Check whether it is allowed to insert into this dataset.
+    # Only for backwards compatibility with older external adapters.
     def check_modification_allowed!
+      # SEQUEL6: Remove
+      Sequel::Deprecation.deprecate("Dataset#check_modification_allowed!", "Use check_{insert,delete,update,truncation}_allowed! instead")
+      _check_modification_allowed!(supports_modifying_joins?)
+    end
+
+    # Check whether it is allowed to insert into this dataset.
+    def check_insert_allowed!
+      _check_modification_allowed!(false)
+    end
+    alias check_truncation_allowed! check_insert_allowed!
+
+    # Check whether it is allowed to delete from this dataset.
+    def check_delete_allowed!
+      _check_modification_allowed!(supports_deleting_joins?)
+    end
+
+    # Check whether it is allowed to update this dataset.
+    def check_update_allowed!
+      _check_modification_allowed!(supports_updating_joins?)
+    end
+
+    # Internals of the check_*_allowed! methods
+    def _check_modification_allowed!(modifying_joins_supported)
       raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
-      raise(InvalidOperation, "Joined datasets cannot be modified") if !supports_modifying_joins? && joined_dataset?
+      raise(InvalidOperation, "Joined datasets cannot be modified") if !modifying_joins_supported && joined_dataset?
     end
 
     # Raise error if the dataset uses limits or offsets.
     def check_not_limited!(type)
       return if @opts[:skip_limit_check] && type != :truncate
       raise InvalidOperation, "Dataset##{type} not supported on datasets with limits or offsets" if opts[:limit] || opts[:offset]
-    end
-
-    # Alias of check_modification_allowed!
-    def check_truncation_allowed!
-      check_modification_allowed!
     end
 
     # Append column list to SQL string.

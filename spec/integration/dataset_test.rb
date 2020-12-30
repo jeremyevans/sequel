@@ -1940,7 +1940,7 @@ describe "Dataset identifier methods" do
   end
 end if IDENTIFIER_MANGLING
 
-if DB.dataset.supports_modifying_joins?
+if DB.dataset.supports_updating_joins? || DB.dataset.supports_deleting_joins?
   describe "Modifying joined datasets" do
     before do
       @db = DB
@@ -1959,20 +1959,24 @@ if DB.dataset.supports_modifying_joins?
       @db.drop_table?(:a, :b, :c)
     end
     
-    it "#update should allow updating joined datasets" do
-      @ds.update(:a=>10)
-      @ds.all.must_equal [{:c=>5, :b=>2, :a=>10, :d=>2, :e=>5, :f=>6}]
-      @db[:a].order(:a).all.must_equal [{:a=>3, :d=>4}, {:a=>10, :d=>2}]
-      @db[:b].order(:b).all.must_equal [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
-      @db[:c].order(:c).all.must_equal [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
+    if DB.dataset.supports_updating_joins?
+      it "#update should allow updating joined datasets" do
+        @ds.update(:a=>10)
+        @ds.all.must_equal [{:c=>5, :b=>2, :a=>10, :d=>2, :e=>5, :f=>6}]
+        @db[:a].order(:a).all.must_equal [{:a=>3, :d=>4}, {:a=>10, :d=>2}]
+        @db[:b].order(:b).all.must_equal [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
+        @db[:c].order(:c).all.must_equal [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
+      end
     end
     
-    it "#delete should allow deleting from joined datasets" do
-      @ds.delete
-      @ds.all.must_equal []
-      @db[:a].order(:a).all.must_equal [{:a=>3, :d=>4}]
-      @db[:b].order(:b).all.must_equal [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
-      @db[:c].order(:c).all.must_equal [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
+    if DB.dataset.supports_deleting_joins?
+      it "#delete should allow deleting from joined datasets" do
+        @ds.delete
+        @ds.all.must_equal []
+        @db[:a].order(:a).all.must_equal [{:a=>3, :d=>4}]
+        @db[:b].order(:b).all.must_equal [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
+        @db[:c].order(:c).all.must_equal [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
+      end
     end
   end
 end

@@ -51,6 +51,11 @@ module Sequel
       false
     end
 
+    # Whether deleting from joined datasets is supported, false by default.
+    def supports_deleting_joins?
+      supports_modifying_joins?
+    end
+    
     # Whether the database supports derived column lists (e.g.
     # "table_expr AS table_alias(column_alias1, column_alias2, ...)"), true by
     # default.
@@ -176,6 +181,11 @@ module Sequel
     # Whether the dataset supports fractional seconds in literal timestamps, true by default.
     def supports_timestamp_usecs?
       true
+    end
+    
+    # Whether updating joined datasets is supported, false by default.
+    def supports_updating_joins?
+      supports_modifying_joins?
     end
     
     # Whether the dataset supports the WINDOW clause to define windows used by multiple
