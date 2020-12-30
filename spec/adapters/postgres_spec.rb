@@ -4377,6 +4377,16 @@ describe 'PostgreSQL row-valued/composite types' do
       Object.send(:remove_const, :Company) rescue nil
     end
 
+    it 'create model objects whose values are model instances using pg_row' do
+      person = Person.create(:id=>1, :address=>@a)
+      person.address.must_equal @a
+      Person.count.must_equal 1
+
+      company = Company.create(:employees=>[person])
+      company.employees.must_equal [person]
+      Company.count.must_equal 1
+    end
+
     it 'insert and retrieve row types as model objects' do
       @ds.insert(:id=>1, :address=>@a)
       @ds.count.must_equal 1
