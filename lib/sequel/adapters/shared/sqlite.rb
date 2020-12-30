@@ -561,7 +561,7 @@ module Sequel
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values on_conflict'], ["else", %w'insert conflict into columns values']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having window compounds order limit lock']])
-      Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
+      Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 33300', %w'with update table set from where'], ['elsif db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
       def cast_sql_append(sql, expr, type)
         if type == Time or type == DateTime
@@ -753,6 +753,11 @@ module Sequel
         false
       end
 
+      # SQLite does not support deleting from a joined dataset
+      def supports_deleting_joins?
+        false
+      end
+
       # SQLite does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
@@ -763,6 +768,11 @@ module Sequel
         false
       end
       
+      # SQLite 3.33.0 supports modifying joined datasets
+      def supports_modifying_joins?
+        db.sqlite_version >= 33300
+      end
+
       # SQLite does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
@@ -824,6 +834,13 @@ module Sequel
           col
         end
       end
+
+      # Raise an InvalidOperation exception if insert is not allowed for this dataset.
+      def check_insert_allowed!
+        raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
+        raise(InvalidOperation, "Joined datasets cannot be modified") if joined_dataset?
+      end
+      alias check_delete_allowed! check_insert_allowed!
 
       # SQLite supports a maximum of 500 rows in a VALUES clause.
       def default_import_slice
@@ -943,6 +960,23 @@ module Sequel
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
       def _truncate_sql(table)
         "DELETE FROM #{table}"
+      end
+
+      # Use FROM to specify additional tables in an update query
+      def update_from_sql(sql)
+        if(from = @opts[:from][1..-1]).empty?
+          raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
+        else
+          sql << ' FROM '
+          source_list_append(sql, from)
+          select_join_sql(sql)
+        end
+      end
+
+      # Only include the primary table in the main update clause
+      def update_table_sql(sql)
+        sql << ' '
+        source_list_append(sql, @opts[:from][0..0])
       end
     end
   end

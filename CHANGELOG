@@ -1,5 +1,7 @@
 === master
 
+* Support UPDATE FROM syntax in SQLite 3.33.0+ (jeremyevans)
+
 * Have pg_interval extension work with ActiveSupport 6.1 (jeremyevans)
 
 * Have date_arithmetic extension work with ActiveSupport 6.1 (jeremyevans)
