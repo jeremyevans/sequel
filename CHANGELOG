@@ -1,4 +1,4 @@
-=== master
+=== 5.40.0 (2021-01-01)
 
 * Support UPDATE FROM syntax in SQLite 3.33.0+ (jeremyevans)
 

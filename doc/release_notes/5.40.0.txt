@@ -1,0 +1,40 @@
+= New Features
+
+* On SQLite 3.33.0+, the UPDATE FROM syntax is now supported. This
+  allows you to update one table based on a join to another table.
+  The SQLite syntax is based on the PostgreSQL syntax, and the
+  Sequel API is the same for both.  You need to pass multiple tables
+  to Dataset#from.  The first table is the table to update, and the
+  remaining tables are used to construct the UPDATE FROM clause:
+
+    DB[:a, :b].where{{a[:c]=>b[:d]}}.update(:e=>'f')
+    # UPDATE a SET e = 'f' FROM b WHERE (a.c = b.d)
+
+  Unlike PostgreSQL, SQLite does not support the deletion of joined
+  datasets.  Related to this, the following methods for testing
+  database support for modifying joined datasets have been added:
+
+  * supports_updating_joins?
+  * supports_deleting_joins?
+
+= Other Improvements
+
+* The pg_interval and date_arithmetic extensions now support
+  ActiveSupport 6.1.
+
+* Sequel no longer issues method redefinition warnings in verbose
+  mode.  As Ruby 3 has dropped uninitialized instance variable
+  warnings, Sequel is now verbose warning free on Ruby 3.
+
+= Backwards Compatibility
+
+* Trying to truncate or insert into a joined dataset now correctly
+  raises an exception even if the joined dataset supports updates.
+
+* The private Dataset#check_modification_allowed! method is now
+  deprecated, and users (custom adapters) should now switch to one
+  of the more specific methods introduced in this version:
+
+  * check_insert_allowed!
+  * check_update_allowed!
+  * check_delete_allowed!
