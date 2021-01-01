@@ -47,7 +47,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">FindOrCreate</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_create</span>(<span class="ruby-identifier">vals</span>)&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:authorships</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">FindOrCreate</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> has been able to support most has_many :through style associations since 1.3, via many_to_many (since it doesn&#39;t break on join tables that are also model tables, unlike ActiveRecord&#39;s has_and_belongs_to_many).  Now it can also support has_many :through style associations where it goes through a has_many association.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> has been able to support most has_many :through style associations since <a href="1_3_txt.html">1.3</a>, via many_to_many (since it doesn&#39;t break on join tables that are also model tables, unlike ActiveRecord&#39;s has_and_belongs_to_many).  Now it can also support has_many :through style associations where it goes through a has_many association.</p>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now support polymorphic associations.  Polymorphic associations are really a design flaw, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn&#39;t support them directly, but the tools that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> gives you make them pretty easy to implement.</p>
 
@@ -160,7 +160,7 @@ Last Update:
 <p>Backwards Incompatible Changes</p>
 <hr>
 <ul><li>
-<p>ParseTree support, deprecated in 2.1.0, has been removed in 2.2.0. You should use the expression filter syntax instead, perferably without the block (though it can be used inside a block as well). This usually involves the following types of changes:</p>
+<p>ParseTree support, deprecated in <a href="2_1_0_txt.html">2.1.0</a>, has been removed in 2.2.0. You should use the expression filter syntax instead, perferably without the block (though it can be used inside a block as well). This usually involves the following types of changes:</p>
 
 <pre>filter{:x == :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &lt;&lt; :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &amp;&amp; :y} =&gt; filter(:x &amp; :y) # Don&#39;t forget about change&#x000A;filter{:x || :y} =&gt; filter(:x | :y) #  in operator precedence&#x000A;filter{:x.like?(&#39;%blah%&#39;)} =&gt; filter(:x.like(&#39;%blah%&#39;))&#x000A;filter do =&gt; filter((:x &gt; 1) &amp; (:y &lt; 2))&#x000A;  :x &gt; 1&#x000A;  :y &lt; 2&#x000A;end</pre>
 </li><li>
@@ -170,7 +170,7 @@ Last Update:
 
 <p>Note that before, save would return false where now it returns nil if you disable raising on save failure.</p>
 </li><li>
-<p>Dataset#update no longer takes a block, as it&#39;s use of the block depended on ParseTree.  With the introduction of the expression syntax in 2.0.0, it&#39;s no longer necessary.  You should use a hash with an expression as the value instead:</p>
+<p>Dataset#update no longer takes a block, as it&#39;s use of the block depended on ParseTree.  With the introduction of the expression syntax in <a href="2_0_0_txt.html">2.0.0</a>, it&#39;s no longer necessary.  You should use a hash with an expression as the value instead:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
 </li><li>
@@ -181,7 +181,7 @@ Last Update:
 <p>Dataset#columns ignores any filtering, ordering, or distinct clauses.  This shouldn&#39;t cause issues unless you were using SQL functions with side effects and expecting them to be called when columns was called (unlikely at best).</p>
 </li></ul>
 
-<p>One significant point of note is that the 2.2.0 release will be the last release with both a sequel_core and sequel gem.  Starting with 2.3.0 they will be combined into one sequel gem.  You will still be able to get just the sequel_core part by requiring &#39;sequel_core&#39;, but they will be packaged together.</p>
+<p>One significant point of note is that the <a href="2_2_0_txt.html">2.2.0</a> release will be the last release with both a sequel_core and sequel gem.  Starting with <a href="2_3_0_txt.html">2.3.0</a> they will be combined into one sequel gem.  You will still be able to get just the sequel_core part by requiring &#39;sequel_core&#39;, but they will be packaged together.</p>
 </div>
 <div id='context'>
 </div>

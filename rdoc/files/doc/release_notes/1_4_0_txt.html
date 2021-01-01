@@ -52,9 +52,9 @@ Last Update:
 
 <p>ActiveRecord style has_many :through associations are now supported via many_to_many.  many_to_many will no longer select the entire result set, just the columns of the associated table (and not the join table), so it works for both has_and_belongs_to_many (simple join table) and has_many :through (join table model) scenarios.  If you want to include all or part of the join table attributes, see the :select option for many_to_many associations.</p>
 
-<p>We reduced the number of gems from three (sequel, sequel_core, sequel_model) to two (sequel, sequel_core).  Basically, sequel_model is now just sequel, and the old sequel gem metapackage is no longer.  There isn&#39;t a reason to have a gem metapackage for two gems when one (sequel_model) depends on the other (sequel_core).  This required a version bump for the model part of sequel from 0.5.0.2 to 1.4.0 (since the previous sequel gem version was 1.3).</p>
+<p>We reduced the number of gems from three (sequel, sequel_core, sequel_model) to two (sequel, sequel_core).  Basically, sequel_model is now just sequel, and the old sequel gem metapackage is no longer.  There isn&#39;t a reason to have a gem metapackage for two gems when one (sequel_model) depends on the other (sequel_core).  This required a version bump for the model part of sequel from 0.5.0.2 to <a href="1_4_0_txt.html">1.4.0</a> (since the previous sequel gem version was <a href="1_3_txt.html">1.3</a>).</p>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 1.4.0 has fixes for 11 trackers issues, including fixes to the MySQL and PostgreSQL adapters.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="1_4_0_txt.html">1.4.0</a> has fixes for 11 trackers issues, including fixes to the MySQL and PostgreSQL adapters.</p>
 
 <p>We have switched the source control repository for <a href="../../../classes/Sequel.html"><code>Sequel</code></a> from Google Code (which uses subversion) to github (which uses git).  If you would like to contribute to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, please fork the github repository, make your changes, and send a pull request.  As before, posting patches on the Google Code issue tracker is fine as well.</p>
 </div>

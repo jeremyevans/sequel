@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.40.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.40.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.40.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-12-31 11:06:03 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>On SQLite <a href="3_33_0_txt.html">3.33.0</a>+, the UPDATE FROM syntax is now supported. This allows you to update one table based on a join to another table. The SQLite syntax is based on the PostgreSQL syntax, and the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> API is the same for both.  You need to pass multiple tables to Dataset#from.  The first table is the table to update, and the remaining tables are used to construct the UPDATE FROM clause:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">a</span>[<span class="ruby-value">:c</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">b</span>[<span class="ruby-value">:d</span>]}}.<span class="ruby-identifier">update</span>(<span class="ruby-value">:e</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;f&#39;</span>)&#x000A;<span class="ruby-comment"># UPDATE a SET e = &#39;f&#39; FROM b WHERE (a.c = b.d)</span></pre>
+
+<p>Unlike PostgreSQL, SQLite does not support the deletion of joined datasets.  Related to this, the following methods for testing database support for modifying joined datasets have been added:</p>
+<ul><li>
+<p>supports_updating_joins?</p>
+</li><li>
+<p>supports_deleting_joins?</p>
+</li></ul>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The pg_interval and date_arithmetic extensions now support ActiveSupport 6.1.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer issues method redefinition warnings in verbose mode.  As Ruby 3 has dropped uninitialized instance variable warnings, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now verbose warning free on Ruby 3.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Trying to truncate or insert into a joined dataset now correctly raises an exception even if the joined dataset supports updates.</p>
+</li><li>
+<p>The private Dataset#check_modification_allowed! method is now deprecated, and users (custom adapters) should now switch to one of the more specific methods introduced in this version:</p>
+<ul><li>
+<p>check_insert_allowed!</p>
+</li><li>
+<p>check_update_allowed!</p>
+</li><li>
+<p>check_delete_allowed!</p>
+</li></ul>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

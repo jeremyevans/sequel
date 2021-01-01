@@ -64,7 +64,7 @@ Last Update:
 <ul><li>
 <p>The association dataset methods now correctly handle cases where one of the keys is nil.  Previously, they would incorrectly use an IS NULL predicate in such cases.  Now, they use a false predicate.</p>
 </li><li>
-<p>The hook_class_methods plugin handling of commit hooks has been fixed.  The implementation of commit hooks (but not rollback hooks) was broken in hook_class_methods starting in 4.39.0 due to changes to avoid keeping references to all model instances until the transaction was committed or rolled back.</p>
+<p>The hook_class_methods plugin handling of commit hooks has been fixed.  The implementation of commit hooks (but not rollback hooks) was broken in hook_class_methods starting in <a href="4_39_0_txt.html">4.39.0</a> due to changes to avoid keeping references to all model instances until the transaction was committed or rolled back.</p>
 </li><li>
 <p>Using the Fixnum schema method no longer raises a warning on ruby 2.4+, as it now uses the Integer class instead of the Fixnum constant.</p>
 </li><li>
@@ -77,7 +77,7 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Support for using the Bignum constant as a generic type has been removed, as was preannounced in the 4.36.0 release notes.  Users should switch to using the :Bignum constant if they haven&#39;t already.</p>
+<p>Support for using the Bignum constant as a generic type has been removed, as was preannounced in the <a href="4_36_0_txt.html">4.36.0</a> release notes.  Users should switch to using the :Bignum constant if they haven&#39;t already.</p>
 </li><li>
 <p>Users of the ado adapter may need to update their code now that the ado adapter correctly handles most types.</p>
 </li><li>

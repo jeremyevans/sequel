@@ -40,7 +40,7 @@ Last Update:
 <ul><li>
 <p>Dataset literalization for simple datasets is now faster by creating a per-adapter SQL literalization method instead of having all adapters share a generic method with higher overhead. Sequel.split_symbol now caches results globally. Symbol literalization is now cached per Database.</p>
 
-<p>Combining these three optimizations, here are the performance increases compared to 4.9.0 for a couple example datasets:</p>
+<p>Combining these three optimizations, here are the performance increases compared to <a href="4_9_0_txt.html">4.9.0</a> for a couple example datasets:</p>
 
 <pre>ds1 = DB[:a]&#x000A;ds2 = DB[:a].select(:a, :b).where(:c=&gt;1).order(:d, :e)&#x000A;        .sql     .all (1 row)&#x000A;ds1     140%     11%&#x000A;ds2     187%     32%</pre>
 </li><li>

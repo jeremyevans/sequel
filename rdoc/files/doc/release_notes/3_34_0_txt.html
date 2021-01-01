@@ -99,7 +99,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_literals</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">QueryLiterals</span>)</pre>
 
-<p>The next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> (4.0.0) will probably integrate this extension into the core library.</p>
+<p>The next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> (<a href="4_0_0_txt.html">4.0.0</a>) will probably integrate this extension into the core library.</p>
 </li><li>
 <p>A select_remove extension has been added that adds Dataset#select_remove, for removing selected columns/expressions from a dataset:</p>
 
@@ -316,7 +316,7 @@ Last Update:
 
 <p>That way they work whether they are loaded before or after the postgres adapter.</p>
 </li><li>
-<p>PostgreSQL 8.2-9.0 now correctly add the RETURNING clause when building queries.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.31.0 added support for returning values from delete/update queries in PostgreSQL 8.2-9.0, but didn&#39;t change the literalization code to use the RETURNING clause on those versions.</p>
+<p>PostgreSQL 8.2-9.0 now correctly add the RETURNING clause when building queries.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_31_0_txt.html">3.31.0</a> added support for returning values from delete/update queries in PostgreSQL 8.2-9.0, but didn&#39;t change the literalization code to use the RETURNING clause on those versions.</p>
 </li><li>
 <p>The jdbc/postgres adapter now converts Java arrays (Java::OrgPostgresqlJdbc4::Jdbc4Array) to ruby arrays.</p>
 </li><li>
@@ -353,13 +353,13 @@ Last Update:
 <p>A spec_model_no_assoc task has been added for running model specs without the association plugin loaded.  This is to check that the SEQUEL_NO_ASSOCIATIONS setting works correctly.</p>
 </li></ul>
 
-<h1 id="label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">Deprecated Features to be Removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.35.0<span><a href="#label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">Deprecated Features to be Removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_35_0_txt.html">3.35.0</a><span><a href="#label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p>Ruby &lt;1.8.7 support is now deprecated.</p>
 </li><li>
 <p>PostgreSQL &lt;8.2 support is now deprecated.</p>
 </li><li>
-<p>Dataset#disable_insert_returning on PostgreSQL is now deprecated. Starting in 3.35.0, RETURNING will now always be used to get the primary key value when inserting.</p>
+<p>Dataset#disable_insert_returning on PostgreSQL is now deprecated. Starting in <a href="3_35_0_txt.html">3.35.0</a>, RETURNING will now always be used to get the primary key value when inserting.</p>
 </li><li>
 <p>Array#all_two_pairs? is now deprecated.  It was part of the core extensions, but the core extensions have been refactored to no longer require it.  As it doesn&#39;t specifically relate to creating <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, it is being removed.  The private Array#sql_expr_if_all_two_pairs method is deprecated as well.</p>
 </li></ul>

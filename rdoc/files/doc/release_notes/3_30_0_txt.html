@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-Dataset+Literalization+Refactoring">Dataset Literalization Refactoring<span><a href="#label-Dataset+Literalization+Refactoring">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>As warned about in the 3.29.0 release notes, dataset literalization has been completely refactored.  It now uses an append-only design which is faster in all cases, about twice as fast for large objects and deeply nested structures, and over two orders of magnitude faster in some pathological cases.</p>
+<p>As warned about in the <a href="3_29_0_txt.html">3.29.0</a> release notes, dataset literalization has been completely refactored.  It now uses an append-only design which is faster in all cases, about twice as fast for large objects and deeply nested structures, and over two orders of magnitude faster in some pathological cases.</p>
 
 <p>This change should not affect applications, but may affect custom extensions or adapters that dealt with literalization of objects. Most literalization methods now have a method with an _append suffix that does the actual literalization, which takes the sql string to append to as the first argument.  If you were overriding a literalization method, you now probably need to override the _append version instead.  If you have this literalization method:</p>
 

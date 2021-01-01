@@ -51,7 +51,7 @@ Last Update:
 <ul><li>
 <p>In the postgres, mysql, and sqlite adapters, typecasting now uses methods instead of procs.  Since methods aren&#39;t closures (while procs are), this makes typecasting faster (up to 15%).</p>
 </li><li>
-<p>When typecasting model column values, the classes of the new and existing values are checked in addition to the values themselves. Previously, if the new and existing values were equal (i.e. 1.0 and 1), it wouldn&#39;t update the value.  Now, if the classes are different, it always updates the value.</p>
+<p>When typecasting model column values, the classes of the new and existing values are checked in addition to the values themselves. Previously, if the new and existing values were equal (i.e. <a href="1_0_txt.html">1.0</a> and 1), it wouldn&#39;t update the value.  Now, if the classes are different, it always updates the value.</p>
 </li><li>
 <p>Date and DateTime objects are now handled correctly when using prepared statements/bound variables in the jdbc adapter.</p>
 </li><li>

@@ -87,7 +87,8 @@ Superclass:
 <div class='method public-class' id='method-method-c-new'>
 <a name='method-c-new'></a>
 <div class='synopsis'>
-<span class='name'>new</span><span class='arguments'>(type, converter=nil)</span>
+<span class='name'>new</span>
+<span class='arguments'>(type, converter=nil)</span>
 
 </div>
 <div class='description'>
@@ -99,14 +100,15 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">409</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">410</span>   <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">411</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="line-num">412</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">410</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">411</span>   <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">412</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="line-num">413</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
 <div class='method public-instance' id='method-method-i-call'>
 <a name='method-i-call'></a>
 <div class='synopsis'>
-<span class='name'>call</span><span class='arguments'>(string)</span>
+<span class='name'>call</span>
+<span class='arguments'>(string)</span>
 
 </div>
 <div class='description'>
@@ -118,7 +120,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">417</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">418</span>   <span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">parse_pg_array</span>(<span class="ruby-identifier">string</span>, <span class="ruby-ivar">@converter</span>), <span class="ruby-ivar">@type</span>)&#x000A;<span class="line-num">419</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">418</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">419</span>   <span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">parse_pg_array</span>(<span class="ruby-identifier">string</span>, <span class="ruby-ivar">@converter</span>), <span class="ruby-ivar">@type</span>)&#x000A;<span class="line-num">420</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

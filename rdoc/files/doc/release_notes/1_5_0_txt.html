@@ -80,7 +80,7 @@ Last Update:
 
 <p>etc.</p>
 
-<p>Starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 1.5.0, some methods are deprecated.  These methods will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.0.0.  The deprecation framework is fairly flexible. You can choose where the messages get sent:</p>
+<p>Starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="1_5_0_txt.html">1.5.0</a>, some methods are deprecated.  These methods will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.0.0.  The deprecation framework is fairly flexible. You can choose where the messages get sent:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecation_message_stream</span> = <span class="ruby-constant">STDERR</span> <span class="ruby-comment"># the default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecation_message_stream</span> = \&#x000A;  <span class="ruby-constant">File</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;deprecation.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>) <span class="ruby-comment"># A file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecation_message_stream</span> = <span class="ruby-keyword">nil</span> <span class="ruby-comment"># ignore the</span></pre>
 
@@ -98,7 +98,7 @@ Last Update:
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer depends on ParseTree, RubyInline, or ruby2ruby.  They are still required to use the block filters.  Sequel&#39;s only gem dependency is on the tiny metaid.</p>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 1.5.0 has fixes for 12 tracker issues, including fixes to the Informix, MySQL, ODBC, ADO, JDBC, Postgres, and SQLite adapters.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="1_5_0_txt.html">1.5.0</a> has fixes for 12 tracker issues, including fixes to the Informix, MySQL, ODBC, ADO, JDBC, Postgres, and SQLite adapters.</p>
 </div>
 <div id='context'>
 </div>

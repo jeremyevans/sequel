@@ -39,9 +39,9 @@ Last Update:
 <p>Deprecated Methods/Features Removed</p>
 <hr>
 
-<p>Methods and features that were deprecated in 2.12.0 have been removed in 3.0.0.  Many features were moved into plugins or extensions, so in many cases you just need to require an extension or use Model.plugin and not make any changes to your code.  See the 2.12.0 release notes for the list of methods/features deprecated in 2.12.0.</p>
+<p>Methods and features that were deprecated in <a href="2_12_0_txt.html">2.12.0</a> have been removed in 3.0.0.  Many features were moved into plugins or extensions, so in many cases you just need to require an extension or use Model.plugin and not make any changes to your code.  See the <a href="2_12_0_txt.html">2.12.0</a> release notes for the list of methods/features deprecated in 2.12.0.</p>
 
-<p>If you are upgrading from a previous 2.x release, please upgrade to 2.12.0 first, fix your code to remove all deprecation warnings, and then upgrade to 3.0.0.</p>
+<p>If you are upgrading from a previous 2.x release, please upgrade to <a href="2_12_0_txt.html">2.12.0</a> first, fix your code to remove all deprecation warnings, and then upgrade to 3.0.0.</p>
 
 <p>New Adapter</p>
 <hr>
@@ -130,7 +130,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}&#x000A;<span class="ruby-comment"># WHERE number &gt; 10 AND name &gt; &#39;M&#39;</span></pre>
 
-<p>2.12.0 raised a deprecation warning if you used a virtual row block without an argument and you hadn&#39;t set Sequel.virtual_row_instance_eval = true.</p>
+<p><a href="2_12_0_txt.html">2.12.0</a> raised a deprecation warning if you used a virtual row block without an argument and you hadn&#39;t set Sequel.virtual_row_instance_eval = true.</p>
 </li><li>
 <p>Dataset#exclude now inverts the given argument, instead of negating it. This only changes its behavior if it is called with a hash or array of all two pairs that have more than one element.</p>
 
@@ -144,7 +144,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>({<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">sql_negate</span>)</pre>
 </li><li>
-<p>As noted above, the methods/features deprecated in 2.12.0 were removed.</p>
+<p>As noted above, the methods/features deprecated in <a href="2_12_0_txt.html">2.12.0</a> were removed.</p>
 </li><li>
 <p>The private Dataset#select_*_sql methods now only take a single argument, the SQL string being built.</p>
 </li><li>

@@ -56,7 +56,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:Bignum</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-value">:Bignum</span>))</pre>
 
-<p>Note that you should only do this if you are using <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.35.0+, as previous versions of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will treat the :Bignum symbol as a database-specific type named Bignum.</p>
+<p>Note that you should only do this if you are using <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="4_35_0_txt.html">4.35.0</a>+, as previous versions of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will treat the :Bignum symbol as a database-specific type named Bignum.</p>
 </li></ul>
 
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>

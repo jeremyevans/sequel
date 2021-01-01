@@ -164,7 +164,7 @@ Last Update:
 </li><li>
 <p>Dataset#select_map and select_order_map now return an array of single element arrays if given an array with a single entry as an argument.  Previously, they returned an array of values, which wasn&#39;t consistent.</p>
 </li><li>
-<p>Sequel&#39;s emulation of bitwise operators with more than 2 arguments now works on all adapters that use the emulation.  The emulation was broken in 3.28.0 when more than 2 arguments were used on H2, DB2, Microsoft SQL Server, PostgreSQL, and SQLite.</p>
+<p>Sequel&#39;s emulation of bitwise operators with more than 2 arguments now works on all adapters that use the emulation.  The emulation was broken in <a href="3_28_0_txt.html">3.28.0</a> when more than 2 arguments were used on H2, DB2, Microsoft SQL Server, PostgreSQL, and SQLite.</p>
 </li><li>
 <p>Dataset#columns now correctly handles the emulated offset support used on DB2, Oracle, and Microsoft SQL Server when using the jdbc, odbc, ado, and dbi adapters.  Previously, Dataet#columns could contain the row number column, which wasn&#39;t in the hashes yielded by Dataset#each.</p>
 </li><li>

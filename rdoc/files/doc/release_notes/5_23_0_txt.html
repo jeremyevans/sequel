@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>An insert_conflict plugin has been added for automatically handling constraint conflicts when saving new model instances.  It is supported on PostgreSQL 9.5+ and SQLite 3.24.0+.</p>
+<p>An insert_conflict plugin has been added for automatically handling constraint conflicts when saving new model instances.  It is supported on PostgreSQL 9.5+ and SQLite <a href="3_24_0_txt.html">3.24.0</a>+.</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>, <span class="ruby-value">copies_sold:</span> <span class="ruby-value">1000</span>).&#x000A;  <span class="ruby-identifier">insert_conflict</span>(&#x000A;    <span class="ruby-value">target:</span> <span class="ruby-value">:name</span>,&#x000A;    <span class="ruby-value">update:</span> {<span class="ruby-value">copies_sold:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}&#x000A;  ).&#x000A;  <span class="ruby-identifier">save</span></pre>
 </li><li>
@@ -64,7 +64,7 @@ Last Update:
 </li><li>
 <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles parsing schema for tables in another database on the same server or in a database on a linked server.</p>
 </li><li>
-<p>The pg_json extension now correctly handles subclasses of core classes when wrapping objects.  This stopped working in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.21.0, when support for wrapping JSON primitives was added.</p>
+<p>The pg_json extension now correctly handles subclasses of core classes when wrapping objects.  This stopped working in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_21_0_txt.html">5.21.0</a>, when support for wrapping JSON primitives was added.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now works around a couple bugs in jdbc-sqlite 3.27.2.1, allowing schema parsing and foreign key parsing to work.</p>
 </li><li>

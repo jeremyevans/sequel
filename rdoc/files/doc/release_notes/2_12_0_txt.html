@@ -283,7 +283,7 @@ Last Update:
 </li><li>
 <p>Dataset#where now always affects the WHERE clause.  Before, it was just an alias of filter, so it modified the HAVING clause if the dataset already had a HAVING clause.</p>
 </li><li>
-<p>The optimization of Model.[] introduced in 2.11.0 broke on databases that didn&#39;t support LIMIT.  The optimization now works on those databases.</p>
+<p>The optimization of Model.[] introduced in <a href="2_11_0_txt.html">2.11.0</a> broke on databases that didn&#39;t support LIMIT.  The optimization now works on those databases.</p>
 </li><li>
 <p>All of the the RDoc documentation was reviewed and many updates were made, resulting in significantly improved documentation quality.</p>
 </li><li>
@@ -315,7 +315,7 @@ Last Update:
 
 <p>Similarly, instead of not modifying changed_columns until after the after hooks run, a @columns_updated instance variable will be available in the after hooks that is a hash of exactly what attribute keys and values were used in the update.</p>
 
-<p>These changes break compatibility with 2.11.0 and 2.10.0, but restore compatibility with 2.9.0 and previous versions.</p>
+<p>These changes break compatibility with <a href="2_11_0_txt.html">2.11.0</a> and <a href="2_10_0_txt.html">2.10.0</a>, but restore compatibility with <a href="2_9_0_txt.html">2.9.0</a> and previous versions.</p>
 </li><li>
 <p>PostgreSQL no longer uses savepoints for nested transactions by default.  If you want to use a savepoint, you have to pass the :savepoint option to the transaction method.  Using savepoints by default broke expectations when a method raised Rollback to rollback the transaction, and it only rolled back to the last savepoint.</p>
 </li><li>

@@ -41,7 +41,7 @@ Last Update:
 <ul><li>
 <p>A real one_to_one association was added to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, replacing the previous :one_to_one option of the one_to_many association.</p>
 
-<p>This is a fully backwards incompatible change, any code that uses the :one_to_one option of one_to_many will be broken in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.10.0, as that option now raises an exception.  Keeping backwards compatibility was not possible, as even the name of the association needs to be changed.  Here are the code changes you need to make:</p>
+<p>This is a fully backwards incompatible change, any code that uses the :one_to_one option of one_to_many will be broken in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_10_0_txt.html">3.10.0</a>, as that option now raises an exception.  Keeping backwards compatibility was not possible, as even the name of the association needs to be changed.  Here are the code changes you need to make:</p>
 <ul><li>
 <p>The association definition needs to change from one_to_many to one_to_one, with no :one_to_one option, and with the association name changed from the plural form to the singular form:</p>
 

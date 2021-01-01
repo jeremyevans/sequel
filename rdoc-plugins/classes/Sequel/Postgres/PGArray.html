@@ -103,7 +103,8 @@ Superclass:
 <div class='method public-class' id='method-method-c-new'>
 <a name='method-c-new'></a>
 <div class='synopsis'>
-<span class='name'>new</span><span class='arguments'>(array, type=nil)</span>
+<span class='name'>new</span>
+<span class='arguments'>(array, type=nil)</span>
 
 </div>
 <div class='description'>
@@ -115,14 +116,15 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">438</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">439</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)&#x000A;<span class="line-num">440</span>   <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">441</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">439</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">440</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)&#x000A;<span class="line-num">441</span>   <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">442</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
 <div class='method public-instance' id='method-method-i-op'>
 <a name='method-i-op'></a>
 <div class='synopsis'>
-<span class='name'>op</span><span class='arguments'>()</span>
+<span class='name'>op</span>
+<span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -140,7 +142,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
 <a name='method-i-sql_literal_append'></a>
 <div class='synopsis'>
-<span class='name'>sql_literal_append</span><span class='arguments'>(ds, sql)</span>
+<span class='name'>sql_literal_append</span>
+<span class='arguments'>(ds, sql)</span>
 
 </div>
 <div class='description'>
@@ -152,7 +155,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">446</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">447</span>   <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>&#x000A;<span class="line-num">448</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>&#x000A;<span class="line-num">449</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>&#x000A;<span class="line-num">450</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">451</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>&#x000A;<span class="line-num">452</span>     <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)&#x000A;<span class="line-num">453</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">454</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>&#x000A;<span class="line-num">455</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>&#x000A;<span class="line-num">456</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">457</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">447</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">448</span>   <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>&#x000A;<span class="line-num">449</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>&#x000A;<span class="line-num">450</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>&#x000A;<span class="line-num">451</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">452</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>&#x000A;<span class="line-num">453</span>     <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)&#x000A;<span class="line-num">454</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">455</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>&#x000A;<span class="line-num">456</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>&#x000A;<span class="line-num">457</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">458</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

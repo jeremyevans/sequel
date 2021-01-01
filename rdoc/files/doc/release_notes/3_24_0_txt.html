@@ -81,11 +81,11 @@ Last Update:
 
 <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Filtering by associations got a lot more powerful.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.23.0 introduced filtering by associations:</p>
+<p>Filtering by associations got a lot more powerful.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_23_0_txt.html">3.23.0</a> introduced filtering by associations:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)</pre>
 
-<p>This capability is much expanded in 3.24.0, allowing you to exclude by associations:</p>
+<p>This capability is much expanded in <a href="3_24_0_txt.html">3.24.0</a>, allowing you to exclude by associations:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)</pre>
 
@@ -166,7 +166,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#create_table? now uses a single query with IF NOT EXISTS if the database supports such syntax.  Previously, it issued a SELECT query to determine table existence.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> currently supports this syntax on MySQL, H2, and SQLite 3.3.0+.</p>
+<p>Database#create_table? now uses a single query with IF NOT EXISTS if the database supports such syntax.  Previously, it issued a SELECT query to determine table existence.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> currently supports this syntax on MySQL, H2, and SQLite <a href="3_3_0_txt.html">3.3.0</a>+.</p>
 
 <p>The Database#supports_create_table_if_not_exists? method was added to allow users to determine whether this syntax is supported.</p>
 </li><li>

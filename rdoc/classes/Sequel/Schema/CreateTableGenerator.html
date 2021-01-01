@@ -132,7 +132,8 @@ Superclass:
 <div class='method public-class' id='method-method-c-add_type_method'>
 <a name='method-c-add_type_method'></a>
 <div class='synopsis'>
-<span class='name'>add_type_method</span><span class='arguments'>(*types)</span>
+<span class='name'>add_type_method</span>
+<span class='arguments'>(*types)</span>
 
 </div>
 <div class='description'>
@@ -150,7 +151,8 @@ Superclass:
 <div class='method public-class' id='method-method-c-new'>
 <a name='method-c-new'></a>
 <div class='synopsis'>
-<span class='name'>new</span><span class='arguments'>(db, &block)</span>
+<span class='name'>new</span>
+<span class='arguments'>(db, &block)</span>
 
 </div>
 <div class='description'>
@@ -169,7 +171,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-Bignum'>
 <a name='method-i-Bignum'></a>
 <div class='synopsis'>
-<span class='name'>Bignum</span><span class='arguments'>(name, opts=OPTS)</span>
+<span class='name'>Bignum</span>
+<span class='arguments'>(name, opts=OPTS)</span>
 
 </div>
 <div class='description'>
@@ -187,7 +190,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-Fixnum'>
 <a name='method-i-Fixnum'></a>
 <div class='synopsis'>
-<span class='name'>Fixnum</span><span class='arguments'>(name, opts=OPTS)</span>
+<span class='name'>Fixnum</span>
+<span class='arguments'>(name, opts=OPTS)</span>
 
 </div>
 <div class='description'>
@@ -205,7 +209,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-check'>
 <a name='method-i-check'></a>
 <div class='synopsis'>
-<span class='name'>check</span><span class='arguments'>(*args, &block)</span>
+<span class='name'>check</span>
+<span class='arguments'>(*args, &block)</span>
 
 </div>
 <div class='description'>
@@ -225,7 +230,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-column'>
 <a name='method-i-column'></a>
 <div class='synopsis'>
-<span class='name'>column</span><span class='arguments'>(name, type, opts = OPTS)</span>
+<span class='name'>column</span>
+<span class='arguments'>(name, type, opts = OPTS)</span>
 
 </div>
 <div class='description'>
@@ -246,7 +252,7 @@ Superclass:
 </td></tr><tr><td class='label'>:deferrable </td><td>
 <p>For foreign key columns, this ensures referential integrity will work even if referencing table uses a foreign key value that does not yet exist on referenced table (but will exist before the transaction commits). Basically it adds DEFERRABLE INITIALLY DEFERRED on key creation. If you use :immediate as the value, uses DEFERRABLE INITIALLY IMMEDIATE.</p>
 </td></tr><tr><td class='label'>:generated_always_as </td><td>
-<p>Specify a GENERATED ALWAYS AS column expression, if generated columns are supported (PostgreSQL 12+, MariaDB 5.2.0+, and MySQL 5.7.6+).</p>
+<p>Specify a GENERATED ALWAYS AS column expression, if generated columns are supported (PostgreSQL 12+, MariaDB <a href="../../../files/doc/release_notes/5_2_0_txt.html">5.2.0</a>+, and MySQL 5.7.6+).</p>
 </td></tr><tr><td class='label'>:index </td><td>
 <p>Create an index on this column.  If given a hash, use the hash as the options for the index.</p>
 </td></tr><tr><td class='label'>:key </td><td>
@@ -299,7 +305,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-constraint'>
 <a name='method-i-constraint'></a>
 <div class='synopsis'>
-<span class='name'>constraint</span><span class='arguments'>(name, *args, &block)</span>
+<span class='name'>constraint</span>
+<span class='arguments'>(name, *args, &block)</span>
 
 </div>
 <div class='description'>
@@ -319,7 +326,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-foreign_key'>
 <a name='method-i-foreign_key'></a>
 <div class='synopsis'>
-<span class='name'>foreign_key</span><span class='arguments'>(name, table=nil, opts = OPTS)</span>
+<span class='name'>foreign_key</span>
+<span class='arguments'>(name, table=nil, opts = OPTS)</span>
 
 </div>
 <div class='description'>
@@ -348,7 +356,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-full_text_index'>
 <a name='method-i-full_text_index'></a>
 <div class='synopsis'>
-<span class='name'>full_text_index</span><span class='arguments'>(columns, opts = OPTS)</span>
+<span class='name'>full_text_index</span>
+<span class='arguments'>(columns, opts = OPTS)</span>
 
 </div>
 <div class='description'>
@@ -378,7 +387,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-has_column-3F'>
 <a name='method-i-has_column-3F'></a>
 <div class='synopsis'>
-<span class='name'>has_column?</span><span class='arguments'>(name)</span>
+<span class='name'>has_column?</span>
+<span class='arguments'>(name)</span>
 
 </div>
 <div class='description'>
@@ -396,7 +406,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-index'>
 <a name='method-i-index'></a>
 <div class='synopsis'>
-<span class='name'>index</span><span class='arguments'>(columns, opts = OPTS)</span>
+<span class='name'>index</span>
+<span class='arguments'>(columns, opts = OPTS)</span>
 
 </div>
 <div class='description'>
@@ -441,7 +452,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-method_missing'>
 <a name='method-i-method_missing'></a>
 <div class='synopsis'>
-<span class='name'>method_missing</span><span class='arguments'>(type, name = nil, opts = OPTS)</span>
+<span class='name'>method_missing</span>
+<span class='arguments'>(type, name = nil, opts = OPTS)</span>
 
 </div>
 <div class='description'>
@@ -459,7 +471,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-primary_key'>
 <a name='method-i-primary_key'></a>
 <div class='synopsis'>
-<span class='name'>primary_key</span><span class='arguments'>(name, *args)</span>
+<span class='name'>primary_key</span>
+<span class='arguments'>(name, *args)</span>
 
 </div>
 <div class='description'>
@@ -490,7 +503,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-primary_key_name'>
 <a name='method-i-primary_key_name'></a>
 <div class='synopsis'>
-<span class='name'>primary_key_name</span><span class='arguments'>()</span>
+<span class='name'>primary_key_name</span>
+<span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -508,7 +522,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-respond_to_missing-3F'>
 <a name='method-i-respond_to_missing-3F'></a>
 <div class='synopsis'>
-<span class='name'>respond_to_missing?</span><span class='arguments'>(meth, include_private)</span>
+<span class='name'>respond_to_missing?</span>
+<span class='arguments'>(meth, include_private)</span>
 
 </div>
 <div class='description'>
@@ -526,7 +541,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-spatial_index'>
 <a name='method-i-spatial_index'></a>
 <div class='synopsis'>
-<span class='name'>spatial_index</span><span class='arguments'>(columns, opts = OPTS)</span>
+<span class='name'>spatial_index</span>
+<span class='arguments'>(columns, opts = OPTS)</span>
 
 </div>
 <div class='description'>
@@ -544,7 +560,8 @@ Superclass:
 <div class='method public-instance' id='method-method-i-unique'>
 <a name='method-i-unique'></a>
 <div class='synopsis'>
-<span class='name'>unique</span><span class='arguments'>(columns, opts = OPTS)</span>
+<span class='name'>unique</span>
+<span class='arguments'>(columns, opts = OPTS)</span>
 
 </div>
 <div class='description'>

@@ -557,6 +557,8 @@ Sequel
 
 <p>Related module: <a href="Sequel/DuplicateColumnsHandler.html"><code>Sequel::DuplicateColumnsHandler</code></a></p>
 
+<p>:nocov:</p>
+
 <p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby&#39;s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby&#39;s ranges, allowing exclusive beginnings and endings (ruby&#39;s range only allows exclusive endings), and unbounded beginnings and endings (which ruby&#39;s range does not support).</p>
 
 <p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when range type values are retrieved, they are parsed and returned as instances of <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="Range.html"><code>Range</code></a>, but it&#39;s not a <a href="Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby&#39;s <a href="Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
@@ -697,7 +699,8 @@ Sequel
 <div class='method public-class' id='method-method-c-core_extensions-3F'>
 <a name='method-c-core_extensions-3F'></a>
 <div class='synopsis'>
-<span class='name'>core_extensions?</span><span class='arguments'>()</span>
+<span class='name'>core_extensions?</span>
+<span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -715,7 +718,8 @@ Sequel
 <div class='method public-class' id='method-method-c-migration'>
 <a name='method-c-migration'></a>
 <div class='synopsis'>
-<span class='name'>migration</span><span class='arguments'>(&block)</span>
+<span class='name'>migration</span>
+<span class='arguments'>(&block)</span>
 
 </div>
 <div class='description'>
@@ -731,7 +735,7 @@ Sequel
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-migration-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">289</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">290</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">291</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">292</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -145,7 +145,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.27.0 was negatively affected by a serious bug in ActiveSupport&#39;s Time.=== that has still not been fixed, which broke the literalization of Time objects.  In spite of the bad precedent it sets, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids using Time.=== on a subclass of Time to work around this ActiveSupport bug.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_27_0_txt.html">3.27.0</a> was negatively affected by a serious bug in ActiveSupport&#39;s Time.=== that has still not been fixed, which broke the literalization of Time objects.  In spite of the bad precedent it sets, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids using Time.=== on a subclass of Time to work around this ActiveSupport bug.</p>
 </li><li>
 <p>Dataset#with_pk now uses a qualified primary key instead of an unqualified primary key, which means it can now be used correctly after joining to a separate table.</p>
 </li><li>

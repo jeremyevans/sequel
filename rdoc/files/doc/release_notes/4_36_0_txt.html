@@ -78,9 +78,9 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Using the Bignum class as a generic type is now deprecated.  As announced in the 4.35.0 release notes, ruby 2.4 is unifying the Fixnum and Bignum classes into Integer, which results in the behavior of the Bignum class changing.  4.35.0 added support for using the :Bignum symbol as a generic 64-bit integer type, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users now need to switch to that to avoid the deprecation warning.</p>
+<p>Using the Bignum class as a generic type is now deprecated.  As announced in the <a href="4_35_0_txt.html">4.35.0</a> release notes, ruby 2.4 is unifying the Fixnum and Bignum classes into Integer, which results in the behavior of the Bignum class changing.  <a href="4_35_0_txt.html">4.35.0</a> added support for using the :Bignum symbol as a generic 64-bit integer type, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users now need to switch to that to avoid the deprecation warning.</p>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.41.0 (to be released in December), will drop support for using the Bignum class as a generic type.  This is being done before the release of ruby 2.4 to hopefully make it unlikely that users will be subject to a behavior changes when upgrading ruby versions.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="4_41_0_txt.html">4.41.0</a> (to be released in December), will drop support for using the Bignum class as a generic type.  This is being done before the release of ruby 2.4 to hopefully make it unlikely that users will be subject to a behavior changes when upgrading ruby versions.</p>
 
 <p>Related to this change, external adapters need to switch from overriding Database#type_literal_generic_bignum to  Database#type_literal_generic_bignum_symbol.</p>
 </li></ul>

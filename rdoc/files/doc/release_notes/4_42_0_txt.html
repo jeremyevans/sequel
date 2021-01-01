@@ -70,7 +70,7 @@ Last Update:
 </li><li>
 <p>Dataset#with_extend now accepts a block and will create a module with that block that will be used to extend the object, after any modules given as arguments have been applied:</p>
 
-<pre>DB[:table].with_extend{def foo; 1 end}.foo =&gt; 1</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">with_extend</span>{<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo</span>; <span class="ruby-value">1</span> <span class="ruby-keyword">end</span>}.<span class="ruby-identifier">foo</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span></pre>
 </li><li>
 <p>The identifier mangling support for datasets (identifier_input_method and identifier_output_method) has been moved to a identifier_mangling database extension, but it is still loaded by default.  You can disable the loading of this extension by using the :identifier_mangling=&gt;false Database option.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 will stop loading of this extension by default, requiring you to load it manually via Database#extension if you need it.</p>
 

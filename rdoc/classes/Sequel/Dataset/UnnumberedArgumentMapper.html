@@ -58,7 +58,8 @@ Sequel::Dataset::UnnumberedArgumentMapper
 <div class='method protected-instance' id='method-method-i-map_to_prepared_args'>
 <a name='method-i-map_to_prepared_args'></a>
 <div class='synopsis'>
-<span class='name'>map_to_prepared_args</span><span class='arguments'>(bind_vars)</span>
+<span class='name'>map_to_prepared_args</span>
+<span class='arguments'>(bind_vars)</span>
 
 </div>
 <div class='description'>
@@ -70,7 +71,7 @@ Sequel::Dataset::UnnumberedArgumentMapper
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-map_to_prepared_args-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-map_to_prepared_args-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>&#x000A;<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map_to_prepared_args</span>(<span class="ruby-identifier">bind_vars</span>)&#x000A;<span class="line-num">253</span>   <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">bind_vars</span>[<span class="ruby-identifier">v</span>]}&#x000A;<span class="line-num">254</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-map_to_prepared_args-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>&#x000A;<span class="line-num">254</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map_to_prepared_args</span>(<span class="ruby-identifier">bind_vars</span>)&#x000A;<span class="line-num">255</span>   <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">bind_vars</span>[<span class="ruby-identifier">v</span>]}&#x000A;<span class="line-num">256</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

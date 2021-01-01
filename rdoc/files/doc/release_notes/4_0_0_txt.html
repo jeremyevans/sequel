@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>All behavior resulting in deprecation messages in 3.48.0 has been removed or modified.  If you plan on upgrading to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.0.0 and have not yet upgraded to 3.48.0, upgrade to 3.48.0 first, fix code that results in deprecation warnings, and then upgrade to 4.0.0.</p>
+<p>All behavior resulting in deprecation messages in <a href="3_48_0_txt.html">3.48.0</a> has been removed or modified.  If you plan on upgrading to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="4_0_0_txt.html">4.0.0</a> and have not yet upgraded to <a href="3_48_0_txt.html">3.48.0</a>, upgrade to <a href="3_48_0_txt.html">3.48.0</a> first, fix code that results in deprecation warnings, and then upgrade to 4.0.0.</p>
 </li><li>
 <p>The threaded connection pools now default to :connection_handling=&gt;:queue.  You can manually set :connection_handling=&gt;:stack to get the previous behavior.</p>
 </li><li>
@@ -96,7 +96,7 @@ Last Update:
 </li><li>
 <p>The SEQUEL_MSSQL_SPEC_REQUIRE and SEQUEL_DB2_SPEC_REQUIRE environment variables are no longer respected when adapter/integration testing those databases.  Use RUBYOPT with the -r flag.</p>
 </li><li>
-<p>In the 3.48.0 release notes, it was announced that Dataset#join_table would default to :qualify=&gt;:deep in 4.0.0.  This change was made but reverted before the release of 4.0.0 as it was determined too likely to break existing code, there was no deprecation warning (since it just changed a setting), and the benefit was minimal. You can make deep qualification the default by by overriding Dataset#default_join_table_qualification.</p>
+<p>In the <a href="3_48_0_txt.html">3.48.0</a> release notes, it was announced that Dataset#join_table would default to :qualify=&gt;:deep in 4.0.0.  This change was made but reverted before the release of <a href="4_0_0_txt.html">4.0.0</a> as it was determined too likely to break existing code, there was no deprecation warning (since it just changed a setting), and the benefit was minimal. You can make deep qualification the default by by overriding Dataset#default_join_table_qualification.</p>
 </li></ul>
 
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
