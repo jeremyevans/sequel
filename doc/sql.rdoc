@@ -544,7 +544,7 @@ On some databases, you can specify null ordering:
 
 === All Columns (.*)
 
-To select all columns in a table, Sequel supports the * method on identifiers and qualified without an argument:
+To select all columns in a table, Sequel supports the * method on identifiers and qualified identifiers without an argument:
 
   Sequel[:table].*          # "table".*
   Sequel[:schema][:table].* # "schema"."table".*
