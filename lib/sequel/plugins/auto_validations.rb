@@ -14,7 +14,9 @@ module Sequel
     # the plugin looks at the database schema for the model's table.  To determine
     # the unique validations, Sequel looks at the indexes on the table.  In order
     # for this plugin to be fully functional, the underlying database adapter needs
-    # to support both schema and index parsing.
+    # to support both schema and index parsing.  Additionally, unique validations are
+    # only added for models that select from a simple table, they are not added for models
+    # that select from a subquery or joined dataset.
     #
     # This plugin uses the validation_helpers plugin underneath to implement the
     # validations.  It does not allow for any per-column validation message
