@@ -85,7 +85,8 @@ describe "pg_interval extension" do
   end
 
   it "should support typecasting for the interval type" do
-    seconds = 31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7
+    m = Sequel::Postgres::IntervalDatabaseMethods::Parser
+    seconds = m::SECONDS_PER_YEAR + 2*m::SECONDS_PER_MONTH + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7
     parts = {:years => 1, :months => 2, :days => 25, :seconds => 18367}
 
     if !defined?(ActiveSupport::VERSION::STRING) || ActiveSupport::VERSION::STRING < '5.1'

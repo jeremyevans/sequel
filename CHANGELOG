@@ -1,3 +1,7 @@
+=== master
+
+* Make pg_interval use the same number of seconds per year and per month as ActiveSupport::Duration when using ActiveSupport 5.1+ (jeremyevans)
+
 === 5.40.0 (2021-01-01)
 
 * Support UPDATE FROM syntax in SQLite 3.33.0+ (jeremyevans)

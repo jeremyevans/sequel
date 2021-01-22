@@ -4073,6 +4073,9 @@ describe 'PostgreSQL interval types' do
   before(:all) do
     @db = DB
     @ds = @db[:items]
+    m = Sequel::Postgres::IntervalDatabaseMethods::Parser
+    @year = m::SECONDS_PER_YEAR
+    @month = m::SECONDS_PER_MONTH
   end
   after do
     @db.drop_table?(:items)
@@ -4091,14 +4094,14 @@ describe 'PostgreSQL interval types' do
       ['123000 hours', '123000:00:00', 442800000, [[:seconds, 442800000]]],
       ['1 day', '1 day', 86400, [[:days, 1]]],
       ['1 week', '7 days', 86400*7, [[:days, 7]]],
-      ['1 month', '1 mon', 86400*30, [[:months, 1]]],
-      ['1 year', '1 year', 31557600, [[:years, 1]]],
-      ['1 decade', '10 years', 31557600*10, [[:years, 10]]],
-      ['1 century', '100 years', 31557600*100, [[:years, 100]]],
-      ['1 millennium', '1000 years', 31557600*1000, [[:years, 1000]]],
-      ['1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds', '1 year 2 mons 25 days 05:06:07', 31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]]],
-      ['-1 year +2 months -3 weeks +4 days -5 hours +6 minutes -7 seconds', '-10 mons -17 days -04:54:07', -10*86400*30 - 3*86400*7 + 4*86400 - 5*3600 + 6*60 - 7, [[:months, -10], [:days, -17], [:seconds, -17647]]],
-      ['+2 years -1 months +3 weeks -4 days +5 hours -6 minutes +7 seconds', '1 year 11 mons 17 days 04:54:07', 31557600 + 11*86400*30 + 3*86400*7 - 4*86400 + 5*3600 - 6*60 + 7, [[:years, 1], [:months, 11], [:days, 17], [:seconds, 17647]]],
+      ['1 month', '1 mon', @month, [[:months, 1]]],
+      ['1 year', '1 year', @year, [[:years, 1]]],
+      ['1 decade', '10 years', @year*10, [[:years, 10]]],
+      ['1 century', '100 years', @year*100, [[:years, 100]]],
+      ['1 millennium', '1000 years', @year*1000, [[:years, 1000]]],
+      ['1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds', '1 year 2 mons 25 days 05:06:07', @year + 2*@month + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]]],
+      ['-1 year +2 months -3 weeks +4 days -5 hours +6 minutes -7 seconds', '-10 mons -17 days -04:54:07', -10*@month - 3*86400*7 + 4*86400 - 5*3600 + 6*60 - 7, [[:months, -10], [:days, -17], [:seconds, -17647]]],
+      ['+2 years -1 months +3 weeks -4 days +5 hours -6 minutes +7 seconds', '1 year 11 mons 17 days 04:54:07', @year + 11*@month + 3*86400*7 - 4*86400 + 5*3600 - 6*60 + 7, [[:years, 1], [:months, 11], [:days, 17], [:seconds, 17647]]],
     ].each do |instr, outstr, value, parts|
       @ds.insert(instr)
       @ds.count.must_equal 1
@@ -4121,7 +4124,7 @@ describe 'PostgreSQL interval types' do
     rs = @ds.all
     rs.first[:i].is_a?(Sequel::Postgres::PGArray).must_equal true
     rs.first[:i].first.is_a?(ActiveSupport::Duration).must_equal true
-    rs.first[:i].first.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+    rs.first[:i].first.must_equal ActiveSupport::Duration.new(@year + 2*@month + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
     rs.first[:i].first.parts.sort_by{|k,v| k.to_s}.must_equal [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
     @ds.delete
     @ds.insert(rs.first)
@@ -4180,7 +4183,7 @@ describe 'PostgreSQL interval types' do
     c = Class.new(Sequel::Model(@db[:items]))
     v = c.create(:i=>'1 year 2 mons 25 days 05:06:07').i
     v.is_a?(ActiveSupport::Duration).must_equal true
-    v.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+    v.must_equal ActiveSupport::Duration.new(@year + 2*@month + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
     v.parts.sort_by{|k,_| k.to_s}.must_equal [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,_| k.to_s}
   end
 end if (begin require 'active_support/duration'; require 'active_support/inflector'; require 'active_support/core_ext/string/inflections'; true; rescue LoadError; false end)

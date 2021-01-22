@@ -71,6 +71,16 @@ module Sequel
         # Whether ActiveSupport::Duration.new takes parts as array instead of hash
         USE_PARTS_ARRAY = !defined?(ActiveSupport::VERSION::STRING) || ActiveSupport::VERSION::STRING < '5.1'
 
+        if defined?(ActiveSupport::Duration::SECONDS_PER_MONTH)
+          SECONDS_PER_MONTH = ActiveSupport::Duration::SECONDS_PER_MONTH
+          SECONDS_PER_YEAR = ActiveSupport::Duration::SECONDS_PER_YEAR
+        # :nocov:
+        else
+          SECONDS_PER_MONTH = 2592000
+          SECONDS_PER_YEAR = 31557600
+        # :nocov:
+        end
+
         # Parse the interval input string into an ActiveSupport::Duration instance.
         def call(string)
           raise(InvalidValue, "invalid or unhandled interval format: #{string.inspect}") unless matches = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/.match(string)
@@ -80,12 +90,12 @@ module Sequel
 
           if v = matches[1]
             v = v.to_i
-            value += 31557600 * v
+            value += SECONDS_PER_YEAR * v
             parts[:years] = v
           end
           if v = matches[2]
             v = v.to_i
-            value += 2592000 * v
+            value += SECONDS_PER_MONTH * v
             parts[:months] = v
           end
           if v = matches[3]
