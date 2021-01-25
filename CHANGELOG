@@ -1,5 +1,7 @@
 === master
 
+* Support :adder, :remover, and :clearer association options that use keyword arguments in Ruby 2.7+ (jeremyevans)
+
 * Make pg_interval use the same number of seconds per year and per month as ActiveSupport::Duration when using ActiveSupport 5.1+ (jeremyevans)
 
 === 5.40.0 (2021-01-01)

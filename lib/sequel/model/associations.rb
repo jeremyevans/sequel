@@ -1929,8 +1929,22 @@ module Sequel
         # can be easily overridden in the class itself while allowing for
         # super to be called.
         def association_module_def(name, opts=OPTS, &block)
-          association_module(opts).send(:define_method, name, &block)
-          association_module(opts).send(:alias_method, name, name)
+          mod = association_module(opts)
+          mod.send(:define_method, name, &block)
+          mod.send(:alias_method, name, name)
+        end
+
+        # Add a method to the module included in the class, so the method
+        # can be easily overridden in the class itself while allowing for
+        # super to be called.  This method allows passing keywords through
+        # the defined methods.
+        def association_module_delegate_def(name, opts, &block)
+          mod = association_module(opts)
+          mod.send(:define_method, name, &block)
+          # :nocov:
+          mod.send(:ruby2_keywords, name) if mod.respond_to?(:ruby2_keywords, true)
+          # :nocov:
+          mod.send(:alias_method, name, name)
         end
       
         # Add a private method to the module included in the class.
@@ -1982,17 +1996,17 @@ module Sequel
 
           if adder = opts[:adder]
             association_module_private_def(opts[:_add_method], opts, &adder)
-            association_module_def(opts[:add_method], opts){|o,*args| add_associated_object(opts, o, *args)}
+            association_module_delegate_def(opts[:add_method], opts){|o,*args| add_associated_object(opts, o, *args)}
           end
 
           if remover = opts[:remover]
             association_module_private_def(opts[:_remove_method], opts, &remover)
-            association_module_def(opts[:remove_method], opts){|o,*args| remove_associated_object(opts, o, *args)}
+            association_module_delegate_def(opts[:remove_method], opts){|o,*args| remove_associated_object(opts, o, *args)}
           end
 
           if clearer = opts[:clearer]
             association_module_private_def(opts[:_remove_all_method], opts, &clearer)
-            association_module_def(opts[:remove_all_method], opts){|*args| remove_all_associated_objects(opts, *args)}
+            association_module_delegate_def(opts[:remove_all_method], opts){|*args| remove_all_associated_objects(opts, *args)}
           end
         end
         
@@ -2424,6 +2438,9 @@ module Sequel
           run_association_callbacks(opts, :after_add, o)
           o
         end
+        # :nocov:
+        ruby2_keywords(:add_associated_object) if respond_to?(:ruby2_keywords, true)
+        # :nocov:
 
         # Add/Set the current object to/as the given object's reciprocal association.
         def add_reciprocal_object(opts, o)
@@ -2566,6 +2583,9 @@ module Sequel
           associations[opts[:name]] = []
           ret
         end
+        # :nocov:
+        ruby2_keywords(:remove_all_associated_objects) if respond_to?(:ruby2_keywords, true)
+        # :nocov:
 
         # Remove the given associated object from the given association
         def remove_associated_object(opts, o, *args)
@@ -2587,6 +2607,9 @@ module Sequel
           run_association_callbacks(opts, :after_remove, o)
           o
         end
+        # :nocov:
+        ruby2_keywords(:remove_associated_object) if respond_to?(:ruby2_keywords, true)
+        # :nocov:
 
         # Check that the object from the associated table specified by the primary key
         # is currently associated to the receiver.  If it is associated, return the object, otherwise
