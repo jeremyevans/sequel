@@ -1,5 +1,7 @@
 === master
 
+* Support a :skip_invalid option in validation_helpers for not adding an error to a column that already has an error (jeremyevans)
+
 * Support :adder, :remover, and :clearer association options that use keyword arguments in Ruby 2.7+ (jeremyevans)
 
 * Make pg_interval use the same number of seconds per year and per month as ActiveSupport::Duration when using ActiveSupport 5.1+ (jeremyevans)

@@ -36,6 +36,7 @@ module Sequel
     # :message :: The message to use.  Can be a string which is used directly, or a
     #             proc which is called.  If the validation method takes a argument before the array of attributes,
     #             that argument is passed as an argument to the proc.
+    # :skip_invalid :: Do not try to validate columns that are already invalid.
     #
     # The default validation options for all models can be modified by
     # overridding the Model#default_validation_helpers_options private method.
@@ -281,14 +282,17 @@ module Sequel
           DEFAULT_OPTIONS[type]
         end
 
-        # Skip validating any attribute that matches one of the allow_* options.
+        # Skip validating any attribute that matches one of the allow_* options,
+        # or already has an error if the skip_invalid option is given.
+        #
         # Otherwise, yield the attribute, value, and passed option :message to
         # the block.  If the block returns anything except nil or false, add it as
         # an error message for that attributes.
         def validatable_attributes(atts, opts)
-          am, an, ab, m = opts.values_at(:allow_missing, :allow_nil, :allow_blank, :message)
+          am, an, ab, m, si = opts.values_at(:allow_missing, :allow_nil, :allow_blank, :message, :skip_invalid)
           from_values = opts[:from] == :values
           Array(atts).each do |a|
+            next if si && errors.on(a)
             next if am && !values.has_key?(a)
             v = from_values ? values[a] : get_column_value(a)
             next if an && v.nil?
