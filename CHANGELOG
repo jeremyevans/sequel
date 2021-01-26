@@ -1,5 +1,7 @@
 === master
 
+* Support a :skip_invalid option in auto_validations plugin for not adding errors to a column that already has an error (jeremyevans)
+
 * Support a :skip_invalid option in validation_helpers for not adding an error to a column that already has an error (jeremyevans)
 
 * Support :adder, :remover, and :clearer association options that use keyword arguments in Ruby 2.7+ (jeremyevans)

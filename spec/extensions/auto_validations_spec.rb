@@ -50,6 +50,27 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
+  it "should add errors to columns that already have errors by default" do
+    def @m.validate
+      errors.add(:name, 'no good')
+      super
+    end
+    @m.d = Date.today
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>['no good', "is not present"])
+  end
+
+  it "should not add errors to columns that already have errors when using :skip_invalid plugin option" do
+    @c.plugin :auto_validations, :skip_invalid=>true
+    def @m.validate
+      errors.add(:name, 'no good')
+      super
+    end
+    @m.d = Date.today
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>['no good'])
+  end
+
   it "should handle simple unique indexes correctly" do
     def (@c.db).indexes(t, *)
       raise if t.is_a?(Sequel::Dataset)

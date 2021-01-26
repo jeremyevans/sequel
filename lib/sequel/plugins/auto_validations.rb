@@ -53,6 +53,11 @@ module Sequel
     # This works for unique_opts, max_length_opts, schema_types_opts,
     # explicit_not_null_opts, and not_null_opts.
     #
+    # If you only want auto_validations to add validations to columns that do not already
+    # have an error associated with them, you can use the skip_invalid option:
+    #
+    #   Model.plugin :auto_validations, skip_invalid: true
+    #
     # Usage:
     #
     #   # Make all model subclass use auto validations (called before loading subclasses)
@@ -102,6 +107,13 @@ module Sequel
               h[type] = h[type].merge(type_opts).freeze
             end
           end
+
+          if opts[:skip_invalid]
+            [:not_null, :explicit_not_null, :max_length, :schema_types].each do |type|
+              h[type] = h[type].merge(:skip_invalid=>true).freeze
+            end
+          end
+
           @auto_validate_options = h.freeze
         end
       end
