@@ -52,14 +52,10 @@ module Sequel
         if defined?(ActiveSupport::Duration) && interval.is_a?(ActiveSupport::Duration)
           interval = interval.parts
         end
-        interval = if interval.is_a?(Enumerable)
-          h = {}
-          interval.each{|k,v| h[k] = -v unless v.nil?}
-          h
-        else
-          -interval
-        end
-        DateAdd.new(expr, interval, opts)
+        parts = {}
+        interval.each{|k,v| parts[k] = -v unless v.nil?}
+        parts
+        DateAdd.new(expr, parts, opts)
       end
     end
 
