@@ -7,9 +7,11 @@
 #   Sequel.extension :blank
 
 [FalseClass, Object, NilClass, Numeric, String, TrueClass].each do |klass|
+  # :nocov:
   if klass.method_defined?(:blank?)
     klass.send(:alias_method, :blank?, :blank?)
   end
+  # :nocov:
 end
 
 class FalseClass

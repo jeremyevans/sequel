@@ -84,9 +84,9 @@ module Sequel
       def convert_output_time_other(v, output_timezone)
         Time.at(v.to_i, :in => output_timezone)
       end
-    else
       # :nodoc:
       # :nocov:
+    else
       def convert_input_time_other(v, input_timezone)
         local_offset = input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset
         Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i
@@ -105,6 +105,8 @@ module Sequel
           Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i
         end
       end
+      # :nodoc:
+      # :nocov:
     end
 
     # Handle both TZInfo 1 and TZInfo 2
@@ -142,6 +144,8 @@ module Sequel
         # Convert timezone offset from UTC to the offset for the output_timezone
         (v - local_offset).new_offset(local_offset)
       end
+      # :nodoc:
+      # :nocov:
     end
     
     # Returns TZInfo::Timezone instance if given a String.
