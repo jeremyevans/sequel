@@ -1,5 +1,7 @@
 === master
 
+* Have explicit :text option for a String column take priority over :size option on PostgreSQL (jeremyevans) (#1750)
+
 * Support a :skip_invalid option in auto_validations plugin for not adding errors to a column that already has an error (jeremyevans)
 
 * Support a :skip_invalid option in validation_helpers for not adding an error to a column that already has an error (jeremyevans)

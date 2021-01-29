@@ -1500,9 +1500,11 @@ module Sequel
       # disallowed or there is a size specified, use the varchar type.
       # Otherwise use the text type.
       def type_literal_generic_string(column)
-        if column[:fixed]
+        if column[:text]
+          :text
+        elsif column[:fixed]
           "char(#{column[:size]||255})"
-        elsif column[:text] == false or column[:size]
+        elsif column[:text] == false || column[:size]
           "varchar(#{column[:size]||255})"
         else
           :text

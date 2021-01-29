@@ -235,6 +235,11 @@ describe "PostgreSQL", '#create_table' do
     proc{@db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}}.must_raise(Sequel::Error)
   end
 
+  it "should not use a size for text columns" do
+    @db.create_table(:tmp_dolls){String :description, text: true, size: :long}
+    @db.tables.must_include :tmp_dolls
+  end
+
   it "should create an unlogged table" do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
   end if DB.server_version >= 90100
