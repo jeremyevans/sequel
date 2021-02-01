@@ -134,8 +134,7 @@ Superclass:
 <div class='method public-class' id='method-method-c-inflections'>
 <a name='method-c-inflections'></a>
 <div class='synopsis'>
-<span class='name'>inflections</span>
-<span class='arguments'>()</span>
+<span class='name'>inflections</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -154,8 +153,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-blank-3F'>
 <a name='method-i-blank-3F'></a>
 <div class='synopsis'>
-<span class='name'>blank?</span>
-<span class='arguments'>()</span>
+<span class='name'>blank?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -167,14 +165,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-blank-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-blank-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/blank.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">blank?</span>&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">strip</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-blank-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/blank.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">blank?</span>&#x000A;<span class="line-num">48</span>   <span class="ruby-identifier">strip</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-camelize'>
 <a name='method-i-camelize'></a>
 <div class='synopsis'>
-<span class='name'>camelize</span>
-<span class='arguments'>(first_letter_in_uppercase = :upper)</span>
+<span class='name'>camelize</span><span class='arguments'>(first_letter_in_uppercase = :upper)</span>
 
 </div>
 <div class='description'>
@@ -192,14 +189,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-camelize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-camelize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">125</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">camelize</span>(<span class="ruby-identifier">first_letter_in_uppercase</span> = <span class="ruby-value">:upper</span>)&#x000A;<span class="line-num">126</span>   <span class="ruby-identifier">s</span> = <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\/(.?)/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;::#{x[-1..-1].upcase unless x == &#39;/&#39;}&quot;</span>}.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/(^|_)(.)/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">-1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">upcase</span>}&#x000A;<span class="line-num">127</span>   <span class="ruby-identifier">s</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>] = <span class="ruby-identifier">s</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>].<span class="ruby-identifier">downcase</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">first_letter_in_uppercase</span> <span class="ruby-operator">==</span> <span class="ruby-value">:upper</span>&#x000A;<span class="line-num">128</span>   <span class="ruby-identifier">s</span>&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-camelize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">127</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">camelize</span>(<span class="ruby-identifier">first_letter_in_uppercase</span> = <span class="ruby-value">:upper</span>)&#x000A;<span class="line-num">128</span>   <span class="ruby-identifier">s</span> = <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\/(.?)/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;::#{x[-1..-1].upcase unless x == &#39;/&#39;}&quot;</span>}.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/(^|_)(.)/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">-1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">upcase</span>}&#x000A;<span class="line-num">129</span>   <span class="ruby-identifier">s</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>] = <span class="ruby-identifier">s</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>].<span class="ruby-identifier">downcase</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">first_letter_in_uppercase</span> <span class="ruby-operator">==</span> <span class="ruby-value">:upper</span>&#x000A;<span class="line-num">130</span>   <span class="ruby-identifier">s</span>&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-classify'>
 <a name='method-i-classify'></a>
 <div class='synopsis'>
-<span class='name'>classify</span>
-<span class='arguments'>()</span>
+<span class='name'>classify</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -215,14 +211,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-classify-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-classify-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">139</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">classify</span>&#x000A;<span class="line-num">140</span>   <span class="ruby-identifier">sub</span>(<span class="ruby-regexp">/.*\./</span>, <span class="ruby-string">&#39;&#39;</span>).<span class="ruby-identifier">singularize</span>.<span class="ruby-identifier">camelize</span>&#x000A;<span class="line-num">141</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-classify-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">classify</span>&#x000A;<span class="line-num">142</span>   <span class="ruby-identifier">sub</span>(<span class="ruby-regexp">/.*\./</span>, <span class="ruby-string">&#39;&#39;</span>).<span class="ruby-identifier">singularize</span>.<span class="ruby-identifier">camelize</span>&#x000A;<span class="line-num">143</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-constantize'>
 <a name='method-i-constantize'></a>
 <div class='synopsis'>
-<span class='name'>constantize</span>
-<span class='arguments'>()</span>
+<span class='name'>constantize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -238,14 +233,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-constantize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-constantize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constantize</span>&#x000A;<span class="line-num">151</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NameError</span>, <span class="ruby-node">&quot;#{inspect} is not a valid constant name!&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">152</span>   <span class="ruby-constant">Object</span>.<span class="ruby-identifier">module_eval</span>(<span class="ruby-node">&quot;::#{m[1]}&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-constantize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">152</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constantize</span>&#x000A;<span class="line-num">153</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NameError</span>, <span class="ruby-node">&quot;#{inspect} is not a valid constant name!&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">154</span>   <span class="ruby-constant">Object</span>.<span class="ruby-identifier">module_eval</span>(<span class="ruby-node">&quot;::#{m[1]}&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;<span class="line-num">155</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-dasherize'>
 <a name='method-i-dasherize'></a>
 <div class='synopsis'>
-<span class='name'>dasherize</span>
-<span class='arguments'>()</span>
+<span class='name'>dasherize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -261,14 +255,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-dasherize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-dasherize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dasherize</span>&#x000A;<span class="line-num">160</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&#39;-&#39;</span>)&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-dasherize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dasherize</span>&#x000A;<span class="line-num">162</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&#39;-&#39;</span>)&#x000A;<span class="line-num">163</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-demodulize'>
 <a name='method-i-demodulize'></a>
 <div class='synopsis'>
-<span class='name'>demodulize</span>
-<span class='arguments'>()</span>
+<span class='name'>demodulize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -284,14 +277,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-demodulize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-demodulize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">demodulize</span>&#x000A;<span class="line-num">169</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/^.*::/</span>, <span class="ruby-string">&#39;&#39;</span>)&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-demodulize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">demodulize</span>&#x000A;<span class="line-num">171</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/^.*::/</span>, <span class="ruby-string">&#39;&#39;</span>)&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-foreign_key'>
 <a name='method-i-foreign_key'></a>
 <div class='synopsis'>
-<span class='name'>foreign_key</span>
-<span class='arguments'>(use_underscore = true)</span>
+<span class='name'>foreign_key</span><span class='arguments'>(use_underscore = true)</span>
 
 </div>
 <div class='description'>
@@ -307,14 +299,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-foreign_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-foreign_key-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key</span>(<span class="ruby-identifier">use_underscore</span> = <span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">180</span>   <span class="ruby-node">&quot;#{demodulize.underscore}#{&#39;_&#39; if use_underscore}id&quot;</span>&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-foreign_key-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key</span>(<span class="ruby-identifier">use_underscore</span> = <span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">182</span>   <span class="ruby-node">&quot;#{demodulize.underscore}#{&#39;_&#39; if use_underscore}id&quot;</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-humanize'>
 <a name='method-i-humanize'></a>
 <div class='synopsis'>
-<span class='name'>humanize</span>
-<span class='arguments'>()</span>
+<span class='name'>humanize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -330,14 +321,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-humanize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-humanize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">humanize</span>&#x000A;<span class="line-num">190</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/_id$/</span>, <span class="ruby-string">&quot;&quot;</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&quot; &quot;</span>).<span class="ruby-identifier">capitalize</span>&#x000A;<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-humanize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">humanize</span>&#x000A;<span class="line-num">192</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/_id$/</span>, <span class="ruby-string">&quot;&quot;</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&quot; &quot;</span>).<span class="ruby-identifier">capitalize</span>&#x000A;<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
 <a name='method-i-lit'></a>
 <div class='synopsis'>
-<span class='name'>lit</span>
-<span class='arguments'>(*args)</span>
+<span class='name'>lit</span><span class='arguments'>(*args)</span>
 
 </div>
 <div class='description'>
@@ -361,8 +351,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-pluralize'>
 <a name='method-i-pluralize'></a>
 <div class='synopsis'>
-<span class='name'>pluralize</span>
-<span class='arguments'>()</span>
+<span class='name'>pluralize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -378,14 +367,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pluralize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pluralize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">202</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pluralize</span>&#x000A;<span class="line-num">203</span>   <span class="ruby-identifier">result</span> = <span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">204</span>   <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">plurals</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)<span class="ruby-operator">|</span> <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)} <span class="ruby-keyword">unless</span> <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">uncountables</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">downcase</span>)&#x000A;<span class="line-num">205</span>   <span class="ruby-identifier">result</span>&#x000A;<span class="line-num">206</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pluralize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">204</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pluralize</span>&#x000A;<span class="line-num">205</span>   <span class="ruby-identifier">result</span> = <span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">206</span>   <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">plurals</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)<span class="ruby-operator">|</span> <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)} <span class="ruby-keyword">unless</span> <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">uncountables</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">downcase</span>)&#x000A;<span class="line-num">207</span>   <span class="ruby-identifier">result</span>&#x000A;<span class="line-num">208</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-singularize'>
 <a name='method-i-singularize'></a>
 <div class='synopsis'>
-<span class='name'>singularize</span>
-<span class='arguments'>()</span>
+<span class='name'>singularize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -401,14 +389,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-singularize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-singularize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">217</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">singularize</span>&#x000A;<span class="line-num">218</span>   <span class="ruby-identifier">result</span> = <span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">219</span>   <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">singulars</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)<span class="ruby-operator">|</span> <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)} <span class="ruby-keyword">unless</span> <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">uncountables</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">downcase</span>)&#x000A;<span class="line-num">220</span>   <span class="ruby-identifier">result</span>&#x000A;<span class="line-num">221</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-singularize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">219</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">singularize</span>&#x000A;<span class="line-num">220</span>   <span class="ruby-identifier">result</span> = <span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">221</span>   <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">singulars</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)<span class="ruby-operator">|</span> <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)} <span class="ruby-keyword">unless</span> <span class="ruby-constant">Inflections</span>.<span class="ruby-identifier">uncountables</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">downcase</span>)&#x000A;<span class="line-num">222</span>   <span class="ruby-identifier">result</span>&#x000A;<span class="line-num">223</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-tableize'>
 <a name='method-i-tableize'></a>
 <div class='synopsis'>
-<span class='name'>tableize</span>
-<span class='arguments'>()</span>
+<span class='name'>tableize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -424,14 +411,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-tableize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-tableize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">229</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tableize</span>&#x000A;<span class="line-num">230</span>   <span class="ruby-identifier">underscore</span>.<span class="ruby-identifier">pluralize</span>&#x000A;<span class="line-num">231</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-tableize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tableize</span>&#x000A;<span class="line-num">232</span>   <span class="ruby-identifier">underscore</span>.<span class="ruby-identifier">pluralize</span>&#x000A;<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-titleize'>
 <a name='method-i-titleize'></a>
 <div class='synopsis'>
-<span class='name'>titleize</span>
-<span class='arguments'>()</span>
+<span class='name'>titleize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -449,14 +435,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-titleize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-titleize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">241</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">titleize</span>&#x000A;<span class="line-num">242</span>   <span class="ruby-identifier">underscore</span>.<span class="ruby-identifier">humanize</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\b([a-z])/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">-1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">upcase</span>}&#x000A;<span class="line-num">243</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-titleize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">243</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">titleize</span>&#x000A;<span class="line-num">244</span>   <span class="ruby-identifier">underscore</span>.<span class="ruby-identifier">humanize</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\b([a-z])/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">-1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">upcase</span>}&#x000A;<span class="line-num">245</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_date'>
 <a name='method-i-to_date'></a>
 <div class='synopsis'>
-<span class='name'>to_date</span>
-<span class='arguments'>()</span>
+<span class='name'>to_date</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -474,8 +459,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-to_datetime'>
 <a name='method-i-to_datetime'></a>
 <div class='synopsis'>
-<span class='name'>to_datetime</span>
-<span class='arguments'>()</span>
+<span class='name'>to_datetime</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -493,8 +477,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
 <a name='method-i-to_sequel_blob'></a>
 <div class='synopsis'>
-<span class='name'>to_sequel_blob</span>
-<span class='arguments'>()</span>
+<span class='name'>to_sequel_blob</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -512,8 +495,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-to_sequel_time'>
 <a name='method-i-to_sequel_time'></a>
 <div class='synopsis'>
-<span class='name'>to_sequel_time</span>
-<span class='arguments'>()</span>
+<span class='name'>to_sequel_time</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -531,8 +513,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-to_time'>
 <a name='method-i-to_time'></a>
 <div class='synopsis'>
-<span class='name'>to_time</span>
-<span class='arguments'>()</span>
+<span class='name'>to_time</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -550,8 +531,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-underscore'>
 <a name='method-i-underscore'></a>
 <div class='synopsis'>
-<span class='name'>underscore</span>
-<span class='arguments'>()</span>
+<span class='name'>underscore</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -567,7 +547,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-underscore-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-underscore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">underscore</span>&#x000A;<span class="line-num">253</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/::/</span>, <span class="ruby-string">&#39;/&#39;</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/([A-Z]+)([A-Z][a-z])/</span>,<span class="ruby-string">&#39;\1_\2&#39;</span>).&#x000A;<span class="line-num">254</span>     <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/([a-z\d])([A-Z])/</span>,<span class="ruby-string">&#39;\1_\2&#39;</span>).<span class="ruby-identifier">tr</span>(<span class="ruby-string">&quot;-&quot;</span>, <span class="ruby-string">&quot;_&quot;</span>).<span class="ruby-identifier">downcase</span>&#x000A;<span class="line-num">255</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-underscore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">254</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">underscore</span>&#x000A;<span class="line-num">255</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/::/</span>, <span class="ruby-string">&#39;/&#39;</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/([A-Z]+)([A-Z][a-z])/</span>,<span class="ruby-string">&#39;\1_\2&#39;</span>).&#x000A;<span class="line-num">256</span>     <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/([a-z\d])([A-Z])/</span>,<span class="ruby-string">&#39;\1_\2&#39;</span>).<span class="ruby-identifier">tr</span>(<span class="ruby-string">&quot;-&quot;</span>, <span class="ruby-string">&quot;_&quot;</span>).<span class="ruby-identifier">downcase</span>&#x000A;<span class="line-num">257</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

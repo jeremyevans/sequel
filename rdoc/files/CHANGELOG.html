@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-12-31 11:06:03 -0800</span>
+<span class='datetime'>2021-02-01 07:43:00 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.41.0+-282021-02-01-29"><a href="doc/release_notes/5_41_0_txt.html">5.41.0</a> (2021-02-01)<span><a href="#label-5.41.0+-282021-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Have explicit :text option for a String column take priority over :size option on PostgreSQL (jeremyevans) (#1750)</p>
+</li><li>
+<p>Support a :skip_invalid option in auto_validations plugin for not adding errors to a column that already has an error (jeremyevans)</p>
+</li><li>
+<p>Support a :skip_invalid option in validation_helpers for not adding an error to a column that already has an error (jeremyevans)</p>
+</li><li>
+<p>Support :adder, :remover, and :clearer association options that use keyword arguments in Ruby 2.7+ (jeremyevans)</p>
+</li><li>
+<p>Make pg_interval use the same number of seconds per year and per month as ActiveSupport::Duration when using ActiveSupport 5.1+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.40.0+-282021-01-01-29"><a href="doc/release_notes/5_40_0_txt.html">5.40.0</a> (2021-01-01)<span><a href="#label-5.40.0+-282021-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support UPDATE FROM syntax in SQLite <a href="doc/release_notes/3_33_0_txt.html">3.33.0</a>+ (jeremyevans)</p>

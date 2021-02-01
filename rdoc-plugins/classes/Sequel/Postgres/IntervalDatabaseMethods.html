@@ -84,8 +84,7 @@ Sequel::Postgres::IntervalDatabaseMethods
 <div class='method public-class' id='method-method-c-extended'>
 <a name='method-c-extended'></a>
 <div class='synopsis'>
-<span class='name'>extended</span>
-<span class='arguments'>(db)</span>
+<span class='name'>extended</span><span class='arguments'>(db)</span>
 
 </div>
 <div class='description'>
@@ -97,14 +96,13 @@ Sequel::Postgres::IntervalDatabaseMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-extended-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb</span>&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">133</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">134</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">IntervalDatasetMethods</span>)&#x000A;<span class="line-num">135</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">1186</span>, <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">IntervalDatabaseMethods</span><span class="ruby-operator">::</span><span class="ruby-constant">PARSER</span>)&#x000A;<span class="line-num">136</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)&#x000A;<span class="line-num">137</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;interval&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1187</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1186</span>)&#x000A;<span class="line-num">138</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">139</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:interval</span>] = <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;<span class="line-num">140</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">141</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">143</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">144</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">IntervalDatasetMethods</span>)&#x000A;<span class="line-num">145</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">1186</span>, <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">IntervalDatabaseMethods</span><span class="ruby-operator">::</span><span class="ruby-constant">PARSER</span>)&#x000A;<span class="line-num">146</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)&#x000A;<span class="line-num">147</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;interval&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1187</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1186</span>)&#x000A;<span class="line-num">148</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">149</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:interval</span>] = <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;<span class="line-num">150</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-literal_duration'>
 <a name='method-c-literal_duration'></a>
 <div class='synopsis'>
-<span class='name'>literal_duration</span>
-<span class='arguments'>(duration)</span>
+<span class='name'>literal_duration</span><span class='arguments'>(duration)</span>
 
 </div>
 <div class='description'>
@@ -123,8 +121,7 @@ Sequel::Postgres::IntervalDatabaseMethods
 <div class='method public-instance' id='method-method-i-bound_variable_arg'>
 <a name='method-i-bound_variable_arg'></a>
 <div class='synopsis'>
-<span class='name'>bound_variable_arg</span>
-<span class='arguments'>(arg, conn)</span>
+<span class='name'>bound_variable_arg</span><span class='arguments'>(arg, conn)</span>
 
 </div>
 <div class='description'>
@@ -136,7 +133,7 @@ Sequel::Postgres::IntervalDatabaseMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-bound_variable_arg-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-bound_variable_arg-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb</span>&#x000A;<span class="line-num">144</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;<span class="line-num">145</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;<span class="line-num">146</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;<span class="line-num">147</span>     <span class="ruby-constant">IntervalDatabaseMethods</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">148</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">149</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">150</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-bound_variable_arg-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;<span class="line-num">155</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;<span class="line-num">156</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;<span class="line-num">157</span>     <span class="ruby-constant">IntervalDatabaseMethods</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">158</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">159</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">160</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

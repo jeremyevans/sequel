@@ -57,6 +57,8 @@ Sequel::Plugins::ValidationHelpers
 <p>Set to :values to pull column values from the values hash instead of calling the related method. Allows for setting up methods on the underlying column values, in the cases where the model transforms the underlying value before returning it, such as when using serialization.</p>
 </td></tr><tr><td class='label'>:message </td><td>
 <p>The message to use.  Can be a string which is used directly, or a proc which is called.  If the validation method takes a argument before the array of attributes, that argument is passed as an argument to the proc.</p>
+</td></tr><tr><td class='label'>:skip_invalid </td><td>
+<p>Do not try to validate columns that are already invalid.</p>
 </td></tr></tbody></table>
 
 <p>The default validation options for all models can be modified by overridding the Model#default_validation_helpers_options private method. By changing the default options, you can setup internationalization of the error messages.  For example, you would modify the default options:</p>

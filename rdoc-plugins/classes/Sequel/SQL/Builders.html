@@ -106,8 +106,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-date_add'>
 <a name='method-i-date_add'></a>
 <div class='synopsis'>
-<span class='name'>date_add</span>
-<span class='arguments'>(expr, interval, opts=OPTS)</span>
+<span class='name'>date_add</span><span class='arguments'>(expr, interval, opts=OPTS)</span>
 
 </div>
 <div class='description'>
@@ -128,8 +127,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-date_sub'>
 <a name='method-i-date_sub'></a>
 <div class='synopsis'>
-<span class='name'>date_sub</span>
-<span class='arguments'>(expr, interval, opts=OPTS)</span>
+<span class='name'>date_sub</span><span class='arguments'>(expr, interval, opts=OPTS)</span>
 
 </div>
 <div class='description'>
@@ -144,14 +142,13 @@ Sequel::SQL::Builders
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-date_sub-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-date_sub-source'>   <span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date_sub</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>)&#x000A;<span class="line-num">53</span>     <span class="ruby-identifier">interval</span> = <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">parts</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">interval</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Enumerable</span>)&#x000A;<span class="line-num">56</span>     <span class="ruby-identifier">h</span> = {}&#x000A;<span class="line-num">57</span>     <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-operator">-</span><span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}&#x000A;<span class="line-num">58</span>     <span class="ruby-identifier">h</span>&#x000A;<span class="line-num">59</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">60</span>     <span class="ruby-operator">-</span><span class="ruby-identifier">interval</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-date_sub-source'>   <span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date_sub</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>)&#x000A;<span class="line-num">53</span>     <span class="ruby-identifier">interval</span> = <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">parts</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">parts</span> = {}&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">parts</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-operator">-</span><span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}&#x000A;<span class="line-num">57</span>   <span class="ruby-identifier">parts</span>&#x000A;<span class="line-num">58</span>   <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">parts</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hstore'>
 <a name='method-i-hstore'></a>
 <div class='synopsis'>
-<span class='name'>hstore</span>
-<span class='arguments'>(v)</span>
+<span class='name'>hstore</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -169,8 +166,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-hstore_op'>
 <a name='method-i-hstore_op'></a>
 <div class='synopsis'>
-<span class='name'>hstore_op</span>
-<span class='arguments'>(v)</span>
+<span class='name'>hstore_op</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -188,8 +184,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_array'>
 <a name='method-i-pg_array'></a>
 <div class='synopsis'>
-<span class='name'>pg_array</span>
-<span class='arguments'>(v, array_type=nil)</span>
+<span class='name'>pg_array</span><span class='arguments'>(v, array_type=nil)</span>
 
 </div>
 <div class='description'>
@@ -207,8 +202,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_array_op'>
 <a name='method-i-pg_array_op'></a>
 <div class='synopsis'>
-<span class='name'>pg_array_op</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_array_op</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -226,8 +220,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_inet_op'>
 <a name='method-i-pg_inet_op'></a>
 <div class='synopsis'>
-<span class='name'>pg_inet_op</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_inet_op</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -245,8 +238,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_json'>
 <a name='method-i-pg_json'></a>
 <div class='synopsis'>
-<span class='name'>pg_json</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_json</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -264,8 +256,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_json_op'>
 <a name='method-i-pg_json_op'></a>
 <div class='synopsis'>
-<span class='name'>pg_json_op</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_json_op</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -283,8 +274,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_json_wrap'>
 <a name='method-i-pg_json_wrap'></a>
 <div class='synopsis'>
-<span class='name'>pg_json_wrap</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_json_wrap</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -302,8 +292,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_jsonb'>
 <a name='method-i-pg_jsonb'></a>
 <div class='synopsis'>
-<span class='name'>pg_jsonb</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_jsonb</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -321,8 +310,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_jsonb_op'>
 <a name='method-i-pg_jsonb_op'></a>
 <div class='synopsis'>
-<span class='name'>pg_jsonb_op</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_jsonb_op</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -340,8 +328,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_jsonb_wrap'>
 <a name='method-i-pg_jsonb_wrap'></a>
 <div class='synopsis'>
-<span class='name'>pg_jsonb_wrap</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_jsonb_wrap</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -359,8 +346,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_range'>
 <a name='method-i-pg_range'></a>
 <div class='synopsis'>
-<span class='name'>pg_range</span>
-<span class='arguments'>(v, db_type=nil)</span>
+<span class='name'>pg_range</span><span class='arguments'>(v, db_type=nil)</span>
 
 </div>
 <div class='description'>
@@ -378,8 +364,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_range_op'>
 <a name='method-i-pg_range_op'></a>
 <div class='synopsis'>
-<span class='name'>pg_range_op</span>
-<span class='arguments'>(v)</span>
+<span class='name'>pg_range_op</span><span class='arguments'>(v)</span>
 
 </div>
 <div class='description'>
@@ -397,8 +382,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_row'>
 <a name='method-i-pg_row'></a>
 <div class='synopsis'>
-<span class='name'>pg_row</span>
-<span class='arguments'>(expr)</span>
+<span class='name'>pg_row</span><span class='arguments'>(expr)</span>
 
 </div>
 <div class='description'>
@@ -416,8 +400,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-pg_row_op'>
 <a name='method-i-pg_row_op'></a>
 <div class='synopsis'>
-<span class='name'>pg_row_op</span>
-<span class='arguments'>(expr)</span>
+<span class='name'>pg_row_op</span><span class='arguments'>(expr)</span>
 
 </div>
 <div class='description'>
@@ -435,8 +418,7 @@ Sequel::SQL::Builders
 <div class='method public-instance' id='method-method-i-string_agg'>
 <a name='method-i-string_agg'></a>
 <div class='synopsis'>
-<span class='name'>string_agg</span>
-<span class='arguments'>(*a)</span>
+<span class='name'>string_agg</span><span class='arguments'>(*a)</span>
 
 </div>
 <div class='description'>

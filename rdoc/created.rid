@@ -1,8 +1,8 @@
-Fri, 01 Jan 2021 09:40:29 -0800
+Mon, 01 Feb 2021 07:50:45 -0800
 README.rdoc	Tue, 03 Nov 2020 13:05:26 -0800
-CHANGELOG	Thu, 31 Dec 2020 11:06:03 -0800
+CHANGELOG	Mon, 01 Feb 2021 07:43:00 -0800
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
-MIT-LICENSE	Wed, 08 Jan 2020 19:52:18 -0800
+MIT-LICENSE	Wed, 06 Jan 2021 14:13:44 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool.rb	Fri, 29 Mar 2019 13:22:52 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Mon, 30 Nov 2020 09:24:48 -0800
-lib/sequel/version.rb	Thu, 31 Dec 2020 11:06:03 -0800
+lib/sequel/version.rb	Mon, 01 Feb 2021 07:43:00 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 26 Jun 2020 14:43:12 -0700
@@ -38,7 +38,7 @@ lib/sequel/dataset/placeholder_literalizer.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/dataset/prepared_statements.rb	Wed, 02 Dec 2020 15:37:08 -0800
 lib/sequel/dataset/query.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/dataset/sql.rb	Wed, 30 Dec 2020 11:42:45 -0800
-lib/sequel/model/associations.rb	Fri, 04 Dec 2020 13:44:07 -0800
+lib/sequel/model/associations.rb	Mon, 25 Jan 2021 14:05:57 -0800
 lib/sequel/model/base.rb	Fri, 04 Dec 2020 13:44:07 -0800
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -71,7 +71,7 @@ doc/reflection.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/schema_modification.rdoc	Mon, 30 Oct 2017 13:46:56 -0700
 doc/security.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
 doc/sharding.rdoc	Mon, 13 May 2019 11:09:07 -0700
-doc/sql.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
+doc/sql.rdoc	Thu, 07 Jan 2021 07:32:42 -0800
 doc/testing.rdoc	Fri, 17 Apr 2020 11:52:37 -0700
 doc/thread_safety.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/transactions.rdoc	Sun, 27 Sep 2020 19:15:06 -0700
@@ -230,6 +230,7 @@ doc/release_notes/5.38.0.txt	Fri, 30 Oct 2020 11:01:43 -0700
 doc/release_notes/5.39.0.txt	Tue, 01 Dec 2020 08:05:35 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.40.0.txt	Thu, 31 Dec 2020 11:06:03 -0800
+doc/release_notes/5.41.0.txt	Mon, 01 Feb 2021 07:43:00 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
