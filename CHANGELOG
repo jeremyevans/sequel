@@ -1,4 +1,4 @@
-=== master
+=== 5.41.0 (2021-02-01)
 
 * Have explicit :text option for a String column take priority over :size option on PostgreSQL (jeremyevans) (#1750)
 

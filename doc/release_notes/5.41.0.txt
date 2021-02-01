@@ -1,0 +1,25 @@
+= New Features
+
+* The validation methods added by the validation_helpers plugin now
+  support the :skip_invalid option, which will not add a validation
+  error on a column if it already has a validation error.  This can
+  be useful if you want to avoid having duplicate errors.
+
+* The auto_validations plugin now supports a :skip_invalid plugin
+  option, which will pass the :skip_invalid option when calling
+  validation methods.
+
+= Other Improvements
+
+* The :adder, :remover, and :clearer association options now
+  support keyword arguments in Ruby 2.7+.
+
+* In the pg_interval extension, Sequel now uses the same number of
+  seconds per month and seconds per year as active_support.  It
+  originally used the same number, but active_support changed the
+  values in active_support 5.1.  Sequel now uses the active_support
+  values if they are available.
+
+* When adding a String column on PostgreSQL, an explicit text: true
+  option now takes precedence over an explicit :size option, as it
+  does in Sequel's default behavior.
