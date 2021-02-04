@@ -163,9 +163,12 @@ task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
     ENV['SEQUEL_MYSQL_URL'] = "mysql2://#{mysql_host}/sequel_test?user=root#{mysql_password}"
   end
 
-  Rake::Task['spec_sqlite'].invoke
   Rake::Task['spec_postgres'].invoke
-  Rake::Task['spec_mysql'].invoke
+
+  if RUBY_VERSION >= '2.4'
+    Rake::Task['spec_sqlite'].invoke
+    Rake::Task['spec_mysql'].invoke
+  end
 end
 
 desc "Print Sequel version"
