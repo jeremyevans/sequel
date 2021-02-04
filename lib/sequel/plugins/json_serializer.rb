@@ -133,19 +133,37 @@ module Sequel
         end
       end
       
-      # Helper class used for making sure that cascading options
-      # for model associations works correctly.  Cascaded options
-      # work by creating instances of this class, which take a
-      # literal JSON string and have +to_json+ return it.
+      # SEQUEL6: Remove
+      # :nocov:
       class Literal
-        # Store the literal JSON to use
         def initialize(json)
           @json = json
         end
         
-        # Return the literal JSON to use
         def to_json(*a)
           @json
+        end
+      end
+      # :nocov:
+      Sequel::Deprecation.deprecate_constant(self, :Literal)
+
+      # Convert the given object to a JSON data structure using the given arguments.
+      def self.object_to_json_data(obj, *args, &block)
+        if obj.is_a?(Array)
+          obj.map{|x| object_to_json_data(x, *args, &block)}
+        else
+          if obj.respond_to?(:to_json_data)
+            obj.to_json_data(*args, &block)
+          else
+            begin
+              Sequel.parse_json(Sequel.object_to_json(obj, *args, &block))
+            # :nocov:
+            rescue Sequel.json_parser_error_class
+              # Support for old Ruby code that only supports parsing JSON object/array
+              Sequel.parse_json(Sequel.object_to_json([obj], *args, &block))[0]
+            # :nocov:
+            end
+          end
         end
       end
 
@@ -324,20 +342,7 @@ module Sequel
                 end
 
                 v = v.empty? ? [] : [v]
-
-                objs = public_send(k)
-
-                is_array = if r = model.association_reflection(k)
-                  r.returns_array?
-                else
-                  objs.is_a?(Array)
-                end
-                
-                h[key_name] = if is_array
-                  objs.map{|obj| Literal.new(Sequel.object_to_json(obj, *v))}
-                else
-                  Literal.new(Sequel.object_to_json(objs, *v))
-                end
+                h[key_name] = JsonSerializer.object_to_json_data(public_send(k), *v)
               end
             else
               Array(inc).each do |c|
@@ -347,7 +352,8 @@ module Sequel
                 else
                   key_name = c.to_s
                 end
-                h[key_name] = public_send(c)
+
+                h[key_name] = JsonSerializer.object_to_json_data(public_send(c))
               end
             end
           end
@@ -361,6 +367,15 @@ module Sequel
 
           h = yield h if block_given?
           Sequel.object_to_json(h, *a)
+        end
+
+        # Convert the receiver to a JSON data structure using the given arguments.
+        def to_json_data(*args, &block)
+          if block
+            to_json(*args){|x| return block.call(x)}
+          else
+            to_json(*args){|x| return x}
+          end
         end
       end
 
@@ -420,7 +435,7 @@ module Sequel
             else
               all
             end
-            array.map{|obj| Literal.new(Sequel.object_to_json(obj, opts, &opts[:instance_block]))}
+            JsonSerializer.object_to_json_data(array, opts, &opts[:instance_block])
           else
             all
           end

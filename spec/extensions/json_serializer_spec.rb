@@ -34,6 +34,11 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.from_json(@album.to_json).must_equal @album
   end
 
+  it "should support to_json_data for getting a JSON data structure" do
+    @artist.to_json_data.must_equal("id"=>2, "name"=>"YJM")
+    @album.to_json_data.must_equal("id"=>1, "name"=>"RF", "artist_id"=>2)
+  end
+
   it "should handle ruby objects in values" do
     class ::Artist
       def name=(v)
