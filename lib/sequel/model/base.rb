@@ -1260,12 +1260,12 @@ module Sequel
       # Once an object is frozen, you cannot modify it's values, changed_columns,
       # errors, or dataset.
       def freeze
-        values.freeze
-        _changed_columns.freeze
         unless errors.frozen?
           validate
           errors.freeze
         end
+        values.freeze
+        _changed_columns.freeze
         this if !new? && model.primary_key
         super
       end

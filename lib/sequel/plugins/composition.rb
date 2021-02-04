@@ -171,8 +171,9 @@ module Sequel
 
         # Freeze compositions hash when freezing model instance.
         def freeze
-          compositions.freeze
+          compositions
           super
+          compositions.freeze
         end
 
         # For each composition, set the columns in the model class based

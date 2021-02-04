@@ -177,8 +177,9 @@ module Sequel
 
         # Freeze the deserialized values
         def freeze
-          deserialized_values.freeze
+          deserialized_values
           super
+          deserialized_values.freeze
         end
 
         # Serialize deserialized values before saving

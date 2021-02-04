@@ -448,6 +448,13 @@ describe "Model#freeze" do
     Album.new.freeze.new?.must_equal true
   end
 
+  it "should handle cases where validations modify values or changed columns" do
+    o = Album.new
+    def o.validate() self.id = 2 end
+    o.freeze
+    o.valid?.must_equal true
+  end
+
   it "should have working valid? method" do
     @o.valid?.must_equal true
     o = Album.new

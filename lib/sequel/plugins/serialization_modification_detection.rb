@@ -50,8 +50,8 @@ module Sequel
         # Freeze the original deserialized values when freezing the instance.
         def freeze
           @original_deserialized_values ||= {}
-          @original_deserialized_values.freeze
           super
+          @original_deserialized_values.freeze
         end
 
         private

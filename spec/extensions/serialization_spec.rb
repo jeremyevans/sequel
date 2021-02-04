@@ -336,6 +336,22 @@ describe "Serialization plugin" do
     proc{o.def = 'h'}.must_raise
   end
 
+  it "should work correctly with frozen instances with validations on serialized column" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, :yaml, :abc, :def
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
+    @c.send(:define_method, :validate){errors.add(:abc, "is 1") if abc == 1}
+
+    o = @c.first
+    o.freeze
+    o.abc.must_equal 1
+    o.abc.must_equal 1
+    o.def.must_equal "hello"
+    o.def.must_equal "hello"
+    proc{o.abc = 2}.must_raise
+    proc{o.def = 'h'}.must_raise
+  end
+
   it "should have dup duplicate internal structures" do
     @c.plugin :serialization, :yaml, :abc, :def
     o = @c.new

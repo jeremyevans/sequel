@@ -236,6 +236,14 @@ describe "Composition plugin" do
     proc{@o.date = Date.today}.must_raise
   end
 
+  it "should work with frozen instances that validate the composted value" do
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    @c.send(:define_method, :validate){errors.add(:date, "something") if date}
+    @o.freeze
+    @o.date.must_equal Date.new(1, 2, 3)
+    proc{@o.date = Date.today}.must_raise
+  end
+
   it "should have #dup duplicate compositions" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @o.date.must_equal Date.new(1, 2, 3)

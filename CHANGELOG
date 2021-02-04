@@ -1,5 +1,7 @@
 === master
 
+* Support cases where validations make modifications beyond setting errors in Model#freeze (jeremyevans)
+
 * Add Model#to_json_data to the json_serializer plugin, returning a JSON data structure (jeremyevans)
 
 === 5.41.0 (2021-02-01)
