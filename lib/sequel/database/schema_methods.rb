@@ -262,6 +262,10 @@ module Sequel
     #   # SELECT * FROM items WHERE foo
     #   # WITH CHECK OPTION
     #
+    #   DB.create_view(:bar_items, DB[:items].select(:foo), columns: [:bar])
+    #   # CREATE VIEW bar_items (bar) AS
+    #   # SELECT foo FROM items
+    #
     # Options:
     # :columns :: The column names to use for the view.  If not given,
     #             automatically determined based on the input dataset.
