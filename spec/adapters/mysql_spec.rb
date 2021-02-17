@@ -12,6 +12,7 @@ describe "MySQL", '#create_table' do
   end
 
   it "should create a temporary table" do
+    @db.disconnect
     @db.create_table(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
     @db.table_exists?(:tmp_dolls).must_equal true
     @db.disconnect

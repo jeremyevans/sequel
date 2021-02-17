@@ -43,7 +43,6 @@ end
 describe "PostgreSQL", '#create_table' do
   before do
     @db = DB
-    @db.test_connection
   end
   after do
     @db.drop_table?(:tmp_dolls, :unlogged_dolls)
@@ -188,53 +187,6 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls_3].order(:id).select_order_map(:id).must_equal [5]
   end if DB.server_version >= 100000 
 
-  it "should create a temporary table" do
-    @db.create_table(:tmp_dolls, :temp => true){text :name}
-    @db.table_exists?(:tmp_dolls).must_equal true
-    @db.disconnect
-    @db.table_exists?(:tmp_dolls).must_equal false
-  end
-
-  it "temporary table should support :on_commit option" do
-    @db.drop_table?(:some_table)
-    @db.transaction do
-      @db.create_table(:some_table, :temp => true, :on_commit => :drop){text :name}
-    end
-    @db.table_exists?(:some_table).must_equal false
-
-    @db.transaction do
-      @db.create_table(:some_table, :temp => true, :on_commit => :delete_rows){text :name}
-      @db[:some_table].insert('a')
-    end
-    @db.table_exists?(:some_table).must_equal true
-    @db[:some_table].empty?.must_equal true
-
-    @db.drop_table(:some_table)
-    @db.transaction do
-      @db.create_table(:some_table, :temp => true, :on_commit => :preserve_rows){text :name}
-      @db[:some_table].insert('a')
-    end
-    @db.table_exists?(:some_table).must_equal true
-    @db[:some_table].count.must_equal 1
-    @db.drop_table(:some_table)
-  end
-
-  it "temporary table should accept :on_commit with :as option" do
-    @db.drop_table?(:some_table)
-    @db.transaction do
-      @db.create_table(:some_table, :temp => true, :on_commit => :drop, :as => 'select 1')
-    end
-    @db.table_exists?(:some_table).must_equal false
-  end
-
-  it ":on_commit should raise error if not used on a temporary table" do
-    proc{@db.create_table(:some_table, :on_commit => :drop)}.must_raise(Sequel::Error)
-  end
-
-  it ":on_commit should raise error if given unsupported value" do
-    proc{@db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}}.must_raise(Sequel::Error)
-  end
-
   it "should not use a size for text columns" do
     @db.create_table(:tmp_dolls){String :description, text: true, size: :long}
     @db.tables.must_include :tmp_dolls
@@ -293,12 +245,6 @@ describe "PostgreSQL", '#create_table' do
       @db.run "DROP FUNCTION IF EXISTS valid_tmp_dolls(tmp_dolls)"
     end
   end if DB.server_version >= 90000
-
-  it "should not allow to pass both :temp and :unlogged" do
-    proc do
-      @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}
-    end.must_raise(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
-  end
 
   it "should support :if_exists option to drop_column" do
     @db.create_table(:tmp_dolls){Integer :a; Integer :b}
@@ -435,6 +381,80 @@ describe "PostgreSQL", '#create_table' do
   end
 end
 
+describe "PostgreSQL temporary table/view support" do
+  before(:all) do
+    @db = DB
+    @db.disconnect
+  end
+  after do
+    @db.drop_view(:tmp_dolls_view, :if_exists=>true, :cascade=>true) rescue nil
+    @db.drop_table?(:tmp_dolls)
+  end
+
+  it "should create a temporary table" do
+    @db.create_table(:tmp_dolls, :temp => true){text :name}
+    @db.table_exists?(:tmp_dolls).must_equal true
+    @db.disconnect
+    @db.table_exists?(:tmp_dolls).must_equal false
+  end
+
+  it "temporary table should support :on_commit option" do
+    @db.drop_table?(:some_table)
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :drop){text :name}
+    end
+    @db.table_exists?(:some_table).must_equal false
+
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :delete_rows){text :name}
+      @db[:some_table].insert('a')
+    end
+    @db.table_exists?(:some_table).must_equal true
+    @db[:some_table].empty?.must_equal true
+
+    @db.drop_table(:some_table)
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :preserve_rows){text :name}
+      @db[:some_table].insert('a')
+    end
+    @db.table_exists?(:some_table).must_equal true
+    @db[:some_table].count.must_equal 1
+    @db.drop_table(:some_table)
+  end
+
+  it "temporary table should accept :on_commit with :as option" do
+    @db.drop_table?(:some_table)
+    @db.transaction do
+      @db.create_table(:some_table, :temp => true, :on_commit => :drop, :as => 'select 1')
+    end
+    @db.table_exists?(:some_table).must_equal false
+  end
+
+  it ":on_commit should raise error if not used on a temporary table" do
+    proc{@db.create_table(:some_table, :on_commit => :drop)}.must_raise(Sequel::Error)
+  end
+
+  it ":on_commit should raise error if given unsupported value" do
+    proc{@db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}}.must_raise(Sequel::Error)
+  end
+
+  it "should not allow to pass both :temp and :unlogged" do
+    proc do
+      @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}
+    end.must_raise(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
+  end
+
+  it "should support temporary views" do
+    @db.create_table(:tmp_dolls, :temp => true){Integer :number}
+    @db[:tmp_dolls].insert(10)
+    @db[:tmp_dolls].insert(20)
+    @db.create_view(:tmp_dolls_view, @db[:tmp_dolls].where(:number=>10), :temp=>true)
+    @db[:tmp_dolls_view].map(:number).must_equal [10]
+    @db.create_or_replace_view(:tmp_dolls_view, @db[:tmp_dolls].where(:number=>20),  :temp=>true)
+    @db[:tmp_dolls_view].map(:number).must_equal [20]
+  end
+end
+
 describe "PostgreSQL views" do
   before do
     @db = DB
@@ -447,13 +467,6 @@ describe "PostgreSQL views" do
     @opts ||={}
     @db.drop_view(:items_view, @opts.merge(:if_exists=>true, :cascade=>true)) rescue nil
     @db.drop_table?(:items)
-  end
-
-  it "should support temporary views" do
-    @db.create_view(:items_view, @db[:items].where(:number=>10), :temp=>true)
-    @db[:items_view].map(:number).must_equal [10]
-    @db.create_or_replace_view(:items_view, @db[:items].where(:number=>20),  :temp=>true)
-    @db[:items_view].map(:number).must_equal [20]
   end
 
   it "should support recursive views" do
@@ -2357,6 +2370,9 @@ if uses_pg && DB.server_version >= 90000
     end
 
     it "should support listen and notify" do
+      # Spec assumes only one connection currently in the pool (otherwise notify_pid will not be deterministic)
+      @db.disconnect
+
       notify_pid = @db.synchronize{|conn| conn.backend_pid}
 
       called = false

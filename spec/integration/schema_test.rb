@@ -285,6 +285,17 @@ describe "Database foreign key parsing" do
   end
 end if DB.supports_foreign_key_parsing?
 
+describe "Database" do
+  after do
+    DB.drop_table(:items_temp) rescue nil
+  end
+
+  it "should create temporary tables without raising an exception" do
+    DB.disconnect
+    DB.create_table!(:items_temp, :temp=>true){Integer :number}
+  end
+end
+
 describe "Database schema modifiers" do
   before do
     @db = DB
@@ -422,10 +433,6 @@ describe "Database schema modifiers" do
       @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
       @db.table_exists?(:cats_dogs).must_equal true
     end
-  end
-
-  it "should create temporary tables without raising an exception" do
-    @db.create_table!(:items_temp, :temp=>true){Integer :number}
   end
 
   it "should have create_table? only create the table if it doesn't already exist" do
