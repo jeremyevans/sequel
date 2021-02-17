@@ -1,5 +1,7 @@
 === master
 
+* Fix possible thread safety issue in Database#extension that could allow Module#extended to be called twice with the same Database instance (jeremyevans)
+
 * Support cases where validations make modifications beyond setting errors in Model#freeze (jeremyevans)
 
 * Add Model#to_json_data to the json_serializer plugin, returning a JSON data structure (jeremyevans)

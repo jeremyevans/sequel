@@ -213,8 +213,7 @@ module Sequel
       Sequel.extension(*exts)
       exts.each do |ext|
         if pr = Sequel.synchronize{EXTENSIONS[ext]}
-          unless Sequel.synchronize{@loaded_extensions.include?(ext)}
-            Sequel.synchronize{@loaded_extensions << ext}
+          if Sequel.synchronize{@loaded_extensions.include?(ext) ? false : (@loaded_extensions << ext)}
             pr.call(self)
           end
         else
