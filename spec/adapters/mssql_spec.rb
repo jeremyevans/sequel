@@ -261,14 +261,14 @@ describe "MSSQL Dataset#output" do
     @db[:out].all.must_equal [{:name => "name", :value => 1}]
     @ds.insert(:name => "name", :value => 2)
     @ds.output(:out, {:name => Sequel[:deleted][:name], :value => Sequel[:deleted][:value]}).delete
-    @db[:out].all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
+    @db[:out].order(:value).all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 
   it "should execute OUTPUT clauses in INSERT statements" do
     @ds.output(:out, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).insert(:name => "name", :value => 1)
     @db[:out].all.must_equal [{:name => "name", :value => 1}]
     @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:inserted][:value]}).insert(:name => "name", :value => 2)
-    @db[:out].all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
+    @db[:out].order(:value).all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 
   it "should execute OUTPUT clauses in UPDATE statements" do
@@ -276,7 +276,7 @@ describe "MSSQL Dataset#output" do
     @ds.output(:out, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).update(:value => 2)
     @db[:out].all.must_equal [{:name => "name", :value => 1}]
     @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:deleted][:value]}).update(:value => 3)
-    @db[:out].all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
+    @db[:out].order(:value).all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 end
 
