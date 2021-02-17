@@ -1,5 +1,7 @@
 === master
 
+* Add async_thread_pool Database extension for executing queries asynchronously using a thread pool (jeremyevans)
+
 * Fix possible thread safety issue in Database#extension that could allow Module#extended to be called twice with the same Database instance (jeremyevans)
 
 * Support cases where validations make modifications beyond setting errors in Model#freeze (jeremyevans)

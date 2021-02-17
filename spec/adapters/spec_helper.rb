@@ -38,6 +38,8 @@ require_relative "../visibility_checking" if ENV['CHECK_METHOD_VISIBILITY']
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 
+require_relative '../async_spec_helper'
+
 DB.extension :pg_timestamptz if ENV['SEQUEL_PG_TIMESTAMPTZ']
 DB.extension :integer64 if ENV['SEQUEL_INTEGER64']
 DB.extension :index_caching if ENV['SEQUEL_INDEX_CACHING']

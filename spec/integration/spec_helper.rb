@@ -44,6 +44,8 @@ if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type
   end
 end
 
+require_relative '../async_spec_helper'
+
 DB.extension :index_caching if ENV['SEQUEL_INDEX_CACHING']
 DB.extension :error_sql if ENV['SEQUEL_ERROR_SQL']
 DB.extension :synchronize_sql if ENV['SEQUEL_SYNCHRONIZE_SQL']

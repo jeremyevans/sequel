@@ -9,14 +9,15 @@ describe "Simple Dataset operations" do
     end
     @ds = @db[:items]
     @ds.insert(:number=>10)
+    @ds = @ds.async if async?
   end
   after do
     @db.drop_table?(:items)
   end
 
   it "should support sequential primary keys" do
-    @ds.insert(:number=>20)
-    @ds.insert(:number=>30)
+    wait{@ds.insert(:number=>20)}
+    wait{@ds.insert(:number=>30)}
     @ds.order(:number).all.must_equal [
       {:id => 1, :number=>10},
       {:id => 2, :number=>20},
@@ -28,20 +29,20 @@ describe "Simple Dataset operations" do
       primary_key :id, :type=>:Bignum
       Integer :number
     end
-    @ds.insert(:number=>20)
-    @ds.insert(:number=>30)
+    wait{@ds.insert(:number=>20)}
+    wait{@ds.insert(:number=>30)}
     @ds.order(:number).all.must_equal [{:id => 1, :number=>20}, {:id => 2, :number=>30}]   
   end 
 
   cspecify "should insert with a primary key specified", :db2, :mssql do
-    @ds.insert(:id=>100, :number=>20)
+    wait{@ds.insert(:id=>100, :number=>20)}
     @ds.count.must_equal 2
     @ds.order(:id).all.must_equal [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
   end
 
   it "should support ordering considering NULLS" do
-    @ds.insert(:number=>20)
-    @ds.insert(:number=>nil)
+    wait{@ds.insert(:number=>20)}
+    wait{@ds.insert(:number=>nil)}
     @ds.order(Sequel[:number].asc(:nulls=>:first)).select_map(:number).must_equal [nil, 10, 20]
     @ds.order(Sequel[:number].asc(:nulls=>:last)).select_map(:number).must_equal [10, 20, nil]
     @ds.order(Sequel[:number].desc(:nulls=>:first)).select_map(:number).must_equal [nil, 20, 10]
@@ -54,7 +55,7 @@ describe "Simple Dataset operations" do
   end
 
   it "should have insert work correctly with static SQL" do
-    @db["INSERT INTO #{@ds.literal(:items)} (#{@ds.literal(:number)}) VALUES (20)"].insert
+    wait{@db["INSERT INTO #{@ds.literal(:items)} (#{@ds.literal(:number)}) VALUES (20)"].insert}
     @ds.filter(:id=>2).first[:number].must_equal 20
   end
 
@@ -63,7 +64,7 @@ describe "Simple Dataset operations" do
   end
 
   it "should handle LATERAL subqueries correctly" do
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.from(Sequel[:items].as(:i), @ds.where(Sequel[:items][:number]=>Sequel[:i][:number]).lateral).select_order_map([Sequel[:i][:number].as(:n), Sequel[:t1][:number]]).must_equal [[10, 10], [20, 20]]
     @ds.from(Sequel[:items].as(:i)).cross_join(@ds.where(Sequel[:items][:number]=>Sequel[:i][:number]).lateral).select_order_map([Sequel[:i][:number].as(:n), Sequel[:t1][:number]]).must_equal [[10, 10], [20, 20]]
     @ds.from(Sequel[:items].as(:i)).join(@ds.where(Sequel[:items][:number]=>Sequel[:i][:number]).lateral, 1=>1).select_order_map([Sequel[:i][:number].as(:n), Sequel[:t1][:number]]).must_equal [[10, 10], [20, 20]]
@@ -96,10 +97,10 @@ describe "Simple Dataset operations" do
     @db.create_table!(:items) do
       Integer :number, :default=>10
     end
-    @ds.insert(:number=>Sequel::DEFAULT)
+    wait{@ds.insert(:number=>Sequel::DEFAULT)}
     @ds.select_map(:number).must_equal [10]
-    @ds.insert(:number=>20)
-    @ds.update(:number=>Sequel::DEFAULT)
+    wait{@ds.insert(:number=>20)}
+    wait{@ds.update(:number=>Sequel::DEFAULT)}
     @ds.select_map(:number).must_equal [10, 10]
   end
 
@@ -108,7 +109,7 @@ describe "Simple Dataset operations" do
       String :name
       Integer :number
     end
-    @ds.insert
+    wait{@ds.insert}
     @ds.all.must_equal [{:name=>nil, :number=>nil}]
   end
 
@@ -131,49 +132,49 @@ describe "Simple Dataset operations" do
 
   it "should iterate over records as they come in" do
     called = false
-    @ds.each{|row| called = true; row.must_equal(:id=>1, :number=>10)}
+    wait{@ds.each{|row| called = true; _(row).must_equal(:id=>1, :number=>10)}}
     called.must_equal true
   end
 
   it "should support iterating over large numbers of records with paged_each" do
-    (2..100).each{|i| @ds.insert(:number=>i*10)}
+    v = (2..100).map{|i| wait{@ds.insert(:number=>i*10)}}
 
     [:offset, :filter].each do |strategy|
       rows = []
-      @ds.order(:number).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      wait{@ds.order(:number).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}}
       rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}})
 
       rows = []
-      @ds.order(:number).paged_each(:rows_per_fetch=>3, :strategy=>strategy){|row| rows << row}
+      wait{@ds.order(:number).paged_each(:rows_per_fetch=>3, :strategy=>strategy){|row| rows << row}}
       rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}})
 
       rows = []
-      @ds.order(:number, :id).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      wait{@ds.order(:number, :id).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}}
       rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}})
 
       rows = []
-      @ds.reverse_order(:number).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      wait{@ds.reverse_order(:number).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}}
       rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}}.reverse)
 
       rows = []
-      @ds.order(Sequel.desc(:number), :id).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      wait{@ds.order(Sequel.desc(:number), :id).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}}
       rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}}.reverse)
     end
 
     rows = []
-    @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3).each{|row| rows << row}
+    wait{@ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3).each{|row| rows << row}}
     rows.must_equal((26..75).map{|i| {:id=>i, :number=>i*10}})
 
     rows = []
-    @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3){|row| rows << row}
+    wait{@ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3){|row| rows << row}}
     rows.must_equal((26..75).map{|i| {:id=>i, :number=>i*10}})
 
     rows = []
-    @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5){|row| rows << row}
+    wait{@ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5){|row| rows << row}}
     rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}})
 
     rows = []
-    @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, :filter_values=>proc{|row, _| [row[:number] * 2]}){|row| rows << row}
+    wait{@ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, :filter_values=>proc{|row, _| [row[:number] * 2]}){|row| rows << row}}
     rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}})
 
     if DB.adapter_scheme == :jdbc
@@ -190,6 +191,7 @@ describe "Simple Dataset operations" do
   end
 
   it "should skip locked rows correctly" do
+    skip if async? # async doesn't work with transactions
     @ds.insert(:number=>10)
     q1 = Queue.new
     q2 = Queue.new
@@ -208,6 +210,7 @@ describe "Simple Dataset operations" do
   end if DB.dataset.supports_skip_locked?
   
   it "should raise error instead of waiting for rows correctly" do
+    skip if async? # async doesn't work with transactions
     @ds.insert(:number=>10)
     q1 = Queue.new
     q2 = Queue.new
@@ -236,6 +239,8 @@ describe "Simple Dataset operations" do
   end
   
   it "should work correctly when returning from each without iterating over the whole result set" do
+    skip if async? # break not allowed in async blocks (break from proc closure error)
+
     @ds.insert(:number=>20)
     @ds.order(:id).each{|v| break v}.must_equal(:id=>1, :number=>10)
     @ds.reverse(:id).each{|v| break v}.must_equal(:id=>2, :number=>20)
@@ -253,7 +258,7 @@ describe "Simple Dataset operations" do
   
   it "should fetch correctly with a limit" do
     @ds.order(:id).limit(2).all.must_equal [{:id=>1, :number=>10}]
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.order(:id).limit(1).all.must_equal [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2).all.must_equal [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
   end
@@ -261,7 +266,7 @@ describe "Simple Dataset operations" do
   it "should fetch correctly with a limit and offset" do
     @ds.order(:id).limit(2, 0).all.must_equal [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2, 1).all.must_equal []
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.order(:id).limit(1, 1).all.must_equal [{:id=>2, :number=>20}]
     @ds.order(:id).limit(2, 0).all.must_equal [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.order(:id).limit(2, 1).all.must_equal [{:id=>2, :number=>20}]
@@ -270,7 +275,7 @@ describe "Simple Dataset operations" do
   it "should fetch correctly with just offset" do
     @ds.order(:id).offset(0).all.must_equal [{:id=>1, :number=>10}]
     @ds.order(:id).offset(1).all.must_equal []
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.order(:id).offset(0).all.must_equal [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.order(:id).offset(1).all.must_equal [{:id=>2, :number=>20}]
     @ds.order(:id).offset(2).all.must_equal []
@@ -279,7 +284,7 @@ describe "Simple Dataset operations" do
   it "should fetch correctly with a limit and offset using seperate methods" do
     @ds.order(:id).limit(2).offset(0).all.must_equal [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2).offset(1).all.must_equal []
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.order(:id).limit(1).offset(1).all.must_equal [{:id=>2, :number=>20}]
     @ds.order(:id).limit(2).offset(0).all.must_equal [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.order(:id).limit(2).offset(1).all.must_equal [{:id=>2, :number=>20}]
@@ -287,14 +292,14 @@ describe "Simple Dataset operations" do
   
   it "should provide correct columns when using a limit and offset" do
     ds = @ds.order(:id).limit(1, 1)
-    ds.all
+    wait{ds.all}
     ds.columns.must_equal [:id, :number]
     @ds.order(:id).limit(1, 1).columns.must_equal [:id, :number]
   end
 
   it "should fetch correctly with a limit and offset for different combinations of from and join tables" do
     @db.create_table!(:items2){primary_key :id2; Integer :number2}
-    @db[:items2].insert(:number2=>10)
+    wait{@db[:items2].insert(:number2=>10)}
     @ds.from(:items, :items2).order(:id).limit(2, 0).all.must_equal [{:id=>1, :number=>10, :id2=>1, :number2=>10}]
     @ds.from(Sequel[:items].as(:i), Sequel[:items2].as(:i2)).order(:id).limit(2, 0).all.must_equal [{:id=>1, :number=>10, :id2=>1, :number2=>10}]
     @ds.cross_join(:items2).order(:id).limit(2, 0).all.must_equal [{:id=>1, :number=>10, :id2=>1, :number2=>10}]
@@ -318,14 +323,14 @@ describe "Simple Dataset operations" do
   end
 
   it "should be orderable by column number" do
-    @ds.insert(:number=>20)
-    @ds.insert(:number=>10)
+    wait{@ds.insert(:number=>20)}
+    wait{@ds.insert(:number=>10)}
     @ds.order(2, 1).select_map([:id, :number]).must_equal [[1, 10], [3, 10], [2, 20]]
   end
 
   it "should fetch correctly with a limit in an IN subselect" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).all.must_equal [{:id=>1, :number=>10}]
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.where(:id=>@ds.select(:id).order(:id).limit(1)).all.must_equal [{:id=>1, :number=>10}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2)).order(:id).all.must_equal [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
   end
@@ -333,14 +338,14 @@ describe "Simple Dataset operations" do
   it "should fetch correctly with a limit and offset in an IN subselect" do
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).all.must_equal [{:id=>1, :number=>10}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.must_equal []
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     @ds.where(:id=>@ds.select(:id).order(:id).limit(1, 1)).all.must_equal [{:id=>2, :number=>20}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 0)).order(:id).all.must_equal [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
     @ds.where(:id=>@ds.select(:id).order(:id).limit(2, 1)).all.must_equal [{:id=>2, :number=>20}]
   end
   
   it "should fetch correctly when using limit and offset in a from_self" do
-    @ds.insert(:number=>20)
+    wait{@ds.insert(:number=>20)}
     ds = @ds.order(:id).limit(1, 1).from_self
     ds.all.must_equal [{:number=>20, :id=>2}]
     ds.columns.must_equal [:id, :number]
@@ -348,8 +353,8 @@ describe "Simple Dataset operations" do
   end
 
   it "should fetch correctly when using nested limit and offset in a from_self" do
-    @ds.insert(:number=>20)
-    @ds.insert(:number=>30)
+    wait{@ds.insert(:number=>20)}
+    wait{@ds.insert(:number=>30)}
     ds = @ds.order(:id).limit(2, 1).from_self.reverse_order(:number).limit(1, 1)
     ds.all.must_equal [{:number=>20, :id=>2}]
     ds.columns.must_equal [:id, :number]
@@ -359,7 +364,7 @@ describe "Simple Dataset operations" do
     ds.all.must_equal []
     ds.columns.must_equal [:id, :number]
 
-    @ds.insert(:number=>40)
+    wait{@ds.insert(:number=>40)}
     ds = @ds.order(:id).limit(3, 1).from_self.reverse_order(:number).limit(2, 1).from_self.reverse_order(:id).limit(1, 1)
     ds.all.must_equal [{:number=>20, :id=>2}]
     ds.columns.must_equal [:id, :number]
@@ -387,6 +392,30 @@ describe "Simple Dataset operations" do
     ds.update(:number=>30).must_equal 2
     ds.delete.must_equal 2
   end
+
+  it "should support execution using an async thread pool" do
+    q = Queue.new
+    ds = @ds.async
+    vals = 3.times.map{ds.all{q.pop}}
+    3.times{q.push nil}
+    vals.each{|v| v[0][:number].must_equal(10)}
+
+    vals = 3.times.map{ds.first}
+    vals.each{|v| v[:number].must_equal(10)}
+
+    vals = 3.times.map{ds.get(:number)}
+    vals.each{|v| v.must_equal(10)}
+
+    vals = [
+      ds.all{q.pop},
+      ds.first,
+      ds.get(:number)
+    ]
+    q.push nil
+    vals[0][0][:number].must_equal 10
+    vals[1][:number].must_equal 10
+    vals[2].must_equal 10
+  end if ENV['SEQUEL_ASYNC_THREAD_POOL']
 end
 
 describe "Simple dataset operations with nasty table names" do
@@ -418,6 +447,7 @@ describe Sequel::Dataset do
       Integer :value
     end
     @d = DB[:test]
+    @d = @d.async if async?
   end
   after do
     DB.drop_table?(:test)
@@ -425,9 +455,9 @@ describe Sequel::Dataset do
 
   it "should return the correct record count" do
     @d.count.must_equal 0
-    @d.insert(:name => 'abc', :value => 123)
-    @d.insert(:name => 'abc', :value => 456)
-    @d.insert(:name => 'def', :value => nil)
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => nil)}
     5.times do
       @d.count.must_equal 3
       @d.count(:name).must_equal 3
@@ -436,14 +466,14 @@ describe Sequel::Dataset do
   end
 
   it "should handle functions with identifier names correctly" do
-    @d.insert(:name => 'abc', :value => 6)
+    wait{@d.insert(:name => 'abc', :value => 6)}
     @d.get{sum.function(:value)}.must_equal 6
   end
 
   it "should handle aggregate methods on limited datasets correctly" do
-    @d.insert(:name => 'abc', :value => 6)
-    @d.insert(:name => 'bcd', :value => 12)
-    @d.insert(:name => 'def', :value => 18)
+    wait{@d.insert(:name => 'abc', :value => 6)}
+    wait{@d.insert(:name => 'bcd', :value => 12)}
+    wait{@d.insert(:name => 'def', :value => 18)}
     @d = @d.order(:name).limit(2)
     @d.count.must_equal 2
     @d.avg(:value).to_i.must_equal 9
@@ -455,9 +485,9 @@ describe Sequel::Dataset do
   end
 
   it "should support or emulate filtered aggregate functions" do
-    @d.insert(:name => 'abc', :value => 123)
-    @d.insert(:name => 'abc', :value => 456)
-    @d.insert(:name => 'def', :value => 324)
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => 324)}
     @d.get{count.function.*.filter{value > 100}}.must_equal 3
     @d.get{count.function.*.filter{value > 200}}.must_equal 2
     @d.get{count.function.*.filter{value > 400}}.must_equal 1
@@ -470,9 +500,9 @@ describe Sequel::Dataset do
 
   it "should return the correct records" do
     @d.to_a.must_equal []
-    @d.insert(:name => 'abc', :value => 123)
-    @d.insert(:name => 'abc', :value => 456)
-    @d.insert(:name => 'def', :value => 789)
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => 789)}
 
     @d.order(:value).to_a.must_equal [
       {:name => 'abc', :value => 123},
@@ -482,27 +512,27 @@ describe Sequel::Dataset do
   end
 
   it "should update records correctly" do
-    @d.insert(:name => 'abc', :value => 123)
-    @d.insert(:name => 'abc', :value => 456)
-    @d.insert(:name => 'def', :value => 789)
-    @d.filter(:name => 'abc').update(:value => 530)
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => 789)}
+    wait{@d.filter(:name => 'abc').update(:value => 530)}
     @d[:name => 'def'][:value].must_equal 789
     @d.filter(:value => 530).count.must_equal 2
   end
 
   it "should delete records correctly" do
-    @d.insert(:name => 'abc', :value => 123)
-    @d.insert(:name => 'abc', :value => 456)
-    @d.insert(:name => 'def', :value => 789)
-    @d.filter(:name => 'abc').delete
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => 789)}
+    wait{@d.filter(:name => 'abc').delete}
     @d.count.must_equal 1
     @d.first[:name].must_equal 'def'
   end
   
   it "should be able to truncate the table" do
-    @d.insert(:name => 'abc', :value => 123)
-    @d.insert(:name => 'abc', :value => 456)
-    @d.insert(:name => 'def', :value => 789)
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => 789)}
     @d.count.must_equal 3
     @d.truncate.must_be_nil
     @d.count.must_equal 0
@@ -570,6 +600,7 @@ describe Sequel::Dataset do
     @d.insert(:value => 123)
     @d.insert(:value => 456)
     @d.insert(:value => 789)
+    @d = @d.async if async?
   end 
   after do
     DB.drop_table?(:items)
@@ -602,6 +633,7 @@ describe "Simple Dataset operations" do
     @ds.insert(:number=>1, :flag=>true)
     @ds.insert(:number=>2, :flag=>false)
     @ds.insert(:number=>3, :flag=>nil)
+    @ds = @ds.async if async?
   end
   after(:all) do
     DB.drop_table?(:items)
@@ -676,6 +708,11 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     @ds2 = DB[:i2]
     @ds2.insert(:number=>10)
     @ds2.insert(:number=>30)
+
+    if async?
+      @ds1 = @ds1.async
+      @ds2 = @ds2.async
+    end
   end
   after do
     DB.drop_table?(:i1, :i2, :i3)
@@ -697,10 +734,10 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     [%w'10 30', %w'10 20 30'].must_include @ds1.limit(1).union(@ds2).order(:number).map{|x| x[:number].to_s}
     [%w'10 30', %w'10 20 30'].must_include @ds1.offset(1).union(@ds2).order(:number).map{|x| x[:number].to_s}
 
-    @ds1.insert(:number=>8)
-    @ds2.insert(:number=>9)
-    @ds1.insert(:number=>38)
-    @ds2.insert(:number=>39)
+    wait{@ds1.insert(:number=>8)}
+    wait{@ds2.insert(:number=>9)}
+    wait{@ds1.insert(:number=>38)}
+    wait{@ds2.insert(:number=>39)}
 
     @ds1.reverse_order(:number).union(@ds2).order(:number).map{|x| x[:number].to_s}.must_equal %w'8 9 10 20 30 38 39'
     @ds1.union(@ds2.reverse_order(:number)).order(:number).map{|x| x[:number].to_s}.must_equal %w'8 9 10 20 30 38 39'
@@ -777,6 +814,7 @@ if DB.dataset.supports_cte?
       @ds.insert(:id=>4, :parent_id=>1)
       @ds.insert(:id=>5, :parent_id=>3)
       @ds.insert(:id=>6, :parent_id=>5)
+      @ds = @ds.async if async?
     end
     after(:all) do
       @db.drop_table?(:i1)
@@ -829,31 +867,30 @@ if DB.dataset.supports_cte?(:insert) || DB.dataset.supports_cte?(:update) || DB.
       @ds2 = @ds.with(:t, @ds)
       @ds.insert(:id=>1)
       @ds.insert(:id=>2)
+      @ds = @ds.async if async?
     end
     after do
       @db.drop_table?(:i1)
     end
     
     it "should give correct results for WITH in insert" do
-      @ds2.insert(@db[:t])
+      wait{@ds2.insert(@db[:t])}
       @ds.select_order_map(:id).must_equal [1, 1, 2, 2]
     end if DB.dataset.supports_cte?(:insert)
 
     it "should give correct results for WITH in update" do
-      @ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>Sequel.+(:id, 1))
+      wait{@ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>Sequel.+(:id, 1))}
       @ds.select_order_map(:id).must_equal [1, 3]
     end if DB.dataset.supports_cte?(:update)
 
     it "should give correct results for WITH in delete" do
-      @ds2.filter(:id=>@db[:t].select{max(id)}).delete
+      wait{@ds2.filter(:id=>@db[:t].select{max(id)}).delete}
       @ds.select_order_map(:id).must_equal [1]
     end if DB.dataset.supports_cte?(:delete)
 
     it "should support a subselect in an subquery used for INSERT" do
-      @db.transaction(:rollback=>:always) do
-        @ds.insert([:id], @db[:foo].with(:foo, @ds.select{(id + 10).as(:id)}))
-        @ds.select_order_map(:id).must_equal [1,2,11,12]
-      end
+      wait{@ds.insert([:id], @db[:foo].with(:foo, @ds.select{(id + 10).as(:id)}))}
+      @ds.select_order_map(:id).must_equal [1,2,11,12]
     end
   end
 end
@@ -864,6 +901,7 @@ if DB.dataset.supports_returning?(:insert)
       @db = DB
       @db.create_table!(:i1){Integer :id; Integer :foo}
       @ds = @db[:i1]
+      @ds = @ds.async if async?
     end
     after do
       @db.drop_table?(:i1)
@@ -871,13 +909,13 @@ if DB.dataset.supports_returning?(:insert)
     
     it "should give correct results" do
       h = {}
-      @ds.returning(:foo).insert(1, 2){|r| h = r}
+      wait{@ds.returning(:foo).insert(1, 2){|r| h = r}}
       h.must_equal(:foo=>2)
-      @ds.returning(:id).insert(3, 4){|r| h = r}
+      wait{@ds.returning(:id).insert(3, 4){|r| h = r}}
       h.must_equal(:id=>3)
-      @ds.returning.insert(5, 6){|r| h = r}
+      wait{@ds.returning.insert(5, 6){|r| h = r}}
       h.must_equal(:id=>5, :foo=>6)
-      @ds.returning(Sequel[:id].as(:foo), Sequel[:foo].as(:id)).insert(7, 8){|r| h = r}
+      wait{@ds.returning(Sequel[:id].as(:foo), Sequel[:foo].as(:id)).insert(7, 8){|r| h = r}}
       h.must_equal(:id=>8, :foo=>7)
     end
   end
@@ -890,6 +928,7 @@ if DB.dataset.supports_returning?(:update) # Assume DELETE support as well
       @db.create_table!(:i1){Integer :id; Integer :foo}
       @ds = @db[:i1]
       @ds.insert(1, 2)
+      @ds = @ds.async if async?
     end
     after do
       @db.drop_table?(:i1)
@@ -897,23 +936,23 @@ if DB.dataset.supports_returning?(:update) # Assume DELETE support as well
     
     it "should give correct results" do
       h = []
-      @ds.returning(:foo).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
+      wait{@ds.returning(:foo).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}}
       h.must_equal [{:foo=>4}]
       h.clear
-      @ds.returning(:id).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
+      wait{@ds.returning(:id).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}}
       h.must_equal [{:id=>3}]
       h.clear
-      @ds.returning.update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
+      wait{@ds.returning.update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}}
       h.must_equal [{:id=>4, :foo=>16}]
       h.clear
-      @ds.returning(Sequel[:id].as(:foo), Sequel[:foo].as(:id)).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}
+      wait{@ds.returning(Sequel[:id].as(:foo), Sequel[:foo].as(:id)).update(:id=>Sequel.+(:id, 1), :foo=>Sequel.*(:foo, 2)){|r| h << r}}
       h.must_equal [{:id=>32, :foo=>5}]
       h.clear
 
-      @ds.returning.delete{|r| h << r}
+      wait{@ds.returning.delete{|r| h << r}}
       h.must_equal [{:id=>5, :foo=>32}]
       h.clear
-      @ds.returning.delete{|r| h << r}
+      wait{@ds.returning.delete{|r| h << r}}
       h.must_equal []
     end
   end
@@ -931,6 +970,7 @@ if DB.dataset.supports_window_functions?
       @ds.insert(:id=>4, :group_id=>2, :amount=>1000)
       @ds.insert(:id=>5, :group_id=>2, :amount=>10000)
       @ds.insert(:id=>6, :group_id=>2, :amount=>100000)
+      @ds = @ds.async if async?
     end
     after(:all) do
       @db.drop_table?(:i1)
@@ -1133,11 +1173,12 @@ describe "Sequel::Dataset#import and #multi_insert" do
   end
 end
 
-describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key " do
+describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key" do
   before do
     @db = DB
     @db.create_table!(:imp){primary_key :id; Integer :i}
     @ds = @db[:imp]
+    @ds = @ds.async if async?
   end
   after do
     @db.drop_table?(:imp)
@@ -1172,6 +1213,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.insert(1, 4, 5)
     @ds.insert(2, 3, 5)
     @ds.insert(2, 4, 6)
+    @ds = @ds.async if async?
   end
   after(:all) do
     @db.drop_table?(:a)
@@ -1198,9 +1240,10 @@ describe "Sequel::Dataset convenience methods" do
     @db = DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
+    @ds = @ds.async if async?
   end
   before do
-    @ds.delete
+    wait{@ds.delete}
   end
   after(:all) do
     @db.drop_table?(:a)
@@ -1208,58 +1251,58 @@ describe "Sequel::Dataset convenience methods" do
   
   it "#empty? should return whether the dataset returns no rows" do
     @ds.empty?.must_equal true
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.empty?.must_equal false
   end
   
   it "#empty? should work correctly for datasets with limits" do
     ds = @ds.limit(1)
     ds.empty?.must_equal true
-    ds.insert(20, 10)
+    wait{ds.insert(20, 10)}
     ds.empty?.must_equal false
   end
   
   it "#empty? should work correctly for datasets with limits and offsets" do
     ds = @ds.limit(1, 1)
     ds.empty?.must_equal true
-    ds.insert(20, 10)
+    wait{ds.insert(20, 10)}
     ds.empty?.must_equal true
-    ds.insert(20, 10)
+    wait{ds.insert(20, 10)}
     ds.empty?.must_equal false
   end
   
   it "#group_and_count should return a grouping by count" do
     @ds.group_and_count(:a).order{count(:a)}.all.must_equal []
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.group_and_count(:a).order{count(:a)}.all.each{|h| h[:count] = h[:count].to_i}.must_equal [{:a=>20, :count=>1}]
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.group_and_count(:a).order{count(:a)}.all.each{|h| h[:count] = h[:count].to_i}.must_equal [{:a=>20, :count=>2}]
-    @ds.insert(30, 30)
+    wait{@ds.insert(30, 30)}
     @ds.group_and_count(:a).order{count(:a)}.all.each{|h| h[:count] = h[:count].to_i}.must_equal [{:a=>30, :count=>1}, {:a=>20, :count=>2}]
   end
   
   it "#group_and_count should support column aliases" do
     @ds.group_and_count(Sequel[:a].as(:c)).order{count(:a)}.all.must_equal []
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.group_and_count(Sequel[:a].as(:c)).order{count(:a)}.all.each{|h| h[:count] = h[:count].to_i}.must_equal [{:c=>20, :count=>1}]
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.group_and_count(Sequel[:a].as(:c)).order{count(:a)}.all.each{|h| h[:count] = h[:count].to_i}.must_equal [{:c=>20, :count=>2}]
-    @ds.insert(30, 30)
+    wait{@ds.insert(30, 30)}
     @ds.group_and_count(Sequel[:a].as(:c)).order{count(:a)}.all.each{|h| h[:count] = h[:count].to_i}.must_equal [{:c=>30, :count=>1}, {:c=>20, :count=>2}]
   end
   
   it "#range should return the range between the maximum and minimum values" do
     @ds = @ds.unordered.extension(:sequel_4_dataset_methods)
-    @ds.insert(20, 10)
-    @ds.insert(30, 10)
+    wait{@ds.insert(20, 10)}
+    wait{@ds.insert(30, 10)}
     @ds.range(:a).must_equal(20..30)
     @ds.range(:b).must_equal(10..10)
   end
   
   it "#interval should return the different between the maximum and minimum values" do
     @ds = @ds.unordered.extension(:sequel_4_dataset_methods)
-    @ds.insert(20, 10)
-    @ds.insert(30, 10)
+    wait{@ds.insert(20, 10)}
+    wait{@ds.insert(30, 10)}
     @ds.interval(:a).to_i.must_equal 10
     @ds.interval(:b).to_i.must_equal 0
   end
@@ -1270,9 +1313,10 @@ describe "Sequel::Dataset main SQL methods" do
     @db = DB
     @db.create_table!(:d){Integer :a; Integer :b}
     @ds = @db[:d].order(:a)
+    @ds = @ds.async if async?
   end
   before do
-    @ds.delete
+    wait{@ds.delete}
   end
   after(:all) do
     @db.drop_table?(:d)
@@ -1280,20 +1324,20 @@ describe "Sequel::Dataset main SQL methods" do
   
   it "#exists should return a usable exists clause" do
     @ds.filter(@db[Sequel[:d].as(:c)].filter(Sequel[:c][:a]=>Sequel[:d][:b]).exists).all.must_equal []
-    @ds.insert(20, 30)
-    @ds.insert(10, 20)
+    wait{@ds.insert(20, 30)}
+    wait{@ds.insert(10, 20)}
     @ds.filter(@db[Sequel[:d].as(:c)].filter(Sequel[:c][:a]=>Sequel[:d][:b]).exists).all.must_equal [{:a=>10, :b=>20}]
   end
   
   it "#filter and #exclude should work with placeholder strings" do
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.filter(Sequel.lit("a > ?", 15)).all.must_equal [{:a=>20, :b=>30}]
     @ds.exclude(Sequel.lit("b < ?", 15)).all.must_equal [{:a=>20, :b=>30}]
     @ds.filter(Sequel.lit("b < ?", 15)).invert.all.must_equal [{:a=>20, :b=>30}]
   end
   
   it "#where and #or should work correctly" do
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.filter(:a=>20).where(:b=>30).all.must_equal [{:a=>20, :b=>30}]
     @ds.filter(:a=>20).where(:b=>15).all.must_equal []
     @ds.filter(:a=>20).or(:b=>15).all.must_equal [{:a=>20, :b=>30}]
@@ -1303,35 +1347,35 @@ describe "Sequel::Dataset main SQL methods" do
   it "#select_group should work correctly" do
     @ds = @ds.unordered
     @ds.select_group(:a).all.must_equal []
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.select_group(:a).all.must_equal [{:a=>20}]
     @ds.select_group(:b).all.must_equal [{:b=>30}]
-    @ds.insert(20, 40)
+    wait{@ds.insert(20, 40)}
     @ds.select_group(:a).all.must_equal [{:a=>20}]
     @ds.order(:b).select_group(:b).all.must_equal [{:b=>30}, {:b=>40}]
   end
 
   it "#select_group should work correctly when aliasing" do
     @ds = @ds.unordered
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.select_group(Sequel[:b].as(:c)).all.must_equal [{:c=>30}]
   end
   
   it "#having should work correctly" do
     @ds = @ds.unordered
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.must_equal []
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.must_equal []
-    @ds.insert(40, 20)
+    wait{@ds.insert(40, 20)}
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.must_equal [{:b=>20, :c=>40}]
   end
   
   cspecify "#having should work without a previous group", :sqlite do
     @ds = @ds.unordered
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.must_equal []
-    @ds.insert(20, 30)
+    wait{@ds.insert(20, 30)}
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.must_equal []
-    @ds.insert(40, 20)
+    wait{@ds.insert(40, 20)}
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.must_equal [{:c=>40}]
   end
 end
@@ -1343,9 +1387,9 @@ describe "Sequel::Dataset convenience methods" do
     @ds = @db[:a].order(:a)
   end
   before do
-    @ds.delete
-    @ds.insert(1, 2, 3, 4)
-    @ds.insert(5, 6, 7, 8)
+    wait{@ds.delete}
+    wait{@ds.insert(1, 2, 3, 4)}
+    wait{@ds.insert(5, 6, 7, 8)}
   end
   after(:all) do
     @db.drop_table?(:a)
@@ -1374,7 +1418,7 @@ describe "Sequel::Dataset convenience methods" do
 
   it "should have working #to_hash_groups" do
     ds = @ds.order(*@ds.columns)
-    ds.insert(1, 2, 3, 9)
+    wait{ds.insert(1, 2, 3, 9)}
     ds.to_hash_groups(:a).must_equal(1=>[{:a=>1, :b=>2, :c=>3, :d=>4}, {:a=>1, :b=>2, :c=>3, :d=>9}], 5=>[{:a=>5, :b=>6, :c=>7, :d=>8}])
     ds.to_hash_groups(:b).must_equal(2=>[{:a=>1, :b=>2, :c=>3, :d=>4}, {:a=>1, :b=>2, :c=>3, :d=>9}], 6=>[{:a=>5, :b=>6, :c=>7, :d=>8}])
     ds.to_hash_groups([:a, :b]).must_equal([1, 2]=>[{:a=>1, :b=>2, :c=>3, :d=>4}, {:a=>1, :b=>2, :c=>3, :d=>9}], [5, 6]=>[{:a=>5, :b=>6, :c=>7, :d=>8}])
@@ -1437,7 +1481,7 @@ describe "Sequel::Dataset convenience methods" do
 
   it "should have working #select_hash_groups" do
     ds = @ds.order(*@ds.columns)
-    ds.insert(1, 2, 3, 9)
+    wait{ds.insert(1, 2, 3, 9)}
     ds.select_hash_groups(:a, :d).must_equal(1=>[4, 9], 5=>[8])
     ds.select_hash_groups(Sequel[:a][:a].as(:e), :d).must_equal(1=>[4, 9], 5=>[8])
     ds.select_hash_groups(Sequel.expr(Sequel[:a][:a]).as(:e), :d).must_equal(1=>[4, 9], 5=>[8])
@@ -1456,16 +1500,17 @@ describe "Sequel::Dataset DSL support" do
     @db = DB
     @db.create_table!(:a){Integer :a; Integer :b}
     @ds = @db[:a].order(:a)
+    @ds = @ds.async if async?
   end
   before do
-    @ds.delete
+    wait{@ds.delete}
   end
   after(:all) do
     @db.drop_table?(:a)
   end
   
   it "should work with standard mathematical operators" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.get{a + b}.to_i.must_equal 30
     @ds.get{a - b}.to_i.must_equal 10
     @ds.get{a * b}.to_i.must_equal 200
@@ -1473,7 +1518,7 @@ describe "Sequel::Dataset DSL support" do
   end
 
   it "should work with exponentiation operator" do
-    @ds.insert(:a=>2)
+    wait{@ds.insert(:a=>2)}
     (-4..4).each do |i|
       # Allow minor differences due to emulation issues on some adapters
       @ds.get{(a / 1.0) ** i}.to_f.must_be_close_to((2**i).to_f)
@@ -1481,21 +1526,21 @@ describe "Sequel::Dataset DSL support" do
   end
   
   cspecify "should work with bitwise shift operators", :derby do
-    @ds.insert(3, 2)
+    wait{@ds.insert(3, 2)}
     b = Sequel[:b]
     b = b.cast(:integer) if @db.database_type == :postgres
     @ds.get{a.sql_number << b}.to_i.must_equal 12
     @ds.get{a.sql_number >> b}.to_i.must_equal 0
     @ds.get{a.sql_number << b << 1}.to_i.must_equal 24
-    @ds.delete
-    @ds.insert(3, 1)
+    wait{@ds.delete}
+    wait{@ds.insert(3, 1)}
     @ds.get{a.sql_number << b}.to_i.must_equal 6
     @ds.get{a.sql_number >> b}.to_i.must_equal 1
     @ds.get{a.sql_number >> b >> 1}.to_i.must_equal 0
   end
 
   cspecify "should work with bitwise AND and OR operators", :derby do
-    @ds.insert(3, 5)
+    wait{@ds.insert(3, 5)}
     @ds.get{a.sql_number | b}.to_i.must_equal 7
     @ds.get{a.sql_number & b}.to_i.must_equal 1
     @ds.get{a.sql_number | b | 8}.to_i.must_equal 15
@@ -1503,29 +1548,29 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with the bitwise compliment operator" do
-    @ds.insert(-3, 3)
+    wait{@ds.insert(-3, 3)}
     @ds.get{~a.sql_number}.to_i.must_equal 2
     @ds.get{~b.sql_number}.to_i.must_equal(-4)
   end
   
   cspecify "should work with the bitwise xor operator", :derby do
-    @ds.insert(3, 5)
+    wait{@ds.insert(3, 5)}
     @ds.get{a.sql_number ^ b}.to_i.must_equal 6
     @ds.get{a.sql_number ^ b ^ 1}.to_i.must_equal 7
   end
   
   it "should work with the modulus operator" do
-    @ds.insert(3, 5)
+    wait{@ds.insert(3, 5)}
     @ds.get{a.sql_number % 4}.to_i.must_equal 3
     @ds.get{b.sql_number % 4}.to_i.must_equal 1
     @ds.get{a.sql_number % 4 % 2}.to_i.must_equal 1
   end
   
   it "should work with inequality operators" do
-    @ds.insert(10, 11)
-    @ds.insert(11, 11)
-    @ds.insert(20, 19)
-    @ds.insert(20, 20)
+    wait{@ds.insert(10, 11)}
+    wait{@ds.insert(11, 11)}
+    wait{@ds.insert(20, 19)}
+    wait{@ds.insert(20, 20)}
     @ds.filter{a > b}.select_order_map(:a).must_equal [20]
     @ds.filter{a >= b}.select_order_map(:a).must_equal [11, 20, 20]
     @ds.filter{a < b}.select_order_map(:a).must_equal [10]
@@ -1533,27 +1578,27 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with casting and string concatentation" do
-    @ds.insert(20, 20)
+    wait{@ds.insert(20, 20)}
     @ds.get{Sequel.cast(a, String).sql_string + Sequel.cast(b, String)}.must_equal '2020'
   end
   
   it "should work with ordering" do
-    @ds.insert(10, 20)
-    @ds.insert(20, 10)
+    wait{@ds.insert(10, 20)}
+    wait{@ds.insert(20, 10)}
     @ds.order(:a, :b).all.must_equal [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
     @ds.order(Sequel.asc(:a), Sequel.asc(:b)).all.must_equal [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
     @ds.order(Sequel.desc(:a), Sequel.desc(:b)).all.must_equal [{:a=>20, :b=>10}, {:a=>10, :b=>20}]
   end
   
   it "should work with qualifying" do
-    @ds.insert(10, 20)
+    wait{@ds.insert(10, 20)}
     @ds.get(Sequel[:a][:b]).must_equal 20
     @ds.get{a[:b]}.must_equal 20
     @ds.get(Sequel.qualify(:a, :b)).must_equal 20
   end
   
   it "should work with aliasing" do
-    @ds.insert(10, 20)
+    wait{@ds.insert(10, 20)}
     @ds.get(Sequel[:a][:b].as(:c)).must_equal 20
     @ds.get{a[:b].as(c)}.must_equal 20
     @ds.get(Sequel.qualify(:a, :b).as(:c)).must_equal 20
@@ -1561,12 +1606,12 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with selecting all columns of a table" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.select_all(:a).all.must_equal [{:a=>20, :b=>10}]
   end
   
   it "should work with ranges as hash values" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(:a=>(10..30)).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(:a=>(25..30)).all.must_equal []
     @ds.filter(:a=>(10..15)).all.must_equal []
@@ -1576,7 +1621,7 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with nil as hash value" do
-    @ds.insert(20, nil)
+    wait{@ds.insert(20, nil)}
     @ds.filter(:a=>nil).all.must_equal []
     @ds.filter(:b=>nil).all.must_equal [{:a=>20, :b=>nil}]
     @ds.exclude(:b=>nil).all.must_equal []
@@ -1584,7 +1629,7 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with arrays as hash values" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(:a=>[10]).all.must_equal []
     @ds.filter(:a=>[20, 10]).all.must_equal [{:a=>20, :b=>10}]
     @ds.exclude(:a=>[10]).all.must_equal [{:a=>20, :b=>10}]
@@ -1592,7 +1637,7 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with endless ranges as hash values" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(:a=>eval('(30..)')).all.must_equal []
     @ds.filter(:a=>eval('(20...)')).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(:a=>eval('(20..)')).all.must_equal [{:a=>20, :b=>10}]
@@ -1600,7 +1645,7 @@ describe "Sequel::Dataset DSL support" do
   end if RUBY_VERSION >= '2.6'
   
   it "should work with startless ranges as hash values" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(:a=>eval('(..30)')).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(:a=>eval('(...30)')).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(:a=>eval('(..20)')).all.must_equal [{:a=>20, :b=>10}]
@@ -1612,7 +1657,7 @@ describe "Sequel::Dataset DSL support" do
   end if RUBY_VERSION >= '2.7'
   
   it "should work with CASE statements" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(Sequel.case({{:a=>20}=>20}, 0) > 0).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(Sequel.case({{:a=>15}=>20}, 0) > 0).all.must_equal []
     @ds.filter(Sequel.case({20=>20}, 0, :a) > 0).all.must_equal [{:a=>20, :b=>10}]
@@ -1620,7 +1665,7 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work with multiple value arrays" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter([:a, :b]=>[[20, 10]]).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter([:a, :b]=>[[10, 20]]).all.must_equal []
     @ds.filter([:a, :b]=>[[20, 10], [1, 2]]).all.must_equal [{:a=>20, :b=>10}]
@@ -1633,7 +1678,7 @@ describe "Sequel::Dataset DSL support" do
   end
 
   it "should work with IN/NOT in with datasets" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     ds = @ds.unordered
 
     @ds.filter(:a=>ds.select(:a)).all.must_equal [{:a=>20, :b=>10}]
@@ -1651,7 +1696,7 @@ describe "Sequel::Dataset DSL support" do
   end
 
   it "should work empty arrays" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(:a=>[]).all.must_equal []
     @ds.exclude(:a=>[]).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter([:a, :b]=>[]).all.must_equal []
@@ -1660,7 +1705,7 @@ describe "Sequel::Dataset DSL support" do
   
   it "should work empty arrays with nulls when using empty_array_consider_nulls extension" do
     @ds = @ds.extension(:empty_array_consider_nulls)
-    @ds.insert(nil, nil)
+    wait{@ds.insert(nil, nil)}
     @ds.filter(:a=>[]).all.must_equal []
     @ds.exclude(:a=>[]).all.must_equal []
     @ds.filter([:a, :b]=>[]).all.must_equal []
@@ -1678,7 +1723,7 @@ describe "Sequel::Dataset DSL support" do
   
   it "should work empty arrays with nulls" do
     ds = @ds
-    ds.insert(nil, nil)
+    wait{ds.insert(nil, nil)}
     ds.filter(:a=>[]).all.must_equal []
     ds.exclude(:a=>[]).all.must_equal [{:a=>nil, :b=>nil}]
     ds.filter([:a, :b]=>[]).all.must_equal []
@@ -1695,7 +1740,7 @@ describe "Sequel::Dataset DSL support" do
   end
 
   it "should work multiple conditions" do
-    @ds.insert(20, 10)
+    wait{@ds.insert(20, 10)}
     @ds.filter(:a=>20, :b=>10).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter([[:a, 20], [:b, 10]]).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(Sequel.&({:a=>20}, {:b=>10})).all.must_equal [{:a=>20, :b=>10}]
@@ -1709,6 +1754,7 @@ describe "SQL Extract Function" do
     @db = DB
     @db.create_table!(:a){DateTime :a}
     @ds = @db[:a].order(:a)
+    @ds = @ds.async if async?
   end
   after do
     @db.drop_table?(:a)
@@ -1717,7 +1763,7 @@ describe "SQL Extract Function" do
   it "should return the part of the datetime asked for" do
     t = Time.now
     @ds = @ds.with_extend{def supports_timestamp_timezones?() false end}
-    @ds.insert(t)
+    wait{@ds.insert(t)}
     @ds.get{a.extract(:year)}.must_equal t.year
     @ds.get{a.extract(:month)}.must_equal t.month
     @ds.get{a.extract(:day)}.must_equal t.day
@@ -1746,16 +1792,17 @@ describe "Dataset string methods" do
       String :b, cic
     end
     @ds = @db[:a].order(:a)
+    @ds = @ds.async if async?
   end
   before do
-    @ds.delete
+    wait{@ds.delete}
   end
   after(:all) do
     @db.drop_table?(:a)
   end
   
   it "#grep should return matching rows" do
-    @ds.insert('foo', 'bar')
+    wait{@ds.insert('foo', 'bar')}
     @ds.grep(:a, 'foo').all.must_equal [{:a=>'foo', :b=>'bar'}]
     @ds.grep(:b, 'foo').all.must_equal []
     @ds.grep(:b, 'bar').all.must_equal [{:a=>'foo', :b=>'bar'}]
@@ -1765,13 +1812,13 @@ describe "Dataset string methods" do
   end
   
   it "#grep should work with :all_patterns and :all_columns options" do
-    @ds.insert('foo bar', ' ')
-    @ds.insert('foo d', 'bar')
-    @ds.insert('foo e', ' ')
-    @ds.insert(' ', 'bar')
-    @ds.insert('foo f', 'baz')
-    @ds.insert('foo baz', 'bar baz')
-    @ds.insert('foo boo', 'boo foo')
+    wait{@ds.insert('foo bar', ' ')}
+    wait{@ds.insert('foo d', 'bar')}
+    wait{@ds.insert('foo e', ' ')}
+    wait{@ds.insert(' ', 'bar')}
+    wait{@ds.insert('foo f', 'baz')}
+    wait{@ds.insert('foo baz', 'bar baz')}
+    wait{@ds.insert('foo boo', 'boo foo')}
 
     @ds.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true).all.must_equal [{:a=>'foo bar', :b=>' '}, {:a=>'foo baz', :b=>'bar baz'}, {:a=>'foo d', :b=>'bar'}]
     @ds.grep([:a, :b], %w'%foo% %bar% %blob%', :all_patterns=>true).all.must_equal []
@@ -1784,7 +1831,7 @@ describe "Dataset string methods" do
   end
   
   it "#like should return matching rows" do
-    @ds.insert('foo', 'bar')
+    wait{@ds.insert('foo', 'bar')}
     @ds.filter(Sequel.expr(:a).like('foo')).all.must_equal [{:a=>'foo', :b=>'bar'}]
     @ds.filter(Sequel.expr(:a).like('bar')).all.must_equal []
     @ds.filter(Sequel.expr(:a).like('foo', 'bar')).all.must_equal [{:a=>'foo', :b=>'bar'}]
@@ -1794,7 +1841,7 @@ describe "Dataset string methods" do
   end
   
   it "#like should be case sensitive" do
-    @ds.insert('foo', 'bar')
+    wait{@ds.insert('foo', 'bar')}
     @ds.filter(Sequel.expr(:a).like('Foo')).all.must_equal []
     @ds.filter(Sequel.expr(:b).like('baR')).all.must_equal []
     @ds.filter(Sequel.expr(:a).like('FOO', 'BAR')).all.must_equal []
@@ -1804,7 +1851,7 @@ describe "Dataset string methods" do
   end
   
   it "#ilike should return matching rows, in a case insensitive manner" do
-    @ds.insert('foo', 'bar')
+    wait{@ds.insert('foo', 'bar')}
     @ds.filter(Sequel.expr(:a).ilike('Foo')).all.must_equal [{:a=>'foo', :b=>'bar'}]
     @ds.filter(Sequel.expr(:a).ilike('baR')).all.must_equal []
     @ds.filter(Sequel.expr(:a).ilike('FOO', 'BAR')).all.must_equal [{:a=>'foo', :b=>'bar'}]
@@ -1814,14 +1861,14 @@ describe "Dataset string methods" do
   end
   
   it "#escape_like should escape any metacharacters" do
-    @ds.insert('foo', 'bar')
-    @ds.insert('foo.', 'bar..')
-    @ds.insert('foo\\..', 'bar\\..')
-    @ds.insert('foo\\_', 'bar\\%')
-    @ds.insert('foo_', 'bar%')
-    @ds.insert('foo_.', 'bar%.')
-    @ds.insert('foo_..', 'bar%..')
-    @ds.insert('[f#*?oo_]', '[bar%]')
+    wait{@ds.insert('foo', 'bar')}
+    wait{@ds.insert('foo.', 'bar..')}
+    wait{@ds.insert('foo\\..', 'bar\\..')}
+    wait{@ds.insert('foo\\_', 'bar\\%')}
+    wait{@ds.insert('foo_', 'bar%')}
+    wait{@ds.insert('foo_.', 'bar%.')}
+    wait{@ds.insert('foo_..', 'bar%..')}
+    wait{@ds.insert('[f#*?oo_]', '[bar%]')}
     @ds.filter(Sequel.expr(:a).like(@ds.escape_like('foo_'))).select_order_map(:a).must_equal ['foo_']
     @ds.filter(Sequel.expr(:b).like(@ds.escape_like('bar%'))).select_order_map(:b).must_equal ['bar%']
     @ds.filter(Sequel.expr(:a).like(@ds.escape_like('foo\\_'))).select_order_map(:a).must_equal ['foo\\_']
@@ -1864,7 +1911,7 @@ describe "Dataset string methods" do
   
   if DB.dataset.supports_regexp?
     it "#like with regexp return matching rows" do
-      @ds.insert('foo', 'bar')
+      wait{@ds.insert('foo', 'bar')}
       @ds.filter(Sequel.expr(:a).like(/fo/)).all.must_equal [{:a=>'foo', :b=>'bar'}]
       @ds.filter(Sequel.expr(:a).like(/fo$/)).all.must_equal []
       @ds.filter(Sequel.expr(:a).like(/fo/, /ar/)).all.must_equal [{:a=>'foo', :b=>'bar'}]
@@ -1874,7 +1921,7 @@ describe "Dataset string methods" do
     end
     
     it "#like with regexp should be case sensitive if regexp is case sensitive" do
-      @ds.insert('foo', 'bar')
+      wait{@ds.insert('foo', 'bar')}
       @ds.filter(Sequel.expr(:a).like(/Fo/)).all.must_equal []
       @ds.filter(Sequel.expr(:b).like(/baR/)).all.must_equal []
       @ds.filter(Sequel.expr(:a).like(/FOO/, /BAR/)).all.must_equal []
@@ -1891,7 +1938,7 @@ describe "Dataset string methods" do
     end
     
     it "#ilike with regexp should return matching rows, in a case insensitive manner" do
-      @ds.insert('foo', 'bar')
+      wait{@ds.insert('foo', 'bar')}
       @ds.filter(Sequel.expr(:a).ilike(/Fo/)).all.must_equal [{:a=>'foo', :b=>'bar'}]
       @ds.filter(Sequel.expr(:b).ilike(/baR/)).all.must_equal [{:a=>'foo', :b=>'bar'}]
       @ds.filter(Sequel.expr(:a).ilike(/FOO/, /BAR/)).all.must_equal [{:a=>'foo', :b=>'bar'}]
@@ -1902,7 +1949,7 @@ describe "Dataset string methods" do
   end
   
   it "should work with strings created with Sequel.join" do
-    @ds.insert('foo', 'bar')
+    wait{@ds.insert('foo', 'bar')}
     @ds.get(Sequel.join([:a, "bar"])).must_equal 'foobar'
     @ds.get(Sequel.join(["foo", :b], ' ')).must_equal 'foo bar'
   end
@@ -1954,6 +2001,7 @@ if DB.dataset.supports_updating_joins? || DB.dataset.supports_deleting_joins?
       @db[:c].insert(5, 6)
       @db[:b].insert(4, 7)
       @db[:c].insert(7, 8)
+      @ds = @ds.async if async?
     end
     after do
       @db.drop_table?(:a, :b, :c)
@@ -1961,7 +2009,7 @@ if DB.dataset.supports_updating_joins? || DB.dataset.supports_deleting_joins?
     
     if DB.dataset.supports_updating_joins?
       it "#update should allow updating joined datasets" do
-        @ds.update(:a=>10)
+        wait{@ds.update(:a=>10)}
         @ds.all.must_equal [{:c=>5, :b=>2, :a=>10, :d=>2, :e=>5, :f=>6}]
         @db[:a].order(:a).all.must_equal [{:a=>3, :d=>4}, {:a=>10, :d=>2}]
         @db[:b].order(:b).all.must_equal [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
@@ -1971,7 +2019,7 @@ if DB.dataset.supports_updating_joins? || DB.dataset.supports_deleting_joins?
     
     if DB.dataset.supports_deleting_joins?
       it "#delete should allow deleting from joined datasets" do
-        @ds.delete
+        wait{@ds.delete}
         @ds.all.must_equal []
         @db[:a].order(:a).all.must_equal [{:a=>3, :d=>4}]
         @db[:b].order(:b).all.must_equal [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
@@ -1986,29 +2034,30 @@ describe "Emulated functions" do
     @db = DB
     @db.create_table!(:a){String :a}
     @ds = @db[:a]
+    @ds = @ds.async if async?
   end
   after(:all) do
     @db.drop_table?(:a)
   end
   after do
-    @ds.delete
+    wait{@ds.delete}
   end
   
   it "Sequel.char_length should return the length of characters in the string" do
     @ds.get(Sequel.char_length(:a)).must_be_nil
-    @ds.insert(:a=>'foo')
+    wait{@ds.insert(:a=>'foo')}
     @ds.get(Sequel.char_length(:a)).must_equal 3
     # Check behavior with leading/trailing blanks
-    @ds.update(:a=>' foo22 ')
+    wait{@ds.update(:a=>' foo22 ')}
     @ds.get(Sequel.char_length(:a)).must_equal 7
   end
   
   it "Sequel.trim should return the string with spaces trimmed from both sides" do
     @ds.get(Sequel.trim(:a)).must_be_nil
-    @ds.insert(:a=>'foo')
+    wait{@ds.insert(:a=>'foo')}
     @ds.get(Sequel.trim(:a)).must_equal 'foo'
     # Check behavior with leading/trailing blanks
-    @ds.update(:a=>' foo22 ')
+    wait{@ds.update(:a=>' foo22 ')}
     @ds.get(Sequel.trim(:a)).must_equal 'foo22'
   end
 end

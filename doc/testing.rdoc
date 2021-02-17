@@ -157,6 +157,8 @@ The SEQUEL_INTEGRATION_URL environment variable specifies the Database connectio
 
 === Other
 
+SEQUEL_ASYNC_THREAD_POOL :: Use the async_thread_pool extension when running the specs
+SEQUEL_ASYNC_THREAD_POOL_PREEMPT :: Use the async_thread_pool extension when running the specs, with the :preempt_async_thread option
 SEQUEL_COLUMNS_INTROSPECTION :: Use the columns_introspection extension when running the specs
 SEQUEL_CONNECTION_VALIDATOR :: Use the connection validator extension when running the specs
 SEQUEL_DUPLICATE_COLUMNS_HANDLER :: Use the duplicate columns handler extension with value given when running the specs
