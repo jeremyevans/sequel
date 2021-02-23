@@ -677,8 +677,28 @@ describe "NestedAttributes plugin" do
       ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
   end
   
+  it "should accept a :reject_nil option " do
+    @Album.nested_attributes(:tags, :reject_nil=>true)
+    a = @Album.new(:name=>'Al', :tags_attributes=>nil)
+    @db.sqls.must_equal []
+    a.save
+    @db.sqls.must_equal ["INSERT INTO albums (name) VALUES ('Al')"]
+  end
+  
   it "should accept a block that each hash gets passed to determine if it should be processed" do
     @Album.nested_attributes(:tags){|h| h[:name].empty?}
+    a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}, {:name=>''}, {:name=>'T2'}]})
+    @db.sqls.must_equal []
+    a.save
+    check_sql_array("INSERT INTO albums (name) VALUES ('Al')",
+      "INSERT INTO tags (name) VALUES ('T')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 2)", "INSERT INTO at (tag_id, album_id) VALUES (2, 1)"],
+      "INSERT INTO tags (name) VALUES ('T2')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (1, 4)", "INSERT INTO at (tag_id, album_id) VALUES (4, 1)"])
+  end
+  
+  it "should accept a :reject_if option that each hash gets passed to determine if it should be processed" do
+    @Album.nested_attributes(:tags, :reject_if=>proc{|h| h[:name].empty?})
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}, {:name=>''}, {:name=>'T2'}]})
     @db.sqls.must_equal []
     a.save

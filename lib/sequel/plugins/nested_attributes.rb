@@ -108,9 +108,10 @@ module Sequel
         #            array of the allowable fields.
         # :limit :: For *_to_many associations, a limit on the number of records
         #           that will be processed, to prevent denial of service attacks.
-        # :reject_if :: A proc that is given each attribute hash before it is
+        # :reject_if :: A proc that is called with each attribute hash before it is
         #               passed to its associated object. If the proc returns a truthy
         #               value, the attribute hash is ignored.
+        # :reject_nil :: Ignore nil objects passed to nested attributes setter methods.
         # :remove :: Allow disassociation of nested records (can remove the associated
         #            object from the parent object, but not destroy the associated object).
         # :require_modification :: Whether to require modification of nested objects when
@@ -146,8 +147,9 @@ module Sequel
         def def_nested_attribute_method(reflection)
           @nested_attributes_module.class_eval do
             meth = :"#{reflection[:name]}_attributes="
+            assoc = reflection[:name]
             define_method(meth) do |v|
-              set_nested_attributes(reflection[:name], v)
+              set_nested_attributes(assoc, v)
             end
             alias_method meth, meth
           end
@@ -161,6 +163,7 @@ module Sequel
         def set_nested_attributes(assoc, obj, opts=OPTS)
           raise(Error, "no association named #{assoc} for #{model.inspect}") unless ref = model.association_reflection(assoc)
           raise(Error, "nested attributes are not enabled for association #{assoc} for #{model.inspect}") unless meta = ref[:nested_attributes]
+          return if obj.nil? && meta[:reject_nil]
           meta = meta.merge(opts)
           meta[:reflection] = ref
           if ref.returns_array?

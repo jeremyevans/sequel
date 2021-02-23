@@ -1,5 +1,7 @@
 === master
 
+* Add :reject_nil option to the nested_attributes method, to ignore calls where nil is passed as the associated object data (jeremyevans)
+
 * Add async_thread_pool plugin for easier async usage with model classes and support for async destroy, with_pk, and with_pk! methods (jeremyevans)
 
 * Add async_thread_pool Database extension for executing queries asynchronously using a thread pool (jeremyevans)
