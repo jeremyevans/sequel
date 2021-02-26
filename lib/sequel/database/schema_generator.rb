@@ -159,7 +159,7 @@ module Sequel
         nil
       end
       
-      # Adds a named constraint (or unnamed if name is nil),
+      # Adds a named CHECK constraint (or unnamed if name is nil),
       # with the given block or args. To provide options for the constraint, pass
       # a hash as the first argument.
       #
@@ -167,6 +167,15 @@ module Sequel
       #   # CONSTRAINT blah CHECK num >= 1 AND num <= 5
       #   constraint({name: :blah, deferrable: true}, num: 1..5)
       #   # CONSTRAINT blah CHECK num >= 1 AND num <= 5 DEFERRABLE INITIALLY DEFERRED
+      #
+      # If the first argument is a hash, the following options are supported:
+      #
+      # Options:
+      # :name :: The name of the CHECK constraint
+      # :deferrable :: Whether the CHECK constraint should be marked DEFERRABLE.
+      #
+      # PostgreSQL specific options:
+      # :not_valid :: Whether the CHECK constraint should be marked NOT VALID.
       def constraint(name, *args, &block)
         opts = name.is_a?(Hash) ? name : {:name=>name}
         constraints << opts.merge(:type=>:check, :check=>block || args)
