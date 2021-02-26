@@ -1,5 +1,7 @@
 === master
 
+* Make the ado timestamp conversion proc a normal conversion proc that can be overridden similar to other conversion procs (jeremyevans)
+
 * Add :reject_nil option to the nested_attributes method, to ignore calls where nil is passed as the associated object data (jeremyevans)
 
 * Add async_thread_pool plugin for easier async usage with model classes and support for async destroy, with_pk, and with_pk! methods (jeremyevans)

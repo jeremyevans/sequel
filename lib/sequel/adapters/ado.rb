@@ -195,8 +195,23 @@ module Sequel
         end
 
         @conversion_procs = CONVERSION_PROCS.dup
+        @conversion_procs[AdDBTimeStamp] = method(:adb_timestamp_to_application_timestamp)
 
         super
+      end
+
+      def adb_timestamp_to_application_timestamp(v)
+        # This hard codes a timestamp_precision of 6 when converting.
+        # That is the default timestamp_precision, but the ado/mssql adapter uses a timestamp_precision
+        # of 3.  However, timestamps returned by ado/mssql have nsec values that end up rounding to a
+        # the same value as if a timestamp_precision of 3 was hard coded (either xxx999yzz, where y is
+        # 5-9 or xxx000yzz where y is 0-4).
+        #
+        # ADO subadapters should override this they would like a different timestamp precision and the
+        # this code does not work for them (for example, if they provide full nsec precision).
+        #
+        # Note that fractional second handling for WIN32OLE objects is not correct on ruby <2.2
+        to_application_timestamp([v.year, v.month, v.day, v.hour, v.min, v.sec, (v.nsec/1000.0).round * 1000])
       end
 
       def dataset_class_default
@@ -233,23 +248,8 @@ module Sequel
           cols = []
           conversion_procs = db.conversion_procs
 
-          ts_cp = nil
           recordset.Fields.each do |field|
-            type = field.Type
-            cp = if type == AdDBTimeStamp
-              ts_cp ||= begin
-                nsec_div = 1000000000.0/(10**(timestamp_precision))
-                nsec_mul = 10**(timestamp_precision+3)
-                meth = db.method(:to_application_timestamp)
-                lambda do |v|
-                  # Fractional second handling is not correct on ruby <2.2
-                  meth.call([v.year, v.month, v.day, v.hour, v.min, v.sec, (v.nsec/nsec_div).round * nsec_mul])
-                end
-              end
-            else
-              conversion_procs[type]
-            end
-            cols << [output_identifier(field.Name), cp]
+            cols << [output_identifier(field.Name), conversion_procs[field.Type]]
           end
 
           self.columns = cols.map(&:first)
