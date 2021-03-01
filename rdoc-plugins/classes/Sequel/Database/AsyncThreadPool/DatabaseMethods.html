@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Database::AsyncThreadPool::DatabaseMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Database::AsyncThreadPool::DatabaseMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/extensions/async_thread_pool_rb.html">lib/sequel/extensions/async_thread_pool.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-extended">extended</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-extended'>
+<a name='method-c-extended'></a>
+<div class='synopsis'>
+<span class='name'>extended</span><span class='arguments'>(db)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-extended-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>&#x000A;<span class="line-num">339</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">340</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">341</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:threaded</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:sharded_threaded</span>&#x000A;<span class="line-num">342</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can only load async_thread_pool extension if using threaded or sharded_threaded connection pool&quot;</span>&#x000A;<span class="line-num">343</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">344</span> &#x000A;<span class="line-num">345</span>     <span class="ruby-identifier">num_async_threads</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:num_async_threads</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:num_async_threads</span>]) <span class="ruby-operator">:</span> (<span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>))&#x000A;<span class="line-num">346</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must have positive number for num_async_threads&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">num_async_threads</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span>&#x000A;<span class="line-num">347</span> &#x000A;<span class="line-num">348</span>     <span class="ruby-identifier">proxy_klass</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:preempt_async_thread</span>]) <span class="ruby-operator">?</span> <span class="ruby-constant">PreemptableProxy</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Proxy</span>&#x000A;<span class="line-num">349</span>     <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:async_job_class</span>){<span class="ruby-identifier">proxy_klass</span>}&#x000A;<span class="line-num">350</span> &#x000A;<span class="line-num">351</span>     <span class="ruby-identifier">queue</span> = <span class="ruby-ivar">@async_thread_queue</span> = <span class="ruby-constant">Queue</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="line-num">352</span>     <span class="ruby-identifier">pool</span> = <span class="ruby-ivar">@async_thread_pool</span> = <span class="ruby-identifier">num_async_threads</span>.<span class="ruby-identifier">times</span>.<span class="ruby-identifier">map</span>{<span class="ruby-constant">JobProcessor</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">queue</span>)}&#x000A;<span class="line-num">353</span>     <span class="ruby-constant">ObjectSpace</span>.<span class="ruby-identifier">define_finalizer</span>(<span class="ruby-identifier">db</span>, <span class="ruby-constant">JobProcessor</span>.<span class="ruby-identifier">create_finalizer</span>(<span class="ruby-identifier">queue</span>, <span class="ruby-identifier">pool</span>))&#x000A;<span class="line-num">354</span> &#x000A;<span class="line-num">355</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)&#x000A;<span class="line-num">356</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">357</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

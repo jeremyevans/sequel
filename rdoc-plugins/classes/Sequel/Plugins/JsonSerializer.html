@@ -110,6 +110,7 @@ Sequel::Plugins::JsonSerializer
 <h3>Public Class</h3>
 <ol>
 <li><a href="#method-c-configure">configure</a></li>
+<li><a href="#method-c-object_to_json_data">object_to_json_data</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -142,6 +143,24 @@ Sequel::Plugins::JsonSerializer
 [show source]
 </a>
 <pre id='method-c-configure-source'>    <span class="ruby-comment"># File lib/sequel/plugins/json_serializer.rb</span>&#x000A;<span class="line-num">130</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">131</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">132</span>     <span class="ruby-ivar">@json_serializer_opts</span> = (<span class="ruby-ivar">@json_serializer_opts</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">133</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">134</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-object_to_json_data'>
+<a name='method-c-object_to_json_data'></a>
+<div class='synopsis'>
+<span class='name'>object_to_json_data</span><span class='arguments'>(obj, *args, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Convert the given object to a JSON data structure using the given arguments.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-object_to_json_data-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-object_to_json_data-source'>    <span class="ruby-comment"># File lib/sequel/plugins/json_serializer.rb</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">object_to_json_data</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">152</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="line-num">153</span>     <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object_to_json_data</span>(<span class="ruby-identifier">x</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="line-num">154</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">155</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:to_json_data</span>)&#x000A;<span class="line-num">156</span>       <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">to_json_data</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">157</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">158</span>       <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">159</span>         <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;<span class="line-num">160</span>       <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">161</span>       <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">json_parser_error_class</span>&#x000A;<span class="line-num">162</span>         <span class="ruby-comment"># Support for old Ruby code that only supports parsing JSON object/array</span>&#x000A;<span class="line-num">163</span>         <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>([<span class="ruby-identifier">obj</span>], <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))[<span class="ruby-value">0</span>]&#x000A;<span class="line-num">164</span>       <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">165</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">166</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">167</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

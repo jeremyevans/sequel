@@ -30,12 +30,29 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-02-01 07:43:00 -0800</span>
+<span class='datetime'>2021-03-01 07:44:40 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.42.0+-282021-03-01-29"><a href="doc/release_notes/5_42_0_txt.html">5.42.0</a> (2021-03-01)<span><a href="#label-5.42.0+-282021-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make the ado timestamp conversion proc a normal conversion proc that can be overridden similar to other conversion procs (jeremyevans)</p>
+</li><li>
+<p>Add :reject_nil option to the nested_attributes method, to ignore calls where nil is passed as the associated object data (jeremyevans)</p>
+</li><li>
+<p>Add async_thread_pool plugin for easier async usage with model classes and support for async destroy, with_pk, and with_pk! methods (jeremyevans)</p>
+</li><li>
+<p>Add async_thread_pool Database extension for executing queries asynchronously using a thread pool (jeremyevans)</p>
+</li><li>
+<p>Fix possible thread safety issue in Database#extension that could allow Module#extended to be called twice with the same Database instance (jeremyevans)</p>
+</li><li>
+<p>Support cases where validations make modifications beyond setting errors in Model#freeze (jeremyevans)</p>
+</li><li>
+<p>Add Model#to_json_data to the json_serializer plugin, returning a JSON data structure (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.41.0+-282021-02-01-29"><a href="doc/release_notes/5_41_0_txt.html">5.41.0</a> (2021-02-01)<span><a href="#label-5.41.0+-282021-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Have explicit :text option for a String column take priority over :size option on PostgreSQL (jeremyevans) (#1750)</p>

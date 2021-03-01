@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v5.41.0</h2>
+    <h2>Sequel::Model Plugins for v5.42.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -148,6 +148,7 @@
 </ul></li>
 <li>Other:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model</a>: Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3+.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/AsyncThreadPool.html">async_thread_pool</a>: Adds better support for model classes to use the async_thread_pool Database extension.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Finder.html">finder</a>: Adds Model.finder and Model.prepared_finder methods for defining optimized lookup methods.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/List.html">list</a>: Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
@@ -199,6 +200,7 @@
 
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/arbitrary_servers_rb.html">arbitrary_servers</a>: Adds ability to connection to arbitrary servers (instead of just preconfigured ones) in the sharding support.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a>: Adds support for running queries asynchronously using a thread pool.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/caller_logging_rb.html">caller_logging</a>: Include caller information when logging queries.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_expiration_rb.html">connection_expiration</a>: Automatically removes connections from the pool after they have been open longer than a timeout.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_validator_rb.html">connection_validator</a>: Automatically validates connections on pool checkout and handles disconnections transparently.</li>

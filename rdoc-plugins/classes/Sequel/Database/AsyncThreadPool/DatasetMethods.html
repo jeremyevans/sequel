@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Database::AsyncThreadPool::DatasetMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Database::AsyncThreadPool::DatasetMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/extensions/async_thread_pool_rb.html">lib/sequel/extensions/async_thread_pool.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-define_async_args_or_block_method">define_async_args_or_block_method</a></li>
+<li><a href="#method-c-define_async_block_method">define_async_block_method</a></li>
+<li><a href="#method-c-define_async_method">define_async_method</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-async">async</a></li>
+<li><a href="#method-i-sync">sync</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-define_async_args_or_block_method'>
+<a name='method-c-define_async_args_or_block_method'></a>
+<div class='synopsis'>
+<span class='name'>define_async_args_or_block_method</span><span class='arguments'>(mod, method)</span>
+
+</div>
+<div class='description'>
+
+<p>Define an method in the given module that will run the given method using an async thread if the current dataset is async and arguments or a block is provided.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-define_async_args_or_block_method-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-define_async_args_or_block_method-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>&#x000A;<span class="line-num">402</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_args_or_block_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)&#x000A;<span class="line-num">403</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">404</span>     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]&#x000A;<span class="line-num">405</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>&#x000A;<span class="line-num">406</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="line-num">407</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">408</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">409</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">410</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">411</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-define_async_block_method'>
+<a name='method-c-define_async_block_method'></a>
+<div class='synopsis'>
+<span class='name'>define_async_block_method</span><span class='arguments'>(mod, method)</span>
+
+</div>
+<div class='description'>
+
+<p>Define an method in the given module that will run the given method using an async thread if the current dataset is async and a block is provided.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-define_async_block_method-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-define_async_block_method-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>&#x000A;<span class="line-num">389</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_block_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)&#x000A;<span class="line-num">390</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">391</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]&#x000A;<span class="line-num">392</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>&#x000A;<span class="line-num">393</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="line-num">394</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">395</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">396</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">397</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">398</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-define_async_method'>
+<a name='method-c-define_async_method'></a>
+<div class='synopsis'>
+<span class='name'>define_async_method</span><span class='arguments'>(mod, method)</span>
+
+</div>
+<div class='description'>
+
+<p>Define an method in the given module that will run the given method using an async thread if the current dataset is async.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-define_async_method-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-define_async_method-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>&#x000A;<span class="line-num">376</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)&#x000A;<span class="line-num">377</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">378</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]&#x000A;<span class="line-num">379</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>&#x000A;<span class="line-num">380</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="line-num">381</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">382</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">383</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">384</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">385</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-async'>
+<a name='method-i-async'></a>
+<div class='synopsis'>
+<span class='name'>async</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return a cloned dataset that will load results using the async thread pool.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-async-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-async-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>&#x000A;<span class="line-num">421</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">async</span>&#x000A;<span class="line-num">422</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_async</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">423</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:async</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">424</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">425</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sync'>
+<a name='method-i-sync'></a>
+<div class='synopsis'>
+<span class='name'>sync</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return a cloned dataset that will not load results using the async thread pool. Only used if the current dataset has been marked as using the async thread pool.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sync-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sync-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>&#x000A;<span class="line-num">429</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sync</span>&#x000A;<span class="line-num">430</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_sync</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">431</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:async</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="line-num">432</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">433</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
