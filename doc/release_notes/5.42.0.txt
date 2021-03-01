@@ -1,0 +1,136 @@
+= New Features
+
+* An async_thread_pool Database extension has been added, which
+  executes queries and processes results using a separate thread
+  pool.  This allows you do do things like:
+
+    foos = DB[:foos].async.all
+    bars = DB[:bars].async.select_map(:name)
+    foo_bars = DB[:foo_bars].async.each{|x| p x}
+
+  and have the three method calls (all, select_map, and each)
+  execute concurrently.  On Ruby implementations without a global
+  VM lock, such as JRuby, it will allow for parallel execution of
+  the method calls.  On CRuby, the main benefit will be for cases
+  where query execution takes a long time or there is significant
+  latency between the application and the database.
+  
+  When you call a method on foos, bars, or foo_bars, if the thread
+  pool hasn't finished processing the method, the calling code will
+  block until the method call has finished.
+
+  By default, for consistency, calling code will not preempt the
+  async thread pool.  For example, if you do:
+
+    DB[:foos].async.all.size
+
+  The calling code will always wait for the async thread pool to
+  run the all method, and then the calling code will call size on
+  the result.  This ensures that async queries will not use the
+  same connection as the the calling thread, even if calling thread
+  has a connection checked out.
+
+  In some cases, such as when the async thread pool is very busy,
+  preemption is desired for performance reasons.  If you set the
+  :preempt_async_thread Database option before loading the
+  async_thread_pool extension, preemption will be allowed.  With
+  preemption allowed, if the async thread pool has not started the
+  processing of the method at the time the calling code needs the
+  results of the method, the calling code will preempt the async
+  thread pool, and run the method on the current thread.
+
+  By default, the async thread pool uses the same number of threads as
+  the Database objects :max_connections attribute (the default for
+  that is 4).  You can modify the number of async threads by setting
+  the :num_async_threads Database option before loading the Database
+  async_thread_pool extension.
+
+  Most Dataset methods that execute queries on the database and return
+  results will operate asynchronously if the the dataset is set to be
+  asynchronous via the Dataset#async method.  This includes most
+  methods available due to the inclusion in Enumerable, even if not
+  defined by Dataset itself.
+
+  There are multiple caveats when using the async_thread_pool
+  extension:
+  
+  * Asynchronous behavior is harder to understand and harder to
+    debug.  It would be wise to only use this support in cases where
+    it provides is significant performance benefit.
+
+  * Dataset methods executed asynchronously will use a separate
+    database connection than the calling thread, so they will not
+    respect transactions in the calling thread, or other cases where
+    the calling thread checks out a connection directly using
+    Database#synchronize.  They will also not respect the use of
+    Database#with_server (from the server_block extension) in the
+    calling thread.
+
+  * Dataset methods executed asynchronously should never ignore their
+    return value.  Code such as:
+
+      DB[:table].async.insert(1)
+
+    is probablematic because without storing the return value, you
+    have no way to block until the insert has been completed.
+
+  * The returned object for Dataset methods executed asynchronously is
+    a proxy object (promise).  So you should never do:
+
+      row = DB[:table].async.first
+      # ...
+      if row
+      end
+
+      # or:
+
+      bool = DB[:table].async.get(:boolean_column)
+      # ...
+      if bool
+      end
+
+    because the if branches will always be taken as row and bool will
+    never be nil or false.  If you want to get the underlying value,
+    call itself on the proxy object (or __value if using Ruby <2.2).
+
+    For the same reason, you should not use the proxy objects directly
+    in case expressions or as arguments to Class#===.  Use itself or
+    __value in those cases.
+
+  * Dataset methods executed asynchronously that include blocks have the
+    block executed asynchronously as well, assuming that the method
+    calls the block.  Because these blocks are executed in a separate
+    thread, you cannot use control flow modifiers such as break or
+    return in them.
+
+* An async_thread_pool model plugin has been added.  This requires the
+  async_thread_pool extension has been loaded into the model's Database
+  object, and allows you to call Model.async instead of
+  Model.dataset.async.  It also adds async support to the destroy,
+  with_pk, and with_pk! model dataset methods.
+
+* Model#to_json_data has been added to the json_serializer plugin, for
+  returning a hash of data that can be converted to JSON, instead of
+  a JSON string.
+
+* A :reject_nil option has been added to the nested_attributes method
+  in the nested_attributes plugin.  This will ignore calls to the
+  nested attributes setter method where nil is passed as the setter
+  method argument.
+
+= Other Improvements
+
+* Model#freeze now works in case where model validation modifies the
+  object beyond adding errors.
+
+* Model#freeze in the composition, serialization, and
+  serialization_modification_detection plugins now works in cases
+  where validation would end up loading the composed or
+  serialized values.
+
+* Database#extension now avoids a possible thread safety issue that
+  could result in the extension being loaded into the Database twice.
+
+* The ado adapter now supports overriding the timestamp conversion
+  proc.  Previously, unlike other conversion procs, the timestamp
+  conversion proc was hard coded and could not be overridden.
