@@ -1,3 +1,7 @@
+=== master
+
+* Add column_encryption plugin, for encrypting column values (jeremyevans)
+
 === 5.42.0 (2021-03-01)
 
 * Make the ado timestamp conversion proc a normal conversion proc that can be overridden similar to other conversion procs (jeremyevans)

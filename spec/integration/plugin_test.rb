@@ -2431,3 +2431,381 @@ describe "insert_conflict plugin" do
     @model.select_order_map([:s, :o]).must_equal [['A', 2], ['B', 3]]
   end
 end if (DB.database_type == :postgres && DB.server_version >= 90500) || (DB.database_type == :sqlite && DB.sqlite_version >= 32400)
+
+describe "column_encryption plugin" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:ce_test) do
+      primary_key :id
+      String :not_enc
+      String :enc
+    end
+  end
+  before do
+    @model = Class.new(Sequel::Model)
+    @model.set_dataset @db[:ce_test]
+    @model.plugin :column_encryption do |enc|
+      enc.key 0, "0"*32
+
+      enc.column :enc
+    end
+    @obj = @model.create(:not_enc=>'123', :enc=>'Abc')
+  end
+  after do
+    @db[:ce_test].delete
+  end
+  after(:all) do
+    @db.drop_table?(:ce_test)
+  end
+
+  it "should store columns encrypted" do
+    @obj.not_enc.must_equal '123'
+    @obj[:not_enc].must_equal '123'
+    @obj.enc.must_equal 'Abc'
+    @obj[:enc].start_with?('AAAA').must_equal true
+  end
+
+  it "should support searching encrypted columns" do
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true
+    end
+    @model.with_encrypted_value(:enc, 'Abc').must_be_empty
+    @obj.reencrypt
+    @model.with_encrypted_value(:enc, 'Abc').all.must_equal [@obj]
+    @model.with_encrypted_value(:enc, 'abc').must_be_empty
+  end
+
+  it "should support case insensitive searching encrypted columns" do
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>:case_insensitive
+    end
+    @model.with_encrypted_value(:enc, 'Abc').must_be_empty
+    @obj.reencrypt
+    @model.with_encrypted_value(:enc, 'Abc').all.must_equal [@obj]
+    @model.with_encrypted_value(:enc, 'abc').all.must_equal [@obj]
+    @model.with_encrypted_value(:enc, 'Abd').must_be_empty
+  end
+
+  it "should support searching columns encrypted with previous keys" do
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true
+    end
+    @obj.reencrypt
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true do |cenc|
+        cenc.key 1, "1"*32
+        cenc.key 0, "0"*32
+      end
+    end
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    @model.with_encrypted_value(:enc, 'abc').must_be_empty
+    obj.must_equal @obj
+    obj[:enc].start_with?('AQAA').must_equal true
+
+    obj.reencrypt
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    @model.with_encrypted_value(:enc, 'abc').must_be_empty
+    obj.wont_equal @obj
+    obj.id.must_equal @obj.id
+    obj.enc.must_equal 'Abc'
+    obj[:enc].start_with?('AQAB').must_equal true
+  end
+
+  it "should support case insensitive searching columns encrypted with previous keys" do
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>:case_insensitive
+    end
+    @obj.reencrypt
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>:case_insensitive do |cenc|
+        cenc.key 1, "1"*32
+        cenc.key 0, "0"*32
+      end
+    end
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    @model.with_encrypted_value(:enc, 'abc').all.must_equal [obj]
+    obj.must_equal @obj
+    obj[:enc].start_with?('AgAA').must_equal true
+
+    obj.reencrypt
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    @model.with_encrypted_value(:enc, 'abc').all.must_equal [obj]
+    obj.wont_equal @obj
+    obj.id.must_equal @obj.id
+    obj.enc.must_equal 'Abc'
+    obj[:enc].start_with?('AgAB').must_equal true
+
+    @model.with_encrypted_value(:enc, 'Abd').must_be_empty
+  end
+
+  it "should support searching columns encrypted with previous keys and different case sensitivity setting" do
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true
+    end
+    @obj.reencrypt
+    obj2 = @model.create(:not_enc=>'234', :enc=>'Def')
+
+    @model.plugin :column_encryption do |enc|
+      enc.key 1, "1"*32
+      enc.key 0, "0"*32
+
+      enc.column :enc, :searchable=>:case_insensitive
+    end
+    @model.with_encrypted_value(:enc, 'Abc').must_be_empty
+    @model.with_encrypted_value(:enc, 'Def').must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.key 2, "2"*32
+      enc.key 1, "1"*32
+      enc.key 0, "0"*32
+
+      enc.column :enc, :searchable=>:case_insensitive, :search_both=>true
+    end
+    @model.with_encrypted_value(:enc, 'abc').must_be_empty
+
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    obj.reencrypt
+    @model.with_encrypted_value(:enc, 'Abc').all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'abc').all.must_equal [obj]
+    obj.wont_equal @obj
+    obj.id.must_equal @obj.id
+    obj.enc.must_equal 'Abc'
+    obj[:enc].start_with?('AgAC').must_equal true
+
+    @model.with_encrypted_value(:enc, 'Def').all.must_equal [obj2]
+    @model.with_encrypted_value(:enc, 'Abd').must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.key 3, "3"*32
+      enc.key 2, "2"*32
+      enc.key 1, "1"*32
+      enc.key 0, "0"*32
+
+      enc.column :enc, :searchable=>true, :search_both=>true
+    end
+
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    @model.with_encrypted_value(:enc, 'abc').all.must_equal [obj]
+
+    obj.reencrypt
+    obj = @model.with_encrypted_value(:enc, 'Abc').first
+    @model.with_encrypted_value(:enc, 'abc').must_be_empty
+    obj.wont_equal @obj
+    obj.id.must_equal @obj.id
+    obj.enc.must_equal 'Abc'
+    obj[:enc].start_with?('AQAD').must_equal true
+
+    @model.with_encrypted_value(:enc, 'Def').all.must_equal [obj2]
+    @model.with_encrypted_value(:enc, 'Abd').must_be_empty
+  end
+
+  it "should not return searching encrypted columns with NULL values" do
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true
+    end
+    @obj.update(:enc=>nil)
+    @obj.reencrypt.must_be_nil
+    @model.with_encrypted_value(:enc, 'Abc').must_be_empty
+    @model.with_encrypted_value(:enc, 'abc').must_be_empty
+  end
+
+  it "should raise an error when trying to decrypt with missing key" do
+    @model.plugin :column_encryption do |enc|
+      enc.key 1, "1"*32
+      enc.column :enc, :searchable=>true
+    end
+    obj = @model.first
+    proc{obj.enc}.must_raise Sequel::Error
+  end
+
+  it "should raise an error when trying to decrypt with invalid key" do
+    @model.plugin :column_encryption do |enc|
+      enc.key 0, "1"*32
+      enc.column :enc, :searchable=>true
+    end
+    obj = @model.first
+    proc{obj.enc}.must_raise 
+  end
+
+  it "should raise an error when trying to decrypt with invalid auth data" do
+    @model.plugin :column_encryption do |enc|
+      enc.key 0, "0"*32, :auth_data=>'Foo'
+      enc.column :enc, :searchable=>true
+    end
+    obj = @model.first
+    proc{obj.enc}.must_raise Sequel::Error
+  end
+
+  it "should support a configurable amount of padding" do
+    @model.plugin :column_encryption do |enc|
+      enc.key 1, "0"*32, :padding=>110
+      enc.key 0, "0"*32
+      enc.column :enc
+    end
+    encrypt_len = @obj[:enc].bytesize
+    @obj.reencrypt
+    @obj[:enc].bytesize.must_be(:>, encrypt_len + 100)
+  end
+
+  it "should support not using padding" do
+    @model.plugin :column_encryption do |enc|
+      enc.key 1, "0"*32, :padding=>false
+      enc.key 0, "0"*32
+      enc.column :enc
+    end
+    encrypt_len = @obj[:enc].bytesize
+    @obj.reencrypt
+    @obj[:enc].bytesize.must_be(:<, encrypt_len)
+  end
+
+  it "should support reencrypting rows that need reencryption" do
+    obj = @model.create(:not_enc=>'234', :enc=>'Def')
+
+    @model.plugin :column_encryption do |enc|
+      enc.key 1, "1"*32
+      enc.key 0, "0"*32
+      enc.column :enc
+    end
+
+    @model.needing_reencryption.count.must_equal 2
+    @model.needing_reencryption.all(&:reencrypt)
+    @model.needing_reencryption.must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.key 1, "1"*32
+      enc.column :enc
+    end
+
+    @model.needing_reencryption.must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true
+    end
+
+    @model.needing_reencryption.count.must_equal 2
+    @model.needing_reencryption.all(&:reencrypt)
+    @model.needing_reencryption.must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>:case_insensitive
+    end
+
+    @model.needing_reencryption.count.must_equal 2
+    obj.refresh.reencrypt
+    @model.needing_reencryption.count.must_equal 1
+    @obj.refresh.reencrypt
+    @model.needing_reencryption.must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>:case_insensitive
+      enc.column :not_enc, :searchable=>true
+    end
+
+    @obj.values.delete(:not_enc)
+    obj.values.delete(:not_enc)
+    @obj.update(:enc=>nil, :not_enc=>'abc')
+    obj.set(:not_enc=>nil).save
+
+    @model.needing_reencryption.must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.key 2, "2"*32
+      enc.key 1, "1"*32
+      enc.column :enc, :searchable=>:case_insensitive
+      enc.column :not_enc, :searchable=>true
+    end
+
+    @model.needing_reencryption.count.must_equal 2
+    obj.refresh.reencrypt
+    @model.needing_reencryption.count.must_equal 1
+    @obj.refresh.reencrypt
+    @model.needing_reencryption.must_be_empty
+
+    @obj.update(:not_enc=>nil)
+    obj.update(:enc=>nil)
+    @model.needing_reencryption.must_be_empty
+  end
+
+  it "should support encrypted columns with a registered serialization format" do
+    require 'json'
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true, :format=>:json
+    end
+    @model.dataset.delete
+
+    obj = @model.create(:not_enc=>'123', :enc=>{'a'=>1})
+    @model[obj.id].enc['a'].must_equal 1
+    @model.with_encrypted_value(:enc, 'a'=>1).all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'a'=>2).must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true, :format=>:json do |cenc|
+        cenc.key 1, "1"*32
+        cenc.key 0, "0"*32
+      end
+    end
+
+    @model[obj.id].enc['a'].must_equal 1
+    @model.with_encrypted_value(:enc, 'a'=>1).all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'a'=>2).must_be_empty
+
+    obj.reencrypt
+    @model[obj.id].enc['a'].must_equal 1
+    @model.with_encrypted_value(:enc, 'a'=>1).all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'a'=>2).must_be_empty
+  end
+
+  it "should support encrypted columns with a custom serialization format" do
+    require 'json'
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true, :format=>[:to_json.to_proc, JSON.method(:parse)]
+    end
+    @model.dataset.delete
+
+    obj = @model.create(:not_enc=>'123', :enc=>{'a'=>1})
+    @model[obj.id].enc['a'].must_equal 1
+    @model.with_encrypted_value(:enc, 'a'=>1).all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'a'=>2).must_be_empty
+
+    @model.plugin :column_encryption do |enc|
+      enc.column :enc, :searchable=>true, :format=>[:to_json.to_proc, JSON.method(:parse)] do |cenc|
+        cenc.key 1, "1"*32
+        cenc.key 0, "0"*32
+      end
+    end
+
+    @model[obj.id].enc['a'].must_equal 1
+    @model.with_encrypted_value(:enc, 'a'=>1).all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'a'=>2).must_be_empty
+
+    obj.reencrypt
+    @model[obj.id].enc['a'].must_equal 1
+    @model.with_encrypted_value(:enc, 'a'=>1).all.must_equal [obj]
+    @model.with_encrypted_value(:enc, 'a'=>2).must_be_empty
+
+    obj = @model.create(:not_enc=>'123', :enc=>nil)
+    @model[obj.id].enc.must_be_nil
+  end
+
+  it "should support unique indexes on searchable value" do
+    begin
+      DB.add_index(:ce_test, Sequel.function(:substring, :enc, 0, 48), :unique=>true, :name=>:ce_enc_idx)
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc, :searchable=>true
+      end
+
+      obj = @model.create(:enc=>"DEF")
+      proc{@model.create(:enc=>"DEF")}.must_raise Sequel::UniqueConstraintViolation
+      @model.create(:enc=>"def").delete
+
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc, :searchable=>:case_insensitive
+      end
+      obj.reencrypt
+      proc{@model.create(:enc=>"DEF")}.must_raise Sequel::UniqueConstraintViolation
+      proc{@model.create(:enc=>"def")}.must_raise Sequel::UniqueConstraintViolation
+    ensure
+      DB.drop_index(:ce_test, :enc, :name=>:ce_enc_idx) rescue nil
+    end
+  end if DB.database_type == :postgres
+end if RUBY_VERSION >= '2.3'
