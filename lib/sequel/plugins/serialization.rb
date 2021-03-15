@@ -127,7 +127,7 @@ module Sequel
         def serialize_attributes(format, *columns)
           if format.is_a?(Symbol)
             unless format = Sequel.synchronize{REGISTERED_FORMATS[format]}
-              raise(Error, "Unsupported serialization format: #{format} (valid formats: #{Sequel.synchronize{REGISTERED_FORMATS.keys}.map(&:inspect).join})")
+              raise(Error, "Unsupported serialization format: #{format} (valid formats: #{Sequel.synchronize{REGISTERED_FORMATS.keys}.inspect})")
             end
           end
           serializer, deserializer = format
@@ -154,7 +154,10 @@ module Sequel
                   deserialized_values[column] = deserialize_value(column, super())
                 end
               end
-              define_method("#{column}=") do |v| 
+              alias_method(column, column)
+
+              setter = :"#{column}="
+              define_method(setter) do |v| 
                 cc = changed_columns
                 if !cc.include?(column) && (new? || get_column_value(column) != v)
                   cc << column
@@ -164,6 +167,7 @@ module Sequel
 
                 deserialized_values[column] = v
               end
+              alias_method(setter, setter)
             end
           end
         end
