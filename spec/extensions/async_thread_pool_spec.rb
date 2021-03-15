@@ -247,7 +247,7 @@ describe "async_thread_pool extension with :preempt_async_thread Database option
     t2.must_be_nil
     q2.pop.must_equal(:v=>1)
 
-    v = @db[:test].async.all{|x| t4 = Thread.current}.__value
+    @db[:test].async.all{|x| t4 = Thread.current}.__value
     t4.must_equal t
 
     q.push(nil)
