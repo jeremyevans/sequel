@@ -54,7 +54,6 @@ module Sequel
         end
         parts = {}
         interval.each{|k,v| parts[k] = -v unless v.nil?}
-        parts
         DateAdd.new(expr, parts, opts)
       end
     end
