@@ -291,7 +291,30 @@ module Sequel
     #
     # As column_encryption is a model plugin, it only works with using model instance methods.
     # If you directly modify the database using a dataset or an external program that modifies
-    # the contents of the encrypted columns, you will probably corrupt the data.
+    # the contents of the encrypted columns, you will probably corrupt the data. To make data
+    # corruption less likely, it is best to have a CHECK constraints on the encrypted column
+    # with a basic format and length check:
+    #
+    #   DB.alter_table(:table_name) do
+    #     c = Sequel[:encrypted_column_name]
+    #     add_constraint(:encrypted_column_name_format,
+    #                    c.like('AA__A%') | c.like('Ag__A%') | c.like('AQ__A%'))
+    #     add_constraint(:encrypted_column_name_length, Sequel.char_length(c) >= 88)
+    #   end
+    #
+    # If possible, it's also best to check that the column is valid urlsafe base64 data of
+    # sufficient length. This can be done on PostgreSQL using a combination of octet_length,
+    # decode, and regexp_replace:
+    #
+    #   DB.alter_table(:ce_test) do
+    #     c = Sequel[:encrypted_column_name]
+    #     add_constraint(:enc_base64) do
+    #       octet_length(decode(regexp_replace(regexp_replace(c, '_', '/', 'g'), '-', '+', 'g'), 'base64')) >= 65}
+    #     end
+    #   end
+    #
+    # Such constraints will probably be sufficient to protect against most unintentional corruption of
+    # encrypted columns.
     #
     # If the database supports transparent data encryption and you trust the database administrator,
     # using the database support is probably a better approach.
@@ -353,13 +376,13 @@ module Sequel
 
           case flags
           when NOT_SEARCHABLE
-            if data.bytesize < 63
+            if data.bytesize < 65
               raise Error, "Decoded encrypted column smaller than minimum size"
             end
 
             data.slice!(0, 4)
           when SEARCHABLE, LOWERCASE_SEARCHABLE
-            if data.bytesize < 95
+            if data.bytesize < 97
               raise Error, "Decoded encrypted column smaller than minimum size"
             end
 

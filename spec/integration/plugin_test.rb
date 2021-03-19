@@ -2808,4 +2808,57 @@ describe "column_encryption plugin" do
       DB.drop_index(:ce_test, :enc, :name=>:ce_enc_idx) rescue nil
     end
   end if DB.database_type == :postgres
+
+  it "should support CHECK constraint on column" do
+    begin
+      DB.alter_table(:ce_test) do
+        c = Sequel[:enc]
+        add_constraint(:enc_format, c.like('AA__A%') | c.like('Ag__A%') | c.like('AQ__A%'))
+        add_constraint(:enc_length, Sequel.char_length(c) >= 88)
+      end
+
+      @model.create(:enc=>"def")
+      proc{@model.insert(:enc=>"def")}.must_raise Sequel::CheckConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError
+
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc, :searchable=>true
+      end
+      @model.needing_reencryption.all(&:reencrypt).size.must_equal 2
+      
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc, :searchable=>:case_insensitive
+      end
+      @model.needing_reencryption.all(&:reencrypt).size.must_equal 2
+    ensure
+      DB.alter_table(:ce_test) do
+        drop_constraint(:enc_length, :type=>:check)
+        drop_constraint(:enc_format, :type=>:check)
+      end
+    end
+  end
+
+  it "should support CHECK constraint on column enforcing urlsafe base64 of sufficient length" do
+    begin
+      DB.alter_table(:ce_test) do
+        add_constraint(:enc_base64){octet_length(decode(regexp_replace(regexp_replace(:enc, '_', '/', 'g'), '-', '+', 'g'), 'base64')) >= 65}
+      end
+
+      @model.create(:enc=>"def")
+      proc{@model.insert(:enc=>"def")}.must_raise Sequel::CheckConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError
+
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc, :searchable=>true
+      end
+      @model.needing_reencryption.all(&:reencrypt).size.must_equal 2
+      
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc, :searchable=>:case_insensitive
+      end
+      @model.needing_reencryption.all(&:reencrypt).size.must_equal 2
+    ensure
+      DB.alter_table(:ce_test) do
+        drop_constraint(:enc_base64, :type=>:check)
+      end
+    end
+  end if DB.database_type == :postgres
 end if RUBY_VERSION >= '2.3'
