@@ -2835,7 +2835,7 @@ describe "column_encryption plugin" do
         drop_constraint(:enc_format, :type=>:check)
       end
     end
-  end
+  end unless DB.database_type == :mysql && DB.server_version < (DB.mariadb? ? 100201 : 80016)
 
   it "should support CHECK constraint on column enforcing urlsafe base64 of sufficient length" do
     begin
