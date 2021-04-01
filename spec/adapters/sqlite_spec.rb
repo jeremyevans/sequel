@@ -25,6 +25,22 @@ describe "An SQLite database" do
     @db.sqlite_version.must_be_kind_of(Integer)
   end
   
+  it "should support dropping noncomposite unique constraint" do
+    @db.create_table(:fk) do
+      primary_key :id
+      String :name, null: false, unique: true
+    end
+    # Find name of unique index, as SQLite does not use a given constraint name
+    name_constraint = @db.indexes(:fk).find do |_, properties|
+      properties[:unique] == true && properties[:columns] == [:name]
+    end || [:missing]
+    @db.alter_table(:fk) do
+      drop_constraint(name_constraint.first, type: :unique)
+    end
+    @db[:fk].insert(:name=>'a')
+    @db[:fk].insert(:name=>'a')
+  end
+  
   it "should keep composite unique constraint when changing a column default" do
     @db.create_table(:fk) do
       Bignum :id, null: false, unique: true

@@ -424,10 +424,10 @@ module Sequel
         skip_indexes = []
         indexes(table, :only_autocreated=>true).each do |name, h|
           skip_indexes << name
-          if h[:unique]
+          if h[:unique] && !opts[:no_unique]
             if h[:columns].length == 1
               unique_columns.concat(h[:columns])
-            elsif h[:columns].map(&:to_s) != pks && !opts[:no_unique]
+            elsif h[:columns].map(&:to_s) != pks
               constraints << {:type=>:unique, :columns=>h[:columns]}
             end
           end

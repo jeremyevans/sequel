@@ -1,3 +1,7 @@
+=== master
+
+* Support dropping non-composite unique constraints on SQLite (jeremyevans) (#1755)
+
 === 5.43.0 (2021-04-01)
 
 * Add column_encryption plugin, for encrypting column values (jeremyevans)
