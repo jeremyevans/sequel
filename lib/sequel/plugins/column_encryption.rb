@@ -145,8 +145,8 @@ module Sequel
     # section:
     #
     #   ConfidentialModel.
-    #     with_encrypted_value(searchable_column_name: "will be")
-    #     with_encrypted_value(ci_searchable_column_name: "encrypted").
+    #     with_encrypted_value(:searchable_column_name, "will be")
+    #     with_encrypted_value(:ci_searchable_column_name, "encrypted").
     #     first
     #
     # = Encryption Key Rotation
