@@ -1,0 +1,98 @@
+= New Features
+
+* A column_encryption plugin has been added to support encrypting the
+  content of individual columns in a table.
+
+  Column values are encrypted with AES-256-GCM using a per-value
+  cipher key derived from a key provided in the configuration using
+  HMAC-SHA256.
+
+  If you would like to support encryption of columns in more than one
+  model, you should probably load the plugin into the parent class of
+  your models and specify the keys:
+ 
+    Sequel::Model.plugin :column_encryption do |enc|
+      enc.key 0, ENV["SEQUEL_COLUMN_ENCRYPTION_KEY"]
+    end
+ 
+  This specifies a single master encryption key.  Unless you are
+  actively rotating keys, it is best to use a single master key.
+ 
+  In the above call, 0 is the id of the key, and
+  ENV["SEQUEL_COLUMN_ENCRYPTION_KEY"] is the content of the key, which
+  must be a string with exactly 32 bytes. As indicated, this key
+  should not be hardcoded or otherwise committed to the source control
+  repository.
+ 
+  For models that need encrypted columns, you load the plugin again,
+  but specify the columns to encrypt:
+ 
+    ConfidentialModel.plugin :column_encryption do |enc|
+      enc.column :encrypted_column_name
+      enc.column :searchable_column_name, searchable: true
+      enc.column :ci_searchable_column_name, searchable: :case_insensitive
+    end
+ 
+  With this, all three specified columns (encrypted_column_name, 
+  searchable_column_name, and ci_searchable_column_name) will be
+  marked as encrypted columns.  When you run the following code:
+ 
+    ConfidentialModel.create(
+      encrypted_column_name: 'These',
+      searchable_column_name: 'will be',
+      ci_searchable_column_name: 'Encrypted'
+    )
+ 
+  It will save encrypted versions to the database.
+  encrypted_column_name will not be searchable, searchable_column_name
+  will be searchable with an exact match, and
+  ci_searchable_column_name will be searchable with a case insensitive
+  match.
+ 
+  To search searchable encrypted columns, use with_encrypted_value.
+  This example code will return the model instance created in the code
+  example in the previous section:
+ 
+    ConfidentialModel.
+      with_encrypted_value(:searchable_column_name, "will be")
+      with_encrypted_value(:ci_searchable_column_name, "encrypted").
+      first
+
+  To rotate encryption keys, add a new key above the existing key,
+  with a new key ID:
+ 
+    Sequel::Model.plugin :column_encryption do |enc|
+      enc.key 1, ENV["SEQUEL_COLUMN_ENCRYPTION_KEY"]
+      enc.key 0, ENV["SEQUEL_OLD_COLUMN_ENCRYPTION_KEY"]
+    end
+ 
+  Newly encrypted data will then use the new key.  Records encrypted
+  with the older key will still be decrypted correctly.
+ 
+  To force reencryption for existing records that are using the older
+  key, you can use the needing_reencryption dataset method and the
+  reencrypt instance method. For a small number of records, you can
+  probably do:
+ 
+    ConfidentialModel.needing_reencryption.all(&:reencrypt)
+ 
+  With more than a small number of records, you'll want to do this in
+  batches.  It's possible you could use an approach such as:
+ 
+    ds = ConfidentialModel.needing_reencryption.limit(100)
+    true until ds.all(&:reencrypt).empty?
+ 
+  After all values have been reencrypted for all models, and no models
+  use the older encryption key, you can remove it from the
+  configuration:
+ 
+    Sequel::Model.plugin :column_encryption do |enc|
+      enc.key 1, ENV["SEQUEL_COLUMN_ENCRYPTION_KEY"]
+    end
+
+  The column_encryption plugin supports encrypting serialized data,
+  as well as enforcing uniquenss of searchable encrypted columns
+  (in the absence of key rotation).  By design, it does not support
+  compression, mixing encrypted and unencrypted data in the same
+  column, or support arbitrary encryption ciphers.  See the plugin
+  documentation for more details.
