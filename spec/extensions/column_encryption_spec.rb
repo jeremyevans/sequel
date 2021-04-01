@@ -564,4 +564,4 @@ describe "column_encryption plugin" do
       end
     end.must_raise Sequel::Error
   end
-end if RUBY_VERSION >= '2.3'
+end if RUBY_VERSION >= '2.3' && (begin; require 'sequel/plugins/column_encryption'; true; rescue LoadError; false end)

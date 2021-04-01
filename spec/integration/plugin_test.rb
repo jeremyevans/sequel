@@ -2861,4 +2861,4 @@ describe "column_encryption plugin" do
       end
     end
   end if DB.database_type == :postgres
-end if RUBY_VERSION >= '2.3'
+end if RUBY_VERSION >= '2.3' && (begin; require 'sequel/plugins/column_encryption'; true; rescue LoadError; false end)

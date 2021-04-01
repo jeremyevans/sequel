@@ -7,10 +7,27 @@ raise(Sequel::Error, "Sequel column_encryption plugin requires ruby 2.3 or great
 require 'openssl'
 
 begin
-  OpenSSL::Cipher.new("aes-256-gcm")
+  # Test cipher actually works
+  cipher = OpenSSL::Cipher.new("aes-256-gcm")
+  cipher.encrypt
+  cipher.key = '1'*32
+  cipher_iv = cipher.random_iv
+  cipher.auth_data = ''
+  cipher_text = cipher.update('2') << cipher.final
+  auth_tag = cipher.auth_tag
+
+  cipher = OpenSSL::Cipher.new("aes-256-gcm")
+  cipher.decrypt
+  cipher.iv = cipher_iv
+  cipher.key = '1'*32
+  cipher.auth_data = ''
+  cipher.auth_tag = auth_tag
+  unless (cipher.update(cipher_text) << cipher.final) == '2'
+    raise OpenSSL::Cipher::CipherError
+  end
 rescue OpenSSL::Cipher::CipherError
   # :nocov:
-  raise LoadError, "Sequel column_encryption plugin requires the aes-256-gcm cipher"
+  raise LoadError, "Sequel column_encryption plugin requires a working aes-256-gcm cipher"
   # :nocov:
 end
 
