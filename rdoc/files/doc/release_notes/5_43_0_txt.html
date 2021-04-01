@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.43.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.43.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.43.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2021-04-01 07:38:02 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A column_encryption plugin has been added to support encrypting the content of individual columns in a table.</p>
+
+<p>Column values are encrypted with AES-256-GCM using a per-value cipher key derived from a key provided in the configuration using HMAC-SHA256.</p>
+
+<p>If you would like to support encryption of columns in more than one model, you should probably load the plugin into the parent class of your models and specify the keys:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_encryption</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">enc</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">key</span> <span class="ruby-value">0</span>, <span class="ruby-constant">ENV</span>[<span class="ruby-string">&quot;SEQUEL_COLUMN_ENCRYPTION_KEY&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>This specifies a single master encryption key.  Unless you are actively rotating keys, it is best to use a single master key.</p>
+
+<p>In the above call, 0 is the id of the key, and <a href=""SEQUEL_COLUMN_ENCRYPTION_KEY"">ENV</a> is the content of the key, which must be a string with exactly 32 bytes. As indicated, this key should not be hardcoded or otherwise committed to the source control repository.</p>
+
+<p>For models that need encrypted columns, you load the plugin again, but specify the columns to encrypt:</p>
+
+<pre class="ruby"><span class="ruby-constant">ConfidentialModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_encryption</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">enc</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">column</span> <span class="ruby-value">:encrypted_column_name</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">column</span> <span class="ruby-value">:searchable_column_name</span>, <span class="ruby-value">searchable:</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">column</span> <span class="ruby-value">:ci_searchable_column_name</span>, <span class="ruby-value">searchable:</span> <span class="ruby-value">:case_insensitive</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>With this, all three specified columns (encrypted_column_name,  searchable_column_name, and ci_searchable_column_name) will be marked as encrypted columns.  When you run the following code:</p>
+
+<pre class="ruby"><span class="ruby-constant">ConfidentialModel</span>.<span class="ruby-identifier">create</span>(&#x000A;  <span class="ruby-value">encrypted_column_name:</span> <span class="ruby-string">&#39;These&#39;</span>,&#x000A;  <span class="ruby-value">searchable_column_name:</span> <span class="ruby-string">&#39;will be&#39;</span>,&#x000A;  <span class="ruby-value">ci_searchable_column_name:</span> <span class="ruby-string">&#39;Encrypted&#39;</span>&#x000A;)</pre>
+
+<p>It will save encrypted versions to the database. encrypted_column_name will not be searchable, searchable_column_name will be searchable with an exact match, and ci_searchable_column_name will be searchable with a case insensitive match.</p>
+
+<p>To search searchable encrypted columns, use with_encrypted_value. This example code will return the model instance created in the code example in the previous section:</p>
+
+<pre class="ruby"><span class="ruby-constant">ConfidentialModel</span>.&#x000A;  <span class="ruby-identifier">with_encrypted_value</span>(<span class="ruby-value">:searchable_column_name</span>, <span class="ruby-string">&quot;will be&quot;</span>)&#x000A;  <span class="ruby-identifier">with_encrypted_value</span>(<span class="ruby-value">:ci_searchable_column_name</span>, <span class="ruby-string">&quot;encrypted&quot;</span>).&#x000A;  <span class="ruby-identifier">first</span></pre>
+
+<p>To rotate encryption keys, add a new key above the existing key, with a new key ID:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_encryption</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">enc</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">key</span> <span class="ruby-value">1</span>, <span class="ruby-constant">ENV</span>[<span class="ruby-string">&quot;SEQUEL_COLUMN_ENCRYPTION_KEY&quot;</span>]&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">key</span> <span class="ruby-value">0</span>, <span class="ruby-constant">ENV</span>[<span class="ruby-string">&quot;SEQUEL_OLD_COLUMN_ENCRYPTION_KEY&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>Newly encrypted data will then use the new key.  Records encrypted with the older key will still be decrypted correctly.</p>
+
+<p>To force reencryption for existing records that are using the older key, you can use the needing_reencryption dataset method and the reencrypt instance method. For a small number of records, you can probably do:</p>
+
+<pre class="ruby"><span class="ruby-constant">ConfidentialModel</span>.<span class="ruby-identifier">needing_reencryption</span>.<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:reencrypt</span>)</pre>
+
+<p>With more than a small number of records, you&#39;ll want to do this in batches.  It&#39;s possible you could use an approach such as:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">ConfidentialModel</span>.<span class="ruby-identifier">needing_reencryption</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">100</span>)&#x000A;<span class="ruby-keyword">true</span> <span class="ruby-keyword">until</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:reencrypt</span>).<span class="ruby-identifier">empty?</span></pre>
+
+<p>After all values have been reencrypted for all models, and no models use the older encryption key, you can remove it from the configuration:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_encryption</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">enc</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">key</span> <span class="ruby-value">1</span>, <span class="ruby-constant">ENV</span>[<span class="ruby-string">&quot;SEQUEL_COLUMN_ENCRYPTION_KEY&quot;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>The column_encryption plugin supports encrypting serialized data, as well as enforcing uniquenss of searchable encrypted columns (in the absence of key rotation).  By design, it does not support compression, mixing encrypted and unencrypted data in the same column, or support arbitrary encryption ciphers.  See the plugin documentation for more details.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-Mon, 01 Mar 2021 07:50:40 -0800
+Thu, 01 Apr 2021 07:47:21 -0700
 lib/sequel/adapters/ado.rb	Fri, 26 Feb 2021 10:40:23 -0800
 lib/sequel/adapters/ado/access.rb	Mon, 28 Jan 2019 08:29:19 -0800
 lib/sequel/adapters/ado/mssql.rb	Mon, 28 Jan 2019 08:29:19 -0800
@@ -35,7 +35,7 @@ lib/sequel/adapters/shared/mysql.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/adapters/shared/oracle.rb	Wed, 07 Oct 2020 15:45:35 -0700
 lib/sequel/adapters/shared/postgres.rb	Fri, 29 Jan 2021 08:07:35 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Thu, 16 Apr 2020 13:01:31 -0700
-lib/sequel/adapters/shared/sqlite.rb	Tue, 26 Jan 2021 09:55:43 -0800
+lib/sequel/adapters/shared/sqlite.rb	Mon, 29 Mar 2021 23:50:01 -0700
 lib/sequel/adapters/sqlanywhere.rb	Mon, 04 Mar 2019 09:24:25 -0800
 lib/sequel/adapters/sqlite.rb	Thu, 09 May 2019 16:09:48 -0700
 lib/sequel/adapters/tinytds.rb	Fri, 10 Jul 2020 07:47:28 -0700

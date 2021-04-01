@@ -1,6 +1,6 @@
-Mon, 01 Mar 2021 07:49:51 -0800
+Thu, 01 Apr 2021 07:46:33 -0700
 README.rdoc	Tue, 03 Nov 2020 13:05:26 -0800
-CHANGELOG	Mon, 01 Mar 2021 07:44:40 -0800
+CHANGELOG	Thu, 01 Apr 2021 07:38:02 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 06 Jan 2021 14:13:44 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Mon, 30 Nov 2020 09:24:48 -0800
-lib/sequel/version.rb	Mon, 01 Mar 2021 07:44:40 -0800
+lib/sequel/version.rb	Thu, 01 Apr 2021 07:38:02 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 26 Jun 2020 14:43:12 -0700
@@ -232,6 +232,7 @@ doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.40.0.txt	Thu, 31 Dec 2020 11:06:03 -0800
 doc/release_notes/5.41.0.txt	Mon, 01 Feb 2021 07:43:00 -0800
 doc/release_notes/5.42.0.txt	Mon, 01 Mar 2021 07:44:40 -0800
+doc/release_notes/5.43.0.txt	Thu, 01 Apr 2021 07:38:02 -0700
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700

@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::ColumnEncryption::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::ColumnEncryption::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/column_encryption_rb.html">lib/sequel/plugins/column_encryption.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-reencrypt">reencrypt</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-reencrypt'>
+<a name='method-i-reencrypt'></a>
+<div class='synopsis'>
+<span class='name'>reencrypt</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Reencrypt the model if needed.  Looks at all of the models encrypted columns and if any were encypted with older keys or a different format, reencrypt with the current key and format and save the object.  Returns the object if reencryption was needed, or nil if reencryption was not needed.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-reencrypt-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-reencrypt-source'>    <span class="ruby-comment"># File lib/sequel/plugins/column_encryption.rb</span>&#x000A;<span class="line-num">670</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reencrypt</span>&#x000A;<span class="line-num">671</span>   <span class="ruby-identifier">do_save</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">672</span> &#x000A;<span class="line-num">673</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:column_encryption_metadata</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span>, <span class="ruby-identifier">metadata</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">674</span>     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">value</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">column</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">value</span>.<span class="ruby-identifier">start_with?</span>(<span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">key_searcher</span>.<span class="ruby-identifier">call</span>)&#x000A;<span class="line-num">675</span>       <span class="ruby-identifier">do_save</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">676</span>       <span class="ruby-identifier">values</span>[<span class="ruby-identifier">column</span>] = <span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">encryptor</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">decryptor</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">value</span>))&#x000A;<span class="line-num">677</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">678</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">679</span> &#x000A;<span class="line-num">680</span>   <span class="ruby-identifier">save</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">do_save</span>&#x000A;<span class="line-num">681</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
