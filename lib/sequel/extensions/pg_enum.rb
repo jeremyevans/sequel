@@ -42,7 +42,7 @@
 #
 # This extension integrates with the pg_array extension.  If you plan
 # to use arrays of enum types, load the pg_array extension before the
-# pg_interval extension:
+# pg_enum extension:
 #
 #   DB.extension :pg_array, :pg_enum
 #
