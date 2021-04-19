@@ -1,5 +1,9 @@
 === master
 
+* Support :weeks as a interval unit in the date_arithmetic extension (jeremyevans) (#1759)
+
+* Raise an exception if an interval hash with an unsupported key is passed in the date_arithmetic extension (jeremyevans) (#1759)
+
 * Support dropping non-composite unique constraints on SQLite (jeremyevans) (#1755)
 
 === 5.43.0 (2021-04-01)

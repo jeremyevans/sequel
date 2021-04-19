@@ -8,9 +8,10 @@
 #   DB.extension :date_arithmetic
 #
 # Then you can use the Sequel.date_add and Sequel.date_sub methods
-# to return Sequel expressions:
+# to return Sequel expressions (this example shows the only supported
+# keys for the second argument):
 #
-#   add = Sequel.date_add(:date_column, years: 1, months: 2, days: 3)
+#   add = Sequel.date_add(:date_column, years: 1, months: 2, weeks: 2, days: 1)
 #   sub = Sequel.date_sub(:date_column, hours: 1, minutes: 2, seconds: 3)
 #
 # In addition to specifying the interval as a hash, there is also
@@ -184,22 +185,35 @@ module Sequel
       # ActiveSupport::Duration :: Converted to a hash using the interval's parts.
       def initialize(expr, interval, opts=OPTS)
         @expr = expr
-        @interval = if interval.is_a?(Hash)
-          interval.each_value do |v|
-             # Attempt to prevent SQL injection by users who pass untrusted strings
-             # as interval values. 
-             if v.is_a?(String) && !v.is_a?(LiteralString)
-               raise Sequel::InvalidValue, "cannot provide String value as interval part: #{v.inspect}"
-             end
+
+        h = Hash.new(0)
+        interval = interval.parts unless interval.is_a?(Hash)
+        interval.each do |unit, value|
+          # skip nil values
+          next unless value
+
+          # Convert weeks to days, as ActiveSupport::Duration can use weeks,
+          # but the database-specific literalizers only support days.
+          if unit == :weeks
+            unit = :days
+            value *= 7
           end
-          Hash[interval]
-        else
-          h = Hash.new(0)
-          interval.parts.each{|unit, value| h[unit] += value}
-          Hash[h]
+
+          unless DatasetMethods::DURATION_UNITS.include?(unit)
+            raise Sequel::Error, "Invalid key used in DateAdd interval hash: #{unit.inspect}"
+          end
+
+          # Attempt to prevent SQL injection by users who pass untrusted strings
+          # as interval values. It doesn't make sense to support literal strings,
+          # due to the numeric adding below.
+          if value.is_a?(String)
+            raise Sequel::InvalidValue, "cannot provide String value as interval part: #{value.inspect}"
+          end
+
+          h[unit] += value
         end
 
-        @interval.freeze
+        @interval = Hash[h].freeze
         @cast_type = opts[:cast] if opts[:cast]
         freeze
       end
