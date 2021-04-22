@@ -5,7 +5,7 @@ module Sequel
 
   module Plugins
     # The async_thread_pool plugin makes it slightly easier to use the async_thread_pool
-    # Dataset extension with models.  It makes Model.async return an async dataset for the
+    # Database extension with models.  It makes Model.async return an async dataset for the
     # model, and support async behavior for #destroy, #with_pk, and #with_pk! for model
     # datasets:
     #
