@@ -237,13 +237,11 @@ describe "Many Through Many Plugin" do
     @album4.add_artist(@artist4)
   end
   after do
+    [:albums_artists, :albums, :artists].each{|t| @db[t].delete}
     [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
     @db.drop_table? :albums_artists, :albums, :artists
-  end
-  def around
-    DB.transaction(:rollback=>:always){super}
   end
   
   def self_join(c)
