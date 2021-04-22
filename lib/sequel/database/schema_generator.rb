@@ -478,6 +478,8 @@ module Sequel
       #             custom SQL).
       # :type :: Set the index type (e.g. full_text, spatial, hash, gin, gist, btree).
       # :if_not_exists :: Only create the index if an index of the same name doesn't already exists
+      # :include :: Include additional column values in the index, without
+      #             actually indexing on those values (PostgreSQL 11+).
       #
       # MySQL specific options:
       #
