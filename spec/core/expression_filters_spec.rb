@@ -1525,3 +1525,20 @@ describe "Sequel core extensions" do
     Sequel.core_extensions?.must_equal false
   end
 end
+
+describe "Sequel.conditional_synchronize" do
+  it "should yield if given nil" do
+    Sequel.conditional_synchronize(nil){1}.must_equal 1
+  end
+
+  it "should synchronize with given mutex" do
+    m = Mutex.new
+    Sequel.conditional_synchronize(m){1}.must_equal 1
+
+    proc do
+      Sequel.conditional_synchronize(m) do
+        Sequel.conditional_synchronize(m){}
+      end
+    end.must_raise ThreadError
+  end
+end

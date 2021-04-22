@@ -170,11 +170,13 @@ module Sequel
           id_map = eo[:id_map]
           parent_map = {}
           children_map = {}
-          eo[:rows].each do |obj|
-            parent_map[prkey_conv[obj]] = obj
-            (children_map[key_conv[obj]] ||= []) << obj
-            obj.associations[ancestors] = []
-            obj.associations[parent] = nil
+          Sequel.conditional_synchronize(eo[:mutex]) do
+            eo[:rows].each do |obj|
+              parent_map[prkey_conv[obj]] = obj
+              (children_map[key_conv[obj]] ||= []) << obj
+              obj.associations[ancestors] = []
+              obj.associations[parent] = nil
+            end
           end
           r = model.association_reflection(ancestors)
           base_case = model.where(prkey=>id_map.keys).
@@ -207,10 +209,12 @@ module Sequel
               root.associations[ancestors] << obj
             end
           end
-          parent_map.each do |parent_id, obj|
-            if children = children_map[parent_id]
-              children.each do |child|
-                child.associations[parent] = obj
+          Sequel.conditional_synchronize(eo[:mutex]) do
+            parent_map.each do |parent_id, obj|
+              if children = children_map[parent_id]
+                children.each do |child|
+                  child.associations[parent] = obj
+                end
               end
             end
           end
@@ -268,10 +272,12 @@ module Sequel
           associations = eo[:associations]
           parent_map = {}
           children_map = {}
-          eo[:rows].each do |obj|
-            parent_map[prkey_conv[obj]] = obj
-            obj.associations[descendants] = []
-            obj.associations[childrena] = []
+          Sequel.conditional_synchronize(eo[:mutex]) do
+            eo[:rows].each do |obj|
+              parent_map[prkey_conv[obj]] = obj
+              obj.associations[descendants] = []
+              obj.associations[childrena] = []
+            end
           end
           r = model.association_reflection(descendants)
           base_case = model.where(key=>id_map.keys).
@@ -316,12 +322,14 @@ module Sequel
             
             (children_map[key_conv[obj]] ||= []) << obj
           end
-          children_map.each do |parent_id, objs|
-            objs = objs.uniq
-            parent_obj = parent_map[parent_id]
-            parent_obj.associations[childrena] = objs
-            objs.each do |obj|
-              obj.associations[parent] = parent_obj
+          Sequel.conditional_synchronize(eo[:mutex]) do
+            children_map.each do |parent_id, objs|
+              objs = objs.uniq
+              parent_obj = parent_map[parent_id]
+              parent_obj.associations[childrena] = objs
+              objs.each do |obj|
+                obj.associations[parent] = parent_obj
+              end
             end
           end
         end

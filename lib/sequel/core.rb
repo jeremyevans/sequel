@@ -176,6 +176,16 @@ module Sequel
       JSON.parse(json, :create_additions=>false)
     end
 
+    # If a mutex is given, synchronize access using it.  Otherwise, just
+    # yield to the block.
+    def conditional_synchronize(mutex)
+      if mutex
+        mutex.synchronize{yield}
+      else
+        yield
+      end
+    end
+
     # Convert each item in the array to the correct type, handling multi-dimensional
     # arrays.  For each element in the array or subarrays, call the converter,
     # unless the value is nil.

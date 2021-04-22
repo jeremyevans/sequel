@@ -263,7 +263,9 @@ module Sequel
         # yielding each row to the block.
         def eager_load_results(eo, &block)
           rows = eo[:rows]
-          initialize_association_cache(rows) unless eo[:initialize_rows] == false
+          unless eo[:initialize_rows] == false
+            Sequel.conditional_synchronize(eo[:mutex]){initialize_association_cache(rows)}
+          end
           if eo[:id_map]
             ids = eo[:id_map].keys
             return ids if ids.empty?
@@ -311,7 +313,8 @@ module Sequel
             objects = loader.all(ids)
           end
 
-          objects.each(&block)
+          Sequel.conditional_synchronize(eo[:mutex]){objects.each(&block)}
+
           if strategy == :ruby
             apply_ruby_eager_limit_strategy(rows, eager_limit || limit_and_offset)
           end
@@ -3374,15 +3377,30 @@ module Sequel
           egl.dup
         end
 
-        # Eagerly load all specified associations 
+        # Eagerly load all specified associations.
         def eager_load(a, eager_assoc=@opts[:eager])
           return if a.empty?
+
+          # Reflections for all associations to eager load
+          reflections = eager_assoc.keys.map{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
+
+          perform_eager_loads(prepare_eager_load(a, reflections, eager_assoc))
+
+          reflections.each do |r|
+            a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} if r[:after_load]
+          end 
+
+          nil
+        end
+
+        # Prepare a hash loaders and eager options which will be used to implement the eager loading.
+        def prepare_eager_load(a, reflections, eager_assoc)
+          eager_load_data = {}
+
           # Key is foreign/primary key name symbol.
           # Value is hash with keys being foreign/primary key values (generally integers)
           # and values being an array of current model objects with that specific foreign/primary key
           key_hash = {}
-          # Reflections for all associations to eager load
-          reflections = eager_assoc.keys.map{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
       
           # Populate the key_hash entry for each association being eagerly loaded
           reflections.each do |r|
@@ -3413,7 +3431,6 @@ module Sequel
               id_map = nil
             end
           
-            loader = r[:eager_loader]
             associations = eager_assoc[r[:name]]
             if associations.respond_to?(:call)
               eager_block = associations
@@ -3421,9 +3438,23 @@ module Sequel
             elsif associations.is_a?(Hash) && associations.length == 1 && (pr_assoc = associations.to_a.first) && pr_assoc.first.respond_to?(:call)
               eager_block, associations = pr_assoc
             end
-            loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block, :id_map=>id_map)
-            a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} if r[:after_load]
-          end 
+
+            eager_load_data[r[:eager_loader]] = {:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block, :id_map=>id_map}
+          end
+
+          eager_load_data
+        end
+
+        # Using the hash of loaders and eager options, perform the eager loading.
+        def perform_eager_loads(eager_load_data)
+          eager_load_data.map do |loader, eo|
+            perform_eager_load(loader, eo)
+          end
+        end
+
+        # Perform eager loading for a single association using the loader and eager options.
+        def perform_eager_load(loader, eo)
+          loader.call(eo)
         end
 
         # Return a subquery expression for filering by a many_to_many association

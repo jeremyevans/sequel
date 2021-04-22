@@ -426,10 +426,12 @@ module Sequel
             id_map = {}
             pkm = opts.primary_key_method
 
-            rows.each do |object|
-              if associated_pks = object.get_column_value(key)
-                associated_pks.each do |apk|
-                  (id_map[apk] ||= []) << object
+            Sequel.conditional_synchronize(eo[:mutex]) do
+              rows.each do |object|
+                if associated_pks = object.get_column_value(key)
+                  associated_pks.each do |apk|
+                    (id_map[apk] ||= []) << object
+                  end
                 end
               end
             end
