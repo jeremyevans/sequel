@@ -22,11 +22,11 @@ begin
   cipher.key = '1'*32
   cipher.auth_data = ''
   cipher.auth_tag = auth_tag
+  # :nocov:
   unless (cipher.update(cipher_text) << cipher.final) == '2'
     raise OpenSSL::Cipher::CipherError
   end
 rescue OpenSSL::Cipher::CipherError
-  # :nocov:
   raise LoadError, "Sequel column_encryption plugin requires a working aes-256-gcm cipher"
   # :nocov:
 end
