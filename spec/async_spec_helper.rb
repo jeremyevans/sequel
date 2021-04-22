@@ -4,6 +4,7 @@ class Minitest::Spec
     if ENV['SEQUEL_ASYNC_THREAD_POOL_PREEMPT']
       ::DB.opts[:preempt_async_thread] = true
     end
+    ::DB.opts[:num_async_threads] = 12
     ::DB.extension :async_thread_pool
   end
 
