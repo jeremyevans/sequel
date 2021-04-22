@@ -3,6 +3,7 @@ require_relative "spec_helper"
 describe "Database transactions" do
   before(:all) do
     @db = DB
+    @db.disconnect
     @db.create_table!(:items, :engine=>'InnoDB'){String :name; Integer :value}
     @d = @db[:items]
   end
