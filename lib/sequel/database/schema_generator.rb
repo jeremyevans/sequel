@@ -214,14 +214,12 @@ module Sequel
       end
 
       # Add a full text index on the given columns.
+      # See #index for additional options.
       #
       # PostgreSQL specific options:
       # :index_type :: Can be set to :gist to use a GIST index instead of the
       #                default GIN index.
       # :language :: Set a language to use for the index (default: simple).
-      #
-      # Microsoft SQL Server specific options:
-      # :key_index :: The KEY INDEX to use for the full text index.
       def full_text_index(columns, opts = OPTS)
         index(columns, opts.merge(:type => :full_text))
       end
@@ -231,35 +229,43 @@ module Sequel
         columns.any?{|c| c[:name] == name}
       end
       
-      # Add an index on the given column(s) with the given options.
-      # General options:
-      #
-      # :name :: The name to use for the index. If not given, a default name
-      #          based on the table and columns is used.
-      # :type :: The type of index to use (only supported by some databases)
-      # :unique :: Make the index unique, so duplicate values are not allowed.
-      # :where :: Create a partial index (only supported by some databases)
-      #
-      # PostgreSQL specific options:
-      #
-      # :concurrently :: Create the index concurrently, so it doesn't block
-      #                  operations on the table while the index is being
-      #                  built.
-      # :opclass :: Use a specific operator class in the index.
-      # :include :: Include additional column values in the index, without
-      #             actually indexing on those values (PostgreSQL 11+).
-      # :tablespace :: Specify tablespace for index.
-      #
-      # Microsoft SQL Server specific options:
-      #
-      # :include :: Include additional column values in the index, without
-      #             actually indexing on those values.
+      # Add an index on the given column(s) with the given options. Examples:
       #
       #   index :name
       #   # CREATE INDEX table_name_index ON table (name)
       #
       #   index [:artist_id, :name]
       #   # CREATE INDEX table_artist_id_name_index ON table (artist_id, name)
+      #
+      #   index [:artist_id, :name], name: :foo
+      #   # CREATE INDEX foo ON table (artist_id, name)
+      #
+      # General options:
+      #
+      # :include :: Include additional column values in the index, without
+      #             actually indexing on those values (only supported by
+      #             some databases).
+      # :name :: The name to use for the index. If not given, a default name
+      #          based on the table and columns is used.
+      # :type :: The type of index to use (only supported by some databases,
+      #          :full_text and :spatial values are handled specially).
+      # :unique :: Make the index unique, so duplicate values are not allowed.
+      # :where :: A filter expression, used to create a partial index (only
+      #           supported by some databases).
+      #
+      # PostgreSQL specific options:
+      #
+      # :concurrently :: Create the index concurrently, so it doesn't block
+      #                  operations on the table while the index is being
+      #                  built.
+      # :if_not_exists :: Only create the index if an index of the same name doesn't already exist.
+      # :opclass :: Set an opclass to use for all columns (per-column opclasses require
+      #             custom SQL).
+      # :tablespace :: Specify tablespace for index.
+      #
+      # Microsoft SQL Server specific options:
+      #
+      # :key_index :: Sets the KEY INDEX to the given value.
       def index(columns, opts = OPTS)
         indexes << {:columns => Array(columns)}.merge!(opts)
         nil
@@ -325,6 +331,7 @@ module Sequel
       end
       
       # Add a spatial index on the given columns.
+      # See #index for additional options.
       def spatial_index(columns, opts = OPTS)
         index(columns, opts.merge(:type => :spatial))
       end
@@ -451,7 +458,7 @@ module Sequel
       end
       
       # Add a full text index on the given columns.
-      # See CreateTableGenerator#index for available options.
+      # See CreateTableGenerator#full_text_index for available options.
       def add_full_text_index(columns, opts = OPTS)
         add_index(columns, {:type=>:full_text}.merge!(opts))
       end
@@ -460,34 +467,6 @@ module Sequel
       # CreateTableGenerator#index for available options.
       #
       #   add_index(:artist_id) # CREATE INDEX table_artist_id_index ON table (artist_id)
-      #
-      # Options:
-      #
-      # :name :: Give a specific name for the index. Highly recommended if you plan on
-      #          dropping the index later.
-      # :where :: A filter expression, used to setup a partial index (if supported).
-      # :unique :: Create a unique index.
-      #
-      # PostgreSQL specific options:
-      #
-      # :concurrently :: Create the index concurrently, so it doesn't require an exclusive lock
-      #                  on the table.
-      # :index_type :: The underlying index type to use for a full_text index, gin by default).
-      # :language :: The language to use for a full text index (simple by default).
-      # :opclass :: Set an opclass to use for all columns (per-column opclasses require
-      #             custom SQL).
-      # :type :: Set the index type (e.g. full_text, spatial, hash, gin, gist, btree).
-      # :if_not_exists :: Only create the index if an index of the same name doesn't already exists
-      #
-      # MySQL specific options:
-      #
-      # :type :: Set the index type, with full_text and spatial indexes handled specially.
-      #
-      # Microsoft SQL Server specific options:
-      #
-      # :include :: Includes additional columns in the index.
-      # :key_index :: Sets the KEY INDEX to the given value.
-      # :type :: clustered uses a clustered index, full_text uses a full text index.
       def add_index(columns, opts = OPTS)
         @operations << {:op => :add_index, :columns => Array(columns)}.merge!(opts)
         nil
