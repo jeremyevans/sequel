@@ -66,7 +66,7 @@ module Sequel
     # concurrent eager loading, you need to make sure you are not modifying
     # the associations for objects concurrently by separate threads.  This is
     # implemented using a mutex, which you can access via <tt>eo_opts[:mutex]</tt>.
-    # To keep things simple, you can use +Sequel.conditional_synchronize+ to only
+    # To keep things simple, you can use +Sequel.synchronize_with+ to only
     # use this mutex if it is available.  You want to use the mutex around the
     # code that initializes the associations (usually to +nil+ or <tt>[]</tt>),
     # and also around the code that sets the associatied objects appropriately
@@ -75,12 +75,12 @@ module Sequel
     # So after the changes, the custom eager loader would look like this:
     #
     #   Album.many_to_one :artist, :eager_loader=>(proc do |eo_opts|
-    #     Sequel.conditional_synchronize(eo[:mutex]) do
+    #     Sequel.synchronize_with(eo[:mutex]) do
     #       eo_opts[:rows].each{|album| album.associations[:artist] = nil}
     #     end
     #     id_map = eo_opts[:id_map]
     #     rows = Artist.where(:id=>id_map.keys).all
-    #     Sequel.conditional_synchronize(eo[:mutex]) do
+    #     Sequel.synchronize_with(eo[:mutex]) do
     #       rows.each do |artist|
     #         if albums = id_map[artist.id]
     #           albums.each do |album|

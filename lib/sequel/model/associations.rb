@@ -264,7 +264,7 @@ module Sequel
         def eager_load_results(eo, &block)
           rows = eo[:rows]
           unless eo[:initialize_rows] == false
-            Sequel.conditional_synchronize(eo[:mutex]){initialize_association_cache(rows)}
+            Sequel.synchronize_with(eo[:mutex]){initialize_association_cache(rows)}
           end
           if eo[:id_map]
             ids = eo[:id_map].keys
@@ -313,7 +313,7 @@ module Sequel
             objects = loader.all(ids)
           end
 
-          Sequel.conditional_synchronize(eo[:mutex]){objects.each(&block)}
+          Sequel.synchronize_with(eo[:mutex]){objects.each(&block)}
 
           if strategy == :ruby
             apply_ruby_eager_limit_strategy(rows, eager_limit || limit_and_offset)

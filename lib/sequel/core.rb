@@ -176,9 +176,10 @@ module Sequel
       JSON.parse(json, :create_additions=>false)
     end
 
-    # If a mutex is given, synchronize access using it.  Otherwise, just
-    # yield to the block.
-    def conditional_synchronize(mutex)
+    # If a mutex is given, synchronize access using it.  If nil is given, just
+    # yield to the block.  This is designed for cases where a mutex may or may
+    # not be provided.
+    def synchronize_with(mutex)
       if mutex
         mutex.synchronize{yield}
       else

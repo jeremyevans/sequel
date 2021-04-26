@@ -426,7 +426,7 @@ module Sequel
             id_map = {}
             pkm = opts.primary_key_method
 
-            Sequel.conditional_synchronize(eo[:mutex]) do
+            Sequel.synchronize_with(eo[:mutex]) do
               rows.each do |object|
                 if associated_pks = object.get_column_value(key)
                   associated_pks.each do |apk|

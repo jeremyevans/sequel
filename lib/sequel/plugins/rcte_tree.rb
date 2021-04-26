@@ -170,7 +170,7 @@ module Sequel
           id_map = eo[:id_map]
           parent_map = {}
           children_map = {}
-          Sequel.conditional_synchronize(eo[:mutex]) do
+          Sequel.synchronize_with(eo[:mutex]) do
             eo[:rows].each do |obj|
               parent_map[prkey_conv[obj]] = obj
               (children_map[key_conv[obj]] ||= []) << obj
@@ -209,7 +209,7 @@ module Sequel
               root.associations[ancestors] << obj
             end
           end
-          Sequel.conditional_synchronize(eo[:mutex]) do
+          Sequel.synchronize_with(eo[:mutex]) do
             parent_map.each do |parent_id, obj|
               if children = children_map[parent_id]
                 children.each do |child|
@@ -272,7 +272,7 @@ module Sequel
           associations = eo[:associations]
           parent_map = {}
           children_map = {}
-          Sequel.conditional_synchronize(eo[:mutex]) do
+          Sequel.synchronize_with(eo[:mutex]) do
             eo[:rows].each do |obj|
               parent_map[prkey_conv[obj]] = obj
               obj.associations[descendants] = []
@@ -322,7 +322,7 @@ module Sequel
             
             (children_map[key_conv[obj]] ||= []) << obj
           end
-          Sequel.conditional_synchronize(eo[:mutex]) do
+          Sequel.synchronize_with(eo[:mutex]) do
             children_map.each do |parent_id, objs|
               objs = objs.uniq
               parent_obj = parent_map[parent_id]
