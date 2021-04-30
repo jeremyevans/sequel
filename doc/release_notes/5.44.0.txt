@@ -1,0 +1,32 @@
+= New Features
+
+* A concurrent_eager_loading plugin has been added.  This plugin
+  builds on top of the async_thread_pool Database extension and
+  allows eager loading multiple associations concurrently in
+  separate threads.  With this plugin, you can mark datasets for
+  concurrent eager loading using eager_load_concurrently:
+
+    Album.eager_load_concurrently.eager(:artist, :genre, :tracks).all
+
+  Datasets that are marked for concurrent eager loading will use
+  concurrent eager loading if they are eager loading more than one
+  association.  If you would like to make concurrent eager loading
+  the default, you can load the plugin with the :always option.
+
+  All of the association types that ship with Sequel now support
+  concurrent eager loading when using this plugin. For custom eager
+  loaders using the :eager_loader association option, please see the
+  documentation for the plugin for how to enable custom eager loading
+  for them.
+
+= Other Improvements
+
+* The date_arithmetic extension now handles ActiveSupport::Duration
+  values with weeks, as well as :weeks as a key in a hash value. Weeks
+  are converted into 7 days internally.
+
+* The shared SQLite adapter now emulates the dropping of non-composite
+  unique constraints.  Non-composite unique constraints are now
+  treated similarly to composite unique constraints, in that dropping
+  any unique constraints on a table will drop all unique constraints
+  on that table.
