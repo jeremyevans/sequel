@@ -26,7 +26,7 @@ begin
   unless (cipher.update(cipher_text) << cipher.final) == '2'
     raise OpenSSL::Cipher::CipherError
   end
-rescue OpenSSL::Cipher::CipherError
+rescue RuntimeError, OpenSSL::Cipher::CipherError
   raise LoadError, "Sequel column_encryption plugin requires a working aes-256-gcm cipher"
   # :nocov:
 end
