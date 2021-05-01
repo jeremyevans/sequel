@@ -30,7 +30,7 @@ lib/sequel/extensions/pg_enum.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-07-09 12:21:33 -0700</span>
+<span class='datetime'>2021-04-09 07:38:35 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -68,7 +68,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-value">:table_name</span>)&#x000A;[[<span class="ruby-value">:column_name</span>, {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:enum</span>, <span class="ruby-value">:enum_values</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;value1&#39;</span>, <span class="ruby-string">&#39;value2&#39;</span>]}]]</pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of enum types, load the pg_array extension before the pg_interval extension:</p>
+<p>This extension integrates with the pg_array extension.  If you plan to use arrays of enum types, load the pg_array extension before the pg_enum extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_enum</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">column</span> <span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;enum_type_name[]&#39;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table_name</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:column_name</span>)&#x000A;<span class="ruby-comment"># [&#39;value1&#39;, &#39;value2&#39;]</span></pre>
 

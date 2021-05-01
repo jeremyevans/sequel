@@ -35,7 +35,7 @@ Sequel::Plugins::AsyncThreadPool
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The async_thread_pool plugin makes it slightly easier to use the async_thread_pool <a href="../Dataset.html"><code>Dataset</code></a> extension with models.  It makes Model.async return an async dataset for the model, and support async behavior for destroy, with_pk, and with_pk! for model datasets:</p>
+<p>The async_thread_pool plugin makes it slightly easier to use the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension with models.  It makes Model.async return an async dataset for the model, and support async behavior for destroy, with_pk, and with_pk! for model datasets:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Will load the artist with primary key 1 asynchronously</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">async</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)</pre>
 

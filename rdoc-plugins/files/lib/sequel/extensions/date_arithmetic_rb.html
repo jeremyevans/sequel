@@ -30,7 +30,7 @@ lib/sequel/extensions/date_arithmetic.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-03-15 12:20:16 -0700</span>
+<span class='datetime'>2021-04-19 08:53:26 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -42,9 +42,9 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:date_arithmetic</span></pre>
 
-<p>Then you can use the Sequel.date_add and Sequel.date_sub methods to return <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
+<p>Then you can use the Sequel.date_add and Sequel.date_sub methods to return <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions (this example shows the only supported keys for the second argument):</p>
 
-<pre class="ruby"><span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(<span class="ruby-value">:date_column</span>, <span class="ruby-value">years:</span> <span class="ruby-value">1</span>, <span class="ruby-value">months:</span> <span class="ruby-value">2</span>, <span class="ruby-value">days:</span> <span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(<span class="ruby-value">:date_column</span>, <span class="ruby-value">hours:</span> <span class="ruby-value">1</span>, <span class="ruby-value">minutes:</span> <span class="ruby-value">2</span>, <span class="ruby-value">seconds:</span> <span class="ruby-value">3</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(<span class="ruby-value">:date_column</span>, <span class="ruby-value">years:</span> <span class="ruby-value">1</span>, <span class="ruby-value">months:</span> <span class="ruby-value">2</span>, <span class="ruby-value">weeks:</span> <span class="ruby-value">2</span>, <span class="ruby-value">days:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(<span class="ruby-value">:date_column</span>, <span class="ruby-value">hours:</span> <span class="ruby-value">1</span>, <span class="ruby-value">minutes:</span> <span class="ruby-value">2</span>, <span class="ruby-value">seconds:</span> <span class="ruby-value">3</span>)</pre>
 
 <p>In addition to specifying the interval as a hash, there is also support for specifying the interval as an ActiveSupport::Duration object:</p>
 
