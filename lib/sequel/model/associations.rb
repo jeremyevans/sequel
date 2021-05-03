@@ -3011,6 +3011,8 @@ module Sequel
         # You can specify an custom alias and/or join type on a per-association basis by providing an
         # Sequel::SQL::AliasedExpression object instead of an a Symbol for the association name.
         #
+        # You cannot mix calls to +eager_graph+ and +graph+ on the same dataset.
+        #
         # Examples:
         #
         #   # For each album, eager_graph load the artist
