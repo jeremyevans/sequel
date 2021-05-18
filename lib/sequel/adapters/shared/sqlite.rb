@@ -239,8 +239,12 @@ module Sequel
             super
           end
         when :drop_column
-          ocp = lambda{|oc| oc.delete_if{|c| c.to_s == op[:name].to_s}}
-          duplicate_table(table, :old_columns_proc=>ocp){|columns| columns.delete_if{|s| s[:name].to_s == op[:name].to_s}}
+          if sqlite_version >= 33500
+            super
+          else
+            ocp = lambda{|oc| oc.delete_if{|c| c.to_s == op[:name].to_s}}
+            duplicate_table(table, :old_columns_proc=>ocp){|columns| columns.delete_if{|s| s[:name].to_s == op[:name].to_s}}
+          end
         when :rename_column
           if sqlite_version >= 32500
             super

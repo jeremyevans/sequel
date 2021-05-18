@@ -1,3 +1,7 @@
+=== master
+
+* Use ALTER TABLE DROP COLUMN for dropping columns on SQLite 3.35+ (jeremyevans)
+
 === 5.44.0 (2021-05-01)
 
 * Add concurrent_eager_loading plugin, for eager loading multiple associations concurrently using separate threads (jeremyevans)

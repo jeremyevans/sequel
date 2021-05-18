@@ -627,7 +627,7 @@ describe "A SQLite database" do
     @db.add_index :test3, :a
     @db.add_index :test3, :b
     @db.add_index :test3, [:b, :a]
-    @db.drop_column :test3, :b
+    @db.rename_column :test3, :b, :c
     @db.indexes(:test3)[:test3_a_index].must_equal(:unique=>false, :columns=>[:a])
   end
 
