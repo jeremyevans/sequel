@@ -1567,6 +1567,13 @@ module Sequel
        sql << ')'
       end
       sql << ' AS '
+
+      case w[:materialized]
+      when true
+        sql << "MATERIALIZED "
+      when false
+        sql << "NOT MATERIALIZED "
+      end
     end
 
     # Whether the symbol cache should be skipped when literalizing the dataset

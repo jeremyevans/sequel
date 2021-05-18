@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#with :materialized option on SQLite 3.35+ for [NOT] MATERIALIZED (jeremyevans)
+
 * Use ALTER TABLE DROP COLUMN for dropping columns on SQLite 3.35+ (jeremyevans)
 
 === 5.44.0 (2021-05-01)

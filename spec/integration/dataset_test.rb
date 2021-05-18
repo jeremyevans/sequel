@@ -855,6 +855,12 @@ if DB.dataset.supports_cte?
         @ds.except(@db[:t].with(:t, @ds)).select_order_map(:id).must_equal []
       end
     end
+
+    it "should give correct results for WITH AS [NOT] MATERIALIZED" do
+      @db[:t].with(:t, @ds, :materialized=>nil).order(:id).map(:id).must_equal [1, 2, 3, 4, 5, 6]
+      @db[:t].with(:t, @ds, :materialized=>true).order(:id).map(:id).must_equal [1, 2, 3, 4, 5, 6]
+      @db[:t].with(:t, @ds, :materialized=>false).order(:id).map(:id).must_equal [1, 2, 3, 4, 5, 6]
+    end if (DB.database_type == :postgres && DB.server_version >= 120000) || (DB.database_type == :sqlite && DB.sqlite_version > 33500)
   end
 end
 

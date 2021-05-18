@@ -1062,10 +1062,8 @@ module Sequel
     # Options:
     # :args :: Specify the arguments/columns for the CTE, should be an array of symbols.
     # :recursive :: Specify that this is a recursive CTE
-    #
-    # PostgreSQL Specific Options:
     # :materialized :: Set to false to force inlining of the CTE, or true to force not inlining
-    #                  the CTE (PostgreSQL 12+).
+    #                  the CTE (PostgreSQL 12+/SQLite 3.35+).
     #
     #   DB[:items].with(:items, DB[:syx].where(Sequel[:name].like('A%')))
     #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%' ESCAPE '\')) SELECT * FROM items

@@ -569,26 +569,6 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
 end if DB.server_version >= 90500
 
 describe "A PostgreSQL database" do
-  before do
-    @db = DB
-    @db.create_table!(:cte_test){Integer :id}
-  end
-  after do
-    @db.drop_table?(:cte_test)
-  end
-
-  it "should give correct results for WITH AS [NOT] MATERIALIZED" do
-    @ds = @db[:cte_test]
-    @ds.insert(1)
-    @ds.insert(2)
-    
-    @db[:t].with(:t, @ds, :materialized=>nil).order(:id).map(:id).must_equal [1, 2]
-    @db[:t].with(:t, @ds, :materialized=>true).order(:id).map(:id).must_equal [1, 2]
-    @db[:t].with(:t, @ds, :materialized=>false).order(:id).map(:id).must_equal [1, 2]
-  end
-end if DB.server_version >= 120000
-
-describe "A PostgreSQL database" do
   before(:all) do
     @db = DB
     @db.create_table!(Sequel[:public][:testfk]){primary_key :id; foreign_key :i, Sequel[:public][:testfk]}
