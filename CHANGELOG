@@ -1,5 +1,7 @@
 === master
 
+* Add auto_validations_constraint_validations_presence_message plugin for auto_validations/constraint_validations presence message integration (jeremyevans)
+
 * Support Dataset#with :materialized option on SQLite 3.35+ for [NOT] MATERIALIZED (jeremyevans)
 
 * Use ALTER TABLE DROP COLUMN for dropping columns on SQLite 3.35+ (jeremyevans)
