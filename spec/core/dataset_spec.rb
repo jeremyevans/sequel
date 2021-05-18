@@ -4366,6 +4366,14 @@ describe "Dataset#with and #with_recursive" do
     @ds.with(:t, @db[:x]).sql.must_equal 'WITH t AS (SELECT * FROM x) SELECT * FROM t'
   end
 
+  it "#with should support materialized CTEs" do
+    @ds.with(:t, @db[:x], :materialized=>true).sql.must_equal 'WITH t AS MATERIALIZED (SELECT * FROM x) SELECT * FROM t'
+  end
+
+  it "#with should support not materialized CTEs" do
+    @ds.with(:t, @db[:x], :materialized=>false).sql.must_equal 'WITH t AS NOT MATERIALIZED (SELECT * FROM x) SELECT * FROM t'
+  end
+
   it "#with_recursive should take a name, nonrecursive dataset, and recursive dataset, and use a WITH clause" do
     @ds.with_recursive(:t, @db[:x], @db[:t]).sql.must_equal 'WITH t AS (SELECT * FROM x UNION ALL SELECT * FROM t) SELECT * FROM t'
   end
