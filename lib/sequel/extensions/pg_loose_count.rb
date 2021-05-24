@@ -12,7 +12,9 @@
 #
 # How accurate this count is depends on the number of rows
 # added/deleted from the table since the last time it was
-# analyzed.
+# analyzed. If the table has not been vacuumed or analyzed
+# yet, this can return 0 or -1 depending on the PostgreSQL
+# version in use.
 # 
 # To load the extension into the database:
 #

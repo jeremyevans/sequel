@@ -372,8 +372,8 @@ describe "PostgreSQL", '#create_table' do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}
     @db.loose_count(:tmp_dolls).must_be_kind_of(Integer)
-    @db.loose_count(:tmp_dolls).must_equal 0
-    @db.loose_count(Sequel[:public][:tmp_dolls]).must_equal 0
+    [0, -1].must_include @db.loose_count(:tmp_dolls)
+    [0, -1].must_include @db.loose_count(Sequel[:public][:tmp_dolls])
     @db[:tmp_dolls].insert('a')
     @db << 'VACUUM ANALYZE tmp_dolls'
     @db.loose_count(:tmp_dolls).must_equal 1
