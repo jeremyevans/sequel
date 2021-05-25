@@ -28,7 +28,7 @@ describe "A MSSQL database" do
     @db = DB
     @db.create_table! :test3 do
       Integer :value
-      Time :time
+      TrueClass :b
     end
   end
   after do
@@ -37,6 +37,14 @@ describe "A MSSQL database" do
 
   it "should work with NOLOCK" do
     @db.transaction{@db[:test3].nolock.all.must_equal []}
+  end
+
+  it "should emulate boolean columns" do
+    ds = @db[:test3]
+    ds.insert(:value=>1, :b=>true)
+    ds.insert(:value=>2, :b=>false)
+    ds.insert(:value=>3, :b=>nil)
+    ds.order(:value).select_map(:b).must_equal [true, false, nil]
   end
 end
 

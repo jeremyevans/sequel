@@ -94,7 +94,11 @@ module Sequel
           self.columns = columns
           s.each do |row|
             hash = {}
-            cols.each{|n,t,j| hash[n] = convert_odbc_value(row[j], t)}
+            cols.each do |n,t,j|
+              v = row[j]
+              # We can assume v is not false, so this shouldn't convert false to nil.
+              hash[n] = (convert_odbc_value(v, t) if v)
+            end
             yield hash
           end
         end
