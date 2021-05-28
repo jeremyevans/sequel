@@ -86,6 +86,7 @@ describe "Sequel::Plugins::AutoValidations" do
   end
 
   it "should not override auto_validations message if auto_validations plugin uses an explicit_not_null message" do
+    @c.db.singleton_class.send(:remove_method, :schema)
     def (@c.db).schema(t, *)
       t = t.first_source if t.is_a?(Sequel::Dataset)
       return [] if t != :test
@@ -103,6 +104,7 @@ describe "Sequel::Plugins::AutoValidations" do
   end
 
   it "should handle case where there isn't an NOT NULL constraint on the column" do
+    @c.db.singleton_class.send(:remove_method, :schema)
     def (@c.db).schema(t, *)
       t = t.first_source if t.is_a?(Sequel::Dataset)
       return [] if t != :test
