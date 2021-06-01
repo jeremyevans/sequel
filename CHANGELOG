@@ -1,4 +1,4 @@
-=== master
+=== 5.45.0 (2021-06-01)
 
 * Fix handling of NULL values in boolean columns in the ODBC adapter (jeremyevans) (#1765)
 

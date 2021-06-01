@@ -1,0 +1,34 @@
+= New Features
+
+* A auto_validations_constraint_validations_presence_message plugin
+  has been added that provides integration for the auto_validations
+  and constraint_validations plugin in the following conditions:
+  
+  * The column has a NOT NULL constraint
+  * The column has a presence constraint validation with both
+    the :message and :allow_nil options used.
+
+  In this case, when saving a nil value in the column, the plugin
+  will make it so the more specific message from the presence
+  constraint validation is used, instead of the generic message
+  from auto_validations.
+
+= Other Improvements
+
+* On SQLite 3.35.0+, Sequel now uses ALTER TABLE DROP COLUMN for
+  dropping columns, instead of emulating the dropped column by
+  recreating the table.
+
+* The Dataset#with :materialized option is now supported on SQLite
+  3.35.0+ for specifying whether common table expressions should be
+  materialized.
+
+* The odbc adapter now correct handles boolean columns with NULL
+  values.  Previously, such values were returned as false instead
+  of nil.
+
+= Backwards Compatibility
+
+* The change to use ALTER TABLE DROP COLUMN on SQLite 3.35.0+ can
+  cause backwards compatibility issues if SQLite 3.35.0+ does
+  not allow dropping the column.
