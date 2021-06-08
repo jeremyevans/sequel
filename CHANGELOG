@@ -1,5 +1,7 @@
 === master
 
+* Add unused_associations plugin, for determining which associations and association methods are not used (jeremyevans)
+
 * Make nil :setter/:adder/:remover/:clearer association options not create related methods (jeremyevans)
 
 === 5.45.0 (2021-06-01)

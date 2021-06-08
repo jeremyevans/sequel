@@ -1849,8 +1849,7 @@ module Sequel
           # Remove :class entry if it exists and is nil, to work with cached_fetch
           opts.delete(:class) unless opts[:class]
 
-          send(:"def_#{type}", opts)
-          def_association_instance_methods(opts)
+          def_association(opts)
       
           orig_opts.delete(:clone)
           opts[:orig_class] = orig_opts[:class] || orig_opts[:class_name]
@@ -1964,6 +1963,13 @@ module Sequel
           association_module(opts).send(:private, name)
         end
 
+        # Delegate to the type-specific association method to setup the
+        # association, and define the association instance methods.
+        def def_association(opts)
+          send(:"def_#{opts[:type]}", opts)
+          def_association_instance_methods(opts)
+        end
+        
         # Adds the association method to the association methods module.
         def def_association_method(opts)
           association_module_def(opts.association_method, opts) do |dynamic_opts=OPTS, &block|
