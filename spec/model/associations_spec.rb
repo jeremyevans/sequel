@@ -130,6 +130,79 @@ describe Sequel::Model, "associate" do
     end
   end
 
+  it "should respect :no_dataset_method option to not create a dataset method" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_one :c, :no_dataset_method=>true
+    c.method_defined?(:c_dataset).must_equal false
+    c.method_defined?(:c).must_equal true
+  end
+
+  it "should respect :no_association_method option to not create an association method" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_one :c, :no_association_method=>true
+    c.method_defined?(:c_dataset).must_equal true
+    c.method_defined?(:c).must_equal false
+  end
+
+  it "should respect :setter=>nil option to not create a setter method" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_one :c, :setter=>nil
+    c.method_defined?(:c).must_equal true
+    c.method_defined?(:c=).must_equal false
+
+    c = Class.new(Sequel::Model(:c))
+    c.one_to_one :c, :setter=>nil
+    c.method_defined?(:c).must_equal true
+    c.method_defined?(:c=).must_equal false
+
+    c = Class.new(Sequel::Model(:c))
+    c.one_to_one :c, :setter=>nil
+    c.method_defined?(:c).must_equal true
+    c.method_defined?(:c=).must_equal false
+  end
+
+  it "should respect :adder=>nil option to not create a add_* method" do
+    c = Class.new(Sequel::Model(:c))
+    c.one_to_many :cs, :adder=>nil
+    c.method_defined?(:add_c).must_equal false
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal true
+
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_many :cs, :adder=>nil
+    c.method_defined?(:add_c).must_equal false
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal true
+  end
+
+  it "should respect :remover=>nil option to not create a remove_* method" do
+    c = Class.new(Sequel::Model(:c))
+    c.one_to_many :cs, :remover=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal false
+    c.method_defined?(:remove_all_cs).must_equal true
+
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_many :cs, :remover=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal false
+    c.method_defined?(:remove_all_cs).must_equal true
+  end
+
+  it "should respect :clearer=>nil option to not create a remove_all_* method" do
+    c = Class.new(Sequel::Model(:c))
+    c.one_to_many :cs, :clearer=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal false
+
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_many :cs, :clearer=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal false
+  end
+
   it "should raise an error if attempting to clone an association of differing type" do
     c = Class.new(Sequel::Model(:c))
     c.many_to_one :c

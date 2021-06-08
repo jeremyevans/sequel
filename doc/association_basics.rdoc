@@ -826,6 +826,8 @@ you also wanted to handle the Artist#add_album method:
     end)
   end
 
+You can set this to +nil+ to not create a add_<i>association</i> method.
+
 === :remover (\_remove_<i>association</i> method)
 
 Continuing with the same example, here's how you would handle the same case if
@@ -836,6 +838,8 @@ you also wanted to handle the Artist#remove_album method:
       album.update(artist_id: nil, file_under: album.name)
     end)
   end
+
+You can set this to +nil+ to not create a remove_<i>association</i> method.
 
 === :clearer (\_remove_all_<i>association</i> method)
 
@@ -849,6 +853,22 @@ you also wanted to handle the Artist#remove_all_albums method:
       albums_dataset.update(artist_id: nil, file_under: :name)
     end)
   end
+
+You can set this to +nil+ to not create a remove_all_<i>association</i> method.
+
+=== :no_dataset_method
+
+Setting this to true will not result in the <i>association</i>_dataset method
+not being defined. This can save memory if you only use the <i>association</i>
+method and do not call the <i>association</i>_dataset method directly or
+indirectly.
+
+=== :no_association_method
+
+Setting this to true will not result in the <i>association</i> method
+not being defined. This can save memory if you only use the
+<i>association</i>_dataset method and do not call the <i>association</i> method
+directly or indirectly.
 
 == Association Options
 
@@ -1638,9 +1658,8 @@ For +many_to_one+ and +one_to_one+ associations, do not add a setter method.
 For +one_to_many+ and +many_to_many+, do not add the add_<i>association</i>,
 remove_<i>association</i>, or remove_all_<i>association</i> methods.
 
-If the default modification methods would not do what you want, and you
-don't plan on overriding the internal modification methods to do what you
-want, it may be best to set this option to true.
+If you are not using the association modification methods, setting this
+value to true will save memory.
 
 ==== :validate
 

@@ -35,6 +35,48 @@ describe Sequel::Model, "pg_array_associations" do
     Object.send(:remove_const, :Tag)
   end
 
+  it "should respect :adder=>nil option to not create a add_* method" do
+    c = Artist
+    c.pg_array_to_many :cs, :adder=>nil
+    c.method_defined?(:add_c).must_equal false
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal true
+
+    c = Tag
+    c.many_to_pg_array :cs, :adder=>nil
+    c.method_defined?(:add_c).must_equal false
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal true
+  end
+
+  it "should respect :remover=>nil option to not create a remove_* method" do
+    c = Artist
+    c.pg_array_to_many :cs, :remover=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal false
+    c.method_defined?(:remove_all_cs).must_equal true
+
+    c = Tag
+    c.many_to_pg_array :cs, :remover=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal false
+    c.method_defined?(:remove_all_cs).must_equal true
+  end
+
+  it "should respect :clearer=>nil option to not create a remove_all_* method" do
+    c = Artist
+    c.pg_array_to_many :cs, :clearer=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal false
+
+    c = Tag
+    c.many_to_pg_array :cs, :clearer=>nil
+    c.method_defined?(:add_c).must_equal true
+    c.method_defined?(:remove_c).must_equal true
+    c.method_defined?(:remove_all_cs).must_equal false
+  end
+
   it "should populate :key_hash and :id_map option correctly for custom eager loaders" do
     khs = []
     pr = proc{|h| khs << [h[:key_hash], h[:id_map]]}

@@ -1,3 +1,7 @@
+=== master
+
+* Make nil :setter/:adder/:remover/:clearer association options not create related methods (jeremyevans)
+
 === 5.45.0 (2021-06-01)
 
 * Fix handling of NULL values in boolean columns in the ODBC adapter (jeremyevans) (#1765)

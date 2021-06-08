@@ -1595,6 +1595,7 @@ module Sequel
         # === Multiple Types
         # :adder :: Proc used to define the private _add_* method for doing the database work
         #           to associate the given object to the current object (*_to_many assocations).
+        #           Set to nil to not define a add_* method for the association.
         # :after_add :: Symbol, Proc, or array of both/either specifying a callback to call
         #               after a new item is added to the association.
         # :after_load :: Symbol, Proc, or array of both/either specifying a callback to call
@@ -1623,6 +1624,7 @@ module Sequel
         #                     the class.  <tt>class: 'Foo', class_namespace: 'Bar'</tt> looks for <tt>::Bar::Foo</tt>.)
         # :clearer :: Proc used to define the private _remove_all_* method for doing the database work
         #             to remove all objects associated to the current object (*_to_many assocations).
+        #             Set to nil to not define a remove_all_* method for the association.
         # :clone :: Merge the current options and block into the options and block used in defining
         #           the given association.  Can be used to DRY up a bunch of similar associations that
         #           all share the same options such as :class and :key, while changing the order and block used.
@@ -1677,7 +1679,7 @@ module Sequel
         # :graph_only_conditions :: The conditions to use on the SQL join when eagerly loading
         #                           the association via +eager_graph+, instead of the default conditions specified by the
         #                           foreign/primary keys.  This option causes the :graph_conditions option to be ignored.
-        # :graph_order :: Over the order to use when using eager_graph, instead of the default order.  This should be used
+        # :graph_order :: the order to use when using eager_graph, instead of the default order.  This should be used
         #                 in the case where :order contains an identifier qualified by the table's name, which may not match
         #                 the alias used when eager graphing.  By setting this to the unqualified identifier, it will be
         #                 automatically qualified when using eager_graph.
@@ -1689,6 +1691,10 @@ module Sequel
         #           limit (first element) and an offset (second element).
         # :methods_module :: The module that methods the association creates will be placed into. Defaults
         #                    to the module containing the model's columns.
+        # :no_association_method :: Do not add a method for the association. This can save memory if the association
+        #                           method is never used.
+        # :no_dataset_method :: Do not add a method for the association dataset. This can save memory if the dataset
+        #                       method is never used.
         # :order :: the column(s) by which to order the association dataset.  Can be a
         #           singular column symbol or an array of column symbols.
         # :order_eager_graph :: Whether to add the association's order to the graphed dataset's order when graphing
@@ -1701,6 +1707,7 @@ module Sequel
         #                the current association's key(s).  Set to nil to not use a reciprocal.
         # :remover :: Proc used to define the private _remove_* method for doing the database work
         #             to remove the association between the given object and the current object (*_to_many assocations).
+        #             Set to nil to not define a remove_* method for the association.
         # :select :: the columns to select.  Defaults to the associated class's table_name.* in an association
         #            that uses joins, which means it doesn't include the attributes from the
         #            join table.  If you want to include the join table attributes, you can
@@ -1709,6 +1716,7 @@ module Sequel
         #            the same name in both the join table and the associated table.
         # :setter :: Proc used to define the private _*= method for doing the work to setup the assocation
         #            between the given object and the current object (*_to_one associations).
+        #            Set to nil to not define a setter method for the association.
         # :subqueries_per_union :: The number of subqueries to use in each UNION query, for eager
         #                          loading limited associations using the default :union strategy.
         # :validate :: Set to false to not validate when implicitly saving any associated object.
@@ -1981,13 +1989,13 @@ module Sequel
             opts[:setter_method] = :"#{opts[:name]}="
           end
 
-          association_module_def(opts.dataset_method, opts){_dataset(opts)}
+          association_module_def(opts.dataset_method, opts){_dataset(opts)} unless opts[:no_dataset_method]
           if opts[:block]
             opts[:block_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_block", 1, &opts[:block])
           end
           opts[:dataset_opt_arity] = opts[:dataset].arity == 0 ? 0 : 1
           opts[:dataset_opt_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_dataset_opt", opts[:dataset_opt_arity], &opts[:dataset])
-          def_association_method(opts)
+          def_association_method(opts) unless opts[:no_association_method]
 
           return if opts[:read_only]
 
@@ -2075,50 +2083,60 @@ module Sequel
           return if opts[:read_only]
       
           if one_through_one
-            opts[:setter] ||= proc do |o|
-              h = {}
-              lh = lcks.zip(lcpks.map{|k| get_column_value(k)})
-              jtds = _join_table_dataset(opts).where(lh)
+            unless opts.has_key?(:setter)
+              opts[:setter] = proc do |o|
+                h = {}
+                lh = lcks.zip(lcpks.map{|k| get_column_value(k)})
+                jtds = _join_table_dataset(opts).where(lh)
 
-              checked_transaction do
-                current = jtds.first
+                checked_transaction do
+                  current = jtds.first
 
-                if o
-                  new_values = []
-                  rcks.zip(opts.right_primary_key_methods).each{|k, pk| new_values << (h[k] = o.get_column_value(pk))}
-                end
-
-                if current
-                  current_values = rcks.map{|k| current[k]}
-                  jtds = jtds.where(rcks.zip(current_values))
                   if o
-                    if current_values != new_values
-                      jtds.update(h)
-                    end
-                  else
-                    jtds.delete
+                    new_values = []
+                    rcks.zip(opts.right_primary_key_methods).each{|k, pk| new_values << (h[k] = o.get_column_value(pk))}
                   end
-                elsif o
-                  lh.each{|k,v| h[k] = v}
-                  jtds.insert(h)
+
+                  if current
+                    current_values = rcks.map{|k| current[k]}
+                    jtds = jtds.where(rcks.zip(current_values))
+                    if o
+                      if current_values != new_values
+                        jtds.update(h)
+                      end
+                    else
+                      jtds.delete
+                    end
+                  elsif o
+                    lh.each{|k,v| h[k] = v}
+                    jtds.insert(h)
+                  end
                 end
               end
             end
-            opts[:_setter] = proc{|o| set_one_through_one_associated_object(opts, o)}
+            if opts.fetch(:setter, true)
+              opts[:_setter] = proc{|o| set_one_through_one_associated_object(opts, o)}
+            end
           else 
-            opts[:adder] ||= proc do |o|
-              h = {}
-              lcks.zip(lcpks).each{|k, pk| h[k] = get_column_value(pk)}
-              rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.get_column_value(pk)}
-              _join_table_dataset(opts).insert(h)
+            unless opts.has_key?(:adder)
+              opts[:adder] = proc do |o|
+                h = {}
+                lcks.zip(lcpks).each{|k, pk| h[k] = get_column_value(pk)}
+                rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.get_column_value(pk)}
+                _join_table_dataset(opts).insert(h)
+              end
             end
 
-            opts[:remover] ||= proc do |o|
-              _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.get_column_value(k)})).delete
+            unless opts.has_key?(:remover)
+              opts[:remover] = proc do |o|
+                _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.get_column_value(k)})).delete
+              end
             end
 
-            opts[:clearer] ||= proc do
-              _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)})).delete
+            unless opts.has_key?(:clearer)
+              opts[:clearer] = proc do
+                _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)})).delete
+              end
             end
           end
         end
@@ -2175,8 +2193,12 @@ module Sequel
       
           return if opts[:read_only]
       
-          opts[:setter] ||= proc{|o| cks.zip(opts.primary_key_methods).each{|k, pk| set_column_value(:"#{k}=", (o.get_column_value(pk) if o))}}
-          opts[:_setter] = proc{|o| set_associated_object(opts, o)}
+          unless opts.has_key?(:setter)
+            opts[:setter] = proc{|o| cks.zip(opts.primary_key_methods).each{|k, pk| set_column_value(:"#{k}=", (o.get_column_value(pk) if o))}}
+          end
+          if opts.fetch(:setter, true)
+            opts[:_setter] = proc{|o| set_associated_object(opts, o)}
+          end
         end
         
         # Configures one_to_many and one_to_one association reflections and adds the related association methods
@@ -2243,49 +2265,59 @@ module Sequel
           cks.each{|k| ck_nil_hash[k] = nil}
 
           if one_to_one
-            opts[:setter] ||= proc do |o|
-              up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)})))
+            unless opts.has_key?(:setter)
+              opts[:setter] = proc do |o|
+                up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)})))
 
-              if (froms = up_ds.opts[:from]) && (from = froms[0]) && (from.is_a?(Sequel::Dataset) || (from.is_a?(Sequel::SQL::AliasedExpression) && from.expression.is_a?(Sequel::Dataset)))
-                if old = up_ds.first
-                  cks.each{|k| old.set_column_value(:"#{k}=", nil)}
-                end
-                save_old = true
-              end
-
-              if o
-                if !o.new? && !save_old
-                  up_ds = up_ds.exclude(o.pk_hash)
-                end
-                cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
-              end
-
-              checked_transaction do
-                if save_old
-                  old.save(save_opts) || raise(Sequel::Error, "invalid previously associated object, cannot save") if old
-                else
-                  up_ds.skip_limit_check.update(ck_nil_hash)
+                if (froms = up_ds.opts[:from]) && (from = froms[0]) && (from.is_a?(Sequel::Dataset) || (from.is_a?(Sequel::SQL::AliasedExpression) && from.expression.is_a?(Sequel::Dataset)))
+                  if old = up_ds.first
+                    cks.each{|k| old.set_column_value(:"#{k}=", nil)}
+                  end
+                  save_old = true
                 end
 
-                o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
+                if o
+                  if !o.new? && !save_old
+                    up_ds = up_ds.exclude(o.pk_hash)
+                  end
+                  cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
+                end
+
+                checked_transaction do
+                  if save_old
+                    old.save(save_opts) || raise(Sequel::Error, "invalid previously associated object, cannot save") if old
+                  else
+                    up_ds.skip_limit_check.update(ck_nil_hash)
+                  end
+
+                  o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
+                end
               end
             end
-            opts[:_setter] = proc{|o| set_one_to_one_associated_object(opts, o)}
+            if opts.fetch(:setter, true)
+              opts[:_setter] = proc{|o| set_one_to_one_associated_object(opts, o)}
+            end
           else 
             save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
-            opts[:adder] ||= proc do |o|
-              cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
-              o.save(save_opts)
+            unless opts.has_key?(:adder)
+              opts[:adder] = proc do |o|
+                cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
+                o.save(save_opts)
+              end
             end
     
-            opts[:remover] ||= proc do |o|
-              cks.each{|k| o.set_column_value(:"#{k}=", nil)}
-              o.save(save_opts)
+            unless opts.has_key?(:remover)
+              opts[:remover] = proc do |o|
+                cks.each{|k| o.set_column_value(:"#{k}=", nil)}
+                o.save(save_opts)
+              end
             end
 
-            opts[:clearer] ||= proc do
-              _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)}))).update(ck_nil_hash)
+            unless opts.has_key?(:clearer)
+              opts[:clearer] = proc do
+                _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)}))).update(ck_nil_hash)
+              end
             end
           end
         end

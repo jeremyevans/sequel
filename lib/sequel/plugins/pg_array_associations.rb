@@ -384,26 +384,32 @@ module Sequel
           save_opts = {:validate=>opts[:validate]}
           save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
-          opts[:adder] ||= proc do |o|
-            if array = o.get_column_value(key)
-              array << get_column_value(pk)
-            else
-              o.set_column_value("#{key}=", Sequel.pg_array([get_column_value(pk)], opts.array_type))
-            end
-            o.save(save_opts)
-          end
-  
-          opts[:remover] ||= proc do |o|
-            if (array = o.get_column_value(key)) && !array.empty?
-              array.delete(get_column_value(pk))
+          unless opts.has_key?(:adder)
+            opts[:adder] = proc do |o|
+              if array = o.get_column_value(key)
+                array << get_column_value(pk)
+              else
+                o.set_column_value("#{key}=", Sequel.pg_array([get_column_value(pk)], opts.array_type))
+              end
               o.save(save_opts)
             end
           end
+    
+          unless opts.has_key?(:remover)
+            opts[:remover] = proc do |o|
+              if (array = o.get_column_value(key)) && !array.empty?
+                array.delete(get_column_value(pk))
+                o.save(save_opts)
+              end
+            end
+          end
 
-          opts[:clearer] ||= proc do
-            pk_value = get_column_value(pk)
-            db_type = opts.array_type
-            opts.associated_dataset.where(Sequel.pg_array_op(key).contains(Sequel.pg_array([pk_value], db_type))).update(key=>Sequel.function(:array_remove, key, Sequel.cast(pk_value, db_type)))
+          unless opts.has_key?(:clearer)
+            opts[:clearer] = proc do
+              pk_value = get_column_value(pk)
+              db_type = opts.array_type
+              opts.associated_dataset.where(Sequel.pg_array_op(key).contains(Sequel.pg_array([pk_value], db_type))).update(key=>Sequel.function(:array_remove, key, Sequel.cast(pk_value, db_type)))
+            end
           end
         end
 
@@ -486,30 +492,36 @@ module Sequel
             end
           end
 
-          opts[:adder] ||= proc do |o|
-            opk = o.get_column_value(opts.primary_key) 
-            if array = get_column_value(key)
-              modified!(key)
-              array << opk
-            else
-              set_column_value("#{key}=", Sequel.pg_array([opk], opts.array_type))
-            end
-            save_after_modify.call(self) if save_after_modify
-          end
-  
-          opts[:remover] ||= proc do |o|
-            if (array = get_column_value(key)) && !array.empty?
-              modified!(key)
-              array.delete(o.get_column_value(opts.primary_key))
+          unless opts.has_key?(:adder)
+            opts[:adder] = proc do |o|
+              opk = o.get_column_value(opts.primary_key) 
+              if array = get_column_value(key)
+                modified!(key)
+                array << opk
+              else
+                set_column_value("#{key}=", Sequel.pg_array([opk], opts.array_type))
+              end
               save_after_modify.call(self) if save_after_modify
+            end
+          end
+    
+          unless opts.has_key?(:remover)
+            opts[:remover] = proc do |o|
+              if (array = get_column_value(key)) && !array.empty?
+                modified!(key)
+                array.delete(o.get_column_value(opts.primary_key))
+                save_after_modify.call(self) if save_after_modify
+              end
             end
           end
 
-          opts[:clearer] ||= proc do
-            if (array = get_column_value(key)) && !array.empty?
-              modified!(key)
-              array.clear
-              save_after_modify.call(self) if save_after_modify
+          unless opts.has_key?(:clearer)
+            opts[:clearer] = proc do
+              if (array = get_column_value(key)) && !array.empty?
+                modified!(key)
+                array.clear
+                save_after_modify.call(self) if save_after_modify
+              end
             end
           end
         end
