@@ -12,6 +12,7 @@ describe "Sequel::Schema::CreateTableGenerator dump methods" do
       varchar :b
       column :dt, DateTime
       column :vc, :varchar
+      column :uuid, :uuid, default: 'uuid_generate_v4()'
       primary_key :c
       foreign_key :d, :a
       foreign_key :e
@@ -692,13 +693,14 @@ END_MIG
        [:c9, {:db_type=>'time', :default=>"'10:20:30'", :type=>:time, :allow_null=>true}],
        [:c10, {:db_type=>'foo', :default=>"'6 weeks'", :type=>nil, :allow_null=>true}],
        [:c11, {:db_type=>'date', :default=>"CURRENT_DATE", :type=>:date, :allow_null=>true}],
-       [:c12, {:db_type=>'timestamp', :default=>"now()", :type=>:datetime, :allow_null=>true}]]
+       [:c12, {:db_type=>'timestamp', :default=>"now()", :type=>:datetime, :allow_null=>true}],
+       [:c13, {:db_type=>'uuid', :default=>"uuid_generate_v4()", :type=>:uuid, :allow_null=>true}]]
       s.each{|_, c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
       s
     end
     e = RUBY_VERSION >= '2.4' ? 'e' : 'E'
-    @d.dump_table_schema(:t4).gsub(/[+-]\d\d\d\d"\)/, '")').gsub(/\.0+/, '.0').must_equal "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  String :c2, :default=>\"blah\"\n  Integer :c3, :default=>-1\n  Float :c4, :default=>1.0\n  BigDecimal :c5, :default=>Kernel::BigDecimal(\"0.1005#{e}3\")\n  File :c6, :default=>Sequel::SQL::Blob.new(\"blah\")\n  Date :c7, :default=>Date.new(2008, 10, 29)\n  DateTime :c8, :default=>DateTime.parse(\"2008-10-29T10:20:30.0\")\n  Time :c9, :default=>Sequel::SQLTime.parse(\"10:20:30.0\"), :only_time=>true\n  String :c10\n  Date :c11, :default=>Sequel::CURRENT_DATE\n  DateTime :c12, :default=>Sequel::CURRENT_TIMESTAMP\nend"
-    @d.dump_table_schema(:t4, :same_db=>true).gsub(/[+-]\d\d\d\d"\)/, '")').gsub(/\.0+/, '.0').must_equal "create_table(:t4) do\n  column :c1, \"boolean\", :default=>false\n  column :c2, \"varchar\", :default=>\"blah\"\n  column :c3, \"integer\", :default=>-1\n  column :c4, \"float\", :default=>1.0\n  column :c5, \"decimal\", :default=>Kernel::BigDecimal(\"0.1005#{e}3\")\n  column :c6, \"blob\", :default=>Sequel::SQL::Blob.new(\"blah\")\n  column :c7, \"date\", :default=>Date.new(2008, 10, 29)\n  column :c8, \"datetime\", :default=>DateTime.parse(\"2008-10-29T10:20:30.0\")\n  column :c9, \"time\", :default=>Sequel::SQLTime.parse(\"10:20:30.0\")\n  column :c10, \"foo\", :default=>Sequel::LiteralString.new(\"'6 weeks'\")\n  column :c11, \"date\", :default=>Sequel::CURRENT_DATE\n  column :c12, \"timestamp\", :default=>Sequel::CURRENT_TIMESTAMP\nend"
+    @d.dump_table_schema(:t4).gsub(/[+-]\d\d\d\d"\)/, '")').gsub(/\.0+/, '.0').must_equal "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  String :c2, :default=>\"blah\"\n  Integer :c3, :default=>-1\n  Float :c4, :default=>1.0\n  BigDecimal :c5, :default=>Kernel::BigDecimal(\"0.1005#{e}3\")\n  File :c6, :default=>Sequel::SQL::Blob.new(\"blah\")\n  Date :c7, :default=>Date.new(2008, 10, 29)\n  DateTime :c8, :default=>DateTime.parse(\"2008-10-29T10:20:30.0\")\n  Time :c9, :default=>Sequel::SQLTime.parse(\"10:20:30.0\"), :only_time=>true\n  String :c10\n  Date :c11, :default=>Sequel::CURRENT_DATE\n  DateTime :c12, :default=>Sequel::CURRENT_TIMESTAMP\n  column :c13, :uuid, :default=>Sequel::SQL::Function.new!(:uuid_generate_v4, [], {})\nend"
+    @d.dump_table_schema(:t4, :same_db=>true).gsub(/[+-]\d\d\d\d"\)/, '")').gsub(/\.0+/, '.0').must_equal "create_table(:t4) do\n  column :c1, \"boolean\", :default=>false\n  column :c2, \"varchar\", :default=>\"blah\"\n  column :c3, \"integer\", :default=>-1\n  column :c4, \"float\", :default=>1.0\n  column :c5, \"decimal\", :default=>Kernel::BigDecimal(\"0.1005#{e}3\")\n  column :c6, \"blob\", :default=>Sequel::SQL::Blob.new(\"blah\")\n  column :c7, \"date\", :default=>Date.new(2008, 10, 29)\n  column :c8, \"datetime\", :default=>DateTime.parse(\"2008-10-29T10:20:30.0\")\n  column :c9, \"time\", :default=>Sequel::SQLTime.parse(\"10:20:30.0\")\n  column :c10, \"foo\", :default=>Sequel::LiteralString.new(\"'6 weeks'\")\n  column :c11, \"date\", :default=>Sequel::CURRENT_DATE\n  column :c12, \"timestamp\", :default=>Sequel::CURRENT_TIMESTAMP\n  column :c13, \"uuid\", :default=>Sequel::SQL::Function.new!(:uuid_generate_v4, [], {})\nend"
   end
   
   it "should not use a literal string as a fallback if using MySQL with the :same_db option" do
