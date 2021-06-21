@@ -3,7 +3,7 @@ Issue Guidelines
 
 1) Issues should only be created for things that are definitely bugs.
    If you are not sure that the behavior is a bug, ask about it on
-   IRC or the sequel-talk Google Group.  GitHub Issues should not be
+   the sequel-talk Google Group.  GitHub Issues should not be
    used as a help forum.
 
 2) If you are sure it is a bug, then post a complete description of
@@ -41,7 +41,7 @@ Pull Request Guidelines
    be merged.  Pull requests should not be used to "start a
    conversation" about a possible code change.  If the pull
    request requires a conversation, that conversation should take
-   place on the sequel-talk Google Group or IRC.
+   place on the sequel-talk Google Group.
 
 7) Pull requests are generally closed as soon as it appears that the
    branch will not be merged.  However, discussion about the code can
@@ -54,8 +54,7 @@ Code of Conduct
 
 This code of conduct applies to all of the project's "collaborative
 space", which is defined as community communications channels,
-including the Google Group, GitHub project, source code repository,
-and IRC channel.
+including the Google Group, GitHub project, and source code repository.
 
 1) Participants must ensure that their language and actions are free
    of personal attacks and remarks disparaging to people or groups.
