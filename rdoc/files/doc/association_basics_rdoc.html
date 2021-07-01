@@ -30,7 +30,7 @@ doc/association_basics.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-07-17 08:42:04 -0700</span>
+<span class='datetime'>2021-06-11 17:28:01 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -456,17 +456,31 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">adder:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-identifier">id</span>, <span class="ruby-value">file_under:</span> <span class="ruby-node">&quot;#{name}-#{album.name}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 
+<p>You can set this to <code>nil</code> to not create a add_<em>association</em> method.</p>
+
 <h3 id="label-3Aremover+-28_remove_association+method-29">:remover (_remove_<em>association</em> method)<span><a href="#label-3Aremover+-28_remove_association+method-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>Continuing with the same example, here&#39;s how you would handle the same case if you also wanted to handle the Artist#remove_album method:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">remover:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-value">file_under:</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 
+<p>You can set this to <code>nil</code> to not create a remove_<em>association</em> method.</p>
+
 <h3 id="label-3Aclearer+-28_remove_all_association+method-29">:clearer (_remove_all_<em>association</em> method)<span><a href="#label-3Aclearer+-28_remove_all_association+method-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>Continuing with the same example, here&#39;s how you would handle the same case if you also wanted to handle the Artist#remove_all_albums method:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">clearer:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># This is Dataset#update, not Model#update, so the file_under: :name</span>&#x000A;    <span class="ruby-comment"># ends up being &quot;SET file_under = name&quot; in SQL.</span>&#x000A;    <span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-value">file_under:</span> <span class="ruby-value">:name</span>)&#x000A;  <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>You can set this to <code>nil</code> to not create a remove_all_<em>association</em> method.</p>
+
+<h3 id="label-3Ano_dataset_method">:no_dataset_method<span><a href="#label-3Ano_dataset_method">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Setting this to true will not result in the <em>association</em>_dataset method not being defined. This can save memory if you only use the <em>association</em> method and do not call the <em>association</em>_dataset method directly or indirectly.</p>
+
+<h3 id="label-3Ano_association_method">:no_association_method<span><a href="#label-3Ano_association_method">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Setting this to true will not result in the <em>association</em> method not being defined. This can save memory if you only use the <em>association</em>_dataset method and do not call the <em>association</em> method directly or indirectly.</p>
 
 <h2 id="label-Association+Options">Association Options<span><a href="#label-Association+Options">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -899,7 +913,7 @@ Last Update:
 
 <p>For <code>many_to_one</code> and <code>one_to_one</code> associations, do not add a setter method. For <code>one_to_many</code> and <code>many_to_many</code>, do not add the add_<em>association</em>, remove_<em>association</em>, or remove_all_<em>association</em> methods.</p>
 
-<p>If the default modification methods would not do what you want, and you don&#39;t plan on overriding the internal modification methods to do what you want, it may be best to set this option to true.</p>
+<p>If you are not using the association modification methods, setting this value to true will save memory.</p>
 
 <h4 id="label-3Avalidate">:validate<span><a href="#label-3Avalidate">&para;</a> <a href="#top">&uarr;</a></span></h4>
 

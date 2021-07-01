@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::UnusedAssociations::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::UnusedAssociations::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/unused_associations_rb.html">lib/sequel/plugins/unused_associations.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-associate">associate</a></li>
+<li><a href="#method-i-delete_unused_associations_files">delete_unused_associations_files</a></li>
+<li><a href="#method-i-unused_association_options">unused_association_options</a></li>
+<li><a href="#method-i-unused_associations">unused_associations</a></li>
+<li><a href="#method-i-update_associations_coverage">update_associations_coverage</a></li>
+<li><a href="#method-i-update_unused_associations_data">update_unused_associations_data</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-associate'>
+<a name='method-i-associate'></a>
+<div class='synopsis'>
+<span class='name'>associate</span><span class='arguments'>(type, assoc_name, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>If modifying associations, and this association is marked as not used, and the association does not include the specific :is_used option, skip defining the association.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-associate-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-associate-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">272</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">assoc_name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">273</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:is_used</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@unused_associations_data</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">data</span> = <span class="ruby-ivar">@unused_associations_data</span>[<span class="ruby-identifier">name</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">data</span>[<span class="ruby-identifier">assoc_name</span>.<span class="ruby-identifier">to_s</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;unused&#39;</span>&#x000A;<span class="line-num">274</span>     <span class="ruby-keyword">return</span>&#x000A;<span class="line-num">275</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">276</span>   &#x000A;<span class="line-num">277</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">278</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-delete_unused_associations_files'>
+<a name='method-i-delete_unused_associations_files'></a>
+<div class='synopsis'>
+<span class='name'>delete_unused_associations_files</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Delete the unused associations coverage file and unused associations data file, if either exist.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-delete_unused_associations_files-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-delete_unused_associations_files-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">440</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete_unused_associations_files</span>&#x000A;<span class="line-num">441</span>   <span class="ruby-identifier">_delete_unused_associations_file</span>(<span class="ruby-ivar">@unused_associations_coverage_file</span>)&#x000A;<span class="line-num">442</span>   <span class="ruby-identifier">_delete_unused_associations_file</span>(<span class="ruby-ivar">@unused_associations_file</span>)&#x000A;<span class="line-num">443</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-unused_association_options'>
+<a name='method-i-unused_association_options'></a>
+<div class='synopsis'>
+<span class='name'>unused_association_options</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return an array of unused association options.  These are associations some but not all of the association methods are used, according to the coverage information. Each entry in the array is an array of three elements.  The first element is the class name string, the second element is the association name string, and the third element is a hash of association options that can be used in the association so it does not define methods that are not used.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:unused_associations_data </td><td>
+<p>The data to use for determining which associations are unused, which is returned from <code>update_unused_associations_data</code>. If not given, loads the data from the file specified by the :file plugin option.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unused_association_options-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-unused_association_options-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">424</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unused_association_options</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">425</span>   <span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:unused_associations_data</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">binread</span>(<span class="ruby-ivar">@unused_associations_file</span>))&#x000A;<span class="line-num">426</span> &#x000A;<span class="line-num">427</span>   <span class="ruby-identifier">unused_association_methods</span> = []&#x000A;<span class="line-num">428</span>   <span class="ruby-identifier">unused_associations_data</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sc</span>, <span class="ruby-identifier">associations</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">429</span>     <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">unused</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">430</span>       <span class="ruby-keyword">unless</span> <span class="ruby-identifier">unused</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;unused&#39;</span>&#x000A;<span class="line-num">431</span>         <span class="ruby-identifier">unused_association_methods</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">sc</span>, <span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">set_unused_options_for_association</span>({}, <span class="ruby-identifier">unused</span>)]&#x000A;<span class="line-num">432</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">433</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">434</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">435</span>   <span class="ruby-identifier">unused_association_methods</span>&#x000A;<span class="line-num">436</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-unused_associations'>
+<a name='method-i-unused_associations'></a>
+<div class='synopsis'>
+<span class='name'>unused_associations</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return an array of unused associations.  These are associations where none of the association methods are used, according to the coverage information.  Each entry in the array is an array of two strings, with the first string being the class name and the second string being the association name.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:unused_associations_data </td><td>
+<p>The data to use for determining which associations are unused, which is returned from <code>update_unused_associations_data</code>. If not given, loads the data from the file specified by the :file plugin option.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unused_associations-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-unused_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">397</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unused_associations</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">398</span>   <span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:unused_associations_data</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">binread</span>(<span class="ruby-ivar">@unused_associations_file</span>))&#x000A;<span class="line-num">399</span> &#x000A;<span class="line-num">400</span>   <span class="ruby-identifier">unused_associations</span> = []&#x000A;<span class="line-num">401</span>   <span class="ruby-identifier">unused_associations_data</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sc</span>, <span class="ruby-identifier">associations</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">402</span>     <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">unused</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">403</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">unused</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;unused&#39;</span>&#x000A;<span class="line-num">404</span>         <span class="ruby-identifier">unused_associations</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">sc</span>, <span class="ruby-identifier">assoc</span>]&#x000A;<span class="line-num">405</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">406</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">407</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">408</span>   <span class="ruby-identifier">unused_associations</span>&#x000A;<span class="line-num">409</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-update_associations_coverage'>
+<a name='method-i-update_associations_coverage'></a>
+<div class='synopsis'>
+<span class='name'>update_associations_coverage</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Parse the coverage result, and return the coverage data for the associations for descendants of this class. If the plugin uses the :coverage_file option, the existing coverage file will be loaded if present, and before the method returns, the coverage file will be updated.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:coverage_result </td><td>
+<p>The coverage result to use. This defaults to <code>Coverage.result</code>.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_associations_coverage-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-update_associations_coverage-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">287</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_associations_coverage</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">288</span>   <span class="ruby-identifier">coverage_result</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:coverage_result</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Coverage</span>.<span class="ruby-identifier">result</span>&#x000A;<span class="line-num">289</span>   <span class="ruby-identifier">module_mapping</span> = {}&#x000A;<span class="line-num">290</span>   <span class="ruby-identifier">file</span> = <span class="ruby-ivar">@unused_associations_coverage_file</span>&#x000A;<span class="line-num">291</span> &#x000A;<span class="line-num">292</span>   <span class="ruby-identifier">coverage_data</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">293</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">binread</span>(<span class="ruby-identifier">file</span>))&#x000A;<span class="line-num">294</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">295</span>     {}&#x000A;<span class="line-num">296</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">297</span> &#x000A;<span class="line-num">298</span>   ([<span class="ruby-keyword">self</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">descendents</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sc</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">299</span>     <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">sc</span>.<span class="ruby-identifier">associations</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>&#x000A;<span class="line-num">300</span>     <span class="ruby-identifier">module_mapping</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:overridable_methods_module</span>)] = <span class="ruby-identifier">sc</span>&#x000A;<span class="line-num">301</span>     <span class="ruby-identifier">coverage_data</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>] <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">302</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">303</span> &#x000A;<span class="line-num">304</span>   <span class="ruby-identifier">coverage_result</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span>, <span class="ruby-identifier">coverage</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">305</span>     <span class="ruby-identifier">coverage</span>[<span class="ruby-value">:methods</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>), <span class="ruby-identifier">times</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">306</span>       <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">sc</span> = <span class="ruby-identifier">module_mapping</span>[<span class="ruby-identifier">mod</span>]&#x000A;<span class="line-num">307</span>       <span class="ruby-identifier">coverage_data</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>][<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>&#x000A;<span class="line-num">308</span>       <span class="ruby-identifier">coverage_data</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>][<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">times</span>&#x000A;<span class="line-num">309</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">310</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">311</span> &#x000A;<span class="line-num">312</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span>&#x000A;<span class="line-num">313</span>     <span class="ruby-constant">File</span>.<span class="ruby-identifier">binwrite</span>(<span class="ruby-identifier">file</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">coverage_data</span>))&#x000A;<span class="line-num">314</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">315</span> &#x000A;<span class="line-num">316</span>   <span class="ruby-identifier">coverage_data</span>&#x000A;<span class="line-num">317</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-update_unused_associations_data'>
+<a name='method-i-update_unused_associations_data'></a>
+<div class='synopsis'>
+<span class='name'>update_unused_associations_data</span><span class='arguments'>(options=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Parse the coverage data returned by <a href="ClassMethods.html#method-i-update_associations_coverage"><code>update_associations_coverage</code></a>, and return data on unused associations and unused association methods.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:coverage_data </td><td>
+<p>The coverage data to use. If not given, it is taken from the file specified by the :coverage_file plugin option.</p>
+</td></tr><tr><td class='label'>:keep_coverage </td><td>
+<p>Do not delete the file specified by the :coverage_file plugin option, even if it exists.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_unused_associations_data-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-update_unused_associations_data-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">327</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_unused_associations_data</span>(<span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">328</span>   <span class="ruby-identifier">coverage_data</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:coverage_data</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">binread</span>(<span class="ruby-ivar">@unused_associations_coverage_file</span>))&#x000A;<span class="line-num">329</span> &#x000A;<span class="line-num">330</span>   <span class="ruby-identifier">unused_associations_data</span> = {}&#x000A;<span class="line-num">331</span> &#x000A;<span class="line-num">332</span>   ([<span class="ruby-keyword">self</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">descendents</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sc</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">333</span>     <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">cov_data</span> = <span class="ruby-identifier">coverage_data</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>]&#x000A;<span class="line-num">334</span> &#x000A;<span class="line-num">335</span>     <span class="ruby-identifier">sc</span>.<span class="ruby-identifier">associations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">336</span>       <span class="ruby-identifier">ref</span> = <span class="ruby-identifier">sc</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">assoc</span>)&#x000A;<span class="line-num">337</span> &#x000A;<span class="line-num">338</span>       <span class="ruby-comment"># Only report associations for the class they are defined in</span>&#x000A;<span class="line-num">339</span>       <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:model</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">sc</span>&#x000A;<span class="line-num">340</span> &#x000A;<span class="line-num">341</span>       <span class="ruby-comment"># Do not report associations using methods_module option, because this plugin only</span>&#x000A;<span class="line-num">342</span>       <span class="ruby-comment"># looks in the class&#39;s overridable_methods_module</span>&#x000A;<span class="line-num">343</span>       <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:methods_module</span>]&#x000A;<span class="line-num">344</span> &#x000A;<span class="line-num">345</span>       <span class="ruby-identifier">info</span> = {}&#x000A;<span class="line-num">346</span> &#x000A;<span class="line-num">347</span>       <span class="ruby-identifier">_update_association_coverage_info</span>(<span class="ruby-identifier">info</span>, <span class="ruby-identifier">cov_data</span>, <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">dataset_method</span>, <span class="ruby-value">:dataset_method</span>)&#x000A;<span class="line-num">348</span>       <span class="ruby-identifier">_update_association_coverage_info</span>(<span class="ruby-identifier">info</span>, <span class="ruby-identifier">cov_data</span>, <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">association_method</span>, <span class="ruby-value">:association_method</span>)&#x000A;<span class="line-num">349</span> &#x000A;<span class="line-num">350</span>       <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:orig_opts</span>][<span class="ruby-value">:read_only</span>]&#x000A;<span class="line-num">351</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">returns_array?</span>&#x000A;<span class="line-num">352</span>           <span class="ruby-identifier">_update_association_coverage_info</span>(<span class="ruby-identifier">info</span>, <span class="ruby-identifier">cov_data</span>, <span class="ruby-identifier">ref</span>[<span class="ruby-value">:add_method</span>], <span class="ruby-value">:adder</span>)&#x000A;<span class="line-num">353</span>           <span class="ruby-identifier">_update_association_coverage_info</span>(<span class="ruby-identifier">info</span>, <span class="ruby-identifier">cov_data</span>, <span class="ruby-identifier">ref</span>[<span class="ruby-value">:remove_method</span>], <span class="ruby-value">:remover</span>)&#x000A;<span class="line-num">354</span>           <span class="ruby-identifier">_update_association_coverage_info</span>(<span class="ruby-identifier">info</span>, <span class="ruby-identifier">cov_data</span>, <span class="ruby-identifier">ref</span>[<span class="ruby-value">:remove_all_method</span>], <span class="ruby-value">:clearer</span>)&#x000A;<span class="line-num">355</span>         <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">356</span>           <span class="ruby-identifier">_update_association_coverage_info</span>(<span class="ruby-identifier">info</span>, <span class="ruby-identifier">cov_data</span>, <span class="ruby-identifier">ref</span>[<span class="ruby-value">:setter_method</span>], <span class="ruby-value">:setter</span>)&#x000A;<span class="line-num">357</span>         <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">358</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">359</span> &#x000A;<span class="line-num">360</span>       <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">info</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">==</span> [<span class="ruby-value">:missing</span>]&#x000A;<span class="line-num">361</span> &#x000A;<span class="line-num">362</span>       <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">info</span>[<span class="ruby-value">:used</span>]&#x000A;<span class="line-num">363</span>         (<span class="ruby-identifier">unused_associations_data</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>] <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">assoc</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-string">&#39;unused&#39;</span>&#x000A;<span class="line-num">364</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">unused</span> = <span class="ruby-identifier">info</span>[<span class="ruby-value">:unused</span>]&#x000A;<span class="line-num">365</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">unused</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:setter</span>) <span class="ruby-operator">||</span> [<span class="ruby-value">:adder</span>, <span class="ruby-value">:remover</span>, <span class="ruby-value">:clearer</span>].<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">unused</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="line-num">366</span>           [<span class="ruby-value">:setter</span>, <span class="ruby-value">:adder</span>, <span class="ruby-value">:remover</span>, <span class="ruby-value">:clearer</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">367</span>             <span class="ruby-identifier">unused</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>)&#x000A;<span class="line-num">368</span>           <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">369</span>           <span class="ruby-identifier">unused</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">:read_only</span>&#x000A;<span class="line-num">370</span>         <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">371</span>         (<span class="ruby-identifier">unused_associations_data</span>[<span class="ruby-identifier">sc</span>.<span class="ruby-identifier">name</span>] <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">assoc</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">unused</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:to_s</span>)&#x000A;<span class="line-num">372</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">373</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">374</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">375</span> &#x000A;<span class="line-num">376</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@unused_associations_file</span>&#x000A;<span class="line-num">377</span>     <span class="ruby-constant">File</span>.<span class="ruby-identifier">binwrite</span>(<span class="ruby-ivar">@unused_associations_file</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">unused_associations_data</span>))&#x000A;<span class="line-num">378</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">379</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:keep_coverage</span>]&#x000A;<span class="line-num">380</span>     <span class="ruby-identifier">_delete_unused_associations_file</span>(<span class="ruby-ivar">@unused_associations_coverage_file</span>)&#x000A;<span class="line-num">381</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">382</span> &#x000A;<span class="line-num">383</span>   <span class="ruby-identifier">unused_associations_data</span>&#x000A;<span class="line-num">384</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
-Tue, 01 Jun 2021 07:47:11 -0700
-README.rdoc	Tue, 03 Nov 2020 13:05:26 -0800
-CHANGELOG	Tue, 01 Jun 2021 07:39:55 -0700
+Thu, 01 Jul 2021 08:05:28 -0700
+README.rdoc	Mon, 21 Jun 2021 08:35:50 -0700
+CHANGELOG	Thu, 01 Jul 2021 07:57:50 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 06 Jan 2021 14:13:44 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Mon, 30 Nov 2020 09:24:48 -0800
-lib/sequel/version.rb	Tue, 01 Jun 2021 07:39:55 -0700
+lib/sequel/version.rb	Thu, 01 Jul 2021 07:57:50 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 26 Jun 2020 14:43:12 -0700
@@ -38,7 +38,7 @@ lib/sequel/dataset/placeholder_literalizer.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/dataset/prepared_statements.rb	Wed, 02 Dec 2020 15:37:08 -0800
 lib/sequel/dataset/query.rb	Tue, 18 May 2021 12:06:56 -0700
 lib/sequel/dataset/sql.rb	Tue, 18 May 2021 12:06:56 -0700
-lib/sequel/model/associations.rb	Mon, 03 May 2021 09:18:23 -0700
+lib/sequel/model/associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
 lib/sequel/model/base.rb	Thu, 04 Feb 2021 15:23:39 -0800
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -47,7 +47,7 @@ lib/sequel/model/exceptions.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/plugins.rb	Fri, 04 Dec 2020 13:44:07 -0800
 doc/advanced_associations.rdoc	Wed, 01 Apr 2020 09:49:55 -0700
-doc/association_basics.rdoc	Fri, 17 Jul 2020 08:42:04 -0700
+doc/association_basics.rdoc	Fri, 11 Jun 2021 17:28:01 -0700
 doc/bin_sequel.rdoc	Thu, 10 Aug 2017 09:06:47 -0700
 doc/cheat_sheet.rdoc	Mon, 30 Nov 2020 09:54:54 -0800
 doc/code_order.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
@@ -235,6 +235,7 @@ doc/release_notes/5.42.0.txt	Mon, 01 Mar 2021 07:44:40 -0800
 doc/release_notes/5.43.0.txt	Thu, 01 Apr 2021 07:38:02 -0700
 doc/release_notes/5.44.0.txt	Fri, 30 Apr 2021 14:59:23 -0700
 doc/release_notes/5.45.0.txt	Tue, 01 Jun 2021 07:39:55 -0700
+doc/release_notes/5.46.0.txt	Thu, 01 Jul 2021 07:57:50 -0700
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700

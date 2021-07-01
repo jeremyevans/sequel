@@ -1,4 +1,4 @@
-Tue, 01 Jun 2021 07:48:05 -0700
+Thu, 01 Jul 2021 08:06:23 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -136,7 +136,7 @@ lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Sat, 20 Jan 2018 09:44:46 -0800
 lib/sequel/plugins/nested_attributes.rb	Tue, 23 Feb 2021 11:14:20 -0800
 lib/sequel/plugins/optimistic_locking.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/pg_array_associations.rb	Mon, 26 Apr 2021 12:52:05 -0700
+lib/sequel/plugins/pg_array_associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
 lib/sequel/plugins/pg_auto_constraint_validations.rb	Wed, 02 Dec 2020 15:37:08 -0800
 lib/sequel/plugins/pg_row.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/prepared_statements.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -163,6 +163,7 @@ lib/sequel/plugins/touch.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/tree.rb	Mon, 02 Nov 2020 12:46:04 -0800
 lib/sequel/plugins/typecast_on_load.rb	Wed, 09 Oct 2019 09:00:49 -0700
 lib/sequel/plugins/unlimited_update.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/unused_associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
 lib/sequel/plugins/update_or_create.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/update_primary_key.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/plugins/update_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
