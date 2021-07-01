@@ -1,4 +1,4 @@
-=== master
+=== 5.46.0 (2021-07-01)
 
 * Add unused_associations plugin, for determining which associations and association methods are not used (jeremyevans)
 
