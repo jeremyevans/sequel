@@ -699,7 +699,7 @@ module Sequel
     end
 
     # Returns a copy of the dataset with a specified order. Can be safely combined with limit.
-    # If you call limit with an offset, it will override override the offset if you've called
+    # If you call limit with an offset, it will override the offset if you've called
     # offset first.
     #
     #   DB[:items].offset(10) # SELECT * FROM items OFFSET 10
