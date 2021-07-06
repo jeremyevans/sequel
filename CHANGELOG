@@ -1,3 +1,7 @@
+=== master
+
+* Support Dataset#returning on SQLite 3.35+ (jeremyevans)
+
 === 5.46.0 (2021-07-01)
 
 * Add unused_associations plugin, for determining which associations and association methods are not used (jeremyevans)

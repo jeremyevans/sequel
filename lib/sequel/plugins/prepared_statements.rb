@@ -169,8 +169,17 @@ module Sequel
           end
 
           case type
-          when :insert, :insert_select, :update
+          when :insert, :update
             true
+          when :insert_select
+            # SQLite RETURNING support has a bug that doesn't allow for committing transactions
+            # when a prepared statement with RETURNING has been used on the connection:
+            #
+            #   SQLite3::BusyException: cannot commit transaction - SQL statements in progress: COMMIT
+            #
+            # Disabling usage of prepared statements for insert_select on SQLite seems to be the
+            # simplest way to workaround the problem.
+            db.database_type != :sqlite
           # :nocov:
           when :delete, :refresh
             Sequel::Deprecation.deprecate("The :delete and :refresh prepared statement types", "There should be no need to check if these types are supported")

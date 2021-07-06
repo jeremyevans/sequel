@@ -562,10 +562,10 @@ module Sequel
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}.freeze
       EXTRACT_MAP.each_value(&:freeze)
 
-      Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
-      Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values on_conflict'], ["else", %w'insert conflict into columns values']])
+      Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 33500', %w'with delete from where returning'], ['elsif db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
+      Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 33500', %w'with insert conflict into columns values on_conflict returning'], ['elsif db.sqlite_version >= 30803', %w'with insert conflict into columns values on_conflict'], ["else", %w'insert conflict into columns values']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having window compounds order limit lock']])
-      Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 33300', %w'with update table set from where'], ['elsif db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
+      Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 33500', %w'with update table set from where returning'], ['elsif db.sqlite_version >= 33300', %w'with update table set from where'], ['elsif db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
       def cast_sql_append(sql, expr, type)
         if type == Time or type == DateTime
@@ -639,8 +639,8 @@ module Sequel
       # SQLite performs a TRUNCATE style DELETE if no filter is specified.
       # Since we want to always return the count of records, add a condition
       # that is always true and then delete.
-      def delete
-        @opts[:where] ? super : where(1=>1).delete
+      def delete(&block)
+        @opts[:where] ? super : where(1=>1).delete(&block)
       end
       
       # Return an array of strings specifying a query explanation for a SELECT of the
@@ -661,6 +661,21 @@ module Sequel
         super
       end
       
+      # Support insert select for associations, so that the model code can use
+      # returning instead of a separate query.
+      def insert_select(*values)
+        return unless supports_insert_select?
+        # Handle case where query does not return a row
+        server?(:default).with_sql_first(insert_select_sql(*values)) || false
+      end
+
+      # The SQL to use for an insert_select, adds a RETURNING clause to the insert
+      # unless the RETURNING clause is already present.
+      def insert_select_sql(*values)
+        ds = opts[:returning] ? self : returning
+        ds.insert_sql(*values)
+      end
+
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
         sql << '`' << c.to_s.gsub('`', '``') << '`'
@@ -742,6 +757,13 @@ module Sequel
         insert_conflict(:ignore)
       end
 
+      # Automatically add aliases to RETURNING values to work around SQLite bug.
+      def returning(*values)
+        return super if values.empty?
+        raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
+        clone(:returning=>_returning_values(values).freeze)
+      end
+
       # SQLite 3.8.3+ supports common table expressions.
       def supports_cte?(type=:select)
         db.sqlite_version >= 30803
@@ -782,6 +804,11 @@ module Sequel
         false
       end
       
+      # SQLite 3.35.0 supports RETURNING on INSERT/UPDATE/DELETE.
+      def supports_returning?(_)
+        db.sqlite_version >= 33500
+      end
+
       # SQLite supports timezones in literal timestamps, since it stores them
       # as text.  But using timezones in timestamps breaks SQLite datetime
       # functions, so we allow the user to override the default per database.
@@ -814,6 +841,21 @@ module Sequel
 
       private
       
+      # Add aliases to symbols and identifiers to work around SQLite bug.
+      def _returning_values(values)
+        values.map do |v|
+          case v
+          when Symbol
+            _, c, a = split_symbol(v)
+            a ? v : Sequel.as(v, c)
+          when SQL::Identifier, SQL::QualifiedIdentifier
+            Sequel.as(v, unqualified_column_for(v))
+          else
+            v
+          end
+        end
+      end
+
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql_append(sql, aliaz, column_aliases=nil)
         raise Error, "sqlite does not support derived column lists" if column_aliases
