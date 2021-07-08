@@ -41,7 +41,7 @@ As is the code to add a related album to an artist:
 
   @artist.add_album(name: 'RF')
 
-It also makes it easier to creating queries that use joins based on the association:
+It also makes it easier to create queries that use joins based on the association:
 
   Artist.association_join(:albums)
   # SELECT * FROM artists
@@ -63,8 +63,8 @@ It ships with additional association types via plugins.
 
 The many_to_one association is used when the table for the current class
 contains a foreign key that references the primary key in the table for the
-associated class.  It is named because there can be many rows in the current
-table for each row in the associated table.
+associated class.  It is named 'many_to_one' because there can be many rows
+in the current table for each row in the associated table.
 
   # Database schema:
   #  albums             artists
@@ -81,8 +81,8 @@ table for each row in the associated table.
 
 The one_to_many association is used when the table for the associated class
 contains a foreign key that references the primary key in the table for the
-current class.  It is named because for each row in the current table there
-can be many rows in the associated table:
+current class.  It is named 'one_to_many' because for each row in the
+current table there can be many rows in the associated table:
 
 The one_to_one association can be thought of as a subset of the one_to_many association,
 but where there can only be either 0 or 1 records in the associated table.  This is
@@ -344,7 +344,7 @@ instance method:
 
 == Dataset Method
 
-In addition to the above methods, associations also add a instance method
+In addition to the above methods, associations also add an instance method
 ending in +_dataset+ that returns a dataset representing the objects in the associated table:
 
   @album.artist_id
