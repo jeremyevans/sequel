@@ -187,6 +187,16 @@ module Sequel
       def views(opts=OPTS)
         full_tables('VIEW', opts)
       end
+
+      # Renames multiple tables:
+      #
+      #   DB.tables #=> [:items, :other_items]
+      #   DB.rename_tables [:items, :old_items], [:other_items, :old_other_items]
+      #   DB.tables #=> [:old_items, :old_other_items]
+      def rename_tables(*renames)
+        execute_ddl(rename_tables_sql(*renames))
+        renames.each { |rename| remove_cached_schema(rename.first) }
+      end
       
       private
       
@@ -715,6 +725,14 @@ module Sequel
       def full_text_sql(cols, terms, opts = OPTS)
         terms = terms.join(' ') if terms.is_a?(Array)
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
+      end
+
+      # SQL statement for renaming multiple tables.
+      def rename_tables_sql(*renames)
+        rename_tos = renames.map do |from, to|
+            "#{quote_schema_table(from)} TO #{quote_schema_table(to)}"
+        end.join(', ')
+        "RENAME TABLE #{rename_tos}"
       end
 
       # Sets up the insert methods to use INSERT IGNORE.

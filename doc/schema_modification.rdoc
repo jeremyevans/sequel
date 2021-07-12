@@ -627,6 +627,12 @@ the first argument is the current name, and the second is the new name:
 
   rename_table(:artist, :artists)
 
+=== +rename_tables+
+
+You can rename multiple tables using +rename_tables+. All the tables will be
+renamed atomically. This is only supported for MySQL as other databases do not
+have a +RENAME+ statement.
+
 === <tt>create_table!</tt>
 
 <tt>create_table!</tt> drops the table if it exists
