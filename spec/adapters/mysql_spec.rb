@@ -1059,3 +1059,18 @@ describe "MySQL joined datasets" do
     @db[:b].select_order_map(:id).must_equal [5]
   end
 end
+
+describe "MySQL::Database#rename_tables" do
+  before do
+    @db = DB
+  end
+
+  it "should rename multiple tables" do
+    @db.create_table!(:posts1){primary_key :a}
+    @db.create_table!(:messages1){primary_key :a}
+
+    @db.rename_tables([:posts1, :posts], [:messages1, :messages])
+    @db.table_exists?(:posts).must_equal true
+    @db.table_exists?(:messages).must_equal true
+  end
+end
