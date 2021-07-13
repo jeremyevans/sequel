@@ -188,14 +188,13 @@ module Sequel
         full_tables('VIEW', opts)
       end
 
-      # Renames multiple tables:
+      # Renames multiple tables in a single call.
       #
-      #   DB.tables #=> [:items, :other_items]
       #   DB.rename_tables [:items, :old_items], [:other_items, :old_other_items]
-      #   DB.tables #=> [:old_items, :old_other_items]
+      #   # RENAME TABLE items TO old_items, other_items TO old_other_items
       def rename_tables(*renames)
-        execute_ddl(rename_tables_sql(*renames))
-        renames.each { |rename| remove_cached_schema(rename.first) }
+        execute_ddl(rename_tables_sql(renames))
+        renames.each{|from,| remove_cached_schema(from)}
       end
       
       private
@@ -483,6 +482,14 @@ module Sequel
         schema(table).select{|a| a[1][:primary_key]}.map{|a| a[0]}
       end
 
+      # SQL statement for renaming multiple tables.
+      def rename_tables_sql(renames)
+        rename_tos = renames.map do |from, to|
+            "#{quote_schema_table(from)} TO #{quote_schema_table(to)}"
+        end.join(', ')
+        "RENAME TABLE #{rename_tos}"
+      end
+
       # Rollback the currently open XA transaction
       def rollback_transaction(conn, opts=OPTS)
         if (s = opts[:prepare]) && savepoint_level(conn) <= 1
@@ -725,14 +732,6 @@ module Sequel
       def full_text_sql(cols, terms, opts = OPTS)
         terms = terms.join(' ') if terms.is_a?(Array)
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
-      end
-
-      # SQL statement for renaming multiple tables.
-      def rename_tables_sql(*renames)
-        rename_tos = renames.map do |from, to|
-            "#{quote_schema_table(from)} TO #{quote_schema_table(to)}"
-        end.join(', ')
-        "RENAME TABLE #{rename_tos}"
       end
 
       # Sets up the insert methods to use INSERT IGNORE.

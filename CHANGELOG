@@ -1,5 +1,7 @@
 === master
 
+* Add Database#rename_tables on MySQL, for renaming multiple tables in a single call (nick96) (#1774)
+
 * Support Dataset#returning on SQLite 3.35+ (jeremyevans)
 
 === 5.46.0 (2021-07-01)

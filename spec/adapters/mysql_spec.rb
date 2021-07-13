@@ -1064,12 +1064,17 @@ describe "MySQL::Database#rename_tables" do
   before do
     @db = DB
   end
+  after do
+    DB.drop_table?(:posts1, :messages1, :posts, :messages)
+  end
 
   it "should rename multiple tables" do
     @db.create_table!(:posts1){primary_key :a}
     @db.create_table!(:messages1){primary_key :a}
 
     @db.rename_tables([:posts1, :posts], [:messages1, :messages])
+    @db.table_exists?(:posts1).must_equal false
+    @db.table_exists?(:messages1).must_equal false
     @db.table_exists?(:posts).must_equal true
     @db.table_exists?(:messages).must_equal true
   end
