@@ -1,5 +1,7 @@
 === master
 
+* Support :allow_eager_graph and :allow_filtering_by association options (jeremyevans)
+
 * Add Database#rename_tables on MySQL, for renaming multiple tables in a single call (nick96) (#1774)
 
 * Support Dataset#returning on SQLite 3.35+ (jeremyevans)

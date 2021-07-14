@@ -3541,6 +3541,8 @@ describe "Filtering by associations" do
       b = lambda{|ds| ds.where(:name=>'B')}
       c = {:name=>'A'}
 
+      many_to_one :no_artist, :class=>artist, :key=>:artist_id, :allow_filtering_by=>false
+
       many_to_one :artist, :class=>artist, :key=>:artist_id
       one_to_many :tracks, :class=>track, :key=>:album_id
       one_to_one :track, :class=>track, :key=>:album_id
@@ -4295,6 +4297,10 @@ describe "Filtering by associations" do
   it "should be able to handle NULL values when excluding multiple many_to_many associations with composite keys" do
     @Album.exclude(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.load(:tid1=>5)]).sql.must_equal 'SELECT * FROM albums WHERE (((albums.id1, albums.id2) NOT IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM albums_tags WHERE (((albums_tags.tag_id1, albums_tags.tag_id2) IN ((3, 4))) AND (albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL)))) OR (albums.id1 IS NULL) OR (albums.id2 IS NULL))'
     @Album.exclude(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.new]).sql.must_equal 'SELECT * FROM albums WHERE (((albums.id1, albums.id2) NOT IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM albums_tags WHERE (((albums_tags.tag_id1, albums_tags.tag_id2) IN ((3, 4))) AND (albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL)))) OR (albums.id1 IS NULL) OR (albums.id2 IS NULL))'
+  end
+
+  it "should not allow filtering on associations with allow_filtering_by: false" do
+    proc{@Album.filter(:no_artist=>@Artist.filter(:x=>1)).sql}.must_raise Sequel::Error
   end
 
   it "should be able to filter on many_to_one association datasets" do

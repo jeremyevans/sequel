@@ -1606,6 +1606,8 @@ module Sequel
         #               after an item is set using the association setter method.
         # :allow_eager :: If set to false, you cannot load the association eagerly
         #                 via eager or eager_graph
+        # :allow_eager_graph :: If set to false, you cannot load the association eagerly via eager_graph.
+        # :allow_filtering_by :: If set to false, you cannot use the association when filtering
         # :before_add :: Symbol, Proc, or array of both/either specifying a callback to call
         #                before a new item is added to the association.
         # :before_remove :: Symbol, Proc, or array of both/either specifying a callback to call
@@ -2899,6 +2901,8 @@ module Sequel
               (multiple = ((op == :IN || op == :'NOT IN') && ((is_ds = r.is_a?(Sequel::Dataset)) || (r.respond_to?(:all?) && r.all?{|x| x.is_a?(Sequel::Model)})))))
             l = args[0]
             if ar = model.association_reflections[l]
+              raise Error, "filtering by associations is not allowed for #{ar.inspect}" if ar[:allow_filtering_by] == false
+
               if multiple
                 klass = ar.associated_class
                 if is_ds
@@ -3394,7 +3398,7 @@ module Sequel
         # Allow associations that are eagerly graphed to be specified as an SQL::AliasedExpression, for
         # per-call determining of the alias base.
         def eager_graph_check_association(model, association)
-          if association.is_a?(SQL::AliasedExpression)
+          reflection = if association.is_a?(SQL::AliasedExpression)
             expr = association.expression
             if expr.is_a?(SQL::Identifier)
               expr = expr.value
@@ -3403,10 +3407,17 @@ module Sequel
               end
             end
 
-            SQL::AliasedExpression.new(check_association(model, expr), association.alias || expr, association.columns)
+            check_reflection = check_association(model, expr)
+            SQL::AliasedExpression.new(check_reflection, association.alias || expr, association.columns)
           else
-            check_association(model, association)
+            check_reflection = check_association(model, association)
           end
+
+          if check_reflection && check_reflection[:allow_eager_graph] == false
+            raise Error, "eager_graph not allowed for #{reflection.inspect}"
+          end
+
+          reflection
         end
       
         # The EagerGraphLoader instance used for converting eager_graph results.

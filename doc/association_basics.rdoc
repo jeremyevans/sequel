@@ -1686,11 +1686,34 @@ If set to false, you cannot load the association eagerly via eager or
 eager_graph.
 
   Artist.one_to_many :albums, allow_eager: false
-  Artist.eager(:albums) # Raises Sequel::Error
+  Artist.eager(:albums)       # Raises Sequel::Error
+  Artist.eager_graph(:albums) # Raises Sequel::Error
 
 This is usually used if the association dataset depends on specific values in
 model instance that would not be valid when eager loading for multiple
 instances.
+
+==== :allow_eager_graph
+
+If set to false, you cannot load the association eagerly via eager_graph.
+
+  Artist.one_to_many :albums, allow_eager_graph: false
+  Artist.eager(:albums)       # Allowed
+  Artist.eager_graph(:albums) # Raises Sequel::Error
+
+This is useful if you still want to allow loading via eager, but do not want
+to allow loading via eager graph, possibly because the association does not
+support joins.
+
+==== :allow_filtering_by
+
+If set to false, you cannot use the association when filtering.
+
+  Artist.one_to_many :albums, allow_filtering_by: false
+  Artist.where(:albums=>Album.where(:name=>'A')).all # Raises Sequel::Error
+
+This is useful if such filtering cannot work, such as when a subquery cannot
+be used because the necessary tables are not in the same database.
 
 ==== :instance_specific
 

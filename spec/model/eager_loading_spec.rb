@@ -1435,6 +1435,7 @@ describe Sequel::Model, "#eager_graph" do
     
     class ::GraphBandMember < Sequel::Model(:members)
       columns :id
+      many_to_many :no_bands, :class=>'GraphBand', :left_key=>:member_id, :right_key=>:band_id, :join_table=>:bm, :allow_eager_graph=>false
       many_to_many :bands, :class=>'GraphBand', :left_key=>:member_id, :right_key=>:band_id, :join_table=>:bm
     end
   end
@@ -1445,6 +1446,10 @@ describe Sequel::Model, "#eager_graph" do
     [:GraphAlbum, :GraphBand, :GraphTrack, :GraphGenre, :GraphBandMember].each{|x| Object.send(:remove_const, x)}
   end
     
+  it "should raise an error if called with an association with allow_eager_graph: false" do
+    proc{GraphBandMember.eager_graph(:no_bounds)}.must_raise(Sequel::Error)
+  end
+
   it "should raise an error if called without a symbol or hash" do
     proc{GraphAlbum.eager_graph(Object.new)}.must_raise(Sequel::Error)
   end
