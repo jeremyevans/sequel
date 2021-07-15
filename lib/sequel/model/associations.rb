@@ -274,7 +274,9 @@ module Sequel
           cascade = eo[:associations]
           eager_limit = nil
 
-          if eo[:eager_block] || eo[:loader] == false
+          if eo[:no_results]
+            no_results = true
+          elsif eo[:eager_block] || eo[:loader] == false
             ds = eager_loading_dataset(eo)
 
             strategy = ds.opts[:eager_limit_strategy] || strategy
@@ -313,7 +315,7 @@ module Sequel
             objects = loader.all(ids)
           end
 
-          Sequel.synchronize_with(eo[:mutex]){objects.each(&block)}
+          Sequel.synchronize_with(eo[:mutex]){objects.each(&block)} unless no_results
 
           if strategy == :ruby
             apply_ruby_eager_limit_strategy(rows, eager_limit || limit_and_offset)
@@ -638,9 +640,7 @@ module Sequel
         # given the hash passed to the eager loader.
         def eager_loading_dataset(eo=OPTS)
           ds = eo[:dataset] || associated_eager_dataset
-          if id_map = eo[:id_map]
-            ds = ds.where(eager_loading_predicate_condition(id_map.keys))
-          end
+          ds = eager_loading_set_predicate_condition(ds, eo)
           if associations = eo[:associations]
             ds = ds.eager(associations)
           end
@@ -665,6 +665,15 @@ module Sequel
         # The default eager limit strategy to use for this association
         def default_eager_limit_strategy
           self[:model].default_eager_limit_strategy || :ruby
+        end
+
+        # Set the predicate condition for the eager loading dataset based on the id map
+        # in the eager loading options.
+        def eager_loading_set_predicate_condition(ds, eo)
+          if id_map = eo[:id_map]
+            ds = ds.where(eager_loading_predicate_condition(id_map.keys))
+          end
+          ds
         end
 
         # The predicate condition to use for the eager_loader.
@@ -1318,7 +1327,7 @@ module Sequel
     
         # many_to_many associations need to select a key in an associated table to eagerly load
         def eager_loading_use_associated_key?
-          true
+          !separate_query_per_table?
         end
 
         # The source of the join table.  This is the join table itself, unless it
@@ -1375,10 +1384,30 @@ module Sequel
           cached_fetch(:select){default_select}
         end
 
+        # Whether a separate query should be used for the join table.
+        def separate_query_per_table?
+          self[:join_table_db]
+        end
+
         private
 
+        # Join to the the join table, unless using a separate query per table.
         def _associated_dataset
-          super.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys), :qualify=>:deep)
+          if separate_query_per_table?
+            super
+          else
+            super.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys), :qualify=>:deep)
+          end
+        end
+
+        # Use the right_keys from the eager loading options if
+        # using a separate query per table.
+        def eager_loading_set_predicate_condition(ds, eo)
+          if separate_query_per_table?
+            ds.where(right_primary_key=>eo[:right_keys])
+          else
+            super
+          end
         end
 
         # The default selection for associations that require joins.  These do not use the default
@@ -1775,6 +1804,9 @@ module Sequel
         #                underscored, sorted, and joined with '_'.
         # :join_table_block :: proc that can be used to modify the dataset used in the add/remove/remove_all
         #                      methods.  Should accept a dataset argument and return a modified dataset if present.
+        # :join_table_db :: When retrieving records when using lazy loading or eager loading via +eager+, instead of
+        #                   a join between to the join table and the associated table, use a separate query for the
+        #                   join table using the given Database object.
         # :left_key :: foreign key in join table that points to current model's
         #              primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
         #              Can use an array of symbols for a composite key association.
@@ -2047,7 +2079,7 @@ module Sequel
             raise(Error, "mismatched number of right keys: #{rcks.inspect} vs #{rcpks.inspect}") unless rcks.length == rcpks.length
           end
           opts[:uses_left_composite_keys] = lcks.length > 1
-          opts[:uses_right_composite_keys] = rcks.length > 1
+          uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
           opts[:cartesian_product_number] ||= one_through_one ? 0 : 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           opts[:left_key_alias] ||= opts.default_associated_key_alias
@@ -2056,8 +2088,75 @@ module Sequel
             opts[:after_load] ||= []
             opts[:after_load].unshift(:array_uniq!)
           end
-          opts[:dataset] ||= opts.association_dataset_proc
-          opts[:eager_loader] ||= opts.method(:default_eager_loader)
+          if join_table_db = opts[:join_table_db]
+            opts[:use_placeholder_loader] = false
+            opts[:allow_eager_graph] = false
+            opts[:allow_filtering_by] = false
+            opts[:eager_limit_strategy] = nil
+            join_table_ds = join_table_db.from(join_table)
+            opts[:dataset] ||= proc do |r|
+              vals = join_table_ds.where(lcks.zip(lcpks.map{|k| get_column_value(k)})).select_map(right)
+              ds = r.associated_dataset.where(opts.right_primary_key => vals)
+              if uses_rcks
+                vals.delete_if{|v| v.any?(&:nil?)}
+              else
+                vals.delete(nil)
+              end
+              ds = ds.clone(:no_results=>true) if vals.empty?
+              ds
+            end
+            opts[:eager_loader] ||= proc do |eo|
+              h = eo[:id_map]
+              assign_singular = opts.assign_singular?
+              rpk = opts.right_primary_key
+              name = opts[:name]
+
+              join_map = join_table_ds.where(left=>h.keys).select_hash_groups(right, left)
+
+              if uses_rcks
+                join_map.delete_if{|v,| v.any?(&:nil?)}
+              else
+                join_map.delete(nil)
+              end
+
+              eo = Hash[eo]
+
+              if join_map.empty?
+                eo[:no_results] = true
+              else
+                join_map.each_value do |vs|
+                  vs.replace(vs.flat_map{|v| h[v]})
+                  vs.uniq!
+                end
+
+                eo[:loader] = false
+                eo[:right_keys] = join_map.keys
+              end
+
+              opts[:model].eager_load_results(opts, eo) do |assoc_record|
+                rpkv = if uses_rcks
+                  assoc_record.values.values_at(*rpk)
+                else
+                  assoc_record.values[rpk]
+                end
+
+                objects = join_map[rpkv]
+
+                if assign_singular
+                  objects.each do |object|
+                    object.associations[name] ||= assoc_record
+                  end
+                else
+                  objects.each do |object|
+                    object.associations[name].push(assoc_record)
+                  end
+                end
+              end
+            end
+          else
+            opts[:dataset] ||= opts.association_dataset_proc
+            opts[:eager_loader] ||= opts.method(:default_eager_loader)
+          end
           
           join_type = opts[:graph_join_type]
           select = opts[:graph_select]
@@ -2419,7 +2518,7 @@ module Sequel
 
         # Dataset for the join table of the given many to many association reflection
         def _join_table_dataset(opts)
-          ds = model.db.from(opts.join_table_source)
+          ds = (opts[:join_table_db] || model.db).from(opts.join_table_source)
           opts[:join_table_block] ? opts[:join_table_block].call(ds) : ds
         end
 
@@ -2440,7 +2539,12 @@ module Sequel
           if loader = _associated_object_loader(opts, dynamic_opts)
             loader.all(*opts.predicate_key_values(self))
           else
-            _associated_dataset(opts, dynamic_opts).all
+            ds = _associated_dataset(opts, dynamic_opts)
+            if ds.opts[:no_results]
+              []
+            else
+              ds.all
+            end
           end
         end
 

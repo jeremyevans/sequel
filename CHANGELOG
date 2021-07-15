@@ -1,5 +1,9 @@
 === master
 
+* Support :db option for join tables in {many,one}_through_many to use a separate query for each join table (jeremyevans)
+
+* Support :join_table_db option for many_to_many/one_through_one associations, to use a separate query for the join table (jeremyevans)
+
 * Support :allow_eager_graph and :allow_filtering_by association options (jeremyevans)
 
 * Add Database#rename_tables on MySQL, for renaming multiple tables in a single call (nick96) (#1774)

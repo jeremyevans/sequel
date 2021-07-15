@@ -123,16 +123,25 @@ module Sequel
           nil
         end
 
+        # Whether a separate query should be used for each join table.
+        def separate_query_per_table?
+          self[:separate_query_per_table]
+        end
+
         private
 
         def _associated_dataset
           ds = associated_class
-          (reverse_edges + [final_reverse_edge]).each do |t|
-            h = {:qualify=>:deep}
-            if t[:alias] != t[:table]
-              h[:table_alias] = t[:alias]
+          if separate_query_per_table?
+            ds = ds.dataset
+          else
+            (reverse_edges + [final_reverse_edge]).each do |t|
+              h = {:qualify=>:deep}
+              if t[:alias] != t[:table]
+                h[:table_alias] = t[:alias]
+              end
+              ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), h)
             end
-            ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), h)
           end
           ds
         end
@@ -208,6 +217,7 @@ module Sequel
         #            :right (last array element) :: The key joining the table to the next table. Can use an
         #                                           array of symbols for a composite key association.
         #            If a hash is provided, the following keys are respected when using eager_graph:
+        #            :db :: The Database containing the table.  This changes lookup to use a separate query for each join table.
         #            :block :: A proc to use as the block argument to join.
         #            :conditions :: Extra conditions to add to the JOIN ON clause.  Must be a hash or array of two pairs.
         #            :join_type :: The join type to use for the join, defaults to :left_outer.
@@ -233,32 +243,121 @@ module Sequel
             opts[:after_load].unshift(:array_uniq!)
           end
           opts[:cartesian_product_number] ||= one_through_many ? 0 : 2
-          opts[:through] = opts[:through].map do |e|
+          separate_query_per_table = false
+          through = opts[:through] = opts[:through].map do |e|
             case e
             when Array
               raise(Error, "array elements of the through option/argument for many_through_many associations must have at least three elements") unless e.length == 3
               {:table=>e[0], :left=>e[1], :right=>e[2]}
             when Hash
               raise(Error, "hash elements of the through option/argument for many_through_many associations must contain :table, :left, and :right keys") unless e[:table] && e[:left] && e[:right]
+              separate_query_per_table = true if e[:db]
               e
             else
               raise(Error, "the through option/argument for many_through_many associations must be an enumerable of arrays or hashes")
             end
           end
+          opts[:separate_query_per_table] = separate_query_per_table
 
           left_key = opts[:left_key] = opts[:through].first[:left]
-          opts[:left_keys] = Array(left_key)
-          opts[:uses_left_composite_keys] = left_key.is_a?(Array)
+          lcks = opts[:left_keys] = Array(left_key)
+          uses_lcks = opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           raise(Error, "no primary key specified for #{inspect}") unless left_pk
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk
           lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
-          opts[:dataset] ||= opts.association_dataset_proc
 
           opts[:left_key_alias] ||= opts.default_associated_key_alias
-          opts[:eager_loader] ||= opts.method(:default_eager_loader)
+          if separate_query_per_table
+            opts[:use_placeholder_loader] = false
+            opts[:allow_eager_graph] = false
+            opts[:allow_filtering_by] = false
+            opts[:eager_limit_strategy] = nil
+
+            opts[:dataset] ||= proc do |r|
+              def_db = r.associated_class.db
+              vals = uses_lcks ? [lpkcs.map{|k| get_column_value(k)}] : get_column_value(left_pk)
+
+              has_results = through.each do |edge|
+                ds = (edge[:db] || def_db).from(edge[:table]).where(edge[:left]=>vals)
+                ds = ds.where(edge[:conditions]) if edge[:conditions]
+                right = edge[:right]
+                vals = ds.select_map(right)
+                if right.is_a?(Array)
+                  vals.delete_if{|v| v.any?(&:nil?)}
+                else
+                  vals.delete(nil)
+                end
+                break if vals.empty?
+              end
+
+              ds = r.associated_dataset.where(opts.right_primary_key=>vals)
+              ds = ds.clone(:no_results=>true) unless has_results
+              ds
+            end
+            opts[:eager_loader] ||= proc do |eo|
+              h = eo[:id_map]
+              assign_singular = opts.assign_singular?
+              uses_rcks = opts.right_primary_key.is_a?(Array)
+              rpk = uses_rcks ? opts.right_primary_keys : opts.right_primary_key
+              name = opts[:name]
+              def_db = opts.associated_class.db
+              join_map = h
+
+              run_query = through.each do |edge|
+                ds = (edge[:db] || def_db).from(edge[:table])
+                ds = ds.where(edge[:conditions]) if edge[:conditions]
+                left = edge[:left]
+                right = edge[:right]
+                prev_map = join_map
+                join_map = ds.where(left=>join_map.keys).select_hash_groups(right, left)
+                if right.is_a?(Array)
+                  join_map.delete_if{|v,| v.any?(&:nil?)}
+                else
+                  join_map.delete(nil)
+                end
+                break if join_map.empty?
+                join_map.each_value do |vs|
+                  vs.replace(vs.flat_map{|v| prev_map[v]})
+                  vs.uniq!
+                end
+              end
+
+              eo = Hash[eo]
+
+              if run_query
+                eo[:loader] = false
+                eo[:right_keys] = join_map.keys
+              else
+                eo[:no_results] = true
+              end
+
+              opts[:model].eager_load_results(opts, eo) do |assoc_record|
+                rpkv = if uses_rcks
+                  assoc_record.values.values_at(*rpk)
+                else
+                  assoc_record.values[rpk]
+                end
+
+                objects = join_map[rpkv]
+
+                if assign_singular
+                  objects.each do |object|
+                    object.associations[name] ||= assoc_record
+                  end
+                else
+                  objects.each do |object|
+                    object.associations[name].push(assoc_record)
+                  end
+                end
+              end
+            end
+          else
+            opts[:dataset] ||= opts.association_dataset_proc
+            opts[:eager_loader] ||= opts.method(:default_eager_loader)
+          end
 
           join_type = opts[:graph_join_type]
           select = opts[:graph_select]

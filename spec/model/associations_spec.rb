@@ -3520,6 +3520,298 @@ describe Sequel::Model, "one_through_one" do
   end
 end
 
+describe "many_to_many/one_through_one associations with :join_table_db" do
+  before do
+    @db1, @db2, @db3 = @dbs = 3.times.map{Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})}
+    @c1 = Class.new(Sequel::Model(@db1[:attributes])) do
+      unrestrict_primary_key
+      attr_accessor :yyy
+      def self.name; 'Attribute'; end
+      def self.to_s; 'Attribute'; end
+      columns :id, :y, :z
+    end
+
+    @c2 = Class.new(Sequel::Model(@db2[:nodes])) do
+      unrestrict_primary_key
+      attr_accessor :xxx
+      
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
+      columns :id, :x
+    end
+
+    @c1.default_association_options[:join_table_db] = @db3
+    @c2.default_association_options[:join_table_db] = @db3
+
+    @db3.fetch = {:attribute_id=>555}
+    @db1.fetch = {:id=>555}
+
+    sqls
+  end
+
+  def sqls
+    @dbs.map(&:sqls)
+  end
+
+  it "should support dataset method" do
+    @c2.many_to_many :attributes, :class => @c1 
+    @c2.new(:id => 1234).attributes_dataset.sql.must_equal "SELECT attributes.* FROM attributes WHERE (id IN (555))"
+    sqls.must_equal [[], [], ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+  
+  it "should support association method" do
+    @c2.many_to_many :attributes, :class => @c1 
+    @c2.new(:id => 1234).attributes.must_equal [@c1.load(:id=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555))"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+
+    @c2.one_through_one :attribute, :class => @c1 
+    @db1.fetch = [{:id=>555, :x=>1}, {:id=>555, :x=>2}]
+    @c2.new(:id => 1234).attribute.must_equal @c1.load(:id=>555, :x=>1)
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555)) LIMIT 1"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+  
+  it "should support an existing selection on the dataset" do
+    @c1.dataset = @c1.dataset.select(Sequel.qualify(:attributes, :id), Sequel.qualify(:attributes, :b))
+    @db1.sqls
+
+    @c2.many_to_many :attributes, :class => @c1
+    @db1.fetch = {:id=>555, :b=>10}
+    @c2.new(:id => 1234).attributes.must_equal [@c1.load(:id=>555, :b=>10)]
+    sqls.must_equal [["SELECT attributes.id, attributes.b FROM attributes WHERE (id IN (555))"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+  
+  it "should support a conditions option" do
+    @c2.many_to_many :attributes, :class => @c1, :conditions => {:a=>32}
+    @c2.new(:id => 1234).attributes.must_equal [@c1.load(:id=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((a = 32) AND (id IN (555)))"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+  
+  it "should support an order option" do
+    @c2.many_to_many :attributes, :class => @c1, :order => :blah
+    @c2.new(:id => 1234).attributes.must_equal [@c1.load(:id=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555)) ORDER BY blah"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+  
+  it "should support :left_primary_key and :right_primary_key options" do
+    @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
+    @db3.fetch = {:attribute_id=>555, :node_id=>5}
+    @db1.fetch = {:id=>14, :yyy=>555}
+    @c2.new(:id => 1234, :xxx=>5).attributes.must_equal [@c1.load(:id=>14, :yyy=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (yyy IN (555))"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 5)"]]
+  end
+  
+  it "should support composite keys" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @db3.fetch = {:l1=>555, :l2=>5, :r1=>14, :r2=>555}
+    @db1.fetch = {:id=>14, :y=>555}
+    @c2.new(:id => 1234, :x=>5).attributes.must_equal [@c1.load(:id=>14, :y=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((id, y) IN ((14, 555)))"], [],
+      ["SELECT r1, r2 FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5))"]]
+  end
+
+  it "should handle case where join table query does not produce any rows" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @db3.fetch = []
+    @db1.fetch = []
+    @c2.load(:id => 1234, :x=>5).attributes.must_equal []
+    sqls.must_equal [[], [], ["SELECT r1, r2 FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5))"]]
+  end
+  
+  it "should handle case where join table query returns a NULL value" do
+    @db1.fetch = []
+
+    @c2.many_to_many :attributes, :class => @c1 
+    @db3.fetch = {:attribute_id=>nil}
+    @c2.new(:id => 1234).attributes.must_equal []
+    sqls.must_equal [[], [], ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @db3.fetch = {:r1=>nil, :r2=>3}
+    @c2.load(:id => 1234, :x=>5).attributes.must_equal []
+    sqls.must_equal [[], [], ["SELECT r1, r2 FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5))"]]
+  end
+  
+  it "should support a select option" do
+    @c2.many_to_many :attributes, :class => @c1, :select => :blah
+    @db1.fetch = {:blah=>19}
+    @c2.new(:id => 1234).attributes.must_equal [@c1.load(:blah=>19)]
+    sqls.must_equal [["SELECT blah FROM attributes WHERE (id IN (555))"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+  
+  it "should accept a block" do
+    @c2.many_to_many :attributes, :class => @c1 do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 444
+    n.attributes.must_equal [@c1.load(:id=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((id IN (555)) AND (xxx = 444))"], [],
+      ["SELECT attribute_id FROM attributes_nodes WHERE (node_id = 1234)"]]
+  end
+
+  it "should handle an aliased join table" do
+    @c2.many_to_many :attributes, :class => @c1, :join_table => Sequel[:attribute2node].as(:attributes_nodes)
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
+    n.attributes.must_equal [@c1.load(:id=>555)]
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555))"], [],
+      ["SELECT attribute_id FROM attribute2node AS attributes_nodes WHERE (node_id = 1234)"]]
+
+    a.must_equal n.add_attribute(a)
+    a.must_equal n.remove_attribute(a)
+    n.remove_all_attributes
+    sqls.must_equal [[], [],
+      ["INSERT INTO attribute2node (node_id, attribute_id) VALUES (1234, 2345)",
+      "DELETE FROM attribute2node WHERE ((node_id = 1234) AND (attribute_id = 2345))",
+      "DELETE FROM attribute2node WHERE (node_id = 1234)"]]
+  end
+  
+  it "should define an add_ method that works on existing records" do
+    @c2.many_to_many :attributes, :class => @c1
+    
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
+    n.add_attribute(a).must_equal a
+    sqls.must_equal [[], [], ["INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)"]]
+  end
+
+  it "should define a remove_ method that works on existing records" do
+    @c2.many_to_many :attributes, :class => @c1
+    
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345)
+    n.remove_attribute(a).must_equal a
+    sqls.must_equal [[], [], ['DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))']]
+  end
+
+  it "should have an remove_all_ method that removes all associations" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes
+    sqls.must_equal [[], [], ['DELETE FROM attributes_nodes WHERE (node_id = 1234)']]
+  end
+
+  it "should support eager loading" do
+    @db2.fetch = [{:id=>1234}, {:id=>33}]
+    @db3.fetch = [{:attribute_id=>555, :node_id=>1234}]
+
+    @c2.many_to_many :attributes, :class => @c1 
+    a = @c2.eager(:attributes).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attributes].must_equal [@c1.load(:id=>555)]
+    a[1].associations[:attributes].must_equal []
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555))"],
+      ["SELECT * FROM nodes"],
+      ["SELECT attribute_id, node_id FROM attributes_nodes WHERE (node_id IN (1234, 33))"]]
+
+    @c2.one_through_one :attribute, :clone=>:attributes
+    @db1.fetch = [{:id=>555, :x=>1}, {:id=>555, :x=>2}]
+    a = @c2.eager(:attribute).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attribute].must_equal @c1.load(:id=>555, :x=>1)
+    a[1].associations[:attribute].must_be_nil
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555))"],
+      ["SELECT * FROM nodes"],
+      ["SELECT attribute_id, node_id FROM attributes_nodes WHERE (node_id IN (1234, 33))"]]
+  end
+
+  it "should skip loading associated table when the join table has no results" do
+    @db2.fetch = [{:id=>1234}, {:id=>33}]
+    @db3.fetch = []
+
+    @c2.many_to_many :attributes, :class => @c1 
+    a = @c2.eager(:attributes).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attributes].must_equal []
+    a[1].associations[:attributes].must_equal []
+    sqls.must_equal [[], ["SELECT * FROM nodes"],
+      ["SELECT attribute_id, node_id FROM attributes_nodes WHERE (node_id IN (1234, 33))"]]
+
+    @c2.one_through_one :attribute, :clone=>:attributes
+    @db1.fetch = [{:id=>555, :x=>1}, {:id=>555, :x=>2}]
+    a = @c2.eager(:attribute).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attribute].must_be_nil
+    a[1].associations[:attribute].must_be_nil
+    sqls.must_equal [[], ["SELECT * FROM nodes"],
+      ["SELECT attribute_id, node_id FROM attributes_nodes WHERE (node_id IN (1234, 33))"]]
+  end
+  
+  it "should support eager loading when the join table includes NULL values" do
+    @db2.fetch = [{:id=>1234}, {:id=>33}]
+    @db3.fetch = [{:attribute_id=>nil, :node_id=>1234}]
+
+    @c2.many_to_many :attributes, :class => @c1 
+    a = @c2.eager(:attributes).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attributes].must_equal []
+    a[1].associations[:attributes].must_equal []
+    sqls.must_equal [[], ["SELECT * FROM nodes"],
+      ["SELECT attribute_id, node_id FROM attributes_nodes WHERE (node_id IN (1234, 33))"]]
+
+    @c2.one_through_one :attribute, :clone=>:attributes
+    a = @c2.eager(:attribute).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attribute].must_be_nil
+    a[1].associations[:attribute].must_be_nil
+    sqls.must_equal [[], ["SELECT * FROM nodes"],
+      ["SELECT attribute_id, node_id FROM attributes_nodes WHERE (node_id IN (1234, 33))"]]
+  end
+  
+  it "should support eager loading when using composite keys" do
+    @db1.fetch = {:id=>14, :y=>555}
+    @db2.fetch = [{:id=>1234, :x=>333}, {:id=>33, :x=>4}]
+    @db3.fetch = [{:l1=>1234, :l2=>333, :r1=>14, :r2=>555}]
+
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    a = @c2.eager(:attributes).all
+    a.must_equal [@c2.load(:id=>1234, :x=>333), @c2.load(:id=>33, :x=>4)]
+    a[0].associations[:attributes].must_equal [@c1.load(:id=>14, :y=>555)]
+    a[1].associations[:attributes].must_equal []
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((id, y) IN ((14, 555)))"],
+      ["SELECT * FROM nodes"],
+      ["SELECT r1, r2, l1, l2 FROM attributes_nodes WHERE ((l1, l2) IN ((1234, 333), (33, 4)))"]]
+
+    @c2.one_through_one :attribute, :clone=>:attributes
+    @db1.fetch = [{:id=>14, :y=>555, :z=>2}, {:id=>14, :y=>555, :z=>3}]
+    a = @c2.eager(:attribute).all
+    a.must_equal [@c2.load(:id=>1234, :x=>333), @c2.load(:id=>33, :x=>4)]
+    a[0].associations[:attribute].must_equal @c1.load(:id=>14, :y=>555, :z=>2)
+    a[1].associations[:attribute].must_be_nil
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((id, y) IN ((14, 555)))"],
+      ["SELECT * FROM nodes"],
+      ["SELECT r1, r2, l1, l2 FROM attributes_nodes WHERE ((l1, l2) IN ((1234, 333), (33, 4)))"]]
+  end
+  
+  it "should support eager loading when using composite keys when the join table includes NULL values" do
+    @db2.fetch = [{:id=>1234, :x=>333}, {:id=>33, :x=>4}]
+    @db3.fetch = [{:l1=>1234, :l2=>333, :r1=>nil, :r2=>555}, {:l1=>1234, :l2=>333, :r1=>14, :r2=>nil}, {:l1=>1234, :l2=>333, :r1=>nil, :r2=>nil}]
+
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    a = @c2.eager(:attributes).all
+    a.must_equal [@c2.load(:id=>1234, :x=>333), @c2.load(:id=>33, :x=>4)]
+    a[0].associations[:attributes].must_equal []
+    a[1].associations[:attributes].must_equal []
+    sqls.must_equal [[], ["SELECT * FROM nodes"],
+      ["SELECT r1, r2, l1, l2 FROM attributes_nodes WHERE ((l1, l2) IN ((1234, 333), (33, 4)))"]]
+
+    @c2.one_through_one :attribute, :clone=>:attributes
+    a = @c2.eager(:attribute).all
+    a.must_equal [@c2.load(:id=>1234, :x=>333), @c2.load(:id=>33, :x=>4)]
+    a[0].associations[:attribute].must_be_nil
+    a[1].associations[:attribute].must_be_nil
+    sqls.must_equal [[], ["SELECT * FROM nodes"],
+      ["SELECT r1, r2, l1, l2 FROM attributes_nodes WHERE ((l1, l2) IN ((1234, 333), (33, 4)))"]]
+  end
+end
+
 describe "Filtering by associations" do
   before(:all) do
     db = Sequel.mock

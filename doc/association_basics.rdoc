@@ -1166,6 +1166,23 @@ when deleting.
     ds.where(instrument_id: 5)
   end)
 
+==== :join_table_db [+many_to_many+, +one_through_one+]
+
+A Sequel::Database to use for the join table.  Specifying this option switches the
+loading to use a separate query for the join table.  This is useful if the
+join table is not located in the same database as the associated table, or
+if the database account with access to the associated table doesn't have
+access to the join table.
+
+For example, if the Album class uses a different Sequel::Database than the Artist
+class, and the join table is in the database that the Artist class uses:
+
+  Artist.many_to_many :lead_guitar_albums, class: :Album, :join_table_db=>Artist.db
+
+This option also affects the add/remove/remove_all methods, by changing
+which database is used for inserts/deletes from the join table (add/remove/remove_all
+defaults to use the current model's database instead of the associated model's database).
+
 === Callback Options
 
 All callbacks can be specified as a Symbol, Proc, or array of both/either

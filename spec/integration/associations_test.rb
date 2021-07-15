@@ -2609,3 +2609,190 @@ describe "Sequel::Model Associations with clashing column names" do
     @bar.mtmfoos.must_equal []
   end
 end 
+
+describe "Sequel::Model query per join table support" do
+  before(:all) do
+    @dbs = 4.times.map do |i|
+      url = if DB.adapter_scheme == :sqlite
+        'sqlite:/'
+      else
+        ENV["SEQUEL_QUERY_PER_ASSOCIATION_DB_#{i}_URL"]
+      end
+      Sequel.connect(url, :keep_reference=>false)
+    end
+  end
+  after(:all) do
+    @dbs.each(&:disconnect)
+  end
+  after do
+    db1, db2, db3, db4 = @dbs
+    db1.drop_table?(:bs)
+    db2.drop_table?(:cs)
+    db3.drop_table?(:bs_cs)
+    db4.drop_table?(:bs_cs2)
+  end
+
+  it "should support a query per join table approach with scalar keys" do
+    db1, db2, db3, db4 = @dbs
+    db1.create_table!(:bs) do
+      primary_key :id
+    end
+    db2.create_table!(:cs) do
+      primary_key :id
+    end
+    db3.create_table!(:bs_cs) do
+      Integer :b_id
+      Integer :c_id
+    end
+    db4.create_table!(:bs_cs2) do
+      Integer :b2_id
+      Integer :c2_id
+    end
+
+    _C = Sequel::Model(db2[:cs])
+    _B = Sequel::Model(db1[:bs])
+    _B.class_eval do
+      plugin :many_through_many
+      many_to_many :cs, :class=>_C, :join_table_db=>db3, :order=>:id, :join_table=>:bs_cs, :left_key=>:b_id
+      one_through_one :c, :clone=>:cs
+      many_through_many :mtm_cs, [{:table=>:bs_cs, :left=>:b_id, :right=>:c_id, :db=>db3}, {:table=>:bs_cs2, :left=>:b2_id, :right=>:c2_id, :db=>db4}], :class=>_C, :order=>:id
+      one_through_many :mtm_c, :clone=>:mtm_cs
+    end
+
+    b1 = _B.create
+    b2 = _B.create
+    b3 = _B.create
+    c1 = _C.create
+    c2 = _C.create
+    c3 = _C.create
+    c4 = _C.create
+    b1.add_c(c1)
+    b1.add_c(c2)
+    b2.add_c(c2)
+    b2.add_c(c3)
+    b1.cs.must_equal [c1, c2]
+    b2.cs.must_equal [c2, c3]
+    b3.cs.must_equal []
+    b1.c.must_equal c1
+    b2.c.must_equal c2
+    b3.c.must_be_nil
+
+    b1, b2, b3 = _B.eager(:cs, :c).order(:id).all
+    b1.associations[:cs].must_equal [c1, c2]
+    b2.associations[:cs].must_equal [c2, c3]
+    b3.associations[:cs].must_equal []
+    b1.associations[:c].must_equal c1
+    b2.associations[:c].must_equal c2
+    b3.associations[:c].must_be_nil
+
+    db4[:bs_cs2].insert(:b2_id=>1, :c2_id=>3)
+    db4[:bs_cs2].insert(:b2_id=>1, :c2_id=>4)
+    db4[:bs_cs2].insert(:b2_id=>2, :c2_id=>2)
+    db4[:bs_cs2].insert(:b2_id=>2, :c2_id=>3)
+    db4[:bs_cs2].insert(:b2_id=>3, :c2_id=>1)
+    db3[:bs_cs].insert(:b_id=>3, :c_id=>5)
+
+    b1.mtm_cs.must_equal [c2, c3, c4]
+    b2.mtm_cs.must_equal [c1, c2, c3]
+    b3.mtm_cs.must_equal []
+    b1.mtm_c.must_equal c2
+    b2.mtm_c.must_equal c1
+    b3.mtm_c.must_be_nil
+
+    b1, b2, b3 = _B.eager(:mtm_cs, :mtm_c).order(:id).all
+    b1.associations[:mtm_cs].must_equal [c2, c3, c4]
+    b2.associations[:mtm_cs].must_equal [c1, c2, c3]
+    b3.associations[:mtm_cs].must_equal []
+    b1.associations[:mtm_c].must_equal c2
+    b2.associations[:mtm_c].must_equal c1
+    b3.associations[:mtm_c].must_be_nil
+  end
+
+  it "should support a query per join table approach with composite keys" do
+    db1, db2, db3, db4 = @dbs
+    db1.create_table!(:bs) do
+      Integer :bs_pk1
+      Integer :bs_pk2
+      primary_key [:bs_pk1, :bs_pk2]
+    end
+    db2.create_table!(:cs) do
+      Integer :cs_pk1
+      Integer :cs_pk2
+      primary_key [:cs_pk1, :cs_pk2]
+    end
+    db3.create_table!(:bs_cs) do
+      Integer :b_id1
+      Integer :b_id2
+      Integer :c_id1
+      Integer :c_id2
+    end
+    db4.create_table!(:bs_cs2) do
+      Integer :b2_id1
+      Integer :b2_id2
+      Integer :c2_id1
+      Integer :c2_id2
+    end
+
+    _C = Sequel::Model(db2[:cs])
+    _B = Sequel::Model(db1[:bs])
+    _C.unrestrict_primary_key
+    _B.class_eval do
+      unrestrict_primary_key
+      plugin :many_through_many
+      many_to_many :cs, :class=>_C, :join_table_db=>db3, :order=>:cs_pk1, :join_table=>:bs_cs, :left_key=>[:b_id1, :b_id2], :right_key=>[:c_id1, :c_id2]
+      one_through_one :c, :clone=>:cs
+      many_through_many :mtm_cs, [{:table=>:bs_cs, :left=>[:b_id1, :b_id2], :right=>[:c_id1, :c_id2], :db=>db3}, {:table=>:bs_cs2, :left=>[:b2_id1, :b2_id2], :right=>[:c2_id1, :c2_id2], :db=>db4}], :class=>_C, :order=>:cs_pk1
+      one_through_many :mtm_c, :clone=>:mtm_cs
+    end
+
+    b1 = _B.create(:bs_pk1=>1, :bs_pk2=>2)
+    b2 = _B.create(:bs_pk1=>3, :bs_pk2=>4)
+    b3 = _B.create(:bs_pk1=>5, :bs_pk2=>6)
+    c1 = _C.create(:cs_pk1=>10, :cs_pk2=>11)
+    c2 = _C.create(:cs_pk1=>12, :cs_pk2=>13)
+    c3 = _C.create(:cs_pk1=>14, :cs_pk2=>15)
+    c4 = _C.create(:cs_pk1=>16, :cs_pk2=>17)
+    b1.add_c(c1)
+    b1.add_c(c2)
+    b2.add_c(c2)
+    b2.add_c(c3)
+    b1.cs.must_equal [c1, c2]
+    b2.cs.must_equal [c2, c3]
+    b3.cs.must_equal []
+    b1.c.must_equal c1
+    b2.c.must_equal c2
+    b3.c.must_be_nil
+
+    b1, b2, b3 = _B.eager(:cs, :c).order(:bs_pk1).all
+    b1.associations[:cs].must_equal [c1, c2]
+    b2.associations[:cs].must_equal [c2, c3]
+    b3.associations[:cs].must_equal []
+    b1.associations[:c].must_equal c1
+    b2.associations[:c].must_equal c2
+    b3.associations[:c].must_be_nil
+
+    db4[:bs_cs2].insert(:b2_id1=>10, :b2_id2=>11, :c2_id1=>14, :c2_id2=>15)
+    db4[:bs_cs2].insert(:b2_id1=>10, :b2_id2=>11, :c2_id1=>16, :c2_id2=>17)
+    db4[:bs_cs2].insert(:b2_id1=>12, :b2_id2=>13, :c2_id1=>12, :c2_id2=>13)
+    db4[:bs_cs2].insert(:b2_id1=>12, :b2_id2=>13, :c2_id1=>14, :c2_id2=>15)
+    db4[:bs_cs2].insert(:b2_id1=>14, :b2_id2=>15, :c2_id1=>10, :c2_id2=>11)
+    db3[:bs_cs].insert(:b_id1=>1, :b_id2=>3, :c_id1=>10, :c_id2=>11)
+    db3[:bs_cs].insert(:b_id1=>1, :b_id2=>2, :c_id1=>10, :c_id2=>5)
+    db3[:bs_cs].insert(:b_id1=>3, :b_id2=>6, :c_id1=>10, :c_id2=>11)
+
+    b1.mtm_cs.must_equal [c2, c3, c4]
+    b2.mtm_cs.must_equal [c1, c2, c3]
+    b3.mtm_cs.must_equal []
+    b1.mtm_c.must_equal c2
+    b2.mtm_c.must_equal c1
+    b3.mtm_c.must_be_nil
+
+    b1, b2, b3 = _B.eager(:mtm_cs, :mtm_c).order(:bs_pk1).all
+    b1.associations[:mtm_cs].must_equal [c2, c3, c4]
+    b2.associations[:mtm_cs].must_equal [c1, c2, c3]
+    b3.associations[:mtm_cs].must_equal []
+    b1.associations[:mtm_c].must_equal c2
+    b2.associations[:mtm_c].must_equal c1
+    b3.associations[:mtm_c].must_be_nil
+  end
+end if DB.adapter_scheme == :sqlite || 4.times.all?{|i| ENV["SEQUEL_QUERY_PER_ASSOCIATION_DB_#{i}_URL"]}
