@@ -1,5 +1,7 @@
 === master
 
+* Make the unused_associations plugin track access to association reflections to determine whether associations are used (jeremyevans)
+
 * Support :db option for join tables in {many,one}_through_many to use a separate query for each join table (jeremyevans)
 
 * Support :join_table_db option for many_to_many/one_through_one associations, to use a separate query for the join table (jeremyevans)

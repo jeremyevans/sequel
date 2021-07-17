@@ -59,6 +59,14 @@ describe "unused_associations plugin" do
       ["TUA::SC", "a7", {"read_only"=>true}]]
   end
   
+  it "should use association reflection access to determine which associations are used" do
+    ua, uao = check("TUA.association_reflection(:a1); TUA::O.a2s")
+    ua.must_equal [["TUA", "a3"], ["TUA", "a4s"], ["TUA", "a5"], ["TUA", "a6s"], ["TUA::SC", "a7"]]
+    uao.must_equal [
+      ["TUA", "a1", {"read_only"=>true, "no_dataset_method"=>true, "no_association_method"=>true}],
+      ["TUA", "a2s", {"read_only"=>true, "no_dataset_method"=>true}]]
+  end
+  
   it "should work with :file and :coverage_file plugin options" do
     ua, uao = check("TUA::O.a1", 'PLUGIN_OPTS'=>Sequel.object_to_json(:coverage_file=>uac_file, :file=>ua_file))
     ua.must_equal [["TUA", "a2s"], ["TUA", "a3"], ["TUA", "a4s"], ["TUA", "a5"], ["TUA", "a6s"], ["TUA::SC", "a7"]]

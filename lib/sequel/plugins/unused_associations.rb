@@ -266,6 +266,18 @@ module Sequel
         # unused_associations only on the class that is loading the plugin.
         Plugins.inherited_instance_variables(self, :@unused_associations_data=>nil)
 
+        # Synchronize access to the used association reflections.
+        def used_association_reflections
+          Sequel.synchronize{@used_association_reflections ||= {}}
+        end
+
+        # Record access to association reflections to determine which associations are not used.
+        def association_reflection(association)
+          uar = used_association_reflections
+          Sequel.synchronize{uar[association] ||= true}
+          super
+        end
+
         # If modifying associations, and this association is marked as not used,
         # and the association does not include the specific :is_used option,
         # skip defining the association.
@@ -274,6 +286,12 @@ module Sequel
             return
           end
           
+          super
+        end
+
+        # Setup the used_association_reflections storage before freezing
+        def freeze
+          used_association_reflections
           super
         end
 
@@ -298,7 +316,7 @@ module Sequel
           ([self] + descendents).each do |sc|
             next if sc.associations.empty? || !sc.name
             module_mapping[sc.send(:overridable_methods_module)] = sc
-            coverage_data[sc.name] ||= {}
+            coverage_data[sc.name] ||= {''=>sc.used_association_reflections.keys.map(&:to_s).sort}
           end
 
           coverage_result.each do |file, coverage|
@@ -331,10 +349,9 @@ module Sequel
 
           ([self] + descendents).each do |sc|
             next unless cov_data = coverage_data[sc.name]
+            reflection_data = cov_data[''] || []
 
-            sc.associations.each do |assoc|
-              ref = sc.association_reflection(assoc)
-
+            sc.association_reflections.each do |assoc, ref|
               # Only report associations for the class they are defined in
               next unless ref[:model] == sc
 
@@ -343,6 +360,9 @@ module Sequel
               next if ref[:methods_module]
 
               info = {}
+              if reflection_data.include?(assoc.to_s)
+                info[:used] = [:reflection]
+              end
 
               _update_association_coverage_info(info, cov_data, ref.dataset_method, :dataset_method)
               _update_association_coverage_info(info, cov_data, ref.association_method, :association_method)

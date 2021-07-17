@@ -37,7 +37,7 @@ begin
      Sequel::Model.unused_association_options(unused_associations_data: data).sort]
   end
 rescue => e
-  result = "#{e.class}: #{e.message}"
+  result = "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
 end
 
 print Sequel.object_to_json(result)
