@@ -19,7 +19,7 @@ module Sequel
     #
     #   # Timestamp Artist instances, forcing an overwrite of the create
     #   # timestamp, and setting the update timestamp when creating
-    #   Album.plugin :timestamps, force: true, update_on_create: true
+    #   Artist.plugin :timestamps, force: true, update_on_create: true
     module Timestamps
       # Configure the plugin by setting the available options.  Note that
       # if this method is run more than once, previous settings are ignored,
