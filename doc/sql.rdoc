@@ -428,6 +428,18 @@ As you can see, these literalize with ANDs by default.  You can use the <tt>Sequ
 
   Sequel.or(column1: 1, column2: 2) # (("column1" = 1) OR ("column2" = 2))
 
+As you can see in the above examples, <tt>Sequel.|</tt> and <tt>Sequel.or</tt> work differently.
+<tt>Sequel.|</tt> is for combining an arbitrary number of expressions using OR. If you pass a single
+argument, <tt>Sequel.|</tt> will just convert it to a Sequel expression, similar to <tt>Sequel.expr</tt>.
+<tt>Sequel.or</tt> is for taking a single hash or array of two element arrays and combining the
+elements of that single argument using OR instead of AND:
+
+  Sequel.|(column1: 1, column2: 2) # (("column1" = 1) AND ("column2" = 2))
+  Sequel.or(column1: 1, column2: 2) # (("column1" = 1) OR ("column2" = 2))
+
+  Sequel.|({column1: 1}, {column2: 2}) # (("column1" = 1) OR ("column2" = 2))
+  Sequel.or({column1: 1}, {column2: 2}) # ArgumentError
+
 You've already seen the <tt>Sequel.negate</tt> method, which will use ANDs if multiple entries are used:
 
   Sequel.negate(column1: 1, column2: 2) # (("column1" != 1) AND ("column2" != 2))
