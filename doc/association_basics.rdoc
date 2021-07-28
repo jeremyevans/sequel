@@ -1107,7 +1107,7 @@ already applied, and the proc should return a modified copy of this dataset.
 Here's an example of an association of songs to artists through lyrics, where
 the artist can perform any one of four tasks for the lyric:
 
-  Album.one_to_many :songs, dataset: (lambda do |r|
+  Artist.one_to_many :songs, dataset: (lambda do |r|
     r.associated_dataset.select_all(:songs).
      join(:lyrics, id: :lyricid, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])
   end)
