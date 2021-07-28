@@ -543,15 +543,21 @@ The main difference between the two is that <tt>-d</tt> will use the type method
 with the database independent ruby class types, while <tt>-D</tt> will use
 the +column+ method with string types.
 
-Note that Sequel cannot dump constraints other than primary key and possibly
-foreign key constraints.  If you are using database features such
-as constraints or triggers, you should use your database's dump and restore
-programs instead of Sequel's schema dumper.
-
 You can take the migration created by the schema dumper to another computer
 with an empty database, and attempt to recreate the schema using:
 
   sequel -m db/migrations postgres://host/database
+
+The schema_dumper extension is quite limited in what types of
+database objects it supports.  In general, it only supports
+dumping tables, columns, primary key and foreign key constraints,
+and some indexes.  It does not support most table options, CHECK
+constraints, partial indexes, database functions, triggers,
+security grants/revokes, and a wide variety of other useful
+database properties.  Be aware of the limitations when using the
+schema_dumper extension. If you are dumping the schema to restore
+to the same database type, it is recommended to use your database's
+dump and restore programs instead of the schema_dumper extension.
 
 == Checking for Current Migrations
 

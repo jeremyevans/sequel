@@ -63,7 +63,7 @@ module Sequel
     # definitions using <tt>create_table</tt>, and +add_index+ accepts all the options
     # available for index definition.
     #
-    # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[rdoc-ref:doc/migration.rdoc].
+    # See <tt>Schema::AlterTableGenerator</tt> and the {Migrations guide}[rdoc-ref:doc/migration.rdoc].
     def alter_table(name, &block)
       generator = alter_table_generator(&block)
       remove_cached_schema(name)

@@ -6,6 +6,17 @@
 # the current database).  The main interface is through
 # Sequel::Database#dump_schema_migration.
 #
+# The schema_dumper extension is quite limited in what types of
+# database objects it supports.  In general, it only supports
+# dumping tables, columns, primary key and foreign key constraints,
+# and some indexes.  It does not support most table options, CHECK
+# constraints, partial indexes, database functions, triggers,
+# security grants/revokes, and a wide variety of other useful
+# database properties.  Be aware of the limitations when using the
+# schema_dumper extension. If you are dumping the schema to restore
+# to the same database type, it is recommended to use your database's
+# dump and restore programs instead of the schema_dumper extension.
+#
 # To load the extension:
 #
 #   DB.extension :schema_dumper
