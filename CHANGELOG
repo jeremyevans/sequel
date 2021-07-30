@@ -1,4 +1,4 @@
-=== master
+=== 5.47.0 (2021-08-01)
 
 * Make the unused_associations plugin track access to association reflections to determine whether associations are used (jeremyevans)
 

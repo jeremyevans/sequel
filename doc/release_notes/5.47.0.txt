@@ -1,0 +1,59 @@
+= New Features
+
+* Sequel now supports using separate queries for each table for both
+  lazy and eager loading of the following associations:
+
+  * many_to_many
+  * one_through_one
+  * many_through_many # many_through_many plugin
+  * one_through_many # many_through_many plugin
+
+  For many_to_many/one_through_one, you specify the :join_table_db
+  association option, which should be a Sequel::Database instance
+  containing the join table.  It is possible for the current table,
+  join table, and associated table all to be in separate databases:
+
+    JOIN_TABLE_DB = Sequel.connect('...')
+    Album.many_to_many :artists, join_table_db: JOIN_TABLE_DB
+
+  For many_through_many/one_through_many, you can use the :db option
+  in each join table specification.  All join tables can be in
+  separate databases:
+
+    JTDB1 = Sequel.connect('...')
+    JTDB2 = Sequel.connect('...')
+    # Tracks on all albums this artist appears on
+    Artist.many_through_many :album_tracks, [
+        {table: :albums_artists, left: :artist_id, right: :album_id, db: JTDB1},
+        {table: :artists, left: :id, right: :id, db: JTDB2}
+      ],
+      class: :Track, right_primary_key: :album_id
+
+* The :allow_eager_graph association option has been added. Setting
+  this option to false will disallow eager loading via #eager_graph.
+  This is useful if you can eager load the association via #eager,
+  but not with #eager_graph.
+
+* The :allow_filtering_by association option has been added. Setting
+  this option to false will disallow the use of filtering by
+  associations for the association.
+
+* Dataset#returning is now supported on SQLite 3.35.0+. To work around
+  bugs in the SQLite implementation, identifiers used in the RETURNING
+  clause are automatically aliased.  Additionally, prepared statements
+  that use the RETURNING clause on SQLite seem to have issues, so the
+  prepared_statements plugin does not automatically use prepared
+  statements on SQLite for queries that use the RETURNING clause.
+
+* Database#rename_tables has been added on MySQL to support renaming
+  multiple tables in the same query.
+
+= Other Improvements
+
+* The unused_associations plugin now tracks access to the association
+  reflection for associations, so it will no longer show an
+  association as completely unused if something is accessing the
+  association reflection for it.  This eliminates most of the false
+  positives, where the plugin would show an association as unused
+  even though something was using it without calling the association
+  methods.
