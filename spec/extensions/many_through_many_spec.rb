@@ -2355,7 +2355,6 @@ describe "many_through_many/one_through_many associations with :db option" do
     @through[1][:table] = Sequel[:bar_attributes].as(:ba)
     @c2.many_through_many :attributes, @through, :class => @c1
     n = @c2.load(:id => 1234)
-    a = @c1.load(:id => 2345)
     n.attributes.must_equal [@c1.load(:id=>555)]
     sqls.must_equal [["SELECT attributes.* FROM attributes WHERE (id IN (555))"], [],
       ["SELECT foo_id FROM foo_nodes AS fn WHERE (node_id = 1234)"],

@@ -260,7 +260,7 @@ module Sequel
           opts[:separate_query_per_table] = separate_query_per_table
 
           left_key = opts[:left_key] = opts[:through].first[:left]
-          lcks = opts[:left_keys] = Array(left_key)
+          opts[:left_keys] = Array(left_key)
           uses_lcks = opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           raise(Error, "no primary key specified for #{inspect}") unless left_pk
