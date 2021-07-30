@@ -2388,6 +2388,35 @@ describe "many_through_many/one_through_many associations with :db option" do
       ["SELECT attribute_id, bar_id FROM bar_attributes WHERE (bar_id IN (444))"]]
   end
 
+  it "should support eager loading with a conditions option" do
+    @db2.fetch = [{:id=>1234}, {:id=>33}]
+    @db3.fetch = {:foo_id=>444, :node_id=>1234}
+    @db4.fetch = {:attribute_id=>555, :bar_id=>444}
+    @through[0][:conditions] = {:x=>7}
+    @through[1][:conditions] = {:y=>8}
+
+    @c2.many_through_many :attributes, @through, :class => @c1, :conditions=>{:z=>9}
+    a = @c2.eager(:attributes).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attributes].must_equal [@c1.load(:id=>555)]
+    a[1].associations[:attributes].must_equal []
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((z = 9) AND (id IN (555)))"],
+      ["SELECT * FROM nodes"],
+      ["SELECT foo_id, node_id FROM foo_nodes WHERE ((x = 7) AND (node_id IN (1234, 33)))"],
+      ["SELECT attribute_id, bar_id FROM bar_attributes WHERE ((y = 8) AND (bar_id IN (444)))"]]
+
+    @c2.one_through_many :attribute, :clone=>:attributes
+    @db1.fetch = [{:id=>555, :x=>1}, {:id=>555, :x=>2}]
+    a = @c2.eager(:attribute).all
+    a.must_equal [@c2.load(:id=>1234), @c2.load(:id=>33)]
+    a[0].associations[:attribute].must_equal @c1.load(:id=>555, :x=>1)
+    a[1].associations[:attribute].must_be_nil
+    sqls.must_equal [["SELECT attributes.* FROM attributes WHERE ((z = 9) AND (id IN (555)))"],
+      ["SELECT * FROM nodes"],
+      ["SELECT foo_id, node_id FROM foo_nodes WHERE ((x = 7) AND (node_id IN (1234, 33)))"],
+      ["SELECT attribute_id, bar_id FROM bar_attributes WHERE ((y = 8) AND (bar_id IN (444)))"]]
+  end
+
   it "should skip loading associated table when the join table has no results" do
     @db2.fetch = [{:id=>1234}, {:id=>33}]
     @db3.fetch = {:foo_id=>444, :node_id=>1234}

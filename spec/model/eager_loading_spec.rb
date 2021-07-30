@@ -1447,7 +1447,7 @@ describe Sequel::Model, "#eager_graph" do
   end
     
   it "should raise an error if called with an association with allow_eager_graph: false" do
-    proc{GraphBandMember.eager_graph(:no_bounds)}.must_raise(Sequel::Error)
+    proc{GraphBandMember.eager_graph(:no_bands)}.must_raise(Sequel::Error)
   end
 
   it "should raise an error if called without a symbol or hash" do

@@ -156,7 +156,7 @@ describe Sequel::Model, "associate" do
     c.method_defined?(:c=).must_equal false
 
     c = Class.new(Sequel::Model(:c))
-    c.one_to_one :c, :setter=>nil
+    c.one_through_one :c, :setter=>nil
     c.method_defined?(:c).must_equal true
     c.method_defined?(:c=).must_equal false
   end

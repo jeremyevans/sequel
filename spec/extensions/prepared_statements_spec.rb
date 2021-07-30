@@ -42,6 +42,12 @@ describe "prepared_statements plugin" do
     proc{@p.send(:use_prepared_statements_for?, :foo)}.must_raise Sequel::Error
   end
 
+  it "should not use prepared statements for insert_select on SQLite" do
+    @p.send(:use_prepared_statements_for?, :insert_select).must_equal true
+    @c.dataset = Sequel.connect('mock://sqlite')[:people]
+    @p.send(:use_prepared_statements_for?, :insert_select).must_equal false
+  end
+
   prepared_statements_spec = shared_description do
     it "should correctly update instance" do
       @p.update(:name=>'bar').must_equal @c.load(:id=>1, :name=>'bar', :i => 2)
