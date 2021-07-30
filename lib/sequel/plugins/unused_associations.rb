@@ -214,11 +214,11 @@ module Sequel
     # reported by this plugin.
     #
     # This plugin only considers the public instance methods the
-    # association defines to determine if it was used.  If an
-    # association is used in a way that does not call an instance
-    # method (such as only using the association with the
-    # dataset_associations plugin), then it would show up as unused
-    # by this plugin.
+    # association defines, and direct access to the related
+    # association reflection via Sequel::Model.association_reflection
+    # to determine if the association was used.  If the association
+    # metadata was accessed another way, it's possible this plugin
+    # will show the association as unused.
     #
     # As this relies on the method coverage added in Ruby 2.5, it does
     # not work on older versions of Ruby.  It also does not work on
