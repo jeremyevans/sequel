@@ -50,6 +50,7 @@ Superclass:
 <li><a href="#method-i-finalize_settings">finalize_settings</a></li>
 <li><a href="#method-i-join_table_alias">join_table_alias</a></li>
 <li><a href="#method-i-reciprocal">reciprocal</a></li>
+<li><a href="#method-i-separate_query_per_table-3F">separate_query_per_table?</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -163,6 +164,24 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-reciprocal-source'>    <span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb</span>&#x000A;<span class="line-num">122</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reciprocal</span>&#x000A;<span class="line-num">123</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-separate_query_per_table-3F'>
+<a name='method-i-separate_query_per_table-3F'></a>
+<div class='synopsis'>
+<span class='name'>separate_query_per_table?</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Whether a separate query should be used for each join table.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-separate_query_per_table-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-separate_query_per_table-3F-source'>    <span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb</span>&#x000A;<span class="line-num">127</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">separate_query_per_table?</span>&#x000A;<span class="line-num">128</span>   <span class="ruby-keyword">self</span>[<span class="ruby-value">:separate_query_per_table</span>]&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

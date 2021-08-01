@@ -30,7 +30,7 @@ doc/association_basics.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-06-11 17:28:01 -0700</span>
+<span class='datetime'>2021-07-28 07:37:57 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -66,7 +66,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>)</pre>
 
-<p>It also makes it easier to creating queries that use joins based on the association:</p>
+<p>It also makes it easier to create queries that use joins based on the association:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">association_join</span>(<span class="ruby-value">:albums</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># INNER JOIN albums ON (albums.artist_id = artists.id)</span></pre>
 
@@ -89,13 +89,13 @@ Last Update:
 
 <h3 id="label-many_to_one">many_to_one<span><a href="#label-many_to_one">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The many_to_one association is used when the table for the current class contains a foreign key that references the primary key in the table for the associated class.  It is named because there can be many rows in the current table for each row in the associated table.</p>
+<p>The many_to_one association is used when the table for the current class contains a foreign key that references the primary key in the table for the associated class.  It is named &#39;many_to_one&#39; because there can be many rows in the current table for each row in the associated table.</p>
 
 <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums             artists</span>&#x000A;<span class="ruby-comment">#   :id           /--&gt; :id</span>&#x000A;<span class="ruby-comment">#   :artist_id --/     :name</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-comment"># Uses singular form of associated model name</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
 <h3 id="label-one_to_many+and+one_to_one">one_to_many and one_to_one<span><a href="#label-one_to_many+and+one_to_one">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The one_to_many association is used when the table for the associated class contains a foreign key that references the primary key in the table for the current class.  It is named because for each row in the current table there can be many rows in the associated table:</p>
+<p>The one_to_many association is used when the table for the associated class contains a foreign key that references the primary key in the table for the current class.  It is named &#39;one_to_many&#39; because for each row in the current table there can be many rows in the associated table:</p>
 
 <p>The one_to_one association can be thought of as a subset of the one_to_many association, but where there can only be either 0 or 1 records in the associated table.  This is useful if there is a unique constraint on the foreign key field in the associated table. It&#39;s also useful if you want to impose an order on the association and just want the first record returned.</p>
 
@@ -202,7 +202,7 @@ Last Update:
 
 <h2 id="label-Dataset+Method">Dataset Method<span><a href="#label-Dataset+Method">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>In addition to the above methods, associations also add a instance method ending in <code>_dataset</code> that returns a dataset representing the objects in the associated table:</p>
+<p>In addition to the above methods, associations also add an instance method ending in <code>_dataset</code> that returns a dataset representing the objects in the associated table:</p>
 
 <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-comment"># 10</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist_dataset</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id = 10) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">id</span>&#x000A;<span class="ruby-comment"># 20</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums_dataset</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (artist_id = 20)</span></pre>
 
@@ -622,7 +622,7 @@ Last Update:
 
 <p>Here&#39;s an example of an association of songs to artists through lyrics, where the artist can perform any one of four tasks for the lyric:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:songs</span>, <span class="ruby-value">dataset:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_dataset</span>.<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:songs</span>).&#x000A;   <span class="ruby-identifier">join</span>(<span class="ruby-value">:lyrics</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:lyricid</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:composer_id</span>, <span class="ruby-value">:arranger_id</span>, <span class="ruby-value">:vocalist_id</span>, <span class="ruby-value">:lyricist_id</span>])&#x000A;<span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">songs_dataset</span>&#x000A;<span class="ruby-comment"># SELECT songs.* FROM songs</span>&#x000A;<span class="ruby-comment"># INNER JOIN lyrics ON ((lyrics.id = songs.lyric_id)</span>&#x000A;<span class="ruby-comment">#   AND (1 IN (composer_id, arranger_id, vocalist_id, lyricist_id))</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:songs</span>, <span class="ruby-value">dataset:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_dataset</span>.<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:songs</span>).&#x000A;   <span class="ruby-identifier">join</span>(<span class="ruby-value">:lyrics</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:lyricid</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:composer_id</span>, <span class="ruby-value">:arranger_id</span>, <span class="ruby-value">:vocalist_id</span>, <span class="ruby-value">:lyricist_id</span>])&#x000A;<span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">songs_dataset</span>&#x000A;<span class="ruby-comment"># SELECT songs.* FROM songs</span>&#x000A;<span class="ruby-comment"># INNER JOIN lyrics ON ((lyrics.id = songs.lyric_id)</span>&#x000A;<span class="ruby-comment">#   AND (1 IN (composer_id, arranger_id, vocalist_id, lyricist_id))</span></pre>
 
 <h4 id="label-3Aextend">:extend<span><a href="#label-3Aextend">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
@@ -655,6 +655,16 @@ Last Update:
 <p>A proc that can be used to modify the dataset used in the add/remove/remove_all methods.  It&#39;s separate from the association block, as that is called on a join of the join table and the associated table, whereas this option just applies to the join table.  It can be used to make sure that filters are used when deleting.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:lead_guitar_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">:join_table_block</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">instrument_id:</span> <span class="ruby-value">5</span>)&#x000A;<span class="ruby-keyword">end</span>)</pre>
+
+<h4 id="label-3Ajoin_table_db+-5Bmany_to_many-2C+one_through_one-5D">:join_table_db [<code>many_to_many</code>, <code>one_through_one</code>]<span><a href="#label-3Ajoin_table_db+-5Bmany_to_many-2C+one_through_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>A <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> to use for the join table.  Specifying this option switches the loading to use a separate query for the join table.  This is useful if the join table is not located in the same database as the associated table, or if the database account with access to the associated table doesn&#39;t have access to the join table.</p>
+
+<p>For example, if the Album class uses a different <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> than the Artist class, and the join table is in the database that the Artist class uses:</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:lead_guitar_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">:join_table_db</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span></pre>
+
+<p>This option also affects the add/remove/remove_all methods, by changing which database is used for inserts/deletes from the join table (add/remove/remove_all defaults to use the current model&#39;s database instead of the associated model&#39;s database).</p>
 
 <h3 id="label-Callback+Options">Callback Options<span><a href="#label-Callback+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -929,9 +939,25 @@ Last Update:
 
 <p>If set to false, you cannot load the association eagerly via eager or eager_graph.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">allow_eager:</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span>) <span class="ruby-comment"># Raises Sequel::Error</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">allow_eager:</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span>)       <span class="ruby-comment"># Raises Sequel::Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>) <span class="ruby-comment"># Raises Sequel::Error</span></pre>
 
 <p>This is usually used if the association dataset depends on specific values in model instance that would not be valid when eager loading for multiple instances.</p>
+
+<h4 id="label-3Aallow_eager_graph">:allow_eager_graph<span><a href="#label-3Aallow_eager_graph">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>If set to false, you cannot load the association eagerly via eager_graph.</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">allow_eager_graph:</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span>)       <span class="ruby-comment"># Allowed</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>) <span class="ruby-comment"># Raises Sequel::Error</span></pre>
+
+<p>This is useful if you still want to allow loading via eager, but do not want to allow loading via eager graph, possibly because the association does not support joins.</p>
+
+<h4 id="label-3Aallow_filtering_by">:allow_filtering_by<span><a href="#label-3Aallow_filtering_by">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>If set to false, you cannot use the association when filtering.</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">allow_filtering_by:</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>)).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Raises Sequel::Error</span></pre>
+
+<p>This is useful if such filtering cannot work, such as when a subquery cannot be used because the necessary tables are not in the same database.</p>
 
 <h4 id="label-3Ainstance_specific">:instance_specific<span><a href="#label-3Ainstance_specific">&para;</a> <a href="#top">&uarr;</a></span></h4>
 

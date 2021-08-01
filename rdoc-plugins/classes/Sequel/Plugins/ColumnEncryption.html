@@ -47,7 +47,7 @@ Sequel::Plugins::ColumnEncryption
 
 <p>This specifies a single master encryption key.  Unless you are actively rotating keys, it is best to use a single master key.  Rotation of encryption keys will be discussed in a later section.</p>
 
-<p>In the above call, <code>0</code> is the id of the key, and the <code>ENV["SEQUEL_COLUMN_ENCRYPTION_KEY"]</code> is the content of the key, which must be a string with exactly 32 bytes. As indicated, this key should not be hardcoded or otherwise committed to the source control repository.</p>
+<p>In the above call, <code>0</code> is the id of the key, and the <code>ENV[&quot;SEQUEL_COLUMN_ENCRYPTION_KEY&quot;]</code> is the content of the key, which must be a string with exactly 32 bytes. As indicated, this key should not be hardcoded or otherwise committed to the source control repository.</p>
 
 <p>For models that need encrypted columns, you load the plugin again, but specify the columns to encrypt:</p>
 
@@ -85,7 +85,7 @@ Sequel::Plugins::ColumnEncryption
 
 <pre class="ruby"><span class="ruby-constant">ConfidentialModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_encryption</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">enc</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">column</span> <span class="ruby-value">:encrypted_column_name</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cenc</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">cenc</span>.<span class="ruby-identifier">key</span> <span class="ruby-value">0</span>, <span class="ruby-constant">ENV</span>[<span class="ruby-string">&quot;SEQUEL_COLUMN_SPECIFIC_ENCRYPTION_KEY&quot;</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">column</span> <span class="ruby-value">:searchable_column_name</span>, <span class="ruby-value">searchable:</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-identifier">enc</span>.<span class="ruby-identifier">column</span> <span class="ruby-value">:ci_searchable_column_name</span>, <span class="ruby-value">searchable:</span> <span class="ruby-value">:case_insensitive</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>In this case, the <code>ENV["SEQUEL_COLUMN_SPECIFIC_ENCRYPTION_KEY"]</code> key will only be used for the <code>:encrypted_column_name</code> column, and not the other columns.</p>
+<p>In this case, the <code>ENV[&quot;SEQUEL_COLUMN_SPECIFIC_ENCRYPTION_KEY&quot;]</code> key will only be used for the <code>:encrypted_column_name</code> column, and not the other columns.</p>
 
 <p>Note that there isn&#39;t a security reason to prefer either model-specific or column-specific keys, as the actual cipher key used is unique per column value.</p>
 

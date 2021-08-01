@@ -30,7 +30,7 @@ doc/sql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-01-07 07:32:42 -0800</span>
+<span class='datetime'>2021-07-23 10:14:17 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -371,6 +371,10 @@ Last Update:
 <p>As you can see, these literalize with ANDs by default.  You can use the <code>Sequel.or</code> method to use OR instead:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-value">column1:</span> <span class="ruby-value">1</span>, <span class="ruby-value">column2:</span> <span class="ruby-value">2</span>) <span class="ruby-comment"># ((&quot;column1&quot; = 1) OR (&quot;column2&quot; = 2))</span></pre>
+
+<p>As you can see in the above examples, <code>Sequel.|</code> and <code>Sequel.or</code> work differently. <code>Sequel.|</code> is for combining an arbitrary number of expressions using OR. If you pass a single argument, <code>Sequel.|</code> will just convert it to a <a href="../../classes/Sequel.html"><code>Sequel</code></a> expression, similar to <code>Sequel.expr</code>. <code>Sequel.or</code> is for taking a single hash or array of two element arrays and combining the elements of that single argument using OR instead of AND:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">|</span>(<span class="ruby-value">column1:</span> <span class="ruby-value">1</span>, <span class="ruby-value">column2:</span> <span class="ruby-value">2</span>) <span class="ruby-comment"># ((&quot;column1&quot; = 1) AND (&quot;column2&quot; = 2))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-value">column1:</span> <span class="ruby-value">1</span>, <span class="ruby-value">column2:</span> <span class="ruby-value">2</span>) <span class="ruby-comment"># ((&quot;column1&quot; = 1) OR (&quot;column2&quot; = 2))</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">|</span>({<span class="ruby-value">column1:</span> <span class="ruby-value">1</span>}, {<span class="ruby-value">column2:</span> <span class="ruby-value">2</span>}) <span class="ruby-comment"># ((&quot;column1&quot; = 1) OR (&quot;column2&quot; = 2))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>({<span class="ruby-value">column1:</span> <span class="ruby-value">1</span>}, {<span class="ruby-value">column2:</span> <span class="ruby-value">2</span>}) <span class="ruby-comment"># ArgumentError</span></pre>
 
 <p>You&#39;ve already seen the <code>Sequel.negate</code> method, which will use ANDs if multiple entries are used:</p>
 

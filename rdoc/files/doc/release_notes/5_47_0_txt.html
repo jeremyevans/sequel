@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.47.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.47.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.47.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2021-07-30 11:31:39 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports using separate queries for each table for both lazy and eager loading of the following associations:</p>
+<ul><li>
+<p>many_to_many</p>
+</li><li>
+<p>one_through_one</p>
+</li><li>
+<p>many_through_many # many_through_many plugin</p>
+</li><li>
+<p>one_through_many # many_through_many plugin</p>
+</li></ul>
+
+<p>For many_to_many/one_through_one, you specify the :join_table_db association option, which should be a <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance containing the join table.  It is possible for the current table, join table, and associated table all to be in separate databases:</p>
+
+<pre class="ruby"><span class="ruby-constant">JOIN_TABLE_DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:artists</span>, <span class="ruby-value">join_table_db:</span> <span class="ruby-constant">JOIN_TABLE_DB</span></pre>
+
+<p>For many_through_many/one_through_many, you can use the :db option in each join table specification.  All join tables can be in separate databases:</p>
+
+<pre class="ruby"><span class="ruby-constant">JTDB1</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">JTDB2</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-comment"># Tracks on all albums this artist appears on</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:album_tracks</span>, [&#x000A;    {<span class="ruby-value">table:</span> <span class="ruby-value">:albums_artists</span>, <span class="ruby-value">left:</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">right:</span> <span class="ruby-value">:album_id</span>, <span class="ruby-value">db:</span> <span class="ruby-constant">JTDB1</span>},&#x000A;    {<span class="ruby-value">table:</span> <span class="ruby-value">:artists</span>, <span class="ruby-value">left:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">right:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">db:</span> <span class="ruby-constant">JTDB2</span>}&#x000A;  ],&#x000A;  <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">right_primary_key:</span> <span class="ruby-value">:album_id</span></pre>
+</li><li>
+<p>The :allow_eager_graph association option has been added. Setting this option to false will disallow eager loading via eager_graph. This is useful if you can eager load the association via eager, but not with eager_graph.</p>
+</li><li>
+<p>The :allow_filtering_by association option has been added. Setting this option to false will disallow the use of filtering by associations for the association.</p>
+</li><li>
+<p>Dataset#returning is now supported on SQLite <a href="3_35_0_txt.html">3.35.0</a>+. To work around bugs in the SQLite implementation, identifiers used in the RETURNING clause are automatically aliased.  Additionally, prepared statements that use the RETURNING clause on SQLite seem to have issues, so the <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin does not automatically use prepared statements on SQLite for queries that use the RETURNING clause.</p>
+</li><li>
+<p>Database#rename_tables has been added on MySQL to support renaming multiple tables in the same query.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The unused_associations plugin now tracks access to the association reflection for associations, so it will no longer show an association as completely unused if something is accessing the association reflection for it.  This eliminates most of the false positives, where the plugin would show an association as unused even though something was using it without calling the association methods.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

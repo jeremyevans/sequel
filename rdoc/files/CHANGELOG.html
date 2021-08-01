@@ -30,12 +30,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-07-01 07:57:50 -0700</span>
+<span class='datetime'>2021-07-30 11:31:39 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.47.0+-282021-08-01-29"><a href="doc/release_notes/5_47_0_txt.html">5.47.0</a> (2021-08-01)<span><a href="#label-5.47.0+-282021-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make the unused_associations plugin track access to association reflections to determine whether associations are used (jeremyevans)</p>
+</li><li>
+<p>Support :db option for join tables in {many,one}_through_many to use a separate query for each join table (jeremyevans)</p>
+</li><li>
+<p>Support :join_table_db option for many_to_many/one_through_one associations, to use a separate query for the join table (jeremyevans)</p>
+</li><li>
+<p>Support :allow_eager_graph and :allow_filtering_by association options (jeremyevans)</p>
+</li><li>
+<p>Add Database#rename_tables on MySQL, for renaming multiple tables in a single call (nick96) (#1774)</p>
+</li><li>
+<p>Support Dataset#returning on SQLite 3.35+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.46.0+-282021-07-01-29"><a href="doc/release_notes/5_46_0_txt.html">5.46.0</a> (2021-07-01)<span><a href="#label-5.46.0+-282021-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Add unused_associations plugin, for determining which associations and association methods are not used (jeremyevans)</p>

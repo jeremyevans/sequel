@@ -30,7 +30,7 @@ doc/migration.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-04-29 16:09:34 -0700</span>
+<span class='datetime'>2021-07-28 09:50:21 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -365,11 +365,11 @@ Last Update:
 
 <p>The main difference between the two is that <code>-d</code> will use the type methods with the database independent ruby class types, while <code>-D</code> will use the <code>column</code> method with string types.</p>
 
-<p>Note that <a href="../../classes/Sequel.html"><code>Sequel</code></a> cannot dump constraints other than primary key and possibly foreign key constraints.  If you are using database features such as constraints or triggers, you should use your database&#39;s dump and restore programs instead of Sequel&#39;s schema dumper.</p>
-
 <p>You can take the migration created by the schema dumper to another computer with an empty database, and attempt to recreate the schema using:</p>
 
 <pre>sequel -m db/migrations postgres://host/database</pre>
+
+<p>The schema_dumper extension is quite limited in what types of database objects it supports.  In general, it only supports dumping tables, columns, primary key and foreign key constraints, and some indexes.  It does not support most table options, CHECK constraints, partial indexes, database functions, triggers, security grants/revokes, and a wide variety of other useful database properties.  Be aware of the limitations when using the schema_dumper extension. If you are dumping the schema to restore to the same database type, it is recommended to use your database&#39;s dump and restore programs instead of the schema_dumper extension.</p>
 
 <h2 id="label-Checking+for+Current+Migrations">Checking for Current Migrations<span><a href="#label-Checking+for+Current+Migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
