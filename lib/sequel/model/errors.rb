@@ -38,7 +38,7 @@ module Sequel
       def full_messages
         inject([]) do |m, kv| 
           att, errors = *kv
-          errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(' and ')} #{e}")}
+          errors.each {|e| m << (e.is_a?(LiteralString) ? e : full_message(att, e))}
           m
         end
       end
@@ -52,6 +52,15 @@ module Sequel
         if v = fetch(att, nil) and !v.empty?
           v
         end
+      end
+
+      private
+
+      # Create full error message to use for the given attribute (or array of attributes)
+      # and error message. This can be overridden for easier internalization.
+      def full_message(att, error_msg)
+        att = att.join(' and ') if att.is_a?(Array)
+        "#{att} #{error_msg}"
       end
     end
   end

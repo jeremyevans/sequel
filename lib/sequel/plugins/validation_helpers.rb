@@ -66,16 +66,13 @@ module Sequel
     #       integer: "is not a number"
     #
     # Note that if you want to support internationalization of Errors#full_messages,
-    # you need to override the method.  Here's an example:
+    # it is easiest to override Errors#full_message (note singular form and not plural form).
+    # Here's an example:
     #   
     #   class Sequel::Model::Errors
-    #     def full_messages
-    #       inject([]) do |m, kv|
-    #         att, errors = *kv
-    #         att.is_a?(Array) ? Array(att).map!{|v| I18n.t("attributes.#{v}")} : att = I18n.t("attributes.#{att}")
-    #         errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(I18n.t('errors.joiner'))} #{e}")}
-    #         m
-    #       end
+    #     private
+    #     def full_message(attribute, error_msg)
+    #       "#{Array(attribute).join(I18n.t('errors.joiner'))} #{error_msg}"
     #     end
     #   end
     module ValidationHelpers

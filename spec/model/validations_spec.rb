@@ -55,6 +55,19 @@ describe Sequel::Model::Errors do
     msgs.sort.must_equal ['blay bliu', 'blich', 'blow blieuh']
   end
 
+  it "should allow for customizing #full_messages via #full_message if not a LiteralString" do
+    @errors.full_messages.must_equal []
+    
+    def @errors.full_message(attribute, msg)
+      "#{attribute.class}-#{msg}-#{attribute.inspect}"
+    end
+    @errors.add(:blow, 'blieuh')
+    @errors.add(:blow, Sequel.lit('blich'))
+    @errors.add(:blay, 'bliu')
+    msgs = @errors.full_messages
+    msgs.sort.must_equal ['Symbol-blieuh-:blow', 'Symbol-bliu-:blay', 'blich']
+  end
+
   it "should return the number of error messages using #count" do
     @errors.count.must_equal 0
     @errors.add(:a, 'b')

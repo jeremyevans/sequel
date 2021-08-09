@@ -1,3 +1,7 @@
+=== master
+
+* Add Model::Errors#full_message private method for easiest i18n support for errors with multiple attributes (jeremyevans) (#1779)
+
 === 5.47.0 (2021-08-01)
 
 * Make the unused_associations plugin track access to association reflections to determine whether associations are used (jeremyevans)
