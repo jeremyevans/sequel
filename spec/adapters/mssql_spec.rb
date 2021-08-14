@@ -21,6 +21,17 @@ describe "A MSSQL database" do
     @db.server_version
     @db.dataset.server_version
   end
+
+
+  it "should support LIKE without COLLATE" do
+    begin
+      like_without_collate = @db.like_without_collate
+      @db.like_without_collate = true
+      @db.get(Sequel.case({Sequel.like('a', 'a')=>1}, 2).as(:v)).must_equal 1
+    ensure
+      @db.like_without_collate = like_without_collate
+    end
+  end
 end
 
 describe "A MSSQL database" do

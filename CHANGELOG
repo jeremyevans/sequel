@@ -1,5 +1,7 @@
 === master
 
+* Add Database#like_without_collate on MSSQL, to avoid using COLLATE on LIKE arguments, which can significantly improve performance (jeremyevans)
+
 * Add Model::Errors#full_message private method for easiest i18n support for errors with multiple attributes (jeremyevans) (#1779)
 
 === 5.47.0 (2021-08-01)

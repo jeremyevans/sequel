@@ -24,6 +24,10 @@ module Sequel
       # Database object.
       attr_accessor :mssql_unicode_strings
 
+      # Whether to use LIKE without COLLATE Latin1_General_CS_AS.  Skipping the COLLATE
+      # can significantly increase performance in some cases.
+      attr_accessor :like_without_collate
+
       # Execute the given stored procedure with the given name.
       #
       # Options:
@@ -548,9 +552,9 @@ module Sequel
         when :'||'
           super(sql, :+, args)
         when :LIKE, :"NOT LIKE"
-          super(sql, op, args.map{|a| Sequel.lit(["(", " COLLATE Latin1_General_CS_AS)"], a)})
+          super(sql, op, complex_expression_sql_like_args(args, " COLLATE Latin1_General_CS_AS)"))
         when :ILIKE, :"NOT ILIKE"
-          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|a| Sequel.lit(["(", " COLLATE Latin1_General_CI_AS)"], a)})
+          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), complex_expression_sql_like_args(args, " COLLATE Latin1_General_CI_AS)"))
         when :<<, :>>
           complex_expression_emulate_append(sql, op, args)
         when :extract
@@ -847,6 +851,15 @@ module Sequel
         server_version >= 11000000
       end
 
+      # Determine whether to add the COLLATE for LIKE arguments, based on the Database setting.
+      def complex_expression_sql_like_args(args, collation)
+        if db.like_without_collate
+          args
+        else
+          args.map{|a| Sequel.lit(["(", collation], a)}
+        end
+      end
+      
       # Use strict ISO-8601 format with T between date and time,
       # since that is the format that is multilanguage and not
       # DATEFORMAT dependent.
