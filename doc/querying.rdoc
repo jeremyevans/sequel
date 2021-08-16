@@ -498,7 +498,7 @@ filters:
   # SELECT * FROM artists WHERE (id != 5)
   
   Artist.where(id: 5).exclude{name > 'A'}
-  # SELECT * FROM artists WHERE ((id = 5) OR (name <= 'A')
+  # SELECT * FROM artists WHERE ((id = 5) AND (name <= 'A')
 
 So to do a NOT IN with an array:
 
