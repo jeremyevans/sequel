@@ -316,7 +316,8 @@ module Sequel
           ([self] + descendents).each do |sc|
             next if sc.associations.empty? || !sc.name
             module_mapping[sc.send(:overridable_methods_module)] = sc
-            coverage_data[sc.name] ||= {''=>sc.used_association_reflections.keys.map(&:to_s).sort}
+            cov_data = coverage_data[sc.name] ||= {''=>[]}
+            cov_data[''].concat(sc.used_association_reflections.keys.map(&:to_s).sort).uniq!
           end
 
           coverage_result.each do |file, coverage|

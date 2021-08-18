@@ -97,6 +97,16 @@ describe "unused_associations plugin" do
       ["TUA", "a2s", {"read_only"=>true, "no_dataset_method"=>true}]]
   end
 
+  it "should respect association_reflection information from multiple coverage runs" do
+    check("", 'KEEP_COVERAGE'=>'1', 'PLUGIN_OPTS'=>Sequel.object_to_json(:coverage_file=>uac_file, :file=>ua_file))
+    ua, uao = check("TUA.association_reflection(:a1); TUA::O.a2s", 'KEEP_COVERAGE'=>'1', 'PLUGIN_OPTS'=>Sequel.object_to_json(:coverage_file=>uac_file, :file=>ua_file))
+
+    ua.must_equal [["TUA", "a3"], ["TUA", "a4s"], ["TUA", "a5"], ["TUA", "a6s"], ["TUA::SC", "a7"]]
+    uao.must_equal [
+      ["TUA", "a1", {"read_only"=>true, "no_dataset_method"=>true, "no_association_method"=>true}],
+      ["TUA", "a2s", {"read_only"=>true, "no_dataset_method"=>true}]]
+  end
+
   it "should not define unused associations when using :modify_associations and :file plugin options" do
     check(<<-RUBY, 'PLUGIN_OPTS'=>Sequel.object_to_json(:file=>ua_file), 'NO_DATA'=>'1')
       obj = TUA::O
