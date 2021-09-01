@@ -30,12 +30,21 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-07-30 11:31:39 -0700</span>
+<span class='datetime'>2021-09-01 08:21:20 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.48.0+-282021-09-01-29"><a href="doc/release_notes/5_48_0_txt.html">5.48.0</a> (2021-09-01)<span><a href="#label-5.48.0+-282021-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make the unused_associations plugin association reflection tracking work correctly when combining coverage runs (jeremyevans)</p>
+</li><li>
+<p>Add Database#like_without_collate on MSSQL, to avoid using COLLATE on LIKE arguments, which can significantly improve performance (jeremyevans)</p>
+</li><li>
+<p>Add Model::Errors#full_message private method for easiest i18n support for errors with multiple attributes (jeremyevans) (#1779)</p>
+</li></ul>
+
 <h3 id="label-5.47.0+-282021-08-01-29"><a href="doc/release_notes/5_47_0_txt.html">5.47.0</a> (2021-08-01)<span><a href="#label-5.47.0+-282021-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make the unused_associations plugin track access to association reflections to determine whether associations are used (jeremyevans)</p>

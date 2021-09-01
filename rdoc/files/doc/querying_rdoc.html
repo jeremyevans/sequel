@@ -30,7 +30,7 @@ doc/querying.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-11-30 09:37:49 -0800</span>
+<span class='datetime'>2021-08-16 14:01:55 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -346,7 +346,7 @@ Last Update:
 
 <p>In general, <code>invert</code> is used rarely, since <code>exclude</code> allows you to invert only specific filters:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">id:</span> <span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id != 5)</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">5</span>).<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;A&#39;</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id = 5) OR (name &lt;= &#39;A&#39;)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">id:</span> <span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id != 5)</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">5</span>).<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;A&#39;</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id = 5) AND (name &lt;= &#39;A&#39;)</span></pre>
 
 <p>So to do a NOT IN with an array:</p>
 

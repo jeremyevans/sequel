@@ -1,4 +1,4 @@
-Sun, 01 Aug 2021 10:29:29 -0700
+Wed, 01 Sep 2021 08:26:43 -0700
 lib/sequel/adapters/ado.rb	Fri, 26 Feb 2021 10:40:23 -0800
 lib/sequel/adapters/ado/access.rb	Mon, 28 Jan 2019 08:29:19 -0800
 lib/sequel/adapters/ado/mssql.rb	Mon, 28 Jan 2019 08:29:19 -0800
@@ -30,7 +30,7 @@ lib/sequel/adapters/postgres.rb	Tue, 26 Jan 2021 09:50:47 -0800
 lib/sequel/adapters/postgresql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/shared/access.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/adapters/shared/db2.rb	Thu, 01 Nov 2018 07:32:49 -0700
-lib/sequel/adapters/shared/mssql.rb	Thu, 19 Nov 2020 13:10:16 -0800
+lib/sequel/adapters/shared/mssql.rb	Fri, 13 Aug 2021 18:22:05 -0700
 lib/sequel/adapters/shared/mysql.rb	Tue, 13 Jul 2021 09:59:54 -0700
 lib/sequel/adapters/shared/oracle.rb	Wed, 07 Oct 2020 15:45:35 -0700
 lib/sequel/adapters/shared/postgres.rb	Tue, 18 May 2021 12:06:56 -0700
