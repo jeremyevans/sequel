@@ -1,0 +1,14 @@
+= New Features
+
+* A Sequel::Database#like_without_collate accessor has been added on
+  Microsoft SQL Server, which avoids using the COLLATE clause for
+  LIKE expressions.  This can speed up query performance significantly.
+
+* A private Sequel::Model::Errors#full_message method has been added
+  to make it easier to support internationalization for Sequel::Model
+  error messages.
+
+= Other Improvements
+
+* The association reflection tracking in the unused_associations
+  plugin now works correctly when combining coverage runs.
