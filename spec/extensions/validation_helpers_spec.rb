@@ -331,6 +331,23 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.must_be :valid?
   end
   
+  it "should support validates_no_null_byte" do
+    @c.set_validations{validates_no_null_byte(:value)}
+    @m.must_be :valid?
+    @m.value = ''
+    @m.must_be :valid?
+    @m.value = 1234
+    @m.must_be :valid?
+    @m.value = "asdfasl\0asdf"
+    @m.wont_be :valid?
+    @m.value = true
+    @m.must_be :valid?
+    @m.value = false
+    @m.must_be :valid?
+    @m.value = Time.now
+    @m.must_be :valid?
+  end
+  
   it "should support validates_presence" do
     @c.set_validations{validates_presence(:value)}
     @m.wont_be :valid?

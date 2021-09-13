@@ -85,6 +85,7 @@ module Sequel
         :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_null=>{:message=>lambda{"is not present"}},
+        :no_null_byte=>{:message=>lambda{"contains a null byte"}},
         :numeric=>{:message=>lambda{"is not a number"}},
         :operator=>{:message=>lambda{|operator, rhs| "is not #{operator} #{rhs}"}},
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
@@ -148,6 +149,11 @@ module Sequel
         # Check attribute value(s) are not NULL/nil.
         def validates_not_null(atts, opts=OPTS)
           validatable_attributes_for_type(:not_null, atts, opts){|a,v,m| validation_error_message(m) if v.nil?}
+        end
+
+        # Check attribute value(s) does not contain a null ("\0", ASCII NUL) byte.
+        def validates_no_null_byte(atts, opts=OPTS)
+          validatable_attributes_for_type(:no_null_byte, atts, opts){|a,v,m| validation_error_message(m) if String === v && v.include?("\0")}
         end
         
         # Check attribute value(s) string representation is a valid float.

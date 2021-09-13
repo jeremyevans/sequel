@@ -1,3 +1,7 @@
+=== master
+
+* Add Model#validates_no_null_byte to validation_helpers plugin (jeremyevans)
+
 === 5.48.0 (2021-09-01)
 
 * Make the unused_associations plugin association reflection tracking work correctly when combining coverage runs (jeremyevans)
