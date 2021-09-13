@@ -2029,6 +2029,15 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
       @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>nil}]
       proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.must_raise(Sequel::DatabaseError)
       @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>nil}]
+
+      if @d.server_version >= 140000
+        proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.must_raise(Sequel::DatabaseError)
+        @d[:test].filter(:name=>'a').update(:name=>'c')
+        @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {Sequel[:new][:name] => 'c'}, :replace=>true)
+        proc{@d[:test].filter(:name=>'c').update(:name=>'c')}.must_raise(Sequel::DatabaseError)
+        @d[:test].filter(:name=>'c').update(:name=>'b')
+      end
+
       @d.drop_trigger(:test, :identity)
     end
   end

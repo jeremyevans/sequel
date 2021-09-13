@@ -1,5 +1,7 @@
 === master
 
+* Add Database#create_trigger :replace option on PostgreSQL 14+ for CREATE OR REPLACE TRIGGER (jeremyevans)
+
 * Make auto_validations plugin automatically setup no_null_byte validations (jeremyevans)
 
 * Add Model#validates_no_null_byte to validation_helpers plugin (jeremyevans)

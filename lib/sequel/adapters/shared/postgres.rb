@@ -479,6 +479,7 @@ module Sequel
       #         :each_row :: Calls the trigger for each row instead of for each statement.
       #         :events :: Can be :insert, :update, :delete, or an array of any of those. Calls the trigger whenever that type of statement is used.  By default,
       #                    the trigger is called for insert, update, or delete.
+      #         :replace :: Replace the trigger with the same name if it already exists (PostgreSQL 14+).
       #         :when :: A filter to use for the trigger
       def create_trigger(table, name, function, opts=OPTS)
         self << create_trigger_sql(table, name, function, opts)
@@ -1237,7 +1238,7 @@ module Sequel
           raise Error, "Trigger conditions are not supported for this database" unless supports_trigger_conditions?
           filter = " WHEN #{filter_expr(filter)}"
         end
-        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]}#{filter} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+        "CREATE #{'OR REPLACE ' if opts[:replace]}TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]}#{filter} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
       end
 
       # DDL fragment for initial part of CREATE VIEW statement
