@@ -71,12 +71,14 @@ module Sequel
       MAX_LENGTH_OPTIONS = {:from=>:values, :allow_nil=>true}.freeze
       SCHEMA_TYPES_OPTIONS = NOT_NULL_OPTIONS
       UNIQUE_OPTIONS = NOT_NULL_OPTIONS
+      NO_NULL_BYTE_OPTIONS = MAX_LENGTH_OPTIONS
       EMPTY_ARRAY = [].freeze
 
       def self.apply(model, opts=OPTS)
         model.instance_exec do
           plugin :validation_helpers
           @auto_validate_presence = false
+          @auto_validate_no_null_byte_columns = []
           @auto_validate_not_null_columns = []
           @auto_validate_explicit_not_null_columns = []
           @auto_validate_max_length_columns = []
@@ -84,6 +86,7 @@ module Sequel
           @auto_validate_types = true
 
           @auto_validate_options = {
+              :no_null_byte=>NO_NULL_BYTE_OPTIONS,
               :not_null=>NOT_NULL_OPTIONS,
               :explicit_not_null=>EXPLICIT_NOT_NULL_OPTIONS,
               :max_length=>MAX_LENGTH_OPTIONS,
@@ -102,14 +105,14 @@ module Sequel
           end
 
           h = @auto_validate_options.dup
-          [:not_null, :explicit_not_null, :max_length, :schema_types, :unique].each do |type|
+          [:not_null, :explicit_not_null, :max_length, :no_null_byte, :schema_types, :unique].each do |type|
             if type_opts = opts[:"#{type}_opts"]
               h[type] = h[type].merge(type_opts).freeze
             end
           end
 
           if opts[:skip_invalid]
-            [:not_null, :explicit_not_null, :max_length, :schema_types].each do |type|
+            [:not_null, :explicit_not_null, :no_null_byte, :max_length, :schema_types].each do |type|
               h[type] = h[type].merge(:skip_invalid=>true).freeze
             end
           end
@@ -119,6 +122,9 @@ module Sequel
       end
 
       module ClassMethods
+        # The columns with automatic no_null_byte validations
+        attr_reader :auto_validate_no_null_byte_columns
+
         # The columns with automatic not_null validations
         attr_reader :auto_validate_not_null_columns
 
@@ -135,7 +141,15 @@ module Sequel
         # Inherited options
         attr_reader :auto_validate_options
 
-        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_max_length_columns=>:dup, :@auto_validate_unique_columns=>:dup, :@auto_validate_options => :dup)
+        Plugins.inherited_instance_variables(self,
+          :@auto_validate_presence=>nil,
+          :@auto_validate_types=>nil,
+          :@auto_validate_no_null_byte_columns=>:dup,
+          :@auto_validate_not_null_columns=>:dup,
+          :@auto_validate_explicit_not_null_columns=>:dup,
+          :@auto_validate_max_length_columns=>:dup,
+          :@auto_validate_unique_columns=>:dup,
+          :@auto_validate_options => :dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
 
         # Whether to use a presence validation for not null columns
@@ -150,6 +164,7 @@ module Sequel
 
         # Freeze auto_validation settings when freezing model class.
         def freeze
+          @auto_validate_no_null_byte_columns.freeze
           @auto_validate_not_null_columns.freeze
           @auto_validate_explicit_not_null_columns.freeze
           @auto_validate_max_length_columns.freeze
@@ -158,12 +173,13 @@ module Sequel
           super
         end
 
-        # Skip automatic validations for the given validation type (:not_null, :types, :unique).
+        # Skip automatic validations for the given validation type
+        # (:not_null, :types, :unique, :max_length, :no_null_byte).
         # If :all is given as the type, skip all auto validations.
         def skip_auto_validations(type)
           case type
           when :all
-            [:not_null, :types, :unique, :max_length].each{|v| skip_auto_validations(v)}
+            [:not_null, :no_null_byte, :types, :unique, :max_length].each{|v| skip_auto_validations(v)}
           when :not_null
             auto_validate_not_null_columns.clear
             auto_validate_explicit_not_null_columns.clear
@@ -183,6 +199,7 @@ module Sequel
           explicit_not_null_cols += Array(primary_key)
           @auto_validate_explicit_not_null_columns = explicit_not_null_cols.uniq
           @auto_validate_max_length_columns = db_schema.select{|col, sch| sch[:type] == :string && sch[:max_length].is_a?(Integer)}.map{|col, sch| [col, sch[:max_length]]}
+          @auto_validate_no_null_byte_columns = db_schema.select{|_, sch| sch[:type] == :string}.map{|col, _| col}
           table = dataset.first_source_table
           @auto_validate_unique_columns = if db.supports_index_parsing? && [Symbol, SQL::QualifiedIdentifier, SQL::Identifier, String].any?{|c| table.is_a?(c)}
             db.indexes(table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns].length == 1 ? idx[:columns].first : idx[:columns]}
@@ -209,6 +226,9 @@ module Sequel
           return if skip.include?(:all)
           opts = model.auto_validate_options
 
+          unless skip.include?(:no_null_byte) || (no_null_byte_columns = model.auto_validate_no_null_byte_columns).empty?
+            validates_no_null_byte(no_null_byte_columns, opts[:no_null_byte])
+          end
 
           unless skip.include?(:not_null)
             not_null_method = model.auto_validate_presence? ? :validates_presence : :validates_not_null

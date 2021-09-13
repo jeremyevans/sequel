@@ -37,11 +37,11 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal false
     @m.errors.must_equal(:d=>["is not present"])
 
-    @m.set(:d=>'/', :num=>'a', :name=>'1')
+    @m.set(:d=>'/', :num=>'a', :name=>"a\0b")
     @m.valid?.must_equal false
-    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
+    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"], :name=>["contains a null byte"])
 
-    @m.set(:d=>Date.today, :num=>1)
+    @m.set(:d=>Date.today, :num=>1, :name=>'')
     @m.valid?.must_equal false
     @m.errors.must_equal([:name, :num]=>["is already taken"])
 

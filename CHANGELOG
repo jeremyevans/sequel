@@ -1,5 +1,7 @@
 === master
 
+* Make auto_validations plugin automatically setup no_null_byte validations (jeremyevans)
+
 * Add Model#validates_no_null_byte to validation_helpers plugin (jeremyevans)
 
 === 5.48.0 (2021-09-01)
