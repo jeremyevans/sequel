@@ -1,5 +1,7 @@
 === master
 
+* Support table aliases for JOIN USING columns on PostgreSQL 14+ (jeremyevans)
+
 * Support calling PostgreSQL procedures without arguments (jeremyevans)
 
 * Support hstore subscripts in pg_hstore_ops on PostgreSQL 14+, for updating only part of an hstore value (jeremyevans)

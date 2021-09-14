@@ -1728,6 +1728,15 @@ module Sequel
         ds.insert_sql(*values)
       end
 
+      # Support SQL::AliasedExpression as expr to setup a USING join with a table alias for the
+      # USING columns.
+      def join_table(type, table, expr=nil, options=OPTS, &block)
+        if expr.is_a?(SQL::AliasedExpression) && expr.expression.is_a?(Array) && !expr.expression.empty? && expr.expression.all?
+          options = options.merge(:join_using=>true)
+        end
+        super
+      end
+
       # Locks all tables in the dataset's FROM clause (but not in JOINs) with
       # the specified mode (e.g. 'EXCLUSIVE').  If a block is given, starts
       # a new transaction, locks the table, and yields.  If a block is not given,
@@ -2024,6 +2033,17 @@ module Sequel
         end
       end
 
+      # Support table aliases for USING columns
+      def join_using_clause_using_sql_append(sql, using_columns)
+        if using_columns.is_a?(SQL::AliasedExpression)
+          super(sql, using_columns.expression)
+          sql << ' AS '
+          identifier_append(sql, using_columns.alias)
+        else
+          super
+        end
+      end
+    
       # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
       def literal_blob_append(sql, v)
         sql << "'" << v.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"} << "'"

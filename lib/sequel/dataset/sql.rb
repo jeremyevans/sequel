@@ -559,11 +559,9 @@ module Sequel
     # Append literalization of JOIN USING clause to SQL string.
     def join_using_clause_sql_append(sql, jc)
       join_clause_sql_append(sql, jc)
-      sql << ' USING ('
-      column_list_append(sql, jc.using)
-      sql << ')'
+      join_using_clause_using_sql_append(sql, jc.using) 
     end
-    
+
     # Append literalization of negative boolean constant to SQL string.
     def negative_boolean_constant_sql_append(sql, constant)
       sql << 'NOT '
@@ -1218,6 +1216,13 @@ module Sequel
       "#{join_type.to_s.gsub('_', ' ').upcase} JOIN"
     end
 
+    # Append USING clause for JOIN USING
+    def join_using_clause_using_sql_append(sql, using_columns)
+      sql << ' USING ('
+      column_list_append(sql, using_columns)
+      sql << ')'
+    end
+    
     # Append a literalization of the array to SQL string.
     # Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
     def literal_array_append(sql, v)

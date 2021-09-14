@@ -428,6 +428,14 @@ rows that are distinct on just those columns:
   DB[:table].distinct(:id).all
   # SELECT DISTINCT ON ("id") * FROM "table"
 
+=== JOIN USING table alias
+
+Sequel allows passing an SQL::AliasedExpression to join table methods to use a USING
+join with a table alias for the USING columns:
+
+  DB[:t1].join(:t2, Sequel.as([:c1, :c2], :alias))
+  # SELECT * FROM "t1" INNER JOIN "t2" USING ("c1", "c2") AS "alias"
+
 === Calling PostgreSQL 11+ Procedures <tt>postgres only</tt>
 
 PostgreSQL 11+ added support for procedures, which are different from the user defined

@@ -605,6 +605,10 @@ describe "A PostgreSQL database" do
     @db.values([[1, 2]]).from_self.cross_join(@db.values([[3, 4]]).as(:x, [:c1, :c2])).map([:column1, :column2, :c1, :c2]).must_equal [[1, 2, 3, 4]]
   end
 
+  it "should support column aliases for JOIN USING" do
+    @db.from(@db.values([[1, 2]]).as(:x, [:c1, :c2])).join(@db.values([[1, 2]]).as(:y, [:c1, :c2]), Sequel.as([:c1, :c2], :foo)).select_all(:foo).all.must_equal [{:c1=>1, :c2=>2}]
+  end if DB.server_version >= 140000
+
   it "should respect the :read_only option per-savepoint" do
     proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[Sequel[:public][:testfk]].insert}}}.must_raise(Sequel::DatabaseError)
     proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[Sequel[:public][:testfk]].insert}}}.must_raise(Sequel::DatabaseError)

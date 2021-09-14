@@ -508,6 +508,7 @@ module Sequel
     #                            argument.
     #            :implicit_qualifier :: The name to use for qualifying implicit conditions.  By default,
     #                                   the last joined or primary table is used.
+    #            :join_using :: Force the using of JOIN USING, even if +expr+ is not an array of symbols.
     #            :reset_implicit_qualifier :: Can set to false to ignore this join when future joins determine qualifier
     #                                         for implicit conditions.
     #            :qualify :: Can be set to false to not do any implicit qualification.  Can be set
@@ -541,7 +542,7 @@ module Sequel
         return s.join_table(type, ds, expr, options, &block)
       end
 
-      using_join = expr.is_a?(Array) && !expr.empty? && expr.all?{|x| x.is_a?(Symbol)}
+      using_join = options[:join_using] || (expr.is_a?(Array) && !expr.empty? && expr.all?{|x| x.is_a?(Symbol)})
       if using_join && !supports_join_using?
         h = {}
         expr.each{|e| h[e] = e}

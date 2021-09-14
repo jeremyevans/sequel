@@ -2636,6 +2636,10 @@ describe "Dataset#join_table" do
     @d.join(:categories, [:id]).sql.must_equal 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."id" = "items"."id")'
   end
 
+  it "should be able to force JOIN USING without an array of symbols using :join_using" do
+    @d.join(:categories, [Sequel.identifier(:id)], :join_using=>true).sql.must_equal 'SELECT * FROM "items" INNER JOIN "categories" USING ("id")'
+  end
+
   it "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
     @d = @d.with_extend do
       def supports_cte?; true end
