@@ -5104,6 +5104,10 @@ describe "Custom ASTTransformer" do
     obj = Sequel::SQL::Expression.new
     def obj.sequel_ast_transform(transformer); transformer.call(:a) end
     Sequel.mock.literal(@c.transform(obj)).must_equal "aa"
+
+    obj = Sequel::SQL::Expression.new
+    def obj.to_s_append(ds, sql) sql << 'a' end
+    Sequel.mock.literal(@c.transform(obj)).must_equal "a"
   end
 end
 

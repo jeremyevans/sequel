@@ -25,6 +25,8 @@ describe "Sequel::Postgres::JSONOp" do
 
     @l[@jb[[1, 2]]].must_equal "(j #> ARRAY[1,2])"
     @l[Sequel.pg_jsonb_op(Sequel.lit('j'))['a'][1]].must_equal "((j -> 'a') -> 1)"
+
+    @db.select(Sequel.pg_jsonb_op(Sequel[:h])['a']).qualify(:t).sql.must_equal "SELECT t.h['a']"
   end
 
   it "should have #[] accept an array" do

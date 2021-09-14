@@ -45,6 +45,8 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal(Sequel.hstore_op(Sequel[:h][:i])['a']).must_equal "h.i['a']"
     @ds.literal(Sequel.hstore_op(Sequel.lit('h'))['a']).must_equal "(h -> 'a')"
     @ds.literal(@h[%w'a']).must_equal "(h -> ARRAY['a'])"
+
+    @ds.select(Sequel.hstore_op(Sequel[:h])['a']).qualify(:t).sql.must_equal "SELECT t.h['a']"
   end
 
   it "#[] should handle arrays" do
