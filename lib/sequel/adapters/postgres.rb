@@ -717,7 +717,9 @@ module Sequel
         sql = String.new
         sql << "CALL "
         identifier_append(sql, name)
-        literal_append(sql, args)
+        sql << "("
+        identifier_list_append(sql, args)
+        sql << ")"
         with_sql_first(sql)
       end
 

@@ -1495,7 +1495,7 @@ describe "Sequel::Postgres::Database" do
     @db.create_table!(:posts){Integer :a}
   end
   after do
-    @db.run("DROP PROCEDURE test_procedure_posts(int, int)")
+    @db.run("DROP PROCEDURE test_procedure_posts(#{"int, int" unless @no_args})")
     @db.drop_table?(:posts)
   end
 
@@ -1513,6 +1513,33 @@ SQL
     @db.call_procedure(:test_procedure_posts, 3, nil).must_equal(:a=>6, :b=>1)
   end
 
+  it "#call_procedure should call a procedure without arguments" do
+    @no_args = true
+    @db.run <<SQL
+CREATE OR REPLACE PROCEDURE test_procedure_posts()
+LANGUAGE SQL
+AS $$
+INSERT INTO posts VALUES (1) RETURNING *;
+INSERT INTO posts VALUES (2) RETURNING *;
+SELECT max(posts.a), min(posts.a) FROM posts;
+$$;
+SQL
+    @db.call_procedure(:test_procedure_posts).must_be_nil
+    @db[:posts].select_order_map(:a).must_equal [1, 2]
+  end
+
+  it "#call_procedure should call a procedure with output parameters" do
+    @db.run <<SQL
+CREATE OR REPLACE PROCEDURE test_procedure_posts(out a int, out b int)
+LANGUAGE SQL
+AS $$
+INSERT INTO posts VALUES (1) RETURNING *;
+INSERT INTO posts VALUES (2) RETURNING *;
+SELECT max(posts.a), min(posts.a) FROM posts;
+$$;
+SQL
+    @db.call_procedure(:test_procedure_posts, nil, nil).must_equal(:a=>2, :b=>1)
+  end if DB.server_version >= 140000
 
   it "#call_procedure should call a procedure that doesn't return a row" do
     @db.run <<SQL
