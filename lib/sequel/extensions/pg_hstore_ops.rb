@@ -62,6 +62,19 @@
 #   # Delete a key
 #   DB[:tab].update(h: Sequel.hstore_op(:h).delete('k1'))
 #  
+# On PostgreSQL 14+, The hstore <tt>[]</tt> method will use subscripts instead of being
+# the same as +get+, if the value being wrapped is an identifer:
+#
+#   Sequel.hstore_op(:hstore_column)['a']    # hstore_column['a']
+#   Sequel.hstore_op(Sequel[:h][:s])['a']      # h.s['a']
+#
+# This support allows you to use hstore subscripts in UPDATE statements to update only
+# part of a column:
+#
+#   h = Sequel.hstore_op(:h)
+#   DB[:t].update(h['key1'] => 'val1', h['key2'] => 'val2')
+#   #  UPDATE "t" SET "h"['key1'] = 'val1', "h"['key2'] = 'val2'
+#
 # See the PostgreSQL hstore function and operator documentation for more
 # details on what these functions and operators do.
 #
@@ -114,10 +127,15 @@ module Sequel
       #
       #   hstore_op['a'] # (hstore -> 'a')
       def [](key)
-        v = Sequel::SQL::PlaceholderLiteralString.new(LOOKUP, [value, wrap_input_array(key)])
         if key.is_a?(Array) || (defined?(Sequel::Postgres::PGArray) && key.is_a?(Sequel::Postgres::PGArray)) || (defined?(Sequel::Postgres::ArrayOp) && key.is_a?(Sequel::Postgres::ArrayOp))
-          wrap_output_array(v)
+          wrap_output_array(Sequel::SQL::PlaceholderLiteralString.new(LOOKUP, [value, wrap_input_array(key)]))
         else
+          v = case @value
+          when Symbol, SQL::Identifier, SQL::QualifiedIdentifier
+            HStoreSubscriptOp.new(self, key)
+          else
+            Sequel::SQL::PlaceholderLiteralString.new(LOOKUP, [value, key])
+          end
           Sequel::SQL::StringExpression.new(:NOOP, v)
         end
       end
@@ -303,6 +321,38 @@ module Sequel
         end
       end
     end
+
+    # Represents hstore subscripts. This is abstracted because the
+    # subscript support depends on the database version.
+    class HStoreSubscriptOp < SQL::Expression
+      SUBSCRIPT = ["".freeze, "[".freeze, "]".freeze].freeze
+
+      # The expression being subscripted
+      attr_reader :expression
+
+      # The subscript to use
+      attr_reader :sub
+
+      # Set the expression and subscript to the given arguments
+      def initialize(expression, sub)
+        @expression = expression
+        @sub = sub
+        freeze
+      end
+
+      # Use subscripts instead of -> operator on PostgreSQL 14+
+      def to_s_append(ds, sql)
+        server_version = ds.db.server_version
+        frag = server_version && server_version >= 140000 ? SUBSCRIPT : HStoreOp::LOOKUP
+        ds.literal_append(sql, Sequel::SQL::PlaceholderLiteralString.new(frag, [@expression, @sub]))
+      end
+
+      # Support transforming of hstore subscripts
+      def sequel_ast_transform(transformer)
+        self.class.new(transformer.call(@expression), transformer.call(@sub))
+      end
+    end
+
 
     module HStoreOpMethods
       # Wrap the receiver in an HStoreOp so you can easily use the PostgreSQL

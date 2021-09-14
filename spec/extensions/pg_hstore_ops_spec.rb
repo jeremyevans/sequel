@@ -38,6 +38,15 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal(@h['a']).must_equal "(h -> 'a')"
   end
 
+  it "#[] should use subscripts for identifiers on PostgreSQL 14+" do
+    def @db.server_version(*); 140000; end
+    @ds.literal(@h['a']).must_equal "h['a']"
+    @ds.literal(Sequel.hstore_op(Sequel[:h])['a']).must_equal "h['a']"
+    @ds.literal(Sequel.hstore_op(Sequel[:h][:i])['a']).must_equal "h.i['a']"
+    @ds.literal(Sequel.hstore_op(Sequel.lit('h'))['a']).must_equal "(h -> 'a')"
+    @ds.literal(@h[%w'a']).must_equal "(h -> ARRAY['a'])"
+  end
+
   it "#[] should handle arrays" do
     @ds.literal(@h[%w'a']).must_equal "(h -> ARRAY['a'])"
   end

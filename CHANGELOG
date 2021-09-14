@@ -1,5 +1,7 @@
 === master
 
+* Support hstore subscripts in pg_hstore_ops on PostgreSQL 14+, for updating only part of an hstore value (jeremyevans)
+
 * Support JSONB subscripts in pg_json_ops on PostgreSQL 14+, for updating only part of a JSONB value (jeremyevans)
 
 * Support SQL::Expression#sequel_ast_transform for custom AST transforms on arbitrary expressions (jeremyevans)

@@ -3179,6 +3179,11 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h2.values.length).must_equal 1
     @ds.get(h1.avals.length).must_equal 2
     @ds.get(h2.avals.length).must_equal 1
+
+    if DB.server_version >= 140000
+      @ds.update(h1['a'] => '2', h1['b'] => '3', h1['c'] => '4')
+      @ds.get(:h1).must_equal("a"=>"2", "b"=>"3", "c"=>"4")
+    end
   end
 end if DB.type_supported?(:hstore)
 
