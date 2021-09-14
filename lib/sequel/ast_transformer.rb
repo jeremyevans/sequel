@@ -80,6 +80,12 @@ module Sequel
         SQL::DelayedEvaluation.new(lambda{|ds| v(o.call(ds))})
       when SQL::Wrapper
         SQL::Wrapper.new(v(o.value))
+      when SQL::Expression
+        if o.respond_to?(:sequel_ast_transform)
+          o.sequel_ast_transform(method(:v))
+        else
+          o
+        end
       else
         o
       end

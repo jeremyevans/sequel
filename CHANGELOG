@@ -1,5 +1,7 @@
 === master
 
+* Support SQL::Expression#sequel_ast_transform for custom AST transforms on arbitrary expressions (jeremyevans)
+
 * Add Database#create_trigger :replace option on PostgreSQL 14+ for CREATE OR REPLACE TRIGGER (jeremyevans)
 
 * Make auto_validations plugin automatically setup no_null_byte validations (jeremyevans)

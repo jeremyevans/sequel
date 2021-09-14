@@ -5095,6 +5095,12 @@ describe "Custom ASTTransformer" do
     ds.sql.must_equal 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
     ds.clone(:from=>@c.transform(ds.opts[:from]), :join=>@c.transform(ds.opts[:join])).sql.must_equal 'SELECT * FROM tt CROSS JOIN aa AS g INNER JOIN bb AS h USING (cc) INNER JOIN dd AS i ON (ii.ee = hh.ff)'
   end
+
+  it "should support sequel_ast_transform on objects for custom transforms" do
+    obj = Sequel::SQL::Expression.new
+    def obj.sequel_ast_transform(transformer); transformer.call(:a) end
+    Sequel.mock.literal(@c.transform(obj)).must_equal "aa"
+  end
 end
 
 describe "Dataset#returning" do
