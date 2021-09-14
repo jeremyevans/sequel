@@ -3532,7 +3532,7 @@ describe 'PostgreSQL json type' do
         end
       end
 
-      if DB.server_version >= 90500  && json_type == :jsonb
+      if DB.server_version >= 90500 && json_type == :jsonb
         @db.get(pg_json.call([nil, 2]).op.strip_nulls[1]).must_equal 2
         @db.get(pg_json.call([nil, 2]).op.pretty).must_equal "[\n    null,\n    2\n]"
         @db.from((jo - 'b').keys.as(:k)).select_order_map(:k).must_equal %w'a'
