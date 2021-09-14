@@ -3674,6 +3674,16 @@ describe 'PostgreSQL json type' do
       j = Sequel.pg_json([{'a'=>1, 'b'=>'c'}, {'a'=>2, 'b'=>'d'}]).op
       @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).must_equal [1, 2]
       @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).must_equal %w'c d'
+
+      if DB.server_version >= 140000 && json_type == :jsonb
+        @db.create_table!(:items){column :i, json_type}
+        @db[:items].delete
+        @db[:items].insert(:i=>Sequel.pg_jsonb('a'=>{'b'=>1}))
+        @db[:items].update(Sequel.pg_jsonb_op(:i)['a']['b'] => '2',
+          Sequel.pg_jsonb_op(:i)['a']['c'] => '3',
+          Sequel.pg_jsonb_op(Sequel[:i])['d'] => Sequel.pg_jsonb('e'=>4))
+        @db[:items].all.must_equal [{:i=>{'a'=>{'b'=>2, 'c'=>3}, 'd'=>{'e'=>4}}}]
+      end
     end if DB.server_version >= 90300
   end
 end if DB.server_version >= 90200

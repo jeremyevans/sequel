@@ -101,6 +101,27 @@
 # substituted in +path+. +silent+ specifies whether errors are suppressed. By default,
 # errors are not suppressed.
 #
+# On PostgreSQL 14+, The JSONB <tt>[]</tt> method will use subscripts instead of being
+# the same as +get+, if the value being wrapped is an identifer:
+#
+#   Sequel.pg_jsonb_op(:jsonb_column)[1]       # jsonb_column[1]
+#   Sequel.pg_jsonb_op(:jsonb_column)[1][2]    # jsonb_column[1][2]
+#   Sequel.pg_jsonb_op(Sequel[:j][:b])[1]      # j.b[1]
+#
+# This support allows you to use JSONB subscripts in UPDATE statements to update only
+# part of a column:
+#
+#   c = Sequel.pg_jsonb_op(:c)
+#   DB[:t].update(c['key1'] => '1', c['key2'] => '"a"')
+#   #  UPDATE "t" SET "c"['key1'] = '1', "c"['key2'] = '"a"'
+#
+# Note that you have to provide the value of a JSONB subscript as a JSONB value, so this
+# will update +key1+ to use the number <tt>1</tt>, and +key2+ to use the string <tt>a</tt>.
+# For this reason it may be simpler to use +to_json+:
+#
+#   c = Sequel.pg_jsonb_op(:c)
+#   DB[:t].update(c['key1'] => 1.to_json, c['key2'] => "a".to_json)
+#
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
 # JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
@@ -322,6 +343,24 @@ module Sequel
       HAS_KEY = ["(".freeze, " ? ".freeze, ")".freeze].freeze
       PATH_EXISTS = ["(".freeze, " @? ".freeze, ")".freeze].freeze
       PATH_MATCH = ["(".freeze, " @@ ".freeze, ")".freeze].freeze
+
+      # Support subscript syntax for JSONB.
+      def [](key)
+        if is_array?(key)
+          super
+        else
+          case @value
+          when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, JSONBSubscriptOp
+            # Only use subscripts for identifiers.  In other cases, switching from
+            # the -> operator to [] for subscripts causes SQL syntax issues.  You
+            # only need the [] for subscripting when doing assignment, and
+            # assignment is generally done on identifiers.
+            self.class.new(JSONBSubscriptOp.new(self, key))
+          else
+            super
+          end
+        end
+      end
 
       # jsonb expression for deletion of the given argument from the
       # current jsonb.
@@ -579,6 +618,37 @@ module Sequel
       # The jsonb type functions are prefixed with jsonb_
       def function_name(name)
         "jsonb_#{name}"
+      end
+    end
+
+    # Represents JSONB subscripts. This is abstracted because the
+    # subscript support depends on the database version.
+    class JSONBSubscriptOp < SQL::Expression
+      SUBSCRIPT = ["".freeze, "[".freeze, "]".freeze].freeze
+
+      # The expression being subscripted
+      attr_reader :expression
+
+      # The subscript to use
+      attr_reader :sub
+
+      # Set the expression and subscript to the given arguments
+      def initialize(expression, sub)
+        @expression = expression
+        @sub = sub
+        freeze
+      end
+
+      # Use subscripts instead of -> operator on PostgreSQL 14+
+      def to_s_append(ds, sql)
+        server_version = ds.db.server_version
+        frag = server_version && server_version >= 140000 ? SUBSCRIPT : JSONOp::GET
+        ds.literal_append(sql, Sequel::SQL::PlaceholderLiteralString.new(frag, [@expression, @sub]))
+      end
+
+      # Support transforming of jsonb subscripts
+      def sequel_ast_transform(transformer)
+        self.class.new(transformer.call(@expression), transformer.call(@sub))
       end
     end
 

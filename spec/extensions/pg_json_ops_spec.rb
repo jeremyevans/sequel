@@ -16,6 +16,17 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@j['a']].must_equal "(j -> 'a')"
   end
 
+  it "should have #[] use subscript form on PostgreSQL 14 for JSONB for identifiers" do
+    def @db.server_version(*); 140000; end
+    @l[@jb[1]].must_equal "j[1]"
+    @l[@jb['a'][1]].must_equal "j['a'][1]"
+    @l[Sequel.pg_jsonb_op(Sequel[:j])[1]].must_equal "j[1]"
+    @l[Sequel.pg_jsonb_op(Sequel[:s][:j])['a'][1]].must_equal "s.j['a'][1]"
+
+    @l[@jb[[1, 2]]].must_equal "(j #> ARRAY[1,2])"
+    @l[Sequel.pg_jsonb_op(Sequel.lit('j'))['a'][1]].must_equal "((j -> 'a') -> 1)"
+  end
+
   it "should have #[] accept an array" do
     @l[@j[%w'a b']].must_equal "(j #> ARRAY['a','b'])"
     @l[@j[Sequel.pg_array(%w'a b')]].must_equal "(j #> ARRAY['a','b'])"
