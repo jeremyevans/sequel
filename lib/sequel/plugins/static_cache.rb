@@ -87,7 +87,7 @@ module Sequel
         # array containing the number of instances specified (single integer
         # argument).
         def first(*args)
-          if block_given? || args.length > 1 || (args.length == 1 && !args[0].is_a?(Integer))
+          if defined?(yield) || args.length > 1 || (args.length == 1 && !args[0].is_a?(Integer))
             super
           else
             @all.first(*args)

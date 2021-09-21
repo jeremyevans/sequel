@@ -617,7 +617,7 @@ module Sequel
     UNCONDITIONED_JOIN_TYPES.each do |jtype|
       class_eval(<<-END, __FILE__, __LINE__+1)
         def #{jtype}_join(table, opts=Sequel::OPTS)
-          raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?
+          raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if defined?(yield)
           raise(Sequel::Error, '#{jtype}_join 2nd argument should be an options hash, not conditions') unless opts.is_a?(Hash)
           join_table(:#{jtype}, table, nil, opts)
         end

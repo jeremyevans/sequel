@@ -359,7 +359,7 @@ module Sequel
             else
               Array(inc).each{|i| to_xml_include(x1, i)}
             end
-            yield x1 if block_given?
+            yield x1 if defined?(yield)
           end
           x.to_xml
         end

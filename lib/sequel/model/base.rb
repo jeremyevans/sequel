@@ -1093,7 +1093,7 @@ module Sequel
         @modified = true
         initialize_set(values)
         _clear_changed_columns(:initialize)
-        yield self if block_given?
+        yield self if defined?(yield)
       end
 
       # Returns value of the column's attribute.

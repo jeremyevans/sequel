@@ -318,7 +318,7 @@ module Sequel
                   conn.OpenSchema(ado_schema.type, ado_schema.criteria) 
                 end
               }
-              yield(r) if block_given?
+              yield(r) if defined?(yield)
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)
             end

@@ -88,11 +88,11 @@ module Sequel
               r = conn.parse(sql)
               args = cursor_bind_params(conn, r, args)
               nr = log_connection_yield(sql, conn, args){r.exec}
-              r = nr unless block_given?
+              r = nr unless defined?(yield)
             else
               r = log_connection_yield(sql, conn){conn.exec(sql)}
             end
-            if block_given?
+            if defined?(yield)
               yield(r)
             elsif type == :insert
               last_insert_id(conn, opts)
@@ -192,7 +192,7 @@ module Sequel
           log_sql << ")"
         end
         r = log_connection_yield(log_sql, conn, args){cursor.exec}
-        if block_given?
+        if defined?(yield)
           yield(cursor)
         elsif type == :insert
           last_insert_id(conn, opts)

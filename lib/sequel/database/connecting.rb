@@ -55,11 +55,11 @@ module Sequel
 
       begin
         db = c.new(opts)
-        if block_given?
+        if defined?(yield)
           return yield(db)
         end
       ensure
-        if block_given?
+        if defined?(yield)
           db.disconnect if db
           Sequel.synchronize{::Sequel::DATABASES.delete(db)}
         end

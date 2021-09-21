@@ -44,7 +44,7 @@ module Sequel
     # :nocov:
 
     # Customize handling of duplicate columns for this dataset.
-    def on_duplicate_columns(handler = (raise Error, "Must provide either an argument or a block to on_duplicate_columns" unless block_given?; nil), &block)
+    def on_duplicate_columns(handler = (raise Error, "Must provide either an argument or a block to on_duplicate_columns" unless defined?(yield); nil), &block)
       raise Error, "Cannot provide both an argument and a block to on_duplicate_columns" if handler && block
       clone(:on_duplicate_columns=>handler||block)
     end

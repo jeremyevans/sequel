@@ -4,7 +4,7 @@ module Sequel
   # Yield the Inflections module if a block is given, and return
   # the Inflections module.
   def self.inflections
-    yield Inflections if block_given?
+    yield Inflections if defined?(yield)
     Inflections
   end
 

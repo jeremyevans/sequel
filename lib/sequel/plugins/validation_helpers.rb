@@ -266,7 +266,7 @@ module Sequel
               next if vals.any?(&:nil?)
               ds.where(arr.zip(vals))
             end
-            ds = yield(ds) if block_given?
+            ds = yield(ds) if defined?(yield)
             unless new?
               h = ds.joined_dataset? ? qualified_pk_hash : pk_hash
               ds = ds.exclude(h)

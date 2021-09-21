@@ -40,7 +40,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             r = log_connection_yield(sql, conn){conn.run(sql)}
-            yield(r) if block_given?
+            yield(r) if defined?(yield)
           rescue ::ODBC::Error, ArgumentError => e
             raise_error(e)
           ensure

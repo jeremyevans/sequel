@@ -120,7 +120,7 @@ module Sequel
 
         case type
         when :select
-          yield rs if block_given?
+          yield rs if defined?(yield)
         when :rows
           return @api.sqlany_affected_rows(rs)
         when :insert

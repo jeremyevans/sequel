@@ -246,7 +246,7 @@ module Sequel
           end
           begin
             stmt = log_connection_yield(log_sql, conn, args){conn.execute_prepared(ps_name, *args)}
-            if block_given?
+            if defined?(yield)
               yield(stmt)
             else  
               stmt.affected
@@ -268,7 +268,7 @@ module Sequel
       # is given or returning the number of affected rows if not, and ensuring the statement is freed.
       def _execute(conn, sql, opts)
         stmt = log_connection_yield(sql, conn){conn.execute(sql)}
-        if block_given?
+        if defined?(yield)
           yield(stmt)
         else  
           stmt.affected

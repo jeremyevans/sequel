@@ -143,7 +143,7 @@ module Sequel
         args = args.map{|v| @db.bound_variable_arg(v, self)} if args
         q = check_disconnect_errors{execute_query(sql, args)}
         begin
-          block_given? ? yield(q) : q.cmd_tuples
+          defined?(yield) ? yield(q) : q.cmd_tuples
         ensure
           q.clear if q && q.respond_to?(:clear)
         end
@@ -350,7 +350,7 @@ module Sequel
           synchronize(opts[:server]) do |conn|
             conn.execute(copy_table_sql(table, opts))
             begin
-              if block_given?
+              if defined?(yield)
                 while buf = conn.get_copy_data
                   yield buf
                 end
@@ -400,16 +400,16 @@ module Sequel
           data = opts[:data]
           data = Array(data) if data.is_a?(String)
 
-          if block_given? && data
+          if defined?(yield) && data
             raise Error, "Cannot provide both a :data option and a block to copy_into"
-          elsif !block_given? && !data
+          elsif !defined?(yield) && !data
             raise Error, "Must provide either a :data option or a block to copy_into"
           end
 
           synchronize(opts[:server]) do |conn|
             conn.execute(copy_into_sql(table, opts))
             begin
-              if block_given?
+              if defined?(yield)
                 while buf = yield
                   conn.put_copy_data(buf)
                 end
@@ -590,7 +590,7 @@ module Sequel
 
         q = conn.check_disconnect_errors{log_connection_yield(log_sql, conn, args){_execute_prepared_statement(conn, ps_name, args, opts)}}
         begin
-          block_given? ? yield(q) : q.cmd_tuples
+          defined?(yield) ? yield(q) : q.cmd_tuples
         ensure
           q.clear if q && q.respond_to?(:clear)
         end
@@ -616,7 +616,7 @@ module Sequel
       
       # Use a cursor for paging.
       def paged_each(opts=OPTS, &block)
-        unless block_given?
+        unless defined?(yield)
           return enum_for(:paged_each, opts)
         end
         use_cursor(opts).each(&block)

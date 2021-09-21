@@ -151,7 +151,7 @@ module Sequel
                 yield r
               end
             end
-          elsif block_given?
+          elsif defined?(yield)
             yield conn
           end
         rescue ::Mysql2::Error => e
@@ -244,7 +244,7 @@ module Sequel
       # it hasn't been disabled.
       def paged_each(opts=OPTS, &block)
         if STREAMING_SUPPORTED && opts[:stream] != false
-          unless block_given?
+          unless defined?(yield)
             return enum_for(:paged_each, opts)
           end
           stream.each(&block)

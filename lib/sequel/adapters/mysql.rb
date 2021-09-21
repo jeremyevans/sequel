@@ -167,7 +167,7 @@ module Sequel
           r = log_connection_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql, conn){conn.query(sql)}
           if opts[:type] == :select
             yield r if r
-          elsif block_given?
+          elsif defined?(yield)
             yield conn
           end
           if conn.respond_to?(:more_results?)

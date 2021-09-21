@@ -35,9 +35,9 @@ module Sequel
           data = opts[:data]
           data = Array(data) if data.is_a?(String)
 
-          if block_given? && data
+          if defined?(yield) && data
             raise Error, "Cannot provide both a :data option and a block to copy_into"
-          elsif !block_given? && !data
+          elsif !defined?(yield) && !data
             raise Error, "Must provide either a :data option or a block to copy_into"
           end
 
@@ -45,7 +45,7 @@ module Sequel
             begin
               copy_manager = org.postgresql.copy.CopyManager.new(conn)
               copier = copy_manager.copy_in(copy_into_sql(table, opts))
-              if block_given?
+              if defined?(yield)
                 while buf = yield
                   java_bytes = buf.to_java_bytes
                   copier.writeToCopy(java_bytes, 0, java_bytes.length)
@@ -77,7 +77,7 @@ module Sequel
             copy_manager = org.postgresql.copy.CopyManager.new(conn)
             copier = copy_manager.copy_out(copy_table_sql(table, opts))
             begin
-              if block_given?
+              if defined?(yield)
                 while buf = copier.readFromCopy
                   yield(String.from_java_bytes(buf))
                 end

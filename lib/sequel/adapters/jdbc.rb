@@ -196,7 +196,7 @@ module Sequel
           args.each{|arg| set_ps_arg(cps, arg, i+=1)}
 
           begin
-            if block_given?
+            if defined?(yield)
               yield log_connection_yield(sql, conn){cps.executeQuery}
             else
               log_connection_yield(sql, conn){cps.executeUpdate}
@@ -461,7 +461,7 @@ module Sequel
             msg << ")"
           end
           begin
-            if block_given?
+            if defined?(yield)
               yield log_connection_yield(msg, conn, args){cps.executeQuery}
             else
               case opts[:type]

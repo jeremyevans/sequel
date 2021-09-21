@@ -467,7 +467,7 @@ module Sequel
       #
       #   Sequel[1] - :a # SQL: (1 - a)
       def expr(arg=(no_arg=true), &block)
-        if block_given?
+        if defined?(yield)
           if no_arg
             return expr(block)
           else

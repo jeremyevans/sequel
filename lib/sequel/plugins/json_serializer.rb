@@ -365,7 +365,7 @@ module Sequel
             h = {root => h}
           end
 
-          h = yield h if block_given?
+          h = yield h if defined?(yield)
           Sequel.object_to_json(h, *a)
         end
 
@@ -441,7 +441,7 @@ module Sequel
           end
 
           res = {collection_root => res} if collection_root
-          res = yield res if block_given?
+          res = yield res if defined?(yield)
 
           Sequel.object_to_json(res, *a)
         end

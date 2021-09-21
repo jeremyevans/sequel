@@ -75,7 +75,7 @@ module Sequel
                 return r.public_send(m) if m
               end
             end
-            yield(r) if block_given?
+            yield(r) if defined?(yield)
           rescue TinyTds::Error => e
             raise_error(e, :disconnect=>!c.active?)
           ensure

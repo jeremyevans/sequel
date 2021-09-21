@@ -55,7 +55,7 @@ module Sequel
         def find_or_new(attrs, set_attrs=nil)
           obj = find(attrs) || new(attrs)
           obj.set(set_attrs) if set_attrs
-          yield obj if block_given?
+          yield obj if defined?(yield)
           obj
         end
       end

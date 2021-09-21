@@ -608,7 +608,7 @@ module Sequel
 
         # Setup encryption for the given column.
         def _encrypt_column(column, opts)
-          cryptor ||= if block_given?
+          cryptor ||= if defined?(yield)
             dsl = ColumnDSL.new
             yield dsl
             Cryptor.new(dsl.keys)

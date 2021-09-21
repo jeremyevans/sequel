@@ -54,7 +54,7 @@ module Sequel
     # an enumerator if no block is given.
     def each_page(page_size)
       raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
-      return to_enum(:each_page, page_size) unless block_given?
+      return to_enum(:each_page, page_size) unless defined?(yield)
       record_count = count
       total_pages = (record_count / page_size.to_f).ceil
       (1..total_pages).each{|page_no| yield paginate(page_no, page_size, record_count)}

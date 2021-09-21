@@ -1,5 +1,7 @@
 === master
 
+* Switch block_given? usage to defined?(yield) (jeremyevans)
+
 * Support table aliases for JOIN USING columns on PostgreSQL 14+ (jeremyevans)
 
 * Support calling PostgreSQL procedures without arguments (jeremyevans)

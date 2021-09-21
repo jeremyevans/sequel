@@ -33,7 +33,7 @@ module Sequel
   module AnyNotEmpty
     # If a block is not given, return whether the dataset is not empty.
     def any?
-      if block_given?
+      if defined?(yield)
         super
       else
         !empty?

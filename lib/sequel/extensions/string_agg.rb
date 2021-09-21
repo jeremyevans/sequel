@@ -147,7 +147,7 @@ module Sequel
       def initialize(expr, separator=nil)
         @expr = expr
         @separator = separator
-        yield self if block_given?
+        yield self if defined?(yield)
         freeze
       end
 

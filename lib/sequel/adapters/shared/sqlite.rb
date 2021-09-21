@@ -393,7 +393,7 @@ module Sequel
         old_columns = def_columns.map{|c| c[:name]}
         opts[:old_columns_proc].call(old_columns) if opts[:old_columns_proc]
 
-        yield def_columns if block_given?
+        yield def_columns if defined?(yield)
 
         constraints = (opts[:constraints] || []).dup
         pks = []

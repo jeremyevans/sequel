@@ -1336,7 +1336,7 @@ module Sequel
         ds = metadata_dataset.from(:pg_class).where(:relkind=>type).select(:relname).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
         ds = filter_schema(ds, opts)
         m = output_identifier_meth
-        if block_given?
+        if defined?(yield)
           yield(ds)
         elsif opts[:qualify]
           ds.select_append{pg_namespace[:nspname]}.map{|r| Sequel.qualify(m.call(r[:nspname]).to_s, m.call(r[:relname]).to_s)}
@@ -1743,7 +1743,7 @@ module Sequel
       # just locks the tables.  Note that PostgreSQL will probably raise an error
       # if you lock the table outside of an existing transaction.  Returns nil.
       def lock(mode, opts=OPTS)
-        if block_given? # perform locking inside a transaction and yield to block
+        if defined?(yield) # perform locking inside a transaction and yield to block
           @db.transaction(opts){lock(mode, opts); yield}
         else
           sql = 'LOCK TABLE '.dup

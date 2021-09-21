@@ -546,7 +546,7 @@ module Sequel
       unless @opts[:order]
         raise Sequel::Error, "Dataset#paged_each requires the dataset be ordered"
       end
-      unless block_given?
+      unless defined?(yield)
         return enum_for(:paged_each, opts)
       end
 
