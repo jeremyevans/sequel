@@ -83,7 +83,7 @@ module Sequel
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
-        if value.is_a?(String) && (m = value.match(/((?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/)) && (m[2] || m[3])
+        if value.is_a?(String) && (m = /((?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/.match(value)) && (m[2] || m[3])
           if m[3]
             value = value.sub(' BC', '').sub(' ', ' BC ')
             conv = defined?(JRUBY_VERSION) && JRUBY_VERSION == '9.2.0.0'
