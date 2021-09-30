@@ -1499,7 +1499,7 @@ describe "Sequel::Postgres::Database" do
     @db.create_table!(:posts){Integer :a}
   end
   after do
-    @db.run("DROP PROCEDURE test_procedure_posts(#{"int, int" unless @no_args})")
+    @db.run("DROP PROCEDURE test_procedure_posts(#{@args || "int, int"})")
     @db.drop_table?(:posts)
   end
 
@@ -1518,7 +1518,7 @@ SQL
   end
 
   it "#call_procedure should call a procedure without arguments" do
-    @no_args = true
+    @args = ''
     @db.run <<SQL
 CREATE OR REPLACE PROCEDURE test_procedure_posts()
 LANGUAGE SQL
@@ -1556,6 +1556,18 @@ $$;
 SQL
     @db.call_procedure(:test_procedure_posts, 1, nil).must_be_nil
     @db.call_procedure(:test_procedure_posts, 3, nil).must_be_nil
+  end
+
+  it "#call_procedure should call a procedure that accepts text" do
+    @args = 'text'
+    @db.run <<SQL
+CREATE OR REPLACE PROCEDURE test_procedure_posts(inout t text)
+LANGUAGE SQL
+AS $$
+SELECT 'a' || t;
+$$;
+SQL
+    @db.call_procedure(:test_procedure_posts, 'b').must_equal(:t=>'ab')
   end
 end if DB.adapter_scheme == :postgres && DB.server_version >= 110000
 

@@ -718,7 +718,7 @@ module Sequel
         sql << "CALL "
         identifier_append(sql, name)
         sql << "("
-        identifier_list_append(sql, args)
+        expression_list_append(sql, args)
         sql << ")"
         with_sql_first(sql)
       end
