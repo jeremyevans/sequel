@@ -1,3 +1,9 @@
+=== master
+
+* Add support for range_merge, multirange, and unnest, and PGMultiRange#op to pg_range_ops extension (jeremyevans)
+
+* Add pg_multirange extension with support for PostgreSQL 14+ multirange types (jeremyevans)
+
 === 5.49.0 (2021-10-01)
 
 * Switch block_given? usage to defined?(yield) (jeremyevans)

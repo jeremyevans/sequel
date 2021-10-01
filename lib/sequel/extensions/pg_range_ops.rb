@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 #
 # The pg_range_ops extension adds support to Sequel's DSL to make
-# it easier to call PostgreSQL range functions and operators.
+# it easier to call PostgreSQL range and multirange functions and operators.
 #
 # To load the extension:
 #
@@ -11,10 +11,11 @@
 #
 #   r = Sequel.pg_range_op(:range)
 #
-# If you have also loaded the pg_range extension, you can use
-# Sequel.pg_range as well:
+# If you have also loaded the pg_range or pg_multirange extensions, you can use
+# Sequel.pg_range or Sequel.pg_multirange as well:
 #
 #   r = Sequel.pg_range(:range)
+#   r = Sequel.pg_multirange(:range)
 #
 # Also, on most Sequel expression objects, you can call the pg_range
 # method:
@@ -46,13 +47,25 @@
 #   r.upper_inc        # upper_inc(range)
 #   r.lower_inf        # lower_inf(range)
 #   r.upper_inf        # upper_inf(range)
+#
+# All of the above methods work for both ranges and multiranges, as long
+# as PostgreSQL supports the operation. The following methods are also
+# supported:
+#
+#   r.range_merge      # range_merge(range)
+#   r.unnest           # unnest(range)
+#   r.multirange       # multirange(range)
+#
+# +range_merge+ and +unnest+ expect the receiver to represent a multirange
+# value, while +multi_range+ expects the receiver to represent a range value.
 #   
-# See the PostgreSQL range function and operator documentation for more
+# See the PostgreSQL range and multirange function and operator documentation for more
 # details on what these functions and operators do.
 #
-# If you are also using the pg_range extension, you should load it before
-# loading this extension.  Doing so will allow you to use PGArray#op to get
-# an RangeOp, allowing you to perform range operations on range literals.
+# If you are also using the pg_range or pg_multirange extension, you should
+# load them before loading this extension.  Doing so will allow you to use
+# PGRange#op and PGMultiRange#op to get a RangeOp, allowing you to perform
+# range operations on range literals.
 #
 # Related module: Sequel::Postgres::RangeOp
 
@@ -77,8 +90,11 @@ module Sequel
         :overlaps => ["(".freeze, " && ".freeze, ")".freeze].freeze,
       }.freeze
 
-      %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'.each do |f|
+      %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf unnest'.each do |f|
         class_eval("def #{f}; function(:#{f}) end", __FILE__, __LINE__)
+      end
+      %w'range_merge multirange'.each do |f|
+        class_eval("def #{f}; RangeOp.new(function(:#{f})) end", __FILE__, __LINE__)
       end
       OPERATORS.each_key do |f|
         class_eval("def #{f}(v); operator(:#{f}, v) end", __FILE__, __LINE__)
@@ -120,6 +136,18 @@ module Sequel
     if defined?(PGRange)
     # :nocov:
       class PGRange
+        # Wrap the PGRange instance in an RangeOp, allowing you to easily use
+        # the PostgreSQL range functions and operators with literal ranges.
+        def op
+          RangeOp.new(self)
+        end
+      end
+    end
+
+    # :nocov:
+    if defined?(PGMultiRange)
+    # :nocov:
+      class PGMultiRange
         # Wrap the PGRange instance in an RangeOp, allowing you to easily use
         # the PostgreSQL range functions and operators with literal ranges.
         def op

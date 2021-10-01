@@ -4,12 +4,9 @@
 # types to Sequel.  PostgreSQL range types are similar to ruby's
 # Range class, representating an array of values.  However, they
 # are more flexible than ruby's ranges, allowing exclusive beginnings
-# and endings (ruby's range only allows exclusive endings), and
-# unbounded beginnings and endings (which ruby's range does not
-# support).
+# and endings (ruby's range only allows exclusive endings).
 #
-# This extension integrates with Sequel's native postgres and jdbc/postgresql adapters, so
-# that when range type values are retrieved, they are parsed and returned
+# When PostgreSQL range values are retreived, they are parsed and returned
 # as instances of Sequel::Postgres::PGRange.  PGRange mostly acts
 # like a Range, but it's not a Range as not all PostgreSQL range
 # type values would be valid ruby ranges.  If the range type value
@@ -19,8 +16,7 @@
 # exception will be raised.
 #
 # In addition to the parser, this extension comes with literalizers
-# for both PGRange and Range that use the standard Sequel literalization
-# callbacks, so they work on all adapters.
+# for PGRange and Range, so they can be used in queries and as bound variables.
 #
 # To turn an existing Range into a PGRange, use Sequel.pg_range:
 #
@@ -249,11 +245,7 @@ module Sequel
 
         # Recognize the registered database range types.
         def schema_column_type(db_type)
-          if type = @pg_range_schema_types[db_type]
-            type
-          else
-            super
-          end
+          @pg_range_schema_types[db_type] || super
         end
 
         # Set the :ruby_default value if the default value is recognized as a range.

@@ -118,7 +118,7 @@ describe "pg_range extension" do
     @db.bound_variable_arg([eval('(1..)'), eval('(2..)')], nil).must_equal '{"[1,]","[2,]"}'
   end if endless_range_support
 
-  it "should support using PGRange instances as bound variables" do
+  it "should support using arrays of PGRange instances as bound variables" do
     @db.bound_variable_arg([@R.new(1, 2),@R.new(2, 3)], nil).must_equal '{"[1,2]","[2,3]"}'
   end
 
@@ -169,7 +169,7 @@ describe "pg_range extension" do
       end
     end
 
-    it "should handle multiple array range types" do
+    it "should handle arrays of multiple range types" do
       %w'int4 int8 num date ts tstz'.each do |i|
         @db.typecast_value(:"#{i}range_array", [@R.new(1, 2, :db_type=>"#{i}range")]).class.must_equal(Sequel::Postgres::PGArray)
         @db.typecast_value(:"#{i}range_array", [@R.new(1, 2, :db_type=>"#{i}range")]).must_equal [@R.new(1, 2, :db_type=>"#{i}range")]
@@ -180,12 +180,12 @@ describe "pg_range extension" do
       @db.typecast_value(:int4range, @o).must_be_same_as(@o)
     end
 
-    it "should return new PGRange value as is if they have a different subtype" do
+    it "should return new PGRange value if they have a different subtype" do
       @db.typecast_value(:int8range, @o).wont_be_same_as(@o)
       @db.typecast_value(:int8range, @o).must_equal @o2
     end
 
-    it "should return new PGRange value as is if they have a different subtype and value is empty" do
+    it "should return new PGRange value if they have a different subtype and value is empty" do
       @db.typecast_value(:int8range, @eo).must_equal @eo2
     end
 
@@ -242,8 +242,8 @@ describe "pg_range extension" do
     proc{@db.register_range_type('fooirange', :subtype_oid=>16){}}.must_raise(Sequel::Error)
   end
 
-  it "should raise an error if using :converter option and a block argument" do
-    proc{@db.register_range_type('fooirange', :converter=>proc{}){}}.must_raise(Sequel::Error)
+  it "should raise an error if using :converter option and a :subtype_oid option " do
+    proc{@db.register_range_type('fooirange', :converter=>proc{}, :subtype_oid=>16)}.must_raise(Sequel::Error)
   end
 
   it "should support registering custom types with :oid option" do

@@ -11,6 +11,7 @@ begin
 rescue LoadError
 end
 DB.extension :pg_hstore if DB.type_supported?('hstore')
+DB.extension :pg_multirange if DB.server_version >= 140000
 
 describe 'A PostgreSQL database' do
   before do
@@ -3929,6 +3930,12 @@ describe 'PostgreSQL custom range types' do
     @db.register_range_type('timerange')
     r = Sequel::SQLTime.create(10, 11, 12)..Sequel::SQLTime.create(11, 12, 13)
     @db.get(Sequel.pg_range(r, :timerange)).to_range.must_equal r
+
+    if DB.server_version >= 140000
+      @db.register_multirange_type('timemultirange')
+      r = [Sequel::SQLTime.create(1, 2, 3)..Sequel::SQLTime.create(7, 8, 9), Sequel::SQLTime.create(10, 11, 12)..Sequel::SQLTime.create(11, 12, 13)]
+      @db.get(Sequel.pg_multirange(r, :timemultirange)).map(&:to_range).must_equal r
+    end
   end
 end if DB.server_version >= 90200
 
@@ -4029,7 +4036,7 @@ describe 'PostgreSQL range types' do
     @db.get(Sequel.cast(eval('(...1)'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, 1, :exclude_begin=>true, :db_type=>"int4range")
   end if RUBY_VERSION >= '2.7'
 
-  it 'handle startless ranges' do
+  it 'handle startless, endless ranges' do
     @db.get(Sequel.cast(eval('nil...nil'), :int4range)).must_be :==, Sequel::Postgres::PGRange.new(nil, nil, :exclude_begin=>true, :exclude_end=>true, :db_type=>"int4range")
     @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, nil, :exclude_begin=>true, :db_type=>"int4range")
     @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, nil, :exclude_end=>true, :db_type=>"int4range")
@@ -4136,6 +4143,232 @@ describe 'PostgreSQL range types' do
     @db.get(Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range).op.upper_inf).must_equal true
   end
 end if DB.server_version >= 90200
+
+describe 'PostgreSQL multirange types' do
+  before(:all) do
+    @db = DB
+    @ds = @db[:items]
+    @map = {:i4=>'int4multirange', :i8=>'int8multirange', :n=>'nummultirange', :d=>'datemultirange', :t=>'tsmultirange', :tz=>'tstzmultirange'}
+    @r = {
+      :i4=>[1...2, 4...5],
+      :i8=>[2...3, 5...6],
+      :n=>[BigDecimal('1.0')..BigDecimal('2.0'), BigDecimal('4.0')..BigDecimal('5.0')],
+      :d=>[Date.today...(Date.today+1), (Date.today+3)...(Date.today+4)],
+      :t=>[Time.local(2011, 1)..Time.local(2011, 2), Time.local(2011, 4)..Time.local(2011, 5)],
+      :tz=>[Time.local(2011, 1)..Time.local(2011, 2), Time.local(2011, 4)..Time.local(2011, 5)],
+    }
+    @pgr = {}
+    @pgra = {}
+    @r.each do |k, v|
+      type = @map[k]
+      val = @pgr[k] = Sequel.pg_multirange(v.map{|range| Sequel::Postgres::PGRange.new(range.begin, range.end, :exclude_end => range.exclude_end?, :db_type => type.sub('multi', ''))}, type)
+      @pgra[k] = Sequel.pg_array([val], type)
+    end
+  end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  it 'insert and retrieve multirange type values' do
+    @db.create_table!(:items){int4multirange :i4; int8multirange :i8; nummultirange :n; datemultirange :d; tsmultirange :t; tstzmultirange :tz}
+    h = {}
+    @pgr.each{|k, v| h[k] = Sequel.cast(v, @map[k])}
+    @ds.insert(h)
+    @ds.count.must_equal 1
+    rs = @ds.all
+    rs.first.each do |k, v|
+      v.class.must_equal(Sequel::Postgres::PGMultiRange)
+      v.each{|range| range.must_be_kind_of(Sequel::Postgres::PGRange)}
+      v.must_be :==, @r[k]
+    end
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
+    @ds.delete
+  end
+
+  it 'insert and retrieve arrays of multirange type values' do
+    @db.create_table!(:items){column :i4, 'int4multirange[]'; column :i8, 'int8multirange[]'; column :n, 'nummultirange[]'; column :d, 'datemultirange[]'; column :t, 'tsmultirange[]'; column :tz, 'tstzmultirange[]'}
+    @ds.insert(@pgra)
+    @ds.count.must_equal 1
+    rs = @ds.all
+    rs.first.each do |k, v|
+      v.class.must_equal(Sequel::Postgres::PGArray)
+      v.to_a.must_be_kind_of(Array)
+      v.first.class.must_equal(Sequel::Postgres::PGMultiRange)
+      v.first.first.class.must_equal(Sequel::Postgres::PGRange)
+      v.first.first.to_range.must_be_kind_of(Range)
+      v.must_be :==, @pgra[k]
+      v.first.must_be :==, @pgr[k]
+      v.first.must_be :==, @r[k]
+    end
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
+    @ds.delete
+  end
+
+  it 'use range types in bound variables' do
+    @db.create_table!(:items){int4multirange :i4; int8multirange :i8; nummultirange :n; datemultirange :d; tsmultirange :t; tstzmultirange :tz}
+    h = {}
+    @r.keys.each{|k| h[k] = :"$#{k}"}
+    r2 = {}
+    @r.each{|k, v| r2[k] = Sequel.pg_multirange(v.map{|range| Range.new(range.begin+2, range.end+2)}, @map[k])}
+    @ds.call(:insert, @pgr, h)
+    @ds.first.must_be :==, @r
+    @ds.filter(h).call(:first, @pgr).must_be :==, @r
+    @ds.filter(h).call(:first, r2).must_be_nil
+    @ds.filter(h).call(:delete, @pgr).must_equal 1
+
+    @db.create_table!(:items){column :i4, 'int4multirange[]'; column :i8, 'int8multirange[]'; column :n, 'nummultirange[]'; column :d, 'datemultirange[]'; column :t, 'tsmultirange[]'; column :tz, 'tstzmultirange[]'}
+    @r.each{|k, v| r2[k] = Sequel.pg_array([Sequel.pg_multirange(v.map{|range| Range.new(range.begin+2, range.end+2)}, @map[k])])}
+    @ds.call(:insert, @pgra, h)
+    @ds.filter(h).call(:first, @pgra).each{|k, v| v.must_be :==, @pgra[k].to_a}
+    @ds.filter(h).call(:first, r2).must_be_nil
+    @ds.filter(h).call(:delete, @pgra).must_equal 1
+  end if uses_pg_or_jdbc
+
+  it 'parse multiranges containing empty ranges' do
+    @db.get(Sequel::Postgres::PGMultiRange.new([], 'int4multirange')).must_be_empty
+    @db.get(Sequel::Postgres::PGMultiRange.new([Sequel::Postgres::PGRange.empty('int4range')], 'int4multirange')).must_be_empty
+  end
+
+  it 'parse default values for schema' do
+    @db.create_table!(:items) do
+      Integer :j
+      int4multirange :i, :default=>Sequel.pg_multirange([1..4], :int4multirange)
+    end
+    @db.schema(:items)[0][1][:ruby_default].must_be_nil
+    @db.schema(:items)[1][1][:ruby_default].must_equal Sequel::Postgres::PGMultiRange.new([Sequel::Postgres::PGRange.new(1, 5, :exclude_end=>true, :db_type=>'int4range')], 'int4multirange')
+    @db.schema(:items)[1][1][:ruby_default].first.must_equal Sequel::Postgres::PGRange.new(1, 5, :exclude_end=>true, :db_type=>'int4range')
+  end
+
+  it 'with models' do
+    @db.create_table!(:items){primary_key :id; int4multirange :i4; int8multirange :i8; nummultirange :n; datemultirange :d; tsmultirange :t; tstzmultirange :tz}
+    c = Class.new(Sequel::Model(@db[:items]))
+    v = c.create(@pgr).values
+    v.delete(:id)
+    v.must_be :==, @pgr
+
+    @db.create_table!(:items){primary_key :id; column :i4, 'int4multirange[]'; column :i8, 'int8multirange[]'; column :n, 'nummultirange[]'; column :d, 'datemultirange[]'; column :t, 'tsmultirange[]'; column :tz, 'tstzmultirange[]'}
+    c = Class.new(Sequel::Model(@db[:items]))
+    v = c.create(@pgra).values
+    v.delete(:id)
+    v.each{|k,v1| v1.must_be :==, @pgra[k].to_a}
+  end
+
+  it 'operations/functions with pg_range_ops' do
+    Sequel.extension :pg_range_ops
+    mr = lambda do |range|
+      type = (Range === range ? 'int4multirange' : range.db_type.to_s.sub('range', 'multirange'))
+      Sequel.pg_multirange([range], type)
+    end
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(mr[2..4])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(mr[3..6])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(mr[0..6])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(Sequel.pg_range(1..5, :int4range))).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(Sequel.pg_range(3..6, :int4range))).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(Sequel.pg_range(0..6, :int4range))).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(3)).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contains(6)).must_equal false
+    @db.get(Sequel.pg_range(0..6, :int4range).op.contains(mr[Sequel.pg_range(1..5, :int4range)])).must_equal true
+    @db.get(Sequel.pg_range(3..6, :int4range).op.contains(mr[Sequel.pg_range(1..5, :int4range)])).must_equal false
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contained_by(mr[0..6])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contained_by(mr[3..6])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contained_by(mr[2..4])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contained_by(Sequel.pg_range(0..6, :int4range))).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.contained_by(Sequel.pg_range(3..6, :int4range))).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(mr[Sequel.pg_range(0..6, :int4range)])).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(mr[Sequel.pg_range(3..6, :int4range)])).must_equal false
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.overlaps(mr[5..6])).must_equal true
+    @db.get(mr[Sequel.pg_range(1...5, :int4range)].op.overlaps(mr[5..6])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.overlaps(Sequel.pg_range(5..6, :int4range))).must_equal true
+    @db.get(mr[Sequel.pg_range(1...5, :int4range)].op.overlaps(Sequel.pg_range(5..6, :int4range))).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.overlaps(mr[Sequel.pg_range(5..6, :int4range)])).must_equal true
+    @db.get(Sequel.pg_range(1...5, :int4range).op.overlaps(mr[Sequel.pg_range(5..6, :int4range)])).must_equal false
+    
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.left_of(mr[6..10])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.left_of(mr[5..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.left_of(mr[-1..0])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.left_of(mr[-1..3])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.left_of(Sequel.pg_range(6..10, :int4range))).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.left_of(Sequel.pg_range(5..10, :int4range))).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(mr[Sequel.pg_range(6..10, :int4range)])).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(mr[Sequel.pg_range(5..10, :int4range)])).must_equal false
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.right_of(mr[6..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.right_of(mr[5..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.right_of(mr[-1..0])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.right_of(mr[-1..3])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.right_of(Sequel.pg_range(6..10, :int4range))).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.right_of(Sequel.pg_range(-1..0, :int4range))).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(mr[Sequel.pg_range(6..10, :int4range)])).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(mr[Sequel.pg_range(-1..0, :int4range)])).must_equal true
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(mr[6..10])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(mr[5..10])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(mr[-1..0])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(mr[-1..3])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(mr[-1..7])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(Sequel.pg_range(5..10, :int4range))).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.ends_before(Sequel.pg_range(-1..0, :int4range))).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(mr[Sequel.pg_range(5..10, :int4range)])).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(mr[Sequel.pg_range(-1..0, :int4range)])).must_equal false
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[6..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[5..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[3..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[-1..10])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[-1..0])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[-1..3])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(mr[-5..-1])).must_equal true
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(Sequel.pg_range(3..10, :int4range))).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.starts_after(Sequel.pg_range(-1..10, :int4range))).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(mr[Sequel.pg_range(3..10, :int4range)])).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(mr[Sequel.pg_range(-1..10, :int4range)])).must_equal true
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.adjacent_to(mr[6..10])).must_equal true
+    @db.get(mr[Sequel.pg_range(1...5, :int4range)].op.adjacent_to(mr[6..10])).must_equal false
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.adjacent_to(Sequel.pg_range(6..10, :int4range))).must_equal true
+    @db.get(mr[Sequel.pg_range(1...5, :int4range)].op.adjacent_to(Sequel.pg_range(6..10, :int4range))).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.adjacent_to(mr[Sequel.pg_range(6..10, :int4range)])).must_equal true
+    @db.get(Sequel.pg_range(1...5, :int4range).op.adjacent_to(mr[Sequel.pg_range(6..10, :int4range)])).must_equal false
+
+    @db.get((mr[Sequel.pg_range(1..5, :int4range)].op + (mr[6..10])).adjacent_to(mr[6..10])).must_equal false
+    @db.get((mr[Sequel.pg_range(1..5, :int4range)].op + (mr[6..10])).adjacent_to(mr[11..20])).must_equal true
+
+    @db.get((mr[Sequel.pg_range(1..5, :int4range)].op * (mr[2..6])).adjacent_to(mr[6..10])).must_equal true
+    @db.get((mr[Sequel.pg_range(1..4, :int4range)].op * (mr[2..6])).adjacent_to(mr[6..10])).must_equal false
+
+    @db.get((mr[Sequel.pg_range(1..5, :int4range)].op - (mr[2..6])).adjacent_to(mr[2..10])).must_equal true
+    @db.get((mr[Sequel.pg_range(0..4, :int4range)].op - (mr[3..6])).adjacent_to(mr[4..10])).must_equal false
+
+    @db.get(mr[Sequel.pg_range(0..4, :int4range)].op.lower).must_equal 0
+    @db.get(mr[Sequel.pg_range(0..4, :int4range)].op.upper).must_equal 5
+
+    @db.get(mr[Sequel.pg_range(0..4, :int4range)].op.isempty).must_equal false
+    @db.get(mr[Sequel::Postgres::PGRange.empty(:int4range)].op.isempty).must_equal true
+
+    @db.get(mr[Sequel.pg_range(1..5, :numrange)].op.lower_inc).must_equal true
+    @db.get(mr[Sequel::Postgres::PGRange.new(1, 5, :exclude_begin=>true, :db_type=>:numrange)].op.lower_inc).must_equal false
+
+    @db.get(mr[Sequel.pg_range(1..5, :numrange)].op.upper_inc).must_equal true
+    @db.get(mr[Sequel.pg_range(1...5, :numrange)].op.upper_inc).must_equal false
+
+    @db.get(mr[Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range)].op.lower_inf).must_equal false
+    @db.get(mr[Sequel::Postgres::PGRange.new(nil, 5, :db_type=>:int4range)].op.lower_inf).must_equal true
+
+    @db.get(mr[Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range)].op.upper_inf).must_equal false
+    @db.get(mr[Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range)].op.upper_inf).must_equal true
+
+    @db.get(mr[Sequel.pg_range(1..5, :int4range)].op.range_merge.adjacent_to(mr[6..10])).must_equal true
+    @db.get(Sequel.pg_range(1...5, :int4range).op.multirange.adjacent_to(mr[6..10])).must_equal false
+    @db.get(Sequel.pg_range(1...5, :int4range).op.multirange.unnest).to_range.must_equal 1...5
+  end
+end if DB.server_version >= 140000
 
 describe 'PostgreSQL interval types' do
   before(:all) do

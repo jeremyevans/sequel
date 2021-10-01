@@ -1,6 +1,6 @@
 require_relative "spec_helper"
 
-Sequel.extension :pg_array, :pg_range, :pg_range_ops
+Sequel.extension :pg_array, :pg_range, :pg_multirange, :pg_range_ops
 
 describe "Sequel::Postgres::RangeOp" do
   before do
@@ -22,6 +22,10 @@ describe "Sequel::Postgres::RangeOp" do
     @ds.literal(Sequel.pg_range(:h).lower).must_equal "lower(h)"
   end
 
+  it "Sequel.pg_multirange should return a new RangeOp if not given a multirange or array" do
+    @ds.literal(Sequel.pg_multirange(:h, 'x').lower).must_equal "lower(h)"
+  end
+
   it "#pg_range should return a RangeOp for literal strings, and expressions" do
     @ds.literal(Sequel.function(:b, :h).pg_range.lower).must_equal "lower(b(h))"
     @ds.literal(Sequel.lit('h').pg_range.lower).must_equal "lower(h)"
@@ -29,6 +33,10 @@ describe "Sequel::Postgres::RangeOp" do
 
   it "PGRange#op should return a RangeOp" do
     @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).must_equal "lower(numrange(1,2,'[]'))"
+  end
+
+  it "PGRange#op should return a RangeOp" do
+    @ds.literal(Sequel.pg_multirange([Sequel.pg_range(1..2, :numrange)], :nummultirange).op.lower).must_equal "lower(nummultirange(numrange(1,2,'[]')))"
   end
 
   it "should define methods for all of the PostgreSQL range operators" do
@@ -50,11 +58,17 @@ describe "Sequel::Postgres::RangeOp" do
     @ds.literal(@h.upper_inc).must_equal "upper_inc(h)"
     @ds.literal(@h.lower_inf).must_equal "lower_inf(h)"
     @ds.literal(@h.upper_inf).must_equal "upper_inf(h)"
+    @ds.literal(@h.unnest).must_equal "unnest(h)"
   end
 
   it "+ - * operators should be defined and return a RangeOp" do
     @ds.literal((@h + @h).lower).must_equal "lower((h + h))"
     @ds.literal((@h * @h).lower).must_equal "lower((h * h))"
     @ds.literal((@h - @h).lower).must_equal "lower((h - h))"
+  end
+
+  it "range_merge and multirange should be defined and return a RangeOp" do
+    @ds.literal(@h.range_merge.lower).must_equal "lower(range_merge(h))"
+    @ds.literal(@h.multirange.lower).must_equal "lower(multirange(h))"
   end
 end
