@@ -1,0 +1,59 @@
+= New Features
+
+* Model#validates_no_null_byte has been added to the
+  validation_helpers.  It checks that the value being validated does
+  not contain an ASCII NUL ('\0') byte.  Some databases will return an
+  error if a string contains a NUL byte.
+
+  The auto_validations plugin will now automatically add no_null_byte
+  validations for all string columns in the model's table.  This will
+  change exceptions raised by NUL bytes from database errors to
+  validation failures.
+  
+  If you are using auto_validations and would like to have a table
+  accept NUL bytes in string columns, use the following code inside
+  the model:
+
+    skip_auto_validations(:no_null_byte)
+
+* JSONB subscripts are now supported on PostgreSQL 14+ when using the
+  pg_json_ops extension.  You can use JSONB subscripts to more easily
+  update part of a JSONB column:
+
+    DB[:table].update(Sequel.pg_jsonb_op(:column)['key'] => 'value')
+    UPDATE "table" SET "column"['key'] = 'value'
+
+* hstore subscripts are now supported on PostgreSQL 14+ when using the
+  pg_hstore_ops extension.  You can use hstore subscripts to more
+  easily update part of an hstore column:
+
+    DB[:table].update(Sequel.hstore_op(:column)['key'] => 'value')
+    UPDATE "table" SET "column"['key'] = 'value'
+
+* Sequel now supports table aliases for JOIN USING columns on
+  PostgreSQL 14+.  These allow you to reference the USING columns in
+  the query using a qualified identifier. To use this support, pass an
+  SQL::AliasedExpression as the expression to join on:
+
+    DB[:t1].join(:t2, Sequel.as([:c1, :c2], :alias))
+    # SELECT * FROM "t1" INNER JOIN "t2" USING ("c1", "c2") AS "alias"
+
+* Database#create_trigger on PostgreSQL now supports a :replace option
+  for CREATE OR REPLACE TRIGGER (supported in PostgreSQL 14+).
+
+* SQL::Expression#sequel_ast_transform has been added to support
+  AST transforms of custom expression classes.
+
+= Other Improvements
+
+* Sequel now supports calling PostgreSQL procedures without arguments
+  when using Database#call_procedure.  Previously, attempts to call
+  procuredures without arguments would call the procedure with a
+  single NULL argument.
+
+* Sequel now uses defined?(yield) instead of block_given? internally
+  for better performance on CRuby.  defined?(yield) is faster as it is
+  built into the VM, while block_given? is a regular method and has
+  the overhead of calling a regular method.  Note that defined?(yield)
+  is not implemented correctly on JRuby before 9.0.0.0, so this
+  release of Sequel drops support for JRuby versions before 9.0.0.0.
