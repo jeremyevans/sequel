@@ -30,7 +30,7 @@ lib/sequel/extensions/pg_hstore_ops.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-07-09 12:21:33 -0700</span>
+<span class='datetime'>2021-09-14 11:02:35 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -65,6 +65,14 @@ Last Update:
 <p>Here are a couple examples for updating an existing hstore column:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Add a key, or update an existing key with a new value</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:tab</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">h:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-value">:h</span>).<span class="ruby-identifier">concat</span>(<span class="ruby-string">&#39;c&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>))&#x000A;&#x000A;<span class="ruby-comment"># Delete a key</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:tab</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">h:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-value">:h</span>).<span class="ruby-identifier">delete</span>(<span class="ruby-string">&#39;k1&#39;</span>))</pre>
+
+<p>On PostgreSQL 14+, The hstore <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifer:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-value">:hstore_column</span>)[<span class="ruby-string">&#39;a&#39;</span>]    <span class="ruby-comment"># hstore_column[&#39;a&#39;]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:h</span>][<span class="ruby-value">:s</span>])[<span class="ruby-string">&#39;a&#39;</span>]      <span class="ruby-comment"># h.s[&#39;a&#39;]</span></pre>
+
+<p>This support allows you to use hstore subscripts in UPDATE statements to update only part of a column:</p>
+
+<pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-value">:h</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">update</span>(<span class="ruby-identifier">h</span>[<span class="ruby-string">&#39;key1&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;val1&#39;</span>, <span class="ruby-identifier">h</span>[<span class="ruby-string">&#39;key2&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;val2&#39;</span>)&#x000A;<span class="ruby-comment">#  UPDATE &quot;t&quot; SET &quot;h&quot;[&#39;key1&#39;] = &#39;val1&#39;, &quot;h&quot;[&#39;key2&#39;] = &#39;val2&#39;</span></pre>
 
 <p>See the PostgreSQL hstore function and operator documentation for more details on what these functions and operators do.</p>
 

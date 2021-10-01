@@ -30,12 +30,33 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-09-01 08:21:20 -0700</span>
+<span class='datetime'>2021-10-01 07:34:33 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.49.0+-282021-10-01-29"><a href="doc/release_notes/5_49_0_txt.html">5.49.0</a> (2021-10-01)<span><a href="#label-5.49.0+-282021-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Switch block_given? usage to defined?(yield) (jeremyevans)</p>
+</li><li>
+<p>Support table aliases for JOIN USING columns on PostgreSQL 14+ (jeremyevans)</p>
+</li><li>
+<p>Support calling PostgreSQL procedures without arguments (jeremyevans)</p>
+</li><li>
+<p>Support hstore subscripts in pg_hstore_ops on PostgreSQL 14+, for updating only part of an hstore value (jeremyevans)</p>
+</li><li>
+<p>Support JSONB subscripts in pg_json_ops on PostgreSQL 14+, for updating only part of a JSONB value (jeremyevans)</p>
+</li><li>
+<p>Support SQL::Expression#sequel_ast_transform for custom AST transforms on arbitrary expressions (jeremyevans)</p>
+</li><li>
+<p>Add Database#create_trigger :replace option on PostgreSQL 14+ for CREATE OR REPLACE TRIGGER (jeremyevans)</p>
+</li><li>
+<p>Make auto_validations plugin automatically setup no_null_byte validations (jeremyevans)</p>
+</li><li>
+<p>Add Model#validates_no_null_byte to validation_helpers plugin (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.48.0+-282021-09-01-29"><a href="doc/release_notes/5_48_0_txt.html">5.48.0</a> (2021-09-01)<span><a href="#label-5.48.0+-282021-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make the unused_associations plugin association reflection tracking work correctly when combining coverage runs (jeremyevans)</p>

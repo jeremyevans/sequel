@@ -146,7 +146,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-inflections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-inflections-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">104</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;<span class="line-num">105</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;<span class="line-num">106</span>   <span class="ruby-constant">Inflections</span>&#x000A;<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-inflections-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">104</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;<span class="line-num">105</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)&#x000A;<span class="line-num">106</span>   <span class="ruby-constant">Inflections</span>&#x000A;<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>

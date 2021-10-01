@@ -1,10 +1,10 @@
-Wed, 01 Sep 2021 08:25:52 -0700
-README.rdoc	Mon, 21 Jun 2021 08:35:50 -0700
-CHANGELOG	Wed, 01 Sep 2021 08:21:20 -0700
+Fri, 01 Oct 2021 07:40:19 -0700
+README.rdoc	Thu, 30 Sep 2021 11:19:59 -0700
+CHANGELOG	Fri, 01 Oct 2021 07:34:33 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 06 Jan 2021 14:13:44 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/ast_transformer.rb	Tue, 14 Sep 2021 11:02:35 -0700
 lib/sequel/connection_pool.rb	Fri, 29 Mar 2019 13:22:52 -0700
 lib/sequel/core.rb	Mon, 26 Apr 2021 12:52:05 -0700
 lib/sequel/database.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -12,14 +12,14 @@ lib/sequel/dataset.rb	Mon, 03 Jun 2019 11:44:00 -0700
 lib/sequel/deprecated.rb	Tue, 14 Jul 2020 12:33:56 -0700
 lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
-lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
+lib/sequel/sql.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/timezones.rb	Mon, 30 Nov 2020 09:24:48 -0800
-lib/sequel/version.rb	Wed, 01 Sep 2021 08:21:20 -0700
+lib/sequel/version.rb	Fri, 01 Oct 2021 07:34:33 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
-lib/sequel/database/connecting.rb	Wed, 21 Oct 2020 16:41:13 -0700
+lib/sequel/database/connecting.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/database/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -29,22 +29,22 @@ lib/sequel/database/query.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/database/schema_generator.rb	Thu, 22 Apr 2021 07:44:59 -0700
 lib/sequel/database/schema_methods.rb	Wed, 28 Jul 2021 09:50:21 -0700
 lib/sequel/database/transactions.rb	Fri, 20 Nov 2020 10:49:30 -0800
-lib/sequel/dataset/actions.rb	Thu, 10 Sep 2020 07:57:41 -0700
+lib/sequel/dataset/actions.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
 lib/sequel/dataset/features.rb	Wed, 30 Dec 2020 11:27:05 -0800
 lib/sequel/dataset/graph.rb	Tue, 19 Mar 2019 16:51:03 -0700
 lib/sequel/dataset/misc.rb	Wed, 08 Jan 2020 19:48:38 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/dataset/prepared_statements.rb	Wed, 02 Dec 2020 15:37:08 -0800
-lib/sequel/dataset/query.rb	Sun, 04 Jul 2021 11:59:58 -0700
-lib/sequel/dataset/sql.rb	Tue, 18 May 2021 12:06:56 -0700
+lib/sequel/dataset/query.rb	Tue, 21 Sep 2021 14:24:30 -0700
+lib/sequel/dataset/sql.rb	Tue, 14 Sep 2021 13:38:58 -0700
 lib/sequel/model/associations.rb	Thu, 15 Jul 2021 15:34:16 -0700
-lib/sequel/model/base.rb	Thu, 04 Feb 2021 15:23:39 -0800
+lib/sequel/model/base.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Mon, 09 Aug 2021 13:30:01 -0700
 lib/sequel/model/exceptions.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/model/inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/model/inflections.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/model/plugins.rb	Fri, 04 Dec 2020 13:44:07 -0800
 doc/advanced_associations.rdoc	Wed, 01 Apr 2020 09:49:55 -0700
 doc/association_basics.rdoc	Wed, 28 Jul 2021 07:37:57 -0700
@@ -64,7 +64,7 @@ doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/opening_databases.rdoc	Fri, 16 Oct 2020 09:55:57 -0700
-doc/postgresql.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
+doc/postgresql.rdoc	Tue, 14 Sep 2021 13:38:58 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Mon, 16 Aug 2021 14:01:55 -0700
 doc/reflection.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -238,6 +238,7 @@ doc/release_notes/5.45.0.txt	Tue, 01 Jun 2021 07:39:55 -0700
 doc/release_notes/5.46.0.txt	Thu, 01 Jul 2021 07:57:50 -0700
 doc/release_notes/5.47.0.txt	Fri, 30 Jul 2021 11:31:39 -0700
 doc/release_notes/5.48.0.txt	Wed, 01 Sep 2021 08:21:20 -0700
+doc/release_notes/5.49.0.txt	Fri, 01 Oct 2021 07:34:33 -0700
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700

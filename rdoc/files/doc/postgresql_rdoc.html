@@ -30,7 +30,7 @@ doc/postgresql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-11-04 10:39:50 -0800</span>
+<span class='datetime'>2021-09-14 13:38:58 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -254,6 +254,12 @@ Last Update:
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> allows passing columns to <code>Dataset#distinct</code>, which will make the dataset return rows that are distinct on just those columns:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">distinct</span>(<span class="ruby-value">:id</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT DISTINCT ON (&quot;id&quot;) * FROM &quot;table&quot;</span></pre>
+
+<h3 id="label-JOIN+USING+table+alias">JOIN USING table alias<span><a href="#label-JOIN+USING+table+alias">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> allows passing an SQL::AliasedExpression to join table methods to use a USING join with a table alias for the USING columns:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:t2</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>([<span class="ruby-value">:c1</span>, <span class="ruby-value">:c2</span>], <span class="ruby-value">:alias</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;t1&quot; INNER JOIN &quot;t2&quot; USING (&quot;c1&quot;, &quot;c2&quot;) AS &quot;alias&quot;</span></pre>
 
 <h3 id="label-Calling+PostgreSQL+11-2B+Procedures+postgres+only">Calling PostgreSQL 11+ Procedures <code>postgres only</code><span><a href="#label-Calling+PostgreSQL+11-2B+Procedures+postgres+only">&para;</a> <a href="#top">&uarr;</a></span></h3>
 

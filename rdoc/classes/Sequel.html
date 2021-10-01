@@ -404,7 +404,7 @@ end</td>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MINOR</td>
 <td>=</td>
-<td class='context-item-value'>48</td>
+<td class='context-item-value'>49</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
 <p>The minor version of <a href="Sequel.html"><code>Sequel</code></a>.  Bumped for every non-patch level release, generally around once a month.</p>
@@ -570,7 +570,7 @@ end</td>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-inflections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-inflections-source'>  <span class="ruby-comment"># File lib/sequel/model/inflections.rb</span>&#x000A;<span class="line-num">6</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;<span class="line-num">7</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;<span class="line-num">8</span>   <span class="ruby-constant">Inflections</span>&#x000A;<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-inflections-source'>  <span class="ruby-comment"># File lib/sequel/model/inflections.rb</span>&#x000A;<span class="line-num">6</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;<span class="line-num">7</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)&#x000A;<span class="line-num">8</span>   <span class="ruby-constant">Inflections</span>&#x000A;<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-migration'>

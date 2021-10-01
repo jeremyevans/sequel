@@ -30,7 +30,7 @@ lib/sequel/extensions/pg_json_ops.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-08-24 11:27:13 -0700</span>
+<span class='datetime'>2021-09-14 11:02:35 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -75,6 +75,18 @@ Last Update:
 <pre class="ruby"><span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_exists_tz!</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)     <span class="ruby-comment"># jsonb_path_exists_tz(jsonb_column, &#39;$.foo&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_match_tz!</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)      <span class="ruby-comment"># jsonb_path_match_tz(jsonb_column, &#39;$.foo&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_tz</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)       <span class="ruby-comment"># jsonb_path_query_tz(jsonb_column, &#39;$.foo&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_array_tz</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-comment"># jsonb_path_query_array_tz(jsonb_column, &#39;$.foo&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_first_tz</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-comment"># jsonb_path_query_first_tz(jsonb_column, &#39;$.foo&#39;)</span></pre>
 
 <p>For the PostgreSQL 12+ SQL/JSON path functions, one argument is required (<code>path</code>) and two more arguments are optional (<code>vars</code> and <code>silent</code>).  <code>path</code> specifies the JSON path. <code>vars</code> specifies a hash or a string in JSON format of named variables to be substituted in <code>path</code>. <code>silent</code> specifies whether errors are suppressed. By default, errors are not suppressed.</p>
+
+<p>On PostgreSQL 14+, The JSONB <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifer:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)[<span class="ruby-value">1</span>]       <span class="ruby-comment"># jsonb_column[1]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)[<span class="ruby-value">1</span>][<span class="ruby-value">2</span>]    <span class="ruby-comment"># jsonb_column[1][2]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:j</span>][<span class="ruby-value">:b</span>])[<span class="ruby-value">1</span>]      <span class="ruby-comment"># j.b[1]</span></pre>
+
+<p>This support allows you to use JSONB subscripts in UPDATE statements to update only part of a column:</p>
+
+<pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:c</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">update</span>(<span class="ruby-identifier">c</span>[<span class="ruby-string">&#39;key1&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-identifier">c</span>[<span class="ruby-string">&#39;key2&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;&quot;a&quot;&#39;</span>)&#x000A;<span class="ruby-comment">#  UPDATE &quot;t&quot; SET &quot;c&quot;[&#39;key1&#39;] = &#39;1&#39;, &quot;c&quot;[&#39;key2&#39;] = &#39;&quot;a&quot;&#39;</span></pre>
+
+<p>Note that you have to provide the value of a JSONB subscript as a JSONB value, so this will update <code>key1</code> to use the number <code>1</code>, and <code>key2</code> to use the string <code>a</code>. For this reason it may be simpler to use <code>to_json</code>:</p>
+
+<pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:c</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">update</span>(<span class="ruby-identifier">c</span>[<span class="ruby-string">&#39;key1&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>.<span class="ruby-identifier">to_json</span>, <span class="ruby-identifier">c</span>[<span class="ruby-string">&#39;key2&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">to_json</span>)</pre>
 
 <p>If you are also using the pg_json extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
 

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::JSONBSubscriptOp</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::JSONBSubscriptOp
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../SQL/Expression.html">Expression</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Represents JSONB subscripts. This is abstracted because the subscript support depends on the database version.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#attribute-i-expression">expression</a></li>
+<li><a href="#method-i-sequel_ast_transform">sequel_ast_transform</a></li>
+<li><a href="#attribute-i-sub">sub</a></li>
+<li><a href="#method-i-to_s_append">to_s_append</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>SUBSCRIPT</td>
+<td>=</td>
+<td class='context-item-value'>["".freeze, "[".freeze, "]".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-expression'>expression</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The expression being subscripted</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-sub'>sub</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The subscript to use</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(expression, sub)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the expression and subscript to the given arguments</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">636</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)&#x000A;<span class="line-num">637</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;<span class="line-num">638</span>   <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>&#x000A;<span class="line-num">639</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">640</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-sequel_ast_transform'>
+<a name='method-i-sequel_ast_transform'></a>
+<div class='synopsis'>
+<span class='name'>sequel_ast_transform</span><span class='arguments'>(transformer)</span>
+
+</div>
+<div class='description'>
+
+<p>Support transforming of jsonb subscripts</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sequel_ast_transform-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sequel_ast_transform-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">650</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_ast_transform</span>(<span class="ruby-identifier">transformer</span>)&#x000A;<span class="line-num">651</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@expression</span>), <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@sub</span>))&#x000A;<span class="line-num">652</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-to_s_append'>
+<a name='method-i-to_s_append'></a>
+<div class='synopsis'>
+<span class='name'>to_s_append</span><span class='arguments'>(ds, sql)</span>
+
+</div>
+<div class='description'>
+
+<p>Use subscripts instead of -&gt; operator on PostgreSQL 14+</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_s_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-to_s_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">643</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">644</span>   <span class="ruby-identifier">server_version</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>&#x000A;<span class="line-num">645</span>   <span class="ruby-identifier">frag</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">140000</span> <span class="ruby-operator">?</span> <span class="ruby-constant">SUBSCRIPT</span> <span class="ruby-operator">:</span> <span class="ruby-constant">JSONOp</span><span class="ruby-operator">::</span><span class="ruby-constant">GET</span>&#x000A;<span class="line-num">646</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">frag</span>, [<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span>]))&#x000A;<span class="line-num">647</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
