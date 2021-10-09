@@ -46,9 +46,10 @@ module Sequel
 
     # Normalize the SQL before calling super.
     def log_connection_yield(sql, conn, args=nil)
-      return yield if skip_logging?
-      sql = normalize_logged_sql(sql)
-      args = nil
+      unless skip_logging?
+        sql = normalize_logged_sql(sql)
+        args = nil
+      end
       super
     end
 
