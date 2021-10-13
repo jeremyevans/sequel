@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+require_relative '../utils/columns_limit_1'
+
 module Sequel
   module SqlAnywhere
     Sequel::Database.set_shared_adapter_scheme(:sqlanywhere, self)
@@ -234,6 +236,7 @@ module Sequel
     module DatasetMethods
       Dataset.def_sql_method(self, :insert, %w'insert into columns values')
       Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having window compounds order lock')
+      include ::Sequel::Dataset::ColumnsLimit1
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the IBMDB module setting.

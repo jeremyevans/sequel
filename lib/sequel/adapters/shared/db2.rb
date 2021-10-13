@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
 require_relative '../utils/emulate_offset_with_row_number'
+require_relative '../utils/columns_limit_1'
 
 module Sequel
   module DB2
@@ -273,6 +274,7 @@ module Sequel
 
     module DatasetMethods
       include EmulateOffsetWithRowNumber
+      include ::Sequel::Dataset::ColumnsLimit1
 
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}.freeze
 
