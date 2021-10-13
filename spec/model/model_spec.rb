@@ -365,9 +365,9 @@ describe Sequel::Model do
     db = Sequel.mock
     def db.supports_savepoints?; true end
     Sequel::Model(db[:table])
-    db.sqls.must_equal ["SELECT * FROM table LIMIT 1"]
+    db.sqls.must_equal ["SELECT * FROM table LIMIT 0"]
     db.transaction{Sequel::Model(db[:table])}
-    db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SELECT * FROM table LIMIT 1", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
+    db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SELECT * FROM table LIMIT 0", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
   end
 
   it "should raise if bad inherited instance variable value is used" do

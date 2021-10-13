@@ -2,6 +2,7 @@
 
 require_relative '../utils/emulate_offset_with_reverse_and_count'
 require_relative '../utils/unmodified_identifiers'
+require_relative '../utils/columns_limit_1'
 
 module Sequel
   module Access
@@ -83,6 +84,7 @@ module Sequel
       end)
       include EmulateOffsetWithReverseAndCount
       include UnmodifiedIdentifiers::DatasetMethods
+      include ::Sequel::Dataset::ColumnsLimit1
 
       EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}.freeze
       EXTRACT_MAP.each_value(&:freeze)

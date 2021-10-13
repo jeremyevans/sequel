@@ -3280,42 +3280,42 @@ describe "Dataset#columns" do
   it "should attempt to get a single record and return @columns if @columns is nil" do
     @dataset.db.columns = [:a]
     @dataset.columns.must_equal [:a]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
   end
   
   it "should be cleared if you change the selected columns" do
     @dataset.db.columns = [[:a], [:b]]
     @dataset.columns.must_equal [:a]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
     @dataset.columns.must_equal [:a]
     @dataset.db.sqls.must_equal []
     ds = @dataset.select{foo.function}
     ds.columns.must_equal [:b]
-    @dataset.db.sqls.must_equal ['SELECT foo() FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT foo() FROM items LIMIT 0']
   end
   
   it "should be cleared if you change the FROM table" do
     @dataset.db.columns = [[:a], [:b]]
     @dataset.columns.must_equal [:a]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
     ds = @dataset.from(:foo)
     ds.columns.must_equal [:b]
-    @dataset.db.sqls.must_equal ['SELECT * FROM foo LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM foo LIMIT 0']
   end
   
   it "should be cleared if you join a table to the dataset" do
     @dataset.db.columns = [[:a], [:a, :b]]
     @dataset.columns.must_equal [:a]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
     ds = @dataset.cross_join(:foo)
     ds.columns.must_equal [:a, :b]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items CROSS JOIN foo LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items CROSS JOIN foo LIMIT 0']
   end
   
   it "should be cleared if you set custom SQL for the dataset" do
     @dataset.db.columns = [[:a], [:b]]
     @dataset.columns.must_equal [:a]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
     ds = @dataset.with_sql('SELECT b FROM foo')
     ds.columns.must_equal [:b]
     @dataset.db.sqls.must_equal ['SELECT b FROM foo']
@@ -3325,7 +3325,7 @@ describe "Dataset#columns" do
     @dataset.db.columns = [:a]
     @dataset = @dataset.where(:b=>100).order(:b).distinct
     @dataset.columns.must_equal [:a]
-    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
   end
 end
 
@@ -3333,9 +3333,9 @@ describe "Dataset#columns!" do
   it "should always attempt to get a record and return @columns" do
     ds = Sequel.mock(:columns=>[[:a, :b, :c], [:d, :e, :f]])[:items]
     ds.columns!.must_equal [:a, :b, :c]
-    ds.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    ds.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
     ds.columns!.must_equal [:d, :e, :f]
-    ds.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    ds.db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
   end
 end
 
@@ -4110,7 +4110,7 @@ describe "Dataset prepared statements and bound variables " do
     @db.columns = [:num]
     @ds = @ds.with_extend{def select_where_sql(sql) super(sql); sql << " OR #{columns.first} = 1" if opts[:where] end}
     @ds.filter(:num=>:$n).prepare(:select, :sn).sql.must_equal 'SELECT * FROM items WHERE (num = $n) OR num = 1'
-    @db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
+    @db.sqls.must_equal ['SELECT * FROM items LIMIT 0']
   end
     
   it "should handle datasets using static sql and placeholders" do

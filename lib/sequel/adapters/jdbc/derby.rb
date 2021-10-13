@@ -2,6 +2,7 @@
 
 Sequel::JDBC.load_driver('org.apache.derby.jdbc.EmbeddedDriver', :Derby)
 require_relative 'transactions'
+require_relative '../utils/columns_limit_1'
 
 module Sequel
   module JDBC
@@ -182,6 +183,8 @@ module Sequel
       end
       
       class Dataset < JDBC::Dataset
+        include ::Sequel::Dataset::ColumnsLimit1
+
         # Derby doesn't support an expression between CASE and WHEN,
         # so remove conditions.
         def case_expression_sql_append(sql, ce)

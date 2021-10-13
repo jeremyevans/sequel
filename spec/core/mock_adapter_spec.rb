@@ -320,7 +320,7 @@ describe "Sequel Mock Adapter" do
   it "should be able to set the columns to set in the dataset as an array of symbols" do
     db = Sequel.mock(:columns=>[:a, :b])
     db[:t].columns.must_equal [:a, :b]
-    db.sqls.must_equal ["SELECT * FROM t LIMIT 1"]
+    db.sqls.must_equal ["SELECT * FROM t LIMIT 0"]
     ds = db[:t]
     ds.all
     db.sqls.must_equal ["SELECT * FROM t"]

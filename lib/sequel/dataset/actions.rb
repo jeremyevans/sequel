@@ -19,7 +19,7 @@ module Sequel
     METHS
 
     # The clone options to use when retrieving columns for a dataset.
-    COLUMNS_CLONE_OPTIONS = {:distinct => nil, :limit => 1, :offset=>nil, :where=>nil, :having=>nil, :order=>nil, :row_proc=>nil, :graph=>nil, :eager_graph=>nil}.freeze
+    COLUMNS_CLONE_OPTIONS = {:distinct => nil, :limit => 0, :offset=>nil, :where=>nil, :having=>nil, :order=>nil, :row_proc=>nil, :graph=>nil, :eager_graph=>nil}.freeze
 
     # Inserts the given argument into the database.  Returns self so it
     # can be used safely when chaining:

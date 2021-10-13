@@ -52,7 +52,7 @@ describe Sequel::Model, ".finder" do
     @c.first_foo(1, 2).must_equal @o
     @c.set_dataset :foos
     @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos LIMIT 0", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
   it "should create a method based on the given block if no method symbol provided" do
@@ -178,7 +178,7 @@ describe Sequel::Model, ".prepared_finder" do
     @c.first_foo(1, 2).must_equal @o
     @c.set_dataset :foos
     @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos LIMIT 0", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
   end
 
   it "should create a method based on the given block if no method symbol provided" do

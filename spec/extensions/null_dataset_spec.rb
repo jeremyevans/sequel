@@ -54,7 +54,7 @@ describe "null_dataset extension" do
     2.times do
       @ds.columns.must_equal [:id]
     end
-    @db.sqls.must_equal ['SELECT * FROM table LIMIT 1']
+    @db.sqls.must_equal ['SELECT * FROM table LIMIT 0']
   end
 
   it "should have count return 0" do

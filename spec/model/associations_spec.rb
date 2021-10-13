@@ -978,7 +978,7 @@ describe Sequel::Model, "one_to_one" do
     @c2.load(:id => 1234).attribute = attrib
     DB.sqls.must_equal []
     db.sqls.must_equal [
-      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes LIMIT 1",
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes LIMIT 0",
       "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (node_id = 1234) LIMIT 1",
       "INSERT INTO attributes (id, node_id) VALUES (3, 1234)",
       "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (id = 3) LIMIT 1"]

@@ -1,5 +1,7 @@
 === master
 
+* Change Dataset#columns! to use a LIMIT 0 query instead of a LIMIT 1 query (jeremyevans)
+
 * Add sql_log_normalizer extension for normalizing logged SQL, helpful for analytics and sensitive data (jeremyevans)
 
 * Add support for range_merge, multirange, and unnest, and PGMultiRange#op to pg_range_ops extension (jeremyevans)
