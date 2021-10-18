@@ -2925,6 +2925,30 @@ describe "Database extensions" do
     db.pool.size.must_equal db.pool.max_size
   end
   
+  it "should support :before_preconnect Database option to configure extensions before :preconnect" do
+    x = []
+    Sequel::Database.register_extension(:a, Module.new do
+      attr_accessor :z
+      define_singleton_method(:extended){|db| db.z = 0}
+    end)
+
+    m = Mutex.new
+    c = Class.new(Sequel::Database) do
+      def dataset_class_default; Sequel::Dataset end
+      define_method(:connect) do |_|
+        m.synchronize{x << z}
+        :connect
+      end
+    end
+    db = c.new(:max_connections=>2, :preconnect=>true, :preconnect_extensions=>:a, :before_preconnect=> proc{|d| d.z = 1})
+    db.pool.size.must_equal db.pool.max_size
+    x.must_equal [1, 1]
+
+    x.clear
+    db = c.new(:max_connections=>2, :preconnect=>true, :preconnect_extensions=>:a)
+    db.pool.size.must_equal db.pool.max_size
+    x.must_equal [0, 0]
+  end
 end
 
 describe "Database specific exception classes" do

@@ -113,6 +113,9 @@ module Sequel
     #                they'll be created sequentially.
     # :preconnect_extensions :: Similar to the :extensions option, but loads the extensions before the
     #                           connections are made by the :preconnect option.
+    # :before_preconnect :: Proc that runs before connections from preconnect are created.
+    #                       This can be used to configure extensions loaded via :preconnect_extensions
+    #                       before any connection is established.
     # :quote_identifiers :: Whether to quote identifiers.
     # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .
     # :single_threaded :: Whether to use a single-threaded connection pool.
@@ -162,6 +165,7 @@ module Sequel
 
         if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
           concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
+          run_before_preconnect(@opts[:before_preconnect])
           @pool.send(:preconnect, concurrent)
         end
 
@@ -433,6 +437,17 @@ module Sequel
         # nothing
       else
         raise Error, "unsupported Database #{key.inspect} option: #{@opts[key].inspect}"
+      end
+    end
+
+    def run_before_preconnect(arg)
+      case arg
+      when Proc
+        arg.call(self)
+      when nil
+        # nothing
+      else
+        raise Error, "before_connect option should be a proc that takes one argument, received #{arg.inspect}"
       end
     end
 
