@@ -95,6 +95,8 @@ module Sequel
     # options hash.
     #
     # Accepts the following options:
+    # :before_preconnect :: Callable that runs after extensions from :preconnect_extensions are loaded,
+    #                       but before any connections are created.
     # :cache_schema :: Whether schema should be cached for this Database instance
     # :default_string_column_size :: The default size of string columns, 255 by default.
     # :extensions :: Extensions to load into this Database instance.  Can be a symbol, array of symbols,
@@ -113,9 +115,6 @@ module Sequel
     #                they'll be created sequentially.
     # :preconnect_extensions :: Similar to the :extensions option, but loads the extensions before the
     #                           connections are made by the :preconnect option.
-    # :before_preconnect :: Proc that runs before connections from preconnect are created.
-    #                       This can be used to configure extensions loaded via :preconnect_extensions
-    #                       before any connection is established.
     # :quote_identifiers :: Whether to quote identifiers.
     # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .
     # :single_threaded :: Whether to use a single-threaded connection pool.
@@ -163,9 +162,12 @@ module Sequel
 
         initialize_load_extensions(:preconnect_extensions)
 
+        if before_preconnect = @opts[:before_preconnect]
+          before_preconnect.call(self)
+        end
+
         if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
           concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
-          run_before_preconnect(@opts[:before_preconnect])
           @pool.send(:preconnect, concurrent)
         end
 
@@ -437,17 +439,6 @@ module Sequel
         # nothing
       else
         raise Error, "unsupported Database #{key.inspect} option: #{@opts[key].inspect}"
-      end
-    end
-
-    def run_before_preconnect(arg)
-      case arg
-      when Proc
-        arg.call(self)
-      when nil
-        # nothing
-      else
-        raise Error, "before_connect option should be a proc that takes one argument, received #{arg.inspect}"
       end
     end
 

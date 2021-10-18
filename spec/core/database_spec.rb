@@ -2945,6 +2945,11 @@ describe "Database extensions" do
     x.must_equal [1, 1]
 
     x.clear
+    db = c.new(:max_connections=>2, :preconnect_extensions=>:a, :before_preconnect=> proc{|d| d.z = 1})
+    db.pool.size.must_equal 1
+    x.must_equal [1]
+
+    x.clear
     db = c.new(:max_connections=>2, :preconnect=>true, :preconnect_extensions=>:a)
     db.pool.size.must_equal db.pool.max_size
     x.must_equal [0, 0]
