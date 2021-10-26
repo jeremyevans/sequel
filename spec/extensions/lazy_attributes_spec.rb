@@ -206,6 +206,19 @@ describe "Sequel::Plugins::LazyAttributes" do
     @c.freeze
     proc{@c.lazy_attributes :name}.must_raise RuntimeError, TypeError
   end
+
+  it "should not affect db_schema" do
+    db_schema = @c.db_schema
+    @c.lazy_attributes :name
+    @c.db_schema.must_be_same_as(db_schema)
+  end
+
+  it "should not affect when selecting from a subquery" do
+    @c.dataset = @db[:la].from_self
+    db_schema = @c.db_schema
+    @c.lazy_attributes :name
+    @c.db_schema.must_be_same_as(db_schema)
+  end
 end
 
 describe "Sequel::Plugins::LazyAttributes with composite keys" do

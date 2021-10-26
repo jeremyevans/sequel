@@ -1,5 +1,7 @@
 === master
 
+* Fix typecasting of lazy columns when using lazy_attributes plugin in model where dataset selects from subquery (jeremyevans)
+
 * Add :before_preconnect Database option, for configuring extensions loaded via :preconnect_extensions (MarcPer, jeremyevans) (#1786)
 
 * Change Dataset#columns! to use a LIMIT 0 query instead of a LIMIT 1 query (jeremyevans)

@@ -52,7 +52,9 @@ module Sequel
           unless select = dataset.opts[:select]
             select = dataset.columns.map{|c| Sequel.qualify(dataset.first_source, c)}
           end
+          db_schema = @db_schema
           set_dataset(dataset.select(*select.reject{|c| attrs.include?(dataset.send(:_hash_key_symbol, c))}))
+          @db_schema = db_schema
           attrs.each{|a| define_lazy_attribute_getter(a)}
         end
         

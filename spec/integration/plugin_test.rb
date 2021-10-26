@@ -471,6 +471,15 @@ describe "Lazy Attributes plugin" do
     i.num.must_equal 1
   end
   
+  it "should typecast lazy attribute in setter when selecting from a subquery" do
+    c = Sequel::Model(@db[:items].from_self)
+    c.instance_variable_set(:@db_schema, Item.db_schema)
+    c.plugin :lazy_attributes, :num
+    i = c.new
+    i.num = '1'
+    i.num.must_equal 1
+  end
+  
   it "should load lazy attribute for all items returned when accessing any item if using identity map " do
     Item.create(:name=>'K', :num=>2)
     a = Item.order(:name).all
