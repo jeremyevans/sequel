@@ -52,6 +52,7 @@ module Sequel
           @original_deserialized_values ||= {}
           super
           @original_deserialized_values.freeze
+          self
         end
 
         private

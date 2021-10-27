@@ -184,6 +184,7 @@ module Sequel
           deserialized_values
           super
           deserialized_values.freeze
+          self
         end
 
         # Serialize deserialized values before saving

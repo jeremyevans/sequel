@@ -1,5 +1,7 @@
 === master
 
+* Fix Model#freeze in composition, serialization, and serialization_modification_detection plugins to return self (jeremyevans) (#1788)
+
 * Fix typecasting of lazy columns when using lazy_attributes plugin in model where dataset selects from subquery (jeremyevans)
 
 * Add :before_preconnect Database option, for configuring extensions loaded via :preconnect_extensions (MarcPer, jeremyevans) (#1786)

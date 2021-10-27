@@ -73,7 +73,7 @@ describe "serialization_modification_detection plugin" do
   it "should work with frozen objects" do
     @o1.changed_columns.must_equal []
     @o1.h.must_equal({})
-    @o1.freeze
+    @o1.freeze.must_be_same_as @o1
     @o1.h[1] = 2
     @o1.changed_columns.must_equal [:h]
   end

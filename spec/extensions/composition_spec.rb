@@ -231,7 +231,7 @@ describe "Composition plugin" do
 
   it "should work with frozen instances" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @o.freeze
+    @o.freeze.must_be_same_as @o
     @o.date.must_equal Date.new(1, 2, 3)
     proc{@o.date = Date.today}.must_raise
   end

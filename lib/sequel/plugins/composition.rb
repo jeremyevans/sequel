@@ -174,6 +174,7 @@ module Sequel
           compositions
           super
           compositions.freeze
+          self
         end
 
         # For each composition, set the columns in the model class based

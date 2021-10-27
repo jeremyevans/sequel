@@ -327,7 +327,7 @@ describe "Serialization plugin" do
     @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
 
     o = @c.first
-    o.freeze
+    o.freeze.must_be_same_as o
     o.abc.must_equal 1
     o.abc.must_equal 1
     o.def.must_equal "hello"
