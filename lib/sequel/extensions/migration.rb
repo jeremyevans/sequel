@@ -388,6 +388,9 @@ module Sequel
 
     # Migrates the supplied database using the migration files in the specified directory. Options:
     # :allow_missing_migration_files :: Don't raise an error if there are missing migration files.
+    #                                   It is very risky to use this option, since it can result in
+    #                                   the database schema version number not matching the expected
+    #                                   database schema.
     # :column :: The column in the :table argument storing the migration version (default: :version).
     # :current :: The current version of the database.  If not given, it is retrieved from the database
     #             using the :table and :column options.

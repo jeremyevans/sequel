@@ -352,7 +352,7 @@ you should give it some thought before using it.
 
 == Ignoring missing migrations
 
-In some cases, you may want to allow a migration in the database that does not exist in the filesystem (deploying to an older version of code without running a down migration when deploy auto-migrates, for example). If required, you can pass <tt>allow_missing_migration_files: true</tt> as an option. This will stop errors from being raised if there are migrations in the database that do not exist in the filesystem.
+In some cases, you may want to allow a migration in the database that does not exist in the filesystem (deploying to an older version of code without running a down migration when deploy auto-migrates, for example). If required, you can pass <tt>allow_missing_migration_files: true</tt> as an option. This will stop errors from being raised if there are migrations in the database that do not exist in the filesystem. Note that the migrations themselves can still raise an error when using this option, if the database schema isn't in the state the migrations expect it to be in.  In general, the <tt>allow_missing_migration_files: true</tt> option is very risky to use, and should only be used if it is absolutely necessary.
 
 == Modifying existing migrations
 
