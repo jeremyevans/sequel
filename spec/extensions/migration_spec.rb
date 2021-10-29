@@ -333,6 +333,7 @@ describe "Sequel::IntegerMigrator" do
   it "should not raise an error if there is a missing integer migration version and allow_missing_migration_files is true" do
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true)
     @db.sqls.last.must_equal "UPDATE schema_info SET version = 3"
+    Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations_missing_last_version", :allow_missing_migration_files => true)
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true, :target=>0)
     @db.sqls.last.must_equal "UPDATE schema_info SET version = 0"
   end
