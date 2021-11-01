@@ -16,18 +16,21 @@ describe "sql_log_normalizer extension" do
     case opts[:type]
     when :backslash
       @db.extend_datasets do
+        private
         def literal_string_append(sql, v)
           sql << "'" << v.gsub(/(\\|')/){"\\#{$1}"} << "'"
         end
       end
     when :n_standard
       @db.extend_datasets do
+        private
         def literal_string_append(sql, v)
           sql << "N'" << v.gsub("'", "''") << "'"
         end
       end
     when :bad
       @db.extend_datasets do
+        private
         def literal_string_append(sql, v)
           sql << "X'" << v.gsub("'", "''") << "'"
         end
