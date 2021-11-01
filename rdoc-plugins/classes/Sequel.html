@@ -187,6 +187,9 @@ Sequel
 <a href="../files/lib/sequel/extensions/pg_loose_count_rb.html">lib/sequel/extensions/pg_loose_count.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/extensions/pg_multirange_rb.html">lib/sequel/extensions/pg_multirange.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/extensions/pg_range_rb.html">lib/sequel/extensions/pg_range.rb</a>
 </li>
 <li class='other'>
@@ -242,6 +245,9 @@ Sequel
 </li>
 <li class='other'>
 <a href="../files/lib/sequel/extensions/sql_comments_rb.html">lib/sequel/extensions/sql_comments.rb</a>
+</li>
+<li class='other'>
+<a href="../files/lib/sequel/extensions/sql_log_normalizer_rb.html">lib/sequel/extensions/sql_log_normalizer.rb</a>
 </li>
 <li class='other'>
 <a href="../files/lib/sequel/extensions/string_agg_rb.html">lib/sequel/extensions/string_agg.rb</a>
@@ -577,11 +583,11 @@ Sequel
 
 <p>:nocov:</p>
 
-<p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby&#39;s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby&#39;s ranges, allowing exclusive beginnings and endings (ruby&#39;s range only allows exclusive endings), and unbounded beginnings and endings (which ruby&#39;s range does not support).</p>
+<p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby&#39;s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby&#39;s ranges, allowing exclusive beginnings and endings (ruby&#39;s range only allows exclusive endings).</p>
 
-<p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when range type values are retrieved, they are parsed and returned as instances of <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="Range.html"><code>Range</code></a>, but it&#39;s not a <a href="Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby&#39;s <a href="Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
+<p>When PostgreSQL range values are retreived, they are parsed and returned as instances of <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="Range.html"><code>Range</code></a>, but it&#39;s not a <a href="Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby&#39;s <a href="Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
 
-<p>In addition to the parser, this extension comes with literalizers for both PGRange and <a href="Range.html"><code>Range</code></a> that use the standard <a href="Sequel.html"><code>Sequel</code></a> literalization callbacks, so they work on all adapters.</p>
+<p>In addition to the parser, this extension comes with literalizers for PGRange and <a href="Range.html"><code>Range</code></a>, so they can be used in queries and as bound variables.</p>
 
 <p>To turn an existing <a href="Range.html"><code>Range</code></a> into a PGRange, use Sequel.pg_range:</p>
 
@@ -683,6 +689,7 @@ Sequel
 <li><a href="Sequel/S.html">Sequel::S</a></li>
 <li><a href="Sequel/SQL.html">Sequel::SQL</a></li>
 <li><a href="Sequel/SQLComments.html">Sequel::SQLComments</a></li>
+<li><a href="Sequel/SQLLogNormalizer.html">Sequel::SQLLogNormalizer</a></li>
 <li><a href="Sequel/Schema.html">Sequel::Schema</a></li>
 <li><a href="Sequel/SchemaCaching.html">Sequel::SchemaCaching</a></li>
 <li><a href="Sequel/SchemaDumper.html">Sequel::SchemaDumper</a></li>

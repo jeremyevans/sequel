@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>pg_multirange.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>pg_multirange.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/pg_multirange.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2021-10-05 12:55:04 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_multirange extension adds support for the PostgreSQL 14+ multirange types to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  PostgreSQL multirange types are similar to an array of ranges, where a match against the multirange is a match against any of the ranges in the multirange.</p>
+
+<p>When PostgreSQL multirange values are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/PGMultiRange.html"><code>Sequel::Postgres::PGMultiRange</code></a>.  PGMultiRange mostly acts like an array of <a href="../../../../classes/Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a> (see the pg_range extension).</p>
+
+<p>In addition to the parser, this extension comes with literalizers for PGMultiRanges, so they can be used in queries and as bound variables.</p>
+
+<p>To turn an existing array of Ranges into a PGMultiRange, use Sequel.pg_multirange. You must provide the type of multirange when creating the multirange:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_multirange</span>(<span class="ruby-identifier">array_of_date_ranges</span>, <span class="ruby-value">:datemultirange</span>)</pre>
+
+<p>To use this extension, load it into the Database instance:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_multirange</span></pre>
+
+<p>See the schema modification guide for details on using multirange type columns in CREATE/ALTER TABLE statements.</p>
+
+<p>This extension makes it easy to add support for other multirange types.  In general, you just need to make sure that the subtype is handled and has the appropriate converter installed.  For user defined types, you can do this via:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">subtype_oid</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }</pre>
+
+<p>Then you can call <a href="../../../../classes/Sequel/Postgres/PGMultiRange/DatabaseMethods.html#method-i-register_multirange_type"><code>Sequel::Postgres::PGMultiRange::DatabaseMethods#register_multirange_type</code></a> to automatically set up a handler for the range type.  So if you want to support the timemultirange type (assuming the time type is already supported):</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_multirange_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)</pre>
+
+<p>This extension integrates with the pg_array extension.  If you plan to use arrays of multirange types, load the pg_array extension before the pg_multirange extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_multirange</span></pre>
+
+<p>The pg_multirange extension will automatically load the pg_range extension.</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/PGMultiRange.html"><code>Sequel::Postgres::PGMultiRange</code></a></p>
+</div>
+<div id='context'>
+<div id='requires'>
+<h2>Required files</h2>
+<ol>
+<li>delegate</li>
+<li>strscan</li>
+</ol>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

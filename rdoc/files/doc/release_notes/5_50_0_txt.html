@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.50.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.50.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.50.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2021-11-01 09:04:52 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A pg_multirange extension has been added with support for PostgreSQL 14+ multirange types.  Multirange types are similar to an array of ranges, where a value is in the multirange if it is in any of the ranges contained in the multirange. Multiranges are useful when you need to check against multiple ranges that do not overlap.</p>
+
+<p>You can create multiranges using Sequel.pg_multirange, passing an array of ranges and a multirange type:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_multirange</span>&#x000A;<span class="ruby-identifier">multirange</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_multirange</span>(<span class="ruby-identifier">array_of_date_ranges</span>, <span class="ruby-value">:datemultirange</span>)</pre>
+
+<p>Sequel.pg_multirange returns a PGMultiRange, which operates as a delegate to an array of PGRange objects.  Behavior of the object is similar to an array, except that cover? is supported, which will test if any of the included ranges covers the argument:</p>
+
+<pre class="ruby"><span class="ruby-identifier">multirange</span>.<span class="ruby-identifier">cover?</span>(<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>)</pre>
+
+<p>Like the pg_range extension, this also supports registering custom multirange types, and using multirange types as bound variables.</p>
+
+<p>The pg_range_ops extension now supports both ranges and multiranges, with a few new methods added to Postgres::RangeOp for converting between them:</p>
+<ul><li>
+<p>range_merge</p>
+</li><li>
+<p>multirange</p>
+</li><li>
+<p>and unnest</p>
+</li></ul>
+</li><li>
+<p>An sql_log_normalizer extension has been added for normalizing logged SQL, replacing numbers and strings inside the SQL string with question marks.  This is useful for analytics and sensitive data.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)&#x000A;<span class="ruby-comment"># Without sql_log_normalizer extension, logged SQL is:</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = 1) AND (&quot;b&quot; = &#39;something&#39;)) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:sql_log_normalizer</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)&#x000A;<span class="ruby-comment"># With sql_log_normalizer_extension, logged SQL is:</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = ?) AND (&quot;b&quot; = ?)) LIMIT ?</span></pre>
+
+<p>This extension scans the logged SQL for numbers and strings, attempting to support the database&#39;s rules for string quoting.  This means it should work with SQL that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> didn&#39;t itself create. However, there are corner cases that the extension doesn&#39;t handle, such as the use of apostrophes inside quoted identifiers, and potentially other cases of database specific SQL where the normal string quoting rules are changed, such as the use of escape strings on PostgreSQL (E&#39;escape string&#39;).</p>
+</li><li>
+<p>A :before_preconnect Database option has been added.  This is useful for configuring extensions added via :preconnect_extensions before the connection takes place.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#columns! now uses a LIMIT 0 query instead of a LIMIT 1 query by default. This can improve performance in cases where the row returned would be large.  Some databases do not support a LIMIT 0 query, and some adapters that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been updated to continue using LIMIT 1.  Custom adapters should be updated to use LIMIT 1 if the database does not support LIMIT 0.</p>
+</li><li>
+<p>The lazy_attributes plugin no longer modifies the database schema. Previously, it could modify the database schema indirectly, resulting in the loss of typecasting for models that were not based on a single table or view, such as usage with the class_table_inheritance plugin.</p>
+</li><li>
+<p>Model#freeze in the composition, serialization, and serialization_modification_detection plugins now returns self. In addition to being more correct, this fixes usage of these plugins with the static_cache plugin.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

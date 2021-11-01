@@ -30,12 +30,31 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-10-01 07:34:33 -0700</span>
+<span class='datetime'>2021-11-01 09:04:52 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.50.0+-282021-11-01-29"><a href="doc/release_notes/5_50_0_txt.html">5.50.0</a> (2021-11-01)<span><a href="#label-5.50.0+-282021-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make Migrator :allow_missing_migration_files also allow down migrations where the current database version is greater than the last migration file version (francisconeves97) (#1789)</p>
+</li><li>
+<p>Fix Model#freeze in composition, serialization, and serialization_modification_detection plugins to return self (jeremyevans) (#1788)</p>
+</li><li>
+<p>Fix typecasting of lazy columns when using lazy_attributes plugin in model where dataset selects from subquery (jeremyevans)</p>
+</li><li>
+<p>Add :before_preconnect Database option, for configuring extensions loaded via :preconnect_extensions (MarcPer, jeremyevans) (#1786)</p>
+</li><li>
+<p>Change Dataset#columns! to use a LIMIT 0 query instead of a LIMIT 1 query (jeremyevans)</p>
+</li><li>
+<p>Add sql_log_normalizer extension for normalizing logged SQL, helpful for analytics and sensitive data (jeremyevans)</p>
+</li><li>
+<p>Add support for range_merge, multirange, and unnest, and PGMultiRange#op to pg_range_ops extension (jeremyevans)</p>
+</li><li>
+<p>Add pg_multirange extension with support for PostgreSQL 14+ multirange types (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.49.0+-282021-10-01-29"><a href="doc/release_notes/5_49_0_txt.html">5.49.0</a> (2021-10-01)<span><a href="#label-5.49.0+-282021-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Switch block_given? usage to defined?(yield) (jeremyevans)</p>

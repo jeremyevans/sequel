@@ -191,7 +191,7 @@ Sequel::Model::Associations::DatasetMethods
 </div>
 <div class='description'>
 
-<p>The secondary eager loading method.  Loads all associations in a single query. This method should only be used if you need to filter or order based on columns in associated tables, or if you have done comparative benchmarking it and determined it is faster.</p>
+<p>The secondary eager loading method.  Loads all associations in a single query. This method should only be used if you need to filter or order based on columns in associated tables, or if you have done comparative benchmarking and determined it is faster.</p>
 
 <p>This method uses <code>Dataset#graph</code> to create appropriate aliases for columns in all the tables.  Then it uses the graph&#39;s metadata to build the associations from the single hash, and finally replaces the array of hashes with an array model objects inside all.</p>
 
