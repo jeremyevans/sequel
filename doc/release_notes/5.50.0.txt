@@ -1,0 +1,78 @@
+= New Features
+
+* A pg_multirange extension has been added with support for PostgreSQL
+  14+ multirange types.  Multirange types are similar to an array of
+  ranges, where a value is in the multirange if it is in any of the
+  ranges contained in the multirange. Multiranges are useful when you
+  need to check against multiple ranges that do not overlap.
+
+  You can create multiranges using Sequel.pg_multirange, passing
+  an array of ranges and a multirange type:
+
+    DB.extension :pg_multirange
+    multirange = Sequel.pg_multirange(array_of_date_ranges, :datemultirange)
+
+  Sequel.pg_multirange returns a PGMultiRange, which operates as a
+  delegate to an array of PGRange objects.  Behavior of the object
+  is similar to an array, except that cover? is supported, which will
+  test if any of the included ranges covers the argument:
+
+    multirange.cover?(Date.today)
+
+  Like the pg_range extension, this also supports registering custom
+  multirange types, and using multirange types as bound variables.
+
+  The pg_range_ops extension now supports both ranges and multiranges,
+  with a few new methods added to Postgres::RangeOp for converting
+  between them:
+
+  * range_merge
+  * multirange
+  * and unnest
+
+* An sql_log_normalizer extension has been added for normalizing
+  logged SQL, replacing numbers and strings inside the SQL string
+  with question marks.  This is useful for analytics and sensitive
+  data.
+
+    DB[:table].first(a: 1, b: 'something')
+    # Without sql_log_normalizer extension, logged SQL is:
+    # SELECT * FROM "table" WHERE (("a" = 1) AND ("b" = 'something')) LIMIT 1
+
+    DB.extension :sql_log_normalizer
+    DB[:table].first(a: 1, b: 'something')
+    # With sql_log_normalizer_extension, logged SQL is:
+    # SELECT * FROM "table" WHERE (("a" = ?) AND ("b" = ?)) LIMIT ?
+
+  This extension scans the logged SQL for numbers and strings,
+  attempting to support the database's rules for string quoting.  This
+  means it should work with SQL that Sequel didn't itself create.
+  However, there are corner cases that the extension doesn't handle,
+  such as the use of apostrophes inside quoted identifiers, and
+  potentially other cases of database specific SQL where the normal
+  string quoting rules are changed, such as the use of escape strings
+  on PostgreSQL (E'escape string').
+
+* A :before_preconnect Database option has been added.  This is useful
+  for configuring extensions added via :preconnect_extensions before
+  the connection takes place.
+
+= Other Improvements
+
+* Dataset#columns! now uses a LIMIT 0 query instead of a LIMIT 1 query
+  by default. This can improve performance in cases where the row
+  returned would be large.  Some databases do not support a LIMIT 0
+  query, and some adapters that ship with Sequel have been updated to
+  continue using LIMIT 1.  Custom adapters should be updated to use
+  LIMIT 1 if the database does not support LIMIT 0.
+
+* The lazy_attributes plugin no longer modifies the database schema.
+  Previously, it could modify the database schema indirectly,
+  resulting in the loss of typecasting for models that were not
+  based on a single table or view, such as usage with the
+  class_table_inheritance plugin.
+
+* Model#freeze in the composition, serialization, and
+  serialization_modification_detection plugins now returns self. In
+  addition to being more correct, this fixes usage of these plugins
+  with the static_cache plugin.
