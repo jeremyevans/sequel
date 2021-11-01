@@ -73,6 +73,7 @@ module Sequel
                 super()
               end
             end
+            alias_method(a, a)
           end
         end
       end
