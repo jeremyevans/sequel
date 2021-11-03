@@ -1,5 +1,7 @@
 === master
 
+* Update mock PostgreSQL adapter to default to PostgreSQL 14 instead of PostgreSQL 9.5 (jeremyevans)
+
 * Support Dataset#with_recursive :search and :cycle options on PostgreSQL 14+ for result ordering and cycle detection (jeremyevans)
 
 * Avoid method redefined verbose mode warnings in lazy_attributes plugin (jeremyevans)

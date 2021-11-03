@@ -16,8 +16,12 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@j['a']].must_equal "(j -> 'a')"
   end
 
+  it "should have #[] use -> operator on for JSONB for identifiers on older PostgreSQL versions" do
+    def @db.server_version(*); 130000; end
+    @l[@jb[1]].must_equal "(j -> 1)"
+  end
+
   it "should have #[] use subscript form on PostgreSQL 14 for JSONB for identifiers" do
-    def @db.server_version(*); 140000; end
     @l[@jb[1]].must_equal "j[1]"
     @l[@jb['a'][1]].must_equal "j['a'][1]"
     @l[Sequel.pg_jsonb_op(Sequel[:j])[1]].must_equal "j[1]"
@@ -38,7 +42,7 @@ describe "Sequel::Postgres::JSONOp" do
   it "should have #[] return an object of the same class" do
     @l[@j[1].to_recordset].must_equal "json_to_recordset((j -> 1))"
     @l[@j[%w'a b'][2]].must_equal "((j #> ARRAY['a','b']) -> 2)"
-    @l[@jb[1].to_recordset].must_equal "jsonb_to_recordset((j -> 1))"
+    @l[@jb[1].to_recordset].must_equal "jsonb_to_recordset(j[1])"
     @l[@jb[%w'a b'][2]].must_equal "((j #> ARRAY['a','b']) -> 2)"
   end
 
@@ -278,7 +282,7 @@ describe "Sequel::Postgres::JSONOp" do
   it "should be able to turn expressions into json ops using pg_json" do
     @db.literal(Sequel.qualify(:b, :a).pg_json[1]).must_equal "(b.a -> 1)"
     @db.literal(Sequel.function(:a, :b).pg_json[1]).must_equal "(a(b) -> 1)"
-    @db.literal(Sequel.qualify(:b, :a).pg_jsonb[1]).must_equal "(b.a -> 1)"
+    @db.literal(Sequel.qualify(:b, :a).pg_jsonb[1]).must_equal "b.a[1]"
     @db.literal(Sequel.function(:a, :b).pg_jsonb[1]).must_equal "(a(b) -> 1)"
   end
 
@@ -289,12 +293,12 @@ describe "Sequel::Postgres::JSONOp" do
 
   it "should be able to turn symbols into json ops using Sequel.pg_json_op" do
     @db.literal(Sequel.pg_json_op(:a)[1]).must_equal "(a -> 1)"
-    @db.literal(Sequel.pg_jsonb_op(:a)[1]).must_equal "(a -> 1)"
+    @db.literal(Sequel.pg_jsonb_op(:a)[1]).must_equal "a[1]"
   end
 
   it "should be able to turn symbols into json ops using Sequel.pg_json" do
     @db.literal(Sequel.pg_json(:a)[1]).must_equal "(a -> 1)"
-    @db.literal(Sequel.pg_jsonb(:a)[1]).must_equal "(a -> 1)"
+    @db.literal(Sequel.pg_jsonb(:a)[1]).must_equal "a[1]"
     @db.literal(Sequel.pg_jsonb(:a).contains('a'=>1)).must_equal "(a @> '{\"a\":1}'::jsonb)"
   end
 

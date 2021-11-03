@@ -34,12 +34,12 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal((@h - :a)['a']).must_equal "((h - a) -> 'a')"
   end
 
-  it "#[] should use the -> operator" do
+  it "#[] should use the -> operator for older PostgreSQL versions" do
+    def @db.server_version(*); 130000; end
     @ds.literal(@h['a']).must_equal "(h -> 'a')"
   end
 
-  it "#[] should use subscripts for identifiers on PostgreSQL 14+" do
-    def @db.server_version(*); 140000; end
+  it "#[] should use subscripts for identifiers" do
     @ds.literal(@h['a']).must_equal "h['a']"
     @ds.literal(Sequel.hstore_op(Sequel[:h])['a']).must_equal "h['a']"
     @ds.literal(Sequel.hstore_op(Sequel[:h][:i])['a']).must_equal "h.i['a']"
@@ -77,7 +77,7 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#[] should return a string expression" do
-    @ds.literal(@h['a'] + 'b').must_equal "((h -> 'a') || 'b')"
+    @ds.literal(@h['a'] + 'b').must_equal "(h['a'] || 'b')"
   end
 
   it "#concat and #merge should use the || operator" do
@@ -235,7 +235,7 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "should be able to turn expressions into hstore ops using hstore" do
-    @ds.literal(Sequel.qualify(:b, :a).hstore['a']).must_equal "(b.a -> 'a')"
+    @ds.literal(Sequel.qualify(:b, :a).hstore['a']).must_equal "b.a['a']"
     @ds.literal(Sequel.function(:a, :b).hstore['a']).must_equal "(a(b) -> 'a')"
   end
 
