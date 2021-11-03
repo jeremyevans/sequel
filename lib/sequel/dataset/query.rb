@@ -1060,6 +1060,7 @@ module Sequel
 
     # Add a common table expression (CTE) with the given name and a dataset that defines the CTE.
     # A common table expression acts as an inline view for the query.
+    #
     # Options:
     # :args :: Specify the arguments/columns for the CTE, should be an array of symbols.
     # :recursive :: Specify that this is a recursive CTE
@@ -1080,9 +1081,34 @@ module Sequel
 
     # Add a recursive common table expression (CTE) with the given name, a dataset that
     # defines the nonrecursive part of the CTE, and a dataset that defines the recursive part
-    # of the CTE.  Options:
+    # of the CTE.
+    #
+    # Options:
     # :args :: Specify the arguments/columns for the CTE, should be an array of symbols.
     # :union_all :: Set to false to use UNION instead of UNION ALL combining the nonrecursive and recursive parts.
+    #
+    # PostgreSQL 14+ Options:
+    # :cycle :: Stop recursive searching when a cycle is detected. Includes two columns in the
+    #           result of the CTE, a cycle column indicating whether a cycle was detected for
+    #           the current row, and a path column for the path traversed to get to the current
+    #           row.  If given, must be a hash with the following keys:
+    #           :columns :: (required) The column or array of columns to use to detect a cycle.
+    #                       If the value of these columns match columns already traversed, then
+    #                       a cycle is detected, and recursive searching will not traverse beyond
+    #                       the cycle (the CTE will include the row where the cycle was detected).
+    #           :cycle_column :: The name of the cycle column in the output, defaults to :is_cycle.
+    #           :cycle_value :: The value of the cycle column in the output if the current row was
+    #                           detected as a cycle, defaults to true.
+    #           :noncycle_value :: The value of the cycle column in the output if the current row
+    #                              was not detected as a cycle, defaults to false. Only respected
+    #                              if :cycle_value is given.
+    #           :path_column :: The name of the path column in the output, defaults to :path.
+    # :search :: Include an order column in the result of the CTE that allows for breadth or
+    #            depth first searching. If given, must be a hash with the following keys:
+    #            :by :: (required) The column or array of columns to search by.
+    #            :order_column :: The name of the order column in the output, defaults to :ordercol.
+    #            :type :: Set to :breadth to use breadth-first searching (depth-first searching
+    #                     is the default).
     #
     #   DB[:t].with_recursive(:t,
     #     DB[:i1].select(:id, :parent_id).where(parent_id: nil),
@@ -1094,6 +1120,21 @@ module Sequel
     #   #   UNION ALL
     #   #   SELECT i1.id, i1.parent_id FROM i1 INNER JOIN t ON (t.id = i1.parent_id)
     #   # ) SELECT * FROM t
+    #
+    #   DB[:t].with_recursive(:t,
+    #     DB[:i1].where(parent_id: nil),
+    #     DB[:i1].join(:t, id: :parent_id).select_all(:i1),
+    #     search: {by: :id, type: :breadth},
+    #     cycle: {columns: :id, cycle_value: 1, noncycle_value: 2})
+    #     
+    #   # WITH RECURSIVE t AS (
+    #   #     SELECT * FROM i1 WHERE (parent_id IS NULL)
+    #   #     UNION ALL
+    #   #     (SELECT i1.* FROM i1 INNER JOIN t ON (t.id = i1.parent_id))
+    #   #   )
+    #   #   SEARCH BREADTH FIRST BY id SET ordercol
+    #   #   CYCLE id SET is_cycle TO 1 DEFAULT 2 USING path
+    #   # SELECT * FROM t
     def with_recursive(name, nonrecursive, recursive, opts=OPTS)
       raise(Error, 'This dataset does not support common table expressions') unless supports_cte?
       if hoist_cte?(nonrecursive)

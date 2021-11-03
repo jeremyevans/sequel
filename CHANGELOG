@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#with_recursive :search and :cycle options on PostgreSQL 14+ for result ordering and cycle detection (jeremyevans)
+
 * Avoid method redefined verbose mode warnings in lazy_attributes plugin (jeremyevans)
 
 === 5.50.0 (2021-11-01)

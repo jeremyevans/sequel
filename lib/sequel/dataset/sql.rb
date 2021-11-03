@@ -1543,15 +1543,14 @@ module Sequel
 
     def select_with_sql(sql)
       return unless supports_cte?
-      ws = opts[:with]
-      return if !ws || ws.empty?
+      ctes = opts[:with]
+      return if !ctes || ctes.empty?
       sql << select_with_sql_base
       c = false
       comma = ', '
-      ws.each do |w|
+      ctes.each do |cte|
         sql << comma if c
-        select_with_sql_prefix(sql, w)
-        literal_dataset_append(sql, w[:dataset])
+        select_with_sql_cte(sql, cte)
         c ||= true
       end
       sql << ' '
@@ -1564,6 +1563,11 @@ module Sequel
       "WITH "
     end
 
+    def select_with_sql_cte(sql, cte)
+      select_with_sql_prefix(sql, cte)
+      literal_dataset_append(sql, cte[:dataset])
+    end
+    
     def select_with_sql_prefix(sql, w)
       quote_identifier_append(sql, w[:name])
       if args = w[:args]

@@ -5071,3 +5071,113 @@ describe "pg_auto_constraint_validations plugin" do
     end
   end
 end if DB.respond_to?(:error_info) && DB.server_version >= 90300
+
+describe "Common Table Expression SEARCH" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:i1){Integer :id; Integer :parent_id}
+    @ds = @db[:i1]
+    @ds.insert(:id=>1)
+    @ds.insert(:id=>2)
+    @ds.insert(:id=>3, :parent_id=>1)
+    @ds.insert(:id=>4, :parent_id=>1)
+    @ds.insert(:id=>5, :parent_id=>3)
+    @ds.insert(:id=>6, :parent_id=>5)
+  end
+  after(:all) do
+    @db.drop_table?(:i1)
+  end
+  
+  it "should support :search option for depth/breadth first ordering" do
+    @db[:t].with_recursive(:t, @ds.filter(:parent_id=>nil), @ds.join(:t, :id=>:parent_id).select_all(:i1), :search=>{:by=>:id}).
+      order(:ordercol, :id).
+      select_map([:id, :ordercol]).must_equal [
+        [1, [["1"]]],
+        [3, [["1"], ["3"]]],
+        [5, [["1"], ["3"], ["5"]]],
+        [6, [["1"], ["3"], ["5"], ["6"]]],
+        [4, [["1"], ["4"]]],
+        [2, [["2"]]]
+      ]
+
+    @db[:t].with_recursive(:t, @ds.filter(:parent_id=>nil), @ds.join(:t, :id=>:parent_id).select_all(:i1), :search=>{:type=>:breadth, :by=>[:id, :parent_id], :set=>:c}, :args=>[:id, :parent_id]).
+      order(:c, :id).
+      select_map([:id, :c]).must_equal [
+        [1, ["0", "1", nil]],
+        [2, ["0", "2", nil]],
+        [3, ["1", "3", "1"]],
+        [4, ["1", "4", "1"]],
+        [5, ["2", "5", "3"]],
+        [6, ["3", "6", "5"]]
+      ]
+  end
+end if DB.server_version >= 140000
+
+describe "Common Table Expression CYCLE" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:i1){Integer :id; Integer :parent_id}
+    @ds = @db[:i1]
+    @ds.insert(:id=>1, :parent_id=>6)
+    @ds.insert(:id=>2)
+    @ds.insert(:id=>3, :parent_id=>1)
+    @ds.insert(:id=>4, :parent_id=>1)
+    @ds.insert(:id=>5, :parent_id=>3)
+    @ds.insert(:id=>6, :parent_id=>5)
+  end
+  after(:all) do
+    @db.drop_table?(:i1)
+  end
+  
+  it "should support :cycle option for detecting cycles" do
+    @db[:t].with_recursive(:t, @ds.filter(:id=>[1,2]), @ds.join(:t, :id=>:parent_id).select_all(:i1), :cycle=>{:columns=>:id}, :args=>[:id, :parent_id]).
+      order(:id).
+      exclude(:is_cycle).
+      select_map([:id, :is_cycle, :path]).must_equal [
+        [1, false, [["1"]]],
+        [2, false, [["2"]]],
+        [3, false, [["1"], ["3"]]],
+        [4, false, [["1"], ["4"]]],
+        [5, false, [["1"], ["3"], ["5"]]],
+        [6, false, [["1"], ["3"], ["5"], ["6"]]]
+      ]
+
+    @db[:t].with_recursive(:t, @ds.filter(:id=>[1,2]), @ds.join(:t, :id=>:parent_id).select_all(:i1), :cycle=>{:columns=>[:id, :parent_id], :path_column=>:pc, :cycle_column=>:cc, :cycle_value=>1, :noncycle_value=>0}).
+      order(:id).
+      where(:cc=>0).
+      select_map([:id, :cc, :pc]).must_equal [
+        [1, 0, [["1", "6"]]],
+        [2, 0, [["2", nil]]],
+        [3, 0, [["1", "6"], ["3", "1"]]],
+        [4, 0, [["1", "6"], ["4", "1"]]],
+        [5, 0, [["1", "6"], ["3", "1"], ["5", "3"]]],
+        [6, 0, [["1", "6"], ["3", "1"], ["5", "3"], ["6", "5"]]]
+      ]
+  end
+
+  it "should support both :search and :cycle options together" do
+    @db[:t].with_recursive(:t, @ds.filter(:id=>[1,2]), @ds.join(:t, :id=>:parent_id).select_all(:i1), :cycle=>{:columns=>:id}, :search=>{:by=>:id}, :args=>[:id, :parent_id]).
+      order(:ordercol, :id).
+      exclude(:is_cycle).
+      select_map([:id, :is_cycle, :path, :ordercol]).must_equal [
+        [1, false, [["1"]], [["1"]]],
+        [3, false, [["1"], ["3"]], [["1"], ["3"]]],
+        [5, false, [["1"], ["3"], ["5"]], [["1"], ["3"], ["5"]]],
+        [6, false, [["1"], ["3"], ["5"], ["6"]], [["1"], ["3"], ["5"], ["6"]]],
+        [4, false, [["1"], ["4"]], [["1"], ["4"]]],
+        [2, false, [["2"]], [["2"]]]
+      ]
+
+    @db[:t].with_recursive(:t, @ds.filter(:id=>[1,2]), @ds.join(:t, :id=>:parent_id).select_all(:i1), :cycle=>{:columns=>:id}, :search=>{:type=>:breadth, :by=>:id}, :args=>[:id, :parent_id]).
+      order(:ordercol, :id).
+      exclude(:is_cycle).
+      select_map([:id, :is_cycle, :path, :ordercol]).must_equal [
+        [1, false, [["1"]], ["0", "1"]],
+        [2, false, [["2"]], ["0", "2"]],
+        [3, false, [["1"], ["3"]], ["1", "3"]],
+        [4, false, [["1"], ["4"]], ["1", "4"]],
+        [5, false, [["1"], ["3"], ["5"]], ["2", "5"]],
+        [6, false, [["1"], ["3"], ["5"], ["6"]], ["3", "6"]]
+      ]
+  end
+end if DB.server_version >= 140000
