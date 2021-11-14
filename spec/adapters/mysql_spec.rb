@@ -76,6 +76,11 @@ describe "MySQL", '#create_table' do
     @db.create_table(:dolls){String :a; String :b, generated_always_as: Sequel.function(:CONCAT, :a, 'plus')}
     @db.schema(:dolls).map{|_,v| v[:generated]}.must_equal [false, true]
   end
+
+  it "should include an :extra schema attribute" do
+    @db.create_table(:dolls) {Integer :a, :primary_key => true }
+    assert @db.schema(:dolls).first.last.key?(:extra)
+  end
 end
 
 if [:mysql, :mysql2].include?(DB.adapter_scheme)
@@ -523,10 +528,12 @@ describe "A MySQL database" do
     @db.create_table(:items) {String :a}
     @db.alter_table(:items){add_column :b, String, :generated_always_as=>Sequel.function(:CONCAT, :a, 'plus'), :generated_type=>:stored, :unique=>true}
     @db.schema(:items)[1][1][:generated].must_equal true
+    @db.schema(:items)[1][1][:extra].must_equal "STORED GENERATED"
     @db.alter_table(:items){add_column :c, String, :generated_always_as=>Sequel.function(:CONCAT, :a, 'minus'), :generated_type=>:virtual}
     @db.schema(:items)[2][1][:generated].must_equal true
+    @db.schema(:items)[2][1][:extra].must_equal "VIRTUAL GENERATED"
   end
-end  
+end
 
 # Socket tests should only be run if the MySQL server is on localhost
 if DB.adapter_scheme == :mysql && %w'localhost 127.0.0.1 ::1'.include?(URI.parse(DB.uri).host)
