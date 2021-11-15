@@ -1,5 +1,7 @@
 === master
 
+* Make association closing handle cases where clone association sets different :class option than cloned association (jeremyevans)
+
 * Make column schema entries on MySQL include an :extra entry for the Extra column in DESCRIBE output (bschmeck) (#1791)
 
 * Update mock PostgreSQL adapter to default to PostgreSQL 14 instead of PostgreSQL 9.5 (jeremyevans)

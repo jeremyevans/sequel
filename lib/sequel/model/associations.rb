@@ -1836,7 +1836,9 @@ module Sequel
 
           if opts[:clone]
             cloned_assoc = association_reflection(opts[:clone])
+            remove_class_name = orig_opts[:class] && !orig_opts[:class_name]
             orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
+            orig_opts.delete(:class_name) if remove_class_name
           end
 
           opts = Hash[default_association_options]
