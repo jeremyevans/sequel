@@ -532,7 +532,7 @@ describe "A MySQL database" do
     @db.alter_table(:items){add_column :c, String, :generated_always_as=>Sequel.function(:CONCAT, :a, 'minus'), :generated_type=>:virtual}
     @db.schema(:items)[2][1][:generated].must_equal true
     @db.schema(:items)[2][1][:extra].must_equal "VIRTUAL GENERATED"
-  end
+  end if !DB.mariadb? || DB.server_version >= 100200
 end
 
 # Socket tests should only be run if the MySQL server is on localhost
