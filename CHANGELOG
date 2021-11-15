@@ -1,6 +1,6 @@
 === master
 
-* Make association closing handle cases where clone association sets different :class option than cloned association (jeremyevans)
+* Make association cloning handle cases where clone association sets different :class option than cloned association (jeremyevans)
 
 * Make column schema entries on MySQL include an :extra entry for the Extra column in DESCRIBE output (bschmeck) (#1791)
 
