@@ -152,9 +152,14 @@ require_relative 'spec_helper'
       ds.take_while{true}.__value.must_equal [{:v=>1}]
 
       @db.sqls
-      ds.each_cons(1){}.__value.must_be_nil
+      if RUBY_VERSION >= '3.1'
+        ds.each_cons(1){}.__value.must_be_kind_of Sequel::Dataset
+        ds.each_slice(1){}.__value.must_be_kind_of Sequel::Dataset
+      else
+        ds.each_cons(1){}.__value.must_be_nil
+        ds.each_slice(1){}.__value.must_be_nil
+      end
       ds.each_entry{}.__value.must_be_kind_of Sequel::Dataset
-      ds.each_slice(1){}.__value.must_be_nil
       ds.each_with_index{}.__value.must_be_kind_of Sequel::Dataset
       ds.reverse_each{}.__value.must_be_kind_of Sequel::Dataset
       @db.sqls.must_equal [
