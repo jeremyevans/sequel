@@ -93,6 +93,16 @@ describe "tactical_eager_loading plugin" do
     ts.map{|x| x.associations.fetch(:parent, 1)}.must_equal [ts[2], ts[3], nil, nil]
   end
 
+  it "association getter methods should not clear associations for objects that already have a cached association" do
+    ts.first.parent(:reload=>true)
+    sql_match('SELECT * FROM t WHERE id = 101')
+    ts.map{|x| x.associations.fetch(:parent, 1)}.must_equal [ts[2], 1, 1, 1]
+    ts[1].associations.delete(:parent)
+    ts[1].parent
+    sql_match(/\ASELECT \* FROM t WHERE \(t\.id IN \(102\)\)\z/)
+    ts.map{|x| x.associations.fetch(:parent, 1)}.must_equal [ts[2], ts[3], nil, nil]
+  end
+
   it "association getter methods should support eagerly loading dependent associations via :eager" do
     parents = ts.map{|x| x.parent(:eager=>:children)}
     sql_match(/\ASELECT \* FROM t WHERE \(t\.id IN \(10[12], 10[12]\)\)\z/, /\ASELECT \* FROM t WHERE \(t\.parent_id IN/)

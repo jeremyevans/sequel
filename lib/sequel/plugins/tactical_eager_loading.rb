@@ -143,9 +143,15 @@ module Sequel
         def load_associated_objects(opts, dynamic_opts=OPTS, &block)
           dynamic_opts = load_association_objects_options(dynamic_opts, &block)
           name = opts[:name]
-          if (!associations.include?(name) || dynamic_opts[:eager_reload]) && opts[:allow_eager] != false && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
+          eager_reload = dynamic_opts[:eager_reload]
+          if (!associations.include?(name) || eager_reload) && opts[:allow_eager] != false && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
             begin
-              retrieved_by.send(:eager_load, retrieved_with.reject(&:frozen?), name=>dynamic_opts[:eager] || OPTS)
+              objects = if eager_reload
+                retrieved_with.reject(&:frozen?)
+              else
+                retrieved_with.reject{|x| x.frozen? || x.associations.include?(name)}
+              end
+              retrieved_by.send(:eager_load, objects, name=>dynamic_opts[:eager] || OPTS)
             rescue Sequel::UndefinedAssociation
               # This can happen if class table inheritance is used and the association
               # is only defined in a subclass.  This particular instance can use the
