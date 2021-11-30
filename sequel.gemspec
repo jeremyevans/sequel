@@ -15,7 +15,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
     'bug_tracker_uri'   => 'https://github.com/jeremyevans/sequel/issues',
     'changelog_uri'     => 'http://sequel.jeremyevans.net/rdoc/files/CHANGELOG.html',
     'documentation_uri' => 'http://sequel.jeremyevans.net/documentation.html',
-    'mailing_list_uri'  => 'https://groups.google.com/forum/#!forum/sequel-talk',
+    'mailing_list_uri'  => 'https://github.com/jeremyevans/sequel/discussions',
     'source_code_uri'   => 'https://github.com/jeremyevans/sequel',
   }
   s.required_ruby_version = ">= 1.9.2"
