@@ -1,4 +1,4 @@
-=== master
+=== 5.51.0 (2021-12-01)
 
 * Make eager loading via tactical_eager_loading no longer modify objects who already have a cached value for the association (jeremyevans)
 

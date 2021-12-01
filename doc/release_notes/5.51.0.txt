@@ -1,0 +1,47 @@
+= New Features
+
+* On PostgreSQL 14+, Dataset#with_recursive now supports :search and
+  :cycle options for result ordering and cycle detection.  These use
+  the SEARCH and CYCLE clauses added in PostgreSQL 14:
+
+    DB[:t].with_recursive(:t,
+      DB[:i1].where(parent_id: nil),
+      DB[:i1].join(:t, id: :parent_id).select_all(:i1),
+      search: {by: :id, type: :breadth},
+      cycle: {columns: :id, cycle_value: 1, noncycle_value: 2})
+
+    # WITH RECURSIVE t AS (
+    #     SELECT * FROM i1 WHERE (parent_id IS NULL)
+    #     UNION ALL
+    #     (SELECT i1.* FROM i1 INNER JOIN t ON (t.id = i1.parent_id))
+    #   )
+    #   SEARCH BREADTH FIRST BY id SET ordercol
+    #   CYCLE id SET is_cycle TO 1 DEFAULT 2 USING path
+
+* On MySQL, column schema hashes now contain an :extra entry, which
+  contains the Extra string returned in MySQL's DESCRIBE results
+  for the column.
+
+= Other Improvements
+
+* When eager loading via the tactical_eager_loading plugin, objects
+  that already have an association loaded will not have it reloaded
+  unless the :eager_reload option is given.
+
+* When cloning an association and using a different :class option
+  than the cloned association, the :class option given when cloning
+  will now take precedence over the :class option for the cloned
+  association.
+
+* When using the mock postgres adapter, the adapter defaults to
+  supporting PostgreSQL 14 (previously, it defaulted to supporting
+  PostgreSQL 9.5).
+
+* Sequel now avoids a method redefined warning in the lazy attributes
+  plugin in verbose warnings mode.
+
+= Other
+
+* Sequel's primary discussion forum is now GitHub Discussions. The
+  sequel-talk Google Group is still available for users who would
+  prefer to use that instead.
