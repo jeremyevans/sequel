@@ -30,12 +30,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-11-01 09:04:52 -0700</span>
+<span class='datetime'>2021-12-01 08:33:17 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.51.0+-282021-12-01-29"><a href="doc/release_notes/5_51_0_txt.html">5.51.0</a> (2021-12-01)<span><a href="#label-5.51.0+-282021-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make eager loading via tactical_eager_loading no longer modify objects who already have a cached value for the association (jeremyevans)</p>
+</li><li>
+<p>Make association cloning handle cases where clone association sets different :class option than cloned association (jeremyevans)</p>
+</li><li>
+<p>Make column schema entries on MySQL include an :extra entry for the Extra column in DESCRIBE output (bschmeck) (#1791)</p>
+</li><li>
+<p>Update mock PostgreSQL adapter to default to PostgreSQL 14 instead of PostgreSQL 9.5 (jeremyevans)</p>
+</li><li>
+<p>Support Dataset#with_recursive :search and :cycle options on PostgreSQL 14+ for result ordering and cycle detection (jeremyevans)</p>
+</li><li>
+<p>Avoid method redefined verbose mode warnings in lazy_attributes plugin (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.50.0+-282021-11-01-29"><a href="doc/release_notes/5_50_0_txt.html">5.50.0</a> (2021-11-01)<span><a href="#label-5.50.0+-282021-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make Migrator :allow_missing_migration_files also allow down migrations where the current database version is greater than the last migration file version (francisconeves97) (#1789)</p>

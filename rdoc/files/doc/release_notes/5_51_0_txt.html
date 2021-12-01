@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.51.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.51.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.51.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2021-12-01 08:33:17 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>On PostgreSQL 14+, Dataset#with_recursive now supports :search and :cycle options for result ordering and cycle detection.  These use the SEARCH and CYCLE clauses added in PostgreSQL 14:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">with_recursive</span>(<span class="ruby-value">:t</span>,&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:i1</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">parent_id:</span> <span class="ruby-keyword">nil</span>),&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:i1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:t</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:parent_id</span>).<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:i1</span>),&#x000A;  <span class="ruby-value">search:</span> {<span class="ruby-value">by:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">type:</span> <span class="ruby-value">:breadth</span>},&#x000A;  <span class="ruby-value">cycle:</span> {<span class="ruby-value">columns:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">cycle_value:</span> <span class="ruby-value">1</span>, <span class="ruby-value">noncycle_value:</span> <span class="ruby-value">2</span>})&#x000A;&#x000A;<span class="ruby-comment"># WITH RECURSIVE t AS (</span>&#x000A;<span class="ruby-comment">#     SELECT * FROM i1 WHERE (parent_id IS NULL)</span>&#x000A;<span class="ruby-comment">#     UNION ALL</span>&#x000A;<span class="ruby-comment">#     (SELECT i1.* FROM i1 INNER JOIN t ON (t.id = i1.parent_id))</span>&#x000A;<span class="ruby-comment">#   )</span>&#x000A;<span class="ruby-comment">#   SEARCH BREADTH FIRST BY id SET ordercol</span>&#x000A;<span class="ruby-comment">#   CYCLE id SET is_cycle TO 1 DEFAULT 2 USING path</span></pre>
+</li><li>
+<p>On MySQL, column schema hashes now contain an :extra entry, which contains the Extra string returned in MySQL&#39;s DESCRIBE results for the column.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When eager loading via the tactical_eager_loading plugin, objects that already have an association loaded will not have it reloaded unless the :eager_reload option is given.</p>
+</li><li>
+<p>When cloning an association and using a different :class option than the cloned association, the :class option given when cloning will now take precedence over the :class option for the cloned association.</p>
+</li><li>
+<p>When using the mock postgres adapter, the adapter defaults to supporting PostgreSQL 14 (previously, it defaulted to supporting PostgreSQL 9.5).</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids a method redefined warning in the lazy attributes plugin in verbose warnings mode.</p>
+</li></ul>
+
+<h1 id="label-Other">Other<span><a href="#label-Other">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Sequel&#39;s primary discussion forum is now GitHub Discussions. The sequel-talk Google Group is still available for users who would prefer to use that instead.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

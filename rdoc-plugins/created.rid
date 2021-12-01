@@ -1,4 +1,4 @@
-Mon, 01 Nov 2021 09:08:55 -0700
+Wed, 01 Dec 2021 08:37:55 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -131,12 +131,12 @@ lib/sequel/plugins/instance_hooks.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_specific_default.rb	Fri, 17 Jul 2020 08:42:04 -0700
 lib/sequel/plugins/inverted_subsets.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/json_serializer.rb	Tue, 21 Sep 2021 14:24:30 -0700
-lib/sequel/plugins/lazy_attributes.rb	Tue, 26 Oct 2021 12:43:22 -0700
+lib/sequel/plugins/lazy_attributes.rb	Mon, 01 Nov 2021 09:23:49 -0700
 lib/sequel/plugins/list.rb	Mon, 30 Jul 2018 18:58:32 -0700
 lib/sequel/plugins/many_through_many.rb	Fri, 30 Jul 2021 11:27:00 -0700
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Sat, 20 Jan 2018 09:44:46 -0800
-lib/sequel/plugins/nested_attributes.rb	Tue, 23 Feb 2021 11:14:20 -0800
+lib/sequel/plugins/nested_attributes.rb	Fri, 19 Nov 2021 23:47:09 -0800
 lib/sequel/plugins/optimistic_locking.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/pg_array_associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
 lib/sequel/plugins/pg_auto_constraint_validations.rb	Wed, 02 Dec 2020 15:37:08 -0800
@@ -158,7 +158,7 @@ lib/sequel/plugins/string_stripper.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/subclasses.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/plugins/subset_conditions.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/table_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/tactical_eager_loading.rb	Mon, 03 Sep 2018 12:02:47 -0700
+lib/sequel/plugins/tactical_eager_loading.rb	Fri, 19 Nov 2021 23:55:56 -0800
 lib/sequel/plugins/throw_failures.rb	Tue, 21 Jan 2020 16:47:15 -0800
 lib/sequel/plugins/timestamps.rb	Mon, 19 Jul 2021 07:43:26 -0700
 lib/sequel/plugins/touch.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -170,7 +170,7 @@ lib/sequel/plugins/update_or_create.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/plugins/update_primary_key.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/plugins/update_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/uuid.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/validate_associated.rb	Mon, 05 Mar 2018 12:07:45 -0800
+lib/sequel/plugins/validate_associated.rb	Fri, 19 Nov 2021 23:47:24 -0800
 lib/sequel/plugins/validation_class_methods.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/validation_contexts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/validation_helpers.rb	Tue, 21 Sep 2021 14:24:30 -0700
