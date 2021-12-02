@@ -1,3 +1,9 @@
+=== master
+
+* Make sql_comments Database extension support Database#with_comments, for automatically including comments for queries executed inside the block (jeremyevans)
+
+* Fix sql_comments extension to not modify cached SQL for a dataset (jeremyevans)
+
 === 5.51.0 (2021-12-01)
 
 * Make eager loading via tactical_eager_loading no longer modify objects who already have a cached value for the association (jeremyevans)
