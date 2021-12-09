@@ -249,7 +249,7 @@ jdbc-mysql :: Depending on the configuration of the MySQL server, jdbc-mysql ver
 
 Requires: mysql
 
-The MySQL adapter does not support the pure-ruby mysql.rb driver, it requires the C-extension driver.
+This should work with the mysql gem (C extension) and the ruby-mysql gem (pure ruby).
 
 The following additional options are supported:
 
