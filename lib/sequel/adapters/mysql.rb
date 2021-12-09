@@ -152,11 +152,6 @@ module Sequel
         super
       end
 
-      # Return the version of the MySQL server to which we are connecting.
-      def server_version(server=nil)
-        @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
-      end
-
       private
       
       # Execute the given SQL on the given connection.  If the :type
