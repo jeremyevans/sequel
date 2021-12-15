@@ -1,5 +1,4 @@
 require 'logger'
-require_relative "../sequel_warning"
 
 if ENV['COVERAGE']
   require_relative "../sequel_coverage"
@@ -33,6 +32,7 @@ unless defined?(DB)
   DB = Sequel.connect(ENV[env_var])
 end
 
+require_relative "../sequel_warning"
 require_relative "../visibility_checking" if ENV['CHECK_METHOD_VISIBILITY']
 
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)

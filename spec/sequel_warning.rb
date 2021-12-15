@@ -1,6 +1,9 @@
-if ENV['WARNING']
-  require 'warning'
-  Warning.ignore(:missing_ivar, File.dirname(File.dirname(__FILE__)))
-  Warning.ignore(/gems\/(tzinfo|activesupport)-\d/)
-  Warning.dedup if Warning.respond_to?(:dedup)
+if RUBY_VERSION >= '3' && [:mysql, :mysql2].include?(DB.adapter_scheme)
+  begin
+    require 'warning'
+  rescue LoadError
+  else
+    Warning.ignore(:taint)
+    Warning.dedup if Warning.respond_to?(:dedup)
+  end
 end

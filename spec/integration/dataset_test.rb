@@ -137,7 +137,7 @@ describe "Simple Dataset operations" do
   end
 
   it "should support iterating over large numbers of records with paged_each" do
-    v = (2..100).map{|i| wait{@ds.insert(:number=>i*10)}}
+    (2..100).map{|i| wait{@ds.insert(:number=>i*10)}}
 
     [:offset, :filter].each do |strategy|
       rows = []
