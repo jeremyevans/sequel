@@ -544,9 +544,10 @@ module Sequel
         server_version >= 50600 && (op[:op] == :drop_index || (op[:op] == :drop_constraint && op[:type] == :unique))
       end
 
-      # Whether the database supports CHECK constraints
+      # CHECK constraints only supported on MariaDB 10.2+ and MySQL 8.0.19+
+      # (at least MySQL documents DROP CONSTRAINT was supported in 8.0.19+).
       def supports_check_constraints?
-        mariadb? && server_version >= 100200
+        server_version >= (mariadb? ? 100200 : 80019)
       end
 
       # MySQL can combine multiple alter table ops into a single query.

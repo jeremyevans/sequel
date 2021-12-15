@@ -1,5 +1,7 @@
 === master
 
+* Make alter_table drop_constraint have an effect on MySQL 8.0.19+ (jeremyevans)
+
 * Make mysql adapter support ruby-mysql 3 API (jeremyevans) (#1795)
 
 * Make mysql adapter no longer use connection's server_version, since it isn't accurate when using the ruby-mysql driver (jeremyevans)
