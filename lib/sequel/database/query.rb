@@ -236,7 +236,7 @@ module Sequel
       when :date
         Sequel.string_to_date(default)
       when :datetime
-        DateTime.parse(default)
+        Sequel.string_to_datetime(default)
       when :time
         Sequel.string_to_time(default)
       when :decimal

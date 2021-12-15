@@ -2778,10 +2778,17 @@ describe "Database#column_schema_to_ruby_default" do
     p["CURRENT_DATE", :datetime].must_equal Sequel::CURRENT_TIMESTAMP
     p["now()", :datetime].must_equal Sequel::CURRENT_TIMESTAMP
     p["getdate()", :datetime].must_equal Sequel::CURRENT_TIMESTAMP
-    p["'2009-10-29T10:20:30-07:00'", :datetime].must_equal DateTime.parse('2009-10-29T10:20:30-07:00')
-    p["'2009-10-29 10:20:30'", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30')
-    p["'10:20:30'", :time].must_equal Time.parse('10:20:30')
+    p["'2009-10-29T10:20:30-07:00'", :datetime].must_equal Time.parse('2009-10-29T10:20:30-07:00')
+    p["'2009-10-29 10:20:30'", :datetime].must_equal Time.parse('2009-10-29 10:20:30')
+    p["'10:20:30'", :time].must_equal Sequel::SQLTime.create(10, 20, 30)
     p["NaN", :float].must_be_nil
+
+    begin
+      Sequel.datetime_class = DateTime
+      p["'2009-10-29 10:20:30'", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30')
+    ensure
+      Sequel.datetime_class = Time
+    end
 
     db = Sequel.mock(:host=>'postgres')
     p["''::text", :string].must_equal ""
@@ -2793,8 +2800,8 @@ describe "Database#column_schema_to_ruby_default" do
     p["'a'::bytea", :blob].must_equal Sequel.blob('a')
     p["'a'::bytea", :blob].must_be_kind_of(Sequel::SQL::Blob)
     p["'2009-10-29'::date", :date].must_equal Date.new(2009,10,29)
-    p["'2009-10-29 10:20:30.241343'::timestamp without time zone", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30.241343')
-    p["'10:20:30'::time without time zone", :time].must_equal Time.parse('10:20:30')
+    p["'2009-10-29 10:20:30.241343'::timestamp without time zone", :datetime].must_equal Time.parse('2009-10-29 10:20:30.241343')
+    p["'10:20:30'::time without time zone", :time].must_equal Sequel::SQLTime.create(10, 20, 30)
 
     db = Sequel.mock(:host=>'mysql')
     p["\\a'b", :string].must_equal "\\a'b"
@@ -2803,8 +2810,8 @@ describe "Database#column_schema_to_ruby_default" do
     p["-1", :float].must_equal(-1.0)
     p['-1', :decimal].must_equal BigDecimal('-1.0')
     p["2009-10-29", :date].must_equal Date.new(2009,10,29)
-    p["2009-10-29 10:20:30", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30')
-    p["10:20:30", :time].must_equal Time.parse('10:20:30')
+    p["2009-10-29 10:20:30", :datetime].must_equal Time.parse('2009-10-29 10:20:30')
+    p["10:20:30", :time].must_equal Sequel::SQLTime.create(10, 20, 30)
     p["a", :enum].must_equal "a"
     p["a,b", :set].must_equal "a,b"
     

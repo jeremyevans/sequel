@@ -1,5 +1,7 @@
 === master
 
+* Make :ruby_default schema entry for type: :datetime respect Sequel.datetime_class (jeremyevans)
+
 * Make alter_table drop_constraint have an effect on MySQL 8.0.19+ (jeremyevans)
 
 * Make mysql adapter support ruby-mysql 3 API (jeremyevans) (#1795)
