@@ -1,6 +1,7 @@
 require_relative "spec_helper"
 
 begin
+  require 'active_support'
   require 'active_support/duration'
   begin
     require 'active_support/gem_version'

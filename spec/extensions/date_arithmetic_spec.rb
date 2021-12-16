@@ -1,6 +1,7 @@
 require_relative "spec_helper"
 
 asd = begin
+  require 'active_support'
   require 'active_support/duration'
   true
 rescue LoadError

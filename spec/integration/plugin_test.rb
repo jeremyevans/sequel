@@ -2293,6 +2293,7 @@ end
 
 describe "date_arithmetic extension" do
   asd = begin
+    require 'active_support'
     require 'active_support/duration'
     require 'active_support/inflector'
     require 'active_support/core_ext/string/inflections'
