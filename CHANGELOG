@@ -1,5 +1,7 @@
 === master
 
+* Make pg_interval extension work with ActiveSupport 7.0 (jeremyevans)
+
 * Make :ruby_default schema entry for type: :datetime respect Sequel.datetime_class (jeremyevans)
 
 * Make alter_table drop_constraint have an effect on MySQL 8.0.19+ (jeremyevans)

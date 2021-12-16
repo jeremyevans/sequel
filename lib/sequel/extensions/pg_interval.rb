@@ -32,6 +32,7 @@
 #
 # Related module: Sequel::Postgres::IntervalDatabaseMethods
 
+require 'active_support'
 require 'active_support/duration'
 
 # :nocov:
