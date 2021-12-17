@@ -278,11 +278,9 @@ module Sequel
     #
     #   Sequel.string_to_date('2010-09-10') # Date.civil(2010, 09, 10)
     def string_to_date(string)
-      begin
-        Date.parse(string, Sequel.convert_two_digit_years)
-      rescue => e
-        raise convert_exception_class(e, InvalidValue)
-      end
+      Date.parse(string, Sequel.convert_two_digit_years)
+    rescue => e
+      raise convert_exception_class(e, InvalidValue)
     end
 
     # Converts the given +string+ into a +Time+ or +DateTime+ object, depending on the
@@ -290,15 +288,13 @@ module Sequel
     #
     #   Sequel.string_to_datetime('2010-09-10 10:20:30') # Time.local(2010, 09, 10, 10, 20, 30)
     def string_to_datetime(string)
-      begin
-        if datetime_class == DateTime
-          DateTime.parse(string, convert_two_digit_years)
-        else
-          datetime_class.parse(string)
-        end
-      rescue => e
-        raise convert_exception_class(e, InvalidValue)
+      if datetime_class == DateTime
+        DateTime.parse(string, convert_two_digit_years)
+      else
+        datetime_class.parse(string)
       end
+    rescue => e
+      raise convert_exception_class(e, InvalidValue)
     end
 
     # Converts the given +string+ into a <tt>Sequel::SQLTime</tt> object.
@@ -306,11 +302,9 @@ module Sequel
     #   v = Sequel.string_to_time('10:20:30') # Sequel::SQLTime.parse('10:20:30')
     #   DB.literal(v) # => '10:20:30'
     def string_to_time(string)
-      begin
-        SQLTime.parse(string)
-      rescue => e
-        raise convert_exception_class(e, InvalidValue)
-      end
+      SQLTime.parse(string)
+    rescue => e
+      raise convert_exception_class(e, InvalidValue)
     end
 
     # Unless in single threaded mode, protects access to any mutable

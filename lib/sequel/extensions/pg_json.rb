@@ -387,11 +387,9 @@ module Sequel
       # argument is true), or a String, Numeric, true, false, or nil
       # if the json library used supports that.
       def _parse_json(s)
-        begin
-          Sequel.parse_json(s)
-        rescue Sequel.json_parser_error_class => e
-          raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
-        end
+        Sequel.parse_json(s)
+      rescue Sequel.json_parser_error_class => e
+        raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
       end
 
       # Wrap the parsed JSON value in the appropriate JSON wrapper class.

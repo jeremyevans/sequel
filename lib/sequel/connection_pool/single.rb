@@ -24,15 +24,13 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
 
   # Yield the connection to the block.
   def hold(server=nil)
-    begin
-      unless c = @conn.first
-        @conn.replace([c = make_new(:default)])
-      end
-      yield c
-    rescue Sequel::DatabaseDisconnectError, *@error_classes => e
-      disconnect if disconnect_error?(e)
-      raise
+    unless c = @conn.first
+      @conn.replace([c = make_new(:default)])
     end
+    yield c
+  rescue Sequel::DatabaseDisconnectError, *@error_classes => e
+    disconnect if disconnect_error?(e)
+    raise
   end
 
   # The SingleConnectionPool always has a maximum size of 1.

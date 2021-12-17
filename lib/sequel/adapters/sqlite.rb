@@ -189,26 +189,24 @@ module Sequel
       # Yield an available connection.  Rescue
       # any SQLite3::Exceptions and turn them into DatabaseErrors.
       def _execute(type, sql, opts, &block)
-        begin
-          synchronize(opts[:server]) do |conn|
-            return execute_prepared_statement(conn, type, sql, opts, &block) if sql.is_a?(Symbol)
-            log_args = opts[:arguments]
-            args = {}
-            opts.fetch(:arguments, OPTS).each{|k, v| args[k] = prepared_statement_argument(v)}
-            case type
-            when :select
-              log_connection_yield(sql, conn, log_args){conn.query(sql, args, &block)}
-            when :insert
-              log_connection_yield(sql, conn, log_args){conn.execute(sql, args)}
-              conn.last_insert_row_id
-            when :update
-              log_connection_yield(sql, conn, log_args){conn.execute_batch(sql, args)}
-              conn.changes
-            end
+        synchronize(opts[:server]) do |conn|
+          return execute_prepared_statement(conn, type, sql, opts, &block) if sql.is_a?(Symbol)
+          log_args = opts[:arguments]
+          args = {}
+          opts.fetch(:arguments, OPTS).each{|k, v| args[k] = prepared_statement_argument(v)}
+          case type
+          when :select
+            log_connection_yield(sql, conn, log_args){conn.query(sql, args, &block)}
+          when :insert
+            log_connection_yield(sql, conn, log_args){conn.execute(sql, args)}
+            conn.last_insert_row_id
+          when :update
+            log_connection_yield(sql, conn, log_args){conn.execute_batch(sql, args)}
+            conn.changes
           end
-        rescue SQLite3::Exception => e
-          raise_error(e)
         end
+      rescue SQLite3::Exception => e
+        raise_error(e)
       end
       
       # The SQLite adapter does not need the pool to convert exceptions.

@@ -55,13 +55,11 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # Yields the connection to the supplied block for the given server.
   # This method simulates the ConnectionPool#hold API.
   def hold(server=:default)
-    begin
-      server = pick_server(server)
-      yield(@conns[server] ||= make_new(server))
-    rescue Sequel::DatabaseDisconnectError, *@error_classes => e
-      disconnect_server(server) if disconnect_error?(e)
-      raise
-    end
+    server = pick_server(server)
+    yield(@conns[server] ||= make_new(server))
+  rescue Sequel::DatabaseDisconnectError, *@error_classes => e
+    disconnect_server(server) if disconnect_error?(e)
+    raise
   end
   
   # The ShardedSingleConnectionPool always has a maximum size of 1.

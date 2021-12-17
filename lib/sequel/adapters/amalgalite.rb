@@ -118,11 +118,9 @@ module Sequel
       # Yield an available connection.  Rescue
       # any Amalgalite::Errors and turn them into DatabaseErrors.
       def _execute(sql, opts)
-        begin
-          synchronize(opts[:server]){|conn| yield conn}
-        rescue ::Amalgalite::Error, ::Amalgalite::SQLite3::Error => e
-          raise_error(e)
-        end
+        synchronize(opts[:server]){|conn| yield conn}
+      rescue ::Amalgalite::Error, ::Amalgalite::SQLite3::Error => e
+        raise_error(e)
       end
       
       # The Amagalite adapter does not need the pool to convert exceptions.

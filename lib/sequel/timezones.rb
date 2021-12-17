@@ -82,22 +82,20 @@ module Sequel
     # +application_timezone+ using +convert_input_timestamp+ and
     # +convert_output_timestamp+.
     def convert_timestamp(v, input_timezone)
-      begin
-        if v.is_a?(Date) && !v.is_a?(DateTime)
-          # Dates handled specially as they are assumed to already be in the application_timezone
-          if datetime_class == DateTime
-            DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : 0)
-          else
-            Time.public_send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
-          end
+      if v.is_a?(Date) && !v.is_a?(DateTime)
+        # Dates handled specially as they are assumed to already be in the application_timezone
+        if datetime_class == DateTime
+          DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : 0)
         else
-          convert_output_timestamp(convert_input_timestamp(v, input_timezone), application_timezone)
+          Time.public_send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
         end
-      rescue InvalidValue
-        raise
-      rescue => e
-        raise convert_exception_class(e, InvalidValue)
+      else
+        convert_output_timestamp(convert_input_timestamp(v, input_timezone), application_timezone)
       end
+    rescue InvalidValue
+      raise
+    rescue => e
+      raise convert_exception_class(e, InvalidValue)
     end
     
     # Convert the given object into an object of <tt>Sequel.datetime_class</tt> in the

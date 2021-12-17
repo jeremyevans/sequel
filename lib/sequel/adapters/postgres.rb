@@ -116,25 +116,23 @@ module Sequel
       # error classes is raised, or a PGError is raised and the connection
       # status cannot be determined or it is not OK.
       def check_disconnect_errors
+        yield
+      rescue *DISCONNECT_ERROR_CLASSES => e
+        disconnect = true
+        raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
+      rescue PGError => e
+        disconnect = false
         begin
-          yield
-        rescue *DISCONNECT_ERROR_CLASSES => e
+          s = status
+        rescue PGError
           disconnect = true
-          raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
-        rescue PGError => e
-          disconnect = false
-          begin
-            s = status
-          rescue PGError
-            disconnect = true
-          end
-          status_ok = (s == Adapter::CONNECTION_OK)
-          disconnect ||= !status_ok
-          disconnect ||= e.message =~ DISCONNECT_ERROR_RE
-          disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
-        ensure
-          block if status_ok && !disconnect
         end
+        status_ok = (s == Adapter::CONNECTION_OK)
+        disconnect ||= !status_ok
+        disconnect ||= e.message =~ DISCONNECT_ERROR_RE
+        disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
+      ensure
+        block if status_ok && !disconnect
       end
 
       # Execute the given SQL with this connection.  If a block is given,
@@ -518,11 +516,9 @@ module Sequel
 
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
-        begin
-          yield
-        rescue => e
-          raise_error(e, :classes=>database_error_classes)
-        end
+        yield
+      rescue => e
+        raise_error(e, :classes=>database_error_classes)
       end
 
       # Set the DateStyle to ISO if configured, for faster date parsing.

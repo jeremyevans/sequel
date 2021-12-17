@@ -88,12 +88,10 @@ module Sequel
   module UnthreadedServerBlock
     # Set a default server/shard to use inside the block.
     def with_server(default_server, read_only_server=default_server)
-      begin
-        set_default_server(default_server, read_only_server)
-        yield
-      ensure
-        clear_default_server
-      end
+      set_default_server(default_server, read_only_server)
+      yield
+    ensure
+      clear_default_server
     end
 
     private
@@ -131,12 +129,10 @@ module Sequel
     # Set a default server/shard to use inside the block for the current
     # thread.
     def with_server(default_server, read_only_server=default_server)
-      begin
-        set_default_server(default_server, read_only_server)
-        yield
-      ensure
-        clear_default_server
-      end
+      set_default_server(default_server, read_only_server)
+      yield
+    ensure
+      clear_default_server
     end
 
     private

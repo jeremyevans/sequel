@@ -682,13 +682,11 @@ module Sequel
       
       # Yield to the passed block and if do_raise is false, swallow all errors other than DatabaseConnectionErrors.
       def check_non_connection_error(do_raise=require_valid_table)
-        begin
-          db.transaction(:savepoint=>:only){yield}
-        rescue Sequel::DatabaseConnectionError
-          raise
-        rescue Sequel::Error
-          raise if do_raise
-        end
+        db.transaction(:savepoint=>:only){yield}
+      rescue Sequel::DatabaseConnectionError
+        raise
+      rescue Sequel::Error
+        raise if do_raise
       end
 
       # Convert the given object to a Dataset that should be used as
@@ -1630,11 +1628,9 @@ module Sequel
       #   artist.set(name: 'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
-        begin
-          _valid?(opts)
-        rescue HookFailed
-          false
-        end
+        _valid?(opts)
+      rescue HookFailed
+        false
       end
 
       private

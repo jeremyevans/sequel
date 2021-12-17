@@ -32,15 +32,13 @@ module Sequel
 
     # Allow loading the necessary JDBC support via a gem.
     def self.load_gem(name)
-      begin
-        require "jdbc/#{name.to_s.downcase}"
-      rescue LoadError
-        # jdbc gem not used, hopefully the user has the .jar in their CLASSPATH
-      else
-        if defined?(::Jdbc) && ( ::Jdbc.const_defined?(name) rescue nil )
-          jdbc_module = ::Jdbc.const_get(name) # e.g. Jdbc::SQLite3
-          jdbc_module.load_driver if jdbc_module.respond_to?(:load_driver)
-        end
+      require "jdbc/#{name.to_s.downcase}"
+    rescue LoadError
+      # jdbc gem not used, hopefully the user has the .jar in their CLASSPATH
+    else
+      if defined?(::Jdbc) && ( ::Jdbc.const_defined?(name) rescue nil )
+        jdbc_module = ::Jdbc.const_get(name) # e.g. Jdbc::SQLite3
+        jdbc_module.load_driver if jdbc_module.respond_to?(:load_driver)
       end
     end
 

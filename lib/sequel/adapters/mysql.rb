@@ -180,45 +180,43 @@ module Sequel
       # option is :select, yield the result of the query, otherwise
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
-        begin
-          r = log_connection_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql, conn){conn.query(sql)}
-          if opts[:type] == :select
-            yield r if r
-          elsif defined?(yield)
-            yield conn
-          end
-          if conn.respond_to?(:more_results?)
-            while conn.more_results? do
-              if r
-                r.free
-                r = nil
-              end
-              begin
-                conn.next_result
-                r = conn.use_result
-              rescue Mysql::Error => e
-                raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
-                break
-              end
-              yield r if opts[:type] == :select
+        r = log_connection_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql, conn){conn.query(sql)}
+        if opts[:type] == :select
+          yield r if r
+        elsif defined?(yield)
+          yield conn
+        end
+        if conn.respond_to?(:more_results?)
+          while conn.more_results? do
+            if r
+              r.free
+              r = nil
             end
-          end
-        rescue Mysql::Error => e
-          raise_error(e)
-        ensure
-          r.free if r
-          # Use up all results to avoid a commands out of sync message.
-          if conn.respond_to?(:more_results?)
-            while conn.more_results? do
-              begin
-                conn.next_result
-                r = conn.use_result
-              rescue Mysql::Error => e
-                raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
-                break
-              end
-              r.free if r
+            begin
+              conn.next_result
+              r = conn.use_result
+            rescue Mysql::Error => e
+              raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
+              break
             end
+            yield r if opts[:type] == :select
+          end
+        end
+      rescue Mysql::Error => e
+        raise_error(e)
+      ensure
+        r.free if r
+        # Use up all results to avoid a commands out of sync message.
+        if conn.respond_to?(:more_results?)
+          while conn.more_results? do
+            begin
+              conn.next_result
+              r = conn.use_result
+            rescue Mysql::Error => e
+              raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
+              break
+            end
+            r.free if r
           end
         end
       end
@@ -250,17 +248,15 @@ module Sequel
       # the conversion raises an InvalidValue exception, return v
       # if :string and nil otherwise.
       def convert_date_time(v)
-        begin
-          yield v
-        rescue InvalidValue
-          case @convert_invalid_date_time
-          when nil, :nil
-            nil
-          when :string
-            v
-          else 
-            raise
-          end
+        yield v
+      rescue InvalidValue
+        case @convert_invalid_date_time
+        when nil, :nil
+          nil
+        when :string
+          v
+        else 
+          raise
         end
       end
     
