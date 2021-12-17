@@ -1,5 +1,7 @@
 === master
 
+* Make postgres adapter respect Database#default_string_column_size (jeremyevans)
+
 * Make pg_interval extension work with ActiveSupport 7.0 (jeremyevans)
 
 * Make :ruby_default schema entry for type: :datetime respect Sequel.datetime_class (jeremyevans)

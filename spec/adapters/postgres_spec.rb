@@ -47,6 +47,21 @@ describe "PostgreSQL", '#create_table' do
   end
   after do
     @db.drop_table?(:tmp_dolls, :unlogged_dolls)
+    @db.default_string_column_size = nil
+  end
+
+  it "should support multiple types of string columns" do
+    @db.default_string_column_size = 50
+    @db.create_table(:tmp_dolls) do
+      String :a1
+      String :a2, :size=>10
+      String :a3, :fixed=>true
+      String :a4, :fixed=>true, :size=>10
+      String :a5, :text=>false
+      String :a6, :text=>false, :size=>10
+      String :a7, :text=>true
+    end
+    @db.schema(:tmp_dolls).map{|k, v| v[:max_length]}.must_equal [nil, 10, 50, 10, 50, 10, nil]
   end
 
   it "should support range partitioned tables for single columns with :partition_* options" do

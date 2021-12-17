@@ -1504,9 +1504,9 @@ module Sequel
         if column[:text]
           :text
         elsif column[:fixed]
-          "char(#{column[:size]||255})"
+          "char(#{column[:size]||default_string_column_size})"
         elsif column[:text] == false || column[:size]
-          "varchar(#{column[:size]||255})"
+          "varchar(#{column[:size]||default_string_column_size})"
         else
           :text
         end
