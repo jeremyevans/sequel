@@ -394,6 +394,11 @@ module Sequel
 
     private
 
+    # Return a hash of date information parsed from the given string.
+    def _date_parse(string)
+      Date._parse(string)
+    end
+
     # Helper method that the database adapter class methods that are added to Sequel via
     # metaprogramming use to parse arguments.
     def adapter_method(adapter, *args, &block)

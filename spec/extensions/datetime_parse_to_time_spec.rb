@@ -170,4 +170,22 @@ describe "datetime_parse_to_time extension" do
     Sequel.application_timezone.must_equal :utc
     Sequel.typecast_timezone.must_equal :utc
   end
+
+  it "should work date_parse_input_handler extension" do
+    Sequel.database_to_application_timestamp("2020-11-12 10:20:30").must_equal Time.local(2020, 11, 12, 10, 20, 30)
+
+    begin
+      Sequel.extension :date_parse_input_handler
+      Sequel.database_timezone = :utc
+      Sequel.date_parse_input_handler do |string|
+        raise Sequel::InvalidValue if string.bytesize > 128
+        "2020-" + string
+      end
+
+      Sequel.database_to_application_timestamp("11-12 10:20:30").must_equal Time.utc(2020, 11, 12, 10, 20, 30)
+      proc{Sequel.database_to_application_timestamp("11-12 10:20:30" + " " * 128)}.must_raise Sequel::InvalidValue
+    ensure
+      Sequel.singleton_class.send(:remove_method, :handle_date_parse_input)
+    end
+  end
 end

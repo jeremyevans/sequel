@@ -156,7 +156,7 @@ module Sequel
       case v
       when String
         v2 = Sequel.string_to_datetime(v)
-        if !input_timezone || Date._parse(v).has_key?(:offset)
+        if !input_timezone || _date_parse(v).has_key?(:offset)
           v2
         else
           # Correct for potentially wrong offset if string doesn't include offset

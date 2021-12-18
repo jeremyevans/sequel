@@ -4,6 +4,10 @@
 # for converting the strings to a date (e.g. String#to_date), allowing
 # for backwards compatibility with legacy Sequel code.
 #
+# These methods calls +parse+ on the related class, and as such, can
+# result in denial of service in older versions of Ruby for large
+# untrusted input, and raise exceptions in newer versions of Ruby. 
+#
 # To load the extension:
 #
 #   Sequel.extension :string_date_time

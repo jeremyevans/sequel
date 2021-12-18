@@ -19,7 +19,11 @@ module Sequel::DateTimeParseToTime
   # Use DateTime.parse.to_time to do the conversion if the input a string and is assumed to
   # be in UTC and there is no offset information in the string.
   def convert_input_timestamp(v, input_timezone)
-    if v.is_a?(String) && datetime_class == Time && input_timezone == :utc && !Date._parse(v).has_key?(:offset)
+    if v.is_a?(String) && datetime_class == Time && input_timezone == :utc && !_date_parse(v).has_key?(:offset)
+      # :nocov:
+      # Whether this is fully branch covered depends on the order in which the specs are run.
+      v = handle_date_parse_input(v) if respond_to?(:handle_date_parse_input, true)
+      # :nocov:
       t = DateTime.parse(v).to_time
       case application_timezone
       when nil, :local

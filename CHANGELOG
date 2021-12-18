@@ -1,5 +1,7 @@
 === master
 
+* Add date_parse_input_handler extension for custom handling of input to date parsing methods (jeremyevans)
+
 * Make postgres adapter respect Database#default_string_column_size (jeremyevans)
 
 * Make pg_interval extension work with ActiveSupport 7.0 (jeremyevans)
