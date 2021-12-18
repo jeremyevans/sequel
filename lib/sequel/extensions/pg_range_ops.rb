@@ -188,7 +188,7 @@ end
 if defined?(Sequel::CoreRefinements)
   module Sequel::CoreRefinements
     refine Symbol do
-      include Sequel::Postgres::RangeOpMethods
+      send INCLUDE_METH, Sequel::Postgres::RangeOpMethods
     end
   end
 end

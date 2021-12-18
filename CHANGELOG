@@ -1,5 +1,7 @@
 === master
 
+* Avoid use of deprecated Refinement#include on Ruby 3.1+ (jeremyevans)
+
 * Add date_parse_input_handler extension for custom handling of input to date parsing methods (jeremyevans)
 
 * Make postgres adapter respect Database#default_string_column_size (jeremyevans)

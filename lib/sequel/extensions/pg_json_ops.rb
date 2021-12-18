@@ -744,7 +744,7 @@ end
 if defined?(Sequel::CoreRefinements)
   module Sequel::CoreRefinements
     refine Symbol do
-      include Sequel::Postgres::JSONOpMethods
+      send INCLUDE_METH, Sequel::Postgres::JSONOpMethods
     end
   end
 end

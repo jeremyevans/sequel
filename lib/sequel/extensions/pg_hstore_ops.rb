@@ -406,7 +406,7 @@ end
 if defined?(Sequel::CoreRefinements)
   module Sequel::CoreRefinements
     refine Symbol do
-      include Sequel::Postgres::HStoreOpMethods
+      send INCLUDE_METH, Sequel::Postgres::HStoreOpMethods
     end
   end
 end

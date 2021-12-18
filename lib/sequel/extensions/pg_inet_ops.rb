@@ -197,7 +197,7 @@ end
 if defined?(Sequel::CoreRefinements)
   module Sequel::CoreRefinements
     refine Symbol do
-      include Sequel::Postgres::InetOpMethods
+      send INCLUDE_METH, Sequel::Postgres::InetOpMethods
     end
   end
 end

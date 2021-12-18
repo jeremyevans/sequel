@@ -15,6 +15,10 @@ raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VE
 # :nocov:
 
 module Sequel::CoreRefinements
+  include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
+  INCLUDE_METH = include_meth
+  private_constant :INCLUDE_METH
+
   refine Array do
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, not matching all of the
     # conditions.
@@ -161,8 +165,8 @@ module Sequel::CoreRefinements
   end
 
   refine String do
-    include Sequel::SQL::AliasMethods
-    include Sequel::SQL::CastMethods
+    send include_meth, Sequel::SQL::AliasMethods
+    send include_meth, Sequel::SQL::CastMethods
 
     # Converts a string into a <tt>Sequel::LiteralString</tt>, in order to override string
     # literalization, e.g.:
@@ -189,15 +193,34 @@ module Sequel::CoreRefinements
   end
 
   refine Symbol do
-    include Sequel::SQL::AliasMethods
-    include Sequel::SQL::CastMethods
-    include Sequel::SQL::OrderMethods
-    include Sequel::SQL::BooleanMethods
-    include Sequel::SQL::NumericMethods
-    include Sequel::SQL::QualifyingMethods
-    include Sequel::SQL::StringMethods
-    include Sequel::SQL::SubscriptMethods
-    include Sequel::SQL::ComplexExpressionMethods
+    send include_meth, Sequel::SQL::AliasMethods
+    send include_meth, Sequel::SQL::CastMethods
+    send include_meth, Sequel::SQL::OrderMethods
+    send include_meth, Sequel::SQL::BooleanMethods
+    send include_meth, Sequel::SQL::NumericMethods
+
+    # :nocov:
+    remove_method :* if RUBY_VERSION >= '3.1'
+    # :nocov:
+
+    send include_meth, Sequel::SQL::QualifyingMethods
+    send include_meth, Sequel::SQL::StringMethods
+    send include_meth, Sequel::SQL::SubscriptMethods
+    send include_meth, Sequel::SQL::ComplexExpressionMethods
+
+    # :nocov:
+    if RUBY_VERSION >= '3.1'
+      remove_method :*
+      def *(ce=(arg=false;nil))
+        if arg == false
+          Sequel::SQL::ColumnAll.new(self)
+        else
+          Sequel::SQL::NumericExpression.new(:*, self, ce)
+        end
+      end
+
+    end
+    # :nocov:
 
     # Returns receiver wrapped in an <tt>Sequel::SQL::Identifier</tt>.
     #

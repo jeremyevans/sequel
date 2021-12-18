@@ -51,9 +51,10 @@ module Sequel::S
 
   # :nocov:
   if RUBY_VERSION >= '2.0.0'
+    include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
   # :nocov:
     refine Object do
-      include Sequel::S
+      send include_meth, Sequel::S
     end
   end
 end

@@ -210,7 +210,7 @@ end
 if defined?(Sequel::CoreRefinements)
   module Sequel::CoreRefinements
     refine Symbol do
-      include Sequel::Postgres::PGRowOp::ExpressionMethods
+      send INCLUDE_METH, Sequel::Postgres::PGRowOp::ExpressionMethods
     end
   end
 end
