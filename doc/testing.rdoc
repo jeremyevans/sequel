@@ -113,7 +113,7 @@ The order in which you delete/truncate the tables is important if you are using 
 
 = Testing Sequel Itself
 
-Sequel has multiple separate test suites.  All test suites use minitest/spec, with the minitest-hooks and minitest-shared_description extensions.
+Sequel has multiple separate test suites.  All test suites use minitest/spec, with the minitest-hooks, minitest-global_expectations, and minitest-shared_description extensions.  To install the dependencies necessary to test Sequel, run <tt>gem install --development sequel</tt>.
 
 == rake
 
@@ -144,6 +144,8 @@ The +spec_bin+ rake task runs the specs for bin/sequel.  These use an SQLite3 da
 The <tt>spec_<i>adapter</i></tt> specs run against a real database connection with nothing mocked, and test for correct results.  They are slower than the standard specs, but they will catch errors that are mocked out by the default specs, as well as show issues that only occur on a certain database, adapter, or a combination of the two.
 
 These specs are broken down into two parts.  For each database, there are specific specs that only apply to that database, and these are called the adapter specs.  There are also shared specs that apply to all (or almost all) databases, these are called the integration specs. For database types that don't have specific adapter tests, you can use <tt>rake spec_integration</tt> to just run the shared integration tests.
+
+Each adapter needs a specific gem installed in order to run.  Please see the {connecting to a database guide}[rdoc-ref:doc/opening_databases.rdoc] for which gem you need to install for the adapter you are testing.
 
 == Environment variables
 

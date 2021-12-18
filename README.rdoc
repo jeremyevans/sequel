@@ -880,6 +880,11 @@ raise an error by default:
     end
   end
 
+== Testing Sequel
+
+Please see the {testing guide}[rdoc-ref:doc/testing.rdoc] for recommendations on testing
+applications that use Sequel, as well as the how to run the tests for Sequel itself.
+
 == Sequel Release Policy
 
 New major versions of Sequel do not have a defined release policy, but historically have
