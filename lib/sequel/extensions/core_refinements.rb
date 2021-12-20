@@ -15,7 +15,9 @@ raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VE
 # :nocov:
 
 module Sequel::CoreRefinements
+  # :nocov:
   include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
+  # :nocov:
   INCLUDE_METH = include_meth
   private_constant :INCLUDE_METH
 
