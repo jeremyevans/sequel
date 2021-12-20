@@ -5,7 +5,7 @@ module Sequel
     # The subclasses plugin keeps track of all subclasses of the
     # current model class.  Direct subclasses are available via the
     # subclasses method, and all descendent classes are available via the
-    # descendents method:
+    # descendants method:
     #
     #   c = Class.new(Sequel::Model)
     #   c.plugin :subclasses
@@ -16,7 +16,7 @@ module Sequel
     #   sc1.subclasses  # [ssc1]
     #   sc2.subclasses  # []
     #   ssc1.subclasses # []
-    #   c.descendents   # [sc1, ssc1, sc2]
+    #   c.descendants   # [sc1, ssc1, sc2]
     #
     # You can also finalize the associations and then freeze the classes
     # in all descendent classes.  Doing so is a recommended practice after
@@ -35,9 +35,14 @@ module Sequel
     #   class B < Sequel::Model; end
     #   a # => [A, B]
     module Subclasses
+      NEED_SUBCLASSES = !Object.respond_to?(:subclasses)
+      private_constant :NEED_SUBCLASSES
+
       # Initialize the subclasses instance variable for the model.
       def self.apply(model, &block)
-        model.instance_variable_set(:@subclasses, [])
+        # :nocov:
+        model.instance_variable_set(:@subclasses, [])  if NEED_SUBCLASSES
+        # :nocov:
         model.instance_variable_set(:@on_subclass, block)
       end
 
@@ -46,20 +51,30 @@ module Sequel
         # class created.
         attr_reader :on_subclass
 
-        # All subclasses for the current model.  Does not
-        # include the model itself.
-        attr_reader :subclasses
+        # :nocov:
+        if NEED_SUBCLASSES
+          # All subclasses for the current model.  Does not
+          # include the model itself.
+          attr_reader :subclasses
+        end
+        # :nocov:
 
         # All descendent classes of this model.
-        def descendents
-          Sequel.synchronize{subclasses.dup}.map{|x| [x] + x.send(:descendents)}.flatten
+        def descendants
+          Sequel.synchronize{subclasses.dup}.map{|x| [x] + x.send(:descendants)}.flatten
         end
+
+        # SEQUEL6: Remove
+        alias descendents descendants
 
         # Freeze all descendent classes.  This also finalizes the associations for those
         # classes before freezing.
-        def freeze_descendents
-          descendents.each(&:finalize_associations).each(&:freeze)
+        def freeze_descendants
+          descendants.each(&:finalize_associations).each(&:freeze)
         end
+
+        # SEQUEL6: Remove
+        alias freeze_descendents freeze_descendants
 
         Plugins.inherited_instance_variables(self, :@subclasses=>lambda{|v| []}, :@on_subclass=>nil)
 
@@ -70,7 +85,9 @@ module Sequel
         # in the subclass.
         def inherited(subclass)
           super
-          Sequel.synchronize{subclasses << subclass}
+          # :nocov:
+          Sequel.synchronize{subclasses << subclass} if NEED_SUBCLASSES
+          # :nocov:
           on_subclass.call(subclass) if on_subclass
         end
       end

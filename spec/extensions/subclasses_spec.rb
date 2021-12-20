@@ -10,47 +10,74 @@ describe Sequel::Model, "Subclasses plugin" do
     @c.subclasses.must_equal []
 
     sc1 = Class.new(@c)
+    sc1.object_id
     @c.subclasses.must_equal [sc1]
     sc1.subclasses.must_equal []
 
     sc2 = Class.new(@c)
-    @c.subclasses.must_equal [sc1, sc2]
+    sc2.object_id
+    @c.subclasses.sort_by(&:object_id).must_equal [sc1, sc2]
     sc1.subclasses.must_equal []
     sc2.subclasses.must_equal []
 
     ssc1 = Class.new(sc1)
-    @c.subclasses.must_equal [sc1, sc2]
+    @c.subclasses.sort_by(&:object_id).must_equal [sc1, sc2]
     sc1.subclasses.must_equal [ssc1]
     sc2.subclasses.must_equal []
   end
 
-  it "#descendents should record all descendent subclasses of the given model" do
+  it "#descendants should record all descendent subclasses of the given model" do
+    @c.descendants.must_equal []
+
+    sc1 = Class.new(@c)
+    sc1.object_id
+    @c.descendants.must_equal [sc1]
+    sc1.descendants.must_equal []
+
+    sc2 = Class.new(@c)
+    sc2.object_id
+    @c.descendants.sort_by(&:object_id).must_equal [sc1, sc2]
+    sc1.descendants.must_equal []
+    sc2.descendants.must_equal []
+
+    ssc1 = Class.new(sc1)
+    ssc1.object_id
+    @c.descendants.sort_by(&:object_id).must_equal [sc1, sc2, ssc1]
+    sc1.descendants.must_equal [ssc1]
+    sc2.descendants.must_equal []
+    ssc1.descendants.must_equal []
+
+    sssc1 = Class.new(ssc1)
+    sssc1.object_id
+    @c.descendants.sort_by(&:object_id).must_equal [sc1, sc2, ssc1, sssc1]
+    sc1.descendants.must_equal [ssc1, sssc1]
+    sc2.descendants.must_equal []
+    ssc1.descendants.must_equal [sssc1]
+    sssc1.descendants.must_equal []
+  end
+
+  it "#descendents should be an alias of descendants" do
     @c.descendents.must_equal []
 
     sc1 = Class.new(@c)
     @c.descendents.must_equal [sc1]
     sc1.descendents.must_equal []
-
-    sc2 = Class.new(@c)
-    @c.descendents.must_equal [sc1, sc2]
-    sc1.descendents.must_equal []
-    sc2.descendents.must_equal []
-
-    ssc1 = Class.new(sc1)
-    @c.descendents.must_equal [sc1, ssc1, sc2]
-    sc1.descendents.must_equal [ssc1]
-    sc2.descendents.must_equal []
-    ssc1.descendents.must_equal []
-
-    sssc1 = Class.new(ssc1)
-    @c.descendents.must_equal [sc1, ssc1, sssc1, sc2]
-    sc1.descendents.must_equal [ssc1, sssc1]
-    sc2.descendents.must_equal []
-    ssc1.descendents.must_equal [sssc1]
-    sssc1.descendents.must_equal []
   end
 
-  it "#freeze_descendents should finalize the associations for all descendents" do
+  it "#freeze_descendants should finalize the associations for all descendants" do
+    sc1 = Class.new(@c)
+    sc1.set_dataset :bars
+    sc1.set_primary_key :foo
+    sc2 = Class.new(@c)
+    sc2.set_dataset :bazs
+    sc2.many_to_one :bar, :class=>sc1
+    @c.freeze_descendants
+    sc1.frozen?.must_equal true
+    sc2.frozen?.must_equal true
+    sc2.association_reflection(:bar)[:primary_key].must_equal :foo
+  end
+
+  it "#freeze_descendents should be an alias of freeze_descendants" do
     sc1 = Class.new(@c)
     sc1.set_dataset :bars
     sc1.set_primary_key :foo

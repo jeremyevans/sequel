@@ -1,5 +1,9 @@
 === master
 
+* Use Class#subclasses if available in the subclasses plugin, instead of a custom Model.subclasses accessor (jeremyevans)
+
+* Add Model.descendants and .freeze_descendants to subclasses plugin (jeremyevans)
+
 * Avoid use of deprecated Refinement#include on Ruby 3.1+ (jeremyevans)
 
 * Add date_parse_input_handler extension for custom handling of input to date parsing methods (jeremyevans)

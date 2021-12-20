@@ -313,7 +313,7 @@ module Sequel
             {}
           end
 
-          ([self] + descendents).each do |sc|
+          ([self] + descendants).each do |sc|
             next if sc.associations.empty? || !sc.name
             module_mapping[sc.send(:overridable_methods_module)] = sc
             cov_data = coverage_data[sc.name] ||= {''=>[]}
@@ -348,7 +348,7 @@ module Sequel
 
           unused_associations_data = {}
 
-          ([self] + descendents).each do |sc|
+          ([self] + descendants).each do |sc|
             next unless cov_data = coverage_data[sc.name]
             reflection_data = cov_data[''] || []
 
