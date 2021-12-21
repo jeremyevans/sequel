@@ -10,18 +10,18 @@ describe Sequel::Model, "Subclasses plugin" do
     @c.subclasses.must_equal []
 
     sc1 = Class.new(@c)
-    sc1.object_id
+    def sc1.name; 'A'; end
     @c.subclasses.must_equal [sc1]
     sc1.subclasses.must_equal []
 
     sc2 = Class.new(@c)
-    sc2.object_id
-    @c.subclasses.sort_by(&:object_id).must_equal [sc1, sc2]
+    def sc2.name; 'B'; end
+    @c.subclasses.sort_by(&:name).must_equal [sc1, sc2]
     sc1.subclasses.must_equal []
     sc2.subclasses.must_equal []
 
     ssc1 = Class.new(sc1)
-    @c.subclasses.sort_by(&:object_id).must_equal [sc1, sc2]
+    @c.subclasses.sort_by(&:name).must_equal [sc1, sc2]
     sc1.subclasses.must_equal [ssc1]
     sc2.subclasses.must_equal []
   end
@@ -30,26 +30,26 @@ describe Sequel::Model, "Subclasses plugin" do
     @c.descendants.must_equal []
 
     sc1 = Class.new(@c)
-    sc1.object_id
+    def sc1.name; 'A'; end
     @c.descendants.must_equal [sc1]
     sc1.descendants.must_equal []
 
     sc2 = Class.new(@c)
-    sc2.object_id
-    @c.descendants.sort_by(&:object_id).must_equal [sc1, sc2]
+    def sc2.name; 'B'; end
+    @c.descendants.sort_by(&:name).must_equal [sc1, sc2]
     sc1.descendants.must_equal []
     sc2.descendants.must_equal []
 
     ssc1 = Class.new(sc1)
-    ssc1.object_id
-    @c.descendants.sort_by(&:object_id).must_equal [sc1, sc2, ssc1]
+    def ssc1.name; 'C'; end
+    @c.descendants.sort_by(&:name).must_equal [sc1, sc2, ssc1]
     sc1.descendants.must_equal [ssc1]
     sc2.descendants.must_equal []
     ssc1.descendants.must_equal []
 
     sssc1 = Class.new(ssc1)
-    sssc1.object_id
-    @c.descendants.sort_by(&:object_id).must_equal [sc1, sc2, ssc1, sssc1]
+    def sssc1.name; 'D'; end
+    @c.descendants.sort_by(&:name).must_equal [sc1, sc2, ssc1, sssc1]
     sc1.descendants.must_equal [ssc1, sssc1]
     sc2.descendants.must_equal []
     ssc1.descendants.must_equal [sssc1]
