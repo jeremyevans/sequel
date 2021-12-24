@@ -648,7 +648,7 @@ describe Sequel::Model, "pg_array_associations" do
     @o1.tag_ids.must_equal []
     @db.sqls.must_equal []
     @o1.save_changes
-    @db.sqls.must_equal ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
+    @db.sqls.must_equal ["UPDATE artists SET tag_ids = '{}' WHERE (id = 1)"]
 
     @o2.remove_all_artists
     @db.sqls.must_equal ["UPDATE artists SET tag_ids = array_remove(tag_ids, CAST(2 AS integer)) WHERE (tag_ids @> ARRAY[2]::integer[])"]
@@ -660,7 +660,7 @@ describe Sequel::Model, "pg_array_associations" do
     @o1.tag_ids.must_equal []
     @db.sqls.must_equal []
     @o1.save_changes
-    @db.sqls.must_equal ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
+    @db.sqls.must_equal ["UPDATE artists SET tag_ids = '{}' WHERE (id = 1)"]
 
     @o2.remove_all_artists
     @db.sqls.must_equal ["UPDATE artists SET tag_ids = array_remove(tag_ids, CAST(2 AS bigint)) WHERE (tag_ids @> ARRAY[2]::bigint[])"]
@@ -691,7 +691,7 @@ describe Sequel::Model, "pg_array_associations" do
 
     @o1.remove_all_tags
     @o1.tag_ids.must_equal []
-    @db.sqls.must_equal ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
+    @db.sqls.must_equal ["UPDATE artists SET tag_ids = '{}' WHERE (id = 1)"]
   end
 
   it "should have association modification methods deal with nil values" do

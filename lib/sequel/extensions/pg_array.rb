@@ -446,7 +446,7 @@ module Sequel
       # database array type.
       def sql_literal_append(ds, sql)
         at = array_type
-        if empty? && at
+        if empty?
           sql << "'{}'"
         else
           sql << "ARRAY"

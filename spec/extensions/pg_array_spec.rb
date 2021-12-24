@@ -144,7 +144,7 @@ describe "pg_array extension" do
   end
 
   it "should literalize arrays without types correctly" do
-    @db.literal(@m::PGArray.new([])).must_equal 'ARRAY[]'
+    @db.literal(@m::PGArray.new([])).must_equal "'{}'"
     @db.literal(@m::PGArray.new([1])).must_equal 'ARRAY[1]'
     @db.literal(@m::PGArray.new([nil])).must_equal 'ARRAY[NULL]'
     @db.literal(@m::PGArray.new([nil, 1])).must_equal 'ARRAY[NULL,1]'
@@ -395,6 +395,6 @@ describe "pg_array extension" do
 
   it "should convert ruby arrays to pg arrays as :default option values" do
     @db.create_table('a'){column :b, 'c[]', :default=>[]; Integer :d}
-    @db.sqls.must_equal ['CREATE TABLE a (b c[] DEFAULT (ARRAY[]::c[]), d integer)']
+    @db.sqls.must_equal ["CREATE TABLE a (b c[] DEFAULT ('{}'::c[]), d integer)"]
   end
 end
