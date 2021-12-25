@@ -1,4 +1,4 @@
-# This file is only used for TravisCI integration.
+# This file is only used for CI.
 
 source 'http://rubygems.org'
 
