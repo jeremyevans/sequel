@@ -65,6 +65,8 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
   end
 
   it "should include association inspect output if an exception would be raised" do
+    skip "skipping due to error_highlight bug in Ruby 3.1.0" if RUBY_VERSION == '3.1.0'
+
     r = @c.many_to_one(:c)
 
     begin
