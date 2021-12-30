@@ -1,4 +1,4 @@
-=== master
+=== 5.52.0 (2022-01-01)
 
 * Use Class#subclasses if available in the subclasses plugin, instead of a custom Model.subclasses accessor (jeremyevans)
 
