@@ -58,14 +58,22 @@ Sequel::PrettyTable
 
 <p>Prints nice-looking plain-text tables via puts</p>
 
-<pre>+--+-------+&#x000A;|id|name   |&#x000A;|--+-------|&#x000A;|1 |fasdfas|&#x000A;|2 |test   |&#x000A;+--+-------+</pre>
+<pre>+--+-------+
+|id|name   |
+|--+-------|
+|1 |fasdfas|
+|2 |test   |
++--+-------+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-print-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-print-source'>   <span class="ruby-comment"># File lib/sequel/extensions/_pretty_table.rb</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">print</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">25</span>   <span class="ruby-identifier">puts</span> <span class="ruby-identifier">string</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-print-source'>   <span class="ruby-comment"># File lib/sequel/extensions/_pretty_table.rb</span>
+<span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">print</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">25</span>   <span class="ruby-identifier">puts</span> <span class="ruby-identifier">string</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span>)
+<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-string'>
@@ -83,7 +91,17 @@ Sequel::PrettyTable
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-string-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-string-source'>   <span class="ruby-comment"># File lib/sequel/extensions/_pretty_table.rb</span>&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span> = <span class="ruby-keyword">nil</span>) <span class="ruby-comment"># records is an array of hashes</span>&#x000A;<span class="line-num">30</span>   <span class="ruby-identifier">columns</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">records</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">sort</span>&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">sizes</span> = <span class="ruby-identifier">column_sizes</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">32</span>   <span class="ruby-identifier">sep_line</span> = <span class="ruby-identifier">separator_line</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sizes</span>)&#x000A;<span class="line-num">33</span> &#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">array</span> = [<span class="ruby-identifier">sep_line</span>, <span class="ruby-identifier">header_line</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sizes</span>), <span class="ruby-identifier">sep_line</span>]&#x000A;<span class="line-num">35</span>   <span class="ruby-identifier">records</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">array</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">data_line</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sizes</span>, <span class="ruby-identifier">r</span>)}&#x000A;<span class="line-num">36</span>   <span class="ruby-identifier">array</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sep_line</span>&#x000A;<span class="line-num">37</span>   <span class="ruby-identifier">array</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-string-source'>   <span class="ruby-comment"># File lib/sequel/extensions/_pretty_table.rb</span>
+<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span> = <span class="ruby-keyword">nil</span>) <span class="ruby-comment"># records is an array of hashes</span>
+<span class="line-num">30</span>   <span class="ruby-identifier">columns</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">records</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">sort</span>
+<span class="line-num">31</span>   <span class="ruby-identifier">sizes</span> = <span class="ruby-identifier">column_sizes</span>(<span class="ruby-identifier">records</span>, <span class="ruby-identifier">columns</span>)
+<span class="line-num">32</span>   <span class="ruby-identifier">sep_line</span> = <span class="ruby-identifier">separator_line</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sizes</span>)
+<span class="line-num">33</span> 
+<span class="line-num">34</span>   <span class="ruby-identifier">array</span> = [<span class="ruby-identifier">sep_line</span>, <span class="ruby-identifier">header_line</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sizes</span>), <span class="ruby-identifier">sep_line</span>]
+<span class="line-num">35</span>   <span class="ruby-identifier">records</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">array</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">data_line</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">sizes</span>, <span class="ruby-identifier">r</span>)}
+<span class="line-num">36</span>   <span class="ruby-identifier">array</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sep_line</span>
+<span class="line-num">37</span>   <span class="ruby-identifier">array</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
+<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -95,7 +113,7 @@ Sequel::PrettyTable
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

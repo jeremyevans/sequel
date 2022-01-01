@@ -43,7 +43,7 @@ Superclass:
 
 <p><a href="CreateTableGenerator.html"><code>Schema::CreateTableGenerator</code></a> has some methods but also includes <a href="CreateTableGenerator.html#method-i-method_missing"><code>method_missing</code></a>, allowing users to specify column type as a method instead of using the column method, which makes for a nicer DSL.</p>
 
-<p>For more information on Sequel&#39;s support for schema modification, see the <a href="../../../files/doc/schema_modification_rdoc.html">“Schema Modification” guide</a>.</p>
+<p>For more information on Sequel’s support for schema modification, see the <a href="../../../files/doc/schema_modification_rdoc.html">“Schema Modification” guide</a>.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -144,7 +144,21 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-add_type_method-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-add_type_method-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">add_type_method</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">types</span>)&#x000A;<span class="line-num">60</span>   <span class="ruby-identifier">types</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">type</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">61</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">62</span>     <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>&#x000A;<span class="line-num">63</span>       <span class="ruby-identifier">method</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">64</span>       <span class="ruby-identifier">type</span> = <span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">65</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">66</span>       <span class="ruby-identifier">method</span> = <span class="ruby-identifier">type</span>.<span class="ruby-identifier">to_s</span>&#x000A;<span class="line-num">67</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">68</span> &#x000A;<span class="line-num">69</span>     <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">method</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span><span class="ruby-operator">|</span> <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>)}&#x000A;<span class="line-num">70</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-add_type_method-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">add_type_method</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">types</span>)
+<span class="line-num">60</span>   <span class="ruby-identifier">types</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">type</span><span class="ruby-operator">|</span>
+<span class="line-num">61</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
+<span class="line-num">62</span>     <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>
+<span class="line-num">63</span>       <span class="ruby-identifier">method</span> = <span class="ruby-identifier">type</span>
+<span class="line-num">64</span>       <span class="ruby-identifier">type</span> = <span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">65</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">66</span>       <span class="ruby-identifier">method</span> = <span class="ruby-identifier">type</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">67</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">68</span> 
+<span class="line-num">69</span>     <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">method</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span><span class="ruby-operator">|</span> <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>)}
+<span class="line-num">70</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">71</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-new'>
@@ -162,7 +176,15 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">35</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="line-num">36</span>   <span class="ruby-ivar">@columns</span> = []&#x000A;<span class="line-num">37</span>   <span class="ruby-ivar">@indexes</span> = []&#x000A;<span class="line-num">38</span>   <span class="ruby-ivar">@constraints</span> = []&#x000A;<span class="line-num">39</span>   <span class="ruby-ivar">@primary_key</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">35</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
+<span class="line-num">36</span>   <span class="ruby-ivar">@columns</span> = []
+<span class="line-num">37</span>   <span class="ruby-ivar">@indexes</span> = []
+<span class="line-num">38</span>   <span class="ruby-ivar">@constraints</span> = []
+<span class="line-num">39</span>   <span class="ruby-ivar">@primary_key</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">40</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -181,7 +203,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-Bignum-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-Bignum-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Bignum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-value">:Bignum</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-Bignum-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Bignum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">46</span>   <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-value">:Bignum</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-Fixnum'>
@@ -199,7 +224,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-Fixnum-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-Fixnum-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Fixnum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-Fixnum-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Fixnum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">52</span>   <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-check'>
@@ -212,14 +240,19 @@ Superclass:
 
 <p>Add an unnamed constraint, specified by the given block or args:</p>
 
-<pre class="ruby"><span class="ruby-identifier">check</span>(<span class="ruby-value">num:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>) <span class="ruby-comment"># CHECK num &gt;= 1 AND num &lt;= 5</span>&#x000A;<span class="ruby-identifier">check</span>{<span class="ruby-identifier">num</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}   <span class="ruby-comment"># CHECK num &gt; 5</span></pre>
+<pre class="ruby"><span class="ruby-identifier">check</span>(<span class="ruby-value">num:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>) <span class="ruby-comment"># CHECK num &gt;= 1 AND num &lt;= 5</span>
+<span class="ruby-identifier">check</span>{<span class="ruby-identifier">num</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}   <span class="ruby-comment"># CHECK num &gt; 5</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-check-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-check-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">80</span>   <span class="ruby-identifier">constraint</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-check-source'>   <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">80</span>   <span class="ruby-identifier">constraint</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-column'>
@@ -232,11 +265,21 @@ Superclass:
 
 <p>Add a column with the given name, type, and opts:</p>
 
-<pre class="ruby"><span class="ruby-identifier">column</span> <span class="ruby-value">:num</span>, <span class="ruby-value">:integer</span>&#x000A;<span class="ruby-comment"># num INTEGER</span>&#x000A;&#x000A;<span class="ruby-identifier">column</span> <span class="ruby-value">:name</span>, <span class="ruby-constant">String</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>, <span class="ruby-value">default:</span> <span class="ruby-string">&#39;a&#39;</span>&#x000A;<span class="ruby-comment"># name varchar(255) NOT NULL DEFAULT &#39;a&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">inet</span> <span class="ruby-value">:ip</span>&#x000A;<span class="ruby-comment"># ip inet</span></pre>
+<pre class="ruby"><span class="ruby-identifier">column</span> <span class="ruby-value">:num</span>, <span class="ruby-value">:integer</span>
+<span class="ruby-comment"># num INTEGER</span>
+
+<span class="ruby-identifier">column</span> <span class="ruby-value">:name</span>, <span class="ruby-constant">String</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>, <span class="ruby-value">default:</span> <span class="ruby-string">&#39;a&#39;</span>
+<span class="ruby-comment"># name varchar(255) NOT NULL DEFAULT &#39;a&#39;</span>
+
+<span class="ruby-identifier">inet</span> <span class="ruby-value">:ip</span>
+<span class="ruby-comment"># ip inet</span>
+</pre>
 
 <p>You can also create columns via method missing, so the following are equivalent:</p>
 
-<pre class="ruby"><span class="ruby-identifier">column</span> <span class="ruby-value">:number</span>, <span class="ruby-value">:integer</span>&#x000A;<span class="ruby-identifier">integer</span> <span class="ruby-value">:number</span></pre>
+<pre class="ruby"><span class="ruby-identifier">column</span> <span class="ruby-value">:number</span>, <span class="ruby-value">:integer</span>
+<span class="ruby-identifier">integer</span> <span class="ruby-value">:number</span>
+</pre>
 
 <p>The following options are supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:collate </td><td>
@@ -293,7 +336,14 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-column-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-column-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">155</span>   <span class="ruby-identifier">columns</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">156</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">index_opts</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:index</span>]&#x000A;<span class="line-num">157</span>     <span class="ruby-identifier">index</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">index_opts</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">index_opts</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">158</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">159</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-column-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">155</span>   <span class="ruby-identifier">columns</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">156</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">index_opts</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:index</span>]
+<span class="line-num">157</span>     <span class="ruby-identifier">index</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">index_opts</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">index_opts</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>)
+<span class="line-num">158</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">159</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-constraint'>
@@ -306,7 +356,11 @@ Superclass:
 
 <p>Adds a named CHECK constraint (or unnamed if name is nil), with the given block or args. To provide options for the constraint, pass a hash as the first argument.</p>
 
-<pre class="ruby"><span class="ruby-identifier">constraint</span>(<span class="ruby-value">:blah</span>, <span class="ruby-value">num:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># CONSTRAINT blah CHECK num &gt;= 1 AND num &lt;= 5</span>&#x000A;<span class="ruby-identifier">constraint</span>({<span class="ruby-value">name:</span> <span class="ruby-value">:blah</span>, <span class="ruby-value">deferrable:</span> <span class="ruby-keyword">true</span>}, <span class="ruby-value">num:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># CONSTRAINT blah CHECK num &gt;= 1 AND num &lt;= 5 DEFERRABLE INITIALLY DEFERRED</span></pre>
+<pre class="ruby"><span class="ruby-identifier">constraint</span>(<span class="ruby-value">:blah</span>, <span class="ruby-value">num:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)
+<span class="ruby-comment"># CONSTRAINT blah CHECK num &gt;= 1 AND num &lt;= 5</span>
+<span class="ruby-identifier">constraint</span>({<span class="ruby-value">name:</span> <span class="ruby-value">:blah</span>, <span class="ruby-value">deferrable:</span> <span class="ruby-keyword">true</span>}, <span class="ruby-value">num:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)
+<span class="ruby-comment"># CONSTRAINT blah CHECK num &gt;= 1 AND num &lt;= 5 DEFERRABLE INITIALLY DEFERRED</span>
+</pre>
 
 <p>If the first argument is a hash, the following options are supported:</p>
 
@@ -327,7 +381,12 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-constraint-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-constraint-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">180</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>}&#x000A;<span class="line-num">181</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:check</span>, <span class="ruby-value">:check</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">182</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-constraint-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">180</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>}
+<span class="line-num">181</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:check</span>, <span class="ruby-value">:check</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">args</span>)
+<span class="line-num">182</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-foreign_key'>
@@ -340,7 +399,11 @@ Superclass:
 
 <p>Add a foreign key in the table that references another table. See <a href="CreateTableGenerator.html#method-i-column"><code>column</code></a> for available options.</p>
 
-<pre class="ruby"><span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>) <span class="ruby-comment"># artist_id INTEGER</span>&#x000A;<span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>) <span class="ruby-comment"># artist_id INTEGER REFERENCES artists</span>&#x000A;<span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:id</span>) <span class="ruby-comment"># artist_id INTEGER REFERENCES artists(id)</span>&#x000A;<span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">type:</span> <span class="ruby-constant">String</span>) <span class="ruby-comment"># artist_id varchar(255) REFERENCES artists(id)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>) <span class="ruby-comment"># artist_id INTEGER</span>
+<span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>) <span class="ruby-comment"># artist_id INTEGER REFERENCES artists</span>
+<span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:id</span>) <span class="ruby-comment"># artist_id INTEGER REFERENCES artists(id)</span>
+<span class="ruby-identifier">foreign_key</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">type:</span> <span class="ruby-constant">String</span>) <span class="ruby-comment"># artist_id varchar(255) REFERENCES artists(id)</span>
+</pre>
 
 <p>Additional Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:foreign_key_constraint_name </td><td>
@@ -349,14 +412,28 @@ Superclass:
 
 <p>If you want a foreign key constraint without adding a column (usually because it is a composite foreign key), you can provide an array of columns as the first argument, and you can provide the :name option to name the constraint:</p>
 
-<pre class="ruby"><span class="ruby-identifier">foreign_key</span>([<span class="ruby-value">:artist_name</span>, <span class="ruby-value">:artist_location</span>], <span class="ruby-value">:artists</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:artist_fk</span>)&#x000A;<span class="ruby-comment"># ADD CONSTRAINT artist_fk FOREIGN KEY (artist_name, artist_location) REFERENCES artists</span></pre>
+<pre class="ruby"><span class="ruby-identifier">foreign_key</span>([<span class="ruby-value">:artist_name</span>, <span class="ruby-value">:artist_location</span>], <span class="ruby-value">:artists</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:artist_fk</span>)
+<span class="ruby-comment"># ADD CONSTRAINT artist_fk FOREIGN KEY (artist_name, artist_location) REFERENCES artists</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-foreign_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-foreign_key-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">table</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">204</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">table</span>&#x000A;<span class="line-num">205</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;<span class="line-num">206</span>     <span class="ruby-identifier">table</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">207</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">NilClass</span>&#x000A;<span class="line-num">208</span>     <span class="ruby-identifier">opts</span>&#x000A;<span class="line-num">209</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">210</span>     <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table</span>)&#x000A;<span class="line-num">211</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">212</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">composite_foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="line-num">213</span>   <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">214</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-foreign_key-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">203</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">table</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">204</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">table</span>
+<span class="line-num">205</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
+<span class="line-num">206</span>     <span class="ruby-identifier">table</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">207</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">NilClass</span>
+<span class="line-num">208</span>     <span class="ruby-identifier">opts</span>
+<span class="line-num">209</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">210</span>     <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table</span>)
+<span class="line-num">211</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">212</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">composite_foreign_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">213</span>   <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">214</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-full_text_index'>
@@ -381,7 +458,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-full_text_index-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-full_text_index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">223</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">224</span>   <span class="ruby-identifier">index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:full_text</span>))&#x000A;<span class="line-num">225</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-full_text_index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">223</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">224</span>   <span class="ruby-identifier">index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:full_text</span>))
+<span class="line-num">225</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-has_column-3F'>
@@ -399,7 +479,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-has_column-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-has_column-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">228</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_column?</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">229</span>   <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">name</span>}&#x000A;<span class="line-num">230</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-has_column-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">228</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_column?</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">229</span>   <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">name</span>}
+<span class="line-num">230</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-index'>
@@ -412,7 +495,15 @@ Superclass:
 
 <p>Add an index on the given column(s) with the given options. Examples:</p>
 
-<pre class="ruby"><span class="ruby-identifier">index</span> <span class="ruby-value">:name</span>&#x000A;<span class="ruby-comment"># CREATE INDEX table_name_index ON table (name)</span>&#x000A;&#x000A;<span class="ruby-identifier">index</span> [<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>]&#x000A;<span class="ruby-comment"># CREATE INDEX table_artist_id_name_index ON table (artist_id, name)</span>&#x000A;&#x000A;<span class="ruby-identifier">index</span> [<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>], <span class="ruby-value">name:</span> <span class="ruby-value">:foo</span>&#x000A;<span class="ruby-comment"># CREATE INDEX foo ON table (artist_id, name)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">index</span> <span class="ruby-value">:name</span>
+<span class="ruby-comment"># CREATE INDEX table_name_index ON table (name)</span>
+
+<span class="ruby-identifier">index</span> [<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>]
+<span class="ruby-comment"># CREATE INDEX table_artist_id_name_index ON table (artist_id, name)</span>
+
+<span class="ruby-identifier">index</span> [<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>], <span class="ruby-value">name:</span> <span class="ruby-value">:foo</span>
+<span class="ruby-comment"># CREATE INDEX foo ON table (artist_id, name)</span>
+</pre>
 
 <p>General options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:include </td><td>
@@ -429,9 +520,9 @@ Superclass:
 
 <p>PostgreSQL specific options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:concurrently </td><td>
-<p>Create the index concurrently, so it doesn&#39;t block operations on the table while the index is being built.</p>
+<p>Create the index concurrently, so it doesn’t block operations on the table while the index is being built.</p>
 </td></tr><tr><td class='label'>:if_not_exists </td><td>
-<p>Only create the index if an index of the same name doesn&#39;t already exist.</p>
+<p>Only create the index if an index of the same name doesn’t already exist.</p>
 </td></tr><tr><td class='label'>:opclass </td><td>
 <p>Set an opclass to use for all columns (per-column opclasses require custom <a href="../SQL.html"><code>SQL</code></a>).</p>
 </td></tr><tr><td class='label'>:tablespace </td><td>
@@ -448,7 +539,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-index-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">269</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">270</span>   <span class="ruby-identifier">indexes</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:columns</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">271</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">272</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">269</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">270</span>   <span class="ruby-identifier">indexes</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:columns</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">271</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">272</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-method_missing'>
@@ -466,7 +561,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-method_missing-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-method_missing-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">276</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">277</span>   <span class="ruby-identifier">name</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">278</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-method_missing-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">276</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">277</span>   <span class="ruby-identifier">name</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>
+<span class="line-num">278</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-primary_key'>
@@ -490,14 +588,36 @@ Superclass:
 
 <p>Examples:</p>
 
-<pre>primary_key(:id)&#x000A;primary_key(:id, type: :Bignum, keep_order: true)&#x000A;primary_key([:street_number, :house_number], name: :some constraint_name)</pre>
+<pre>primary_key(:id)
+primary_key(:id, type: :Bignum, keep_order: true)
+primary_key([:street_number, :house_number], name: :some constraint_name)</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-primary_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-primary_key-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">307</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">308</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">composite_primary_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="line-num">309</span>   <span class="ruby-identifier">column</span> = <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">merge</span>({<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>})&#x000A;<span class="line-num">310</span>   &#x000A;<span class="line-num">311</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span>&#x000A;<span class="line-num">312</span>     <span class="ruby-identifier">opts</span> = {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>} <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;<span class="line-num">313</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span>&#x000A;<span class="line-num">314</span>       <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">315</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">316</span>     <span class="ruby-identifier">column</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">317</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">318</span> &#x000A;<span class="line-num">319</span>   <span class="ruby-ivar">@primary_key</span> = <span class="ruby-identifier">column</span>&#x000A;<span class="line-num">320</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>[<span class="ruby-value">:keep_order</span>]&#x000A;<span class="line-num">321</span>     <span class="ruby-identifier">columns</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">column</span>&#x000A;<span class="line-num">322</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">323</span>     <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-identifier">column</span>)&#x000A;<span class="line-num">324</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">325</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">326</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-primary_key-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">307</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">308</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">composite_primary_key</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">309</span>   <span class="ruby-identifier">column</span> = <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">merge</span>({<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>})
+<span class="line-num">310</span>   
+<span class="line-num">311</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span>
+<span class="line-num">312</span>     <span class="ruby-identifier">opts</span> = {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>} <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+<span class="line-num">313</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span>
+<span class="line-num">314</span>       <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>)
+<span class="line-num">315</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">316</span>     <span class="ruby-identifier">column</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">317</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">318</span> 
+<span class="line-num">319</span>   <span class="ruby-ivar">@primary_key</span> = <span class="ruby-identifier">column</span>
+<span class="line-num">320</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>[<span class="ruby-value">:keep_order</span>]
+<span class="line-num">321</span>     <span class="ruby-identifier">columns</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">column</span>
+<span class="line-num">322</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">323</span>     <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-identifier">column</span>)
+<span class="line-num">324</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">325</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">326</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-primary_key_name'>
@@ -515,7 +635,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-primary_key_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-primary_key_name-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">329</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key_name</span>&#x000A;<span class="line-num">330</span>   <span class="ruby-ivar">@primary_key</span>[<span class="ruby-value">:name</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@primary_key</span>&#x000A;<span class="line-num">331</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-primary_key_name-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">329</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key_name</span>
+<span class="line-num">330</span>   <span class="ruby-ivar">@primary_key</span>[<span class="ruby-value">:name</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@primary_key</span>
+<span class="line-num">331</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-respond_to_missing-3F'>
@@ -533,7 +656,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-respond_to_missing-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-respond_to_missing-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">281</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">respond_to_missing?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">include_private</span>)&#x000A;<span class="line-num">282</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">283</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-respond_to_missing-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">281</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">respond_to_missing?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">include_private</span>)
+<span class="line-num">282</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">283</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-spatial_index'>
@@ -551,7 +677,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-spatial_index-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-spatial_index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">335</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">spatial_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">336</span>   <span class="ruby-identifier">index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:spatial</span>))&#x000A;<span class="line-num">337</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-spatial_index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">335</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">spatial_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">336</span>   <span class="ruby-identifier">index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:spatial</span>))
+<span class="line-num">337</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unique'>
@@ -564,7 +693,8 @@ Superclass:
 
 <p>Add a unique constraint on the given columns.</p>
 
-<pre class="ruby"><span class="ruby-identifier">unique</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># UNIQUE (name)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">unique</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># UNIQUE (name)</span>
+</pre>
 
 <p>Supports the same :deferrable option as <a href="CreateTableGenerator.html#method-i-column"><code>column</code></a>. The :name option can be used to name the constraint.</p>
 
@@ -573,7 +703,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unique-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unique-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>&#x000A;<span class="line-num">345</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unique</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">346</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:unique</span>, <span class="ruby-value">:columns</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">347</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">348</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unique-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
+<span class="line-num">345</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unique</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">346</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:unique</span>, <span class="ruby-value">:columns</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>)}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">347</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">348</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -585,7 +719,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

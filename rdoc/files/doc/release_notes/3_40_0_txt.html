@@ -57,7 +57,7 @@ Last Update:
 </li><li>
 <p>Sequel::Postgres::HStore instances can now be marshalled.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses clob for String :text=&gt;true types on databases that don&#39;t support a text type.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses clob for String :text=&gt;true types on databases that don’t support a text type.</p>
 </li><li>
 <p>On PostgreSQL, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now quotes channel identifier names when using LISTEN/NOTIFY.</p>
 </li><li>
@@ -69,12 +69,12 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now detects more types of disconnections in the postgres, mysql, and mysql2 adapters.</p>
 </li><li>
-<p>If a database provides a default column value that isn&#39;t a ruby string, it is used directly as the ruby default, instead of causing the schema parsing to fail.</p>
+<p>If a database provides a default column value that isn’t a ruby string, it is used directly as the ruby default, instead of causing the schema parsing to fail.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Code using Sequel&#39;s oracle adapter that expected clob values to be returned as OCI8::CLOB instances needs to be modified to work with ruby strings.</p>
+<p>Code using Sequel’s oracle adapter that expected clob values to be returned as OCI8::CLOB instances needs to be modified to work with ruby strings.</p>
 </li><li>
 <p>Because <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now quotes column names in common table expressions, those names are now case sensitive, which could break certain poorly coded queries.  Similar issues exist with the quoting of channel identifier names in LISTEN/NOTIFY on PostgreSQL.</p>
 </li><li>
@@ -92,7 +92,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

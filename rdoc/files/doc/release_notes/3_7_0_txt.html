@@ -43,7 +43,18 @@ Last Update:
 
 <p>This allows you to do:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:a</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:a</span>; <span class="ruby-constant">Integer</span> <span class="ruby-value">:d</span>}&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:b</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:b</span>; <span class="ruby-constant">Integer</span> <span class="ruby-value">:e</span>}&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:c</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:c</span>; <span class="ruby-constant">Integer</span> <span class="ruby-value">:f</span>}&#x000A;&#x000A;<span class="ruby-comment"># Insert some rows</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>).&#x000A;  <span class="ruby-identifier">join</span>(<span class="ruby-value">:c</span>, <span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:e</span>.<span class="ruby-identifier">identifier</span>).&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:f</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">6</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">10</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:f</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>).<span class="ruby-identifier">delete</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:a</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:a</span>; <span class="ruby-constant">Integer</span> <span class="ruby-value">:d</span>}
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:b</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:b</span>; <span class="ruby-constant">Integer</span> <span class="ruby-value">:e</span>}
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:c</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:c</span>; <span class="ruby-constant">Integer</span> <span class="ruby-value">:f</span>}
+
+<span class="ruby-comment"># Insert some rows</span>
+
+<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>).
+  <span class="ruby-identifier">join</span>(<span class="ruby-value">:c</span>, <span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:e</span>.<span class="ruby-identifier">identifier</span>).
+  <span class="ruby-identifier">where</span>(<span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:f</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">6</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">10</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:f</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>).<span class="ruby-identifier">delete</span>
+</pre>
 
 <p>Which will set the a column to 10 for all rows in table a, where an associated row in table c (through table b) has a value of 6 for column f.  It will delete rows from table a where an associated row in table c (through table b) has a value of 5 for column f.</p>
 
@@ -57,35 +68,55 @@ Last Update:
 
 <p>Neither of these methods offer any new functionality, they just cut down on the number of required key strokes:</p>
 
-<pre class="ruby"><span class="ruby-identifier">select_map</span>(<span class="ruby-value">:column</span>)       <span class="ruby-comment"># select(:column).map(:column)</span>&#x000A;<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:column</span>) <span class="ruby-comment"># select(:column).order(:column).</span>&#x000A;                          <span class="ruby-comment">#  map(:column)</span>&#x000A;<span class="ruby-identifier">select_hash</span>(<span class="ruby-value">:key_column</span>, <span class="ruby-value">:value_column</span>)&#x000A;<span class="ruby-comment"># select(:key_column, :value_column).</span>&#x000A;<span class="ruby-comment">#  to_hash(:key_column, :value_column)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">select_map</span>(<span class="ruby-value">:column</span>)       <span class="ruby-comment"># select(:column).map(:column)</span>
+<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:column</span>) <span class="ruby-comment"># select(:column).order(:column).</span>
+                          <span class="ruby-comment">#  map(:column)</span>
+<span class="ruby-identifier">select_hash</span>(<span class="ruby-value">:key_column</span>, <span class="ruby-value">:value_column</span>)
+<span class="ruby-comment"># select(:key_column, :value_column).</span>
+<span class="ruby-comment">#  to_hash(:key_column, :value_column)</span>
+</pre>
 </li><li>
 <p>The NULL, NOTNULL, TRUE, SQLTRUE, FALSE, and SQLFALSE constants were added to <a href="../../../classes/Sequel/SQL/Constants.html"><code>Sequel::SQL::Constants</code></a>.  This allows you to do:</p>
 
-<pre class="ruby"><span class="ruby-identifier">include</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Constants</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">NOTNULL</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">include</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Constants</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">NOTNULL</span>)
+</pre>
 
 <p>Previously, the shortest way to do this was:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;1&#39;</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;1&#39;</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>)
+</pre>
 
 <p>It may make the code more descriptive:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">NULL</span>)&#x000A;<span class="ruby-comment"># compared to</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">NULL</span>)
+<span class="ruby-comment"># compared to</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>)
+</pre>
 
 <p>This gives the option to use SQL terminology instead of ruby terminology.</p>
 
 <p>The other advantage of using the constants it that they handle operators and methods like other <a href="../../../classes/Sequel/SQL.html"><code>Sequel::SQL</code></a> objects:</p>
 
-<pre class="ruby"><span class="ruby-constant">NULL</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">SQLFALSE</span> <span class="ruby-comment"># BooleanExpression =&gt; &quot;(NULL AND FALSE)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">false</span>     <span class="ruby-comment"># false</span>&#x000A;&#x000A;<span class="ruby-constant">NULL</span> <span class="ruby-operator">+</span> <span class="ruby-value">:a</span>       <span class="ruby-comment"># NumericExpression =&gt; &quot;(NULL + a)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> <span class="ruby-operator">+</span> <span class="ruby-value">:a</span>        <span class="ruby-comment"># raises NoMethodError</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-value">:a</span>  <span class="ruby-comment"># StringExpression =&gt; &quot;(NULL || a)&quot;</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:b</span>)     <span class="ruby-comment"># AliasedExpression =&gt; &quot;NULL AS b&quot;</span></pre>
+<pre class="ruby"><span class="ruby-constant">NULL</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">SQLFALSE</span> <span class="ruby-comment"># BooleanExpression =&gt; &quot;(NULL AND FALSE)&quot;</span>
+<span class="ruby-keyword">nil</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">false</span>     <span class="ruby-comment"># false</span>
 
-<p>For complex systems that want to represent SQL boolean objects in ruby (where you don&#39;t know exactly how they&#39;ll be used), using the constants is recommended.</p>
+<span class="ruby-constant">NULL</span> <span class="ruby-operator">+</span> <span class="ruby-value">:a</span>       <span class="ruby-comment"># NumericExpression =&gt; &quot;(NULL + a)&quot;</span>
+<span class="ruby-keyword">nil</span> <span class="ruby-operator">+</span> <span class="ruby-value">:a</span>        <span class="ruby-comment"># raises NoMethodError</span>
+<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-value">:a</span>  <span class="ruby-comment"># StringExpression =&gt; &quot;(NULL || a)&quot;</span>
+<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:b</span>)     <span class="ruby-comment"># AliasedExpression =&gt; &quot;NULL AS b&quot;</span>
+</pre>
 
-<p>In order not to be too verbose, including <a href="../../../classes/Sequel/SQL/Constants.html"><code>Sequel::SQL::Constants</code></a> is recommended.  It&#39;s not done by default, but you can still reference the constants under the main <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module by default (e.g. Sequel::NULL).</p>
+<p>For complex systems that want to represent SQL boolean objects in ruby (where you don’t know exactly how they’ll be used), using the constants is recommended.</p>
+
+<p>In order not to be too verbose, including <a href="../../../classes/Sequel/SQL/Constants.html"><code>Sequel::SQL::Constants</code></a> is recommended.  It’s not done by default, but you can still reference the constants under the main <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module by default (e.g. Sequel::NULL).</p>
 </li><li>
-<p>The validates_unique method in the validation_helpers plugin now supports an :only_if_modified option, which should speed up the common case where the unique attribute is not modified for an existing record.  It&#39;s not on by default, since it&#39;s possible the database could be changed between retrieving the model object and updating it.</p>
+<p>The validates_unique method in the validation_helpers plugin now supports an :only_if_modified option, which should speed up the common case where the unique attribute is not modified for an existing record.  It’s not on by default, since it’s possible the database could be changed between retrieving the model object and updating it.</p>
 </li><li>
 <p>The Dataset union, intersect, and except methods now accept an :alias option which is used as the alias for the returned dataset.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:old_table</span>], <span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:table</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:old_table</span>], <span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:table</span>)
+</pre>
 </li><li>
 <p>Model#destroy now supports a :transaction option, similar to Model#save.</p>
 </li><li>
@@ -93,7 +124,10 @@ Last Update:
 
 <p>This makes Oracle work correctly when using models, with something like the following:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sequence</span>(<span class="ruby-value">:seq_albums_id</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">set_dataset</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sequence</span>(<span class="ruby-value">:seq_albums_id</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You currently need to call Dataset#sequence in every model class where the underlying table uses a sequence to generate primary key values.</p>
 </li></ul>
@@ -105,13 +139,14 @@ Last Update:
 </li><li>
 <p>Dataset#group_and_count now handles arguments other than Symbols. A previous change to the method raised an exception if a Symbol was not provided.  It also handles AliasedExpressions natively, so the following works correctly:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">group_and_count</span>(<span class="ruby-value">:column</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">group_and_count</span>(<span class="ruby-value">:column</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>))
+</pre>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer uses native autoreconnection in the mysql adapter. Native autoreconnection has problems with prepared statements, where a new native connection is used behind Sequel&#39;s back, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> thinks the prepared statement has already been defined on the connection, when it fact it hasn&#39;t.  Any other changes that affect the state of the connection will be lost when native autoreconnection is used as well.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer uses native autoreconnection in the mysql adapter. Native autoreconnection has problems with prepared statements, where a new native connection is used behind Sequel’s back, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> thinks the prepared statement has already been defined on the connection, when it fact it hasn’t.  Any other changes that affect the state of the connection will be lost when native autoreconnection is used as well.</p>
 
-<p>Sequel&#39;s connection pool already handles reconnection if it detects a disconnection.  This commit also adds an additional exception message to recognize as a disconnect.  If there other exception messages related to disconnects, please post them on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> mailing list.</p>
+<p>Sequel’s connection pool already handles reconnection if it detects a disconnection.  This commit also adds an additional exception message to recognize as a disconnect.  If there other exception messages related to disconnects, please post them on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> mailing list.</p>
 </li><li>
-<p>The schema_dumper plugin now specifies the :type option for primary key if it isn&#39;t Integer.</p>
+<p>The schema_dumper plugin now specifies the :type option for primary key if it isn’t Integer.</p>
 </li><li>
 <p>On PostgreSQL, the bigserial type is used if :type=&gt;Bignum is given as an option to primary key.  This makes it operate more similarly to other adapters that support autoincrementing 64-bit integer primary keys.</p>
 </li><li>
@@ -144,7 +179,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

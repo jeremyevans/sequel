@@ -38,21 +38,32 @@ Last Update:
 <div id='description'>
 <p>Eager loading for all types of associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:genre</span>, <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:genre</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:year</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2008</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:genre</span>, <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:genre</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:year</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2008</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>).<span class="ruby-identifier">all</span>
+</pre>
 
-<p>Eager loading supports cascading to an unlimited depth, and doesn&#39;t have any aliasing issues:</p>
+<p>Eager loading supports cascading to an unlimited depth, and doesn’t have any aliasing issues:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:tracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:genre</span>}).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:tracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:genre</span>}).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>Unfortunately, eager loading comes at the expense of a small amount of backward compatibility.  If you were using uncached associations (the default in sequel_model 0.5), they no longer work the same way.  Now, all associations act as if :cache=&gt;true (which is now set for all associations, so if you wrote a tool that worked with both cached and uncached associations, it should still work).</p>
 
 <p>One to many associations now populate the corresponding many to one instance variable (even when eagerly loaded):</p>
 
-<pre class="ruby"><span class="ruby-comment"># Assuming: Album.one_to_many :tracks</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># This following code is only one query,</span>&#x000A;<span class="ruby-comment"># not a query for the album and one for each track</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span>}</pre>
+<pre class="ruby"><span class="ruby-comment"># Assuming: Album.one_to_many :tracks</span>
+<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># This following code is only one query,</span>
+<span class="ruby-comment"># not a query for the album and one for each track</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span>}
+</pre>
 
 <p>ActiveRecord style has_many :through associations are now supported via many_to_many.  many_to_many will no longer select the entire result set, just the columns of the associated table (and not the join table), so it works for both has_and_belongs_to_many (simple join table) and has_many :through (join table model) scenarios.  If you want to include all or part of the join table attributes, see the :select option for many_to_many associations.</p>
 
-<p>We reduced the number of gems from three (sequel, sequel_core, sequel_model) to two (sequel, sequel_core).  Basically, sequel_model is now just sequel, and the old sequel gem metapackage is no longer.  There isn&#39;t a reason to have a gem metapackage for two gems when one (sequel_model) depends on the other (sequel_core).  This required a version bump for the model part of sequel from 0.5.0.2 to <a href="1_4_0_txt.html">1.4.0</a> (since the previous sequel gem version was <a href="1_3_txt.html">1.3</a>).</p>
+<p>We reduced the number of gems from three (sequel, sequel_core, sequel_model) to two (sequel, sequel_core).  Basically, sequel_model is now just sequel, and the old sequel gem metapackage is no longer.  There isn’t a reason to have a gem metapackage for two gems when one (sequel_model) depends on the other (sequel_core).  This required a version bump for the model part of sequel from 0.5.0.2 to <a href="1_4_0_txt.html">1.4.0</a> (since the previous sequel gem version was <a href="1_3_txt.html">1.3</a>).</p>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="1_4_0_txt.html">1.4.0</a> has fixes for 11 trackers issues, including fixes to the MySQL and PostgreSQL adapters.</p>
 
@@ -67,7 +78,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

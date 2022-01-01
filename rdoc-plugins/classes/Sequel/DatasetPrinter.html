@@ -62,7 +62,12 @@ Sequel::DatasetPrinter
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-print-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-print-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pretty_table.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">print</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">naked</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">rows</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="line-num">35</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">PrettyTable</span>.<span class="ruby-identifier">print</span>(<span class="ruby-identifier">rows</span>, <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">columns</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">cols</span>)&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-print-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pretty_table.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">print</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)
+<span class="line-num">33</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">naked</span>
+<span class="line-num">34</span>   <span class="ruby-identifier">rows</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>
+<span class="line-num">35</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">PrettyTable</span>.<span class="ruby-identifier">print</span>(<span class="ruby-identifier">rows</span>, <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">columns</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">cols</span>)
+<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +79,7 @@ Sequel::DatasetPrinter
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

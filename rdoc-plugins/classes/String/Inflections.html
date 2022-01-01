@@ -37,7 +37,15 @@ String::Inflections
 <div id='description'>
 <p>This module acts as a singleton returned/yielded by <a href="../String.html#method-c-inflections"><code>String.inflections</code></a>, which is used to override or specify additional inflection rules. Examples:</p>
 
-<pre class="ruby"><span class="ruby-constant">String</span>.<span class="ruby-identifier">inflections</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">inflect</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">plural</span> <span class="ruby-regexp">/^(ox)$/i</span>, <span class="ruby-string">&#39;\1\2en&#39;</span>&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">singular</span> <span class="ruby-regexp">/^(ox)en/i</span>, <span class="ruby-string">&#39;\1&#39;</span>&#x000A;&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;octopus&#39;</span>, <span class="ruby-string">&#39;octopi&#39;</span>&#x000A;&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;equipment&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">String</span>.<span class="ruby-identifier">inflections</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">inflect</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">plural</span> <span class="ruby-regexp">/^(ox)$/i</span>, <span class="ruby-string">&#39;\1\2en&#39;</span>
+  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">singular</span> <span class="ruby-regexp">/^(ox)en/i</span>, <span class="ruby-string">&#39;\1&#39;</span>
+
+  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;octopus&#39;</span>, <span class="ruby-string">&#39;octopi&#39;</span>
+
+  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;equipment&quot;</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>New rules are added at the top. So in the example above, the irregular rule for octopus will now be the first of the pluralization and singularization rules that is runs. This guarantees that your rules run before any of the rules that may already have been loaded.</p>
 </div>
@@ -106,14 +114,24 @@ String::Inflections
 
 <p>Examples:</p>
 
-<pre class="ruby"><span class="ruby-identifier">clear</span> <span class="ruby-value">:all</span>&#x000A;<span class="ruby-identifier">clear</span> <span class="ruby-value">:plurals</span></pre>
+<pre class="ruby"><span class="ruby-identifier">clear</span> <span class="ruby-value">:all</span>
+<span class="ruby-identifier">clear</span> <span class="ruby-value">:plurals</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-clear-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-clear-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">clear</span>(<span class="ruby-identifier">scope</span> = <span class="ruby-value">:all</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>&#x000A;<span class="line-num">53</span>     <span class="ruby-ivar">@plurals</span>, <span class="ruby-ivar">@singulars</span>, <span class="ruby-ivar">@uncountables</span> = [], [], []&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">55</span>     <span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{scope}&quot;</span>, [])&#x000A;<span class="line-num">56</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-clear-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
+<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">clear</span>(<span class="ruby-identifier">scope</span> = <span class="ruby-value">:all</span>)
+<span class="line-num">51</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span>
+<span class="line-num">52</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>
+<span class="line-num">53</span>     <span class="ruby-ivar">@plurals</span>, <span class="ruby-ivar">@singulars</span>, <span class="ruby-ivar">@uncountables</span> = [], [], []
+<span class="line-num">54</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">55</span>     <span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{scope}&quot;</span>, [])
+<span class="line-num">56</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-irregular'>
@@ -128,14 +146,20 @@ String::Inflections
 
 <p>Examples:</p>
 
-<pre class="ruby"><span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;octopus&#39;</span>, <span class="ruby-string">&#39;octopi&#39;</span>&#x000A;<span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;person&#39;</span>, <span class="ruby-string">&#39;people&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;octopus&#39;</span>, <span class="ruby-string">&#39;octopi&#39;</span>
+<span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;person&#39;</span>, <span class="ruby-string">&#39;people&#39;</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-irregular-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-irregular-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">irregular</span>(<span class="ruby-identifier">singular</span>, <span class="ruby-identifier">plural</span>)&#x000A;<span class="line-num">66</span>   <span class="ruby-identifier">plural</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{singular[0,1]})#{singular[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">plural</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])&#x000A;<span class="line-num">67</span>   <span class="ruby-identifier">singular</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{plural[0,1]})#{plural[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">singular</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-irregular-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
+<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">irregular</span>(<span class="ruby-identifier">singular</span>, <span class="ruby-identifier">plural</span>)
+<span class="line-num">66</span>   <span class="ruby-identifier">plural</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{singular[0,1]})#{singular[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">plural</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])
+<span class="line-num">67</span>   <span class="ruby-identifier">singular</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{plural[0,1]})#{plural[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">singular</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-plural'>
@@ -150,14 +174,18 @@ String::Inflections
 
 <p>Example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">plural</span>(<span class="ruby-regexp">/(x|ch|ss|sh)$/i</span>, <span class="ruby-string">&#39;\1es&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">plural</span>(<span class="ruby-regexp">/(x|ch|ss|sh)$/i</span>, <span class="ruby-string">&#39;\1es&#39;</span>)
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-plural-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-plural-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">plural</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)&#x000A;<span class="line-num">76</span>   <span class="ruby-ivar">@plurals</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-plural-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
+<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">plural</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)
+<span class="line-num">76</span>   <span class="ruby-ivar">@plurals</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-singular'>
@@ -172,14 +200,18 @@ String::Inflections
 
 <p>Example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">singular</span>(<span class="ruby-regexp">/([^aeiouy]|qu)ies$/i</span>, <span class="ruby-string">&#39;\1y&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">singular</span>(<span class="ruby-regexp">/([^aeiouy]|qu)ies$/i</span>, <span class="ruby-string">&#39;\1y&#39;</span>)
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-singular-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-singular-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">singular</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)&#x000A;<span class="line-num">85</span>   <span class="ruby-ivar">@singulars</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-singular-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
+<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">singular</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)
+<span class="line-num">85</span>   <span class="ruby-ivar">@singulars</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])
+<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-uncountable'>
@@ -190,18 +222,24 @@ String::Inflections
 </div>
 <div class='description'>
 
-<p>Add uncountable words that shouldn&#39;t be attempted inflected.</p>
+<p>Add uncountable words that shouldn’t be attempted inflected.</p>
 
 <p>Examples:</p>
 
-<pre class="ruby"><span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;money&quot;</span>&#x000A;<span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;money&quot;</span>, <span class="ruby-string">&quot;information&quot;</span>&#x000A;<span class="ruby-identifier">uncountable</span> <span class="ruby-node">%w( money information rice )</span></pre>
+<pre class="ruby"><span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;money&quot;</span>
+<span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;money&quot;</span>, <span class="ruby-string">&quot;information&quot;</span>
+<span class="ruby-identifier">uncountable</span> <span class="ruby-node">%w( money information rice )</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-uncountable-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-uncountable-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>&#x000A;<span class="line-num">94</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">uncountable</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">words</span>)&#x000A;<span class="line-num">95</span>   (<span class="ruby-ivar">@uncountables</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">words</span>).<span class="ruby-identifier">flatten!</span>&#x000A;<span class="line-num">96</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-uncountable-source'>   <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
+<span class="line-num">94</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">uncountable</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">words</span>)
+<span class="line-num">95</span>   (<span class="ruby-ivar">@uncountables</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">words</span>).<span class="ruby-identifier">flatten!</span>
+<span class="line-num">96</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -213,7 +251,7 @@ String::Inflections
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

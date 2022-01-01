@@ -44,13 +44,37 @@ Last Update:
 
 <p>There are two APIs for this optimization framework.  There is a lower level dataset API:</p>
 
-<pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.&#x000A; <span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], <span class="ruby-node">%w&quot;foo bar&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id IN (1, 2)) AND</span>&#x000A;<span class="ruby-comment">#   (name NOT IN (&#39;foo&#39;, &#39;bar&#39;))) LIMIT 1</span></pre>
+<pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.
+ <span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&quot;foo&quot;</span>)
+<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span>
+
+<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], <span class="ruby-node">%w&quot;foo bar&quot;</span>)
+<span class="ruby-comment"># SELECT * FROM items WHERE ((id IN (1, 2)) AND</span>
+<span class="ruby-comment">#   (name NOT IN (&#39;foo&#39;, &#39;bar&#39;))) LIMIT 1</span>
+</pre>
 
 <p>There is also a higher level model API (Model.finder):</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-comment"># Given class method that returns a dataset</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">by_id_and_not_name</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">not_name</span>)&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">not_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Create optimized method that returns first value</span>&#x000A;  <span class="ruby-identifier">finder</span> <span class="ruby-value">:by_id_and_not_name</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Call optimized method</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">first_by_id_and_not_name</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-comment"># Given class method that returns a dataset</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">by_id_and_not_name</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">not_name</span>)
+    <span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">not_name</span>)
+  <span class="ruby-keyword">end</span>
 
-<p>Model.finder defaults to creating a method that returns the first matching row, but using the :type option you can create methods that call each, all, or get.  There is also an option to choose the method name (:name), as well as one to specify the number of arguments to use if the method doesn&#39;t take a fixed number (:arity).</p>
+  <span class="ruby-comment"># Create optimized method that returns first value</span>
+  <span class="ruby-identifier">finder</span> <span class="ruby-value">:by_id_and_not_name</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-comment"># Call optimized method</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">first_by_id_and_not_name</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&#39;foo&#39;</span>)
+<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span>
+</pre>
+
+<p>Model.finder defaults to creating a method that returns the first matching row, but using the :type option you can create methods that call each, all, or get.  There is also an option to choose the method name (:name), as well as one to specify the number of arguments to use if the method doesn’t take a fixed number (:arity).</p>
 
 <p>Finally, Model.find, .first, and .first! now automatically use an optimized finder if given a single argument. Model.[] uses an optimized finder if given a single hash, and Model.[], .with_pk, and .with_pk! use an optimized finder if the model has a composite primary key.  In all of these cases, these methods are about 50% faster than before.</p>
 </li><li>
@@ -66,7 +90,7 @@ Last Update:
 </li><li>
 <p>In the mysql2 adapter, Dataset#paged_each now automatically uses streaming for improved performance, if streaming is supported.</p>
 </li><li>
-<p>Dataset#with_sql_{each,all,first,single_value,insert,update} have been added.  These methods take specific SQL and execute it on the database, returning the appropriate value.  They are significantly faster than the previous approach of with_sql(SQL).{each,all,first,single_value,insert,update}, as they don&#39;t require cloning the dataset.</p>
+<p>Dataset#with_sql_{each,all,first,single_value,insert,update} have been added.  These methods take specific SQL and execute it on the database, returning the appropriate value.  They are significantly faster than the previous approach of with_sql(SQL).{each,all,first,single_value,insert,update}, as they don’t require cloning the dataset.</p>
 </li></ul>
 
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -75,13 +99,17 @@ Last Update:
 </li><li>
 <p>A :hold option has been added to Dataset#use_cursor in the postgres adapter, which uses WITH HOLD in the query, allowing for usage of the cursor outside the enclosing transaction.  When :hold is used, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> does not automatically use a transaction around the cursor call.</p>
 </li><li>
-<p>Dataset#where_current_of has been added to the postgres adapter, for updating rows based on a cursor&#39;s current position.  This can be used to update a large dataset where new values depend on some ruby method, without keeping all rows in memory.</p>
+<p>Dataset#where_current_of has been added to the postgres adapter, for updating rows based on a cursor’s current position.  This can be used to update a large dataset where new values depend on some ruby method, without keeping all rows in memory.</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:huge_table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">use_cursor</span>(<span class="ruby-value">:rows_per_fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ruby_method</span>(<span class="ruby-identifier">row</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:huge_table</span>]
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">use_cursor</span>(<span class="ruby-value">:rows_per_fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ruby_method</span>(<span class="ruby-identifier">row</span>))
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>A current_datetime_timestamp extension has been added, for creating Time/DateTime instances that are literalized as CURRENT_TIMESTAMP.  When the dataset uses this extension, models that use the touch and timestamps plugins will use CURRENT_TIMESTAMP for the timestamps.</p>
 </li><li>
-<p>The jdbc adapter now supports a :driver option, useful when <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn&#39;t have direct support for the underlying driver, and where java.sql.DriverManager.getConnection does not work correctly due to Java class loading issues.</p>
+<p>The jdbc adapter now supports a :driver option, useful when <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t have direct support for the underlying driver, and where java.sql.DriverManager.getConnection does not work correctly due to Java class loading issues.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -92,9 +120,9 @@ Last Update:
 </li><li>
 <p>Database#column_schema_to_ruby_default is now a public method in the schema_dumper extension.</p>
 </li><li>
-<p>When validating associated objects for one_to_many and one_to_one associations in the nested_attributes plugin, don&#39;t remove column values if the association&#39;s foreign key is the associated model&#39;s primary key.</p>
+<p>When validating associated objects for one_to_many and one_to_one associations in the nested_attributes plugin, don’t remove column values if the association’s foreign key is the associated model’s primary key.</p>
 </li><li>
-<p>On PostgreSQL, Dataset#disable_insert_returning has been added back.  This disables the automatic use of RETURNING for INSERTs for the dataset.  This is necessary in cases where INSERT RETURNING doesn&#39;t work, such as PostgreSQL &lt;8.2 (or PostgreSQL variants that forked before 8.2), or when using partitioning with trigger functions, or conditional rules.</p>
+<p>On PostgreSQL, Dataset#disable_insert_returning has been added back.  This disables the automatic use of RETURNING for INSERTs for the dataset.  This is necessary in cases where INSERT RETURNING doesn’t work, such as PostgreSQL &lt;8.2 (or PostgreSQL variants that forked before 8.2), or when using partitioning with trigger functions, or conditional rules.</p>
 
 <p>Note that if you use disable_insert_returning, insert will not return the autoincremented primary key.  You need to call currval or lastval manually using the same connection to get the value, or use nextval to get the value to use before inserting.</p>
 </li><li>
@@ -113,9 +141,9 @@ Last Update:
 </li><li>
 <p>The pg_array extension no longer recognizes the :typecast_method option when registering an array type.  The option allowed reuse of an existing typecast method, but as that results in an incorrect type at the database level, the option was fundementally broken.</p>
 </li><li>
-<p>The internals of the PostgreSQL array parser have changed.  If you were relying on them, you&#39;ll need to update your code.</p>
+<p>The internals of the PostgreSQL array parser have changed.  If you were relying on them, you’ll need to update your code.</p>
 </li><li>
-<p>Dataset#complex_expression_arg_pairs private method now returns nested expression objects instead of an already literalized string in some cases.  Custom adapters that call this method will probably need to be changed.  It&#39;s recommended that such adapters switch to using the new Dataset#complex_expression_emulate_append method if possible.</p>
+<p>Dataset#complex_expression_arg_pairs private method now returns nested expression objects instead of an already literalized string in some cases.  Custom adapters that call this method will probably need to be changed.  It’s recommended that such adapters switch to using the new Dataset#complex_expression_emulate_append method if possible.</p>
 </li></ul>
 </div>
 <div id='context'>
@@ -127,7 +155,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

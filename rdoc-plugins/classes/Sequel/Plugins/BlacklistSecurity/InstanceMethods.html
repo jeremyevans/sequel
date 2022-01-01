@@ -58,14 +58,19 @@ Sequel::Plugins::BlacklistSecurity::InstanceMethods
 
 <p>Set all values using the entries in the hash, except for the keys given in except.  You should probably use <code>set_fields</code> instead of this method, as blacklist approaches to security are a bad idea.</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_except</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:hometown</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_except</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:hometown</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_except-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_except-source'>   <span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;<span class="line-num">76</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_except-source'>   <span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb</span>
+<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)
+<span class="line-num">76</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_except'>
@@ -78,14 +83,18 @@ Sequel::Plugins::BlacklistSecurity::InstanceMethods
 
 <p>Update all values using the entries in the hash, except for the keys given in except.  You should probably use <code>update_fields</code> instead of this method, as blacklist approaches to security are a bad idea.</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_except</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:hometown</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_except</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:hometown</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_except-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update_except-source'>   <span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb</span>&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;<span class="line-num">85</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update_except-source'>   <span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb</span>
+<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)
+<span class="line-num">85</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))
+<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -97,7 +106,7 @@ Sequel::Plugins::BlacklistSecurity::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

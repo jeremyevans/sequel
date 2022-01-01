@@ -40,17 +40,22 @@ Last Update:
 <ul><li>
 <p>An instance-level skip_auto_validations method has been added to the auto_validations plugin, allowing you to skip all or specific types of auto validations inside the block:</p>
 
-<pre class="ruby"><span class="ruby-identifier">model_instance</span>.<span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-value">:unique</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">model_instance</span>.<span class="ruby-identifier">valid?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">model_instance</span>.<span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-value">:unique</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">model_instance</span>.<span class="ruby-identifier">valid?</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>A Database :preconnect_extensions option has been added.  This option is similar to :extensions, but the extensions are loaded before the :preconnect option is processed.  This allows you to use the server_logging extension with the :preconnect option.</p>
 </li><li>
 <p>For specifying custom table aliases when using eager_graph and association_join, you can now use:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:association</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:table_alias</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:association</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:table_alias</span>)
+</pre>
 
 <p>in addition to:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:association</span>, <span class="ruby-value">:table_alias</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:association</span>, <span class="ruby-value">:table_alias</span>)
+</pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -69,7 +74,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

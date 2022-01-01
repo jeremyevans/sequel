@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::SqlComments</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::SqlComments
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/sql_comments_rb.html">lib/sequel/plugins/sql_comments.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The sql_comments plugin will automatically use <a href="../SQL.html"><code>SQL</code></a> comments on queries for the model it is loaded into.  These comments will show the related model, what type of method was called, and the method name (or association name for queries to load associations):</p>
+
+<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]
+<span class="ruby-comment"># SELECT * FROM albums WHERE (id = 1) LIMIT 1</span>
+<span class="ruby-comment"># -- model:Album,method_type:class,method:[]</span>
+
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>)
+<span class="ruby-comment"># UPDATE albums SET name = &#39;baz&#39; WHERE (id = 1)</span>
+<span class="ruby-comment"># -- model:Album,method_type:instance,method:update</span>
+
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span>
+<span class="ruby-comment"># SELECT * FROM artists WHERE (artists.id = 1)</span>
+<span class="ruby-comment"># -- model:Album,method_type:association_load,association:artist</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artists</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># SELECT * FROM albums</span>
+<span class="ruby-comment"># SELECT * FROM artists WHERE (artists.id IN (1))</span>
+<span class="ruby-comment"># -- model:Album,method_type:association_eager_load,association:artist</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">delete</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE (id = 1)</span>
+<span class="ruby-comment"># -- model:Album,method_type:dataset,method:delete</span>
+</pre>
+
+<p>This plugin automatically supports the class, instance, and dataset methods are are supported by default in <a href="../Model.html"><code>Sequel::Model</code></a>.  To support custom class, instance, and dataset methods, such as those added by other plugins, you can use the appropriate <code>sql_comments_*_methods</code> class method:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">sql_comments_class_methods</span> <span class="ruby-value">:first_by_name</span> <span class="ruby-comment"># example from finder plugin, with :mod option</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">sql_comments_instance_methods</span> <span class="ruby-value">:lazy_attribute_lookup</span> <span class="ruby-comment"># lazy_attributes plugin</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">sql_comments_dataset_methods</span> <span class="ruby-value">:to_csv</span> <span class="ruby-comment"># csv_serializer plugin</span>
+</pre>
+
+<p>In order for the sql_comments plugin to work, the sql_comments <a href="../../Database.html"><code>Database</code></a> extension must be loaded into the model’s database.</p>
+
+<p>Note that in order to make sure <a href="../SQL.html"><code>SQL</code></a> comments are included, some optimizations are disabled if this plugin is loaded.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support automatic SQL comments</span>
+<span class="ruby-comment"># (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:sql_comments</span>
+
+<span class="ruby-comment"># Make the Album class support automatic SQL comments</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:sql_comments</span>
+</pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-configure">configure</a></li>
+<li><a href="#method-c-def_sql_commend_method">def_sql_commend_method</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="SqlComments/ClassMethods.html">Sequel::Plugins::SqlComments::ClassMethods</a></li>
+<li><a href="SqlComments/DatasetMethods.html">Sequel::Plugins::SqlComments::DatasetMethods</a></li>
+<li><a href="SqlComments/InstanceMethods.html">Sequel::Plugins::SqlComments::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/sql_comments.rb</span>
+<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">71</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:reset_fast_pk_lookup_sql</span>)
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-def_sql_commend_method'>
+<a name='method-c-def_sql_commend_method'></a>
+<div class='synopsis'>
+<span class='name'>def_sql_commend_method</span><span class='arguments'>(mod, model, method_type, meth)</span>
+
+</div>
+<div class='description'>
+
+<p>Define a method <code>meth</code> on the given module <code>mod</code> that will use automatic <a href="../SQL.html"><code>SQL</code></a> comments with the given model, method_type, and method.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-def_sql_commend_method-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-def_sql_commend_method-source'>   <span class="ruby-comment"># File lib/sequel/plugins/sql_comments.rb</span>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_sql_commend_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">model</span>, <span class="ruby-identifier">method_type</span>, <span class="ruby-identifier">meth</span>)
+<span class="line-num">60</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
+<span class="line-num">61</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">:model</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">model</span>, <span class="ruby-value">:method_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">method_type</span>, <span class="ruby-value">:method</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">62</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">63</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">64</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">65</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">66</span>   <span class="ruby-identifier">ruby2_keywords</span>(<span class="ruby-identifier">meth</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-keyword">false</span>)
+<span class="line-num">67</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

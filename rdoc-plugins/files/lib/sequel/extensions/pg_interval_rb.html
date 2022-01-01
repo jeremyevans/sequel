@@ -30,27 +30,29 @@ lib/sequel/extensions/pg_interval.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-01-21 18:24:47 -0800</span>
+<span class='datetime'>2021-12-15 19:22:54 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_interval extension adds support for PostgreSQL&#39;s interval type.</p>
+<p>The pg_interval extension adds support for PostgreSQL’s interval type.</p>
 
-<p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when interval type values are retrieved, they are parsed and returned as instances of ActiveSupport::Duration.</p>
+<p>This extension integrates with Sequel’s native postgres and jdbc/postgresql adapters, so that when interval type values are retrieved, they are parsed and returned as instances of ActiveSupport::Duration.</p>
 
 <p>In addition to the parser, this extension adds literalizers for ActiveSupport::Duration that use the standard <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> literalization callbacks, so they work on all adapters.</p>
 
 <p>To use this extension, load it into the Database instance:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_interval</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_interval</span>
+</pre>
 
 <p>This extension integrates with the pg_array extension.  If you plan to use arrays of interval types, load the pg_array extension before the pg_interval extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_interval</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_interval</span>
+</pre>
 
-<p>The parser this extension uses requires that IntervalStyle for PostgreSQL is set to postgres (the default setting).  If IntervalStyle is changed from the default setting, the parser will probably not work.  The parser used is very simple, and is only designed to parse PostgreSQL&#39;s default output format, it is not designed to support all input formats that PostgreSQL supports.</p>
+<p>The parser this extension uses requires that IntervalStyle for PostgreSQL is set to postgres (the default setting).  If IntervalStyle is changed from the default setting, the parser will probably not work.  The parser used is very simple, and is only designed to parse PostgreSQL’s default output format, it is not designed to support all input formats that PostgreSQL supports.</p>
 
 <p>See the schema modification guide for details on using interval columns in CREATE/ALTER TABLE statements.</p>
 
@@ -60,6 +62,7 @@ Last Update:
 <div id='requires'>
 <h2>Required files</h2>
 <ol>
+<li>active_support</li>
 <li>active_support/duration</li>
 <li>active_support/version</li>
 </ol>
@@ -72,7 +75,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -97,14 +97,26 @@ Superclass:
 
 <p>The pattern match will be case insensitive if the last argument is a hash with a key of :case_insensitive that is not false or nil. Also, if a case insensitive regular expression is used (//i), that particular pattern which will always be case insensitive.</p>
 
-<pre class="ruby"><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;a%&#39;</span>) <span class="ruby-comment"># (&quot;a&quot; LIKE &#39;a%&#39; ESCAPE &#39;\&#39;)</span>&#x000A;<span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;a%&#39;</span>, <span class="ruby-value">case_insensitive:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># (&quot;a&quot; ILIKE &#39;a%&#39; ESCAPE &#39;\&#39;)</span>&#x000A;<span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;a%&#39;</span>, <span class="ruby-regexp">/^a/i</span>) <span class="ruby-comment"># ((&quot;a&quot; LIKE &#39;a%&#39; ESCAPE &#39;\&#39;) OR (&quot;a&quot; ~* &#39;^a&#39;))</span></pre>
+<pre class="ruby"><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;a%&#39;</span>) <span class="ruby-comment"># (&quot;a&quot; LIKE &#39;a%&#39; ESCAPE &#39;\&#39;)</span>
+<span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;a%&#39;</span>, <span class="ruby-value">case_insensitive:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># (&quot;a&quot; ILIKE &#39;a%&#39; ESCAPE &#39;\&#39;)</span>
+<span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;a%&#39;</span>, <span class="ruby-regexp">/^a/i</span>) <span class="ruby-comment"># ((&quot;a&quot; LIKE &#39;a%&#39; ESCAPE &#39;\&#39;) OR (&quot;a&quot; ~* &#39;^a&#39;))</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-like-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-like-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1769</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">like</span>(<span class="ruby-identifier">l</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;<span class="line-num">1770</span>   <span class="ruby-identifier">l</span>, <span class="ruby-identifier">lre</span>, <span class="ruby-identifier">lci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">l</span>)&#x000A;<span class="line-num">1771</span>   <span class="ruby-identifier">lci</span> = (<span class="ruby-identifier">ces</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>)[<span class="ruby-value">:case_insensitive</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lci</span>&#x000A;<span class="line-num">1772</span>   <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">map!</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">1773</span>     <span class="ruby-identifier">r</span>, <span class="ruby-identifier">rre</span>, <span class="ruby-identifier">rci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">1774</span>     <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LIKE_MAP</span>[[<span class="ruby-identifier">lre</span><span class="ruby-operator">||</span><span class="ruby-identifier">rre</span>, <span class="ruby-identifier">lci</span><span class="ruby-operator">||</span><span class="ruby-identifier">rci</span>]], <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)&#x000A;<span class="line-num">1775</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1776</span>   <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">:</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;<span class="line-num">1777</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-like-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1769</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">like</span>(<span class="ruby-identifier">l</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)
+<span class="line-num">1770</span>   <span class="ruby-identifier">l</span>, <span class="ruby-identifier">lre</span>, <span class="ruby-identifier">lci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">l</span>)
+<span class="line-num">1771</span>   <span class="ruby-identifier">lci</span> = (<span class="ruby-identifier">ces</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>)[<span class="ruby-value">:case_insensitive</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lci</span>
+<span class="line-num">1772</span>   <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">map!</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span>
+<span class="line-num">1773</span>     <span class="ruby-identifier">r</span>, <span class="ruby-identifier">rre</span>, <span class="ruby-identifier">rci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">1774</span>     <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LIKE_MAP</span>[[<span class="ruby-identifier">lre</span><span class="ruby-operator">||</span><span class="ruby-identifier">rre</span>, <span class="ruby-identifier">lci</span><span class="ruby-operator">||</span><span class="ruby-identifier">rci</span>]], <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)
+<span class="line-num">1775</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1776</span>   <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">:</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)
+<span class="line-num">1777</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -123,7 +135,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_string-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_string-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1793</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_string</span>&#x000A;<span class="line-num">1794</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">1795</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_string-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1793</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_string</span>
+<span class="line-num">1794</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1795</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -135,7 +150,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -40,11 +40,15 @@ Last Update:
 <ul><li>
 <p>Ruby 2.6+ endless ranges are now supported as condition specifier values, using a &gt;= operator for them:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">c:</span> <span class="ruby-value">1</span><span class="ruby-operator">...</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM t WHERE (c &gt;= 1)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">c:</span> <span class="ruby-value">1</span><span class="ruby-operator">...</span>)
+<span class="ruby-comment"># SELECT * FROM t WHERE (c &gt;= 1)</span>
+</pre>
 </li><li>
 <p>Ruby 2.6+ endless ranges are now supported in the pg_range extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">r:</span> <span class="ruby-value">1</span><span class="ruby-operator">...</span>)&#x000A;<span class="ruby-comment"># UPDATE t SET r = &#39;[1,)&#39; WHERE (id = 1)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">r:</span> <span class="ruby-value">1</span><span class="ruby-operator">...</span>)
+<span class="ruby-comment"># UPDATE t SET r = &#39;[1,)&#39; WHERE (id = 1)</span>
+</pre>
 </li><li>
 <p>The :include option when creating indexes is now supported on PostgreSQL 11, specifying additional columns to include in the index without indexing them.  This is useful to allow index only scans in additional cases.</p>
 </li><li>
@@ -91,7 +95,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

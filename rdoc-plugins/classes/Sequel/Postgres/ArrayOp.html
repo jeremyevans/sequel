@@ -43,7 +43,8 @@ Superclass:
 
 <p>In the method documentation examples, assume that:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span> = <span class="ruby-value">:array</span>.<span class="ruby-identifier">pg_array</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span> = <span class="ruby-value">:array</span>.<span class="ruby-identifier">pg_array</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -136,14 +137,20 @@ Superclass:
 
 <p>Access a member of the array, returns an SQL::Subscript instance:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># array[1]</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># array[1]</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">91</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">92</span>   <span class="ruby-identifier">s</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, [<span class="ruby-identifier">key</span>])&#x000A;<span class="line-num">93</span>   <span class="ruby-identifier">s</span> = <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Range</span>)&#x000A;<span class="line-num">94</span>   <span class="ruby-identifier">s</span>&#x000A;<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">91</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">92</span>   <span class="ruby-identifier">s</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, [<span class="ruby-identifier">key</span>])
+<span class="line-num">93</span>   <span class="ruby-identifier">s</span> = <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Range</span>)
+<span class="line-num">94</span>   <span class="ruby-identifier">s</span>
+<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-all'>
@@ -156,18 +163,24 @@ Superclass:
 
 <p>Call the ALL function:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># ALL(array)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># ALL(array)</span>
+</pre>
 
 <p>Usually used like:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">all</span>)&#x000A;<span class="ruby-comment"># WHERE (1 = ALL(array))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">all</span>)
+<span class="ruby-comment"># WHERE (1 = ALL(array))</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-all-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-all-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">105</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>&#x000A;<span class="line-num">106</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:ALL</span>)&#x000A;<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-all-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">105</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>
+<span class="line-num">106</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:ALL</span>)
+<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-any'>
@@ -180,18 +193,24 @@ Superclass:
 
 <p>Call the ANY function:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># ANY(array)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># ANY(array)</span>
+</pre>
 
 <p>Usually used like:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">any</span>)&#x000A;<span class="ruby-comment"># WHERE (1 = ANY(array))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">any</span>)
+<span class="ruby-comment"># WHERE (1 = ANY(array))</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-any-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-any-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">any</span>&#x000A;<span class="line-num">118</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:ANY</span>)&#x000A;<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-any-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">any</span>
+<span class="line-num">118</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:ANY</span>)
+<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cardinality'>
@@ -204,14 +223,18 @@ Superclass:
 
 <p>Call the cardinality method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">cardinality</span> <span class="ruby-comment"># cardinality(array)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">cardinality</span> <span class="ruby-comment"># cardinality(array)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cardinality-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cardinality-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cardinality</span>&#x000A;<span class="line-num">125</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:cardinality</span>)&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cardinality-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cardinality</span>
+<span class="line-num">125</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:cardinality</span>)
+<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-contained_by'>
@@ -224,14 +247,18 @@ Superclass:
 
 <p>Use the contained by (&lt;@) operator:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">contained_by</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array &lt;@ a)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">contained_by</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array &lt;@ a)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-contained_by-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-contained_by-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">139</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-contained_by-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contained_by</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">139</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-contains'>
@@ -244,14 +271,18 @@ Superclass:
 
 <p>Use the contains (@&gt;) operator:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">contains</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array @&gt; a)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">contains</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array @&gt; a)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-contains-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-contains-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">132</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="line-num">133</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-contains-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contains</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">132</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">133</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-dims'>
@@ -264,14 +295,18 @@ Superclass:
 
 <p>Call the array_dims method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">dims</span> <span class="ruby-comment"># array_dims(array)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">dims</span> <span class="ruby-comment"># array_dims(array)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-dims-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-dims-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">145</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dims</span>&#x000A;<span class="line-num">146</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_dims</span>)&#x000A;<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-dims-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">145</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dims</span>
+<span class="line-num">146</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_dims</span>)
+<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hstore'>
@@ -284,14 +319,29 @@ Superclass:
 
 <p>Convert the array into an hstore using the hstore function. If given an argument, use the two array form:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">hstore</span>          <span class="ruby-comment"># hstore(array)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-value">:array2</span>) <span class="ruby-comment"># hstore(array, array2)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">hstore</span>          <span class="ruby-comment"># hstore(array)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-value">:array2</span>) <span class="ruby-comment"># hstore(array, array2)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hstore-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hstore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg_given</span>=<span class="ruby-keyword">true</span>; <span class="ruby-keyword">nil</span>))&#x000A;<span class="line-num">155</span>   <span class="ruby-identifier">v</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg_given</span>&#x000A;<span class="line-num">156</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">157</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">158</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">arg</span>))&#x000A;<span class="line-num">159</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">160</span>   <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">161</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:hstore_op</span>)&#x000A;<span class="line-num">162</span>   <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">163</span>     <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">164</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">165</span>   <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hstore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg_given</span>=<span class="ruby-keyword">true</span>; <span class="ruby-keyword">nil</span>))
+<span class="line-num">155</span>   <span class="ruby-identifier">v</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg_given</span>
+<span class="line-num">156</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">157</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">158</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">arg</span>))
+<span class="line-num">159</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">160</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">161</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:hstore_op</span>)
+<span class="line-num">162</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">163</span>     <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">164</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">165</span>   <span class="ruby-identifier">v</span>
+<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-length'>
@@ -304,14 +354,19 @@ Superclass:
 
 <p>Call the array_length method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">length</span>    <span class="ruby-comment"># array_length(array, 1)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">length</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># array_length(array, 2)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">length</span>    <span class="ruby-comment"># array_length(array, 1)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">length</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># array_length(array, 2)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-length-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">length</span>(<span class="ruby-identifier">dimension</span> = <span class="ruby-value">1</span>)&#x000A;<span class="line-num">173</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>, <span class="ruby-identifier">dimension</span>)&#x000A;<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">length</span>(<span class="ruby-identifier">dimension</span> = <span class="ruby-value">1</span>)
+<span class="line-num">173</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>, <span class="ruby-identifier">dimension</span>)
+<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lower'>
@@ -324,14 +379,19 @@ Superclass:
 
 <p>Call the array_lower method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">lower</span>    <span class="ruby-comment"># array_lower(array, 1)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">lower</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># array_lower(array, 2)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">lower</span>    <span class="ruby-comment"># array_lower(array, 1)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">lower</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># array_lower(array, 2)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lower-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lower-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lower</span>(<span class="ruby-identifier">dimension</span> = <span class="ruby-value">1</span>)&#x000A;<span class="line-num">181</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_lower</span>, <span class="ruby-identifier">dimension</span>)&#x000A;<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lower-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lower</span>(<span class="ruby-identifier">dimension</span> = <span class="ruby-value">1</span>)
+<span class="line-num">181</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_lower</span>, <span class="ruby-identifier">dimension</span>)
+<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-overlaps'>
@@ -344,14 +404,18 @@ Superclass:
 
 <p>Use the overlaps (&amp;&amp;) operator:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">overlaps</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array &amp;&amp; a)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">overlaps</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array &amp;&amp; a)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-overlaps-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-overlaps-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overlaps</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">188</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">OVERLAPS</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-overlaps-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overlaps</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">188</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">OVERLAPS</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_array'>
@@ -369,7 +433,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_array-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>
+<span class="line-num">202</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-push'>
@@ -382,14 +449,19 @@ Superclass:
 
 <p>Use the concatentation (||) operator:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array || a)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array || a)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array || a)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (array || a)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-push-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-push-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">push</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">196</span>   <span class="ruby-identifier">array_op</span>(<span class="ruby-constant">CONCAT</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>)])&#x000A;<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-push-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">push</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">196</span>   <span class="ruby-identifier">array_op</span>(<span class="ruby-constant">CONCAT</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>)])
+<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-remove'>
@@ -402,14 +474,18 @@ Superclass:
 
 <p>Remove the given element from the array:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># array_remove(array, 1)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># array_remove(array, 1)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-remove-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-remove-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove</span>(<span class="ruby-identifier">element</span>)&#x000A;<span class="line-num">209</span>   <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:array_remove</span>, <span class="ruby-identifier">element</span>))&#x000A;<span class="line-num">210</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-remove-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove</span>(<span class="ruby-identifier">element</span>)
+<span class="line-num">209</span>   <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:array_remove</span>, <span class="ruby-identifier">element</span>))
+<span class="line-num">210</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-replace'>
@@ -422,14 +498,18 @@ Superclass:
 
 <p>Replace the given element in the array with another element:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array_replace(array, 1, 2)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array_replace(array, 1, 2)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-replace-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-replace-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">216</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace</span>(<span class="ruby-identifier">element</span>, <span class="ruby-identifier">replacement</span>)&#x000A;<span class="line-num">217</span>   <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:array_replace</span>, <span class="ruby-identifier">element</span>, <span class="ruby-identifier">replacement</span>))&#x000A;<span class="line-num">218</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-replace-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">216</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace</span>(<span class="ruby-identifier">element</span>, <span class="ruby-identifier">replacement</span>)
+<span class="line-num">217</span>   <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:array_replace</span>, <span class="ruby-identifier">element</span>, <span class="ruby-identifier">replacement</span>))
+<span class="line-num">218</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_string'>
@@ -442,14 +522,25 @@ Superclass:
 
 <p>Call the array_to_string method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">join</span>           <span class="ruby-comment"># array_to_string(array, &#39;&#39;)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">to_string</span>      <span class="ruby-comment"># array_to_string(array, &#39;&#39;)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;:&quot;</span>)      <span class="ruby-comment"># array_to_string(array, &#39;:&#39;)</span>&#x000A;<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;:&quot;</span>, <span class="ruby-string">&quot;*&quot;</span>) <span class="ruby-comment"># array_to_string(array, &#39;:&#39;, &#39;*&#39;)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">join</span>           <span class="ruby-comment"># array_to_string(array, &#39;&#39;)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">to_string</span>      <span class="ruby-comment"># array_to_string(array, &#39;&#39;)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;:&quot;</span>)      <span class="ruby-comment"># array_to_string(array, &#39;:&#39;)</span>
+<span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;:&quot;</span>, <span class="ruby-string">&quot;*&quot;</span>) <span class="ruby-comment"># array_to_string(array, &#39;:&#39;, &#39;*&#39;)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_string-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_string-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_string</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-string">&quot;&quot;</span>, <span class="ruby-identifier">null</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">227</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">null</span>.<span class="ruby-identifier">nil?</span>&#x000A;<span class="line-num">228</span>     <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_to_string</span>, <span class="ruby-identifier">joiner</span>)&#x000A;<span class="line-num">229</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">230</span>     <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_to_string</span>, <span class="ruby-identifier">joiner</span>, <span class="ruby-identifier">null</span>)&#x000A;<span class="line-num">231</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">232</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_string-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_string</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-string">&quot;&quot;</span>, <span class="ruby-identifier">null</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">227</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">null</span>.<span class="ruby-identifier">nil?</span>
+<span class="line-num">228</span>     <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_to_string</span>, <span class="ruby-identifier">joiner</span>)
+<span class="line-num">229</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">230</span>     <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_to_string</span>, <span class="ruby-identifier">joiner</span>, <span class="ruby-identifier">null</span>)
+<span class="line-num">231</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">232</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unnest'>
@@ -462,14 +553,18 @@ Superclass:
 
 <p>Call the unnest method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">unnest</span> <span class="ruby-comment"># unnest(array)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">unnest</span> <span class="ruby-comment"># unnest(array)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unnest-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unnest-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">238</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unnest</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">239</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:unnest</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">a</span>)})&#x000A;<span class="line-num">240</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unnest-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">238</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unnest</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">239</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:unnest</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">a</span>)})
+<span class="line-num">240</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unshift'>
@@ -482,14 +577,18 @@ Superclass:
 
 <p>Use the concatentation (||) operator, reversing the order:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (a || array)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array_op</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (a || array)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unshift-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unshift-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unshift</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">246</span>   <span class="ruby-identifier">array_op</span>(<span class="ruby-constant">CONCAT</span>, [<span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>), <span class="ruby-keyword">self</span>])&#x000A;<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unshift-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>
+<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unshift</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">246</span>   <span class="ruby-identifier">array_op</span>(<span class="ruby-constant">CONCAT</span>, [<span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">other</span>), <span class="ruby-keyword">self</span>])
+<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -501,7 +600,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

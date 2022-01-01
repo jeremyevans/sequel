@@ -41,7 +41,17 @@ Sequel::Plugins::Touch
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Allow touching of all model instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Album instances, with a custom column</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>, <span class="ruby-value">column:</span> <span class="ruby-value">:updated_on</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Artist instances, updating the albums and tags</span>&#x000A;<span class="ruby-comment"># associations when touching, touching the +updated_on+ column for</span>&#x000A;<span class="ruby-comment"># albums and the +updated_at+ column for tags</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>, <span class="ruby-value">associations:</span> [{<span class="ruby-value">albums:</span> <span class="ruby-value">:updated_on</span>}, <span class="ruby-value">:tags</span>]</pre>
+<pre class="ruby"><span class="ruby-comment"># Allow touching of all model instances (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>
+
+<span class="ruby-comment"># Allow touching of Album instances, with a custom column</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>, <span class="ruby-value">column:</span> <span class="ruby-value">:updated_on</span>
+
+<span class="ruby-comment"># Allow touching of Artist instances, updating the albums and tags</span>
+<span class="ruby-comment"># associations when touching, touching the +updated_on+ column for</span>
+<span class="ruby-comment"># albums and the +updated_at+ column for tags</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>, <span class="ruby-value">associations:</span> [{<span class="ruby-value">albums:</span> <span class="ruby-value">:updated_on</span>}, <span class="ruby-value">:tags</span>]
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +86,10 @@ Sequel::Plugins::Touch
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})
+<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -89,7 +102,7 @@ Sequel::Plugins::Touch
 
 <p>Set the touch_column and touched_associations variables for the model. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
-<p>The associations to touch when a model instance is updated or destroyed.  Can be a symbol for a single association, a hash with association keys and column values, or an array of symbols and/or hashes.  If a symbol is used, the column used when updating the associated objects is the model&#39;s touch_column. If a hash is used, the value is used as the column to update.</p>
+<p>The associations to touch when a model instance is updated or destroyed.  Can be a symbol for a single association, a hash with association keys and column values, or an array of symbols and/or hashes.  If a symbol is used, the column used when updating the associated objects is the model’s touch_column. If a hash is used, the value is used as the column to update.</p>
 </td></tr><tr><td class='label'>:column </td><td>
 <p>The column to modify when touching a model instance.</p>
 </td></tr></tbody></table>
@@ -99,7 +112,11 @@ Sequel::Plugins::Touch
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:updated_at</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;<span class="line-num">47</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>
+<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">46</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:updated_at</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>
+<span class="line-num">47</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]
+<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -111,7 +128,7 @@ Sequel::Plugins::Touch
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

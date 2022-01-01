@@ -40,49 +40,73 @@ Last Update:
 <ul><li>
 <p>A no_auto_literal_strings extension has been added, which removes the automatic usage of strings in filter arguments as literal SQL code. By default, if you do:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;N&#39;&quot;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;N&#39;&quot;</span>)
+</pre>
 
-<p>By default <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will treat “name &gt; &#39;N&#39;” as SQL code.  However, this makes it much easier to introduce SQL injection:</p>
+<p>By default <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will treat “name &gt; ‘N’” as SQL code.  However, this makes it much easier to introduce SQL injection:</p>
 
-<pre class="ruby"><span class="ruby-comment"># SQL Injection vulnerability in default Sequel</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;params[:letter]&#39;&quot;</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># SQL Injection vulnerability in default Sequel</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;params[:letter]&#39;&quot;</span>)
+</pre>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> does support using placeholders when using literal strings:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Safe in default Sequel</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:letter</span>])</pre>
+<pre class="ruby"><span class="ruby-comment"># Safe in default Sequel</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:letter</span>])
+</pre>
 
 <p>However, if you forget to use placeholders, you can end up with SQL injection.  Accidental usage of filter strings derived from user input as literal SQL code is probably the most common SQL injection vector in applications using <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
 <p>With the no_auto_literal_strings extension, passing a plain string as the first or only argument to a filter method raises an exception.  If you want to use literal SQL code, you have to do so explicitly:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; &#39;N&#39;&quot;</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; &#39;N&#39;&quot;</span>))
+</pre>
 
 <p>You can also specify placeholders when using Sequel.lit:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:letter</span>]))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:letter</span>]))
+</pre>
 
 <p>Note that in many cases, you can avoid using literal SQL strings completely:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:letter</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:letter</span>]}
+</pre>
 </li><li>
 <p>one_through_one associations now support a setter method:</p>
 
-<pre class="ruby"><span class="ruby-constant">Foo</span>.<span class="ruby-identifier">one_through_one</span> <span class="ruby-value">:bar</span>&#x000A;&#x000A;<span class="ruby-identifier">foo</span> = <span class="ruby-constant">Foo</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">foo</span>.<span class="ruby-identifier">bar</span> = <span class="ruby-constant">Bar</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-identifier">foo</span>.<span class="ruby-identifier">bar</span> = <span class="ruby-keyword">nil</span></pre>
+<pre class="ruby"><span class="ruby-constant">Foo</span>.<span class="ruby-identifier">one_through_one</span> <span class="ruby-value">:bar</span>
+
+<span class="ruby-identifier">foo</span> = <span class="ruby-constant">Foo</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">foo</span>.<span class="ruby-identifier">bar</span> = <span class="ruby-constant">Bar</span>[<span class="ruby-value">2</span>]
+<span class="ruby-identifier">foo</span>.<span class="ruby-identifier">bar</span> = <span class="ruby-keyword">nil</span>
+</pre>
 
 <p>This will check the current entry in the join table, and based on the argument and the current entry, run a DELETE, INSERT, or UPDATE query, or take no action if the join table is already in the correct state.</p>
 </li><li>
 <p>Model.default_association_options has been added, which supports default options for all future associations.  You can use this to do:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span> = {<span class="ruby-value">:read_only</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span> = {<span class="ruby-value">:read_only</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}
+</pre>
 
 <p>Which makes associations not create modification methods by default. You could still create the modification methods by passing :read_only=&gt;true when creating association.</p>
 </li><li>
 <p>The tactical_eager_loading plugin now supports two additional options when calling an association method: :eager and :eager_reload. Example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">first</span>&#x000A;&#x000A;<span class="ruby-comment"># Loads all albums for all of the artists,</span>&#x000A;<span class="ruby-comment"># and all tracks for all of those albums</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>(<span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>)&#x000A;&#x000A;<span class="ruby-comment"># Reload the artists association for all artists</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>(<span class="ruby-value">:eager_reload</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">first</span>
+
+<span class="ruby-comment"># Loads all albums for all of the artists,</span>
+<span class="ruby-comment"># and all tracks for all of those albums</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>(<span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>)
+
+<span class="ruby-comment"># Reload the artists association for all artists</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>(<span class="ruby-value">:eager_reload</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+</pre>
 
 <p>You can also use the :eager option for an eager loading callback:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Eagerly load the albums with names starting with A-M</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>(<span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;N&#39;</span>)})</pre>
+<pre class="ruby"><span class="ruby-comment"># Eagerly load the albums with names starting with A-M</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>(<span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;N&#39;</span>)})
+</pre>
 </li><li>
 <p>The association_pks plugin now supports an :association_pks_nil association option in the association_pks setter, for determining how nil values should be handled.</p>
 
@@ -94,7 +118,9 @@ Last Update:
 </li><li>
 <p>Dataset#delete_from has been added on MySQL, allowing deletions from multiple tables in a single query:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>).<span class="ruby-identifier">delete_from</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>).<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># DELETE a, b FROM a INNER JOIN b ON (b.a_id = a.id)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>).<span class="ruby-identifier">delete_from</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>).<span class="ruby-identifier">delete</span>
+<span class="ruby-comment"># DELETE a, b FROM a INNER JOIN b ON (b.a_id = a.id)</span>
+</pre>
 </li><li>
 <p>The JDBC schema parser now includes a :remarks entry for each column, which contains comments on the column.</p>
 </li></ul>
@@ -124,7 +150,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

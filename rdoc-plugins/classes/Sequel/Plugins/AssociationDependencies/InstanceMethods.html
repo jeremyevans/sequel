@@ -63,7 +63,12 @@ Sequel::Plugins::AssociationDependencies::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>&#x000A;<span class="line-num">89</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;<span class="line-num">90</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">91</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:after_delete</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">delete</span>}&#x000A;<span class="line-num">92</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:after_destroy</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">destroy</span>}&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>
+<span class="line-num">89</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>
+<span class="line-num">90</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">91</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:after_delete</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">delete</span>}
+<span class="line-num">92</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:after_destroy</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">destroy</span>}
+<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_destroy'>
@@ -81,7 +86,13 @@ Sequel::Plugins::AssociationDependencies::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_destroy-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>&#x000A;<span class="line-num"> 97</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>&#x000A;<span class="line-num"> 98</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:before_delete</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">delete</span>}&#x000A;<span class="line-num"> 99</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:before_destroy</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">destroy</span>}&#x000A;<span class="line-num">100</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:before_nullify</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}&#x000A;<span class="line-num">101</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">102</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_destroy-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>
+<span class="line-num"> 97</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>
+<span class="line-num"> 98</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:before_delete</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">delete</span>}
+<span class="line-num"> 99</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:before_destroy</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">destroy</span>}
+<span class="line-num">100</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:before_nullify</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">101</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">102</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +104,7 @@ Sequel::Plugins::AssociationDependencies::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

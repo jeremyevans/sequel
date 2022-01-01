@@ -38,21 +38,23 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+PostgreSQL+Extensions">New PostgreSQL Extensions<span><a href="#label-New+PostgreSQL+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A pg_array extension has been added, supporting PostgreSQL&#39;s numeric and string array types.  Both single dimensional and multi-dimensional array types are supported.  Array values are returned as instances of Sequel::Postgres::PGArray, which is a delegate class of Array.  You can turn an existing array into a PGArray using Array#pg_array.</p>
+<p>A pg_array extension has been added, supporting PostgreSQL’s numeric and string array types.  Both single dimensional and multi-dimensional array types are supported.  Array values are returned as instances of Sequel::Postgres::PGArray, which is a delegate class of Array.  You can turn an existing array into a PGArray using Array#pg_array.</p>
 
 <p>If you are using arrays in model objects, you need to load support for that:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseMethods</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseMethods</span>
+</pre>
 
 <p>This makes schema parsing and typecasting of array columns work correctly.</p>
 
 <p>This extension also allows you to use PGArray objects and arrays in bound variables when using the postgres adapter with pg.</p>
 </li><li>
-<p>A pg_hstore extension has been added, supporting PostgreSQL&#39;s hstore type, which is a simple hash with string keys and string or NULL values.  hstore values are retrieved as instances of Sequel::Postgres::HStore, which is a delegate class of Hash.  You can turn an existing hash into an hstore using Hash#hstore.</p>
+<p>A pg_hstore extension has been added, supporting PostgreSQL’s hstore type, which is a simple hash with string keys and string or NULL values.  hstore values are retrieved as instances of Sequel::Postgres::HStore, which is a delegate class of Hash.  You can turn an existing hash into an hstore using Hash#hstore.</p>
 
 <p>If you are using hstores in model objects, you need to load support for that:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseMethods</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseMethods</span>
+</pre>
 
 <p>This makes schema parsing and typecasting of hstore columns work correctly.</p>
 
@@ -60,23 +62,40 @@ Last Update:
 </li><li>
 <p>A pg_array_ops extension has been added, making it easier to call PostgreSQL array operators and functions using plain ruby code. Examples:</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-value">:array_column</span>.<span class="ruby-identifier">pg_array</span>&#x000A;<span class="ruby-identifier">a</span>[<span class="ruby-value">1</span>]              <span class="ruby-comment"># array_column[1]</span>&#x000A;<span class="ruby-identifier">a</span>[<span class="ruby-value">1</span>][<span class="ruby-value">2</span>]           <span class="ruby-comment"># array_column[1][2]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">1</span>)         <span class="ruby-comment"># array_column || 1</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-value">1</span>)      <span class="ruby-comment"># 1 || array_column</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">any</span>             <span class="ruby-comment"># ANY(array_column)</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">join</span>            <span class="ruby-comment"># array_to_string(array_column, &#39;&#39;, NULL)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-value">:array_column</span>.<span class="ruby-identifier">pg_array</span>
+<span class="ruby-identifier">a</span>[<span class="ruby-value">1</span>]              <span class="ruby-comment"># array_column[1]</span>
+<span class="ruby-identifier">a</span>[<span class="ruby-value">1</span>][<span class="ruby-value">2</span>]           <span class="ruby-comment"># array_column[1][2]</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">1</span>)         <span class="ruby-comment"># array_column || 1</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-value">1</span>)      <span class="ruby-comment"># 1 || array_column</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">any</span>             <span class="ruby-comment"># ANY(array_column)</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">join</span>            <span class="ruby-comment"># array_to_string(array_column, &#39;&#39;, NULL)</span>
+</pre>
 
 <p>If you are also using the pg_array extension, you can turn a PGArray object into a query object, which allows you to run operations on array literals:</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span> = [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>].<span class="ruby-identifier">pg_array</span>.<span class="ruby-identifier">op</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">3</span>)               <span class="ruby-comment"># ARRAY[1,2] || 3</span></pre>
+<pre class="ruby"><span class="ruby-identifier">a</span> = [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>].<span class="ruby-identifier">pg_array</span>.<span class="ruby-identifier">op</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">3</span>)               <span class="ruby-comment"># ARRAY[1,2] || 3</span>
+</pre>
 </li><li>
 <p>A pg_hstore_ops extension has been added, making it easier to call PostgreSQL hstore operators and functions using plain ruby code. Examples:</p>
 
-<pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-value">:hstore_column</span>.<span class="ruby-identifier">hstore</span>&#x000A;<span class="ruby-identifier">h</span>[<span class="ruby-string">&#39;a&#39;</span>]             <span class="ruby-comment"># hstore_column -&gt; &#39;a&#39;</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>)    <span class="ruby-comment"># hstore_column ? &#39;a&#39;</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">keys</span>             <span class="ruby-comment"># akeys(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">to_array</span>         <span class="ruby-comment"># hstore_to_array(hstore_column)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-value">:hstore_column</span>.<span class="ruby-identifier">hstore</span>
+<span class="ruby-identifier">h</span>[<span class="ruby-string">&#39;a&#39;</span>]             <span class="ruby-comment"># hstore_column -&gt; &#39;a&#39;</span>
+<span class="ruby-identifier">h</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>)    <span class="ruby-comment"># hstore_column ? &#39;a&#39;</span>
+<span class="ruby-identifier">h</span>.<span class="ruby-identifier">keys</span>             <span class="ruby-comment"># akeys(hstore_column)</span>
+<span class="ruby-identifier">h</span>.<span class="ruby-identifier">to_array</span>         <span class="ruby-comment"># hstore_to_array(hstore_column)</span>
+</pre>
 
 <p>If you are also using the pg_hstore extension, you can turn an HStore object into a query object, which allows you to run operations on hstore literals:</p>
 
-<pre class="ruby"><span class="ruby-identifier">h</span> = {<span class="ruby-string">&#39;a&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;b&#39;</span>}.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">op</span>&#x000A;<span class="ruby-identifier">h</span>[<span class="ruby-identifier">a</span>]               <span class="ruby-comment"># &#39;&quot;a&quot;=&gt;&quot;b&quot;&#39;::hstore -&gt; &#39;a&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">h</span> = {<span class="ruby-string">&#39;a&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;b&#39;</span>}.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">op</span>
+<span class="ruby-identifier">h</span>[<span class="ruby-identifier">a</span>]               <span class="ruby-comment"># &#39;&quot;a&quot;=&gt;&quot;b&quot;&#39;::hstore -&gt; &#39;a&#39;</span>
+</pre>
 </li><li>
 <p>A pg_auto_parameterize extension has been added for automatically using bound variables for all queries.  For example, it can take code such as:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+</pre>
 
 <p>and do:</p>
 
@@ -86,24 +105,43 @@ Last Update:
 </li><li>
 <p>A pg_statement_cache extension has been added that works with the pg_auto_parameterize extension for automatically caching prepared statements and reusing them when using the postgres adapter with pg.  The combination of these two extensions makes it possible to take an entire <a href="../../../classes/Sequel.html"><code>Sequel</code></a> application and turn most or all of the queries into prepared statements.</p>
 
-<p>Note that these two extensions do not necessarily improve performance.  For simple queries, they actually hurt performance. They do help for complex queries, but in all cases, it&#39;s faster to use Sequel&#39;s prepared statements API manually.</p>
+<p>Note that these two extensions do not necessarily improve performance.  For simple queries, they actually hurt performance. They do help for complex queries, but in all cases, it’s faster to use Sequel’s prepared statements API manually.</p>
 </li></ul>
 
 <h1 id="label-Other+New+Extensions">Other New Extensions<span><a href="#label-Other+New+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p>A query_literals extension has been added that makes the select, group, and order methods operate similar to the filter methods in that if they are given a regular string as their first argument, they treat it as a literal string, with additional arguments, if any, used as placeholder values.  This extension allows you to write code such as:</p>
 
-<pre>DB[:table].select(&#39;a, b, ?&#39; 2).group(&#39;a, b&#39;).order(&#39;c&#39;)&#x000A;# Without query_literals:&#x000A;#   SELECT &#39;a, b, ?&#39;, 2 FROM table GROUP BY &#39;a, b&#39; ORDER BY &#39;c&#39;&#x000A;# With query_literals:&#x000A;#   SELECT a, b, 2 FROM table GROUP BY a, b ORDER BY c</pre>
+<pre>DB[:table].select(&#39;a, b, ?&#39; 2).group(&#39;a, b&#39;).order(&#39;c&#39;)
+# Without query_literals:
+#   SELECT &#39;a, b, ?&#39;, 2 FROM table GROUP BY &#39;a, b&#39; ORDER BY &#39;c&#39;
+# With query_literals:
+#   SELECT a, b, 2 FROM table GROUP BY a, b ORDER BY c</pre>
 
-<p>Sequel&#39;s default handling in this case is to use literal strings, which is generally not desired and on some databases not even valid syntax.  In general, you&#39;ll probably want to use this extension for all of a database&#39;s datasets, which you can do via:</p>
+<p>Sequel’s default handling in this case is to use literal strings, which is generally not desired and on some databases not even valid syntax.  In general, you’ll probably want to use this extension for all of a database’s datasets, which you can do via:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_literals</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">QueryLiterals</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_literals</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">QueryLiterals</span>)
+</pre>
 
 <p>The next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> (<a href="4_0_0_txt.html">4.0.0</a>) will probably integrate this extension into the core library.</p>
 </li><li>
 <p>A select_remove extension has been added that adds Dataset#select_remove, for removing selected columns/expressions from a dataset:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-comment"># Assume table has columns a, b, and c</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>)&#x000A;<span class="ruby-comment"># SELECT a, b FROM table</span>&#x000A;&#x000A;<span class="ruby-comment"># Removal by column alias</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b___c</span>, <span class="ruby-value">:c___b</span>).<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>)&#x000A;<span class="ruby-comment"># SELECT a, c AS b FROM table</span>&#x000A;&#x000A;<span class="ruby-comment"># Removal by expression</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b___c</span>, <span class="ruby-value">:c___b</span>).<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c___b</span>)&#x000A;<span class="ruby-comment"># SELECT a, b AS c FROM table</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]
+<span class="ruby-comment"># Assume table has columns a, b, and c</span>
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>)
+<span class="ruby-comment"># SELECT a, b FROM table</span>
+
+<span class="ruby-comment"># Removal by column alias</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b___c</span>, <span class="ruby-value">:c___b</span>).<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>)
+<span class="ruby-comment"># SELECT a, c AS b FROM table</span>
+
+<span class="ruby-comment"># Removal by expression</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b___c</span>, <span class="ruby-value">:c___b</span>).<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c___b</span>)
+<span class="ruby-comment"># SELECT a, b AS c FROM table</span>
+</pre>
 
 <p>This method makes it easier to select all columns except for the columns given.  This is common in cases where a table has a few large columns that are expensive to retrieve.  This method does have some corner cases, so read the documentation before using it.</p>
 </li><li>
@@ -138,9 +176,35 @@ Last Update:
 
 <h1 id="label-Core+Extension+Replacements">Core Extension Replacements<span><a href="#label-Core+Extension+Replacements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Most of Sequel&#39;s core extensions now have equivalent methods defined on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module:</p>
+<p>Most of Sequel’s core extensions now have equivalent methods defined on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module:</p>
 
-<pre>:column.as(:alias)        -&gt; Sequel.as(:column, :alias)   &#x000A;:column.asc               -&gt; Sequel.asc(:column)&#x000A;:column.desc              -&gt; Sequel.desc(:column)&#x000A;:column.cast(Integer)     -&gt; Sequel.cast(:column, Integer)&#x000A;:column.cast_numeric      -&gt; Sequel.cast_numeric(:column)&#x000A;:column.cast_string       -&gt; Sequel.cast_string(:column)&#x000A;:column.extract(:year)    -&gt; Sequel.extract(:year, :column)&#x000A;:column.identifier        -&gt; Sequel.identifier(:column)&#x000A;:column.ilike(&#39;A%&#39;)       -&gt; Sequel.ilike(:column, &#39;A%&#39;)&#x000A;:column.like(&#39;A%&#39;)        -&gt; Sequel.like(:column, &#39;A%&#39;)&#x000A;:column.qualify(:table)   -&gt; Sequel.qualify(:table, :column)&#x000A;:column.sql_subscript(1)  -&gt; Sequel.subscript(:column, 1)&#x000A;:function.sql_function(1) -&gt; Sequel.function(:function, 1)&#x000A;&#39;some SQL&#39;.lit            -&gt; Sequel.lit(&#39;some SQL&#39;)&#x000A;&#39;string&#39;.to_sequel_blob   -&gt; Sequel.blob(&#39;string&#39;)&#x000A;{:a=&gt;1}.case(0)           -&gt; Sequel.case({:a=&gt;1}, 0)&#x000A;{:a=&gt;1}.sql_negate        -&gt; Sequel.negate(:a=&gt;1)&#x000A;{:a=&gt;1}.sql_or            -&gt; Sequel.or(:a=&gt;1)&#x000A;[[1, 2]].sql_value_list   -&gt; Sequel.value_list([[1, 2]])&#x000A;[:a, :b].sql_string_join  -&gt; Sequel.join([:a, :b])&#x000A;~{:a=&gt;1}                  -&gt; Sequel.~(:a=&gt;1)&#x000A;:a + 1                    -&gt; Sequel.+(:a, 1)&#x000A;:a - 1                    -&gt; Sequel.-(:a, 1)&#x000A;:a * 1                    -&gt; Sequel.*(:a, 1)&#x000A;:a / 1                    -&gt; Sequel./(:a, 1)&#x000A;:a &amp; 1                    -&gt; Sequel.&amp;(:a, 1)&#x000A;:a | 1                    -&gt; Sequel.|(:a, 1)</pre>
+<pre>:column.as(:alias)        -&gt; Sequel.as(:column, :alias)   
+:column.asc               -&gt; Sequel.asc(:column)
+:column.desc              -&gt; Sequel.desc(:column)
+:column.cast(Integer)     -&gt; Sequel.cast(:column, Integer)
+:column.cast_numeric      -&gt; Sequel.cast_numeric(:column)
+:column.cast_string       -&gt; Sequel.cast_string(:column)
+:column.extract(:year)    -&gt; Sequel.extract(:year, :column)
+:column.identifier        -&gt; Sequel.identifier(:column)
+:column.ilike(&#39;A%&#39;)       -&gt; Sequel.ilike(:column, &#39;A%&#39;)
+:column.like(&#39;A%&#39;)        -&gt; Sequel.like(:column, &#39;A%&#39;)
+:column.qualify(:table)   -&gt; Sequel.qualify(:table, :column)
+:column.sql_subscript(1)  -&gt; Sequel.subscript(:column, 1)
+:function.sql_function(1) -&gt; Sequel.function(:function, 1)
+&#39;some SQL&#39;.lit            -&gt; Sequel.lit(&#39;some SQL&#39;)
+&#39;string&#39;.to_sequel_blob   -&gt; Sequel.blob(&#39;string&#39;)
+{:a=&gt;1}.case(0)           -&gt; Sequel.case({:a=&gt;1}, 0)
+{:a=&gt;1}.sql_negate        -&gt; Sequel.negate(:a=&gt;1)
+{:a=&gt;1}.sql_or            -&gt; Sequel.or(:a=&gt;1)
+[[1, 2]].sql_value_list   -&gt; Sequel.value_list([[1, 2]])
+[:a, :b].sql_string_join  -&gt; Sequel.join([:a, :b])
+~{:a=&gt;1}                  -&gt; Sequel.~(:a=&gt;1)
+:a + 1                    -&gt; Sequel.+(:a, 1)
+:a - 1                    -&gt; Sequel.-(:a, 1)
+:a * 1                    -&gt; Sequel.*(:a, 1)
+:a / 1                    -&gt; Sequel./(:a, 1)
+:a &amp; 1                    -&gt; Sequel.&amp;(:a, 1)
+:a | 1                    -&gt; Sequel.|(:a, 1)</pre>
 </li><li>
 <p>You can now wrap any object in a <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression using Sequel.expr.  This is similar to the sql_expr extension, but without defining the sql_expr method on all objects:</p>
 
@@ -150,25 +214,29 @@ Last Update:
 </li><li>
 <p>Virtual Rows now have methods defined that handle the standard mathematical operators:</p>
 
-<pre class="ruby"><span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">+</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)} <span class="ruby-comment"># SELECT (1 + a)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">+</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)} <span class="ruby-comment"># SELECT (1 + a)</span>
+</pre>
 
 <p>the standard inequality operators:</p>
 
-<pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&gt;</span>(<span class="ruby-value">2</span>, <span class="ruby-value">:a</span>)}  <span class="ruby-comment"># WHERE (2 &gt; a)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&gt;</span>(<span class="ruby-value">2</span>, <span class="ruby-value">:a</span>)}  <span class="ruby-comment"># WHERE (2 &gt; a)</span>
+</pre>
 
 <p>and the standard boolean operators:</p>
 
-<pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>))} <span class="ruby-comment"># WHERE ((a = 1) AND (b != 1))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>))} <span class="ruby-comment"># WHERE ((a = 1) AND (b != 1))</span>
+</pre>
 
-<p>Additionally, there is now direct support for creating literal strings in instance_evaled virtual row blocks using `:</p>
+<p>Additionally, there is now direct support for creating literal strings in instance_evaled virtual row blocks using ‘:</p>
 
-<pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">`some crazy SQL`</span>} <span class="ruby-comment"># WHERE (a &gt; some crazy SQL)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">`some crazy SQL`</span>} <span class="ruby-comment"># WHERE (a &gt; some crazy SQL)</span>
+</pre>
 
-<p>This doesn&#39;t override Kernel.`, since virtual rows use a BasicObject subclass.  Previously, using ` would result in calling the SQL function named ` with the given string, which probably isn&#39;t valid syntax on most databases.</p>
+<p>This doesn’t override Kernel.‘, since virtual rows use a BasicObject subclass.  Previously, using ` would result in calling the SQL function named ` with the given string, which probably isn’t valid syntax on most databases.</p>
 </li><li>
-<p>You can now require &#39;sequel/no_core_ext&#39; to load <a href="../../../classes/Sequel.html"><code>Sequel</code></a> without the core extensions.  The previous way of setting the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable before loading <a href="../../../classes/Sequel.html"><code>Sequel</code></a> still works.</p>
+<p>You can now require ‘sequel/no_core_ext’ to load <a href="../../../classes/Sequel.html"><code>Sequel</code></a> without the core extensions.  The previous way of setting the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable before loading <a href="../../../classes/Sequel.html"><code>Sequel</code></a> still works.</p>
 </li><li>
-<p>The core extensions have been moved from Sequel&#39;s core library into an extension that is loadable with Sequel.extension.  This extension is still loaded by default for backwards compatibility.  However, the next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer load this extension by default (though it will still be available to load manually).</p>
+<p>The core extensions have been moved from Sequel’s core library into an extension that is loadable with Sequel.extension.  This extension is still loaded by default for backwards compatibility.  However, the next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer load this extension by default (though it will still be available to load manually).</p>
 </li><li>
 <p>You can now check if the core extensions have been loaded by using Sequel.core_extensions?.</p>
 </li></ul>
@@ -208,15 +276,24 @@ Last Update:
 <ul><li>
 <p>Dataset#to_hash_groups and select_hash_groups have been added. These methods are similar to to_hash and select_hash in that they return a hash, but hashes returned by *_hash_groups methods have arrays of all matching values, unlike the *_hash methods which just use the last matching value. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># =&gt; [{:a=&gt;1, :b=&gt;2}, {:a=&gt;1, :b=&gt;3}, {:a=&gt;2, :b=&gt;4}]</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">to_hash</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;3, 2=&gt;4}</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">to_hash_groups</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;[2, 3], 2=&gt;[4]}</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># =&gt; [{:a=&gt;1, :b=&gt;2}, {:a=&gt;1, :b=&gt;3}, {:a=&gt;2, :b=&gt;4}]</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">to_hash</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)
+<span class="ruby-comment"># =&gt; {1=&gt;3, 2=&gt;4}</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">to_hash_groups</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)
+<span class="ruby-comment"># =&gt; {1=&gt;[2, 3], 2=&gt;[4]}</span>
+</pre>
 </li><li>
-<p>Model#set_fields and update_fields now accept :missing=&gt;:skip and :missing=&gt;:raise options, allowing them to be used in more cases. :missing=&gt;:skip skips missing entries in the hash, instead of setting the field to the default hash value.  :missing=&gt;:raise raises an error for missing fields, similar to strict_param_setting = true.  It&#39;s recommended that these options be used in new code in preference to set_only and update_only.</p>
+<p>Model#set_fields and update_fields now accept :missing=&gt;:skip and :missing=&gt;:raise options, allowing them to be used in more cases. :missing=&gt;:skip skips missing entries in the hash, instead of setting the field to the default hash value.  :missing=&gt;:raise raises an error for missing fields, similar to strict_param_setting = true.  It’s recommended that these options be used in new code in preference to set_only and update_only.</p>
 </li><li>
 <p>Database#drop_table? has been added, for dropping tables if they already exist.  This uses DROP TABLE IF EXISTS on the databases that support it.  Database#supports_drop_table_if_exists? has been added for checking whether the database supports that syntax.</p>
 </li><li>
 <p>Database#create_join_table has been added that allows easy  creation of many_to_many join tables:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_join_table</span>(<span class="ruby-value">:album_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artists</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_join_table</span>(<span class="ruby-value">:album_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artists</span>)
+</pre>
 
 <p>This uses real foreign keys for both of the columns, uses a composite primary key of both of the columns, and adds an additional composite index of the columns in reverse order.  The primary key and additional index should ensure that almost all operations on the join table can benefit from an index.</p>
 
@@ -224,19 +301,19 @@ Last Update:
 
 <p>Database#drop_join_table also exists and takes the same options as create_join_table.  It mostly exists to make it easy to reverse migrations that use create_join_table.</p>
 </li><li>
-<p>Model#freeze has been added that freezes a model such that it works correctly in a read-only state.  Before, it used the standard Object#freeze, which broke some things that should work, and allowed changes that shouldn&#39;t be allowed (like modifying the instance&#39;s values).</p>
+<p>Model#freeze has been added that freezes a model such that it works correctly in a read-only state.  Before, it used the standard Object#freeze, which broke some things that should work, and allowed changes that shouldn’t be allowed (like modifying the instance’s values).</p>
 </li><li>
 <p>ConnectionPool#all_connections has been added, which yields each available connection in the pool to the block.  For threaded pools, it does not yield connections that are currently being used by other threads.  When using this method, it is important to only operate on the yielded connection objects, and not make any modifications to the pool itself.  The pool is also locked until the method returns.</p>
 </li><li>
-<p>ConnectionPool#after_connect= has been added, allowing you to change a connection pool&#39;s after_connect proc after instantiating the pool.</p>
+<p>ConnectionPool#after_connect= has been added, allowing you to change a connection pool’s after_connect proc after instantiating the pool.</p>
 </li><li>
-<p>ConnectionPool#disconnection_proc= has been added, allowing you to change a connection pool&#39;s disconnection_proc after instantiating the pool.</p>
+<p>ConnectionPool#disconnection_proc= has been added, allowing you to change a connection pool’s disconnection_proc after instantiating the pool.</p>
 </li><li>
-<p>A Model.cache_anonymous_models accessor has been added, and can be set to false to disable the caching of classes created by Sequel::Model().  This caching is only useful if you want to reload the model&#39;s file without getting a superclass mismatch.  This setting is true by default for backwards compatibility, but may be changed to false in a later version, so you should manually set it to true if you are using code reloading.</p>
+<p>A Model.cache_anonymous_models accessor has been added, and can be set to false to disable the caching of classes created by Sequel::Model().  This caching is only useful if you want to reload the model’s file without getting a superclass mismatch.  This setting is true by default for backwards compatibility, but may be changed to false in a later version, so you should manually set it to true if you are using code reloading.</p>
 </li><li>
 <p>Model.instance_dataset has been added for getting the dataset used for model instances (a naked dataset restricted to a single row).</p>
 </li><li>
-<p>Dataset#with_sql_delete has been added for running the given SQL string as a delete and returning the number of rows modified.  It&#39;s designed as a replacement for with_sql(sql).delete, which is slower as it requires cloning the dataset.</p>
+<p>Dataset#with_sql_delete has been added for running the given SQL string as a delete and returning the number of rows modified.  It’s designed as a replacement for with_sql(sql).delete, which is slower as it requires cloning the dataset.</p>
 </li><li>
 <p>The :on_update and :on_delete entries for foreign_key now accept string arguments which are used literally.</p>
 </li><li>
@@ -248,7 +325,8 @@ Last Update:
 </li><li>
 <p>A Database#type_supported? method has been added on PostgreSQL to check if the database supports the given type:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">type_supported?</span>(<span class="ruby-value">:hstore</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">type_supported?</span>(<span class="ruby-value">:hstore</span>)
+</pre>
 </li><li>
 <p>Datatabase#reset_conversion_procs has been added to the postgres adapter, for use by extensions that modify the default conversion procs and want to have the database use the updated defaults.</p>
 </li><li>
@@ -256,11 +334,13 @@ Last Update:
 </li><li>
 <p>SQL::PlaceholderLiteralString objects can now use a placeholder array, where placeholder values are inserted between array elements. This is about 2.5-3x faster than using a string with ? placeholders, and allows usage of ? inside the array:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; ? &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-value">1</span>, <span class="ruby-value">2</span>)  <span class="ruby-comment"># (1 ? 2)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; ? &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-value">1</span>, <span class="ruby-value">2</span>)  <span class="ruby-comment"># (1 ? 2)</span>
+</pre>
 </li><li>
 <p>SQL::Subscript#[] has been added for accessing members of a multi-dimensional array:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:column</span>, <span class="ruby-value">1</span>)[<span class="ruby-value">2</span>][<span class="ruby-value">3</span>]  <span class="ruby-comment"># column[1][2][3]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:column</span>, <span class="ruby-value">1</span>)[<span class="ruby-value">2</span>][<span class="ruby-value">3</span>]  <span class="ruby-comment"># column[1][2][3]</span>
+</pre>
 </li><li>
 <p>SQL::Wrapper has been added for wrapping arbitrary objects in a <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression object.</p>
 </li><li>
@@ -286,7 +366,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#uri and url now return the connection string given to Sequel.connect.  Previously, they tried to reconstruct the url using the database&#39;s options, but that didn&#39;t work well in corner cases.</p>
+<p>Database#uri and url now return the connection string given to Sequel.connect.  Previously, they tried to reconstruct the url using the database’s options, but that didn’t work well in corner cases.</p>
 </li><li>
 <p>Database#inspect now shows the URL and/or options given when connecting to the database.  Previously, it showed the URL, or all of the databases options if constructing the URL raised an error.</p>
 </li><li>
@@ -294,9 +374,9 @@ Last Update:
 </li><li>
 <p>The schema utility dataset cached in the Database object is now reset if you use Database#extend_datasets, ensuring that the new value will use the given extension.</p>
 </li><li>
-<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>* plugins now log the full SQL by default. Since the user doesn&#39;t choose the name of the prepared statements, it was often difficult to determine what SQL was actually run if you were only looking at a subsection of the SQL log.</p>
+<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>* plugins now log the full SQL by default. Since the user doesn’t choose the name of the prepared statements, it was often difficult to determine what SQL was actually run if you were only looking at a subsection of the SQL log.</p>
 </li><li>
-<p>The nested_attributes plugin&#39;s delete/remove support now works correctly when a false value is given for _delete/_remove and strict_param_setting is true.</p>
+<p>The nested_attributes plugin’s delete/remove support now works correctly when a false value is given for _delete/_remove and strict_param_setting is true.</p>
 </li><li>
 <p>The hook_class_methods and validation_class_methods plugins now work correctly when subclassing if the subclass attempts to create instances inside Model.inherited.</p>
 </li><li>
@@ -310,19 +390,21 @@ Last Update:
 </li><li>
 <p>The postgres adapter now works around issues in ruby-pg by supporting fractional seconds for Time/DateTime values, and supporting SQL::Blob (bytea) values with embedded “0” characters.</p>
 </li><li>
-<p>The postgres adapter now supports pre-defining the PG_NAMED_TYPES and PG_TYPES constants.  This is so extensions can define them, so they don&#39;t have to load the postgres adapter file first. If extensions need to use these constants, they should do:</p>
+<p>The postgres adapter now supports pre-defining the PG_NAMED_TYPES and PG_TYPES constants.  This is so extensions can define them, so they don’t have to load the postgres adapter file first. If extensions need to use these constants, they should do:</p>
 
-<pre class="ruby"><span class="ruby-constant">PG_NAMED_TYPES</span> = {} <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_NAMED_TYPES</span>)&#x000A;<span class="ruby-constant">PG_TYPES</span> = {} <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_TYPES</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">PG_NAMED_TYPES</span> = {} <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_NAMED_TYPES</span>)
+<span class="ruby-constant">PG_TYPES</span> = {} <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_TYPES</span>)
+</pre>
 
 <p>That way they work whether they are loaded before or after the postgres adapter.</p>
 </li><li>
-<p>PostgreSQL 8.2-9.0 now correctly add the RETURNING clause when building queries.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_31_0_txt.html">3.31.0</a> added support for returning values from delete/update queries in PostgreSQL 8.2-9.0, but didn&#39;t change the literalization code to use the RETURNING clause on those versions.</p>
+<p>PostgreSQL 8.2-9.0 now correctly add the RETURNING clause when building queries.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_31_0_txt.html">3.31.0</a> added support for returning values from delete/update queries in PostgreSQL 8.2-9.0, but didn’t change the literalization code to use the RETURNING clause on those versions.</p>
 </li><li>
 <p>The jdbc/postgres adapter now converts Java arrays (Java::OrgPostgresqlJdbc4::Jdbc4Array) to ruby arrays.</p>
 </li><li>
-<p>Tables and schemas with embedded &#39; characters are now handled correctly when parsing primary keys and sequences on PostgreSQL.</p>
+<p>Tables and schemas with embedded ‘ characters are now handled correctly when parsing primary keys and sequences on PostgreSQL.</p>
 </li><li>
-<p>Identifiers are now escaped on MySQL and SQLite. Previously they were quoted, but internal ` characters were not doubled.</p>
+<p>Identifiers are now escaped on MySQL and SQLite. Previously they were quoted, but internal ‘ characters were not doubled.</p>
 </li><li>
 <p>Fractional seconds for the time type are now returned correctly on jdbc (assuming they are returned as java.sql.Time values by JDBC).</p>
 </li><li>
@@ -361,12 +443,12 @@ Last Update:
 </li><li>
 <p>Dataset#disable_insert_returning on PostgreSQL is now deprecated. Starting in <a href="3_35_0_txt.html">3.35.0</a>, RETURNING will now always be used to get the primary key value when inserting.</p>
 </li><li>
-<p>Array#all_two_pairs? is now deprecated.  It was part of the core extensions, but the core extensions have been refactored to no longer require it.  As it doesn&#39;t specifically relate to creating <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, it is being removed.  The private Array#sql_expr_if_all_two_pairs method is deprecated as well.</p>
+<p>Array#all_two_pairs? is now deprecated.  It was part of the core extensions, but the core extensions have been refactored to no longer require it.  As it doesn’t specifically relate to creating <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, it is being removed.  The private Array#sql_expr_if_all_two_pairs method is deprecated as well.</p>
 </li></ul>
 
 <h1 id="label-Other+Backwards+Compatibility+Issues">Other Backwards Compatibility Issues<span><a href="#label-Other+Backwards+Compatibility+Issues">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The generic Bignum type now uses bigint on SQLite, similar to other databases.  The integer type was previously used.  The only exception is for auto incrementing primary keys, which still use integer for Bignum as SQLite doesn&#39;t support autoincrementing columns other than integer.</p>
+<p>The generic Bignum type now uses bigint on SQLite, similar to other databases.  The integer type was previously used.  The only exception is for auto incrementing primary keys, which still use integer for Bignum as SQLite doesn’t support autoincrementing columns other than integer.</p>
 </li><li>
 <p>On SQLite, Dataset#explain now returns a string, similar to PostgreSQL (and now MySQL).</p>
 </li><li>
@@ -388,11 +470,18 @@ Last Update:
 </li><li>
 <p>Some internally used constants and private methods have been deleted:</p>
 
-<pre class="ruby"><span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">CASCADE</span>&#x000A;<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">NO_ACTION</span>&#x000A;<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">SET_DEFAULTS</span>&#x000A;<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">SET_NULL</span>&#x000A;<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">RESTRICT</span>&#x000A;<span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">COLUMN_ALL</span></pre>
+<pre class="ruby"><span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">CASCADE</span>
+<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">NO_ACTION</span>
+<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">SET_DEFAULTS</span>
+<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">SET_NULL</span>
+<span class="ruby-constant">Database</span><span class="ruby-operator">::</span><span class="ruby-constant">RESTRICT</span>
+<span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">COLUMN_ALL</span>
+</pre>
 
 <p>or moved:</p>
 
-<pre>MySQL::Dataset::AFFECTED_ROWS_RE -&gt; MySQL::Database&#x000A;MySQL::Dataset#affected_rows -&gt; MySQL::Database</pre>
+<pre>MySQL::Dataset::AFFECTED_ROWS_RE -&gt; MySQL::Database
+MySQL::Dataset#affected_rows -&gt; MySQL::Database</pre>
 </li><li>
 <p>The sql_expr extension no longer creates the Sequel::SQL::GenericComplexExpression class.</p>
 </li></ul>
@@ -406,7 +495,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

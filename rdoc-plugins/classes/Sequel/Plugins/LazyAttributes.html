@@ -39,7 +39,14 @@ Sequel::Plugins::LazyAttributes
 
 <p>This plugin depends on the tactical_eager_loading plugin, and allows you to eagerly load lazy attributes for all objects retrieved with the current object. So the following code should issue one query to get the albums and one query to get the reviews for all of those albums:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">review</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># You can specify multiple columns to lazily load:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>, <span class="ruby-value">:tracklist</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">review</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-comment"># You can specify multiple columns to lazily load:</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>, <span class="ruby-value">:tracklist</span>
+</pre>
 
 <p>Note that by default on databases that supporting RETURNING, using explicit column selections will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the insert_returning_select plugin to automatically use RETURNING for instance creations for models using the lazy_attributes plugin.</p>
 </div>
@@ -78,7 +85,10 @@ Sequel::Plugins::LazyAttributes
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;<span class="line-num">32</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>  &#x000A;<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>
+<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)
+<span class="line-num">32</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>  
+<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -96,7 +106,10 @@ Sequel::Plugins::LazyAttributes
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;<span class="line-num">37</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lazy_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>
+<span class="line-num">36</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)
+<span class="line-num">37</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lazy_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -108,7 +121,7 @@ Sequel::Plugins::LazyAttributes
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

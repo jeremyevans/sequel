@@ -36,45 +36,70 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_enum extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL&#39;s enum types.  To use this extension, first load it into your Database instance:</p>
+<p>The pg_enum extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL’s enum types.  To use this extension, first load it into your Database instance:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_enum</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_enum</span>
+</pre>
 
 <p>It allows creation of enum types using create_enum:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)
+</pre>
 
 <p>You can also add values to existing enums via add_enum_value:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_enum_value</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-string">&#39;value4&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_enum_value</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-string">&#39;value4&#39;</span>)
+</pre>
 
 <p>If you want to rename an enum type, you can use rename_enum:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-value">:enum_type_another_name</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-value">:enum_type_another_name</span>)
+</pre>
 
 <p>If you want to rename an enum value, you can use rename_enum_value:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_enum_value</span>(&#x000A;  <span class="ruby-value">:enum_type_name</span>, <span class="ruby-value">:enum_value_name</span>, <span class="ruby-value">:enum_value_another_name</span>&#x000A;)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_enum_value</span>(
+  <span class="ruby-value">:enum_type_name</span>, <span class="ruby-value">:enum_value_name</span>, <span class="ruby-value">:enum_value_another_name</span>
+)
+</pre>
 
 <p>If you want to drop an enum type, you can use drop_enum:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_enum</span>(<span class="ruby-value">:enum_type_name</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_enum</span>(<span class="ruby-value">:enum_type_name</span>)
+</pre>
 
 <p>Just like any user-created type, after creating the type, you can create tables that have a column of that type:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">enum_type_name</span> <span class="ruby-value">:column_name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">enum_type_name</span> <span class="ruby-value">:column_name</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>When parsing the schema, enum types are recognized, and available values returned in the schema hash:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-value">:table_name</span>)&#x000A;[[<span class="ruby-value">:column_name</span>, {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:enum</span>, <span class="ruby-value">:enum_values</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;value1&#39;</span>, <span class="ruby-string">&#39;value2&#39;</span>]}]]</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-value">:table_name</span>)
+[[<span class="ruby-value">:column_name</span>, {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:enum</span>, <span class="ruby-value">:enum_values</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;value1&#39;</span>, <span class="ruby-string">&#39;value2&#39;</span>]}]]
+</pre>
 
 <p>This extension integrates with the pg_array extension.  If you plan to use arrays of enum types, load the pg_array extension before the pg_enum extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_enum</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">column</span> <span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;enum_type_name[]&#39;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table_name</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:column_name</span>)&#x000A;<span class="ruby-comment"># [&#39;value1&#39;, &#39;value2&#39;]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_enum</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">column</span> <span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;enum_type_name[]&#39;</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table_name</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:column_name</span>)
+<span class="ruby-comment"># [&#39;value1&#39;, &#39;value2&#39;]</span>
+</pre>
 
 <p>If the migration extension is loaded before this one (the order is important), you can use create_enum in a reversible migration:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">create_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Finally, typecasting for enums is setup to cast to strings, which allows you to use symbols in your model code.  Similar, you can provide the enum values as symbols when creating enums using create_enum or add_enum_value.</p>
 
@@ -89,7 +114,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

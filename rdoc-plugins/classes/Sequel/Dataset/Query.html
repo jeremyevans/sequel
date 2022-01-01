@@ -87,7 +87,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/extensions/query.rb</span>&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">dataset</span>)&#x000A;<span class="line-num">67</span>   <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">dataset</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/extensions/query.rb</span>
+<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">dataset</span>)
+<span class="line-num">67</span>   <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">dataset</span>
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -99,14 +102,20 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Replace the query&#39;s dataset with dataset returned by the method call.</p>
+<p>Replace the query’s dataset with dataset returned by the method call.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-method_missing-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-method_missing-source'>   <span class="ruby-comment"># File lib/sequel/extensions/query.rb</span>&#x000A;<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">72</span>   <span class="ruby-comment"># Allow calling private methods, so things like raise works</span>&#x000A;<span class="line-num">73</span>   <span class="ruby-ivar">@dataset</span> = <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">74</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;method #{method.inspect} did not return a dataset&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)&#x000A;<span class="line-num">75</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">76</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-method_missing-source'>   <span class="ruby-comment"># File lib/sequel/extensions/query.rb</span>
+<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">72</span>   <span class="ruby-comment"># Allow calling private methods, so things like raise works</span>
+<span class="line-num">73</span>   <span class="ruby-ivar">@dataset</span> = <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">74</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;method #{method.inspect} did not return a dataset&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)
+<span class="line-num">75</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">76</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -118,7 +127,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

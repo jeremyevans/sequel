@@ -82,6 +82,9 @@ Sequel
 <a href="../files/lib/sequel/extensions/date_arithmetic_rb.html">lib/sequel/extensions/date_arithmetic.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/extensions/date_parse_input_handler_rb.html">lib/sequel/extensions/date_parse_input_handler.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/extensions/datetime_parse_to_time_rb.html">lib/sequel/extensions/datetime_parse_to_time.rb</a>
 </li>
 <li class='other'>
@@ -478,6 +481,9 @@ Sequel
 <a href="../files/lib/sequel/plugins/split_values_rb.html">lib/sequel/plugins/split_values.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/plugins/sql_comments_rb.html">lib/sequel/plugins/sql_comments.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/plugins/static_cache_rb.html">lib/sequel/plugins/static_cache.rb</a>
 </li>
 <li class='other'>
@@ -557,25 +563,53 @@ Sequel
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<p>The date_parse_input_handler extension allows for configuring how input to date parsing methods should be handled.  By default, the extension does not change behavior.  However, you can use the <code>Sequel.date_parse_input_handler</code> method to support custom handling of input strings to the date parsing methods.  For example, if you want to implement a length check to prevent denial of service vulnerabilities in older versions of Ruby, you can do:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:date_parse_input_handler</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_parse_input_handler</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>, <span class="ruby-string">&quot;string length (200) exceeds the limit 128&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">string</span>.<span class="ruby-identifier">bytesize</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">128</span>
+  <span class="ruby-identifier">string</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>You can also use <code>Sequel.date_parse_input_handler</code> to modify the string that will be passed to the parsing methods.  For example, you could truncate it:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_parse_input_handler</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">string</span>.<span class="ruby-identifier">b</span>[<span class="ruby-value">0</span>, <span class="ruby-value">128</span>]
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Be aware that modern versions of Ruby will raise an exception if date parsing input exceeds 128 bytes.</p>
+
 <p>The duplicate_columns_handler extension allows you to customize handling of duplicate column names in your queries on a per-database or per-dataset level.</p>
 
 <p>For example, you may want to raise an exception if you join 2 tables together which contains a column that will override another columns.</p>
 
 <p>To use the extension, you need to load the extension into the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:duplicate_columns_handler</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:duplicate_columns_handler</span>
+</pre>
 
 <p>or into individual datasets:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)
+</pre>
 
 <p>A database option is introduced: :on_duplicate_columns. It accepts a <a href="Symbol.html"><code>Symbol</code></a> or any object that responds to :call.</p>
 
-<pre>on_duplicate_columns: :raise&#x000A;on_duplicate_columns: :warn&#x000A;on_duplicate_columns: :ignore&#x000A;on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</pre>
+<pre>on_duplicate_columns: :raise
+on_duplicate_columns: :warn
+on_duplicate_columns: :ignore
+on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</pre>
 
 <p>You may also configure duplicate columns handling for a specific dataset:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:warn</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:raise</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:ignore</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>})</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:warn</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:raise</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:ignore</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>})
+</pre>
 
 <p>If :raise is specified, a <a href="Sequel/DuplicateColumnError.html"><code>Sequel::DuplicateColumnError</code></a> is raised. If :warn is specified, you will receive a warning via <code>warn</code>. If a callable is specified, it will be called. If no on_duplicate_columns is specified, the default is :warn.</p>
 
@@ -583,61 +617,74 @@ Sequel
 
 <p>:nocov:</p>
 
-<p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby&#39;s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby&#39;s ranges, allowing exclusive beginnings and endings (ruby&#39;s range only allows exclusive endings).</p>
+<p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby’s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby’s ranges, allowing exclusive beginnings and endings (ruby’s range only allows exclusive endings).</p>
 
-<p>When PostgreSQL range values are retreived, they are parsed and returned as instances of <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="Range.html"><code>Range</code></a>, but it&#39;s not a <a href="Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby&#39;s <a href="Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
+<p>When PostgreSQL range values are retreived, they are parsed and returned as instances of <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="Range.html"><code>Range</code></a>, but it’s not a <a href="Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby’s <a href="Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
 
 <p>In addition to the parser, this extension comes with literalizers for PGRange and <a href="Range.html"><code>Range</code></a>, so they can be used in queries and as bound variables.</p>
 
 <p>To turn an existing <a href="Range.html"><code>Range</code></a> into a PGRange, use Sequel.pg_range:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>)
+</pre>
 
 <p>If you have loaded the <a href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="Range.html#method-i-pg_range"><code>Range#pg_range</code></a>:</p>
 
-<pre class="ruby"><span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span></pre>
+<pre class="ruby"><span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span>
+</pre>
 
 <p>You may want to specify a specific range type:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>, <span class="ruby-value">:daterange</span>)&#x000A;<span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-value">:daterange</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>, <span class="ruby-value">:daterange</span>)
+<span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-value">:daterange</span>)
+</pre>
 
 <p>If you specify the range database type, <a href="Sequel.html"><code>Sequel</code></a> will automatically cast the value to that type when literalizing.</p>
 
 <p>To use this extension, load it into the <a href="Database.html"><code>Database</code></a> instance:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_range</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_range</span>
+</pre>
 
 <p>See the schema modification guide for details on using range type columns in CREATE/ALTER TABLE statements.</p>
 
 <p>This extension makes it easy to add support for other range types.  In general, you just need to make sure that the subtype is handled and has the appropriate converter installed.  For user defined types, you can do this via:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">subtype_oid</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">subtype_oid</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }
+</pre>
 
 <p>Then you can call <a href="Sequel/Postgres/PGRange/DatabaseMethods.html#method-i-register_range_type"><code>Sequel::Postgres::PGRange::DatabaseMethods#register_range_type</code></a> to automatically set up a handler for the range type.  So if you want to support the timerange type (assuming the time type is already supported):</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)
+</pre>
 
 <p>This extension integrates with the pg_array extension.  If you plan to use arrays of range types, load the pg_array extension before the pg_range extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_range</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_range</span>
+</pre>
 
 <p>Related module: <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a></p>
 
-<p>The round_timestamps extension will automatically round timestamp values to the database&#39;s supported level of precision before literalizing them.</p>
+<p>The round_timestamps extension will automatically round timestamp values to the database’s supported level of precision before literalizing them.</p>
 
 <p>For example, if the database supports millisecond precision, and you give it a Time value with microsecond precision, it will round it appropriately:</p>
 
-<pre class="ruby"><span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1405341161.917999982833862</span>)&#x000A;<span class="ruby-comment"># default: 2014-07-14 14:32:41.917999</span>&#x000A;<span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span></pre>
+<pre class="ruby"><span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1405341161.917999982833862</span>)
+<span class="ruby-comment"># default: 2014-07-14 14:32:41.917999</span>
+<span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span>
+</pre>
 
 <p>The round_timestamps extension correctly deals with databases that support millisecond or second precision.  In addition to handling Time values, it also handles DateTime values and Sequel::SQLTime values (for the TIME type).</p>
 
 <p>To round timestamps for a single dataset:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)
+</pre>
 
 <p>To round timestamps for all datasets on a single database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)
+</pre>
 
 <p>Related module: <a href="Sequel/Dataset/RoundTimestamps.html"><code>Sequel::Dataset::RoundTimestamps</code></a></p>
 </div>
@@ -668,6 +715,7 @@ Sequel
 <li><a href="Sequel/DatasetPagination.html">Sequel::DatasetPagination</a></li>
 <li><a href="Sequel/DatasetPrinter.html">Sequel::DatasetPrinter</a></li>
 <li><a href="Sequel/DatasetQuery.html">Sequel::DatasetQuery</a></li>
+<li><a href="Sequel/DateParseInputHandler.html">Sequel::DateParseInputHandler</a></li>
 <li><a href="Sequel/DateTimeParseToTime.html">Sequel::DateTimeParseToTime</a></li>
 <li><a href="Sequel/DuplicateColumnsHandler.html">Sequel::DuplicateColumnsHandler</a></li>
 <li><a href="Sequel/EmptyArrayConsiderNulls.html">Sequel::EmptyArrayConsiderNulls</a></li>
@@ -736,7 +784,10 @@ Sequel
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-core_extensions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-core_extensions-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>&#x000A;<span class="line-num">11</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier ruby-title">core_extensions?</span>&#x000A;<span class="line-num">12</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">13</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-core_extensions-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>
+<span class="line-num">11</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier ruby-title">core_extensions?</span>
+<span class="line-num">12</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">13</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-migration'>
@@ -749,7 +800,19 @@ Sequel
 
 <p>The preferred method for writing <a href="Sequel.html"><code>Sequel</code></a> migrations, using a DSL:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(<span class="ruby-value">:artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;      <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">create_table</span>(<span class="ruby-value">:artists</span>) <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
+      <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:artists</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Designed to be used with the <code>Migrator</code> class, part of the <code>migration</code> extension.</p>
 
@@ -758,7 +821,10 @@ Sequel
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-migration-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">292</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
+<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">292</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -770,7 +836,7 @@ Sequel
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

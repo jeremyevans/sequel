@@ -57,14 +57,18 @@ Sequel::Plugins::SerializationModificationDetection::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Clear the cache of original deserialized values after saving so that it doesn&#39;t show the column is modified after saving.</p>
+<p>Clear the cache of original deserialized values after saving so that it doesn’t show the column is modified after saving.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_save-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>&#x000A;<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;<span class="line-num">38</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">39</span>   <span class="ruby-ivar">@original_deserialized_values</span> = <span class="ruby-ivar">@deserialized_values</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_save-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>
+<span class="line-num">38</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">39</span>   <span class="ruby-ivar">@original_deserialized_values</span> = <span class="ruby-ivar">@deserialized_values</span>
+<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-changed_columns'>
@@ -82,7 +86,13 @@ Sequel::Plugins::SerializationModificationDetection::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-changed_columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-changed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">changed_columns</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">cc</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">45</span>   <span class="ruby-identifier">cc</span> = <span class="ruby-identifier">cc</span>.<span class="ruby-identifier">dup</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cc</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cc</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">original_deserialized_value</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">v</span>} &#x000A;<span class="line-num">47</span>   <span class="ruby-identifier">cc</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-changed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>
+<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">changed_columns</span>
+<span class="line-num">44</span>   <span class="ruby-identifier">cc</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">45</span>   <span class="ruby-identifier">cc</span> = <span class="ruby-identifier">cc</span>.<span class="ruby-identifier">dup</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
+<span class="line-num">46</span>   <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cc</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cc</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">original_deserialized_value</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">v</span>} 
+<span class="line-num">47</span>   <span class="ruby-identifier">cc</span>
+<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -100,7 +110,13 @@ Sequel::Plugins::SerializationModificationDetection::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-ivar">@original_deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">53</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-ivar">@original_deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">56</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>
+<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">52</span>   <span class="ruby-ivar">@original_deserialized_values</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">53</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">54</span>   <span class="ruby-ivar">@original_deserialized_values</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">55</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">56</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -112,7 +128,7 @@ Sequel::Plugins::SerializationModificationDetection::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

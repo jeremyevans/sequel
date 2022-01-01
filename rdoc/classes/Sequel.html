@@ -168,11 +168,19 @@ Sequel
 
 <p>There are some module methods that are added via metaprogramming, one for each supported adapter.  For example:</p>
 
-<pre>DB = Sequel.sqlite # Memory database&#x000A;DB = Sequel.sqlite(&#39;blog.db&#39;)&#x000A;DB = Sequel.postgres(&#39;database_name&#39;,&#x000A;       user:&#39;user&#39;, &#x000A;       password: &#39;password&#39;,&#x000A;       host: &#39;host&#39;&#x000A;       port: 5432, &#x000A;       max_connections: 10)</pre>
+<pre>DB = Sequel.sqlite # Memory database
+DB = Sequel.sqlite(&#39;blog.db&#39;)
+DB = Sequel.postgres(&#39;database_name&#39;,
+       user:&#39;user&#39;, 
+       password: &#39;password&#39;,
+       host: &#39;host&#39;
+       port: 5432, 
+       max_connections: 10)</pre>
 
 <p>If a block is given to these methods, it is passed the opened <a href="Sequel/Database.html"><code>Database</code></a> object, which is closed (disconnected) when the block exits, just like a block passed to Sequel.connect.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}
+</pre>
 
 <p>For a more expanded introduction, see the <a href="../files/README_rdoc.html">README</a>. For a quicker introduction, see the <a href="../files/doc/cheat_sheet_rdoc.html">cheat sheet</a>.</p>
 </div>
@@ -250,7 +258,7 @@ Sequel
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html"><code>Error</code></a> raised when the adapter requested doesn&#39;t exist or can&#39;t be loaded.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when the adapter requested doesn’t exist or can’t be loaded.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -404,7 +412,7 @@ end</td>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MINOR</td>
 <td>=</td>
-<td class='context-item-value'>51</td>
+<td class='context-item-value'>52</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
 <p>The minor version of <a href="Sequel.html"><code>Sequel</code></a>.  Bumped for every non-patch level release, generally around once a month.</p>
@@ -425,7 +433,7 @@ end</td>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Exception class raised when <code>require_modification</code> is set and an UPDATE or DELETE statement to modify the dataset doesn&#39;t modify a single row.</p>
+<p>Exception class raised when <code>require_modification</code> is set and an UPDATE or DELETE statement to modify the dataset doesn’t modify a single row.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -461,7 +469,7 @@ end</td>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html"><code>Error</code></a> that you should raise to signal a rollback of the current transaction. The transaction block will catch this exception, rollback the current transaction, and won&#39;t reraise it (unless a reraise is requested).</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> that you should raise to signal a rollback of the current transaction. The transaction block will catch this exception, rollback the current transaction, and won’t reraise it (unless a reraise is requested).</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -570,7 +578,11 @@ end</td>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-inflections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-inflections-source'>  <span class="ruby-comment"># File lib/sequel/model/inflections.rb</span>&#x000A;<span class="line-num">6</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;<span class="line-num">7</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)&#x000A;<span class="line-num">8</span>   <span class="ruby-constant">Inflections</span>&#x000A;<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-inflections-source'>  <span class="ruby-comment"># File lib/sequel/model/inflections.rb</span>
+<span class="line-num">6</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>
+<span class="line-num">7</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">8</span>   <span class="ruby-constant">Inflections</span>
+<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-migration'>
@@ -583,7 +595,19 @@ end</td>
 
 <p>The preferred method for writing <a href="Sequel.html"><code>Sequel</code></a> migrations, using a DSL:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(<span class="ruby-value">:artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;      <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">create_table</span>(<span class="ruby-value">:artists</span>) <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
+      <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:artists</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Designed to be used with the <code>Migrator</code> class, part of the <code>migration</code> extension.</p>
 
@@ -592,7 +616,10 @@ end</td>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-migration-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">292</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
+<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">292</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-version'>
@@ -610,7 +637,10 @@ end</td>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-version-source'>   <span class="ruby-comment"># File lib/sequel/version.rb</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">version</span>&#x000A;<span class="line-num">23</span>   <span class="ruby-constant">VERSION</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-version-source'>   <span class="ruby-comment"># File lib/sequel/version.rb</span>
+<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">version</span>
+<span class="line-num">23</span>   <span class="ruby-constant">VERSION</span>
+<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -622,7 +652,7 @@ end</td>
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -35,13 +35,18 @@ Sequel::Plugins::ColumnSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The column_select plugin changes the default selection for a model dataset to explicit select all columns from the table: <code>table.column1, table.column2, table.column3, ...</code>. This makes it simpler to add columns to the model&#39;s table in a migration concurrently while running the application, without it affecting the operation of the application.</p>
+<p>The column_select plugin changes the default selection for a model dataset to explicit select all columns from the table: <code>table.column1, table.column2, table.column3, ...</code>. This makes it simpler to add columns to the model’s table in a migration concurrently while running the application, without it affecting the operation of the application.</p>
 
 <p>Note that by default on databases that supporting RETURNING, using explicit column selections will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the insert_returning_select plugin to automatically use RETURNING for instance creations for models where the column_select plugin automatically sets up an explicit column selection.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses explicitly select qualified columns</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class select qualified columns</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses explicitly select qualified columns</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span>
+
+<span class="ruby-comment"># Make the Album class select qualified columns</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -69,14 +74,19 @@ Sequel::Plugins::ColumnSelect
 </div>
 <div class='description'>
 
-<p>Modify the current model&#39;s dataset selection, if the model has a dataset.</p>
+<p>Modify the current model’s dataset selection, if the model has a dataset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_select.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">32</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">33</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_select.rb</span>
+<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">32</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
+<span class="line-num">33</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -88,7 +98,7 @@ Sequel::Plugins::ColumnSelect
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

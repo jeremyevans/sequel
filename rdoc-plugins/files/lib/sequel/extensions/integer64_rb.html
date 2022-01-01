@@ -38,11 +38,12 @@ Last Update:
 <div id='description'>
 <p>The integer64 extension changes the default type used for Integer to be the same type as used for :Bignum.  In general, this means that instead of Integer resulting in a 32-bit database integer type, it will result in a 64-bit database integer type.  This affects the default type used for primary_key and foreign_key when using the schema modification methods.</p>
 
-<p>Note that it doesn&#39;t make sense to use this extension on SQLite, since the integer type will automatically handle 64-bit integers, and it treats the integer type specially when the column is also the primary key.</p>
+<p>Note that it doesn’t make sense to use this extension on SQLite, since the integer type will automatically handle 64-bit integers, and it treats the integer type specially when the column is also the primary key.</p>
 
 <p>To load the extension into the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:integer64</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:integer64</span>
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/Integer64.html"><code>Sequel::Integer64</code></a></p>
 </div>
@@ -55,7 +56,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

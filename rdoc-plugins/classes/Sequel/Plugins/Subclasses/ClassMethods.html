@@ -39,15 +39,37 @@ Sequel::Plugins::Subclasses::ClassMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
-<li><a href="#method-i-descendents">descendents</a></li>
-<li><a href="#method-i-freeze_descendents">freeze_descendents</a></li>
+<li><a href="#method-i-descendants">descendants</a></li>
+<li><a href="#method-i-freeze_descendants">freeze_descendants</a></li>
 <li><a href="#attribute-i-on_subclass">on_subclass</a></li>
-<li><a href="#attribute-i-subclasses">subclasses</a></li>
 </ol>
 </div>
 <div id='context'>
 </div>
 <div id='section'>
+<div id='aliases-list'>
+<h2>Public Instance Aliases</h2>
+<div class='name-list'>
+<table summary='Public Instance Aliases'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>descendents</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-descendants">descendants</a></td>
+<td class='context-item-desc'>
+<p>SEQUEL6: Remove</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>freeze_descendents</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-freeze_descendants">freeze_descendants</a></td>
+<td class='context-item-desc'>
+<p>SEQUEL6: Remove</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
 <div id='attribute-list'>
 <h2 class='section-bar'>Attributes</h2>
 <div class='name-list'>
@@ -61,24 +83,15 @@ Sequel::Plugins::Subclasses::ClassMethods
 <p>Callable object that should be called with every descendent class created.</p>
 </td>
 </tr>
-<tr class='top-aligned-row context-row'>
-<td class='context-item-name'>
-<a name='attribute-i-subclasses'>subclasses</a>
-</td>
-<td class='context-item-value'>[R]</td>
-<td class='context-item-desc'>
-<p>All subclasses for the current model.  Does not include the model itself.</p>
-</td>
-</tr>
 </table>
 </div>
 </div>
 <div id='methods'>
 <h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-descendents'>
-<a name='method-i-descendents'></a>
+<div class='method public-instance' id='method-method-i-descendants'>
+<a name='method-i-descendants'></a>
 <div class='synopsis'>
-<span class='name'>descendents</span><span class='arguments'>()</span>
+<span class='name'>descendants</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -87,16 +100,19 @@ Sequel::Plugins::Subclasses::ClassMethods
 
 </div>
 <div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-descendents-source&#39;); return false'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-descendants-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-descendents-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">descendents</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="line-num">56</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-descendants-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>
+<span class="line-num">63</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">descendants</span>
+<span class="line-num">64</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendants</span>)}.<span class="ruby-identifier">flatten</span>
+<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
-<div class='method public-instance' id='method-method-i-freeze_descendents'>
-<a name='method-i-freeze_descendents'></a>
+<div class='method public-instance' id='method-method-i-freeze_descendants'>
+<a name='method-i-freeze_descendants'></a>
 <div class='synopsis'>
-<span class='name'>freeze_descendents</span><span class='arguments'>()</span>
+<span class='name'>freeze_descendants</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -105,10 +121,13 @@ Sequel::Plugins::Subclasses::ClassMethods
 
 </div>
 <div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze_descendents-source&#39;); return false'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze_descendants-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze_descendents-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze_descendents</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze_descendants-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>
+<span class="line-num">72</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze_descendants</span>
+<span class="line-num">73</span>   <span class="ruby-identifier">descendants</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
+<span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -120,7 +139,7 @@ Sequel::Plugins::Subclasses::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

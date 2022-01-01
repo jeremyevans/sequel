@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#transaction now recognizes a :retry_on option, which should contain an exception class or array of exception classes. If the transaction raises one of the given exceptions, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will automatically retry the transaction block.  It&#39;s a bad idea to use this option if the transaction block is not idempotent.</p>
+<p>Database#transaction now recognizes a :retry_on option, which should contain an exception class or array of exception classes. If the transaction raises one of the given exceptions, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will automatically retry the transaction block.  It’s a bad idea to use this option if the transaction block is not idempotent.</p>
 
 <p>By default, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> only retries the block 5 times by default, to protect against infinite looping.  You can change the number of retries with the :num_retries option.</p>
 
@@ -56,7 +56,7 @@ Last Update:
 </li><li>
 <p>Dataset.def_mutation_method now accepts a :module option for the module in which to define the methods (defaulting to self).</p>
 </li><li>
-<p>An unlimited_update plugin has been added.  It&#39;s sole purpose is to eliminate a MySQL warning in replicated environments, since by default <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses a LIMIT clause when updating on MySQL.</p>
+<p>An unlimited_update plugin has been added.  It’s sole purpose is to eliminate a MySQL warning in replicated environments, since by default <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses a LIMIT clause when updating on MySQL.</p>
 </li><li>
 <p>The named_timezones extension now adds a Sequel.tzinfo_disambiguator accessor to automatically handle TZInfo::AmbiguousTime exceptions.  This should be a callable object that accepts two arguments, a DateTime instance and an array of timezone periods, and returns the timezone period to use.</p>
 </li></ul>
@@ -67,13 +67,19 @@ Last Update:
 </li><li>
 <p>The json_serializer and xml_serializer plugins are now secure by default.  Before, the default behavior of these plugins allowed for round tripping, such that:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">album</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">album</span>
+</pre>
 
 <p>Unfortunately, that requires that the deserialization allow the setting of any column.  Since the plugins also handle associations, you could also set any column in any associated object, even cascading to associated objects of those objects.</p>
 
 <p>The new default behavior only allows deserialization to set the same columns that mass-assignment would set, and not to handle associated objects at all by default.  The following additional options are supported:</p>
 
-<pre>:fields :: The specific fields to set (this was already supported&#x000A;           by the json_serializer plugin).&#x000A;:associations :: The specific associations to handle.&#x000A;:all_columns :: The previous behavior of setting all columns.&#x000A;:all_associations :: The previous behavior of setting all&#x000A;                     associations.</pre>
+<pre>:fields :: The specific fields to set (this was already supported
+           by the json_serializer plugin).
+:associations :: The specific associations to handle.
+:all_columns :: The previous behavior of setting all columns.
+:all_associations :: The previous behavior of setting all
+                     associations.</pre>
 
 <p>Since JSON parsing no longer deserializes into arbitrary ruby instances, from_json and array_from_json class methods have been added to the json_serializer plugin, for deserializing into model instances.  These mirror the from_xml and array_from_xml class methods in the xml_serializer plugin.</p>
 
@@ -81,7 +87,7 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now attempts to use database specific error codes or SQLState codes instead of regexp parsing to determine if a more specific DatabaseError subclass should be used.  This should make error handling faster and more robust.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses ESCAPE &#39;&#39; when using LIKE, for similar behavior across databases.  Previously, no ESCAPE clause was used, so behavior differed across databases, with most not using escaping, and PostgreSQL, MySQL, and H2 defaulting to backslash as the escape character.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses ESCAPE ‘&#39; when using LIKE, for similar behavior across databases.  Previously, no ESCAPE clause was used, so behavior differed across databases, with most not using escaping, and PostgreSQL, MySQL, and H2 defaulting to backslash as the escape character.</p>
 </li><li>
 <p>The query extension has been reimplemented and now uses a proxy object instead of Object#extend.</p>
 </li><li>
@@ -91,7 +97,7 @@ Last Update:
 </li><li>
 <p>Metadata parsing (schema, indexes, foreign_key_list) on PostgreSQL now correctly handles the case where an unqualified table name is used and tables with that name exist in multiple schemas.  It now picks the first matching table in the schema_search_path, instead of failing or returning results from all tables.</p>
 </li><li>
-<p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> instances no longer attempt to typecast the money type on PostgreSQL, since the previous typecast didn&#39;t work correctly, and correct typecasting is locale-dependent.</p>
+<p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> instances no longer attempt to typecast the money type on PostgreSQL, since the previous typecast didn’t work correctly, and correct typecasting is locale-dependent.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer picks up foreign keys for tables in other databases when using Database#foreign_key_list on MySQL.</p>
 </li><li>
@@ -99,7 +105,7 @@ Last Update:
 </li><li>
 <p>A warning has been eliminated when using the jdbc/oracle adapter on JRuby 1.7.</p>
 </li><li>
-<p>Sequel&#39;s ilike emulation should now work by default on databases without specific syntax support.</p>
+<p>Sequel’s ilike emulation should now work by default on databases without specific syntax support.</p>
 </li><li>
 <p>Dataset#from_self! no longer creates a self referential dataset.</p>
 </li><li>
@@ -110,7 +116,7 @@ Last Update:
 <ul><li>
 <p>The switch to using JSON.parse :create_additions=&gt;false means that if your app expected JSON to deserialize into arbitrary ruby objects, it is probably broken.  You should update your application code to manually convert the deserialized hashes into the ruby objects you want.</p>
 
-<p>Note that it&#39;s not just this new version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> that will cause that, older versions of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will break in the same way if you update your JSON library to a version that is not vulnerable by default.</p>
+<p>Note that it’s not just this new version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> that will cause that, older versions of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will break in the same way if you update your JSON library to a version that is not vulnerable by default.</p>
 
 <p>This potentially affects the pg_json extension and serialization plugin if you were expecting the JSON stored in the database to be deserialized into arbitrary ruby objects.</p>
 
@@ -124,7 +130,7 @@ Last Update:
 </li><li>
 <p>The Dataset#def_mutation_method instance method has been removed. This method added mutation methods directly on the dataset instance, which is generally not desired.  Using the def_mutation_method class method with the :module option is now the recommended approach.</p>
 </li><li>
-<p>The switch to using ESCAPE for LIKE characters is backwards incompatible on databases that don&#39;t use escaping by default,  when backslash is used in a LIKE pattern as a regular character. Now you have to double the backslash in the pattern.</p>
+<p>The switch to using ESCAPE for LIKE characters is backwards incompatible on databases that don’t use escaping by default,  when backslash is used in a LIKE pattern as a regular character. Now you have to double the backslash in the pattern.</p>
 </li><li>
 <p>Database#database_error_regexps private method now can return any enumerable yielding regexp/exception class pairs, it is no longer specified to return a hash.</p>
 </li></ul>
@@ -138,7 +144,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

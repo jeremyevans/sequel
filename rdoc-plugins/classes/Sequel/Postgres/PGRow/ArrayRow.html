@@ -92,7 +92,7 @@ Superclass:
 </td>
 <td class='context-item-value'>[W]</td>
 <td class='context-item-desc'>
-<p>Sets the database type associated with this instance.  This is used to override the class&#39;s default database type.</p>
+<p>Sets the database type associated with this instance.  This is used to override the class’s default database type.</p>
 </td>
 </tr>
 </table>
@@ -115,7 +115,12 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-subclass-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-subclass-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>&#x000A;<span class="line-num">114</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">subclass</span>(<span class="ruby-identifier">db_type</span>)&#x000A;<span class="line-num">115</span>   <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">116</span>     <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>&#x000A;<span class="line-num">117</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">118</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-subclass-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
+<span class="line-num">114</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">subclass</span>(<span class="ruby-identifier">db_type</span>)
+<span class="line-num">115</span>   <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">116</span>     <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>
+<span class="line-num">117</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">118</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -127,14 +132,17 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Return the instance&#39;s database type, or the class&#39;s database type if the instance has not overridden it.</p>
+<p>Return the instance’s database type, or the class’s database type if the instance has not overridden it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-db_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-db_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>&#x000A;<span class="line-num">127</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-db_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
+<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>
+<span class="line-num">127</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>
+<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-op'>
@@ -152,7 +160,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-op-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;<span class="line-num">169</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>
+<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>
+<span class="line-num">169</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -170,7 +181,15 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">132</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;ROW&#39;</span>&#x000A;<span class="line-num">133</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">to_a</span>)&#x000A;<span class="line-num">134</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>&#x000A;<span class="line-num">135</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span>&#x000A;<span class="line-num">136</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)&#x000A;<span class="line-num">137</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
+<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">132</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;ROW&#39;</span>
+<span class="line-num">133</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">to_a</span>)
+<span class="line-num">134</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>
+<span class="line-num">135</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span>
+<span class="line-num">136</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">137</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -182,7 +201,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

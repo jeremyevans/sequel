@@ -65,14 +65,20 @@ Sequel::Dataset::NullDataset
 </div>
 <div class='description'>
 
-<p>Create a new dataset from the dataset (which won&#39;t be nulled) to get the columns if they aren&#39;t already cached.</p>
+<p>Create a new dataset from the dataset (which won’t be nulled) to get the columns if they aren’t already cached.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-columns-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">_columns</span>&#x000A;<span class="line-num">55</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">cols</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">57</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-ivar">@opts</span>).<span class="ruby-identifier">columns</span>&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-columns-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>
+<span class="line-num">54</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">_columns</span>
+<span class="line-num">55</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">cols</span>
+<span class="line-num">56</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">57</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-ivar">@opts</span>).<span class="ruby-identifier">columns</span>
+<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-delete'>
@@ -90,7 +96,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-delete-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-delete-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-value">0</span>&#x000A;<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-delete-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>
+<span class="line-num">62</span>   <span class="ruby-value">0</span>
+<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -108,7 +117,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-each-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>&#x000A;<span class="line-num">67</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-each-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
+<span class="line-num">67</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -126,7 +138,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-fetch_rows-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-fetch_rows-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">72</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-fetch_rows-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">72</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert'>
@@ -144,7 +159,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">76</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-operator">*</span>)&#x000A;<span class="line-num">77</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">76</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-operator">*</span>)
+<span class="line-num">77</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-truncate'>
@@ -162,7 +180,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-truncate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-truncate-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>&#x000A;<span class="line-num">82</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-truncate-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">81</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>
+<span class="line-num">82</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update'>
@@ -180,7 +201,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">v</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">87</span>   <span class="ruby-value">0</span>&#x000A;<span class="line-num">88</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">86</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">v</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">87</span>   <span class="ruby-value">0</span>
+<span class="line-num">88</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -199,7 +223,10 @@ Sequel::Dataset::NullDataset
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_import-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-_import-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">94</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-_import-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
+<span class="line-num">93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">94</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -211,7 +238,7 @@ Sequel::Dataset::NullDataset
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

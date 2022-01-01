@@ -61,13 +61,13 @@ Last Update:
 </li><li>
 <p>Model#dup now duplicates the associations hash for the object.</p>
 </li><li>
-<p>Model#freeze no longer validates an object if the the errors for the object are already frozen.  The static_cache plugin now freezes the errors before freezing the object, so that it doesn&#39;t validate the object.  This can skip many database queries when the auto_validations plugin is used and there is a unique constraint or index on the related table.</p>
+<p>Model#freeze no longer validates an object if the the errors for the object are already frozen.  The static_cache plugin now freezes the errors before freezing the object, so that it doesn’t validate the object.  This can skip many database queries when the auto_validations plugin is used and there is a unique constraint or index on the related table.</p>
 </li><li>
-<p>AUTOINCREMENT is now used again on SQLite by default for primary keys.  It was removed when :auto_increment was added to the schema hashes, but the removal changed SQLite&#39;s behavior.  This restores the previous behavior.</p>
+<p>AUTOINCREMENT is now used again on SQLite by default for primary keys.  It was removed when :auto_increment was added to the schema hashes, but the removal changed SQLite’s behavior.  This restores the previous behavior.</p>
 </li><li>
-<p>Microsoft SQL Server&#39;s bit type is now recognized as a boolean type by the schema dumper.</p>
+<p>Microsoft SQL Server’s bit type is now recognized as a boolean type by the schema dumper.</p>
 </li><li>
-<p>The pg_enum extension&#39;s create_enum method can now be used in reversible migrations.</p>
+<p>The pg_enum extension’s create_enum method can now be used in reversible migrations.</p>
 </li><li>
 <p>set_column_type with the :auto_increment=&gt;true option once again works on MySQL.  It had been broken since <a href="../../../classes/Sequel.html"><code>Sequel</code></a> started adding :auto_increment to the schema hashes.</p>
 </li><li>
@@ -90,7 +90,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

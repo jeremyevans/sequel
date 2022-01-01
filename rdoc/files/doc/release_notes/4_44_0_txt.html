@@ -42,25 +42,53 @@ Last Update:
 </li><li>
 <p>Model.finalize_associations has been added, speeding up some association reflection methods by about 10x.  This method should be called after all associated models have been loaded. This can speed up the retrieval of associated objects for small datasets by 5-10%.</p>
 
-<p>One advantage of using this is it will raise an exception if it recognizes that any of your associations are not defined correctly, such as referencing an associated class that doesn&#39;t exist.</p>
+<p>One advantage of using this is it will raise an exception if it recognizes that any of your associations are not defined correctly, such as referencing an associated class that doesn’t exist.</p>
 </li><li>
-<p>Model.freeze_descendents has been added to the subclasses plugin. This method finalizes associations for all descendent classes, then freezes the descendent class.  It&#39;s designed to make it easy to freeze all model classes in use:</p>
+<p>Model.freeze_descendents has been added to the subclasses plugin. This method finalizes associations for all descendent classes, then freezes the descendent class.  It’s designed to make it easy to freeze all model classes in use:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendents</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>
+<span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendents</span>
+</pre>
 </li><li>
 <p>An implicit_subquery dataset extension has been added, which implicitly uses a subquery if you have a dataset with raw SQL and you call a method that would modify the SQL used:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM foo</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:implicit_subquery</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM foo) AS t1 WHERE (bar = 1)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-comment"># SELECT * FROM foo</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:implicit_subquery</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-comment"># SELECT * FROM (SELECT * FROM foo) AS t1 WHERE (bar = 1)</span>
+</pre>
 </li><li>
 <p>Model datasets now have where_all, where_each, and where_single_value methods for returning data:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_all</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>])&#x000A;<span class="ruby-comment"># =&gt; [Album[1], Album[3], Album[2]]</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">where_single_value</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># &quot;Album&#39;s Name&quot;</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_all</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>])
+<span class="ruby-comment"># =&gt; [Album[1], Album[3], Album[2]]</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
+  <span class="ruby-comment"># ...</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">where_single_value</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-comment"># &quot;Album&#39;s Name&quot;</span>
+</pre>
 
 <p>These methods are designed for use by other dataset methods you define, and are optimized for frozen datasets if the methods will be called multiple times on the same dataset.  where_all and where_each can increase performance by up to 40% for small datasets compared to where.all and where.each.  where_single_value can be up to twice as fast as where.single_value.</p>
 </li><li>
 <p>Model.dataset_module now supports an eager method for eager loading:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">eager</span> <span class="ruby-value">:with_artist</span>, <span class="ruby-value">:artist</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_artist</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># eagerly loads artist association</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>
+
+  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">eager</span> <span class="ruby-value">:with_artist</span>, <span class="ruby-value">:artist</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_artist</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># eagerly loads artist association</span>
+</pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -71,7 +99,18 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> classes that are subclasses of core classes now define custom inspect methods so instances can easily be differentiated from core class instances.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::Blob:0xa6f3a3c3710 bytes=1 content=&quot;a&quot;&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">now</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQLTime 10:03:06&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::LiteralString &quot;foo&quot;&gt;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Album.many_to_one :artist&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]])&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::ValueList [[1, 2]]&gt;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;a&#39;</span>)
+<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::Blob:0xa6f3a3c3710 bytes=1 content=&quot;a&quot;&gt;</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">now</span>
+<span class="ruby-comment"># =&gt; #&lt;Sequel::SQLTime 10:03:06&gt;</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;foo&quot;</span>)
+<span class="ruby-comment"># =&gt; #&lt;Sequel::LiteralString &quot;foo&quot;&gt;</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>
+<span class="ruby-comment"># =&gt; #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Album.many_to_one :artist&gt;</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]])
+<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::ValueList [[1, 2]]&gt;</span>
+</pre>
 </li><li>
 <p>Dataset#from_self now copies the columns from the current dataset if they are present, since wrapping a dataset in a subquery should not change the columns returned.</p>
 </li><li>
@@ -105,7 +144,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

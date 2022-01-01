@@ -61,11 +61,15 @@ Superclass:
 
 <p>Add an exclusion constraint when creating the table. Elements should be an array of 2 element arrays, with the first element being the column or expression the exclusion constraint is applied to, and the second element being the operator to use for the column/expression to check for exclusion:</p>
 
-<pre class="ruby"><span class="ruby-identifier">exclude</span>([[<span class="ruby-value">:col1</span>, <span class="ruby-string">&#39;&amp;&amp;&#39;</span>], [<span class="ruby-value">:col2</span>, <span class="ruby-string">&#39;=&#39;</span>]])&#x000A;<span class="ruby-comment"># EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">exclude</span>([[<span class="ruby-value">:col1</span>, <span class="ruby-string">&#39;&amp;&amp;&#39;</span>], [<span class="ruby-value">:col2</span>, <span class="ruby-string">&#39;=&#39;</span>]])
+<span class="ruby-comment"># EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)</span>
+</pre>
 
 <p>To use a custom operator class, you need to use Sequel.lit with the expression and operator class:</p>
 
-<pre class="ruby"><span class="ruby-identifier">exclude</span>([[<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;col1 inet_ops&#39;</span>), <span class="ruby-string">&#39;&amp;&amp;&#39;</span>], [<span class="ruby-value">:col2</span>, <span class="ruby-string">&#39;=&#39;</span>]])&#x000A;<span class="ruby-comment"># EXCLUDE USING gist (col1 inet_ops WITH &amp;&amp;, col2 WITH =)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">exclude</span>([[<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;col1 inet_ops&#39;</span>), <span class="ruby-string">&#39;&amp;&amp;&#39;</span>], [<span class="ruby-value">:col2</span>, <span class="ruby-string">&#39;=&#39;</span>]])
+<span class="ruby-comment"># EXCLUDE USING gist (col1 inet_ops WITH &amp;&amp;, col2 WITH =)</span>
+</pre>
 
 <p>Options supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
@@ -81,7 +85,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exclude-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-exclude-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">119</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-exclude-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">119</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +100,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

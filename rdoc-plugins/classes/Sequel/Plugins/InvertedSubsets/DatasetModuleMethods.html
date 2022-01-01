@@ -62,7 +62,11 @@ Sequel::Plugins::InvertedSubsets::DatasetModuleMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-where-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-where-source'>   <span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">47</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">48</span>   <span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">inverted_subset_name</span>(<span class="ruby-identifier">name</span>), <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-where-source'>   <span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb</span>
+<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">47</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">48</span>   <span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">inverted_subset_name</span>(<span class="ruby-identifier">name</span>), <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +78,7 @@ Sequel::Plugins::InvertedSubsets::DatasetModuleMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

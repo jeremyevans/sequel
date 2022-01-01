@@ -45,23 +45,48 @@ Last Update:
 </li><li>
 <p>The raise_on_typecast_failure switch was added, with it being true by default (so no change in behavior).  This allows the user to silently ignore errors when typecasting fails, at the global, class, and instance levels.</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Instance</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:numtracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># =&gt; raises Sequel::Error::InvalidValue</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:numtracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># =&gt; #&lt;Album @values={:numtracks=&gt;&quot;a&quot;}&gt;</span></pre>
-</li><li>
-<p>Associations&#39; orders are now respected when eager loading via eager_graph.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will qualify the columns in the order with the alias being used, so you can have overlapping columns when eager loading multiple associations.</p>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># Class</span>
+<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Instance</span>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:name</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:number</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(<span class="ruby-value">:artists__name</span>).<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># =&gt; ... ORDER BY artists.name, albums.name, tracks.number</span></pre>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:numtracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># =&gt; raises Sequel::Error::InvalidValue</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_typecast_failure</span> = <span class="ruby-keyword">false</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:numtracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># =&gt; #&lt;Album @values={:numtracks=&gt;&quot;a&quot;}&gt;</span>
+</pre>
+</li><li>
+<p>Associations’ orders are now respected when eager loading via eager_graph.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will qualify the columns in the order with the alias being used, so you can have overlapping columns when eager loading multiple associations.</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:name</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:number</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(<span class="ruby-value">:artists__name</span>).<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>).<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># =&gt; ... ORDER BY artists.name, albums.name, tracks.number</span>
+</pre>
 </li><li>
 <p>The support for CASE expressions has been enhanced by allowing the use of an optional expression:</p>
 
-<pre class="ruby">{<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-value">:x</span>)&#x000A;<span class="ruby-comment"># =&gt; CASE x WHEN 1 THEN 2 ELSE 0 END</span>&#x000A;[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">:c</span>, <span class="ruby-value">3</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">4</span>, <span class="ruby-value">:y</span>)&#x000A;<span class="ruby-comment"># =&gt; CASE y WHEN a THEN 1 WHEN b THEN 2 WHEN c THEN 3 ELSE 4 END</span></pre>
+<pre class="ruby">{<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-value">:x</span>)
+<span class="ruby-comment"># =&gt; CASE x WHEN 1 THEN 2 ELSE 0 END</span>
+[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">:c</span>, <span class="ruby-value">3</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">4</span>, <span class="ruby-value">:y</span>)
+<span class="ruby-comment"># =&gt; CASE y WHEN a THEN 1 WHEN b THEN 2 WHEN c THEN 3 ELSE 4 END</span>
+</pre>
 
 <p>Previously, to get something equivalent to this, you had to do:</p>
 
-<pre>{{:x=&gt;1}=&gt;2}.case(0)&#x000A;# =&gt; CASE WHEN (x = 1) THEN 2 ELSE 0 END&#x000A;[[{:y=&gt;:a}, 1], [{:y=&gt;:b}, 2], [{:y=&gt;:c}, 3]].case(4)&#x000A;# =&gt; CASE WHEN (y = a) THEN 1 WHEN (y = b) THEN 2 WHEN (y = c)&#x000A;     THEN 3 ELSE 4 END</pre>
+<pre>{{:x=&gt;1}=&gt;2}.case(0)
+# =&gt; CASE WHEN (x = 1) THEN 2 ELSE 0 END
+[[{:y=&gt;:a}, 1], [{:y=&gt;:b}, 2], [{:y=&gt;:c}, 3]].case(4)
+# =&gt; CASE WHEN (y = a) THEN 1 WHEN (y = b) THEN 2 WHEN (y = c)
+     THEN 3 ELSE 4 END</pre>
 </li><li>
 <p>You can now change the NULL/NOT NULL value of an existing column using the set_column_allow_null method.</p>
 
-<pre class="ruby"><span class="ruby-comment"># Set NOT NULL</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:artists</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:name</span>, <span class="ruby-keyword">false</span>}&#x000A;<span class="ruby-comment"># Set NULL</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:artists</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:name</span>, <span class="ruby-keyword">true</span>}</pre>
+<pre class="ruby"><span class="ruby-comment"># Set NOT NULL</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:artists</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:name</span>, <span class="ruby-keyword">false</span>}
+<span class="ruby-comment"># Set NULL</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:artists</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:name</span>, <span class="ruby-keyword">true</span>}
+</pre>
 </li><li>
 <p>You can now get the schema information for a table in a non-public schema in PostgreSQL using the implicit :schema__table syntax. Before, the :schema option had to be given explicitly to Database#schema.  This allows models to get schema information for tables outside the public schema.</p>
 </li><li>
@@ -117,7 +142,7 @@ Last Update:
 </li><li>
 <p>The SQLite adapter used to always return Time instances for timestamp types, even if Sequel.datetime_class was DateTime.  For datetime types it always returned a DateTime instance.  It now returns an instance of Sequel.datetime_class in both cases.</p>
 </li><li>
-<p>It&#39;s possible that the including of associations&#39; orders when eager loading via eager_graph could cause problems.  You can use the :order_eager_graph=&gt;false option to not use the :order option when eager loading via :eager_graph.</p>
+<p>It’s possible that the including of associations’ orders when eager loading via eager_graph could cause problems.  You can use the :order_eager_graph=&gt;false option to not use the :order option when eager loading via :eager_graph.</p>
 </li><li>
 <p>There were small changes in SQL creation where the AS keyword is now used explicitly.  These should have no effect, but could break tests for explicit SQL.</p>
 </li></ul>
@@ -131,7 +156,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

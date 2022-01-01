@@ -65,41 +65,65 @@ Last Update:
 
 <p>Generally, when using prepared statements (and certainly when using bound variables), you need to put placeholders in your SQL to indicate where you want your bound arguments to appear.  Database support and syntax vary significantly for placeholders (e.g. :name, $1, ?).  <a href="../../classes/Sequel.html"><code>Sequel</code></a> abstracts all of that and allows you to specify placeholders by using the :$name format for placeholders, e.g.:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+</pre>
 
 <p>You can use these placeholders in most places where you can use the value directly.  For example, if you want to use placeholders while also using raw SQL, you can do:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE name = ?&quot;</span>, <span class="ruby-value">:$n</span>]</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE name = ?&quot;</span>, <span class="ruby-value">:$n</span>]
+</pre>
 
 <h2 id="label-Bound+Variables">Bound Variables<span><a href="#label-Bound+Variables">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Using bound variables for this query is simple:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+</pre>
 
-<p>This will do the equivalent of selecting records that have the name &#39;Jim&#39;. It returns all records, and can take a block that is passed to <code>Dataset#all</code>.</p>
+<p>This will do the equivalent of selecting records that have the name ‘Jim’. It returns all records, and can take a block that is passed to <code>Dataset#all</code>.</p>
 
 <p>Deleting or returning the first record works similarly:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:first</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># First record with name &#39;Jim&#39;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:delete</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># Delete records with name &#39;Jim&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:first</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># First record with name &#39;Jim&#39;</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:delete</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># Delete records with name &#39;Jim&#39;</span>
+</pre>
 
 <p>For inserting/updating records, you should also specify a value hash, which may itself contain placeholders:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Insert record with &#39;Jim&#39;, note that the previous filter is ignored</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:insert</span>, {<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)&#x000A;<span class="ruby-comment"># Change name to &#39;Bob&#39; for all records with name of &#39;Jim&#39;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update</span>, {<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>}, <span class="ruby-value">name:</span> <span class="ruby-value">:$new_n</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># Insert record with &#39;Jim&#39;, note that the previous filter is ignored</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:insert</span>, {<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+<span class="ruby-comment"># Change name to &#39;Bob&#39; for all records with name of &#39;Jim&#39;</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update</span>, {<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>}, <span class="ruby-value">name:</span> <span class="ruby-value">:$new_n</span>)
+</pre>
 
 <h2 id="label-Prepared+Statements">Prepared Statements<span><a href="#label-Prepared+Statements">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Prepared statement support is similar to bound variable support, but you use <code>Dataset#prepare</code> with a name, and <code>Dataset#call</code> or <code>Database#call</code> later with the values:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)&#x000A;<span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:select_by_name</span>)&#x000A;&#x000A;<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select_by_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+<span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:select_by_name</span>)
+
+<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select_by_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same</span>
+</pre>
 
 <p>The <code>Dataset#prepare</code> method returns a prepared statement, and also stores a copy of the prepared statement in the database for later use.  For insert and update queries, the hash to insert/update is passed to <code>prepare</code>:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ps1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:insert</span>, <span class="ruby-value">:insert_with_name</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)&#x000A;&#x000A;<span class="ruby-identifier">ps1</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:insert_with_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)&#x000A;<span class="ruby-identifier">ps2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:update</span>, <span class="ruby-value">:update_name</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:$new_n</span>)&#x000A;&#x000A;<span class="ruby-identifier">ps2</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># same</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ps1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:insert</span>, <span class="ruby-value">:insert_with_name</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+
+<span class="ruby-identifier">ps1</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:insert_with_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same</span>
+
+<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$n</span>)
+<span class="ruby-identifier">ps2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:update</span>, <span class="ruby-value">:update_name</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:$new_n</span>)
+
+<span class="ruby-identifier">ps2</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update_name</span>, <span class="ruby-value">n:</span> <span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">new_n:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># same</span>
+</pre>
 
 <h2 id="label-Implementation+Issues">Implementation Issues<span><a href="#label-Implementation+Issues">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Currently, creating a prepared statement uses Object#extend, which can hurt performance.  For high performance applications, it&#39;s recommended to create all of your prepared statements upon application initialization, and not to create prepared statements dynamically at runtime.</p>
+<p>Currently, creating a prepared statement uses Object#extend, which can hurt performance.  For high performance applications, it’s recommended to create all of your prepared statements upon application initialization, and not to create prepared statements dynamically at runtime.</p>
 
 <h2 id="label-Database+support">Database support<span><a href="#label-Database+support">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -123,7 +147,7 @@ Last Update:
 
 <h3 id="label-TinyTDS">TinyTDS<span><a href="#label-TinyTDS">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>Uses the sp_executesql stored procedure with bound variables, since Microsoft SQL Server doesn&#39;t support true prepared statements.</p>
+<p>Uses the sp_executesql stored procedure with bound variables, since Microsoft SQL Server doesn’t support true prepared statements.</p>
 
 <h3 id="label-IBM_DB">IBM_DB<span><a href="#label-IBM_DB">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -146,7 +170,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

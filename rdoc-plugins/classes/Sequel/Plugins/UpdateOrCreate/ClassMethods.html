@@ -63,7 +63,13 @@ Sequel::Plugins::UpdateOrCreate::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-find_or_new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-find_or_new-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">attrs</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attrs</span>)&#x000A;<span class="line-num">57</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">set_attrs</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">set_attrs</span>&#x000A;<span class="line-num">58</span>   <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)&#x000A;<span class="line-num">59</span>   <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-find_or_new-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb</span>
+<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">56</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">attrs</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attrs</span>)
+<span class="line-num">57</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">set_attrs</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">set_attrs</span>
+<span class="line-num">58</span>   <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">59</span>   <span class="ruby-identifier">obj</span>
+<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_or_create'>
@@ -81,7 +87,12 @@ Sequel::Plugins::UpdateOrCreate::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_or_create-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update_or_create-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_or_create</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">49</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">save_changes</span>&#x000A;<span class="line-num">50</span>   <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update_or_create-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_or_create</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">48</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">49</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">save_changes</span>
+<span class="line-num">50</span>   <span class="ruby-identifier">obj</span>
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +104,7 @@ Sequel::Plugins::UpdateOrCreate::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

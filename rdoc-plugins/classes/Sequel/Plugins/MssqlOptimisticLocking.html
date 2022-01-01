@@ -37,11 +37,19 @@ Sequel::Plugins::MssqlOptimisticLocking
 <div id='description'>
 <p>This plugin implements optimistic locking mechanism on Microsoft <a href="../SQL.html"><code>SQL</code></a> Server using a timestamp/rowversion column to ensure that concurrent updates are detected and previous changes are not automatically overridden. This is best implemented by a code example:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:mssql_optimistic_locking</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># raises Sequel::NoExistingObject</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:mssql_optimistic_locking</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># works</span>
+<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># raises Sequel::NoExistingObject</span>
+</pre>
 
 <p>In order for this plugin to work, you need to make sure that the database table has a column of timestamp or rowversion.  The plugin uses a default name of timestamp for this columns, but you can override that using the :lock_column option:</p>
 
-<pre class="ruby"><span class="ruby-identifier">plugin</span> <span class="ruby-value">:mssql_optimistic_locking</span>, <span class="ruby-value">lock_column:</span> <span class="ruby-value">:column_name</span></pre>
+<pre class="ruby"><span class="ruby-identifier">plugin</span> <span class="ruby-value">:mssql_optimistic_locking</span>, <span class="ruby-value">lock_column:</span> <span class="ruby-value">:column_name</span>
+</pre>
 
 <p>This plugin relies on the instance_filters plugin.</p>
 </div>
@@ -80,7 +88,10 @@ Sequel::Plugins::MssqlOptimisticLocking
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">29</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>
+<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">29</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -98,7 +109,10 @@ Sequel::Plugins::MssqlOptimisticLocking
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>&#x000A;<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:timestamp</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>
+<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:timestamp</span>
+<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -110,7 +124,7 @@ Sequel::Plugins::MssqlOptimisticLocking
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

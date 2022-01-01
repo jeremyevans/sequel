@@ -46,12 +46,26 @@ Last Update:
 
 <p>If you use a deprecated method or feature, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will by default print a deprecation message and 10 lines of backtrace to standard error to easily allow you to figure out which code needs to be updated.  You can change where the deprecation messages go and how many lines of backtrace are given using the following:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-comment"># Turn off all deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)
+
+<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-value">5</span>
+
+<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">true</span>
+
+<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">false</span>
+
+<span class="ruby-comment"># Turn off all deprecation logging</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span>
+</pre>
 
 <p>Deprecated Features Moving to Extensions</p>
 <hr>
 <ul><li>
-<p>Migrations are being moved into sequel/extensions/migration.  There isn&#39;t any reason that they should be loaded in normal use since they are used so rarely.  The sequel command line tool uses this extension to run the migrations.</p>
+<p>Migrations are being moved into sequel/extensions/migration.  There isn’t any reason that they should be loaded in normal use since they are used so rarely.  The sequel command line tool uses this extension to run the migrations.</p>
 </li><li>
 <p>Adding the blank? method to all objects has been moved into sequel/extensions/blank.</p>
 </li><li>
@@ -63,47 +77,56 @@ Last Update:
 </li><li>
 <p>String inflection methods (e.g. “people”.singularize) have been moved into sequel/extensions/inflector.</p>
 </li><li>
-<p>String date/time conversion methods (e.g. &#39;2000-01-01&#39;.to_date) have been moved into sequel/extensions/string_date_time.</p>
+<p>String date/time conversion methods (e.g. ‘2000-01-01’.to_date) have been moved into sequel/extensions/string_date_time.</p>
 </li></ul>
 
 <p>Deprecated Model Features Moving to Plugins</p>
 <hr>
 <ul><li>
-<p>Model validation class methods have been moved to a plugin.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to write their own validate instance method instead. A new validation_helpers plugin has been added to make this easier, it&#39;s explained in the New Features section.  If you want to continue using the validation class methods:</p>
+<p>Model validation class methods have been moved to a plugin.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to write their own validate instance method instead. A new validation_helpers plugin has been added to make this easier, it’s explained in the New Features section.  If you want to continue using the validation class methods:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span>
+</pre>
 </li><li>
 <p>Model hook class methods have been moved to a plugin.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to write their own hook instance methods, and call super to get hooks specified in superclasses or plugins.  If you want to continue using the hook class methods:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span>
+</pre>
 </li><li>
 <p>Model schema methods (e.g. Model.set_schema, Model.create_table,  Model.drop_table) have been moved to a plugin.  The use of these methods has been discouraged for a long time.  If you want to use them:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:schema</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:schema</span>
+</pre>
 </li><li>
 <p>Model.set_sti_key has been moved to a plugin.  So you should change:</p>
 
-<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">set_sti_key</span> <span class="ruby-value">:key_column</span></pre>
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">set_sti_key</span> <span class="ruby-value">:key_column</span>
+</pre>
 
 <p>to:</p>
 
-<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-value">:key_column</span></pre>
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-value">:key_column</span>
+</pre>
 </li><li>
 <p>Model.set_cache has been moved to a plugin.  So you should change:</p>
 
-<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">set_cache</span> <span class="ruby-identifier">cache_store</span>, <span class="ruby-identifier">opts</span></pre>
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">set_cache</span> <span class="ruby-identifier">cache_store</span>, <span class="ruby-identifier">opts</span>
+</pre>
 
 <p>to:</p>
 
-<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:caching</span>, <span class="ruby-identifier">cache_store</span>, <span class="ruby-identifier">opts</span></pre>
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:caching</span>, <span class="ruby-identifier">cache_store</span>, <span class="ruby-identifier">opts</span>
+</pre>
 </li><li>
 <p>Model.serialize has been moved to a plugin.  So you should change:</p>
 
-<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">serialize</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:format</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:yaml</span></pre>
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">serialize</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:format</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:yaml</span>
+</pre>
 
 <p>to:</p>
 
-<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>, <span class="ruby-value">:yaml</span>, <span class="ruby-value">:column</span></pre>
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>, <span class="ruby-value">:yaml</span>, <span class="ruby-value">:column</span>
+</pre>
 
 <p>Because the previous serialization support depended on dataset transforms, the new serialization support is implemented differently, and behavior may not be identical in all cases. However, this should be a drop in replacement for most users.</p>
 </li></ul>
@@ -113,7 +136,7 @@ Last Update:
 <ul><li>
 <p>Dataset#transform is deprecated without any replacement planned. It was announced on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> mailing list that transforms would be removed unless someone said they needed them, and nobody said that they did.</p>
 </li><li>
-<p>Dataset#multi_insert and Dataset#import are no longer aliases of each other.  Dataset#multi_insert now takes an array of hashes, and Dataset#import now takes an array of columns and an array of arrays of values.  Using multi_insert with import&#39;s API or vice-versa is deprecated.</p>
+<p>Dataset#multi_insert and Dataset#import are no longer aliases of each other.  Dataset#multi_insert now takes an array of hashes, and Dataset#import now takes an array of columns and an array of arrays of values.  Using multi_insert with import’s API or vice-versa is deprecated.</p>
 </li><li>
 <p>Calling Dataset#[] with no arguments or an integer argument is deprecated.</p>
 </li><li>
@@ -125,7 +148,7 @@ Last Update:
 </li><li>
 <p>Array#extract_options! and Object#is_one_of? are both deprecated.</p>
 </li><li>
-<p>The metaprogramming methods taken from metaid are deprecated and have been moved into Sequel::Metaprogramming.  If you want them available to specific objects/classes, just include or extend with Sequel::Metaprogramming.  If you want all objects to have access to the metaprogramming methods, install metaid.  Note that the class_def method from metaid doesn&#39;t exist in Sequel::Metaprogramming, since it really isn&#39;t different from define_method (except it is public instead of private).</p>
+<p>The metaprogramming methods taken from metaid are deprecated and have been moved into Sequel::Metaprogramming.  If you want them available to specific objects/classes, just include or extend with Sequel::Metaprogramming.  If you want all objects to have access to the metaprogramming methods, install metaid.  Note that the class_def method from metaid doesn’t exist in Sequel::Metaprogramming, since it really isn’t different from define_method (except it is public instead of private).</p>
 </li><li>
 <p>Module#class_attr_overridable, class_attr_reader, and metaalias are deprecated.</p>
 </li><li>
@@ -191,7 +214,7 @@ Last Update:
 </li><li>
 <p>Using a virtual row block without an argument is deprecated, see Sequel.virtual_row_instance_eval= under New Features.</p>
 </li><li>
-<p>When using the JDBC adapter, Java::JavaSQL::Timestamp#usec is deprecated.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has returned Java::JavaSQL::Timestamp as DateTime or Time for a few versions, so this shouldn&#39;t affect most people.</p>
+<p>When using the JDBC adapter, Java::JavaSQL::Timestamp#usec is deprecated.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has returned Java::JavaSQL::Timestamp as DateTime or Time for a few versions, so this shouldn’t affect most people.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer require bigdecimal/util, enumerator, or yaml in 3.0.  If you need them in your code, make sure you require them yourself.  Using features added by requiring these standard libaries will not bring up a deprecation warning, for obvious reasons.</p>
 </li><li>
@@ -203,49 +226,106 @@ Last Update:
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>Sequel.virtual_row_instance_eval= was added, which lets you give <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.12 the behavior that will be the standard in 3.0. It changes blocks passed to Dataset#filter, select, or order that don&#39;t accept arguments (or accept any number of arguments) to instance eval the block in the context of a new VirtualRow instance instead of passing a new VirtualRow instance to the block. It allows you to change code that looks like this:</p>
+<p>Sequel.virtual_row_instance_eval= was added, which lets you give <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.12 the behavior that will be the standard in 3.0. It changes blocks passed to Dataset#filter, select, or order that don’t accept arguments (or accept any number of arguments) to instance eval the block in the context of a new VirtualRow instance instead of passing a new VirtualRow instance to the block. It allows you to change code that looks like this:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}
+</pre>
 
 <p>to:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}
+</pre>
 
 <p>When instance_eval is used, only local variables are available to the block.  Any calls to instance methods will be interpreted as calling VirtualRow#method_missing, which generates identifiers or functions.  When virtual_row_instance_eval is enabled, the following type of code will break:</p>
 
-<pre class="ruby"><span class="ruby-comment"># amount is a instance method</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-value">:number</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">amount</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}</pre>
+<pre class="ruby"><span class="ruby-comment"># amount is a instance method</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-value">:number</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">amount</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}
+</pre>
 
-<p>Just like this example, the only type of code that should break is when a virtual row block was used when it wasn&#39;t necessary (since it doesn&#39;t use the VirtualRow argument).</p>
+<p>Just like this example, the only type of code that should break is when a virtual row block was used when it wasn’t necessary (since it doesn’t use the VirtualRow argument).</p>
 
-<p>When Sequel.virtual_row_instance_eval = false, using a virtual row block that doesn&#39;t accept an argument will cause a deprecation message.</p>
+<p>When Sequel.virtual_row_instance_eval = false, using a virtual row block that doesn’t accept an argument will cause a deprecation message.</p>
 
-<p>Here&#39;s a regular expression that should catch most places where you are using a virtual row block without an argument.</p>
+<p>Here’s a regular expression that should catch most places where you are using a virtual row block without an argument.</p>
 
 <pre>egrep -nr &#39;[^A-Za-z0-9_](filter|select|select_more|order|order_more|get|where|having|from|first|and|or|exclude|find|subset|constraint|check)( *(\([^)]*\) *)?){*[^|]&#39; *</pre>
 
 <p>An RDoc page explaining virtual row blocks was added as well.</p>
 </li><li>
-<p>A validation_helpers model plugin was added that allows you to do validations similar to the old class level validations inside the Model#validate instance method.  The API has changed, but it&#39;s capable of most of the same validations.  It doesn&#39;t handle acceptance_of or confirmation_of validations, as those shouldn&#39;t be handled in the model.</p>
+<p>A validation_helpers model plugin was added that allows you to do validations similar to the old class level validations inside the Model#validate instance method.  The API has changed, but it’s capable of most of the same validations.  It doesn’t handle acceptance_of or confirmation_of validations, as those shouldn’t be handled in the model.</p>
 
-<pre class="ruby"><span class="ruby-comment"># Old class level validations</span>&#x000A;<span class="ruby-identifier">validates_format_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:with</span><span class="ruby-operator">=&gt;</span><span class="ruby-regexp">/.../</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:maximum</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:minimum</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:is</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:within</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>&#x000A;<span class="ruby-identifier">validates_not_string</span> <span class="ruby-value">:col</span>&#x000A;<span class="ruby-identifier">validates_numericality_of</span> <span class="ruby-value">:col</span>&#x000A;<span class="ruby-identifier">validates_numericality_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:only_integer</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">validates_presence_of</span> <span class="ruby-value">:col</span>&#x000A;<span class="ruby-identifier">validates_inclusion_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:in</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>]&#x000A;<span class="ruby-identifier">validates_uniqueness_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>&#x000A;<span class="ruby-identifier">validates_uniqueness_of</span>([<span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>])&#x000A;&#x000A;<span class="ruby-comment"># New instance level validations</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/.../</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_max_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_exact_length</span> <span class="ruby-value">4</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_not_string</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_numeric</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_includes</span>([<span class="ruby-value">3</span>,<span class="ruby-value">4</span>,<span class="ruby-value">5</span>], <span class="ruby-value">:col</span>)&#x000A;  <span class="ruby-identifier">validates_unique</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>&#x000A;  <span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Old class level validations</span>
+<span class="ruby-identifier">validates_format_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:with</span><span class="ruby-operator">=&gt;</span><span class="ruby-regexp">/.../</span>
+<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:maximum</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>
+<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:minimum</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>
+<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:is</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">4</span>
+<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:within</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>
+<span class="ruby-identifier">validates_not_string</span> <span class="ruby-value">:col</span>
+<span class="ruby-identifier">validates_numericality_of</span> <span class="ruby-value">:col</span>
+<span class="ruby-identifier">validates_numericality_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:only_integer</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>
+<span class="ruby-identifier">validates_presence_of</span> <span class="ruby-value">:col</span>
+<span class="ruby-identifier">validates_inclusion_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:in</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>]
+<span class="ruby-identifier">validates_uniqueness_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>
+<span class="ruby-identifier">validates_uniqueness_of</span>([<span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>])
+
+<span class="ruby-comment"># New instance level validations</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+  <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/.../</span>, <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_max_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_exact_length</span> <span class="ruby-value">4</span>, <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>, <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_not_string</span> <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_numeric</span> <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:col</span>
+  <span class="ruby-identifier">validates_includes</span>([<span class="ruby-value">3</span>,<span class="ruby-value">4</span>,<span class="ruby-value">5</span>], <span class="ruby-value">:col</span>)
+  <span class="ruby-identifier">validates_unique</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>
+  <span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>])
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Another change made is to specify the same type of validation on multiple attributes, you must use an array:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Old</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:name</span>, <span class="ruby-value">:password</span>, <span class="ruby-value">:within</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># New</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:password</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Old</span>
+<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:name</span>, <span class="ruby-value">:password</span>, <span class="ruby-value">:within</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>
+
+<span class="ruby-comment"># New</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+  <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:password</span>]
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>The :message, :allow_blank, :allow_missing, and :allow_nil options are still respected.  The :tag option is not needed as instance level validations work with code reloading without workarounds. The :if option is also not needed for instance level validations:</p>
 
-<pre># Old&#x000A;validates_presence_of :name, :if=&gt;:new?&#x000A;validates_presence_of :pass, :if=&gt;{flag &gt; 3}&#x000A;# New&#x000A;def validate&#x000A;  validates_presence(:name) if new?&#x000A;  validates_presence(:pass) if flag &gt; 3&#x000A;end</pre>
+<pre># Old
+validates_presence_of :name, :if=&gt;:new?
+validates_presence_of :pass, :if=&gt;{flag &gt; 3}
+# New
+def validate
+  validates_presence(:name) if new?
+  validates_presence(:pass) if flag &gt; 3
+end</pre>
 
-<p>The validates_each also doesn&#39;t have an equivalent instance method, since it is much easier to just write your own validation:</p>
+<p>The validates_each also doesn’t have an equivalent instance method, since it is much easier to just write your own validation:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Old</span>&#x000A;<span class="ruby-identifier">validates_each</span>(<span class="ruby-value">:date</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">o</span>,<span class="ruby-identifier">a</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">o</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># New</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:date</span>, <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Old</span>
+<span class="ruby-identifier">validates_each</span>(<span class="ruby-value">:date</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">o</span>,<span class="ruby-identifier">a</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">o</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-comment"># New</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+  <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:date</span>, <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>MySQL adapter datasets now have on_duplicate_key_update and insert_ignore methods which modify the SQL used to support ON DUPLICATE KEY UPDATE and INSERT INGORE syntax in multi_insert and import.</p>
 </li><li>
 <p>If you use the MySQL native adapter, you can set:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">convert_invalid_date_time</span> = <span class="ruby-keyword">nil</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">convert_invalid_date_time</span> = <span class="ruby-keyword">nil</span>
+</pre>
 
 <p>to return dates like “0000-00-00” and times like “25:00:00” as nil values instead of raising an error.  You can also set it to :string to return the values as strings.</p>
 </li><li>
@@ -259,19 +339,23 @@ Last Update:
 <ul><li>
 <p>Model column accessors have been made faster and the overhead of creating them has been reduced significantly.</p>
 </li><li>
-<p>~{:bool_col=&gt;true} now generates an bool_col IS NOT TRUE filter instead of bool_col != TRUE.  This makes it return records with NULL values.  If you only want to have false records, you should use {:bool_col=&gt;false}.  This works better with SQL&#39;s 3 valued boolean logic.</p>
+<p>~{:bool_col=&gt;true} now generates an bool_col IS NOT TRUE filter instead of bool_col != TRUE.  This makes it return records with NULL values.  If you only want to have false records, you should use {:bool_col=&gt;false}.  This works better with SQL’s 3 valued boolean logic.</p>
 
-<p>It is slightly inconsistent with ~{:col=&gt;1}, since that won&#39;t return values where col is NULL, but it gives the user the ability to create an IS [NOT] (TRUE|FALSE) filter, which <a href="../../../classes/Sequel.html"><code>Sequel</code></a> previously did not support.</p>
+<p>It is slightly inconsistent with ~{:col=&gt;1}, since that won’t return values where col is NULL, but it gives the user the ability to create an IS [NOT] (TRUE|FALSE) filter, which <a href="../../../classes/Sequel.html"><code>Sequel</code></a> previously did not support.</p>
 
 <p>If you really want the old behavior, you can change it to  ~{true=&gt;:bool_col}.</p>
 </li><li>
-<p>Model.use_transactions was added for setting whether model objects should use transactions when destroying or saving records.  Like most <a href="../../../classes/Sequel.html"><code>Sequel</code></a> options, it&#39;s settable on a global, per model, and per object basis:</p>
+<p>Model.use_transactions was added for setting whether model objects should use transactions when destroying or saving records.  Like most <a href="../../../classes/Sequel.html"><code>Sequel</code></a> options, it’s settable on a global, per model, and per object basis:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">my_model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>
+<span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-identifier">my_model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>
+</pre>
 
 <p>You can also turn it on or off for specific save calls:</p>
 
-<pre class="ruby"><span class="ruby-identifier">my_model</span>.<span class="ruby-identifier">save</span>(<span class="ruby-value">:transaction</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">my_model</span>.<span class="ruby-identifier">save</span>(<span class="ruby-value">:transaction</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+</pre>
 </li><li>
 <p>The Oracle adapter now supports schema parsing.</p>
 </li><li>
@@ -283,11 +367,11 @@ Last Update:
 </li><li>
 <p>Dataset#where now always affects the WHERE clause.  Before, it was just an alias of filter, so it modified the HAVING clause if the dataset already had a HAVING clause.</p>
 </li><li>
-<p>The optimization of Model.[] introduced in <a href="2_11_0_txt.html">2.11.0</a> broke on databases that didn&#39;t support LIMIT.  The optimization now works on those databases.</p>
+<p>The optimization of Model.[] introduced in <a href="2_11_0_txt.html">2.11.0</a> broke on databases that didn’t support LIMIT.  The optimization now works on those databases.</p>
 </li><li>
 <p>All of the the RDoc documentation was reviewed and many updates were made, resulting in significantly improved documentation quality.</p>
 </li><li>
-<p>Model.def_dataset_method now works when the model doesn&#39;t have an associated dataset, as it will add the method to a dataset given to set_dataset in the future.</p>
+<p>Model.def_dataset_method now works when the model doesn’t have an associated dataset, as it will add the method to a dataset given to set_dataset in the future.</p>
 </li><li>
 <p>Database#get and select now take a block that is passed to the dataset they create.</p>
 </li><li>
@@ -323,11 +407,11 @@ Last Update:
 </li><li>
 <p>The mappings of adapter schemes to classes are now stored in Sequel::ADAPTER_MAP instead of the Database @@adapters class variable.</p>
 </li><li>
-<p>Model instances no longer contain a reference to their class&#39;s @db_schema.</p>
+<p>Model instances no longer contain a reference to their class’s @db_schema.</p>
 </li><li>
 <p>Database schema sql methods (e.g. alter_table_sql) are now private.</p>
 </li><li>
-<p>Database#[] no longer accepts a block.  It&#39;s not possible to call it with a block in general usage, anyway.</p>
+<p>Database#[] no longer accepts a block.  It’s not possible to call it with a block in general usage, anyway.</p>
 </li><li>
 <p>The Sequel::Schema::SQL module no longer exists, the methods it included were placed directly in the <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> class.</p>
 </li><li>
@@ -347,7 +431,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

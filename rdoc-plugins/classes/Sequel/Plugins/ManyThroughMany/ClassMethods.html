@@ -90,7 +90,10 @@ Sequel::Plugins::ManyThroughMany::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-many_through_many-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-many_through_many-source'>    <span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb</span>&#x000A;<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">227</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">228</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-many_through_many-source'>    <span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb</span>
+<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">227</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">228</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-one_through_many'>
@@ -108,7 +111,10 @@ Sequel::Plugins::ManyThroughMany::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-one_through_many-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-one_through_many-source'>    <span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb</span>&#x000A;<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">232</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-one_through_many-source'>    <span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb</span>
+<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">232</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -120,7 +126,7 @@ Sequel::Plugins::ManyThroughMany::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

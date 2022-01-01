@@ -41,7 +41,15 @@ Superclass:
 <div id='description'>
 <p>This Module subclass is used by <a href="../Database.html#method-i-extend_datasets"><code>Database#extend_datasets</code></a> and <a href="../Dataset.html#method-i-with_extend"><code>Dataset#with_extend</code></a> to add dataset methods to classes. It adds some helper methods inside the module that can define named methods on the dataset instances which do specific actions. For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">order</span> <span class="ruby-value">:by_id</span>, <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-identifier">select</span> <span class="ruby-value">:with_id_and_name</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">active</span>.<span class="ruby-identifier">with_id_and_name</span>.<span class="ruby-identifier">by_id</span>&#x000A;<span class="ruby-comment"># SELECT id, name FROM table WHERE active ORDER BY id</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">order</span> <span class="ruby-value">:by_id</span>, <span class="ruby-value">:id</span>
+  <span class="ruby-identifier">select</span> <span class="ruby-value">:with_id_and_name</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">active</span>.<span class="ruby-identifier">with_id_and_name</span>.<span class="ruby-identifier">by_id</span>
+<span class="ruby-comment"># SELECT id, name FROM table WHERE active ORDER BY id</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -70,7 +78,19 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-def_dataset_caching_method-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-def_dataset_caching_method-source'>   <span class="ruby-comment"># File lib/sequel/dataset/dataset_module.rb</span>&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_dataset_caching_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;<span class="line-num">29</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">30</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">31</span>       <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>){<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="line-num">32</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">33</span>       <span class="ruby-identifier">key</span> = <span class="ruby-value">:&quot;_#{meth}_#{name}_ds&quot;</span>&#x000A;<span class="line-num">34</span>       <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">35</span>         <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-identifier">key</span>){<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}&#x000A;<span class="line-num">36</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">37</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">38</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-def_dataset_caching_method-source'>   <span class="ruby-comment"># File lib/sequel/dataset/dataset_module.rb</span>
+<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_dataset_caching_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)
+<span class="line-num">29</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
+<span class="line-num">30</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">31</span>       <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>){<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">32</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">33</span>       <span class="ruby-identifier">key</span> = <span class="ruby-value">:&quot;_#{meth}_#{name}_ds&quot;</span>
+<span class="line-num">34</span>       <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">35</span>         <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-identifier">key</span>){<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">36</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">37</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">38</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -82,7 +102,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

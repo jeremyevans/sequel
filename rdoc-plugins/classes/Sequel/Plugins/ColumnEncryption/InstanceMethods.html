@@ -62,7 +62,19 @@ Sequel::Plugins::ColumnEncryption::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-reencrypt-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-reencrypt-source'>    <span class="ruby-comment"># File lib/sequel/plugins/column_encryption.rb</span>&#x000A;<span class="line-num">687</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reencrypt</span>&#x000A;<span class="line-num">688</span>   <span class="ruby-identifier">do_save</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">689</span> &#x000A;<span class="line-num">690</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:column_encryption_metadata</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span>, <span class="ruby-identifier">metadata</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">691</span>     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">value</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">column</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">value</span>.<span class="ruby-identifier">start_with?</span>(<span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">key_searcher</span>.<span class="ruby-identifier">call</span>)&#x000A;<span class="line-num">692</span>       <span class="ruby-identifier">do_save</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">693</span>       <span class="ruby-identifier">values</span>[<span class="ruby-identifier">column</span>] = <span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">encryptor</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">decryptor</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">value</span>))&#x000A;<span class="line-num">694</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">695</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">696</span> &#x000A;<span class="line-num">697</span>   <span class="ruby-identifier">save</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">do_save</span>&#x000A;<span class="line-num">698</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-reencrypt-source'>    <span class="ruby-comment"># File lib/sequel/plugins/column_encryption.rb</span>
+<span class="line-num">687</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reencrypt</span>
+<span class="line-num">688</span>   <span class="ruby-identifier">do_save</span> = <span class="ruby-keyword">false</span>
+<span class="line-num">689</span> 
+<span class="line-num">690</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:column_encryption_metadata</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span>, <span class="ruby-identifier">metadata</span><span class="ruby-operator">|</span>
+<span class="line-num">691</span>     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">value</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">column</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">value</span>.<span class="ruby-identifier">start_with?</span>(<span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">key_searcher</span>.<span class="ruby-identifier">call</span>)
+<span class="line-num">692</span>       <span class="ruby-identifier">do_save</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">693</span>       <span class="ruby-identifier">values</span>[<span class="ruby-identifier">column</span>] = <span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">encryptor</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">decryptor</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">value</span>))
+<span class="line-num">694</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">695</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">696</span> 
+<span class="line-num">697</span>   <span class="ruby-identifier">save</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">do_save</span>
+<span class="line-num">698</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +86,7 @@ Sequel::Plugins::ColumnEncryption::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

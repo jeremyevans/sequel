@@ -37,7 +37,14 @@ Sequel::Plugins::AssociationMultiAddRemove
 <div id='description'>
 <p>The association_multi_add_remove plugin allows adding, removing and setting multiple associated objects in a single method call. By default <a href="../Model.html"><code>Sequel::Model</code></a> defines singular <code>add_*</code> and <code>remove_*</code> methods that operate on a single associated object, this adds plural forms that operate on multiple associated objects. Example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album1]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_albums</span>([<span class="ruby-identifier">album2</span>, <span class="ruby-identifier">album3</span>])&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album1, album2, album3]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">remove_albums</span>([<span class="ruby-identifier">album3</span>, <span class="ruby-identifier">album1</span>])&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album2]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> = [<span class="ruby-identifier">album2</span>, <span class="ruby-identifier">album3</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album2, album3]</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album1]</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_albums</span>([<span class="ruby-identifier">album2</span>, <span class="ruby-identifier">album3</span>])
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album1, album2, album3]</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">remove_albums</span>([<span class="ruby-identifier">album3</span>, <span class="ruby-identifier">album1</span>])
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album2]</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> = [<span class="ruby-identifier">album2</span>, <span class="ruby-identifier">album3</span>]
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album2, album3]</span>
+</pre>
 
 <p>It can handle all situations that the normal singular methods handle, but there is no attempt to optimize behavior, so using these methods will not improve performance.</p>
 
@@ -47,7 +54,14 @@ Sequel::Plugins::AssociationMultiAddRemove
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Allow adding/removing/setting multiple associated objects in a single call</span>&#x000A;<span class="ruby-comment"># for all model subclass instances (called before loading subclasses):</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_multi_add_remove</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow adding/removing/setting multiple associated objects in a single call</span>&#x000A;<span class="ruby-comment"># for Album instances (called before defining associations in the class):</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_multi_add_remove</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Allow adding/removing/setting multiple associated objects in a single call</span>
+<span class="ruby-comment"># for all model subclass instances (called before loading subclasses):</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_multi_add_remove</span>
+
+<span class="ruby-comment"># Allow adding/removing/setting multiple associated objects in a single call</span>
+<span class="ruby-comment"># for Album instances (called before defining associations in the class):</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_multi_add_remove</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -66,7 +80,7 @@ Sequel::Plugins::AssociationMultiAddRemove
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

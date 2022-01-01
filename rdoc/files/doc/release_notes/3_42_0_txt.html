@@ -40,13 +40,20 @@ Last Update:
 <ul><li>
 <p>Dataset#avg, interval, min, max, range, and sum now accept virtual row blocks, allowing you to more easily get aggregate values of expressions based on the table:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">sum</span>{<span class="ruby-identifier">some_function</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)} <span class="ruby-comment"># =&gt; 134</span>&#x000A;<span class="ruby-comment"># SELECT sum(some_function(column1, column2)) FROM table</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">sum</span>{<span class="ruby-identifier">some_function</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)} <span class="ruby-comment"># =&gt; 134</span>
+<span class="ruby-comment"># SELECT sum(some_function(column1, column2)) FROM table</span>
+</pre>
 </li><li>
 <p>Database#do has been added on PostgreSQL for using the DO anonymous code block execution statement.</p>
 </li><li>
 <p>Model.dataset_module now uses a Module subclass, which allows you to call subset inside a dataset_module block, making it easier to consolidate dataset method code:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">subset</span>(<span class="ruby-value">:gold</span>){<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">subset</span>(<span class="ruby-value">:gold</span>){<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>Database#copy_table and copy_into are now supported on jdbc/postgres.</p>
 </li><li>
@@ -54,7 +61,7 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports INITIALLY IMMEDIATE deferred constraints via the :deferrable=&gt;:immediate constraint/column option.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports setting the default size of string columns, via the default_string_column_size option or accessor.  In some cases, Sequel&#39;s default string column size of 255 is too large (e.g. MySQL with utf8mb4 character set), and this allows you to change it.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports setting the default size of string columns, via the default_string_column_size option or accessor.  In some cases, Sequel’s default string column size of 255 is too large (e.g. MySQL with utf8mb4 character set), and this allows you to change it.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -63,7 +70,7 @@ Last Update:
 </li><li>
 <p>If an error occurs while attempting to commit a transaction, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now attempts to rollback the transaction.  Some databases do this automatically, but not all.  Among other things, this fixes issues with deferred foreign key constraint violations on SQLite.</p>
 </li><li>
-<p>When extending a model&#39;s dataset, the model&#39;s instance_dataset is reset, insuring that it will also be extended with the module.</p>
+<p>When extending a model’s dataset, the model’s instance_dataset is reset, insuring that it will also be extended with the module.</p>
 </li><li>
 <p>When passing an invalid argument to Dataset#filter, the exception message now includes the argument.</p>
 </li><li>
@@ -90,7 +97,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

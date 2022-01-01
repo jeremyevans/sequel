@@ -64,7 +64,13 @@ Sequel::ThreadedServerBlock
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_server-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_server-source'>    <span class="ruby-comment"># File lib/sequel/extensions/server_block.rb</span>&#x000A;<span class="line-num">133</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>)&#x000A;<span class="line-num">134</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">135</span>     <span class="ruby-identifier">set_default_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>)&#x000A;<span class="line-num">136</span>     <span class="ruby-keyword">yield</span>&#x000A;<span class="line-num">137</span>   <span class="ruby-keyword">ensure</span>&#x000A;<span class="line-num">138</span>     <span class="ruby-identifier">clear_default_server</span>&#x000A;<span class="line-num">139</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_server-source'>    <span class="ruby-comment"># File lib/sequel/extensions/server_block.rb</span>
+<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>)
+<span class="line-num">132</span>   <span class="ruby-identifier">set_default_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>)
+<span class="line-num">133</span>   <span class="ruby-keyword">yield</span>
+<span class="line-num">134</span> <span class="ruby-keyword">ensure</span>
+<span class="line-num">135</span>   <span class="ruby-identifier">clear_default_server</span>
+<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -76,7 +82,7 @@ Sequel::ThreadedServerBlock
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -44,31 +44,43 @@ Last Update:
 
 <p>The following stored procedure is used as an example:</p>
 
-<pre>CREATE PROCEDURE dbo.SequelTest(&#x000A;  @Input varchar(25),&#x000A;  @Output int OUTPUT&#x000A;)&#x000A;AS&#x000A;  SET @Output = LEN(@Input)&#x000A;  RETURN 0</pre>
+<pre>CREATE PROCEDURE dbo.SequelTest(
+  @Input varchar(25),
+  @Output int OUTPUT
+)
+AS
+  SET @Output = LEN(@Input)
+  RETURN 0</pre>
 
 <p>Execute it as follows:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, <span class="ruby-value">:output</span>]})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, <span class="ruby-value">:output</span>]})
+</pre>
 
 <p>Use the <code>:output</code> symbol to denote an output variable. The result will contain a hash of the output variables, as well as the result code and number of affected rows:</p>
 
-<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:var1</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}</pre>
+<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:var1</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}
+</pre>
 
 <p>Output variables will be strings by default. To specify their type, include the SQL type:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [<span class="ruby-value">:output</span>, <span class="ruby-string">&#39;int&#39;</span>]]})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [<span class="ruby-value">:output</span>, <span class="ruby-string">&#39;int&#39;</span>]]})
+</pre>
 
 <p>Result:</p>
 
-<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:var1</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>}</pre>
+<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:var1</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>}
+</pre>
 
 <p>Output variables will be named +var#{n}+ where n is their zero indexed position in the parameter list. To name the output variable, include their name:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [<span class="ruby-value">:output</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;Output&#39;</span>]]})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [<span class="ruby-value">:output</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;Output&#39;</span>]]})
+</pre>
 
 <p>Result:</p>
 
-<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:output</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}</pre>
+<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:output</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -79,7 +91,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

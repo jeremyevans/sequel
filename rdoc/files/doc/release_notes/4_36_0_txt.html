@@ -42,15 +42,48 @@ Last Update:
 
 <p>A :class_namespace association option has been added to make it possible to set a default namespace for the :class option if given as a symbol or string.</p>
 
-<p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.Model.cache_anonymous_models has been added and controls whether to cache anonymous model subclasses created by Sequel::Model::Model() on a per-class basis.</p>
+<p>Sequel::Model.Model.cache_anonymous_models has been added and controls whether to cache anonymous model subclasses created by Sequel::Model::Model() on a per-class basis.</p>
 
 <p>These changes are designed to make it easier to use namespaced models, for example:</p>
 
-<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Foo</span>&#x000A;   <span class="ruby-constant">Model</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">def_Model</span>(<span class="ruby-keyword">self</span>)&#x000A;   <span class="ruby-constant">DB</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>[<span class="ruby-string">&#39;FOO_DATABASE_URL&#39;</span>])&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span>[<span class="ruby-value">:class_namespace</span>] = <span class="ruby-string">&#39;Foo&#39;</span>&#x000A;&#x000A;   <span class="ruby-keyword">class</span> <span class="ruby-constant">Bar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>&#x000A;     <span class="ruby-comment"># Uses Foo::DB[:bars] as dataset</span>&#x000A;&#x000A;     <span class="ruby-comment"># Implicitly uses Foo::Baz as associated class</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:bazes</span>&#x000A;&#x000A;     <span class="ruby-comment"># Uses Foo::Baz due to :class_namespace option</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:oldest_bazes</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Baz</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>&#x000A;   <span class="ruby-keyword">end</span>&#x000A;&#x000A;   <span class="ruby-keyword">class</span> <span class="ruby-constant">Baz</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>(<span class="ruby-value">:my_baz</span>)&#x000A;     <span class="ruby-comment"># Uses Foo::DB[:my_baz] as dataset</span>&#x000A;&#x000A;     <span class="ruby-comment"># Implicitly uses Foo::Bar as associated class</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:bars</span>&#x000A;&#x000A;     <span class="ruby-comment"># Uses Foo::Bar due to :class_namespace option</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:oldest_bars</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Bar</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>&#x000A;   <span class="ruby-keyword">end</span>&#x000A; <span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Foo</span>
+   <span class="ruby-constant">Model</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)
+   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">def_Model</span>(<span class="ruby-keyword">self</span>)
+   <span class="ruby-constant">DB</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>[<span class="ruby-string">&#39;FOO_DATABASE_URL&#39;</span>])
+   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>
+   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span>[<span class="ruby-value">:class_namespace</span>] = <span class="ruby-string">&#39;Foo&#39;</span>
+
+   <span class="ruby-keyword">class</span> <span class="ruby-constant">Bar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>
+     <span class="ruby-comment"># Uses Foo::DB[:bars] as dataset</span>
+
+     <span class="ruby-comment"># Implicitly uses Foo::Baz as associated class</span>
+     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:bazes</span>
+
+     <span class="ruby-comment"># Uses Foo::Baz due to :class_namespace option</span>
+     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:oldest_bazes</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Baz</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>
+   <span class="ruby-keyword">end</span>
+
+   <span class="ruby-keyword">class</span> <span class="ruby-constant">Baz</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>(<span class="ruby-value">:my_baz</span>)
+     <span class="ruby-comment"># Uses Foo::DB[:my_baz] as dataset</span>
+
+     <span class="ruby-comment"># Implicitly uses Foo::Bar as associated class</span>
+     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:bars</span>
+
+     <span class="ruby-comment"># Uses Foo::Bar due to :class_namespace option</span>
+     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:oldest_bars</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Bar</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>
+   <span class="ruby-keyword">end</span>
+ <span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>A string_agg extension has been added for aggregate string concatentation support on PostgreSQL 9+, SQLAnywhere 12+, Oracle11g+, DB 9.7+, MySQL, HSQLDB, H2, and CUBRID:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_agg</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>))             <span class="ruby-comment"># &#39;,&#39; default separator</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>, <span class="ruby-string">&#39; - &#39;</span>))      <span class="ruby-comment"># custom separator</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:bar</span>)) <span class="ruby-comment"># force order</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">distinct</span>)    <span class="ruby-comment"># remove duplicates</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_agg</span>
+<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>))             <span class="ruby-comment"># &#39;,&#39; default separator</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>, <span class="ruby-string">&#39; - &#39;</span>))      <span class="ruby-comment"># custom separator</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:bar</span>)) <span class="ruby-comment"># force order</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">distinct</span>)    <span class="ruby-comment"># remove duplicates</span>
+</pre>
 </li><li>
 <p>A connection_expiration extension has been added, for automatically removing connections from the connection pool after they have been open for a given amount of time (4 hours by default).</p>
 </li><li>
@@ -58,7 +91,9 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel/SQL/Function.html#method-i-order"><code>Sequel::SQL::Function#order</code></a> has been added to support ordered aggregate functions:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:baz</span>)&#x000A;<span class="ruby-comment"># foo(bar ORDER BY baz)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:baz</span>)
+<span class="ruby-comment"># foo(bar ORDER BY baz)</span>
+</pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -94,7 +129,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

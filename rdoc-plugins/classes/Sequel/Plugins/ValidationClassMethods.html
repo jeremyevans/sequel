@@ -35,13 +35,18 @@ Sequel::Plugins::ValidationClassMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Sequel&#39;s built-in validation_class_methods plugin adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</p>
+<p>Sequel’s built-in validation_class_methods plugin adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</p>
 
 <p>It is recommended to use the validation_helpers plugin instead of this one, as it is less complex and more flexible.  However, this plugin provides reflection support, since it is class-level, while the instance-level validation_helpers plugin does not.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Add the validation class methods to all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span>&#x000A;&#x000A;<span class="ruby-comment"># Add the validation class methods to the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Add the validation class methods to all model subclasses (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span>
+
+<span class="ruby-comment"># Add the validation class methods to the Album class</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -77,7 +82,13 @@ Sequel::Plugins::ValidationClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/validation_class_methods.rb</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">24</span>     <span class="ruby-ivar">@validations</span> = {}&#x000A;<span class="line-num">25</span>     <span class="ruby-ivar">@validation_reflections</span> = {}&#x000A;<span class="line-num">26</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/validation_class_methods.rb</span>
+<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-keyword">do</span>
+<span class="line-num">24</span>     <span class="ruby-ivar">@validations</span> = {}
+<span class="line-num">25</span>     <span class="ruby-ivar">@validation_reflections</span> = {}
+<span class="line-num">26</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">27</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -89,7 +100,7 @@ Sequel::Plugins::ValidationClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

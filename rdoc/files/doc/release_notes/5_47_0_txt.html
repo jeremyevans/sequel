@@ -51,11 +51,21 @@ Last Update:
 
 <p>For many_to_many/one_through_one, you specify the :join_table_db association option, which should be a <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance containing the join table.  It is possible for the current table, join table, and associated table all to be in separate databases:</p>
 
-<pre class="ruby"><span class="ruby-constant">JOIN_TABLE_DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:artists</span>, <span class="ruby-value">join_table_db:</span> <span class="ruby-constant">JOIN_TABLE_DB</span></pre>
+<pre class="ruby"><span class="ruby-constant">JOIN_TABLE_DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:artists</span>, <span class="ruby-value">join_table_db:</span> <span class="ruby-constant">JOIN_TABLE_DB</span>
+</pre>
 
 <p>For many_through_many/one_through_many, you can use the :db option in each join table specification.  All join tables can be in separate databases:</p>
 
-<pre class="ruby"><span class="ruby-constant">JTDB1</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">JTDB2</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-comment"># Tracks on all albums this artist appears on</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:album_tracks</span>, [&#x000A;    {<span class="ruby-value">table:</span> <span class="ruby-value">:albums_artists</span>, <span class="ruby-value">left:</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">right:</span> <span class="ruby-value">:album_id</span>, <span class="ruby-value">db:</span> <span class="ruby-constant">JTDB1</span>},&#x000A;    {<span class="ruby-value">table:</span> <span class="ruby-value">:artists</span>, <span class="ruby-value">left:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">right:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">db:</span> <span class="ruby-constant">JTDB2</span>}&#x000A;  ],&#x000A;  <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">right_primary_key:</span> <span class="ruby-value">:album_id</span></pre>
+<pre class="ruby"><span class="ruby-constant">JTDB1</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)
+<span class="ruby-constant">JTDB2</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)
+<span class="ruby-comment"># Tracks on all albums this artist appears on</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:album_tracks</span>, [
+    {<span class="ruby-value">table:</span> <span class="ruby-value">:albums_artists</span>, <span class="ruby-value">left:</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">right:</span> <span class="ruby-value">:album_id</span>, <span class="ruby-value">db:</span> <span class="ruby-constant">JTDB1</span>},
+    {<span class="ruby-value">table:</span> <span class="ruby-value">:artists</span>, <span class="ruby-value">left:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">right:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">db:</span> <span class="ruby-constant">JTDB2</span>}
+  ],
+  <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">right_primary_key:</span> <span class="ruby-value">:album_id</span>
+</pre>
 </li><li>
 <p>The :allow_eager_graph association option has been added. Setting this option to false will disallow eager loading via eager_graph. This is useful if you can eager load the association via eager, but not with eager_graph.</p>
 </li><li>
@@ -80,7 +90,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

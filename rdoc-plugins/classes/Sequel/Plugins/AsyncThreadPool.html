@@ -37,13 +37,21 @@ Sequel::Plugins::AsyncThreadPool
 <div id='description'>
 <p>The async_thread_pool plugin makes it slightly easier to use the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension with models.  It makes Model.async return an async dataset for the model, and support async behavior for destroy, with_pk, and with_pk! for model datasets:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Will load the artist with primary key 1 asynchronously</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">async</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># Will load the artist with primary key 1 asynchronously</span>
+<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">async</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)
+</pre>
 
 <p>You must load the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension into the <a href="../../Database.html"><code>Database</code></a> object the model class uses in order for async behavior to work.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass datasets support support async class methods and additional</span>&#x000A;<span class="ruby-comment"># async dataset methods</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:async_thread_pool</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support async class method and additional async dataset methods</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:async_thread_pool</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass datasets support support async class methods and additional</span>
+<span class="ruby-comment"># async dataset methods</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:async_thread_pool</span>
+
+<span class="ruby-comment"># Make the Album class support async class method and additional async dataset methods</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:async_thread_pool</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -63,7 +71,7 @@ Sequel::Plugins::AsyncThreadPool
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

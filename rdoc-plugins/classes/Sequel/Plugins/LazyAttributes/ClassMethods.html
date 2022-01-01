@@ -63,7 +63,12 @@ Sequel::Plugins::LazyAttributes::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">43</span>   <span class="ruby-ivar">@lazy_attributes_module</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@lazy_attributes_module</span>&#x000A;<span class="line-num">44</span> &#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>
+<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">43</span>   <span class="ruby-ivar">@lazy_attributes_module</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@lazy_attributes_module</span>
+<span class="line-num">44</span> 
+<span class="line-num">45</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lazy_attributes'>
@@ -81,7 +86,16 @@ Sequel::Plugins::LazyAttributes::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lazy_attributes-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lazy_attributes-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lazy_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">select</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>]&#x000A;<span class="line-num">53</span>     <span class="ruby-identifier">select</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">first_source</span>, <span class="ruby-identifier">c</span>)}&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">db_schema</span> = <span class="ruby-ivar">@db_schema</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">set_dataset</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">select</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_hash_key_symbol</span>, <span class="ruby-identifier">c</span>))}))&#x000A;<span class="line-num">57</span>   <span class="ruby-ivar">@db_schema</span> = <span class="ruby-identifier">db_schema</span>&#x000A;<span class="line-num">58</span>   <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">define_lazy_attribute_getter</span>(<span class="ruby-identifier">a</span>)}&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lazy_attributes-source'>   <span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb</span>
+<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lazy_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)
+<span class="line-num">52</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">select</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>]
+<span class="line-num">53</span>     <span class="ruby-identifier">select</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">first_source</span>, <span class="ruby-identifier">c</span>)}
+<span class="line-num">54</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">55</span>   <span class="ruby-identifier">db_schema</span> = <span class="ruby-ivar">@db_schema</span>
+<span class="line-num">56</span>   <span class="ruby-identifier">set_dataset</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">select</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_hash_key_symbol</span>, <span class="ruby-identifier">c</span>))}))
+<span class="line-num">57</span>   <span class="ruby-ivar">@db_schema</span> = <span class="ruby-identifier">db_schema</span>
+<span class="line-num">58</span>   <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">define_lazy_attribute_getter</span>(<span class="ruby-identifier">a</span>)}
+<span class="line-num">59</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +107,7 @@ Sequel::Plugins::LazyAttributes::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

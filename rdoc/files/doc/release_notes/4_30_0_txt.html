@@ -40,11 +40,17 @@ Last Update:
 <ul><li>
 <p>Overriding the :limit and :eager_limit_strategy association options can now be done on a per-call basis when eager loading, by using an eager block callback and setting the :eager_limit or :eager_limit_strategy dataset options. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:tracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:eager_limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>)}).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:tracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:eager_limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>)}).<span class="ruby-identifier">all</span>
+</pre>
 </li><li>
 <p>Dataset#insert_conflict and insert_ignore have been added on SQLite, adding support for the INSERT OR … SQL syntax:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_ignore</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:replace</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_ignore</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)
+<span class="ruby-comment"># INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:replace</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)
+<span class="ruby-comment"># INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)</span>
+</pre>
 </li><li>
 <p>An identifier_columns plugin has been added, which allows Sequel::Model#save to work when column names contain double underscores.</p>
 </li></ul>
@@ -53,7 +59,7 @@ Last Update:
 <ul><li>
 <p>IPv6 addresses can now be used in connection URLs when using ruby 1.9.3+.</p>
 </li><li>
-<p>The :db_type entries in column schema hashes now include sizes for string and decimal types on DB2 and when using the jdbc adapter&#39;s generic schema parsing.</p>
+<p>The :db_type entries in column schema hashes now include sizes for string and decimal types on DB2 and when using the jdbc adapter’s generic schema parsing.</p>
 </li><li>
 <p>Database#row_type in the pg_row extension now handles different formats of specifying schema qualified types.  So a row type registered via :schema__type can be found using Sequel.qualify(:schema, :type).</p>
 </li><li>
@@ -69,7 +75,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

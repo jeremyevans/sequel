@@ -42,27 +42,27 @@ Last Update:
 
 <h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>This guide is designed to teach you how to use Sequel::Model&#39;s validation support.  It attempts to explain how Sequel&#39;s validation support works, what validations are useful for, and how to use the <code>validation_helpers</code> plugin to add specific types of validations to your models.</p>
+<p>This guide is designed to teach you how to use <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>‘s validation support.  It attempts to explain how Sequel’s validation support works, what validations are useful for, and how to use the <code>validation_helpers</code> plugin to add specific types of validations to your models.</p>
 
 <h2 id="label-Why+Validations-3F">Why Validations?<span><a href="#label-Why+Validations-3F">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Validations are primarily useful for associating error messages to display to the user with specific attributes on the model.  It is also possible to use them to enforce data integrity for model instances, but that&#39;s not recommended unless the only way to modify the database is through model instances, or you have complex data integrity requirements that aren&#39;t possible to specify via database-level constraints.</p>
+<p>Validations are primarily useful for associating error messages to display to the user with specific attributes on the model.  It is also possible to use them to enforce data integrity for model instances, but that’s not recommended unless the only way to modify the database is through model instances, or you have complex data integrity requirements that aren’t possible to specify via database-level constraints.</p>
 
 <h2 id="label-Data+Integrity">Data Integrity<span><a href="#label-Data+Integrity">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Data integrity is best handled by the database itself.  For example, if you have a date column that should never contain a NULL value, the column should be specified in the database as NOT NULL.  If you have an integer column that should only have values from 1 to 10, there should be a CHECK constraint that ensures that the value of that column is between 1 and 10.  And if you have a varchar column where the length of the entries should be between 2 and 255, you should be setting the size of the varchar column to 255, and using a CHECK constraint to ensure that all values have at least two characters.</p>
 
-<p>Unfortunately, sometimes there are situations where that is not possible.  For example, if you don&#39;t have control over the schema and cannot add constraints, or you are using MySQL (which doesn&#39;t support CHECK constraints), it may be necessary to use a model validation to enforce the database integrity.</p>
+<p>Unfortunately, sometimes there are situations where that is not possible.  For example, if you don’t have control over the schema and cannot add constraints, or you are using MySQL (which doesn’t support CHECK constraints), it may be necessary to use a model validation to enforce the database integrity.</p>
 
 <p>In some cases you may have data integrity requirements that are difficult to enforce via database constraints, especially if you are targetting multiple database types.</p>
 
-<p>Validations are generally easier to write than database constraints, so if data integrity isn&#39;t of great importance, using validations to provide minimal data integrity may be acceptable.</p>
+<p>Validations are generally easier to write than database constraints, so if data integrity isn’t of great importance, using validations to provide minimal data integrity may be acceptable.</p>
 
 <h2 id="label-Usage">Usage<span><a href="#label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Regardless of whether you are using validations for data integrity or just for error messages, the usage is the same.  Whenever you attempt to save a model instance, before sending the INSERT or UPDATE query to the database, <code>Sequel::Model</code> will attempt to validate the instance by calling <code>validate</code>.  If <code>validate</code> does not add any errors to the object, the object is considered valid, and <code>valid?</code> will return true.  If <code>validate</code> adds any errors to the object, <code>valid?</code> will return false, and the save will either raise a <code>Sequel::ValidationFailed</code> exception (the default), or return nil (if <code>raise_on_save_failure</code> is false).</p>
 
-<p>By validating the object before sending the database query, <a href="../../classes/Sequel.html"><code>Sequel</code></a> attempts to ensure that invalid objects are not saved in the database.  However, if you are not enforcing the same validations in the database via constraints, it&#39;s possible that invalid data can get added to the database via some other method. This leads to odd cases such as retrieving a model object from the database, not making any changes to it, attempting to save it, and having the save raise an error.</p>
+<p>By validating the object before sending the database query, <a href="../../classes/Sequel.html"><code>Sequel</code></a> attempts to ensure that invalid objects are not saved in the database.  However, if you are not enforcing the same validations in the database via constraints, it’s possible that invalid data can get added to the database via some other method. This leads to odd cases such as retrieving a model object from the database, not making any changes to it, attempting to save it, and having the save raise an error.</p>
 
 <h2 id="label-Skipping+Validations">Skipping Validations<span><a href="#label-Skipping+Validations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -70,37 +70,73 @@ Last Update:
 
 <p>The only way to skip validations when saving a model object is to pass the <code>validate: false</code> option to <code>save</code>. If you use that option, <code>save</code> will not attempt to validate the object before saving it.</p>
 
-<p>Note that it&#39;s always possible to update the instance&#39;s database row without using <code>save</code>, by using a <a href="../../classes/Sequel.html"><code>Sequel</code></a> dataset to update it, or updating it via another program. Validations will only be run if you call <code>save</code> on the model object, or another model method that calls <code>save</code>.  For example, the <code>create</code> class method instantiates a new instance of the model, and then calls <code>save</code>, so it validates the object.  However, the <code>insert</code> class method is a dataset method that just inserts the raw hash into the database, so it doesn&#39;t validate the object.</p>
+<p>Note that it’s always possible to update the instance’s database row without using <code>save</code>, by using a <a href="../../classes/Sequel.html"><code>Sequel</code></a> dataset to update it, or updating it via another program. Validations will only be run if you call <code>save</code> on the model object, or another model method that calls <code>save</code>.  For example, the <code>create</code> class method instantiates a new instance of the model, and then calls <code>save</code>, so it validates the object.  However, the <code>insert</code> class method is a dataset method that just inserts the raw hash into the database, so it doesn’t validate the object.</p>
 
 <h2 id="label-valid-3F+and+validate"><code>valid?</code> and <code>validate</code><span><a href="#label-valid-3F+and+validate">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p><code>Sequel::Model</code> uses the <code>valid?</code> method to check whether or not a model instance is valid.  This method should not be overridden.  Instead, the <code>validate</code> method should be overridden to add validations to the model:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;cannot be empty&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">name</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;&#39;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># true</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;cannot be empty&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">name</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">empty?</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># false</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;&#39;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># false</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># true</span>
+</pre>
 
 <p>If the <code>valid?</code> method returns false, you can call the <code>errors</code> method to get an instance of <code>Sequel::Model::Errors</code> describing the errors on the model:</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Album @values={}&gt;</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">valid?</span>&#x000A;<span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">errors</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;[&quot;cannot be empty&quot;]}</span></pre>
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-comment"># =&gt; #&lt;Album @values={}&gt;</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">valid?</span>
+<span class="ruby-comment"># =&gt; false</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">errors</span>
+<span class="ruby-comment"># =&gt; {:name=&gt;[&quot;cannot be empty&quot;]}</span>
+</pre>
 
-<p>You may notice that the <code>errors</code> method appears to return a hash.  That&#39;s because <code>Sequel::Model::Errors</code> is a subclass of Hash.</p>
+<p>You may notice that the <code>errors</code> method appears to return a hash.  That’s because <code>Sequel::Model::Errors</code> is a subclass of Hash.</p>
 
 <p>Note that calling the <code>errors</code> method before the <code>valid?</code> method will result in an <code>errors</code> being empty:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">errors</span>&#x000A;<span class="ruby-comment"># =&gt; {}</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">errors</span>
+<span class="ruby-comment"># =&gt; {}</span>
+</pre>
 
-<p>So just remember that you shouldn&#39;t check <code>errors</code> until after you call <code>valid?</code>.</p>
+<p>So just remember that you shouldn’t check <code>errors</code> until after you call <code>valid?</code>.</p>
 
-<p><code>Sequel::Model::Errors</code> has some helper methods that make it easy to get an array of all of the instance&#39;s errors, or for checking for errors on a specific attribute.  These will be covered later in this guide.</p>
+<p><code>Sequel::Model::Errors</code> has some helper methods that make it easy to get an array of all of the instance’s errors, or for checking for errors on a specific attribute.  These will be covered later in this guide.</p>
 
 <h2 id="label-validation_helpers"><code>validation_helpers</code><span><a href="#label-validation_helpers">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>While <code>Sequel::Model</code> does provide a validations framework, it does not define any built-in validation helper methods that you can call.  However, <a href="../../classes/Sequel.html"><code>Sequel</code></a> ships with a plugin called <code>validation_helpers</code> that handles most basic validation needs.  So instead of specifying validations like this:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;cannot be empty&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">name</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;is already taken&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">Album</span>[{<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>}]&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:website</span>, <span class="ruby-string">&#39;cannot be empty&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">website</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">website</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:website</span>, <span class="ruby-string">&#39;is not a valid URL&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">website</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;cannot be empty&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">name</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;is already taken&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">Album</span>[{<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>}]
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:website</span>, <span class="ruby-string">&#39;cannot be empty&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">website</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">website</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:website</span>, <span class="ruby-string">&#39;is not a valid URL&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">website</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You can call simple methods such as:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:website</span>]&#x000A;    <span class="ruby-identifier">validates_unique</span> <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>, <span class="ruby-value">:website</span>, <span class="ruby-value">message:</span> <span class="ruby-string">&#39;is not a valid URL&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:website</span>]
+    <span class="ruby-identifier">validates_unique</span> <span class="ruby-value">:name</span>
+    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>, <span class="ruby-value">:website</span>, <span class="ruby-value">message:</span> <span class="ruby-string">&#39;is not a valid URL&#39;</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Other than <code>validates_unique</code>, which has its own API, the methods defined by <code>validation_helpers</code> have one of the following two APIs:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>(atts, opts={})</code></td><td>
@@ -117,7 +153,13 @@ Last Update:
 
 <p>This method checks that the specified attributes are not blank.  In general, if an object responds to <code>blank?</code>, it calls the method to determine if the object is blank.  Otherwise, nil is considered blank, empty strings or strings that just contain whitespace are blank, and objects that respond to <code>empty?</code> and return true are considered blank.  All other objects are considered non-blank for the purposes of <code>validates_presence</code>.  This means that <code>validates_presence</code> is safe to use on boolean columns where you want to ensure that either true or false is used, but not NULL.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:website</span>, <span class="ruby-value">:debut_album</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:website</span>, <span class="ruby-value">:debut_album</span>]
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_not_null"><code>validates_not_null</code><span><a href="#label-validates_not_null">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -125,49 +167,111 @@ Last Update:
 
 <h3 id="label-validates_format"><code>validates_format</code><span><a href="#label-validates_format">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p><code>validates_format</code> is used to ensure that the string value of the specified attributes matches the specified regular expression.  It&#39;s useful for checking that fields such as email addresses, URLs, UPC codes, ISBN codes, and the like, are in a specific format.  It can also be used to validate that only certain characters are used in the string.</p>
+<p><code>validates_format</code> is used to ensure that the string value of the specified attributes matches the specified regular expression.  It’s useful for checking that fields such as email addresses, URLs, UPC codes, ISBN codes, and the like, are in a specific format.  It can also be used to validate that only certain characters are used in the string.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A\d\d\d-\d-\d{7}-\d-\d\z/</span>, <span class="ruby-value">:isbn</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A[0-9a-zA-Z:&#39; ]+\z/</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A\d\d\d-\d-\d{7}-\d-\d\z/</span>, <span class="ruby-value">:isbn</span>
+    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A[0-9a-zA-Z:&#39; ]+\z/</span>, <span class="ruby-value">:name</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_exact_length-2C+validates_min_length-2C+validates_max_length-2C+validates_length_range"><code>validates_exact_length</code>, <code>validates_min_length</code>, <code>validates_max_length</code>, <code>validates_length_range</code><span><a href="#label-validates_exact_length-2C+validates_min_length-2C+validates_max_length-2C+validates_length_range">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>These methods all deal with ensuring that the length of the specified attribute matches the criteria specified by the first argument to the method.  <code>validates_exact_length</code> is for checking that the length of the attribute is equal to that value, <code>validates_min_length</code> is for checking that the length of the attribute is greater than or equal to that value, <code>validates_max_length</code> is for checking that the length of the attribute is less than or equal to that value, and <code>validates_length_range</code> is for checking that the length of the attribute falls in the value, which should be a range or an object that responds to <code>include?</code>.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_exact_length</span> <span class="ruby-value">17</span>, <span class="ruby-value">:isbn</span>&#x000A;    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-identifier">validates_max_length</span> <span class="ruby-value">100</span>, <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_exact_length</span> <span class="ruby-value">17</span>, <span class="ruby-value">:isbn</span>
+    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:name</span>
+    <span class="ruby-identifier">validates_max_length</span> <span class="ruby-value">100</span>, <span class="ruby-value">:name</span>
+    <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>, <span class="ruby-value">:name</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_integer-2C+validates_numeric"><code>validates_integer</code>, <code>validates_numeric</code><span><a href="#label-validates_integer-2C+validates_numeric">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>These methods check that the specified attributes can be valid integers or valid floats.  <code>validates_integer</code> tests the attribute value using <code>Kernel.Integer</code> and <code>validates_numeric</code> tests the attribute using <code>Kernel.Float</code>.  If the Kernel methods raise an exception, the validation fails, otherwise it succeeds.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span>&#x000A;    <span class="ruby-identifier">validates_numeric</span> <span class="ruby-value">:replaygain</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span>
+    <span class="ruby-identifier">validates_numeric</span> <span class="ruby-value">:replaygain</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_includes"><code>validates_includes</code><span><a href="#label-validates_includes">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p><code>validates_includes</code> checks that the specified attributes are included in the first argument to the method, which is usually an array, but can be any object that responds to <code>include?</code>.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_includes</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>], <span class="ruby-value">:rating</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_includes</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>], <span class="ruby-value">:rating</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_operator"><code>validates_operator</code><span><a href="#label-validates_operator">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p><code>validates_operator</code> checks that a given <code>operator</code> method returns a truthy value when called on attribute with a specified value for comparison.  Generally, this is used for inequality checks (&gt;, &gt;=, etc.) but any method that can be called on the attribute that accepts an argument and returns a truthy value may be used.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&gt;</span>, <span class="ruby-value">3</span>, <span class="ruby-value">:tracks</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&gt;</span>, <span class="ruby-value">3</span>, <span class="ruby-value">:tracks</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_type"><code>validates_type</code><span><a href="#label-validates_type">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p><code>validates_type</code> checks that the specified attributes are instances of the class specified in the first argument.  The class can be specified as the class itself, or as a string or symbol with the class name, or as a an array of classes.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_type</span> <span class="ruby-constant">String</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:website</span>]&#x000A;    <span class="ruby-identifier">validates_type</span> <span class="ruby-value">:Artist</span>, <span class="ruby-value">:artist</span>&#x000A;    <span class="ruby-identifier">validates_type</span> [<span class="ruby-constant">String</span>, <span class="ruby-constant">Integer</span>], <span class="ruby-value">:foo</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_type</span> <span class="ruby-constant">String</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:website</span>]
+    <span class="ruby-identifier">validates_type</span> <span class="ruby-value">:Artist</span>, <span class="ruby-value">:artist</span>
+    <span class="ruby-identifier">validates_type</span> [<span class="ruby-constant">String</span>, <span class="ruby-constant">Integer</span>], <span class="ruby-value">:foo</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-validates_schema_types"><code>validates_schema_types</code><span><a href="#label-validates_schema_types">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p><code>validates_schema_types</code> uses the database metadata for the model&#39;s table to determine which ruby type(s) should be used for the given database type, and calls <code>validates_type</code> with that ruby type.  It&#39;s designed to be used with the default <code>raise_on_typecast_failure = false</code> setting, where <a href="../../classes/Sequel.html"><code>Sequel</code></a> will attempt to typecast values, but silently ignore any errors raised:</p>
+<p><code>validates_schema_types</code> uses the database metadata for the model’s table to determine which ruby type(s) should be used for the given database type, and calls <code>validates_type</code> with that ruby type.  It’s designed to be used with the default <code>raise_on_typecast_failure = false</code> setting, where <a href="../../classes/Sequel.html"><code>Sequel</code></a> will attempt to typecast values, but silently ignore any errors raised:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> = <span class="ruby-string">&#39;1&#39;</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-comment"># =&gt; 1</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> = <span class="ruby-string">&#39;banana&#39;</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-comment"># =&gt; &#39;banana&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> = <span class="ruby-string">&#39;1&#39;</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-comment"># =&gt; 1</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> = <span class="ruby-string">&#39;banana&#39;</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-comment"># =&gt; &#39;banana&#39;</span>
+</pre>
 
-<p>In general, you can call <code>validates_schema_types</code> with all columns.  If any of those columns has a value that doesn&#39;t match the type that <a href="../../classes/Sequel.html"><code>Sequel</code></a> expects, it&#39;s probably because the column was set and <a href="../../classes/Sequel.html"><code>Sequel</code></a> was not able to typecast it correctly, which means it probably isn&#39;t valid.  For example, let&#39;s say that you want to check that a couple of columns contain valid dates:</p>
+<p>In general, you can call <code>validates_schema_types</code> with all columns.  If any of those columns has a value that doesn’t match the type that <a href="../../classes/Sequel.html"><code>Sequel</code></a> expects, it’s probably because the column was set and <a href="../../classes/Sequel.html"><code>Sequel</code></a> was not able to typecast it correctly, which means it probably isn’t valid.  For example, let’s say that you want to check that a couple of columns contain valid dates:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_schema_types</span> [<span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">release_date</span> = <span class="ruby-string">&#39;banana&#39;</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">release_date</span> <span class="ruby-comment"># =&gt; &#39;banana&#39;</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">record_date</span> = <span class="ruby-string">&#39;2010-05-17&#39;</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">record_date</span> <span class="ruby-comment"># =&gt; #&lt;Date: 4910667/2,0,2299161&gt;</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span> <span class="ruby-comment"># =&gt; {:release_date=&gt;[&quot;is not a valid date&quot;]}</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_schema_types</span> [<span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>]
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">release_date</span> = <span class="ruby-string">&#39;banana&#39;</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">release_date</span> <span class="ruby-comment"># =&gt; &#39;banana&#39;</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">record_date</span> = <span class="ruby-string">&#39;2010-05-17&#39;</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">record_date</span> <span class="ruby-comment"># =&gt; #&lt;Date: 4910667/2,0,2299161&gt;</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; false</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span> <span class="ruby-comment"># =&gt; {:release_date=&gt;[&quot;is not a valid date&quot;]}</span>
+</pre>
 
 <p>For web applications, you usually want the default setting, so that you can accept all of the input without raising an error, and then present the user with all error messages.  If <code>raise_on_typecast_failure = true</code> is set and the user submits any invalid data, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will immediately raise an error.  <code>validates_schema_types</code> is helpful because it allows you to check for typecasting errors on columns, and provides a good default error message stating that the attribute is not of the expected type.</p>
 
@@ -175,27 +279,31 @@ Last Update:
 
 <p><code>validates_unique</code> has a similar but different API than the other <code>validation_helpers</code> methods.  It takes an arbitrary number of arguments, which should be column symbols or arrays of column symbols.  If any argument is a symbol, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets up a unique validation for just that column.  If any argument is an array of symbols, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets up a unique validation for the combination of the columns.  This means that you get different behavior depending on whether you call the object with an array or with separate arguments.  For example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_unique</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_unique</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>)
+</pre>
 
-<p>Will set up a 2 separate uniqueness validations.  It will make it so that no two albums can have the same name, and that each artist can only be associated with one album.  In general, that&#39;s probably not what you want.  You probably want it so that two albums can have the same name, unless they are by the same artist.  To do that, you need to use an array:</p>
+<p>Will set up a 2 separate uniqueness validations.  It will make it so that no two albums can have the same name, and that each artist can only be associated with one album.  In general, that’s probably not what you want.  You probably want it so that two albums can have the same name, unless they are by the same artist.  To do that, you need to use an array:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>])
+</pre>
 
 <p>That sets up a single uniqueness validation for the combination of the fields.</p>
 
 <p>You can mix and match the two approaches.  For example, if all albums should have a unique UPC, and no artist can have duplicate album names:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_unique</span>(<span class="ruby-value">:upc</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_unique</span>(<span class="ruby-value">:upc</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>])
+</pre>
 
 <p><code>validates_unique</code> also accepts a block to scope the uniqueness constraint.  For example, if you want to ensure that all active albums have a unique name, but inactive albums can duplicate the name:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_unique</span>(<span class="ruby-value">:name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>)}</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_unique</span>(<span class="ruby-value">:name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>)}
+</pre>
 
-<p>If you provide a block, it is called with the dataset to use for the uniqueness check, which you can then filter to scope the uniqueness validation to a subset of the model&#39;s dataset.</p>
+<p>If you provide a block, it is called with the dataset to use for the uniqueness check, which you can then filter to scope the uniqueness validation to a subset of the model’s dataset.</p>
 
 <p>You can also include an options hash as the last argument.  Unlike the other validations, the options hash for <code>validates_unique</code> only recognizes for these options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:dataset </td><td>
-<p>The base dataset to use for the unique query, defaults to the model&#39;s dataset</p>
+<p>The base dataset to use for the unique query, defaults to the model’s dataset</p>
 </td></tr><tr><td class='label'>:message </td><td>
 <p>The message to use</p>
 </td></tr><tr><td class='label'>:only_if_modified </td><td>
@@ -214,51 +322,88 @@ Last Update:
 
 <p>The <code>:message</code> option overrides the default validation error message.  Can be either a string or a proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes an argument before the array of attributes, that argument is passed as an argument to the proc.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:copies_sold</span>, <span class="ruby-value">message:</span> <span class="ruby-string">&#39;was not given&#39;</span>&#x000A;    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:name</span>, <span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;should be more than #{s} characters&quot;</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:copies_sold</span>, <span class="ruby-value">message:</span> <span class="ruby-string">&#39;was not given&#39;</span>
+    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:name</span>, <span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;should be more than #{s} characters&quot;</span>}
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-3Aallow_nil"><code>:allow_nil</code><span><a href="#label-3Aallow_nil">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The <code>:allow_nil</code> option skips the validation if the attribute value is nil or if the attribute is not present.  It&#39;s commonly used when you have a <code>validates_presence</code> method already on the attribute, and don&#39;t want multiple validation errors for the same attribute:</p>
+<p>The <code>:allow_nil</code> option skips the validation if the attribute value is nil or if the attribute is not present.  It’s commonly used when you have a <code>validates_presence</code> method already on the attribute, and don’t want multiple validation errors for the same attribute:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:copies_sold</span>&#x000A;    <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span>, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:copies_sold</span>
+    <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span>, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Without the <code>:allow_nil</code> option to <code>validates_integer</code>, if the copies_sold attribute was nil, you would get two separate validation errors, instead of a single validation error.</p>
 
 <h3 id="label-3Aallow_blank"><code>:allow_blank</code><span><a href="#label-3Aallow_blank">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The <code>:allow_blank</code> is similar to the <code>:allow_nil</code> option, but instead of just skipping the attribute for nil values, it skips the attribute for all blank values.  For example, let&#39;s say that artists can have a website.  If they have one, it should be formatted like a URL, but it can be nil or an empty string if they don&#39;t have one.</p>
+<p>The <code>:allow_blank</code> is similar to the <code>:allow_nil</code> option, but instead of just skipping the attribute for nil values, it skips the attribute for all blank values.  For example, let’s say that artists can have a website.  If they have one, it should be formatted like a URL, but it can be nil or an empty string if they don’t have one.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>, <span class="ruby-value">:website</span>, <span class="ruby-value">allow_blank:</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">website</span> = <span class="ruby-string">&#39;&#39;</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># true</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>, <span class="ruby-value">:website</span>, <span class="ruby-value">allow_blank:</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">website</span> = <span class="ruby-string">&#39;&#39;</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># true</span>
+</pre>
 
 <h3 id="label-3Aallow_missing"><code>:allow_missing</code><span><a href="#label-3Aallow_missing">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The <code>:allow_missing</code> option is different from the <code>:allow_nil</code> option, in that instead of checking if the attribute value is nil, it checks if the attribute is present in the model instance&#39;s values hash.   <code>:allow_nil</code> will skip the validation when the attribute is in the values hash and has a nil value and when the attribute is not in the values hash.  <code>:allow_missing</code> will only skip the validation when the attribute is not in the values hash.  If the attribute is in the values hash but has a nil value, <code>:allow_missing</code> will not skip it.</p>
+<p>The <code>:allow_missing</code> option is different from the <code>:allow_nil</code> option, in that instead of checking if the attribute value is nil, it checks if the attribute is present in the model instance’s values hash.   <code>:allow_nil</code> will skip the validation when the attribute is in the values hash and has a nil value and when the attribute is not in the values hash.  <code>:allow_missing</code> will only skip the validation when the attribute is not in the values hash.  If the attribute is in the values hash but has a nil value, <code>:allow_missing</code> will not skip it.</p>
 
-<p>The purpose of this option is to work correctly with missing columns when inserting or updating records.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> only sends the attributes in the values hash when doing an insert or update. If the attribute is not present in the values hash, <a href="../../classes/Sequel.html"><code>Sequel</code></a> doesn&#39;t specify it, so the database will use the table&#39;s default value when inserting the record, or not modify the value when saving it. This is different from having an attribute in the values hash with a value of nil, which <a href="../../classes/Sequel.html"><code>Sequel</code></a> will send as NULL. If your database table has a non NULL default, this may be a good option to use. You don&#39;t want to use allow_nil, because if the attribute is in values but has a value nil, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will attempt to insert a NULL value into the database, instead of using the database&#39;s default.</p>
+<p>The purpose of this option is to work correctly with missing columns when inserting or updating records.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> only sends the attributes in the values hash when doing an insert or update. If the attribute is not present in the values hash, <a href="../../classes/Sequel.html"><code>Sequel</code></a> doesn’t specify it, so the database will use the table’s default value when inserting the record, or not modify the value when saving it. This is different from having an attribute in the values hash with a value of nil, which <a href="../../classes/Sequel.html"><code>Sequel</code></a> will send as NULL. If your database table has a non NULL default, this may be a good option to use. You don’t want to use allow_nil, because if the attribute is in values but has a value nil, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will attempt to insert a NULL value into the database, instead of using the database’s default.</p>
 
 <h2 id="label-Conditional+Validation">Conditional Validation<span><a href="#label-Conditional+Validation">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Because <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses the <code>validate</code> instance method to handle validation, making validations conditional is easy as it works exactly the same as ruby&#39;s standard conditionals.  For example, if you only want to validate an attribute when creating an object:</p>
+<p>Because <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses the <code>validate</code> instance method to handle validation, making validations conditional is easy as it works exactly the same as ruby’s standard conditionals.  For example, if you only want to validate an attribute when creating an object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span></pre>
+<pre class="ruby"><span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span>
+</pre>
 
 <p>If you only want to validate the attribute when updating an existing object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span></pre>
+<pre class="ruby"><span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span>
+</pre>
 
-<p>Let&#39;s say you only to make a validation conditional on the status of the object:</p>
+<p>Let’s say you only to make a validation conditional on the status of the object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span></pre>
+<pre class="ruby"><span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+<span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:copies_sold</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>
+</pre>
 
 <p>You can use all the standard ruby conditional expressions, such as <code>case</code>:</p>
 
-<pre class="ruby"><span class="ruby-keyword">case</span> <span class="ruby-identifier">status_id</span>&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span>&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">2</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>]&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">3</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:copies_sold</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">case</span> <span class="ruby-identifier">status_id</span>
+<span class="ruby-keyword">when</span> <span class="ruby-value">1</span>
+  <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span>
+<span class="ruby-keyword">when</span> <span class="ruby-value">2</span>
+  <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>]
+<span class="ruby-keyword">when</span> <span class="ruby-value">3</span>
+  <span class="ruby-identifier">validates_presence</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:copies_sold</span>]
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You can make the input to some validations dependent on the values of another attribute:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_min_length</span>(<span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">?</span> <span class="ruby-value">5</span> <span class="ruby-operator">:</span> <span class="ruby-value">10</span>, [<span class="ruby-value">:name</span>])&#x000A;<span class="ruby-identifier">validates_presence</span>(<span class="ruby-identifier">status_id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">?</span> <span class="ruby-value">:name</span> <span class="ruby-operator">:</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_min_length</span>(<span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">?</span> <span class="ruby-value">5</span> <span class="ruby-operator">:</span> <span class="ruby-value">10</span>, [<span class="ruby-value">:name</span>])
+<span class="ruby-identifier">validates_presence</span>(<span class="ruby-identifier">status_id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">?</span> <span class="ruby-value">:name</span> <span class="ruby-operator">:</span> [<span class="ruby-value">:name</span>, <span class="ruby-value">:artist_id</span>])
+</pre>
 
-<p>Basically, there&#39;s no special syntax you have to use for conditional validations.  Just handle conditionals the way you would in other ruby code.</p>
+<p>Basically, there’s no special syntax you have to use for conditional validations.  Just handle conditionals the way you would in other ruby code.</p>
 
 <h2 id="label-Default+Error+Messages">Default Error Messages<span><a href="#label-Default+Error+Messages">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -295,31 +440,84 @@ Last Update:
 
 <p>You can override <code>Sequel::Model#default_validation_helpers_options</code> private method to override the default settings on a per validation type basis:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_validation_helpers_options</span>(<span class="ruby-identifier">type</span>)&#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:presence</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-string">&#39;cannot be empty&#39;</span>}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:includes</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-string">&#39;invalid option&#39;</span>, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:max_length</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;cannot be more than #{i} characters&quot;</span>}, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:format</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-string">&#39;contains invalid characters&#39;</span>, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">private</span>
+
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_validation_helpers_options</span>(<span class="ruby-identifier">type</span>)
+    <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-value">:presence</span>
+      {<span class="ruby-value">message:</span> <span class="ruby-string">&#39;cannot be empty&#39;</span>}
+    <span class="ruby-keyword">when</span> <span class="ruby-value">:includes</span>
+      {<span class="ruby-value">message:</span> <span class="ruby-string">&#39;invalid option&#39;</span>, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>}
+    <span class="ruby-keyword">when</span> <span class="ruby-value">:max_length</span>
+      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;cannot be more than #{i} characters&quot;</span>}, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>}
+    <span class="ruby-keyword">when</span> <span class="ruby-value">:format</span>
+      {<span class="ruby-value">message:</span> <span class="ruby-string">&#39;contains invalid characters&#39;</span>, <span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>}
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-keyword">super</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h2 id="label-Custom+Validations">Custom Validations<span><a href="#label-Custom+Validations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Just as the first validation example showed, you aren&#39;t limited to the validation methods defined by <code>validation_helpers</code>.  Inside the <code>validate</code> method, you can add your own validations by adding to the instance&#39;s errors using <code>errors.add</code> whenever an attribute is not valid:</p>
+<p>Just as the first validation example showed, you aren’t limited to the validation methods defined by <code>validation_helpers</code>.  Inside the <code>validate</code> method, you can add your own validations by adding to the instance’s errors using <code>errors.add</code> whenever an attribute is not valid:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:release_date</span>, <span class="ruby-string">&#39;cannot be before record date&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">release_date</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">record_date</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:release_date</span>, <span class="ruby-string">&#39;cannot be before record date&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">release_date</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">record_date</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Just like conditional validations, with custom validations you are just using the standard ruby conditionals, and calling <code>errors.add</code> with the column symbol and the error message if you detect invalid data.</p>
 
-<p>It&#39;s fairly easy to create your own custom validations that can be reused in all your models.  For example, if there is a common need to validate that one column in the model comes before another column:</p>
+<p>It’s fairly easy to create your own custom validations that can be reused in all your models.  For example, if there is a common need to validate that one column in the model comes before another column:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validates_after</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>)&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-node">&quot;cannot be before #{col2}&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">col1</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">col2</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_after</span>(<span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validates_after</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>)
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-node">&quot;cannot be before #{col2}&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">col1</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">col2</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_after</span>(<span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h2 id="label-Setting+Validations+for+All+Models">Setting Validations for All Models<span><a href="#label-Setting+Validations+for+All+Models">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Let&#39;s say you want to add some default validations that apply to all of your model classes.  It&#39;s fairly easy to do by overriding the <code>validate</code> method in <code>Sequel::Model</code>, adding some validations to it, and if you override <code>validate</code> in your model classes, just make sure to call <code>super</code>.</p>
+<p>Let’s say you want to add some default validations that apply to all of your model classes.  It’s fairly easy to do by overriding the <code>validate</code> method in <code>Sequel::Model</code>, adding some validations to it, and if you override <code>validate</code> in your model classes, just make sure to call <code>super</code>.</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_columns</span>&#x000A;    <span class="ruby-ivar">@string_columns</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db_schema</span>[<span class="ruby-identifier">c</span>][<span class="ruby-value">:type</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">:string</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_format</span>(<span class="ruby-regexp">/\A[^\x00-\x08\x0e-\x1f\x7f\x81\x8d\x8f\x90\x9d]*\z/n</span>,&#x000A;     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">string_columns</span>,&#x000A;     <span class="ruby-value">message:</span> <span class="ruby-string">&quot;contains invalid characters&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_columns</span>
+    <span class="ruby-ivar">@string_columns</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db_schema</span>[<span class="ruby-identifier">c</span>][<span class="ruby-value">:type</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">:string</span>}
+  <span class="ruby-keyword">end</span>
 
-<p>This will make sure that all string columns in the model are validated to make sure they don&#39;t contain any invalid characters.  Just remember that if you override the <code>validate</code> method in your model classes, you need to call <code>super</code>:</p>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_format</span>(<span class="ruby-regexp">/\A[^\x00-\x08\x0e-\x1f\x7f\x81\x8d\x8f\x90\x9d]*\z/n</span>,
+     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">string_columns</span>,
+     <span class="ruby-value">message:</span> <span class="ruby-string">&quot;contains invalid characters&quot;</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span> <span class="ruby-comment"># Important!</span>&#x000A;    <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<p>This will make sure that all string columns in the model are validated to make sure they don’t contain any invalid characters.  Just remember that if you override the <code>validate</code> method in your model classes, you need to call <code>super</code>:</p>
 
-<p>If you forget to call <code>super</code>, the validations that you defined in <code>Sequel::Model</code> will not be enforced.  It&#39;s a good idea to call super whenever you override one of <code>Sequel::Model</code>&#39;s methods, unless you specifically do not want the default behavior.</p>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span> <span class="ruby-comment"># Important!</span>
+    <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:name</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>If you forget to call <code>super</code>, the validations that you defined in <code>Sequel::Model</code> will not be enforced.  It’s a good idea to call super whenever you override one of <code>Sequel::Model</code>‘s methods, unless you specifically do not want the default behavior.</p>
 
 <h2 id="label-Sequel-3A-3AModel-3A-3AErrors"><code>Sequel::Model::Errors</code><span><a href="#label-Sequel-3A-3AModel-3A-3AErrors">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -329,29 +527,39 @@ Last Update:
 
 <p><code>add</code> is the method used to add error messages for a given column.  It takes the column symbol as the first argument and the error message as the second argument:</p>
 
-<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;is not valid&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;is not valid&#39;</span>)
+</pre>
 
 <h3 id="label-on"><code>on</code><span><a href="#label-on">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p><code>on</code> is a method usually used after validation has been completed, to determine if there were any errors on a given attribute.  It takes the column value, and returns an array of error messages if there were any, or nil if not:</p>
 
-<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:name</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:name</span>)
+</pre>
 
 <p>If you want to make some validations dependent upon the results of other validations, you may want to use <code>on</code> inside your validates method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_integer</span>(<span class="ruby-value">:release_date</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:record_date</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_integer</span>(<span class="ruby-value">:release_date</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:record_date</span>)
+</pre>
 
-<p>Here, you don&#39;t care about validating the release date if there were validation errors for the record date.</p>
+<p>Here, you don’t care about validating the release date if there were validation errors for the record date.</p>
 
 <h3 id="label-full_messages"><code>full_messages</code><span><a href="#label-full_messages">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p><code>full_messages</code> returns an array of error messages for the object.  It&#39;s commonly called after validation to get a list of error messages to display to the user:</p>
+<p><code>full_messages</code> returns an array of error messages for the object.  It’s commonly called after validation to get a list of error messages to display to the user:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;[&quot;cannot be empty&quot;]}</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;name cannot be empty&quot;]</span></pre>
+<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>
+<span class="ruby-comment"># =&gt; {:name=&gt;[&quot;cannot be empty&quot;]}</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>
+<span class="ruby-comment"># =&gt; [&quot;name cannot be empty&quot;]</span>
+</pre>
 
 <p>Note that the column names used in the errors are used verbatim in the error messages.  If you want full control over the error messages, you can use <code>add</code> with a literal string:</p>
 
-<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;Album name is not valid&quot;</span>))&#x000A;<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;Album name is not valid&quot;]</span></pre>
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;Album name is not valid&quot;</span>))
+<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>
+<span class="ruby-comment"># =&gt; [&quot;Album name is not valid&quot;]</span>
+</pre>
 
 <p>Alternatively, feel free to override <a href="../../classes/Sequel/Model/Errors.html#method-i-full_messages"><code>Sequel::Model::Errors#full_messages</code></a>.  As long as it returns an array of strings, overriding it is completely safe.</p>
 
@@ -359,7 +567,8 @@ Last Update:
 
 <p><code>count</code> returns the total number of error messages in the errors.</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">count</span> <span class="ruby-comment"># =&gt; 1</span></pre>
+<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">count</span> <span class="ruby-comment"># =&gt; 1</span>
+</pre>
 
 <h2 id="label-Other+Validation+Plugins">Other Validation Plugins<span><a href="#label-Other+Validation+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -369,7 +578,7 @@ Last Update:
 
 <h3 id="label-auto_validations"><code>auto_validations</code><span><a href="#label-auto_validations">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>auto_validations uses the not null and type information obtained from parsing the database schema, and the unique index information from parsing the database&#39;s index information, and automatically setting up not_null, string length, schema type, and unique validations.  If you don&#39;t require customizing validation messages on a per-column basis, it can DRY up a lot of validation code.</p>
+<p>auto_validations uses the not null and type information obtained from parsing the database schema, and the unique index information from parsing the database’s index information, and automatically setting up not_null, string length, schema type, and unique validations.  If you don’t require customizing validation messages on a per-column basis, it can DRY up a lot of validation code.</p>
 
 <h3 id="label-validation_class_methods"><code>validation_class_methods</code><span><a href="#label-validation_class_methods">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -384,7 +593,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

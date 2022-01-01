@@ -39,11 +39,26 @@ Sequel::Plugins::InvertedSubsets
 
 <p>You can change the prefix, or indeed entirely customise the inverted names, by passing a block to the plugin configuration:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Use an exclude_ prefix for inverted subsets instead of not_</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:inverted_subsets</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;exclude_#{name}&quot;</span>}</pre>
+<pre class="ruby"><span class="ruby-comment"># Use an exclude_ prefix for inverted subsets instead of not_</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:inverted_subsets</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;exclude_#{name}&quot;</span>}
+</pre>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Add inverted subsets in the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:inverted_subsets</span>&#x000A;&#x000A;<span class="ruby-comment"># This will now create two methods, published and not_published</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">where</span> <span class="ruby-value">:published</span>, <span class="ruby-value">published:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS TRUE)</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">not_published</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS NOT TRUE)</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Add inverted subsets in the Album class</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:inverted_subsets</span>
+
+<span class="ruby-comment"># This will now create two methods, published and not_published</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:published</span>, <span class="ruby-value">published:</span> <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published</span>.<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS TRUE)</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">not_published</span>.<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS NOT TRUE)</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -82,7 +97,18 @@ Sequel::Plugins::InvertedSubsets
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">35</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;<span class="line-num">36</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">37</span>         <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:inverted_subset_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">38</span>         <span class="ruby-identifier">private</span> <span class="ruby-value">:inverted_subset_name</span>&#x000A;<span class="line-num">39</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">41</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">34</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">35</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>
+<span class="line-num">36</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">37</span>         <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:inverted_subset_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">38</span>         <span class="ruby-identifier">private</span> <span class="ruby-value">:inverted_subset_name</span>
+<span class="line-num">39</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">40</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">41</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -94,7 +120,7 @@ Sequel::Plugins::InvertedSubsets
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

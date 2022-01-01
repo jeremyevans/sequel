@@ -30,7 +30,7 @@ lib/sequel/extensions/sql_comments.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-10-30 16:02:05 -0700</span>
+<span class='datetime'>2021-12-02 16:40:01 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -38,15 +38,26 @@ Last Update:
 <div id='description'>
 <p>The sql_comments extension adds Dataset#comment to the datasets, allowing you to set SQL comments in the resulting query.  These comments are appended to the end of the SQL query:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment</span>&#x000A;<span class="ruby-comment">#</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># SELECT * FROM table -- Some Comment</span>
+<span class="ruby-comment">#</span>
+</pre>
 
 <p>As you can see, this uses single line SQL comments (–) suffixed by a newline.  This plugin transforms all consecutive whitespace in the comment to a single string:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># SELECT * FROM table -- Some Comment Here</span>
+<span class="ruby-comment">#</span>
+</pre>
 
 <p>The reason for the prefixing and suffixing by newlines is to work correctly when used in subqueries:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">ds</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (id IN (SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment"># )) -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">ds</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># SELECT * FROM table WHERE (id IN (SELECT * FROM table -- Some Comment Here</span>
+<span class="ruby-comment"># )) -- Some Comment Here</span>
+<span class="ruby-comment">#</span>
+</pre>
 
 <p>In addition to working on SELECT queries, it also works when inserting, updating, and deleting.</p>
 
@@ -54,15 +65,55 @@ Last Update:
 
 <p>You can load this extension into specific datasets:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]
+<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)
+</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database’s datasets, which is probably the desired behavior if you are using this extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)
+</pre>
+
+<p>Loading the sql_comments extension into the database also adds  support for block-level comment support via Database#with_comments. You call with_comments with a hash.  Queries inside the hash will include a comment based on the hash (assuming they are inside the same thread):</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">model:</span> <span class="ruby-constant">Album</span>, <span class="ruby-value">action:</span> <span class="ruby-value">:all</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">all</span>
+  <span class="ruby-comment"># SELECT * FROM albums -- model:Album,action:all</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>You can nest calls to with_comments, which will combine the entries from both calls:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">application:</span> <span class="ruby-constant">App</span>, <span class="ruby-value">path:</span> <span class="ruby-value">:scrubbed_path</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">model:</span> <span class="ruby-constant">Album</span>, <span class="ruby-value">action:</span> <span class="ruby-value">:all</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">all</span>
+    <span class="ruby-comment"># SELECT * FROM albums</span>
+    <span class="ruby-comment"># -- application:App,path:scrubbed_path,model:Album,action:all</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>You can override comment entries specified in earlier blocks, or remove entries specified earlier using a nil value:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">application:</span> <span class="ruby-constant">App</span>, <span class="ruby-value">path:</span> <span class="ruby-value">:scrubbed_path</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">application:</span> <span class="ruby-constant">Foo</span>, <span class="ruby-value">path:</span> <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">all</span>
+    <span class="ruby-comment"># SELECT * FROM albums # -- application:Foo</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>You can combine block-level comments with dataset-specific comments:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">model:</span> <span class="ruby-constant">Album</span>, <span class="ruby-value">action:</span> <span class="ruby-value">:all</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>
+  <span class="ruby-comment"># SELECT * FROM albums -- model:Album,action:all -- Some Comment</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Note that Microsoft Access does not support inline comments, and attempting to use comments on it will result in SQL syntax errors.</p>
 
-<p>Related module: <a href="../../../../classes/Sequel/SQLComments.html"><code>Sequel::SQLComments</code></a></p>
+<p>Related modules: <a href="../../../../classes/Sequel/SQLComments.html"><code>Sequel::SQLComments</code></a>, Sequel::Database::SQLComments</p>
 </div>
 <div id='context'>
 </div>
@@ -73,7 +124,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

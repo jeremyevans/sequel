@@ -41,7 +41,12 @@ Sequel::Plugins::DelayAddAssociation
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass delay add_association for new objects</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:delay_add_association</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class delay add_association for new objects</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:delay_add_association</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass delay add_association for new objects</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:delay_add_association</span>
+
+<span class="ruby-comment"># Make the Album class delay add_association for new objects</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:delay_add_association</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +81,10 @@ Sequel::Plugins::DelayAddAssociation
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/delay_add_association.rb</span>&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;<span class="line-num">29</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/delay_add_association.rb</span>
+<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)
+<span class="line-num">29</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -88,7 +96,7 @@ Sequel::Plugins::DelayAddAssociation
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

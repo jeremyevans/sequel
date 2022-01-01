@@ -42,17 +42,22 @@ Last Update:
 </li><li>
 <p>The filter by associations support now handles cases where the association has :conditions or a block (as long as the block does not rely on instance-specific behavior).  This allows you to handle the following:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:popular_tags</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Tag</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">tags__popularity</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">9000</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:popular_tags</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-constant">Tag</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]])</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:popular_tags</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Tag</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">tags__popularity</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">9000</span>}
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:popular_tags</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-constant">Tag</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]])
+</pre>
 
-<p>This will return all albums whose popular_tags would include at least one of those two tags.  Previously, the block would be ignored, returning albums containing one those tags even if the tags weren&#39;t popular.</p>
+<p>This will return all albums whose popular_tags would include at least one of those two tags.  Previously, the block would be ignored, returning albums containing one those tags even if the tags weren’t popular.</p>
 </li><li>
-<p>A table_select plugin has been added that changes the default selection for models from * to table.*.  This is useful for people who want ActiveRecord-like behavior instead of SQL-like behavior, where joining tables doesn&#39;t automatically include columns in the other table.</p>
+<p>A table_select plugin has been added that changes the default selection for models from * to table.*.  This is useful for people who want ActiveRecord-like behavior instead of SQL-like behavior, where joining tables doesn’t automatically include columns in the other table.</p>
 
 <p>This can fix issues where joining another table that has columns with the same name as columns in the model table without specifying an explicit selection results in model objects being returned where the values in the model object are the values from the joined table instead of the model table.</p>
 </li><li>
 <p>Dataset#offset has been added, for specifying offset separately from limit.  Previous this was possible via:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">offset</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">offset</span>)
+</pre>
 
 <p>but this is a friendlier API.</p>
 </li><li>
@@ -77,7 +82,7 @@ Last Update:
 
 <p>You should no longer need to use the typecast_on_load or pg_typecast_on_load plugins when using model objects that use these types when using the jdbc/postgresql adapter.</p>
 </li><li>
-<p>Offset emulation on Oracle now handles cases where selected columns can&#39;t be ordered.</p>
+<p>Offset emulation on Oracle now handles cases where selected columns can’t be ordered.</p>
 </li><li>
 <p>Offset emulation on DB2 no longer automatically orders on all columns if the dataset itself is unordered.</p>
 </li><li>
@@ -99,7 +104,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

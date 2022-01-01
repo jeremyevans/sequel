@@ -37,11 +37,17 @@ Sequel::SQL::PatternMatchMethods
 <div id='description'>
 <p>This module includes methods for overriding the =~ method for <a href="../SQL.html"><code>SQL</code></a> equality, inclusion, and pattern matching.  It returns the same result that <a href="../../Sequel.html"><code>Sequel</code></a> would return when using a hash with a single entry, where the receiver was the key and the argument was the value. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a = 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NULL)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a = 1)</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a IN [1, 2])</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NULL)</span>
+</pre>
 
 <p>This also adds the !~ method, for easily setting up not equals, exclusion, and inverse pattern matching.  This is the same as as inverting the result of the =~ method</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a NOT IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NOT NULL)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a != 1)</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a NOT IN [1, 2])</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NOT NULL)</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -69,7 +75,10 @@ Sequel::SQL::PatternMatchMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-21~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-21~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">835</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">!~</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">836</span>   <span class="ruby-operator">~</span>(<span class="ruby-keyword">self</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">837</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-21~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">835</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">!~</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">836</span>   <span class="ruby-operator">~</span>(<span class="ruby-keyword">self</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">other</span>)
+<span class="line-num">837</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-3D~'>
@@ -87,7 +96,10 @@ Sequel::SQL::PatternMatchMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-3D~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-3D~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">831</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">832</span>   <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">833</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-3D~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">831</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">=~</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">832</span>   <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)
+<span class="line-num">833</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -99,7 +111,7 @@ Sequel::SQL::PatternMatchMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

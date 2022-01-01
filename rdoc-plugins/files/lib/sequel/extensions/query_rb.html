@@ -38,15 +38,23 @@ Last Update:
 <div id='description'>
 <p>The query extension adds a query method which allows a different way to construct queries instead of the usual method chaining:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">select</span> <span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>&#x000A;  <span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}&#x000A;  <span class="ruby-identifier">reverse</span> <span class="ruby-value">:z</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">select</span> <span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>
+  <span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}
+  <span class="ruby-identifier">reverse</span> <span class="ruby-value">:z</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You can load this extension into specific datasets:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:query</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]
+<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:query</span>)
+</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database’s datasets, which is probably the desired behavior if you are using this extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:query</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:query</span>)
+</pre>
 
 <p>Related modules: <a href="../../../../classes/Sequel/DatabaseQuery.html"><code>Sequel::DatabaseQuery</code></a>, <a href="../../../../classes/Sequel/DatasetQuery.html"><code>Sequel::DatasetQuery</code></a>, <a href="../../../../classes/Sequel/Dataset/Query.html"><code>Sequel::Dataset::Query</code></a></p>
 </div>
@@ -59,7 +67,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -42,7 +42,11 @@ Last Update:
 
 <p>Combining these three optimizations, here are the performance increases compared to <a href="4_9_0_txt.html">4.9.0</a> for a couple example datasets:</p>
 
-<pre>ds1 = DB[:a]&#x000A;ds2 = DB[:a].select(:a, :b).where(:c=&gt;1).order(:d, :e)&#x000A;        .sql     .all (1 row)&#x000A;ds1     140%     11%&#x000A;ds2     187%     32%</pre>
+<pre>ds1 = DB[:a]
+ds2 = DB[:a].select(:a, :b).where(:c=&gt;1).order(:d, :e)
+        .sql     .all (1 row)
+ds1     140%     11%
+ds2     187%     32%</pre>
 </li><li>
 <p>Regular association loading now uses a placeholder literalizer in most cases, for up to an 85% improvement when loading simple associations.</p>
 </li><li>
@@ -56,7 +60,7 @@ Last Update:
 </li><li>
 <p>The many_to_many setter method in the association_pks plugin now uses Dataset#import to insert many rows at once, instead of using a seperate query per insert.</p>
 </li><li>
-<p>The jdbc adapter&#39;s type conversion has been rewritten to be more similar to the other adapters, setting up the type conversion procs before iterating over results.  This increases performance up to 20%.</p>
+<p>The jdbc adapter’s type conversion has been rewritten to be more similar to the other adapters, setting up the type conversion procs before iterating over results.  This increases performance up to 20%.</p>
 </li><li>
 <p>The jdbc/oracle adapter now defaults to a fetch_size of 100, similar to the oci8-based oracle adapter, significantly improving performance for large datasets.</p>
 </li></ul>
@@ -85,7 +89,12 @@ Last Update:
 </li><li>
 <p>Database#call_mssql_sproc on Microsoft SQL Server now handles named parameters:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:sproc_name</span>, <span class="ruby-value">:args</span> <span class="ruby-operator">=&gt;</span> {&#x000A;  <span class="ruby-string">&#39;input_arg1_name&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;input arg1 value&#39;</span>,&#x000A;  <span class="ruby-string">&#39;input_arg2_name&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;input arg2 value&#39;</span>,&#x000A;  <span class="ruby-string">&#39;output_arg_name&#39;</span> <span class="ruby-operator">=&gt;</span> [<span class="ruby-value">:output</span>, <span class="ruby-string">&#39;int&#39;</span>, <span class="ruby-string">&#39;result key name&#39;</span>]&#x000A;})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:sproc_name</span>, <span class="ruby-value">:args</span> <span class="ruby-operator">=&gt;</span> {
+  <span class="ruby-string">&#39;input_arg1_name&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;input arg1 value&#39;</span>,
+  <span class="ruby-string">&#39;input_arg2_name&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;input arg2 value&#39;</span>,
+  <span class="ruby-string">&#39;output_arg_name&#39;</span> <span class="ruby-operator">=&gt;</span> [<span class="ruby-value">:output</span>, <span class="ruby-string">&#39;int&#39;</span>, <span class="ruby-string">&#39;result key name&#39;</span>]
+})
+</pre>
 </li><li>
 <p>Database#drop_view now supports an :if_exists option on SQLite, MySQL, H2, and HSQLDB.</p>
 </li><li>
@@ -141,9 +150,9 @@ Last Update:
 </li><li>
 <p>The install/uninstall rake tasks have been removed.</p>
 </li><li>
-<p>Model association and association reflection internals have changed significantly, if you were relying on them, you&#39;ll probably need to update your code.</p>
+<p>Model association and association reflection internals have changed significantly, if you were relying on them, you’ll probably need to update your code.</p>
 </li><li>
-<p>Database transaction internals have changed significantly, if you were relying on them, you&#39;ll probably need to update your code.</p>
+<p>Database transaction internals have changed significantly, if you were relying on them, you’ll probably need to update your code.</p>
 </li><li>
 <p>Dataset literalization internals have changed significantly, with the Dataset#*_clause_methods private methods being removed. Custom adapters that used these methods should switch to using the new Dataset.def_sql_method method.</p>
 </li><li>
@@ -163,7 +172,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

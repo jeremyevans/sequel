@@ -37,17 +37,23 @@ Sequel::Plugins::ManyThroughMany
 <div id='description'>
 <p>The many_through_many plugin allow you to create an association using multiple join tables. For example, assume the following associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:albums</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>
+</pre>
 
 <p>The many_through_many plugin would allow this:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tags</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tags</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]
+</pre>
 
-<p>Which will give you the tags for all of the artist&#39;s albums.</p>
+<p>Which will give you the tags for all of the artist’s albums.</p>
 
-<p>Let&#39;s break down the 2nd argument of the many_through_many call:</p>
+<p>Let’s break down the 2nd argument of the many_through_many call:</p>
 
-<pre class="ruby">[[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],&#x000A; [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]</pre>
+<pre class="ruby">[[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],
+ [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]
+</pre>
 
 <p>This argument is an array of arrays with three elements.  Each entry in the main array represents a JOIN in SQL:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>first element </td><td>
@@ -60,29 +66,56 @@ Sequel::Plugins::ManyThroughMany
 
 <p>So the “Artist.many_through_many :tags” is translated into something similar to:</p>
 
-<pre class="ruby"><span class="ruby-constant">FROM</span> <span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">albums_artists</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">id</span> = <span class="ruby-identifier">albums_artists</span>.<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">albums_tags</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">albums_artists</span>.<span class="ruby-identifier">album_id</span> = <span class="ruby-identifier">albums_tag</span>.<span class="ruby-identifier">album_id</span>)&#x000A;<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">tags</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">albums_tags</span>.<span class="ruby-identifier">tag_id</span> = <span class="ruby-identifier">tags</span>.<span class="ruby-identifier">id</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">FROM</span> <span class="ruby-identifier">artists</span>
+<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">albums_artists</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">id</span> = <span class="ruby-identifier">albums_artists</span>.<span class="ruby-identifier">artist_id</span>)
+<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">albums_tags</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">albums_artists</span>.<span class="ruby-identifier">album_id</span> = <span class="ruby-identifier">albums_tag</span>.<span class="ruby-identifier">album_id</span>)
+<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">tags</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">albums_tags</span>.<span class="ruby-identifier">tag_id</span> = <span class="ruby-identifier">tags</span>.<span class="ruby-identifier">id</span>)
+</pre>
 
 <p>The “artists.id” and “tags.id” criteria come from other association options (defaulting to the primary keys of the current and associated tables), but hopefully you can see how each argument in the array is used in the JOIN clauses. Note that you do not need to add an entry for the final table (tags in this example), as that comes from the associated class.</p>
 
 <p>Here are some more examples:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Same as Artist.many_to_many :albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:albums</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All artists that are associated to any album that this artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All albums by artists that are associated to any album that this artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artist_albums</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],&#x000A; [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]],&#x000A; <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>&#x000A;&#x000A;<span class="ruby-comment"># All tracks on albums by this artist (also could be a many_to_many)</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tracks</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]],&#x000A; <span class="ruby-value">right_primary_key:</span> <span class="ruby-value">:album_id</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Same as Artist.many_to_many :albums</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:albums</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]]
 
-<p>Often you don&#39;t want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:</p>
+<span class="ruby-comment"># All artists that are associated to any album that this artist is associated to</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]]
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]],&#x000A;  <span class="ruby-value">after_load:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">artist</span>, <span class="ruby-identifier">associated_artists</span><span class="ruby-operator">|</span> <span class="ruby-identifier">associated_artists</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">artist</span>)}</pre>
+<span class="ruby-comment"># All albums by artists that are associated to any album that this artist is associated to</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artist_albums</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],
+ [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]],
+ <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>
 
-<p>You can also handle it by adding a dataset block that excludes the current record (so it won&#39;t be retrieved at all), but that won&#39;t work when eagerly loading, which is why the :after_load proc is recommended instead.</p>
+<span class="ruby-comment"># All tracks on albums by this artist (also could be a many_to_many)</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tracks</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]],
+ <span class="ruby-value">right_primary_key:</span> <span class="ruby-value">:album_id</span>
+</pre>
 
-<p>It&#39;s also common to not want duplicate records, in which case the :distinct option can be used:</p>
+<p>Often you don’t want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]],&#x000A; <span class="ruby-value">distinct:</span> <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]],
+  <span class="ruby-value">after_load:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">artist</span>, <span class="ruby-identifier">associated_artists</span><span class="ruby-operator">|</span> <span class="ruby-identifier">associated_artists</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">artist</span>)}
+</pre>
+
+<p>You can also handle it by adding a dataset block that excludes the current record (so it won’t be retrieved at all), but that won’t work when eagerly loading, which is why the :after_load proc is recommended instead.</p>
+
+<p>It’s also common to not want duplicate records, in which case the :distinct option can be used:</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>], [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]],
+ <span class="ruby-value">distinct:</span> <span class="ruby-keyword">true</span>
+</pre>
 
 <p>In addition to many_through_many, this plugin also adds one_through_many, for an association to a single object through multiple join tables. This is useful if there are unique constraints on the foreign keys in the join tables that reference back to the current table, or if you want to set an order on the association and just want the first record.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support many_through_many associations</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support many_through_many associations</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support many_through_many associations</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span>
+
+<span class="ruby-comment"># Make the Album class support many_through_many associations</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -104,7 +137,7 @@ Sequel::Plugins::ManyThroughMany
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

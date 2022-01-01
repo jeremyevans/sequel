@@ -48,11 +48,12 @@ Last Update:
 
 <p>For recent Linux users, this means you can have a shebang line such as:</p>
 
-<pre class="ruby"><span class="ruby-comment">#!/usr/bin/sequel postgres://user:pass@host/db</span></pre>
+<pre class="ruby"><span class="ruby-comment">#!/usr/bin/sequel postgres://user:pass@host/db</span>
+</pre>
 
 <p>to create a self contained script.</p>
 </li><li>
-<p>bin/sequel now supports -r and -I options similar to ruby&#39;s -r and -I options.</p>
+<p>bin/sequel now supports -r and -I options similar to ruby’s -r and -I options.</p>
 </li><li>
 <p>MySQL datasets now have a calc_found_rows method that uses SQL_CALC_FOUND_ROWS, which provides a fast way to limit the number of results returned by a dataset while having an easy way to determine how many rows would have been returned if no limit was applied.</p>
 </li></ul>
@@ -61,7 +62,7 @@ Last Update:
 <ul><li>
 <p>The Sequel::Model.plugin method can now be overridden just like any other method.  Previously, it was the only method that was defined directly on the class.  This allows the creation of plugins that can modify the plugin system itself.</p>
 </li><li>
-<p>Symbol splitting (:table__column___alias) now works correctly for identifiers that include characters that aren&#39;t in [w ]. Among other things, this means that identifiers with accented characters or even kanji characters can be used with symbol splitting.</p>
+<p>Symbol splitting (:table__column___alias) now works correctly for identifiers that include characters that aren’t in [w ]. Among other things, this means that identifiers with accented characters or even kanji characters can be used with symbol splitting.</p>
 </li><li>
 <p>If cover? is defined, it is now used in preference to include? for the validates_includes/validates_inclusion_of validations. ruby 1.9 defines include? differently for some ranges and can be very slow, while cover? is similar to the 1.8 behavior of just checking the beginning and end of the range.</p>
 </li><li>
@@ -91,7 +92,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

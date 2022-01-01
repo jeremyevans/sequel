@@ -37,21 +37,34 @@ Sequel::Plugins::Finder
 <div id='description'>
 <p>The finder plugin adds Model.finder for defining optimized finder methods. There are two ways to use this.  The recommended way is to pass a symbol that represents a model class method that returns a dataset:</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier ruby-title">by_name</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> <span class="ruby-value">:by_name</span></pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier ruby-title">by_name</span>(<span class="ruby-identifier">name</span>)
+  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> <span class="ruby-value">:by_name</span>
+</pre>
 
 <p>This creates an optimized first_by_name method, which you can call normally:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-string">&quot;Joe&quot;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-string">&quot;Joe&quot;</span>)
+</pre>
 
 <p>The alternative way to use this to pass your own block:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}
+</pre>
 
 <p>Additionally, there is a Model.prepared_finder method.  This works similarly to Model.finder, but uses a prepared statement.  This limits the types of arguments that will be accepted, but can perform better in the database.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support Model.finder</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:finder</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support Model.finder</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:finder</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support Model.finder</span>
+<span class="ruby-comment"># (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:finder</span>
+
+<span class="ruby-comment"># Make the Album class support Model.finder</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:finder</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -98,7 +111,13 @@ Sequel::Plugins::Finder
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/finder.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">41</span>     <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">42</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/finder.rb</span>
+<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">39</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">40</span>     <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">41</span>     <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">42</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -110,7 +129,7 @@ Sequel::Plugins::Finder
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

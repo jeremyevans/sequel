@@ -62,7 +62,12 @@ Sequel::MySQL::PreparedStatements::DatasetMethods::CallableStatementMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-subselect_sql_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-subselect_sql_append-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)&#x000A;<span class="line-num">36</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">prepared_args</span>, <span class="ruby-value">:bind_vars</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]).&#x000A;<span class="line-num">37</span>     <span class="ruby-identifier">send</span>(<span class="ruby-value">:to_prepared_statement</span>, <span class="ruby-value">:select</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">bound_variable_modules</span>).&#x000A;<span class="line-num">38</span>     <span class="ruby-identifier">prepared_sql</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-subselect_sql_append-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb</span>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)
+<span class="line-num">36</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">prepared_args</span>, <span class="ruby-value">:bind_vars</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]).
+<span class="line-num">37</span>     <span class="ruby-identifier">send</span>(<span class="ruby-value">:to_prepared_statement</span>, <span class="ruby-value">:select</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">bound_variable_modules</span>).
+<span class="line-num">38</span>     <span class="ruby-identifier">prepared_sql</span>
+<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +79,7 @@ Sequel::MySQL::PreparedStatements::DatasetMethods::CallableStatementMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

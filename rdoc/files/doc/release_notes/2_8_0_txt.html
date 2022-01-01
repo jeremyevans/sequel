@@ -41,15 +41,23 @@ Last Update:
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports database stored procedures similar to its support for prepared statements.  The API is as follows:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:mysp</span>, <span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-identifier">sp</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:mysp</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param3&#39;</span>, <span class="ruby-string">&#39;param4&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:mysp</span>, <span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)
+<span class="ruby-comment"># or</span>
+<span class="ruby-identifier">sp</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:mysp</span>)
+<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)
+<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param3&#39;</span>, <span class="ruby-string">&#39;param4&#39;</span>)
+</pre>
 
 <p>This works with Model datasets as well, allowing them to return model objects:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:new_albums</span>)&#x000A;<span class="ruby-comment">#=&gt; [#&lt;Album ...&gt;, #&lt;Album ...&gt;]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:new_albums</span>)
+<span class="ruby-comment">#=&gt; [#&lt;Album ...&gt;, #&lt;Album ...&gt;]</span>
+</pre>
 
-<p>You can call a stored procedure directly on the Database object if you want to, but the results and API are adapter dependent, and you definitely shouldn&#39;t do it if the stored procedure returns rows:</p>
+<p>You can call a stored procedure directly on the Database object if you want to, but the results and API are adapter dependent, and you definitely shouldn’t do it if the stored procedure returns rows:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:mysp</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>])</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:mysp</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>])
+</pre>
 
 <p>Currently, the MySQL and JDBC adapters support stored procedures. Other adapters may support them in a future version.</p>
 </li><li>
@@ -59,23 +67,37 @@ Last Update:
 
 <p>To turn upcasing on or off:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-comment"># Database</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&quot;postgres://...&quot;</span>, <span class="ruby-value">:upcase_identifiers</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Dataset</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Global</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-comment"># Database</span>
+<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&quot;postgres://...&quot;</span>, <span class="ruby-value">:upcase_identifiers</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">false</span>
+<span class="ruby-comment"># Dataset</span>
+<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span>
+</pre>
 </li><li>
 <p>Options are now supported when altering a columns type:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:items</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:integer</span>, <span class="ruby-value">:unsigned</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:varchar</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">30</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:enum</span>, <span class="ruby-value">:elements</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:items</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:integer</span>, <span class="ruby-value">:unsigned</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>
+  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:varchar</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">30</span>
+  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:enum</span>, <span class="ruby-value">:elements</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>]
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
-<p>Standard conforming strings are now turned on by default in the PostgreSQL adapter.  This makes PostgreSQL not interpret backslash escapes.  This is the PostgreSQL recommended setting, which will be the default setting in a future version of PostgreSQL.  If you don&#39;t want for force the use of standard strings, use:</p>
+<p>Standard conforming strings are now turned on by default in the PostgreSQL adapter.  This makes PostgreSQL not interpret backslash escapes.  This is the PostgreSQL recommended setting, which will be the default setting in a future version of PostgreSQL.  If you don’t want for force the use of standard strings, use:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> = <span class="ruby-keyword">false</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> = <span class="ruby-keyword">false</span>
+</pre>
 
 <p>You need to do that after you call Sequel.connect but before you use the database for anything, since that setting is set on initial connection.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an error if you attempt to use EXCEPT [ALL] or INTERSECT [ALL] on a database that doesn&#39;t support it.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an error if you attempt to use EXCEPT [ALL] or INTERSECT [ALL] on a database that doesn’t support it.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an error if you attempt to use DISTINCT ON with MySQL or Oracle, which don&#39;t support it.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an error if you attempt to use DISTINCT ON with MySQL or Oracle, which don’t support it.</p>
 </li><li>
-<p>A subadapter for the Progress RDBMS was added to the ODBC adapter. To connect to a Progress database, use the :db_type=&gt;&#39;progress&#39; option.  This adapter targets Progress 9.</p>
+<p>A subadapter for the Progress RDBMS was added to the ODBC adapter. To connect to a Progress database, use the :db_type=&gt;‘progress’ option.  This adapter targets Progress 9.</p>
 </li><li>
 <p>The ODBC adapter now supports transactions.</p>
 </li><li>
@@ -89,7 +111,11 @@ Last Update:
 </li><li>
 <p>You can now use literal strings with placeholders as well as subselects when using prepared statements.  For example, the following all work now:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, <span class="ruby-value">:$i</span>).<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>)\&#x000A;  .<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$i</span>)).<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE id = ?&quot;</span>, <span class="ruby-value">:$i</span>].<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, <span class="ruby-value">:$i</span>).<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>)\
+  .<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$i</span>)).<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE id = ?&quot;</span>, <span class="ruby-value">:$i</span>].<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+</pre>
 </li><li>
 <p>Model#initialize received a few more micro-optimizations.</p>
 </li><li>
@@ -99,17 +125,21 @@ Last Update:
 </li><li>
 <p>You can now submit multiple SQL queries at once in the MySQL adapter:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT 1; SELECT 2&#39;</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment">#=&gt; [{:&quot;1&quot;=&gt;1, :&quot;2&quot;=&gt;2}]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT 1; SELECT 2&#39;</span>].<span class="ruby-identifier">all</span>
+<span class="ruby-comment">#=&gt; [{:&quot;1&quot;=&gt;1, :&quot;2&quot;=&gt;2}]</span>
+</pre>
 
-<p>This may fix issues if you&#39;ve seen a MySQL “commands out of sync” message.  Note that this doesn&#39;t work if you are connecting to MySQL via JDBC.</p>
+<p>This may fix issues if you’ve seen a MySQL “commands out of sync” message.  Note that this doesn’t work if you are connecting to MySQL via JDBC.</p>
 </li><li>
 <p>You can now use AliasedExpressions directly in table names given to join_table:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:i</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:j</span>)).<span class="ruby-identifier">join</span>(<span class="ruby-value">:k</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:l</span>), <span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)&#x000A;<span class="ruby-comment">#=&gt; ... FROM i AS j INNER JOIN k AS l ON (l.a = j.b)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:i</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:j</span>)).<span class="ruby-identifier">join</span>(<span class="ruby-value">:k</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:l</span>), <span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)
+<span class="ruby-comment">#=&gt; ... FROM i AS j INNER JOIN k AS l ON (l.a = j.b)</span>
+</pre>
 </li><li>
 <p>Database#rename_table once again works on PostgreSQL.  It was broken in 2.7.0.</p>
 </li><li>
-<p>The interval type is now treated as it&#39;s own type. It was previously treated as an integer type.</p>
+<p>The interval type is now treated as it’s own type. It was previously treated as an integer type.</p>
 </li><li>
 <p>Subselects are now aliased correctly when using Oracle.</p>
 </li><li>
@@ -143,7 +173,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

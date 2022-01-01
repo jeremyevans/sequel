@@ -40,22 +40,40 @@ Last Update:
 <ul><li>
 <p>A subset_conditions plugin has been added, which adds a method for each subset that returns the filter conditions for the subset.  This makes it easier to reuse the subset conditions:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:subset_conditions</span>&#x000A;  <span class="ruby-identifier">subset</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active_conditions</span>)&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">or</span>(<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active_conditions</span>)</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:subset_conditions</span>
+  <span class="ruby-identifier">subset</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active_conditions</span>)
+<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">or</span>(<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active_conditions</span>)
+</pre>
 </li><li>
 <p>A boolean_subsets plugin has been added, which adds a subset for each boolean column:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Assume boolean column :active</span>&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span>&#x000A;&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active</span>&#x000A;<span class="ruby-comment"># SELECT * FROM foos WHERE (active IS TRUE)</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Assume boolean column :active</span>
+<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span>
+
+<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active</span>
+<span class="ruby-comment"># SELECT * FROM foos WHERE (active IS TRUE)</span>
+</pre>
 
 <p>You can provide a block to the plugin to change the arguments passed to subset:</p>
 
-<pre class="ruby"><span class="ruby-constant">Foo</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;  [<span class="ruby-value">:&quot;where_#{column}&quot;</span>, <span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">where_active</span>&#x000A;<span class="ruby-comment"># SELECT * FROM foos WHERE active</span></pre>
+<pre class="ruby"><span class="ruby-constant">Foo</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>
+  [<span class="ruby-value">:&quot;where_#{column}&quot;</span>, <span class="ruby-identifier">column</span>]
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">where_active</span>
+<span class="ruby-comment"># SELECT * FROM foos WHERE active</span>
+</pre>
 
 <p>As with similar plugins, you can add the boolean_subsets plugin to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself, and all subclasses created afterward will have the boolean subset methods automatically created.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>If Model#refresh can&#39;t find the related row, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises a Sequel::NoExistingObject exception instead of a generic <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> exception.</p>
+<p>If Model#refresh can’t find the related row, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises a Sequel::NoExistingObject exception instead of a generic <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> exception.</p>
 </li><li>
 <p>In the csv_serializer plugin, when calling to_csv on a model class or dataset, instead of using [] to access data, send is used to call methods.  This is more similar to other plugins as well as Model#to_csv.</p>
 </li><li>
@@ -64,7 +82,7 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The change to the csv_serializer plugin can change results if you are overriding any of the column accessor methods.  It can also break existing code if one of the columns being used isn&#39;t defined as a method or the method requires more than one argument.</p>
+<p>The change to the csv_serializer plugin can change results if you are overriding any of the column accessor methods.  It can also break existing code if one of the columns being used isn’t defined as a method or the method requires more than one argument.</p>
 </li></ul>
 </div>
 <div id='context'>
@@ -76,7 +94,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

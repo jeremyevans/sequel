@@ -103,7 +103,35 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-connect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-connect-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">38</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:username</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:user</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">|=</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span><span class="ruby-operator">::</span><span class="ruby-constant">FOUND_ROWS</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-value">:FOUND_ROWS</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]&#x000A;<span class="line-num">43</span>   <span class="ruby-identifier">conn</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:symbolize_keys</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:cache_rows</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="line-num">45</span>     &#x000A;<span class="line-num">46</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">NativePreparedStatements</span>&#x000A;<span class="line-num">47</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_default_query_options</span>, <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">49</span> &#x000A;<span class="line-num">50</span>   <span class="ruby-identifier">sqls</span> = <span class="ruby-identifier">mysql_connection_setting_sqls</span>&#x000A;<span class="line-num">51</span> &#x000A;<span class="line-num">52</span>   <span class="ruby-comment"># Set encoding a slightly different way after connecting,</span>&#x000A;<span class="line-num">53</span>   <span class="ruby-comment"># in case the READ_DEFAULT_GROUP overrode the provided encoding.</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-comment"># Doesn&#39;t work across implicit reconnects, but Sequel doesn&#39;t turn on</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-comment"># that feature.</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>]&#x000A;<span class="line-num">57</span>     <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-node">&quot;SET NAMES #{conn.escape(encoding.to_s)}&quot;</span>)&#x000A;<span class="line-num">58</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">59</span> &#x000A;<span class="line-num">60</span>   <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="line-num">61</span> &#x000A;<span class="line-num">62</span>   <span class="ruby-identifier">add_prepared_statements_cache</span>(<span class="ruby-identifier">conn</span>)&#x000A;<span class="line-num">63</span>   <span class="ruby-identifier">conn</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-connect-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">38</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">39</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:username</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:user</span>)
+<span class="line-num">40</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+<span class="line-num">41</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">|=</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span><span class="ruby-operator">::</span><span class="ruby-constant">FOUND_ROWS</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-value">:FOUND_ROWS</span>)
+<span class="line-num">42</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]
+<span class="line-num">43</span>   <span class="ruby-identifier">conn</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">44</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:symbolize_keys</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:cache_rows</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="line-num">45</span>     
+<span class="line-num">46</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">NativePreparedStatements</span>
+<span class="line-num">47</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_default_query_options</span>, <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">dup</span>)
+<span class="line-num">48</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">49</span> 
+<span class="line-num">50</span>   <span class="ruby-identifier">sqls</span> = <span class="ruby-identifier">mysql_connection_setting_sqls</span>
+<span class="line-num">51</span> 
+<span class="line-num">52</span>   <span class="ruby-comment"># Set encoding a slightly different way after connecting,</span>
+<span class="line-num">53</span>   <span class="ruby-comment"># in case the READ_DEFAULT_GROUP overrode the provided encoding.</span>
+<span class="line-num">54</span>   <span class="ruby-comment"># Doesn&#39;t work across implicit reconnects, but Sequel doesn&#39;t turn on</span>
+<span class="line-num">55</span>   <span class="ruby-comment"># that feature.</span>
+<span class="line-num">56</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>]
+<span class="line-num">57</span>     <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-node">&quot;SET NAMES #{conn.escape(encoding.to_s)}&quot;</span>)
+<span class="line-num">58</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">59</span> 
+<span class="line-num">60</span>   <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>)}}
+<span class="line-num">61</span> 
+<span class="line-num">62</span>   <span class="ruby-identifier">add_prepared_statements_cache</span>(<span class="ruby-identifier">conn</span>)
+<span class="line-num">63</span>   <span class="ruby-identifier">conn</span>
+<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_dui'>
@@ -119,7 +147,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_dui-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute_dui-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">67</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">affected_rows</span>}&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute_dui-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>
+<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">67</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">affected_rows</span>}
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_insert'>
@@ -135,7 +166,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_insert-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute_insert-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">71</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">last_id</span>}&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute_insert-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>
+<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">71</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">last_id</span>}
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -151,7 +185,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">75</span>   <span class="ruby-identifier">server_version</span>&#x000A;<span class="line-num">76</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>
+<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">75</span>   <span class="ruby-identifier">server_version</span>
+<span class="line-num">76</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-server_version'>
@@ -169,7 +207,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-server_version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-server_version-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">_server</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">81</span>   <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">super</span>()&#x000A;<span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-server_version-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>
+<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">_server</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">81</span>   <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">super</span>()
+<span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -181,7 +222,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

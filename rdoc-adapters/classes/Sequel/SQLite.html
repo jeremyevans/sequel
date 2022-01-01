@@ -109,7 +109,17 @@ Sequel::SQLite
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>&#x000A;<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">11</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">12</span>     <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-value">30903</span>&#x000A;<span class="line-num">13</span> &#x000A;<span class="line-num">14</span>     <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_parse_table</span>(<span class="ruby-operator">*</span>)&#x000A;<span class="line-num">15</span>       []&#x000A;<span class="line-num">16</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">17</span>     <span class="ruby-identifier">singleton_class</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:private</span>, <span class="ruby-value">:schema_parse_table</span>)&#x000A;<span class="line-num">18</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">19</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
+<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">11</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">12</span>     <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-value">30903</span>
+<span class="line-num">13</span> 
+<span class="line-num">14</span>     <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_parse_table</span>(<span class="ruby-operator">*</span>)
+<span class="line-num">15</span>       []
+<span class="line-num">16</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">17</span>     <span class="ruby-identifier">singleton_class</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:private</span>, <span class="ruby-value">:schema_parse_table</span>)
+<span class="line-num">18</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">19</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -126,7 +136,10 @@ Sequel::SQLite
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-schema_parse_table-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-schema_parse_table-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_parse_table</span>(<span class="ruby-operator">*</span>)&#x000A;<span class="line-num">15</span>   []&#x000A;<span class="line-num">16</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-schema_parse_table-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
+<span class="line-num">14</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_parse_table</span>(<span class="ruby-operator">*</span>)
+<span class="line-num">15</span>   []
+<span class="line-num">16</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -138,7 +151,7 @@ Sequel::SQLite
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

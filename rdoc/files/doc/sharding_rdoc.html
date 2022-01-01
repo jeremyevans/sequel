@@ -44,9 +44,10 @@ Last Update:
 
 <p>Sharding and read_only support are both enabled via the :servers database option.  Using the :servers database option makes <a href="../../classes/Sequel.html"><code>Sequel</code></a> use a connection pool class that supports sharding, and the minimum required to enable sharding support is to use the empty hash:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>, <span class="ruby-value">servers:</span> {})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>, <span class="ruby-value">servers:</span> {})
+</pre>
 
-<p>In most cases, you are probably not going to want to use an empty hash.  Keys in the server hash are not restricted to type, but the general recommendation is to use a symbol unless you have special requirements. Values in the server hash should be either hashes or procs that return hashes. These hashes are merged into the Database object&#39;s default options hash to get the connection options for the shard, so you don&#39;t need to override all options, just the ones that need to be modified.  For example, if you are using the same user, password, and database name and just the host is changing, you only need a :host entry in each shard&#39;s hash.</p>
+<p>In most cases, you are probably not going to want to use an empty hash.  Keys in the server hash are not restricted to type, but the general recommendation is to use a symbol unless you have special requirements. Values in the server hash should be either hashes or procs that return hashes. These hashes are merged into the Database object’s default options hash to get the connection options for the shard, so you don’t need to override all options, just the ones that need to be modified.  For example, if you are using the same user, password, and database name and just the host is changing, you only need a :host entry in each shard’s hash.</p>
 
 <p>Note that all servers should have the same schema for all tables you are accessing, unless you really know what you are doing.</p>
 
@@ -56,73 +57,130 @@ Last Update:
 
 <p>To use a single, read-only replica that handles SELECT queries, the following is the simplest configuration:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>, &#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;replica_server&#39;</span>}})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>, 
+  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;replica_server&#39;</span>}})
+</pre>
 
 <p>This will use the replica_server for SELECT queries and primary_server for other queries.</p>
 
 <p>If you want to ensure your queries are going to a specific database, you can force this for a given query by using the .server method and passing  the symbol name defined in the connect options. For example:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Force the SELECT to run on the primary server</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Force the DELETE to run on the read-only replica</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Force the SELECT to run on the primary server</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span>
+
+<span class="ruby-comment"># Force the DELETE to run on the read-only replica</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span>
+</pre>
 
 <h3 id="label-Single+Primary-2C+Multiple+Replicas">Single Primary, Multiple Replicas<span><a href="#label-Single+Primary-2C+Multiple+Replicas">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>Let&#39;s say you have 4 replica servers with names replica_server0, replica_server1, replica_server2, and replica_server3.</p>
+<p>Let’s say you have 4 replica servers with names replica_server0, replica_server1, replica_server2, and replica_server3.</p>
 
-<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)&#x000A;<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;replica_server#{(read_only_host+=1) % num_read_only}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>,&#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})</pre>
+<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>
+<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)
+<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>
+  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;replica_server#{(read_only_host+=1) % num_read_only}&quot;</span>}
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>,
+  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})
+</pre>
 
-<p>This will use one of the replica servers for SELECT queries and use the primary server for other queries.  It&#39;s also possible to pick a random host instead of using the round robin approach presented above, but that can result in less optimal resource usage.</p>
+<p>This will use one of the replica servers for SELECT queries and use the primary server for other queries.  It’s also possible to pick a random host instead of using the round robin approach presented above, but that can result in less optimal resource usage.</p>
 
 <h3 id="label-Multiple+Primary-2C+Multiple+Replicas">Multiple Primary, Multiple Replicas<span><a href="#label-Multiple+Primary-2C+Multiple+Replicas">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>This involves the same basic idea as the multiple replicas, single primary, but it shows that the primary database is named :default.  So for 4 primary servers and 4 replica servers:</p>
 
-<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)&#x000A;<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;replica_server#{(read_only_host+=1) % num_read_only}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">num_default</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">default_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_default</span>)&#x000A;<span class="ruby-identifier">default_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;primary_server#{(default_host+=1) % num_default}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>,&#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">default:</span> <span class="ruby-identifier">default_proc</span>, <span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})</pre>
+<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>
+<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)
+<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>
+  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;replica_server#{(read_only_host+=1) % num_read_only}&quot;</span>}
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">num_default</span> = <span class="ruby-value">4</span>
+<span class="ruby-identifier">default_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_default</span>)
+<span class="ruby-identifier">default_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>
+  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;primary_server#{(default_host+=1) % num_default}&quot;</span>}
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>,
+  <span class="ruby-value">servers:</span> {<span class="ruby-value">default:</span> <span class="ruby-identifier">default_proc</span>, <span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})
+</pre>
 
 <h2 id="label-Sharding">Sharding<span><a href="#label-Sharding">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>There is specific support in <a href="../../classes/Sequel.html"><code>Sequel</code></a> for handling primary/replica database combinations, with the only necessary setup being the database configuration. However, since sharding is always going to be implementation dependent, <a href="../../classes/Sequel.html"><code>Sequel</code></a> supplies the basic infrastructure, but you have to tell it which server to use for each dataset.  Let&#39;s assume a simple scenario, a distributed rainbow table for SHA-1 hashes, sharding based on the first hex character (for a total of 16 shards).  First, you need to configure the database:</p>
+<p>There is specific support in <a href="../../classes/Sequel.html"><code>Sequel</code></a> for handling primary/replica database combinations, with the only necessary setup being the database configuration. However, since sharding is always going to be implementation dependent, <a href="../../classes/Sequel.html"><code>Sequel</code></a> supplies the basic infrastructure, but you have to tell it which server to use for each dataset.  Let’s assume a simple scenario, a distributed rainbow table for SHA-1 hashes, sharding based on the first hex character (for a total of 16 shards).  First, you need to configure the database:</p>
 
-<pre class="ruby"><span class="ruby-identifier">servers</span> = {}&#x000A;((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, <span class="ruby-value">servers:</span> <span class="ruby-identifier">servers</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">servers</span> = {}
+((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, <span class="ruby-value">servers:</span> <span class="ruby-identifier">servers</span>)
+</pre>
 
-<p>This configures 17 servers, the 16 shard servers (/hash_host_[0-9a-f]/), and 1 default server which will be used if no shard is specified (“hash_host”).  If you want the default server to be one of the shard servers (e.g. hash_host_a), it&#39;s easiest to do:</p>
+<p>This configures 17 servers, the 16 shard servers (/hash_host_[0-9a-f]/), and 1 default server which will be used if no shard is specified (“hash_host”).  If you want the default server to be one of the shard servers (e.g. hash_host_a), it’s easiest to do:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host_a/hashes&#39;</span>, <span class="ruby-value">servers:</span> <span class="ruby-identifier">servers</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host_a/hashes&#39;</span>, <span class="ruby-value">servers:</span> <span class="ruby-identifier">servers</span>)
+</pre>
 
 <p>That will still set up a second pool of connections for the default server, since it considers the default server and shard servers independent.  Note that if you always set the shard on a dataset before using it in queries, it will not attempt to connect to the default server.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> may use the default server in queries it generates itself, such as to get column names or table schemas, so you should always have a default server that works.</p>
 
 <p>To set the shard for a given query, you use the Dataset#server method:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:hashes</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:hashes</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)
+</pre>
 
 <p>That will return all matching rows on the hash_host_a shard that have a hash column that contains 31337.</p>
 
-<p>Rainbow tables are generally used to find specific hashes, so to save some work, you might want to add a method to the dataset that automatically sets the shard to use.  This is fairly easy using a Sequel::Model:</p>
+<p>Rainbow tables are generally used to find specific hashes, so to save some work, you might want to add a method to the dataset that automatically sets the shard to use.  This is fairly easy using a <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:hashes</span>)&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">plaintext_for_hash</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-string">&#39;Invalid SHA-1 Hash&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-regexp">/\A[0-9a-f]{40}\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">server</span>(<span class="ruby-identifier">hash</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>].<span class="ruby-identifier">to_sym</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">hash:</span> <span class="ruby-identifier">hash</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:plaintext</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">plaintext_for_hash</span>(<span class="ruby-string">&quot;e580726d31f6e1ad216ffd87279e536d1f74e606&quot;</span>)</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:hashes</span>)
+  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">plaintext_for_hash</span>(<span class="ruby-identifier">hash</span>)
+      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-string">&#39;Invalid SHA-1 Hash&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-regexp">/\A[0-9a-f]{40}\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">hash</span>)
+      <span class="ruby-identifier">server</span>(<span class="ruby-identifier">hash</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>].<span class="ruby-identifier">to_sym</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">hash:</span> <span class="ruby-identifier">hash</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:plaintext</span>)
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">plaintext_for_hash</span>(<span class="ruby-string">&quot;e580726d31f6e1ad216ffd87279e536d1f74e606&quot;</span>)
+</pre>
 
 <h3 id="label-3Aservers_hash+Option">:servers_hash Option<span><a href="#label-3Aservers_hash+Option">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The connection pool can be further controlled to change how it handles attempts to access shards that haven&#39;t been configured.  The default is to assume the :default shard.  However, you can specify a different shard using the :servers_hash option when connecting to the database:</p>
+<p>The connection pool can be further controlled to change how it handles attempts to access shards that haven’t been configured.  The default is to assume the :default shard.  However, you can specify a different shard using the :servers_hash option when connecting to the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>, <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:some_shard</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>, <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:some_shard</span>))
+</pre>
 
 <p>You can also use this feature to raise an exception if an unconfigured shard is used:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>, <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-string">&#39;foo&#39;</span>})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>, <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-string">&#39;foo&#39;</span>})
+</pre>
 
 <p>If you specify a :servers_hash option to raise an exception for non configured shards you should also explicitly specify a :read_only entry in your :servers option for the case where a shard is not specified. In most cases it is sufficient to make the :read_only entry the same as the :default shard:</p>
 
-<pre class="ruby"><span class="ruby-identifier">servers</span> = {<span class="ruby-value">read_only:</span> {}}&#x000A;((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, <span class="ruby-value">servers:</span> <span class="ruby-identifier">servers</span>, &#x000A;  <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Invalid Server&quot;</span>})</pre>
+<pre class="ruby"><span class="ruby-identifier">servers</span> = {<span class="ruby-value">read_only:</span> {}}
+((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, <span class="ruby-value">servers:</span> <span class="ruby-identifier">servers</span>, 
+  <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Invalid Server&quot;</span>})
+</pre>
 
 <h3 id="label-Sharding+Plugin">Sharding Plugin<span><a href="#label-Sharding+Plugin">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> comes with a sharding plugin that makes it easy to use sharding with model objects. It makes sure that objects retrieved from a specific shard are always saved back to that shard, allows you to create objects on specific shards, and even makes sure associations work well with shards.  You just need to remember to set to model to use the plugin:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:hashes</span>)&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:sharding</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">server</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">plaintext:</span> <span class="ruby-string">&#39;VGM&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:hashes</span>)
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:sharding</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">server</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">plaintext:</span> <span class="ruby-string">&#39;VGM&#39;</span>)
+</pre>
 
 <p>If all of your models are sharded, you can set all models to use the plugin via:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:sharding</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:sharding</span>
+</pre>
 
 <h3 id="label-server_block+Extension">server_block Extension<span><a href="#label-server_block+Extension">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -130,35 +188,66 @@ Last Update:
 
 <p>The server_block extension adds a Database#with_server method that scopes all database access inside the block to the given shard by default:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># this SELECT query uses the &quot;a&quot; shard</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:a</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># this SELECT query uses the &quot;a&quot; shard</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)
+    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>
+    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
-<p>The server_block extension doesn&#39;t currently integrate with the sharding plugin, as it ties into the Dataset#server method.  This shouldn&#39;t present a problem in practice as long as you just access the models inside the with_server block, since they will use the shard set by with_server by default.  However, you will probably have issues if you retrieve the models inside the block and save them outside of the block.  If you need to do that, call the server method explicitly on the dataset used to retrieve the model objects.</p>
+<p>The server_block extension doesn’t currently integrate with the sharding plugin, as it ties into the Dataset#server method.  This shouldn’t present a problem in practice as long as you just access the models inside the with_server block, since they will use the shard set by with_server by default.  However, you will probably have issues if you retrieve the models inside the block and save them outside of the block.  If you need to do that, call the server method explicitly on the dataset used to retrieve the model objects.</p>
 
 <p>The with_server method also supports a second argument for the default read_only server to use, which can be useful if you are mixing sharding and primary/replica servers:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:a_read_only</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># this SELECT query uses the &quot;a_read_only&quot; shard</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:a_read_only</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># this SELECT query uses the &quot;a_read_only&quot; shard</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)
+    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>
+    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h3 id="label-arbitrary_servers+Extension">arbitrary_servers Extension<span><a href="#label-arbitrary_servers+Extension">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>By default, Sequel&#39;s sharding support is designed to work with predefined shards.  It ships with Database#add_servers and Database#remove_servers methods to modify these predefined shards on the fly, but it is a bit cumbersome to work with truly arbitrary servers (requiring you to call add_servers before use, then remove_servers after use).</p>
+<p>By default, Sequel’s sharding support is designed to work with predefined shards.  It ships with Database#add_servers and Database#remove_servers methods to modify these predefined shards on the fly, but it is a bit cumbersome to work with truly arbitrary servers (requiring you to call add_servers before use, then remove_servers after use).</p>
 
-<p>The arbitrary_servers extension allows you to pass a server/shard options hash as the server to use, and those options will be merged directly into the database&#39;s default options:</p>
+<p>The arbitrary_servers extension allows you to pass a server/shard options hash as the server to use, and those options will be merged directly into the database’s default options:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:arbitrary_servers</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:rainbows</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;hash_host_a&#39;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:rainbows</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;hash_host_b&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;backup&#39;</span>).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:arbitrary_servers</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:rainbows</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;hash_host_a&#39;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># or</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:rainbows</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;hash_host_b&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;backup&#39;</span>).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>arbitrary_servers is designed to work well in conjunction with the server_block extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;hash_host_b&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;backup&#39;</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># All queries here default to the backup database on hash_host_b</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;hash_host_b&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;backup&#39;</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># All queries here default to the backup database on hash_host_b</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
-<p>If you are using arbitrary_servers with server_block, you may want to define the following method (or something similar) so that you don&#39;t need to call synchronize separately:</p>
+<p>If you are using arbitrary_servers with server_block, you may want to define the following method (or something similar) so that you don’t need to call synchronize separately:</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-operator">*</span>)
+  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}
+<span class="ruby-keyword">end</span>
+</pre>
 
-<p>The reason for the synchronize method is that it checks out a connection and makes the same connection available for the duration of the block. If you don&#39;t do that, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will probably disconnect from the database and reconnect to the database on each request, since connections to arbitrary servers are not cached.</p>
+<p>The reason for the synchronize method is that it checks out a connection and makes the same connection available for the duration of the block. If you don’t do that, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will probably disconnect from the database and reconnect to the database on each request, since connections to arbitrary servers are not cached.</p>
 
 <p>Note that this extension only works with the sharded threaded connection pool.  If you are using the sharded single connection pool, you need to switch to the sharded threaded connection pool before using this extension.  If you are passing the :single_threaded option to the Database, just remove that option.  If you are setting:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span> = <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span> = <span class="ruby-keyword">true</span>
+</pre>
 
 <p>just remove or comment out that code.</p>
 
@@ -166,7 +255,9 @@ Last Update:
 
 <p>If you are using the jdbc adapter, note that it does not handle separate options such as <code>:host</code>, <code>:user</code>, and <code>:port</code>.  If you would like to use the <code>:servers</code> option when connecting to a JDBC database, each hash value in the <code>servers</code> option should contain a <code>:uri</code> key with a JDBC connection string for that shard as the value.  Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgresql://primary_server/database&#39;</span>, &#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">uri:</span> <span class="ruby-string">&#39;jdbc:postgresql://replica_server/database&#39;</span>}})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgresql://primary_server/database&#39;</span>, 
+  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">uri:</span> <span class="ruby-string">&#39;jdbc:postgresql://replica_server/database&#39;</span>}})
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -177,7 +268,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

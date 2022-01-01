@@ -62,7 +62,14 @@ Sequel::Plugins::ConstraintValidations::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-validate-source'>    <span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb</span>&#x000A;<span class="line-num">241</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;<span class="line-num">242</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">243</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">constraint_validations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">244</span>     <span class="ruby-comment"># Allow calling private validation methods</span>&#x000A;<span class="line-num">245</span>     <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">246</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-validate-source'>    <span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb</span>
+<span class="line-num">241</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+<span class="line-num">242</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">243</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">constraint_validations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">244</span>     <span class="ruby-comment"># Allow calling private validation methods</span>
+<span class="line-num">245</span>     <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
+<span class="line-num">246</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +81,7 @@ Sequel::Plugins::ConstraintValidations::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

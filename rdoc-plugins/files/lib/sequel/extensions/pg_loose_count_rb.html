@@ -38,17 +38,20 @@ Last Update:
 <div id='description'>
 <p>The pg_loose_count extension looks at the table statistics in the PostgreSQL system tables to get a fast approximate count of the number of rows in a given table:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-value">:table</span>) <span class="ruby-comment"># =&gt; 123456</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-value">:table</span>) <span class="ruby-comment"># =&gt; 123456</span>
+</pre>
 
 <p>It can also support schema qualified tables:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>]) <span class="ruby-comment"># =&gt; 123456</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>]) <span class="ruby-comment"># =&gt; 123456</span>
+</pre>
 
 <p>How accurate this count is depends on the number of rows added/deleted from the table since the last time it was analyzed. If the table has not been vacuumed or analyzed yet, this can return 0 or -1 depending on the PostgreSQL version in use.</p>
 
 <p>To load the extension into the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_loose_count</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_loose_count</span>
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/LooseCount.html"><code>Sequel::Postgres::LooseCount</code></a></p>
 </div>
@@ -61,7 +64,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

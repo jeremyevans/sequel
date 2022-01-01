@@ -59,14 +59,22 @@ Sequel::SQL::SubscriptMethods
 
 <p>Return a <code>Subscript</code> with the given arguments, representing an <a href="../SQL.html"><code>SQL</code></a> array access.</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># array[1]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array[1, 2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]) <span class="ruby-comment"># array[1, 2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># array[1:2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">...</span><span class="ruby-value">3</span>) <span class="ruby-comment"># array[1:2]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># array[1]</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array[1, 2]</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]) <span class="ruby-comment"># array[1, 2]</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># array[1:2]</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">...</span><span class="ruby-value">3</span>) <span class="ruby-comment"># array[1:2]</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_subscript-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_subscript-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">990</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_subscript</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">sub</span>)&#x000A;<span class="line-num">991</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="line-num">992</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_subscript-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">990</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_subscript</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">sub</span>)
+<span class="line-num">991</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">flatten</span>)
+<span class="line-num">992</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -78,7 +86,7 @@ Sequel::SQL::SubscriptMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

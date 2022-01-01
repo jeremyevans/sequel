@@ -65,7 +65,10 @@ Sequel::Dataset::Replace
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-multi_replace-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-multi_replace-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>&#x000A;<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">multi_replace</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">19</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">multi_insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">20</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-multi_replace-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>
+<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">multi_replace</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">19</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">multi_insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">20</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-replace'>
@@ -83,7 +86,10 @@ Sequel::Dataset::Replace
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-replace-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-replace-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>&#x000A;<span class="line-num"> 8</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num"> 9</span>   <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">replace_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>))&#x000A;<span class="line-num">10</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-replace-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>
+<span class="line-num"> 8</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num"> 9</span>   <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">replace_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>))
+<span class="line-num">10</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-replace_sql'>
@@ -101,7 +107,10 @@ Sequel::Dataset::Replace
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-replace_sql-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-replace_sql-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>&#x000A;<span class="line-num">13</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">14</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">15</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-replace_sql-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>
+<span class="line-num">13</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">14</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">15</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_replace-3F'>
@@ -119,7 +128,10 @@ Sequel::Dataset::Replace
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_replace-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_replace-3F-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>&#x000A;<span class="line-num">23</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_replace?</span>&#x000A;<span class="line-num">24</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">25</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_replace-3F-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb</span>
+<span class="line-num">23</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_replace?</span>
+<span class="line-num">24</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">25</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -131,7 +143,7 @@ Sequel::Dataset::Replace
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -42,7 +42,23 @@ Last Update:
 
 <p>This change should not affect applications, but may affect custom extensions or adapters that dealt with literalization of objects. Most literalization methods now have a method with an _append suffix that does the actual literalization, which takes the sql string to append to as the first argument.  If you were overriding a literalization method, you now probably need to override the _append version instead.  If you have this literalization method:</p>
 
-<pre class="ruby"> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo_sql</span>(<span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-node">&quot;BAR #{literal(bar.baz)}&quot;</span>&#x000A; <span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">You</span> <span class="ruby-identifier">need</span> <span class="ruby-identifier">to</span> <span class="ruby-identifier">change</span> <span class="ruby-identifier">the</span> <span class="ruby-identifier">code</span> <span class="ruby-value">to:</span>&#x000A;&#x000A; <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;BAR &quot;</span>&#x000A;   <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>.<span class="ruby-identifier">baz</span>)&#x000A; <span class="ruby-keyword">end</span>&#x000A;&#x000A; <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo_sql</span>(<span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-identifier">sql</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;   <span class="ruby-identifier">foo_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>)&#x000A;   <span class="ruby-identifier">sql</span>&#x000A; <span class="ruby-keyword">end</span></pre>
+<pre class="ruby"> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo_sql</span>(<span class="ruby-identifier">bar</span>)
+   <span class="ruby-node">&quot;BAR #{literal(bar.baz)}&quot;</span>
+ <span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">You</span> <span class="ruby-identifier">need</span> <span class="ruby-identifier">to</span> <span class="ruby-identifier">change</span> <span class="ruby-identifier">the</span> <span class="ruby-identifier">code</span> <span class="ruby-value">to:</span>
+
+ <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>)
+   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;BAR &quot;</span>
+   <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>.<span class="ruby-identifier">baz</span>)
+ <span class="ruby-keyword">end</span>
+
+ <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo_sql</span>(<span class="ruby-identifier">bar</span>)
+   <span class="ruby-identifier">sql</span> = <span class="ruby-string">&quot;&quot;</span>
+   <span class="ruby-identifier">foo_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">bar</span>)
+   <span class="ruby-identifier">sql</span>
+ <span class="ruby-keyword">end</span>
+</pre>
 
 <p>If you have questions about modifying your custom adapter or extension, please ask on the Google Group or the IRC channel.</p>
 </li></ul>
@@ -51,7 +67,9 @@ Last Update:
 <ul><li>
 <p>Model#set_server has been added to the base support (it was previously only in the sharding plugin), which allows you to set the shard on which to save/delete the model instance:</p>
 
-<pre class="ruby"><span class="ruby-identifier">foo1</span>.<span class="ruby-identifier">set_server</span>(<span class="ruby-value">:server_a</span>).<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-identifier">foo2</span>.<span class="ruby-identifier">set_server</span>(<span class="ruby-value">:server_a</span>).<span class="ruby-identifier">destroy</span></pre>
+<pre class="ruby"><span class="ruby-identifier">foo1</span>.<span class="ruby-identifier">set_server</span>(<span class="ruby-value">:server_a</span>).<span class="ruby-identifier">save</span>
+<span class="ruby-identifier">foo2</span>.<span class="ruby-identifier">set_server</span>(<span class="ruby-value">:server_a</span>).<span class="ruby-identifier">destroy</span>
+</pre>
 </li><li>
 <p>Model#save now accepts a :server option that uses set_server to set the shard to use.  Unlike most other save options, this option persists past the end of the save.  Previously, the :server option only affected the transaction code, it now affects the INSERT/UPDATE statement as well.</p>
 </li><li>
@@ -68,19 +86,19 @@ Last Update:
 <ul><li>
 <p>Type conversion of Java to Ruby types in the JDBC adapter has been made much faster, as conversion method lookup is now O(number of columns) instead of O(number of columns*number of rows).</p>
 </li><li>
-<p><a href="../../../classes/Sequel/SQL/Blob.html"><code>Sequel::SQL::Blob</code></a> literalization is now much faster on adapters that use hex encoding, by switching to String#unpack(&#39;H*&#39;).</p>
+<p><a href="../../../classes/Sequel/SQL/Blob.html"><code>Sequel::SQL::Blob</code></a> literalization is now much faster on adapters that use hex encoding, by switching to String#unpack(‘H*’).</p>
 </li><li>
 <p>Database#after_commit and after_rollback now respect the :server option to set the server/shard to use.</p>
 </li><li>
 <p>Symbol splitting (e.g. for table__column) is now slightly faster.</p>
 </li><li>
-<p>All adapters now pass the dataset :limit/:offset value through Dataset#literal instead of using it verbatim.  Note that Dataset#limit already called to_i on input strings, so this isn&#39;t a security issue.  However, the previous code broke if you provided a Sequel-specific object (e.g. <a href="../../../classes/Sequel/SQL/Function.html"><code>Sequel::SQL::Function</code></a>) as the :limit/:offset value.</p>
+<p>All adapters now pass the dataset :limit/:offset value through Dataset#literal instead of using it verbatim.  Note that Dataset#limit already called to_i on input strings, so this isn’t a security issue.  However, the previous code broke if you provided a Sequel-specific object (e.g. <a href="../../../classes/Sequel/SQL/Function.html"><code>Sequel::SQL::Function</code></a>) as the :limit/:offset value.</p>
 </li><li>
 <p>Calling graph and eager_graph on an already graphed dataset no longer modifies the receiver.</p>
 </li><li>
 <p>Model#set_server now correctly handles the case where @this is already loaded.</p>
 </li><li>
-<p>Dataset#destroy for model datasets now uses the dataset&#39;s shard for transactions.</p>
+<p>Dataset#destroy for model datasets now uses the dataset’s shard for transactions.</p>
 </li><li>
 <p>When emulating offset support using ROW_NUMBER (on Microsoft SQL Server, DB2, and Oracle), explicitly order by the ROW_NUMBER result, as otherwise the results are not guaranteed to be ordered.</p>
 </li><li>
@@ -113,7 +131,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

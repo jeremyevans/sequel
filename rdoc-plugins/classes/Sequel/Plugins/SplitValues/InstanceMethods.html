@@ -56,14 +56,21 @@ Sequel::Plugins::SplitValues::InstanceMethods
 </div>
 <div class='description'>
 
-<p>If there isn&#39;t an entry in the values hash, but there is a noncolumn_values hash, look in that hash for the value.</p>
+<p>If there isn’t an entry in the values hash, but there is a noncolumn_values hash, look in that hash for the value.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/split_values.rb</span>&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">k</span>)&#x000A;<span class="line-num">50</span>   <span class="ruby-keyword">if</span>  (<span class="ruby-identifier">res</span> = <span class="ruby-keyword">super</span>).<span class="ruby-identifier">nil?</span>&#x000A;<span class="line-num">51</span>     <span class="ruby-ivar">@noncolumn_values</span>[<span class="ruby-identifier">k</span>] <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@values</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@noncolumn_values</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">53</span>     <span class="ruby-identifier">res</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/split_values.rb</span>
+<span class="line-num">49</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">k</span>)
+<span class="line-num">50</span>   <span class="ruby-keyword">if</span>  (<span class="ruby-identifier">res</span> = <span class="ruby-keyword">super</span>).<span class="ruby-identifier">nil?</span>
+<span class="line-num">51</span>     <span class="ruby-ivar">@noncolumn_values</span>[<span class="ruby-identifier">k</span>] <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@values</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@noncolumn_values</span>
+<span class="line-num">52</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">53</span>     <span class="ruby-identifier">res</span>
+<span class="line-num">54</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-split_noncolumn_values'>
@@ -81,7 +88,16 @@ Sequel::Plugins::SplitValues::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-split_noncolumn_values-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-split_noncolumn_values-source'>   <span class="ruby-comment"># File lib/sequel/plugins/split_values.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_noncolumn_values</span>&#x000A;<span class="line-num">60</span>   <span class="ruby-identifier">cols</span> = (<span class="ruby-ivar">@values</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">61</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">62</span> &#x000A;<span class="line-num">63</span>   <span class="ruby-identifier">nc</span> = <span class="ruby-ivar">@noncolumn_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">64</span>   <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>&#x000A;<span class="line-num">65</span>   <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">nc</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="line-num">66</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-split_noncolumn_values-source'>   <span class="ruby-comment"># File lib/sequel/plugins/split_values.rb</span>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_noncolumn_values</span>
+<span class="line-num">60</span>   <span class="ruby-identifier">cols</span> = (<span class="ruby-ivar">@values</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">columns</span>)
+<span class="line-num">61</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">62</span> 
+<span class="line-num">63</span>   <span class="ruby-identifier">nc</span> = <span class="ruby-ivar">@noncolumn_values</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">64</span>   <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>
+<span class="line-num">65</span>   <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">nc</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>)}
+<span class="line-num">66</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">67</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +109,7 @@ Sequel::Plugins::SplitValues::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

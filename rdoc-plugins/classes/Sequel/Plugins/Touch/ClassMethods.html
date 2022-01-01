@@ -58,7 +58,7 @@ Sequel::Plugins::Touch::ClassMethods
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>The column to modify when touching a model instance, as a symbol.  Also used as the default column when touching associations, if the associations don&#39;t specify a column.</p>
+<p>The column to modify when touching a model instance, as a symbol.  Also used as the default column when touching associations, if the associations don’t specify a column.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -90,7 +90,12 @@ Sequel::Plugins::Touch::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">65</span>   <span class="ruby-ivar">@touched_associations</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">66</span> &#x000A;<span class="line-num">67</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>
+<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">65</span>   <span class="ruby-ivar">@touched_associations</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">66</span> 
+<span class="line-num">67</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-touch_associations'>
@@ -108,7 +113,16 @@ Sequel::Plugins::Touch::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-touch_associations-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-touch_associations-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">touch_associations</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>)&#x000A;<span class="line-num">74</span>   <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">75</span>     <span class="ruby-identifier">a</span> = {<span class="ruby-identifier">a</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">touch_column</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;<span class="line-num">76</span>     <span class="ruby-identifier">a</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">77</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid association: #{k}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">k</span>)&#x000A;<span class="line-num">78</span>       <span class="ruby-identifier">touched_associations</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">79</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">80</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-touch_associations-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>
+<span class="line-num">73</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">touch_associations</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>)
+<span class="line-num">74</span>   <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
+<span class="line-num">75</span>     <span class="ruby-identifier">a</span> = {<span class="ruby-identifier">a</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">touch_column</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
+<span class="line-num">76</span>     <span class="ruby-identifier">a</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">77</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid association: #{k}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">k</span>)
+<span class="line-num">78</span>       <span class="ruby-identifier">touched_associations</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>
+<span class="line-num">79</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">80</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -120,7 +134,7 @@ Sequel::Plugins::Touch::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -65,7 +65,10 @@ Sequel::Dataset::StoredProcedureMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>&#x000A;<span class="line-num">12</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">13</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:sproc_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>
+<span class="line-num">12</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">13</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:sproc_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inspect'>
@@ -83,7 +86,10 @@ Sequel::Dataset::StoredProcedureMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>&#x000A;<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">19</span>   <span class="ruby-node">&quot;&lt;#{self.class.name}/StoredProcedure name=#{@sproc_name}&gt;&quot;</span>&#x000A;<span class="line-num">20</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>
+<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">19</span>   <span class="ruby-node">&quot;&lt;#{self.class.name}/StoredProcedure name=#{@sproc_name}&gt;&quot;</span>
+<span class="line-num">20</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-run'>
@@ -101,7 +107,21 @@ Sequel::Dataset::StoredProcedureMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-run-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-run-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>&#x000A;<span class="line-num">23</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">24</span>   <span class="ruby-keyword">case</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sproc_type</span>]&#x000A;<span class="line-num">25</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>&#x000A;<span class="line-num">26</span>     <span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">27</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>&#x000A;<span class="line-num">28</span>     <span class="ruby-identifier">first</span>&#x000A;<span class="line-num">29</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>&#x000A;<span class="line-num">30</span>     <span class="ruby-identifier">insert</span>&#x000A;<span class="line-num">31</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:update</span>&#x000A;<span class="line-num">32</span>     <span class="ruby-identifier">update</span>&#x000A;<span class="line-num">33</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:delete</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-identifier">delete</span>&#x000A;<span class="line-num">35</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-run-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>
+<span class="line-num">23</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">24</span>   <span class="ruby-keyword">case</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sproc_type</span>]
+<span class="line-num">25</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>
+<span class="line-num">26</span>     <span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">27</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>
+<span class="line-num">28</span>     <span class="ruby-identifier">first</span>
+<span class="line-num">29</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>
+<span class="line-num">30</span>     <span class="ruby-identifier">insert</span>
+<span class="line-num">31</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:update</span>
+<span class="line-num">32</span>     <span class="ruby-identifier">update</span>
+<span class="line-num">33</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:delete</span>
+<span class="line-num">34</span>     <span class="ruby-identifier">delete</span>
+<span class="line-num">35</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sproc_name'>
@@ -119,7 +139,10 @@ Sequel::Dataset::StoredProcedureMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sproc_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sproc_name-source'>  <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>&#x000A;<span class="line-num">7</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sproc_name</span>&#x000A;<span class="line-num">8</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sproc_name</span>]&#x000A;<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sproc_name-source'>  <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>
+<span class="line-num">7</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sproc_name</span>
+<span class="line-num">8</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sproc_name</span>]
+<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -131,7 +154,7 @@ Sequel::Dataset::StoredProcedureMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

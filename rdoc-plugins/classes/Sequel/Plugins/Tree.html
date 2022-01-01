@@ -47,7 +47,14 @@ Sequel::Plugins::Tree
 
 <p>Examples:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:tree</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:tree</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:parentid</span>, <span class="ruby-value">order:</span> <span class="ruby-value">:position</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:tree</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:tree</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:parentid</span>, <span class="ruby-value">order:</span> <span class="ruby-value">:position</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -86,7 +93,33 @@ Sequel::Plugins::Tree
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>] = <span class="ruby-identifier">model</span>&#x000A;<span class="line-num">35</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:parent_id</span>&#x000A;<span class="line-num">36</span> &#x000A;<span class="line-num">37</span>   <span class="ruby-identifier">par</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:parent</span>, <span class="ruby-constant">OPTS</span>))&#x000A;<span class="line-num">38</span>   <span class="ruby-identifier">parent</span> = <span class="ruby-identifier">par</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:parent</span>)&#x000A;<span class="line-num">39</span>   &#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">chi</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:children</span>, <span class="ruby-constant">OPTS</span>))&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">children</span> = <span class="ruby-identifier">chi</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:children</span>)&#x000A;<span class="line-num">42</span> &#x000A;<span class="line-num">43</span>   <span class="ruby-identifier">par</span>[<span class="ruby-value">:reciprocal</span>] = <span class="ruby-identifier">children</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">chi</span>[<span class="ruby-value">:reciprocal</span>] = <span class="ruby-identifier">parent</span>&#x000A;<span class="line-num">45</span> &#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">47</span>     <span class="ruby-ivar">@parent_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>]&#x000A;<span class="line-num">48</span>     <span class="ruby-ivar">@qualified_parent_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>])&#x000A;<span class="line-num">49</span>     <span class="ruby-ivar">@tree_order</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order</span>]&#x000A;<span class="line-num">50</span>     <span class="ruby-ivar">@parent_association_name</span> = <span class="ruby-identifier">parent</span>&#x000A;<span class="line-num">51</span>     <span class="ruby-ivar">@children_association_name</span> = <span class="ruby-identifier">children</span>&#x000A;<span class="line-num">52</span> &#x000A;<span class="line-num">53</span>     <span class="ruby-identifier">many_to_one</span> <span class="ruby-identifier">parent</span>, <span class="ruby-identifier">par</span>&#x000A;<span class="line-num">54</span>     <span class="ruby-identifier">one_to_many</span> <span class="ruby-identifier">children</span>, <span class="ruby-identifier">chi</span>&#x000A;<span class="line-num">55</span>     <span class="ruby-identifier">plugin</span> <span class="ruby-constant">SingleRoot</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:single_root</span>]&#x000A;<span class="line-num">56</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">33</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">34</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>] = <span class="ruby-identifier">model</span>
+<span class="line-num">35</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:parent_id</span>
+<span class="line-num">36</span> 
+<span class="line-num">37</span>   <span class="ruby-identifier">par</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:parent</span>, <span class="ruby-constant">OPTS</span>))
+<span class="line-num">38</span>   <span class="ruby-identifier">parent</span> = <span class="ruby-identifier">par</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:parent</span>)
+<span class="line-num">39</span>   
+<span class="line-num">40</span>   <span class="ruby-identifier">chi</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:children</span>, <span class="ruby-constant">OPTS</span>))
+<span class="line-num">41</span>   <span class="ruby-identifier">children</span> = <span class="ruby-identifier">chi</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:children</span>)
+<span class="line-num">42</span> 
+<span class="line-num">43</span>   <span class="ruby-identifier">par</span>[<span class="ruby-value">:reciprocal</span>] = <span class="ruby-identifier">children</span>
+<span class="line-num">44</span>   <span class="ruby-identifier">chi</span>[<span class="ruby-value">:reciprocal</span>] = <span class="ruby-identifier">parent</span>
+<span class="line-num">45</span> 
+<span class="line-num">46</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">47</span>     <span class="ruby-ivar">@parent_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>]
+<span class="line-num">48</span>     <span class="ruby-ivar">@qualified_parent_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>])
+<span class="line-num">49</span>     <span class="ruby-ivar">@tree_order</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order</span>]
+<span class="line-num">50</span>     <span class="ruby-ivar">@parent_association_name</span> = <span class="ruby-identifier">parent</span>
+<span class="line-num">51</span>     <span class="ruby-ivar">@children_association_name</span> = <span class="ruby-identifier">children</span>
+<span class="line-num">52</span> 
+<span class="line-num">53</span>     <span class="ruby-identifier">many_to_one</span> <span class="ruby-identifier">parent</span>, <span class="ruby-identifier">par</span>
+<span class="line-num">54</span>     <span class="ruby-identifier">one_to_many</span> <span class="ruby-identifier">children</span>, <span class="ruby-identifier">chi</span>
+<span class="line-num">55</span>     <span class="ruby-identifier">plugin</span> <span class="ruby-constant">SingleRoot</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:single_root</span>]
+<span class="line-num">56</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -98,7 +131,7 @@ Sequel::Plugins::Tree
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

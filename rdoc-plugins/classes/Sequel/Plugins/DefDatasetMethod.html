@@ -37,17 +37,27 @@ Sequel::Plugins::DefDatasetMethod
 <div id='description'>
 <p>The def_dataset_method plugin adds Model.def_dataset_method for defining dataset methods:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-value">:by_name</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-value">:by_name</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Additionally, this adds support for Model.subset, which can also be used to define dataset methods that add specific filters:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">subset</span>(<span class="ruby-value">:gold</span>){<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">500000</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">subset</span>(<span class="ruby-value">:gold</span>){<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">500000</span>}
+</pre>
 
 <p>This exists for backwards compatibility with previous <a href="../../Sequel.html"><code>Sequel</code></a> versions.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support Model.def_dataset_method</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:def_dataset_method</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support Model.def_dataset_method</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:def_dataset_method</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support Model.def_dataset_method</span>
+<span class="ruby-comment"># (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:def_dataset_method</span>
+
+<span class="ruby-comment"># Make the Album class support Model.def_dataset_method</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:def_dataset_method</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -66,7 +76,7 @@ Sequel::Plugins::DefDatasetMethod
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -40,19 +40,34 @@ Last Update:
 
 <p>With the new <a href="../../../classes/Sequel.html"><code>Sequel</code></a> release you no longer need to explicitly specify the table name for each model class, assuming your model name is the singular of the table name (just like in ActiveRecord or DataMapper):</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">UglyBug</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">UglyBug</span>.<span class="ruby-identifier">table_name</span> <span class="ruby-comment">#=&gt; :ugly_bugs</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">UglyBug</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">UglyBug</span>.<span class="ruby-identifier">table_name</span> <span class="ruby-comment">#=&gt; :ugly_bugs</span>
+</pre>
 
 <h3 id="label-New+model+validations+and+support+for+virtual+attributes">New model validations and support for virtual attributes<span><a href="#label-New+model+validations+and+support+for+virtual+attributes">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> model now include validation functionality which largly follows the validations offered in ActiveRecord. Validations can be checked anytime by calling Model#valid?, with validation errors accessible through Model#errors:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">validates_presence_of</span> <span class="ruby-value">:name</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">my_item</span> = <span class="ruby-constant">Item</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">my_item</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment">#=&gt; false</span>&#x000A;<span class="ruby-identifier">my_item</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span> <span class="ruby-comment">#=&gt; [&quot;name is not present&quot;]</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">validates_presence_of</span> <span class="ruby-value">:name</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-identifier">my_item</span> = <span class="ruby-constant">Item</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">my_item</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-comment">#=&gt; false</span>
+<span class="ruby-identifier">my_item</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span> <span class="ruby-comment">#=&gt; [&quot;name is not present&quot;]</span>
+</pre>
 
 <p>The Model#save method has been changed to check for validity before saving. If the model instance is not valid, the save method returns false without saving the instance. You can also bypass the validity test by calling Model#save! instead.</p>
 
 <p>Model classes also now support virtual attributes, letting you assign values to any attribute (virtual or persistent) at initialization time:</p>
 
-<pre>class User &lt; Sequel::Model&#x000A;  attr_accessor :password&#x000A;end&#x000A;u = User.new(:password =&gt; &#39;blah&#39;, ...)&#x000A;u.password #=&gt; &#39;blah&#39;</pre>
+<pre>class User &lt; Sequel::Model
+  attr_accessor :password
+end
+u = User.new(:password =&gt; &#39;blah&#39;, ...)
+u.password #=&gt; &#39;blah&#39;</pre>
 
 <p>Also, virtual attributes can be validated just like persistent attributes.</p>
 
@@ -181,7 +196,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

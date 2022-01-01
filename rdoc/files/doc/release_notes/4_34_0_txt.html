@@ -40,11 +40,21 @@ Last Update:
 <ul><li>
 <p>A duplicate_columns_handler extension has been added, for printing a warning or raising an exception if a dataset returns multiple columns with the same name.  You can set this globally for the Database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:duplicate_columns_handler</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_duplicate_columns</span>] = <span class="ruby-value">:warn</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_duplicate_columns</span>] = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:foo</span>) <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ignore</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:duplicate_columns_handler</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_duplicate_columns</span>] = <span class="ruby-value">:warn</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_duplicate_columns</span>] = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:foo</span>) <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ignore</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>or for specific datasets:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:raise</span>)&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:foo</span>) <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ignore</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)
+<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:raise</span>)
+<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:foo</span>) <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ignore</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>This makes it easier to detect when duplicate columns are returned, which in some cases can cause undesired behavior, such as the values for later columns of the same name overwriting values for earlier columns.</p>
 </li><li>
@@ -52,11 +62,19 @@ Last Update:
 </li><li>
 <p>A validators_operator validation has been added to the validation_helpers plugin:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Example</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&gt;</span>, <span class="ruby-value">3</span>, <span class="ruby-value">:column1</span>)&#x000A;    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&lt;=</span>, <span class="ruby-value">4</span>, [<span class="ruby-value">:column2</span>, <span class="ruby-value">:column3</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Example</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&gt;</span>, <span class="ruby-value">3</span>, <span class="ruby-value">:column1</span>)
+    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&lt;=</span>, <span class="ruby-value">4</span>, [<span class="ruby-value">:column2</span>, <span class="ruby-value">:column3</span>])
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>The pg_range extension now adds a register_range_type Database method, supporting per-Database custom range types:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)
+</pre>
 </li><li>
 <p>The dataset_associations plugin now supports a :dataset_associations_join association option on associations that use joined datasets.  This option will have the datasets returned by the dataset association methods join to the same tables that would be joined when retriving the associated objects, allowing selected columns, orders, and filters that reference columns in the joined tables to work correctly.</p>
 </li><li>
@@ -90,7 +108,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

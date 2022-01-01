@@ -38,19 +38,26 @@ Last Update:
 <div id='description'>
 <h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Symbol splitting is now deprecated by default.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has split symbols since the very first version, but it has caused many problems over the years and while terse, it isn&#39;t intuitive to new <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users and causes significant problems when using databases that use double/triple underscores in identifiers.</p>
+<p>Symbol splitting is now deprecated by default.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has split symbols since the very first version, but it has caused many problems over the years and while terse, it isn’t intuitive to new <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users and causes significant problems when using databases that use double/triple underscores in identifiers.</p>
 
 <p>If you are using symbols with embedded double/triple underscores, such as:</p>
 
-<pre class="ruby"><span class="ruby-value">:table__column</span>&#x000A;<span class="ruby-value">:column___alias</span>&#x000A;<span class="ruby-value">:table__column___alias</span></pre>
+<pre class="ruby"><span class="ruby-value">:table__column</span>
+<span class="ruby-value">:column___alias</span>
+<span class="ruby-value">:table__column___alias</span>
+</pre>
 
 <p>you either need to turn symbol splitting on by doing:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">true</span>
+</pre>
 
 <p>or you need to convert the symbols to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> objects:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>]&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>]
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)
+</pre>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> ships with multiple extensions that make creation of those <a href="../../../classes/Sequel.html"><code>Sequel</code></a> objects less verbose, so consider using the symbol_aref, symbol_aref_refinement, symbol_as,  symbol_as_refinement, and/or s extensions.</p>
 
@@ -58,47 +65,91 @@ Last Update:
 
 <p>This deprecation also affects virtual row block methods that use double underscores.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table__column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table__column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}
+</pre>
 
 <p>should be changed to:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}
+</pre>
 </li><li>
 <p>Automatically treating plain strings passed to filtering/update methods as literal strings has been deprecated, with support moved to the auto_literal_strings extension.  The automatic conversion of plain strings to literal SQL is the most common cause of SQL injections in applications using <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, since many methods pass their arguments down to the filtering methods, without considering whether the argument might be a string derived from user input.  By requiring explicit marking of literal SQL strings, SQL injections are less likely and easier to audit for.</p>
 
 <p>This change means that unless you want to use the auto_literal_strings extension, code such as:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;a = 1&quot;</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;a &gt; ?&quot;</span>, <span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;a = 1&quot;</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;a &gt; ?&quot;</span>, <span class="ruby-value">1</span>)
+</pre>
 
 <p>should to be converted to:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;a = 1&quot;</span>))&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;a &gt; ?&quot;</span>, <span class="ruby-value">1</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;a = 1&quot;</span>))
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;a &gt; ?&quot;</span>, <span class="ruby-value">1</span>))
+</pre>
 
 <p>or even better, avoid literal SQL completely by converting it to use equivalent <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+</pre>
 
 <p>This change also affects passing Dataset#update a string:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;a = a + 1&quot;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;a = a + 1&quot;</span>))&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># Before</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;a = a + 1&quot;</span>)
+
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;a = a + 1&quot;</span>))
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)
+</pre>
 
 <p>Note that this deprecation does not affect cases where literal SQL is used for the entire query, such as when using any of the following:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM foo&quot;</span>]&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;SELECT * FROM foo WHERE a = ?&quot;</span>, <span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT * FROM foo WHERE a = ?&quot;</span>, <span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM foo&quot;</span>]
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;SELECT * FROM foo WHERE a = ?&quot;</span>, <span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT * FROM foo WHERE a = ?&quot;</span>, <span class="ruby-value">1</span>)
+</pre>
 </li><li>
-<p>Passing blocks to virtual row methods has been deprecated, with support moved to the virtual_row_method_block extension.  Historically, passing blocks to virtual row methods changed how the methods were handled, but in recent years alternative methods have been added to get the same results. If you don&#39;t want to use the virtual_row_method_block extension, conversion is fairly simple:</p>
+<p>Passing blocks to virtual row methods has been deprecated, with support moved to the virtual_row_method_block extension.  Historically, passing blocks to virtual row methods changed how the methods were handled, but in recent years alternative methods have been added to get the same results. If you don’t want to use the virtual_row_method_block extension, conversion is fairly simple:</p>
 
-<pre class="ruby"><span class="ruby-comment"># WHERE a()</span>&#x000A;<span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span>{}}&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span>.<span class="ruby-identifier">function</span>}&#x000A;&#x000A;<span class="ruby-comment"># SELECT count(*)</span>&#x000A;<span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:*</span>){}}&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>}&#x000A;&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT c)</span>&#x000A;<span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:distinct</span>, <span class="ruby-value">:c</span>){}}&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">distinct</span>}&#x000A;&#x000A;<span class="ruby-comment"># SELECT sum(c) OVER (PARTITION BY a)</span>&#x000A;<span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:over</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">c</span>, <span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>){}}&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>)}</pre>
+<pre class="ruby"><span class="ruby-comment"># WHERE a()</span>
+<span class="ruby-comment"># Before</span>
+<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span>{}}
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span>.<span class="ruby-identifier">function</span>}
+
+<span class="ruby-comment"># SELECT count(*)</span>
+<span class="ruby-comment"># Before</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:*</span>){}}
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>}
+
+<span class="ruby-comment"># SELECT count(DISTINCT c)</span>
+<span class="ruby-comment"># Before</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:distinct</span>, <span class="ruby-value">:c</span>){}}
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">distinct</span>}
+
+<span class="ruby-comment"># SELECT sum(c) OVER (PARTITION BY a)</span>
+<span class="ruby-comment"># Before</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:over</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">c</span>, <span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>){}}
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>)}
+</pre>
 </li><li>
 <p>Model.set_allowed_columns and Model#{set,update}_{all,only} have been deprecated, with support moved to the whitelist_security plugin.  These were the historical mass assignment methods supported by <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, but set_fields and update_fields have been recommended instead for many years.</p>
 </li><li>
 <p>Model.finder and .prepared_finder have been deprecated by default, with support moved to the finder plugin.  Model.finder was originally added to make it easy to create optimized finder methods, but few <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users actually use it, so it makes more sense to move it to a plugin.</p>
 </li><li>
-<p>Model.def_dataset_method and Model.subset have been deprecated by default, with support moved to the def_dataset_method plugin. It&#39;s been recommended for many years to use Model.dataset_module to define dataset methods, instead of calling def_dataset_method and subset on the model class.</p>
+<p>Model.def_dataset_method and Model.subset have been deprecated by default, with support moved to the def_dataset_method plugin. It’s been recommended for many years to use Model.dataset_module to define dataset methods, instead of calling def_dataset_method and subset on the model class.</p>
 </li><li>
-<p>Using ` in virtual rows to create literal SQL is now deprecated, switch to using Sequel.lit instead:</p>
+<p>Using ‘ in virtual rows to create literal SQL is now deprecated, switch to using Sequel.lit instead:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-string">`a = 1`</span>}&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = 1&#39;</span>))</pre>
+<pre class="ruby"><span class="ruby-comment"># Before</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-string">`a = 1`</span>}
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = 1&#39;</span>))
+</pre>
 </li><li>
 <p>Corner cases in argument handling in the filtering methods are now deprecated, including:</p>
 <ul><li>
@@ -113,7 +164,11 @@ Last Update:
 </li><li>
 <p>Using a joined dataset as a <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> dataset is now deprecated.  Such datasets should now be wrapped in a subquery. In <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5, such datasets will automatically be wrapped in a subquery aliased to the first table.</p>
 
-<pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b_id</span>)&#x000A;<span class="ruby-comment"># Change to</span>&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b_id</span>).<span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># Before</span>
+<span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b_id</span>)
+<span class="ruby-comment"># Change to</span>
+<span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b_id</span>).<span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>)
+</pre>
 </li><li>
 <p>Model.first_where has been deprecated, Model.first should be used instead.</p>
 </li><li>
@@ -123,23 +178,28 @@ Last Update:
 </li><li>
 <p>Many internal Database and Dataset regexp and string constants that were previously used internally have been deprecated. Additionally, some historical aliases for existing constants have also been deprecated, such as Sequel::Schema::Generator. Ruby 2.3+ is required to receive deprecation warnings related to these constants.</p>
 </li><li>
-<p>Passing model classes as the first argument to Dataset#join_table and Dataset#graph is now deprecated.  Pass the model&#39;s table name or the model&#39;s datasets instead.</p>
+<p>Passing model classes as the first argument to Dataset#join_table and Dataset#graph is now deprecated.  Pass the model’s table name or the model’s datasets instead.</p>
 </li><li>
 <p>Passing model instances to Dataset#insert and insert_sql is now deprecated. Call values on the model instance to get the values hash, and pass that as the argument instead.</p>
 </li><li>
 <p>Calling Dataset#set_graph_aliases before Dataset#graph is now deprecated.  Dataset#set_graph_aliases should now be called after Dataset#graph, not before.</p>
 </li><li>
-<p>The sequel/no_core_ext file is deprecated.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> hasn&#39;t loaded the core extensions by default since <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.  You can use the following if you want to support both <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3 and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5:</p>
+<p>The sequel/no_core_ext file is deprecated.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> hasn’t loaded the core extensions by default since <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.  You can use the following if you want to support both <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3 and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5:</p>
 
-<pre class="ruby"><span class="ruby-keyword">begin</span>&#x000A;  <span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/no_core_ext&#39;</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">LoadError</span>&#x000A;  <span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">begin</span>
+  <span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/no_core_ext&#39;</span>
+<span class="ruby-keyword">rescue</span> <span class="ruby-constant">LoadError</span>
+  <span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>Database#pragma_get and pragma_set on SQLite are now deprecated, along with any method that calls them, such as auto_vacuum, temp_store, foreign_keys, case_sensitive_like, synchronous, and their setter methods.  To set these pragrams for all SQLite database connections, the appropriate options should be passed when creating the Database instance.</p>
 </li><li>
-<p>Automatically looking up the dataset class for a Database instance by looking for a DatasetClass constant in the Database&#39;s class is now deprecated.  All adapters that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been converted, but external adapters should now define the Database#dataset_class_default private method appropriately to return the correct dataset class.</p>
+<p>Automatically looking up the dataset class for a Database instance by looking for a DatasetClass constant in the Database’s class is now deprecated.  All adapters that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been converted, but external adapters should now define the Database#dataset_class_default private method appropriately to return the correct dataset class.</p>
 </li><li>
 <p>Calling Model.db= on a model with a dataset is now deprecated. If a model already has a dataset, you must now use set_dataset or dataset= to change the dataset, not db=.</p>
 </li><li>
-<p>Sequel::SQL::Expression#sql_literal and lit are now deprecated. These aren&#39;t used internally and aren&#39;t expected to be used externally.</p>
+<p>Sequel::SQL::Expression#sql_literal and lit are now deprecated. These aren’t used internally and aren’t expected to be used externally.</p>
 </li><li>
 <p>{Integer,Timestamp}Migrator::DEFAULT_SCHEMA_{COLUMN,TABLE} are now deprecated.  They have been replaced by default_schema_column and default_schema_table instance methods.</p>
 </li><li>
@@ -199,20 +259,29 @@ Last Update:
 </li><li>
 <p>The jdbc/db2 adapter no longer adds jdbc_* methods to JDBC::Database.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer issues deprecation warnings on ruby 1.8.7. <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 will drop support for ruby 1.8.7, and it doesn&#39;t make sense to issue a deprecation warning if you couldn&#39;t upgrade anyway.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer issues deprecation warnings on ruby 1.8.7. <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 will drop support for ruby 1.8.7, and it doesn’t make sense to issue a deprecation warning if you couldn’t upgrade anyway.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>When specifying the :fields option to a nested_attributes setter, set_fields is now used internally instead of set_only. set_fields has been recommended over set_fields since it&#39;s introduction in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.12, but nested_attributes was added in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.4, before set_fields was available.  The result of this change is that if additional fields are provided that do not match the fields in the :fields option, they will be ignored instead of an exception being raised.</p>
+<p>When specifying the :fields option to a nested_attributes setter, set_fields is now used internally instead of set_only. set_fields has been recommended over set_fields since it’s introduction in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.12, but nested_attributes was added in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.4, before set_fields was available.  The result of this change is that if additional fields are provided that do not match the fields in the :fields option, they will be ignored instead of an exception being raised.</p>
 </li><li>
 <p>When specifying a function name using a <a href="../../../classes/Sequel/SQL/Identifier.html"><code>Sequel::SQL::Identifier</code></a> instance, the function name is no longer quoted unless <a href="../../../classes/Sequel/SQL/Function.html#method-i-quoted"><code>Sequel::SQL::Function#quoted</code></a> is used to create a quoted function.  The reason for this is to make converting virtual row method block code easier.</p>
 
-<pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]) <span class="ruby-comment"># &quot;a&quot;()</span>&#x000A;&#x000A;<span class="ruby-comment"># Now</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]) <span class="ruby-comment"># a()</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]).<span class="ruby-identifier">quoted</span> <span class="ruby-comment"># &quot;a&quot;()</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Before</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]) <span class="ruby-comment"># &quot;a&quot;()</span>
+
+<span class="ruby-comment"># Now</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]) <span class="ruby-comment"># a()</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]).<span class="ruby-identifier">quoted</span> <span class="ruby-comment"># &quot;a&quot;()</span>
+</pre>
 </li><li>
 <p>When passing an SQL::PlaceholderLiteralString instance to a dataset filtering method, the placeholder string is now always wrapped in parentheses:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;? OR ?&#39;</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)).<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span>)&#x000A;<span class="ruby-comment"># Before: WHERE a OR b AND c</span>&#x000A;<span class="ruby-comment"># Now: WHERE (a OR b) AND c</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;? OR ?&#39;</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)).<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span>)
+<span class="ruby-comment"># Before: WHERE a OR b AND c</span>
+<span class="ruby-comment"># Now: WHERE (a OR b) AND c</span>
+</pre>
 
 <p>This is more of a bugfix than a backwards compatibility issue, but is listed in the backwards compatibility section as there may be applications that could break due to this change.</p>
 </li><li>
@@ -232,7 +301,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

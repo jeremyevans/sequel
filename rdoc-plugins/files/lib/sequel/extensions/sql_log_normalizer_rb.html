@@ -38,11 +38,20 @@ Last Update:
 <div id='description'>
 <p>The sql_log_normalizer extension normalizes the SQL that is logged, removing the literal strings and numbers in the SQL, and removing the logging of any bound variables:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)&#x000A;<span class="ruby-comment"># Without sql_log_normalizer extension</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = 1) AND (&quot;b&quot; = &#39;something&#39;)) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-comment"># With sql_log_normalizer_extension</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = ?) AND (&quot;b&quot; = ?)) LIMIT ?</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)
+<span class="ruby-comment"># Without sql_log_normalizer extension</span>
+<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = 1) AND (&quot;b&quot; = &#39;something&#39;)) LIMIT 1</span>
+
+<span class="ruby-comment"># With sql_log_normalizer_extension</span>
+<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = ?) AND (&quot;b&quot; = ?)) LIMIT ?</span>
+</pre>
 
 <p>The normalization is done by scanning the SQL string being executed for literal strings and numbers, and replacing them with question marks.  While this should work for all or almost all production queries, there are pathlogical queries that will not be handled correctly, such as the use of apostrophes in identifiers:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:&quot;asf&#39;bar&quot;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>).<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># Logged as:</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;asf?something&#39;)) LIMIT ?</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:&quot;asf&#39;bar&quot;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>).<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># Logged as:</span>
+<span class="ruby-comment"># SELECT * FROM &quot;asf?something&#39;)) LIMIT ?</span>
+</pre>
 
 <p>The expected use case for this extension is when you want to normalize logs to group similar queries, or when you want to protect sensitive data from being stored in the logs.</p>
 
@@ -57,7 +66,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

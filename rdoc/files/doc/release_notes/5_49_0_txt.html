@@ -38,25 +38,30 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Model#validates_no_null_byte has been added to the validation_helpers.  It checks that the value being validated does not contain an ASCII NUL (&#39;0&#39;) byte.  Some databases will return an error if a string contains a NUL byte.</p>
+<p>Model#validates_no_null_byte has been added to the validation_helpers.  It checks that the value being validated does not contain an ASCII NUL (‘0’) byte.  Some databases will return an error if a string contains a NUL byte.</p>
 
-<p>The auto_validations plugin will now automatically add no_null_byte validations for all string columns in the model&#39;s table.  This will change exceptions raised by NUL bytes from database errors to validation failures.</p>
+<p>The auto_validations plugin will now automatically add no_null_byte validations for all string columns in the model’s table.  This will change exceptions raised by NUL bytes from database errors to validation failures.</p>
 
 <p>If you are using auto_validations and would like to have a table accept NUL bytes in string columns, use the following code inside the model:</p>
 
-<pre class="ruby"><span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-value">:no_null_byte</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-value">:no_null_byte</span>)
+</pre>
 </li><li>
 <p>JSONB subscripts are now supported on PostgreSQL 14+ when using the pg_json_ops extension.  You can use JSONB subscripts to more easily update part of a JSONB column:</p>
 
-<pre>DB[:table].update(Sequel.pg_jsonb_op(:column)[&#39;key&#39;] =&gt; &#39;value&#39;)&#x000A;UPDATE &quot;table&quot; SET &quot;column&quot;[&#39;key&#39;] = &#39;value&#39;</pre>
+<pre>DB[:table].update(Sequel.pg_jsonb_op(:column)[&#39;key&#39;] =&gt; &#39;value&#39;)
+UPDATE &quot;table&quot; SET &quot;column&quot;[&#39;key&#39;] = &#39;value&#39;</pre>
 </li><li>
 <p>hstore subscripts are now supported on PostgreSQL 14+ when using the pg_hstore_ops extension.  You can use hstore subscripts to more easily update part of an hstore column:</p>
 
-<pre>DB[:table].update(Sequel.hstore_op(:column)[&#39;key&#39;] =&gt; &#39;value&#39;)&#x000A;UPDATE &quot;table&quot; SET &quot;column&quot;[&#39;key&#39;] = &#39;value&#39;</pre>
+<pre>DB[:table].update(Sequel.hstore_op(:column)[&#39;key&#39;] =&gt; &#39;value&#39;)
+UPDATE &quot;table&quot; SET &quot;column&quot;[&#39;key&#39;] = &#39;value&#39;</pre>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports table aliases for JOIN USING columns on PostgreSQL 14+.  These allow you to reference the USING columns in the query using a qualified identifier. To use this support, pass an SQL::AliasedExpression as the expression to join on:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:t2</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>([<span class="ruby-value">:c1</span>, <span class="ruby-value">:c2</span>], <span class="ruby-value">:alias</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;t1&quot; INNER JOIN &quot;t2&quot; USING (&quot;c1&quot;, &quot;c2&quot;) AS &quot;alias&quot;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:t2</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>([<span class="ruby-value">:c1</span>, <span class="ruby-value">:c2</span>], <span class="ruby-value">:alias</span>))
+<span class="ruby-comment"># SELECT * FROM &quot;t1&quot; INNER JOIN &quot;t2&quot; USING (&quot;c1&quot;, &quot;c2&quot;) AS &quot;alias&quot;</span>
+</pre>
 </li><li>
 <p>Database#create_trigger on PostgreSQL now supports a :replace option for CREATE OR REPLACE TRIGGER (supported in PostgreSQL 14+).</p>
 </li><li>
@@ -79,7 +84,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

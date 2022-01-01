@@ -39,7 +39,14 @@ Sequel::Plugins::StaticCacheCache
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses that use the static_cache plugin use</span>&#x000A;<span class="ruby-comment"># the cached values in the given file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache_cache</span>, <span class="ruby-string">&quot;static_cache.cache&quot;</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the AlbumType model the cached values in the given file,</span>&#x000A;<span class="ruby-comment"># should be loaded before the static_cache plugin</span>&#x000A;<span class="ruby-constant">AlbumType</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache_cache</span>, <span class="ruby-string">&quot;static_cache.cache&quot;</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses that use the static_cache plugin use</span>
+<span class="ruby-comment"># the cached values in the given file</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache_cache</span>, <span class="ruby-string">&quot;static_cache.cache&quot;</span>
+
+<span class="ruby-comment"># Make the AlbumType model the cached values in the given file,</span>
+<span class="ruby-comment"># should be loaded before the static_cache plugin</span>
+<span class="ruby-constant">AlbumType</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache_cache</span>, <span class="ruby-string">&quot;static_cache.cache&quot;</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -72,7 +79,11 @@ Sequel::Plugins::StaticCacheCache
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/static_cache_cache.rb</span>&#x000A;<span class="line-num">21</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">22</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@static_cache_cache_file</span>, <span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@static_cache_cache</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>)) <span class="ruby-operator">:</span> {})&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/static_cache_cache.rb</span>
+<span class="line-num">21</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">file</span>)
+<span class="line-num">22</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@static_cache_cache_file</span>, <span class="ruby-identifier">file</span>)
+<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@static_cache_cache</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>)) <span class="ruby-operator">:</span> {})
+<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -84,7 +95,7 @@ Sequel::Plugins::StaticCacheCache
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

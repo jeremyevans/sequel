@@ -48,7 +48,11 @@ Sequel::Plugins::AssociationDependencies
 
 <p>To set up an association dependency, you must provide a hash with association name symbols and dependency action values.  You can provide the hash to the plugin call itself or to the add_association_dependencies method:</p>
 
-<pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>, <span class="ruby-value">address:</span> <span class="ruby-value">:delete</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> <span class="ruby-value">albums:</span> <span class="ruby-value">:destroy</span>, <span class="ruby-value">reviews:</span> <span class="ruby-value">:delete</span>, <span class="ruby-value">tags:</span> <span class="ruby-value">:nullify</span></pre>
+<pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>, <span class="ruby-value">address:</span> <span class="ruby-value">:delete</span>
+<span class="ruby-comment"># or:</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> <span class="ruby-value">albums:</span> <span class="ruby-value">:destroy</span>, <span class="ruby-value">reviews:</span> <span class="ruby-value">:delete</span>, <span class="ruby-value">tags:</span> <span class="ruby-value">:nullify</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -110,7 +114,10 @@ Sequel::Plugins::AssociationDependencies
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">35</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-ivar">@association_dependencies</span> = {<span class="ruby-value">:before_delete</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:before_destroy</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:before_nullify</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:after_delete</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:after_destroy</span><span class="ruby-operator">=&gt;</span>[]}}&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>
+<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">35</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-ivar">@association_dependencies</span> = {<span class="ruby-value">:before_delete</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:before_destroy</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:before_nullify</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:after_delete</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:after_destroy</span><span class="ruby-operator">=&gt;</span>[]}}
+<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -128,7 +135,10 @@ Sequel::Plugins::AssociationDependencies
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">add_association_dependencies</span>(<span class="ruby-identifier">hash</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb</span>
+<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">40</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">add_association_dependencies</span>(<span class="ruby-identifier">hash</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -140,7 +150,7 @@ Sequel::Plugins::AssociationDependencies
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

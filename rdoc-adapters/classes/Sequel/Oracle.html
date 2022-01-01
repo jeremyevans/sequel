@@ -75,7 +75,13 @@ Sequel::Oracle
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>&#x000A;<span class="line-num"> 9</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">10</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">11</span>     <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">11000000</span>&#x000A;<span class="line-num">12</span>     <span class="ruby-ivar">@primary_key_sequences</span> = {}&#x000A;<span class="line-num">13</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
+<span class="line-num"> 9</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">10</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">11</span>     <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">11000000</span>
+<span class="line-num">12</span>     <span class="ruby-ivar">@primary_key_sequences</span> = {}
+<span class="line-num">13</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -87,7 +93,7 @@ Sequel::Oracle
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

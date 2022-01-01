@@ -36,21 +36,26 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The round_timestamps extension will automatically round timestamp values to the database&#39;s supported level of precision before literalizing them.</p>
+<p>The round_timestamps extension will automatically round timestamp values to the database’s supported level of precision before literalizing them.</p>
 
 <p>For example, if the database supports millisecond precision, and you give it a Time value with microsecond precision, it will round it appropriately:</p>
 
-<pre class="ruby"><span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1405341161.917999982833862</span>)&#x000A;<span class="ruby-comment"># default: 2014-07-14 14:32:41.917999</span>&#x000A;<span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span></pre>
+<pre class="ruby"><span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1405341161.917999982833862</span>)
+<span class="ruby-comment"># default: 2014-07-14 14:32:41.917999</span>
+<span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span>
+</pre>
 
 <p>The round_timestamps extension correctly deals with databases that support millisecond or second precision.  In addition to handling Time values, it also handles DateTime values and Sequel::SQLTime values (for the TIME type).</p>
 
 <p>To round timestamps for a single dataset:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)
+</pre>
 
 <p>To round timestamps for all datasets on a single database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:round_timestamps</span>)
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/Dataset/RoundTimestamps.html"><code>Sequel::Dataset::RoundTimestamps</code></a></p>
 </div>
@@ -63,7 +68,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -35,17 +35,32 @@ Sequel::Plugins::HookClassMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Sequel&#39;s built-in hook_class_methods plugin is designed for backwards compatibility.  Its use is not encouraged, it is recommended to use instance methods and super instead of this plugin.  This plugin allows calling class methods with blocks to define hooks:</p>
+<p>Sequel’s built-in hook_class_methods plugin is designed for backwards compatibility.  Its use is not encouraged, it is recommended to use instance methods and super instead of this plugin.  This plugin allows calling class methods with blocks to define hooks:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Block only, can cause duplicate hooks if code is reloaded</span>&#x000A;<span class="ruby-identifier">before_save</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}&#x000A;<span class="ruby-comment"># Block with tag, safe for reloading</span>&#x000A;<span class="ruby-identifier">before_save</span>(<span class="ruby-value">:set_created_at</span>){<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}&#x000A;<span class="ruby-comment"># Tag only, safe for reloading, calls instance method</span>&#x000A;<span class="ruby-identifier">before_save</span>(<span class="ruby-value">:set_created_at</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># Block only, can cause duplicate hooks if code is reloaded</span>
+<span class="ruby-identifier">before_save</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}
+<span class="ruby-comment"># Block with tag, safe for reloading</span>
+<span class="ruby-identifier">before_save</span>(<span class="ruby-value">:set_created_at</span>){<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}
+<span class="ruby-comment"># Tag only, safe for reloading, calls instance method</span>
+<span class="ruby-identifier">before_save</span>(<span class="ruby-value">:set_created_at</span>)
+</pre>
 
 <p>Pretty much anything you can do with a hook class method, you can also do with an instance method instead (making sure to call super), which is the recommended way to add hooks in Sequel:</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>
+  <span class="ruby-keyword">super</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Allow use of hook class methods in all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow the use of hook class methods in the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Allow use of hook class methods in all model subclasses (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span>
+
+<span class="ruby-comment"># Allow the use of hook class methods in the Album class</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -81,7 +96,11 @@ Sequel::Plugins::HookClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">36</span>   <span class="ruby-identifier">hooks</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@hooks</span>, {})&#x000A;<span class="line-num">37</span>   <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hooks</span>[<span class="ruby-identifier">h</span>] = []}&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">36</span>   <span class="ruby-identifier">hooks</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@hooks</span>, {})
+<span class="line-num">37</span>   <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hooks</span>[<span class="ruby-identifier">h</span>] = []}
+<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +112,7 @@ Sequel::Plugins::HookClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -30,61 +30,106 @@ lib/sequel/extensions/pg_json.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-10-15 07:43:30 -0700</span>
+<span class='datetime'>2021-12-17 16:59:47 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_json extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL&#39;s json and jsonb types.  By default, it wraps JSON arrays and JSON objects with ruby array-like and hash-like objects.  If you would like to wrap JSON primitives (numbers, strings, <code>null</code>, <code>true</code>, and <code>false</code>), you need to use the <code>wrap_json_primitives</code> setter:</p>
+<p>The pg_json extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL’s json and jsonb types.  By default, it wraps JSON arrays and JSON objects with ruby array-like and hash-like objects.  If you would like to wrap JSON primitives (numbers, strings, <code>null</code>, <code>true</code>, and <code>false</code>), you need to use the <code>wrap_json_primitives</code> setter:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">wrap_json_primitives</span> = <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">wrap_json_primitives</span> = <span class="ruby-keyword">true</span>
+</pre>
 
 <p>Note that wrapping JSON primitives changes the behavior for JSON false and null values.  Because only <code>false</code> and <code>nil</code> in Ruby are considered falsey, wrapping these objects results in unexpected behavior if you use the values directly in conditionals:</p>
 
-<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)&#x000A;  <span class="ruby-comment"># called if the value of json_column is null/false</span>&#x000A;  <span class="ruby-comment"># if you are wrapping primitives</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)
+  <span class="ruby-comment"># called if the value of json_column is null/false</span>
+  <span class="ruby-comment"># if you are wrapping primitives</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
-<p>To extract the Ruby primitive object from the wrapper object, you can use +__getobj__+ (this comes from Ruby&#39;s delegate library).</p>
+<p>To extract the Ruby primitive object from the wrapper object, you can use +__getobj__+ (this comes from Ruby’s delegate library).</p>
 
 <p>To wrap an existing Ruby array, hash, string, integer, float, <code>nil</code>, <code>true</code>, or <code>false</code>, use <code>Sequel.pg_json_wrap</code> or <code>Sequel.pg_jsonb_wrap</code>:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-identifier">object</span>)  <span class="ruby-comment"># json type</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_wrap</span>(<span class="ruby-identifier">object</span>) <span class="ruby-comment"># jsonb type</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-identifier">object</span>)  <span class="ruby-comment"># json type</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_wrap</span>(<span class="ruby-identifier">object</span>) <span class="ruby-comment"># jsonb type</span>
+</pre>
 
 <p>So if you want to insert an array or hash into an json database column:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]))&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>({<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-string">&#39;b&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]))
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>({<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-string">&#39;b&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}))
+</pre>
 
 <p>Note that the <code>pg_json_wrap</code> and <code>pg_jsonb_wrap</code> methods only handle Ruby primitives, they do not handle already wrapped objects.</p>
 
 <p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use the <code>pg_json</code> and <code>pg_jsonb</code> methods directly on <a href="../../../../classes/Array.html"><code>Array</code></a> or Hash:</p>
 
-<pre class="ruby"><span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_json</span>  <span class="ruby-comment"># json type</span>&#x000A;<span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_jsonb</span> <span class="ruby-comment"># jsonb type</span>&#x000A;&#x000A;<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">pg_json</span>   <span class="ruby-comment"># json type</span>&#x000A;<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">pg_jsonb</span>  <span class="ruby-comment"># jsonb type</span></pre>
+<pre class="ruby"><span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_json</span>  <span class="ruby-comment"># json type</span>
+<span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_jsonb</span> <span class="ruby-comment"># jsonb type</span>
+
+<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">pg_json</span>   <span class="ruby-comment"># json type</span>
+<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">pg_jsonb</span>  <span class="ruby-comment"># jsonb type</span>
+</pre>
 
 <p>Model classes that use json or jsonb columns will have typecasting automatically setup, so you can assign Ruby primitives to model columns and have the wrapped objects automatically created.  However, for backwards compatibility, passing a string object will parse the string as JSON, not create a JSON string object.</p>
 
-<pre class="ruby"><span class="ruby-identifier">obj</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = {<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;b&#39;</span>}&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>&#x000A;<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONHash</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>[<span class="ruby-string">&#39;a&#39;</span>]&#x000A;<span class="ruby-comment"># =&gt; &#39;b&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-string">&#39;{&quot;a&quot;: &quot;b&quot;}&#39;</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>&#x000A;<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONHash</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>[<span class="ruby-string">&#39;a&#39;</span>]&#x000A;<span class="ruby-comment"># =&gt; &#39;b&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">obj</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = {<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;b&#39;</span>}
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>
+<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONHash</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>[<span class="ruby-string">&#39;a&#39;</span>]
+<span class="ruby-comment"># =&gt; &#39;b&#39;</span>
+
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-string">&#39;{&quot;a&quot;: &quot;b&quot;}&#39;</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>
+<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONHash</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>[<span class="ruby-string">&#39;a&#39;</span>]
+<span class="ruby-comment"># =&gt; &#39;b&#39;</span>
+</pre>
 
 <p>You can change the handling of string typecasting by using <code>typecast_json_strings</code>:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">typecast_json_strings</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-string">&#39;{&quot;a&quot;: &quot;b&quot;}&#39;</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>&#x000A;<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONString</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;a&quot;: &quot;b&quot;}&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">typecast_json_strings</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-string">&#39;{&quot;a&quot;: &quot;b&quot;}&#39;</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>
+<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONString</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>
+<span class="ruby-comment"># =&gt; &#39;{&quot;a&quot;: &quot;b&quot;}&#39;</span>
+</pre>
 
 <p>Note that <code>nil</code> values are never automatically wrapped:</p>
 
-<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>&#x000A;<span class="ruby-comment"># =&gt; NilClass</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>&#x000A;<span class="ruby-comment"># =&gt; nil</span></pre>
+<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>
+<span class="ruby-comment"># =&gt; NilClass</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>
+<span class="ruby-comment"># =&gt; nil</span>
+</pre>
 
 <p>If you want to set a JSON null value when using a model, you must wrap it explicitly:</p>
 
-<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>&#x000A;<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONNull</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>&#x000A;<span class="ruby-comment"># =&gt; nil</span></pre>
+<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-keyword">nil</span>)
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">class</span>
+<span class="ruby-comment"># =&gt; Sequel::Postgres::JSONNull</span>
+<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_column</span>
+<span class="ruby-comment"># =&gt; nil</span>
+</pre>
 
 <p>To use this extension, load it into the Database instance:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span>
+</pre>
 
 <p>See the schema modification guide for details on using json columns in CREATE/ALTER TABLE statements.</p>
 
 <p>This extension integrates with the pg_array extension.  If you plan to use the json[] or jsonb[] types, load the pg_array extension before the pg_json extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_json</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_json</span>
+</pre>
 
 <p>Note that when accessing json hashes, you should always use strings for keys. Attempting to use other values (such as symbols) will not work correctly.</p>
 
@@ -108,7 +153,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

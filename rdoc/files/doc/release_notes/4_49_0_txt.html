@@ -100,29 +100,56 @@ Last Update:
 
 <p>Defining dataset methods is done by calling methods with the same name as dataset methods inside the extend_datasets or with_extend block:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">order</span> <span class="ruby-value">:by_id</span>, <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-identifier">select</span> <span class="ruby-value">:with_id_and_name</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">order</span> <span class="ruby-value">:by_id</span>, <span class="ruby-value">:id</span>
+  <span class="ruby-identifier">select</span> <span class="ruby-value">:with_id_and_name</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>This is equivalent to:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">by_id</span>&#x000A;    <span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_id_and_name</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">active</span>&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">by_id</span>
+    <span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_id_and_name</span>
+    <span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">active</span>
+    <span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Except that for frozen datasets (the default in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5), code like:</p>
 
-<pre class="ruby"><span class="ruby-value">100</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">active</span>.<span class="ruby-identifier">with_id_and_name</span>.<span class="ruby-identifier">by_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-value">100</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">active</span>.<span class="ruby-identifier">with_id_and_name</span>.<span class="ruby-identifier">by_id</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>will only allocate 4 datasets instead of 400, and can be 3-4 times faster.</p>
 </li><li>
 <p>Dataset#where_{all,each,single_value} are now core dataset methods instead of just model dataset methods.  These methods allow you to replace:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">each</span>{}&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">single_value</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">each</span>{}
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">single_value</span>
+</pre>
 
 <p>with:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where_all</span>(<span class="ruby-identifier">cond</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-identifier">cond</span>){}&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where_single_value</span>(<span class="ruby-identifier">cond</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where_all</span>(<span class="ruby-identifier">cond</span>)
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-identifier">cond</span>){}
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where_single_value</span>(<span class="ruby-identifier">cond</span>)
+</pre>
 
 <p>The advantage of where_{all,each,single_value} is that frozen datasets can take potentially advantage of caching and perform 70%-300% faster.</p>
 </li><li>
-<p>Oracle 12 native limit/offset support is now supported, which in particular makes offset queries much faster as they don&#39;t have to be emulated using the row_number window function.</p>
+<p>Oracle 12 native limit/offset support is now supported, which in particular makes offset queries much faster as they don’t have to be emulated using the row_number window function.</p>
 </li><li>
 <p>Dataset#paged_each in the mysql2 adapter now supports a :stream=&gt;false option to disable streaming and fallback to the default implementation.</p>
 </li><li>
@@ -135,17 +162,17 @@ Last Update:
 <ul><li>
 <p>Using the dataset_associations plugin with a many_through_many association that joins to the same table multiple times is now handled correctly by automatically aliasing the table appropriately.</p>
 </li><li>
-<p>On Ruby 2.1+, <a href="../../../classes/Sequel/Error.html#method-i-cause"><code>Sequel::Error#cause</code></a> will use wrapped_exception if one is set.  This doesn&#39;t result in different behavior in most cases, but it can in cases where nested exception handling is done and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> tries to raise the most relevant exception.</p>
+<p>On Ruby 2.1+, <a href="../../../classes/Sequel/Error.html#method-i-cause"><code>Sequel::Error#cause</code></a> will use wrapped_exception if one is set.  This doesn’t result in different behavior in most cases, but it can in cases where nested exception handling is done and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> tries to raise the most relevant exception.</p>
 </li><li>
 <p>Using the composition plugin with the :mapping option now works correctly when using the column_conflicts plugin.</p>
 </li><li>
-<p>The validation_helpers plugin&#39;s validates_max_length method now correctly gets the default :nil_message option from the default_validation_helpers_options method instead of looking at the plugin defaults.</p>
+<p>The validation_helpers plugin’s validates_max_length method now correctly gets the default :nil_message option from the default_validation_helpers_options method instead of looking at the plugin defaults.</p>
 </li><li>
 <p>The duplicate_columns_handler extension no longer makes the Dataset#columns= method public.</p>
 </li><li>
 <p>On H2 1.4+, alter_table add_primary_key now works correctly.</p>
 </li><li>
-<p>The jdbc/sqlserver adapter&#39;s datetimeoffset type handling now works with more JDBC driver versions.</p>
+<p>The jdbc/sqlserver adapter’s datetimeoffset type handling now works with more JDBC driver versions.</p>
 </li></ul>
 </div>
 <div id='context'>
@@ -157,7 +184,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

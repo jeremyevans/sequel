@@ -40,23 +40,44 @@ Last Update:
 <ul><li>
 <p>Alternatives for the more complex virtual row method calls have been added:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Window Functions using SQL::Function#over</span>&#x000A;<span class="ruby-comment"># before: select{sum(:over, :args=&gt;:col1, :partition=&gt;:col2){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-value">:col1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:col2</span>)}&#x000A;&#x000A;<span class="ruby-comment"># count(*) using SQL::Function#*</span>&#x000A;<span class="ruby-comment"># before: select{count(:*){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>{}.<span class="ruby-identifier">*</span>}&#x000A;&#x000A;<span class="ruby-comment"># count(distinct col) using SQL::Function#distinct</span>&#x000A;<span class="ruby-comment"># before: select{count(:distinct, :col){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:col</span>).<span class="ruby-identifier">distinct</span>}</pre>
+<pre class="ruby"><span class="ruby-comment"># Window Functions using SQL::Function#over</span>
+<span class="ruby-comment"># before: select{sum(:over, :args=&gt;:col1, :partition=&gt;:col2){}}</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-value">:col1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:col2</span>)}
+
+<span class="ruby-comment"># count(*) using SQL::Function#*</span>
+<span class="ruby-comment"># before: select{count(:*){}}</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>{}.<span class="ruby-identifier">*</span>}
+
+<span class="ruby-comment"># count(distinct col) using SQL::Function#distinct</span>
+<span class="ruby-comment"># before: select{count(:distinct, :col){}}</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:col</span>).<span class="ruby-identifier">distinct</span>}
+</pre>
 
 <p>Additionally, schema qualified functions are now supported via SQL::QualifiedIdentifier#function, and quoted functions are now supported via SQL::Identifier#function on some databases:</p>
 
-<pre class="ruby"><span class="ruby-comment"># &quot;func&quot;(&quot;col&quot;)</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">func</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:col</span>)}&#x000A;&#x000A;<span class="ruby-comment"># &quot;schema&quot;.&quot;func&quot;(&quot;col1&quot;)</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__func</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:col1</span>)}</pre>
+<pre class="ruby"><span class="ruby-comment"># &quot;func&quot;(&quot;col&quot;)</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">func</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:col</span>)}
+
+<span class="ruby-comment"># &quot;schema&quot;.&quot;func&quot;(&quot;col1&quot;)</span>
+<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__func</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:col1</span>)}
+</pre>
 
 <p>If the database does not support quoting function names, then <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not quote them.</p>
 </li><li>
-<p>An update_or_create plugin has been added, for updating a matching object if one exists, or creating an object if it does not. For example, the following code will update the number of copies sold for album with the name &#39;Hello&#39;, or it will create an album with the name &#39;Hello&#39; and 1000 number of copies sold:</p>
+<p>An update_or_create plugin has been added, for updating a matching object if one exists, or creating an object if it does not. For example, the following code will update the number of copies sold for album with the name ‘Hello’, or it will create an album with the name ‘Hello’ and 1000 number of copies sold:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_or_create</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_or_create</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You can also use a shorter form of this, with two hashes:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>}, {<span class="ruby-value">:num_copies_sold</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1000</span>})</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>}, {<span class="ruby-value">:num_copies_sold</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1000</span>})
+</pre>
 
-<p>This plugin also adds a method named find_or_new, which does the same thing as update_or_create, except it doesn&#39;t persist any changes.</p>
+<p>This plugin also adds a method named find_or_new, which does the same thing as update_or_create, except it doesn’t persist any changes.</p>
 </li><li>
 <p>A :raise_on_save_failure option has been added for one_to_many, pg_array_to_many, and many_to_pg_array associations.  This mirrors the Model.raise_on_save_failure setting, and if set to false, it will make the add/remove methods return nil instead of raising an error if there is a validation/hook error when saving the associated record.</p>
 </li><li>
@@ -84,7 +105,7 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The odbc adapter&#39;s :driver option is no longer deprecated, as reports were received that it still works.</p>
+<p>The odbc adapter’s :driver option is no longer deprecated, as reports were received that it still works.</p>
 </li><li>
 <p>If you were re-adding instance validation hooks using instance_hooks after a save failure, and then retrying the save, you may now end up with duplicate validations.  You no longer need to re-add validation hooks unless the object was saved successfully.</p>
 </li></ul>
@@ -98,7 +119,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

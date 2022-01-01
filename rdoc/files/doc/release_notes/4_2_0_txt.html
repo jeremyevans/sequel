@@ -40,17 +40,23 @@ Last Update:
 <ul><li>
 <p>LATERAL subqueries are now supported on PostgreSQL 9.3+, HSQLDB, and DB2 via Dataset#lateral:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a__d</span>).<span class="ruby-identifier">lateral</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a,</span>&#x000A;<span class="ruby-comment"># LATERAL (SELECT * FROM b WHERE (c = a.d)) AS t1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a__d</span>).<span class="ruby-identifier">lateral</span>)
+<span class="ruby-comment"># SELECT * FROM a,</span>
+<span class="ruby-comment"># LATERAL (SELECT * FROM b WHERE (c = a.d)) AS t1</span>
+</pre>
 
 <p>You can use a similar syntax when joining tables:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">cross_join</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a__d</span>).<span class="ruby-identifier">lateral</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a</span>&#x000A;<span class="ruby-comment"># CROSS JOIN LATERAL (SELECT * FROM b WHERE (c = a.d)) AS t1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">cross_join</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a__d</span>).<span class="ruby-identifier">lateral</span>)
+<span class="ruby-comment"># SELECT * FROM a</span>
+<span class="ruby-comment"># CROSS JOIN LATERAL (SELECT * FROM b WHERE (c = a.d)) AS t1</span>
+</pre>
 
 <p>If you are using Microsoft SQL Server, you can use the new mssql_emulate_lateral_with_apply extension to emulate LATERAL subqueries via CROSS/OUTER APPLY.</p>
 </li><li>
 <p>The static_cache plugin now supports a :frozen=&gt;false option.  When this option is used, instead of returning the frozen cached values, the model now returns new, unfrozen objects that can be modified. Note that if you make any database modifications, you are responsible for updating the cache manually.</p>
 </li><li>
-<p>A pg_static_cache_updater extension has been added.  This extension can automatically update the caches used by the static_cache plugin, whenever the underlying database table is updated, using PostgreSQL&#39;s notification channels.</p>
+<p>A pg_static_cache_updater extension has been added.  This extension can automatically update the caches used by the static_cache plugin, whenever the underlying database table is updated, using PostgreSQL’s notification channels.</p>
 
 <p>This works by defining triggers on the underlying model tables that use NOTIFY, and spinning up a thread in your application processes that uses LISTEN, and refreshes the cache for the related model whenever it receives a notification that the underlying table has been modified.</p>
 
@@ -58,13 +64,15 @@ Last Update:
 </li><li>
 <p>A from_block extension has been added that makes Database#from operate like Dataset#from in regards to a passed block, allowing you to write code like:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg1</span>, <span class="ruby-identifier">arg2</span>)}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg1</span>, <span class="ruby-identifier">arg2</span>)}
+</pre>
 </li><li>
 <p>Database#supports_partial_indexes? has been added for checking for partial index support.  Partial indexes are now supported on SQLite <a href="3_8_0_txt.html">3.8.0</a>+.</p>
 </li><li>
 <p>A pg_loose_count extension has been added for fast approximate counts of PostgreSQL tables.  This uses the system tables and should be fairly accurate if the table statistics are up to date:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-value">:table</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-value">:table</span>)
+</pre>
 </li><li>
 <p>The Dataset#use_cursor method in the postgres adapter now supports a :cursor_name option.  You can set this option if you want to use nested cursors.</p>
 </li><li>
@@ -73,15 +81,18 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset#freeze has been implemented.  Previously, it was not implemented, so Object#freeze was used, which resulted in a dataset that wasn&#39;t cloneable.  Dataset#freeze now works as expected, resulting in a cloneable dataset, but it doesn&#39;t allow methods to be called that mutate the receiver.</p>
+<p>Dataset#freeze has been implemented.  Previously, it was not implemented, so Object#freeze was used, which resulted in a dataset that wasn’t cloneable.  Dataset#freeze now works as expected, resulting in a cloneable dataset, but it doesn’t allow methods to be called that mutate the receiver.</p>
 </li><li>
-<p>Dataset#dup has been implemented.  Previously, it was not implemented, so Object#dup was used, which resulted in a dataset that shared an options hash with the receiver, so modifying the dup&#39;s opts could also change the original dataset. Now dup works similarly to clone, except that the returned object will not be frozen.</p>
+<p>Dataset#dup has been implemented.  Previously, it was not implemented, so Object#dup was used, which resulted in a dataset that shared an options hash with the receiver, so modifying the dup’s opts could also change the original dataset. Now dup works similarly to clone, except that the returned object will not be frozen.</p>
 </li><li>
-<p>Model#dup has been implemented.  Previously, it was not implemented, so Object#dup was used, which resulted in a model instance that shared the values hash with the receiver, so modifying the dup&#39;s values also changed the original&#39;s values.  Now, dup does a shallow copy of some of the internal data structures as well, so the copy is more independent.</p>
+<p>Model#dup has been implemented.  Previously, it was not implemented, so Object#dup was used, which resulted in a model instance that shared the values hash with the receiver, so modifying the dup’s values also changed the original’s values.  Now, dup does a shallow copy of some of the internal data structures as well, so the copy is more independent.</p>
 
 <p>Note that you still need to be careful if you mutate objects:</p>
 
-<pre class="ruby"><span class="ruby-identifier">m</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-identifier">m2</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">dup</span>&#x000A;<span class="ruby-identifier">m</span>.<span class="ruby-identifier">a</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># also changes m2</span></pre>
+<pre class="ruby"><span class="ruby-identifier">m</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>)
+<span class="ruby-identifier">m2</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">dup</span>
+<span class="ruby-identifier">m</span>.<span class="ruby-identifier">a</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># also changes m2</span>
+</pre>
 </li><li>
 <p>Model#clone has been implemented.  Previously, it had the same issues as dup.  Now, it calls the new Model#dup, but also freezes the returned object if the receiver is frozen.</p>
 </li><li>
@@ -112,7 +123,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

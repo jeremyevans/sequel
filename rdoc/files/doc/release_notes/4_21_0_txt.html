@@ -40,50 +40,76 @@ Last Update:
 <ul><li>
 <p>SQL::GenericExpression#=~ has been added as an alternative method of specifying equality/inclusion/identity.  Previously, you had to use a hash.  This led to some slightly weird looking syntax when used inside virtual rows:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>)<span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>}}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) = 0</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>)<span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>}}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) = 0</span>
+</pre>
 
 <p>You can now use =~ as an equivalent:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) = 0</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">0</span>}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) = 0</span>
+</pre>
 
 <p>Like when using a hash, this works also for inclusion:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) IN (1, 2, 3)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) IN (1, 2, 3)</span>
+</pre>
 
 <p>for identity:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span>}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) IS NULL</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span>}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) IS NULL</span>
+</pre>
 
 <p>and for matching (on MySQL/PostgreSQL):</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-regexp">/foo/i</span>}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) ~* &#39;foo&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-regexp">/foo/i</span>}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) ~* &#39;foo&#39;</span>
+</pre>
 
 <p>This new syntax makes more complex conditions simpler to express:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">0</span>) <span class="ruby-operator">|</span> (<span class="ruby-identifier">column</span> <span class="ruby-operator">=~</span> <span class="ruby-value">1</span>)}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) = 0 OR column = 1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">0</span>) <span class="ruby-operator">|</span> (<span class="ruby-identifier">column</span> <span class="ruby-operator">=~</span> <span class="ruby-value">1</span>)}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) = 0 OR column = 1</span>
+</pre>
 
 <p>compared to previous versions of Sequel:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">|</span>({<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>}, {<span class="ruby-value">:column</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>})}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">|</span>({<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>}, {<span class="ruby-value">:column</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>})}
+</pre>
 
 <p>On ruby 1.9+, you can also use SQL::GenericExpression#!~ to invert the condition:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) != 0</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) NOT IN (1, 2, 3)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span>}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) IS NOT NULL</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> <span class="ruby-regexp">/foo/i</span>}&#x000A;<span class="ruby-comment"># SELECT FROM items WHERE function(column) !~* &#39;foo&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> <span class="ruby-value">0</span>}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) != 0</span>
 
-<p>This makes it simpler to write inverted conditions.  Ruby 1.8 doesn&#39;t support overriding the !~ method, but you can still use the unary ~ method to invert:</p>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) NOT IN (1, 2, 3)</span>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-operator">~</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">0</span>)}</pre>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span>}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) IS NOT NULL</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">!~</span> <span class="ruby-regexp">/foo/i</span>}
+<span class="ruby-comment"># SELECT FROM items WHERE function(column) !~* &#39;foo&#39;</span>
+</pre>
+
+<p>This makes it simpler to write inverted conditions.  Ruby 1.8 doesn’t support overriding the !~ method, but you can still use the unary ~ method to invert:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-operator">~</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">0</span>)}
+</pre>
 </li><li>
 <p>Database#add_named_conversion_proc has been added on PostgreSQL to make it easier to add conversion procs by name instead of by OID:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:citext</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:citext</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>}
+</pre>
 </li><li>
 <p>Database#full_text_search on PostgreSQL now supports :tsquery and :tsvector options for using existing tsquery and/or tsvector arguments, instead of assuming the arguments are query terms or the text to be search.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#transaction now works inside after_commit and after_rollback hooks.  Previously, it didn&#39;t work correctly as it thought it was already inside the previously committed/rolled back transaction.</p>
+<p>Database#transaction now works inside after_commit and after_rollback hooks.  Previously, it didn’t work correctly as it thought it was already inside the previously committed/rolled back transaction.</p>
 </li><li>
 <p>Sequel.pg_jsonb now returns JSONBOp instances instead of JSONOp instances when passed other than Array or Hash.</p>
 </li><li>
@@ -94,7 +120,7 @@ Last Update:
 <ul><li>
 <p>The default root name used in the JSON serializer is now demodulized before being underscored.  This changes the behavior when the model is namespaced.  For example, if the model class name is Mod::Model, the previous default root name would be “mod/model”, the new default root name is “model”.</p>
 </li><li>
-<p>If you were calling =~ or !~ on SQL::GenericExpression objects and expecting the default ruby behavior of returning nil for =~ and true for !~, you&#39;ll have to update your code.</p>
+<p>If you were calling =~ or !~ on SQL::GenericExpression objects and expecting the default ruby behavior of returning nil for =~ and true for !~, you’ll have to update your code.</p>
 </li></ul>
 </div>
 <div id='context'>
@@ -106,7 +132,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

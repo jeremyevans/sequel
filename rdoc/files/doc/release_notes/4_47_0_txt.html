@@ -40,7 +40,8 @@ Last Update:
 <ul><li>
 <p>Setting an invalid dataset for a model is now deprecated. Historically, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has swallowed exceptions for this to keep backwards compatibility, but it generally just results in code breaking later.  To allow invalid datasets to be used:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">require_valid_table</span> = <span class="ruby-keyword">false</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">require_valid_table</span> = <span class="ruby-keyword">false</span>
+</pre>
 </li><li>
 <p>The association_autoreloading and many_to_one_pk_lookup plugins are now deprecated.  They were moved from plugins to standard model behavior in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.0, and have been no-ops since.</p>
 </li><li>
@@ -51,11 +52,17 @@ Last Update:
 <ul><li>
 <p>Database#with_server in the server_block extension now accepts an optional second argument for the read only server to use.  This allows for overriding the default server while providing a separate default for read only queries:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:server1</span>, <span class="ruby-value">:server1ro</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span>       <span class="ruby-comment"># Uses server1ro</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># Uses server1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:server1</span>, <span class="ruby-value">:server1ro</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span>       <span class="ruby-comment"># Uses server1ro</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># Uses server1</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>Model.default_association_type_options has been added, allowing the ability to set default options per association type.  This can be used to make some association types read_only by default:</p>
 
-<pre class="ruby"><span class="ruby-identifier">opts</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_type_options</span>&#x000A;<span class="ruby-identifier">opts</span>[<span class="ruby-value">:one_to_many</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:many_to_many</span>] = {<span class="ruby-value">:read_only</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}</pre>
+<pre class="ruby"><span class="ruby-identifier">opts</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_type_options</span>
+<span class="ruby-identifier">opts</span>[<span class="ruby-value">:one_to_many</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:many_to_many</span>] = {<span class="ruby-value">:read_only</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}
+</pre>
 </li><li>
 <p>Database#views on PostgreSQL now accepts a :materialized option to return materialized views instead of regular views.</p>
 </li></ul>
@@ -83,7 +90,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

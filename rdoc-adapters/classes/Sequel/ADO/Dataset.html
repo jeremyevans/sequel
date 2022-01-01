@@ -65,7 +65,37 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-fetch_rows-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-fetch_rows-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ado.rb</span>&#x000A;<span class="line-num">246</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">247</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">recordset</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">248</span>     <span class="ruby-identifier">cols</span> = []&#x000A;<span class="line-num">249</span>     <span class="ruby-identifier">conversion_procs</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">conversion_procs</span>&#x000A;<span class="line-num">250</span> &#x000A;<span class="line-num">251</span>     <span class="ruby-identifier">recordset</span>.<span class="ruby-constant">Fields</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">252</span>       <span class="ruby-identifier">cols</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">field</span>.<span class="ruby-constant">Name</span>), <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">field</span>.<span class="ruby-constant">Type</span>]]&#x000A;<span class="line-num">253</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">254</span> &#x000A;<span class="line-num">255</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:first</span>)&#x000A;<span class="line-num">256</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">recordset</span>.<span class="ruby-constant">EOF</span>&#x000A;<span class="line-num">257</span>     <span class="ruby-identifier">max</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">length</span>&#x000A;<span class="line-num">258</span> &#x000A;<span class="line-num">259</span>     <span class="ruby-identifier">recordset</span>.<span class="ruby-constant">GetRows</span>.<span class="ruby-identifier">transpose</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field_values</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">260</span>       <span class="ruby-identifier">h</span> = {}&#x000A;<span class="line-num">261</span> &#x000A;<span class="line-num">262</span>       <span class="ruby-identifier">i</span> = <span class="ruby-value">-1</span>&#x000A;<span class="line-num">263</span>       <span class="ruby-keyword">while</span> (<span class="ruby-identifier">i</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span>&#x000A;<span class="line-num">264</span>         <span class="ruby-identifier">name</span>, <span class="ruby-identifier">cp</span> = <span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]&#x000A;<span class="line-num">265</span>         <span class="ruby-identifier">h</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-keyword">if</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">field_values</span>[<span class="ruby-identifier">i</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cp</span>&#x000A;<span class="line-num">266</span>           <span class="ruby-identifier">cp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">267</span>         <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">268</span>           <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">269</span>         <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">270</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">271</span>       &#x000A;<span class="line-num">272</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>&#x000A;<span class="line-num">273</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">274</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">275</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-fetch_rows-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ado.rb</span>
+<span class="line-num">246</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">247</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">recordset</span><span class="ruby-operator">|</span>
+<span class="line-num">248</span>     <span class="ruby-identifier">cols</span> = []
+<span class="line-num">249</span>     <span class="ruby-identifier">conversion_procs</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">conversion_procs</span>
+<span class="line-num">250</span> 
+<span class="line-num">251</span>     <span class="ruby-identifier">recordset</span>.<span class="ruby-constant">Fields</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field</span><span class="ruby-operator">|</span>
+<span class="line-num">252</span>       <span class="ruby-identifier">cols</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">field</span>.<span class="ruby-constant">Name</span>), <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">field</span>.<span class="ruby-constant">Type</span>]]
+<span class="line-num">253</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">254</span> 
+<span class="line-num">255</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:first</span>)
+<span class="line-num">256</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">recordset</span>.<span class="ruby-constant">EOF</span>
+<span class="line-num">257</span>     <span class="ruby-identifier">max</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">258</span> 
+<span class="line-num">259</span>     <span class="ruby-identifier">recordset</span>.<span class="ruby-constant">GetRows</span>.<span class="ruby-identifier">transpose</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field_values</span><span class="ruby-operator">|</span>
+<span class="line-num">260</span>       <span class="ruby-identifier">h</span> = {}
+<span class="line-num">261</span> 
+<span class="line-num">262</span>       <span class="ruby-identifier">i</span> = <span class="ruby-value">-1</span>
+<span class="line-num">263</span>       <span class="ruby-keyword">while</span> (<span class="ruby-identifier">i</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span>
+<span class="line-num">264</span>         <span class="ruby-identifier">name</span>, <span class="ruby-identifier">cp</span> = <span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]
+<span class="line-num">265</span>         <span class="ruby-identifier">h</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-keyword">if</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">field_values</span>[<span class="ruby-identifier">i</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cp</span>
+<span class="line-num">266</span>           <span class="ruby-identifier">cp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">267</span>         <span class="ruby-keyword">else</span>
+<span class="line-num">268</span>           <span class="ruby-identifier">v</span>
+<span class="line-num">269</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">270</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">271</span>       
+<span class="line-num">272</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>
+<span class="line-num">273</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">274</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">275</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-provides_accurate_rows_matched-3F'>
@@ -83,7 +113,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-provides_accurate_rows_matched-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-provides_accurate_rows_matched-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ado.rb</span>&#x000A;<span class="line-num">278</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">provides_accurate_rows_matched?</span>&#x000A;<span class="line-num">279</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">280</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-provides_accurate_rows_matched-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ado.rb</span>
+<span class="line-num">278</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">provides_accurate_rows_matched?</span>
+<span class="line-num">279</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">280</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -95,7 +128,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

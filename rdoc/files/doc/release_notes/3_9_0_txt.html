@@ -41,7 +41,7 @@ Last Update:
 <ul><li>
 <p>The ConnectionPool classes were refactored from 2 separate classes to a 5 class hierarchy, with one main class and 4  subclasses, one for each combination of sharding and threading.</p>
 
-<p>The primary reason for this refactoring is to make it so that the user doesn&#39;t have to pay a performance penalty for sharding if they aren&#39;t using it.  A connection pool that supports sharding is automatically used if the :servers option is used when setting up the database connection.</p>
+<p>The primary reason for this refactoring is to make it so that the user doesn’t have to pay a performance penalty for sharding if they aren’t using it.  A connection pool that supports sharding is automatically used if the :servers option is used when setting up the database connection.</p>
 
 <p>In addition, the default connection pool no longer contains the code to schedule future disconnections of currently allocated connections.  The sharded connection pool must be used if that feature is desired.</p>
 
@@ -49,7 +49,16 @@ Last Update:
 </li><li>
 <p>An optimistic_locking plugin was added to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.  This plugin implements a simple database-independent locking mechanism to ensure that concurrent updates do not override changes:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:optimistic_locking</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-comment"># raises Sequel::Plugins::OptimisticLocking::Error</span>&#x000A;<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:optimistic_locking</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]
+<span class="ruby-comment"># works</span>
+<span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)
+<span class="ruby-comment"># raises Sequel::Plugins::OptimisticLocking::Error</span>
+<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)
+</pre>
 
 <p>In order for this plugin to work, you need to make sure that the database table has a lock_version column (or other column you name via the lock_column class level accessor) that defaults to 0.</p>
 
@@ -57,7 +66,9 @@ Last Update:
 </li><li>
 <p>Dataset#unused_table_alias was added, which takes a symbol and returns either that symbol or a new symbol which can be used as a table alias when joining a table to the dataset.  The symbol returned is guaranteed to not already be used by the dataset:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">unused_table_alias</span>(<span class="ruby-value">:blah</span>) <span class="ruby-comment"># =&gt; :blah</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">unused_table_alias</span>(<span class="ruby-value">:test</span>) <span class="ruby-comment"># =&gt; :test_0</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">unused_table_alias</span>(<span class="ruby-value">:blah</span>) <span class="ruby-comment"># =&gt; :blah</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">unused_table_alias</span>(<span class="ruby-value">:test</span>) <span class="ruby-comment"># =&gt; :test_0</span>
+</pre>
 
 <p>The use case is when you need to join a table to a dataset, where the table may already be used inside the dataset, and you want to generate a unique alias:</p>
 
@@ -77,19 +88,22 @@ Last Update:
 <ul><li>
 <p>IN/NOT IN constructs with an empty array are now handled properly.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[]) <span class="ruby-comment"># IN</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[]) <span class="ruby-comment"># NOT IN</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[]) <span class="ruby-comment"># IN</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[]) <span class="ruby-comment"># NOT IN</span>
+</pre>
 
 <p>Before, the IN construct would mostly work, other than some minor differences in NULL semantics.  However, the NOT IN construct would not work.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles the NOT IN case using an expression that evaluates to true.</p>
 </li><li>
 <p>If using an IN/NOT IN construct with multiple columns and a dataset argument, where multiple column IN/NOT IN support is emulated, a separate query is done to get the records, which is then handled like an array of values.  This means that the following type of query now works on all tested databases:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">filter</span>([<span class="ruby-value">:id1</span>, <span class="ruby-value">:id2</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:table2</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id1</span>, <span class="ruby-value">:id2</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">filter</span>([<span class="ruby-value">:id1</span>, <span class="ruby-value">:id2</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:table2</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id1</span>, <span class="ruby-value">:id2</span>))
+</pre>
 </li><li>
 <p>Schemas and aliases are now handled correctly when eager graphing.</p>
 </li><li>
 <p>Implicitly qualified symbols are now handled correctly in update statements, useful if you are updating a joined dataset and need to reference a column that appears in multiple tables.</p>
 </li><li>
-<p>The active_model plugin has been brought up to date with activemodel 3.0 beta (though it doesn&#39;t work on edge). Additionally, the active_model plugin now requires active_model in order to use ActiveModel::Naming.</p>
+<p>The active_model plugin has been brought up to date with activemodel 3.0 beta (though it doesn’t work on edge). Additionally, the active_model plugin now requires active_model in order to use ActiveModel::Naming.</p>
 </li><li>
 <p>In the schema_dumper extension, always include the varchar limit, even if it is 255 columns (the default).  This makes it so that PostgreSQL will use a varchar(255) column instead of a text column when restoring a schema dump of a varchar(255) column from another database.</p>
 </li><li>
@@ -105,7 +119,7 @@ Last Update:
 </li><li>
 <p>In the single_table_inheritance plugin, qualify the sti_key column with the table name, so that subclass datasets can safely be joined to other tables having the same column name.</p>
 </li><li>
-<p>In the single_table_inheritance plugin, handle case where the sti_key value is nil or &#39;&#39; specially, so that those cases always return an instance of the main model class.  This fixes issues if constantize(nil) returns Object instead of raising an exception.</p>
+<p>In the single_table_inheritance plugin, handle case where the sti_key value is nil or ” specially, so that those cases always return an instance of the main model class.  This fixes issues if constantize(nil) returns Object instead of raising an exception.</p>
 </li><li>
 <p>No longer use Date#to_s for literalization, always use ISO8601 format for dates.</p>
 </li><li>
@@ -113,7 +127,7 @@ Last Update:
 </li><li>
 <p>MSSQL emulated offset support was simplified to only use one subquery, and made to work correctly on ruby 1.9.</p>
 </li><li>
-<p>Emulate multiple column IN/NOT IN on H2, since it doesn&#39;t handle all cases correctly.</p>
+<p>Emulate multiple column IN/NOT IN on H2, since it doesn’t handle all cases correctly.</p>
 </li><li>
 <p>ODBC timestamps are now handled correctly if the database_timezone is nil.</p>
 </li><li>
@@ -121,7 +135,7 @@ Last Update:
 </li><li>
 <p>Attempting to use DISTINCT ON on SQLite now raises an error before sending the query to the database.</p>
 </li><li>
-<p>The options hash passed to the database connection method is no longer modified.  However, there may be additional options present in Database#opts that weren&#39;t specified by the options hash passed to the database connection method.</p>
+<p>The options hash passed to the database connection method is no longer modified.  However, there may be additional options present in Database#opts that weren’t specified by the options hash passed to the database connection method.</p>
 </li><li>
 <p>Make Dataset#add_graph_aliases handle the case where the dataset has not yet been graphed.</p>
 </li><li>
@@ -177,7 +191,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

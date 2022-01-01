@@ -35,21 +35,47 @@ Sequel::Plugins::DatasetAssociations
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="DatasetAssociations.html"><code>DatasetAssociations</code></a> allows you to easily use your model associations via datasets.  For each association you define, it creates a dataset method for that association that returns a dataset of all objects that are associated to objects in the current dataset.  Here&#39;s a simple example:</p>
+<p><a href="DatasetAssociations.html"><code>DatasetAssociations</code></a> allows you to easily use your model associations via datasets.  For each association you define, it creates a dataset method for that association that returns a dataset of all objects that are associated to objects in the current dataset.  Here’s a simple example:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:dataset_associations</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>).<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># WHERE (albums.artist_id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT id FROM artists</span>&#x000A;<span class="ruby-comment">#   WHERE ((id &gt;= 1) AND (id &lt;= 100))))</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:dataset_associations</span>
+  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>).<span class="ruby-identifier">albums</span>
+<span class="ruby-comment"># SELECT * FROM albums</span>
+<span class="ruby-comment"># WHERE (albums.artist_id IN (</span>
+<span class="ruby-comment">#   SELECT id FROM artists</span>
+<span class="ruby-comment">#   WHERE ((id &gt;= 1) AND (id &lt;= 100))))</span>
+</pre>
 
 <p>This works for all of the association types that ship with <a href="../../Sequel.html"><code>Sequel</code></a>, including ones implemented in other plugins.  Most association options that are supported when eager loading are supported when using a dataset association. However, it will only work for limited associations or *_one associations with orders if the database supports window functions.</p>
 
 <p>As the dataset methods return datasets, you can easily chain the methods to get associated datasets of associated datasets:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>).<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">tags</span>&#x000A;<span class="ruby-comment"># SELECT tags.* FROM tags</span>&#x000A;<span class="ruby-comment"># WHERE (tags.id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT albums_tags.tag_id FROM albums</span>&#x000A;<span class="ruby-comment">#   INNER JOIN albums_tags</span>&#x000A;<span class="ruby-comment">#     ON (albums_tags.album_id = albums.id)</span>&#x000A;<span class="ruby-comment">#   WHERE</span>&#x000A;<span class="ruby-comment">#     ((albums.artist_id IN (</span>&#x000A;<span class="ruby-comment">#       SELECT id FROM artists</span>&#x000A;<span class="ruby-comment">#       WHERE ((id &gt;= 1) AND (id &lt;= 100)))</span>&#x000A;<span class="ruby-comment">#     AND</span>&#x000A;<span class="ruby-comment">#     (name &lt; &#39;M&#39;)))))</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>).<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">tags</span>
+<span class="ruby-comment"># SELECT tags.* FROM tags</span>
+<span class="ruby-comment"># WHERE (tags.id IN (</span>
+<span class="ruby-comment">#   SELECT albums_tags.tag_id FROM albums</span>
+<span class="ruby-comment">#   INNER JOIN albums_tags</span>
+<span class="ruby-comment">#     ON (albums_tags.album_id = albums.id)</span>
+<span class="ruby-comment">#   WHERE</span>
+<span class="ruby-comment">#     ((albums.artist_id IN (</span>
+<span class="ruby-comment">#       SELECT id FROM artists</span>
+<span class="ruby-comment">#       WHERE ((id &gt;= 1) AND (id &lt;= 100)))</span>
+<span class="ruby-comment">#     AND</span>
+<span class="ruby-comment">#     (name &lt; &#39;M&#39;)))))</span>
+</pre>
 
 <p>For associations that do JOINs, such as many_to_many, note that the datasets returned by a dataset association method do not do a JOIN by default (they use a subquery that JOINs).  This can cause problems when you are doing a select, order, or filter on a column in the joined table.  In that case, you should use the <code>:dataset_associations_join</code> option in the association, which will make sure the datasets returned by the dataset association methods also use JOINs, allowing such dataset association methods to work correctly.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses create association methods for datasets</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:dataset_associations</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class create association methods for datasets</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:dataset_associations</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses create association methods for datasets</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:dataset_associations</span>
+
+<span class="ruby-comment"># Make the Album class create association methods for datasets</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:dataset_associations</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -69,7 +95,7 @@ Sequel::Plugins::DatasetAssociations
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

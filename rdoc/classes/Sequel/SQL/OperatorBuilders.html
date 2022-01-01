@@ -37,7 +37,13 @@ Sequel::SQL::OperatorBuilders
 <div id='description'>
 <p>This adds methods to create <a href="../SQL.html"><code>SQL</code></a> expressions using operators:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">+</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 + a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 - a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">*</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 * a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">/</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 / a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (b AND a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">|</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (b OR a)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">+</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 + a)</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 - a)</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">*</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 * a)</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">/</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (1 / a)</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (b AND a)</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">|</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a</span>)   <span class="ruby-comment"># (b OR a)</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -62,14 +68,18 @@ Sequel::SQL::OperatorBuilders
 
 <p>Return <a href="NumericExpression.html"><code>NumericExpression</code></a> for the exponentiation:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">**</span>(<span class="ruby-value">2</span>, <span class="ruby-value">3</span>) <span class="ruby-comment"># SQL: power(2, 3)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">**</span>(<span class="ruby-value">2</span>, <span class="ruby-value">3</span>) <span class="ruby-comment"># SQL: power(2, 3)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2A-2A-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-2A-2A-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">871</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">**</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)&#x000A;<span class="line-num">872</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:**</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)&#x000A;<span class="line-num">873</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-2A-2A-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">871</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">**</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)
+<span class="line-num">872</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:**</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)
+<span class="line-num">873</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-~'>
@@ -82,14 +92,24 @@ Sequel::SQL::OperatorBuilders
 
 <p>Invert the given expression.  Returns a <code>Sequel::SQL::BooleanExpression</code> created from this argument, not matching all of the conditions.</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">nil</span>) <span class="ruby-comment"># SQL: NOT NULL</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>([[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]]) <span class="ruby-comment"># SQL: a IS NOT TRUE</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>([[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]]) <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">nil</span>) <span class="ruby-comment"># SQL: NOT NULL</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>([[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]]) <span class="ruby-comment"># SQL: a IS NOT TRUE</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>([[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]]) <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">881</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">882</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">883</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value">:OR</span>, <span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">884</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">885</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">886</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">887</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">881</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">882</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">883</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value">:OR</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">884</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">885</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">886</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">887</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -101,7 +121,7 @@ Sequel::SQL::OperatorBuilders
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

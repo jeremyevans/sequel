@@ -40,11 +40,23 @@ Last Update:
 <ul><li>
 <p>The pg_json extension now adds a Database#wrap_json_primitives accessor.  When set to true, JSON primitive values (string, number, true, false, and null) will be wrapped by delegate Ruby objects instead of using Ruby primitives.  This allows the values to round trip, so the following code will work even for primitive values in json_column:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">wrap_json_primitives</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">value</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:other_table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">json_column:</span> <span class="ruby-identifier">value</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">wrap_json_primitives</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-identifier">value</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:other_table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">json_column:</span> <span class="ruby-identifier">value</span>)
+</pre>
 
 <p>This should be enabled with care, especially in cases where false and null JSON values are used, as the behavior will change if the objects are used in a boolean context in Ruby, as only false and nil in Ruby are treated as false:</p>
 
-<pre class="ruby"><span class="ruby-comment"># assume JSON false or null value</span>&#x000A;<span class="ruby-identifier">value</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)&#x000A;&#x000A;<span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-comment"># executed if wrap_json_primitives is true</span>&#x000A;<span class="ruby-keyword">else</span>&#x000A;  <span class="ruby-comment"># executed by default</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># assume JSON false or null value</span>
+<span class="ruby-identifier">value</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)
+
+<span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>
+  <span class="ruby-comment"># executed if wrap_json_primitives is true</span>
+<span class="ruby-keyword">else</span>
+  <span class="ruby-comment"># executed by default</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>When typecasting input in model objects to a JSON type, string input will still be parsed as JSON.  However, you can set the Database#typecast_json_strings accessor to true, and then string input will be considered as a JSON string instead of parsing the string as JSON.</p>
 
@@ -52,18 +64,19 @@ Last Update:
 
 <p>As model objects always consider a nil value as SQL NULL and do not typecast it, if you want to explicitly set a JSON null value, you need to wrap it explicitly:</p>
 
-<pre class="ruby"><span class="ruby-identifier">model_object</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-keyword">nil</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">model_object</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-keyword">nil</span>)
+</pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports window function options :window, :exclude, and :frame :type=&gt;:groups, :start, and :end on SQLite <a href="3_28_0_txt.html">3.28.0</a>+.</p>
 </li><li>
-<p>The server_block extension now respects the :servers_hash Database option.  This makes it more similar to Sequel&#39;s default behavior. However, that means by default, the server_block extension will default to handling unknown shards as the default shard, instead of raising an error for them.</p>
+<p>The server_block extension now respects the :servers_hash Database option.  This makes it more similar to Sequel’s default behavior. However, that means by default, the server_block extension will default to handling unknown shards as the default shard, instead of raising an error for them.</p>
 </li><li>
 <p>The rcte_tree plugin now disallows eager graphing of the ancestors and descendants associations.  Previously, eager graphing of these associations generated incorrect results.  It is not possible to eager graph these extensions, but normal eager loading does work.</p>
 </li><li>
-<p>The ado adapter&#39;s performance has been improved by using faster callables for type conversion and a more efficient inner loop.</p>
+<p>The ado adapter’s performance has been improved by using faster callables for type conversion and a more efficient inner loop.</p>
 </li><li>
 <p>The sqlite adapter now converts a :timeout option given as a string to an integer.  This allows you to use the option inside of a connection string.</p>
 </li><li>
@@ -95,7 +108,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

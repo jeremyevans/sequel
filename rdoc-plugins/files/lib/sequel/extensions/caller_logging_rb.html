@@ -38,15 +38,26 @@ Last Update:
 <div id='description'>
 <p>The caller_logging extension includes caller information before query logging, showing which code caused the query.  It skips internal <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> code, showing the first non-Sequel caller line.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:caller_logging</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># Logger:</span>&#x000A;<span class="ruby-comment"># (0.000041s) (source: /path/to/app/foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:caller_logging</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># Logger:</span>
+<span class="ruby-comment"># (0.000041s) (source: /path/to/app/foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1</span>
+</pre>
 
 <p>You can further filter the caller lines by setting <code>Database#caller_logging_ignore</code> to a regexp of additional caller lines to ignore.  This is useful if you have specific methods or internal extensions/plugins that you would also like to ignore as they obscure the code actually making the request.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_ignore</span> = <span class="ruby-regexp">%r{/path/to/app/lib/plugins}</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_ignore</span> = <span class="ruby-regexp">%r{/path/to/app/lib/plugins}</span>
+</pre>
 
 <p>You can also format the caller before it is placed in the logger, using <code>caller_logging_formatter</code>:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_formatter</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">caller</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-node">&quot;(#{caller.sub(/\A\/path\/to\/app\//, &#39;&#39;)})&quot;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># Logger:</span>&#x000A;<span class="ruby-comment"># (0.000041s) (foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_formatter</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">caller</span><span class="ruby-operator">|</span>
+  <span class="ruby-node">&quot;(#{caller.sub(/\A\/path\/to\/app\//, &#39;&#39;)})&quot;</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># Logger:</span>
+<span class="ruby-comment"># (0.000041s) (foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1</span>
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/CallerLogging.html"><code>Sequel::CallerLogging</code></a></p>
 </div>
@@ -65,7 +76,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

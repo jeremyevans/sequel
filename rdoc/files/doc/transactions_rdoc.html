@@ -65,73 +65,202 @@ Last Update:
 
 <p>In <a href="../../classes/Sequel.html"><code>Sequel</code></a>, the <code>Database#transaction</code> method should be called if you want to use a database transaction.  This method must be called with a block.  If the block does not raise an exception, the transaction is committed:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <p>If the block raises a Sequel::Rollback exception, the transaction is rolled back, but no exception is raised outside the block:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># no exception raised</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+<span class="ruby-comment"># no exception raised</span>
+</pre>
 
 <p>If any other exception is raised, the transaction is rolled back, and the exception is raised outside the block:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># ArgumentError raised</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+<span class="ruby-comment"># ArgumentError raised</span>
+</pre>
 
 <p>If you want the current transaction to be rolled back when the transaction block exits instead of being committed (even if an exception is not raised), use <code>Database#rollback_on_exit</code></p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+</pre>
 
 <p>If you want Sequel::Rollback exceptions to be reraised, use the <code>rollback: :reraise</code> option:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">rollback:</span> <span class="ruby-value">:reraise</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># Sequel::Rollback raised</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">rollback:</span> <span class="ruby-value">:reraise</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+<span class="ruby-comment"># Sequel::Rollback raised</span>
+</pre>
 
 <p>If you always want to rollback (useful for testing), use the <code>rollback: :always</code> option:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">rollback:</span> <span class="ruby-value">:always</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># no exception raised</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">rollback:</span> <span class="ruby-value">:always</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+<span class="ruby-comment"># no exception raised</span>
+</pre>
 
 <p>If you want to check whether you are currently in a transaction, use the Database#in_transaction? method:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">in_transaction?</span> <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">in_transaction?</span> <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">in_transaction?</span> <span class="ruby-comment"># false</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">in_transaction?</span> <span class="ruby-comment"># true</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h2 id="label-Transaction+Hooks">Transaction Hooks<span><a href="#label-Transaction+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>You can add hooks to an in progress transaction that are called after the transaction commits or rolls back:</p>
 
-<pre class="ruby"><span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 1</span>&#x000A;&#x000A;<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span></pre>
+<pre class="ruby"><span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}
+  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">x</span> <span class="ruby-comment"># 1</span>
+
+<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>
+</pre>
 
 <h2 id="label-Nested+Transaction+Calls+-2F+Savepoints">Nested Transaction Calls / Savepoints<span><a href="#label-Nested+Transaction+Calls+-2F+Savepoints">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>You can nest calls to transaction, which by default just reuses the existing transaction:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <p>You can use the <code>savepoint: true</code> option in the inner transaction to explicitly use a savepoint (if the database supports it):</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <p>You can use the <code>auto_savepoint: true</code> option in the outer transaction to explicitly use a savepoint in the inner transaction (if the database supports it):</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">auto_savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">auto_savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <p>If a Sequel::Rollback exception is raised inside the savepoint block, it will only rollback to the savepoint:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-comment"># no exception raised</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+  <span class="ruby-comment"># no exception raised</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <p>Other exceptions, unless rescued inside the outer transaction block, will rollback the savepoint and the outer transactions, since they are reraised by the transaction code:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># ArgumentError raised</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+<span class="ruby-comment"># ArgumentError raised</span>
+</pre>
 
 <p>If you want the current savepoint to be rolled back when the savepoint block exits instead of being committed (even if an exception is not raised), use <code>Database#rollback_on_exit(:savepoint=&gt;true)</code></p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <p>If you want the current savepoint and potentially enclosing savepoints to be rolled back when the savepoint blocks exit  (even if an exception is not raised), use <code>Database#rollback_on_exit(:savepoint=&gt;integer)</code></p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)&#x000A;    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)
+    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)
+    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
+</pre>
 
 <h3 id="label-Savepoint+Hooks">Savepoint Hooks<span><a href="#label-Savepoint+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>When using savepoints, you can use the <code>:savepoint</code> option to <code>after_commit</code> or <code>after_rollback</code> to use a savepoint hook.  For <code>after_commit</code>, this will only run the hook after transaction commit if all enclosing savepoints are released (not rolled back). For <code>after_rollback</code>, this will run the hook after any enclosing savepoint is rolled back (before transaction commit), or after the transaction is rolled back if all enclosing savepoints are released:</p>
 
-<pre class="ruby"><span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;    <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 1</span>&#x000A;&#x000A;<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>  <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;    <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>&#x000A;&#x000A;<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span></pre>
+<pre class="ruby"><span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}
+    <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>
+  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+<span class="ruby-identifier">x</span> <span class="ruby-comment"># 1</span>
+
+<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>  <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}
+    <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
+  <span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>
+
+<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}
+  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>
+  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>
+</pre>
 
 <h2 id="label-Prepared+Transactions+-2F+Two-Phase+Commit">Prepared Transactions / Two-Phase Commit<span><a href="#label-Prepared+Transactions+-2F+Two-Phase+Commit">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -139,33 +268,49 @@ Last Update:
 
 <p>To use prepared transactions in <a href="../../classes/Sequel.html"><code>Sequel</code></a>, you provide a string as the value of the :prepare option:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">prepare:</span> <span class="ruby-string">&#39;foo&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># PREPARE TRANSACTION &#39;foo&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">prepare:</span> <span class="ruby-string">&#39;foo&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># PREPARE TRANSACTION &#39;foo&#39;</span>
+</pre>
 
 <p>Later, you can commit the prepared transaction:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-string">&#39;foo&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-string">&#39;foo&#39;</span>)
+</pre>
 
 <p>or roll the prepared transaction back:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;foo&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;foo&#39;</span>)
+</pre>
 
 <h2 id="label-Transaction+Isolation+Levels">Transaction Isolation Levels<span><a href="#label-Transaction+Isolation+Levels">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on most databases, you can specify which transaction isolation level you want to use via the :isolation option to <code>Database#transaction</code>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option makes <a href="../../classes/Sequel.html"><code>Sequel</code></a> use the correct transaction isolation syntax for your database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">isolation:</span> <span class="ruby-value">:serializable</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-comment"># SET TRANSACTION ISOLATION LEVEL SERIALIZABLE</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">isolation:</span> <span class="ruby-value">:serializable</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
+  <span class="ruby-comment"># SET TRANSACTION ISOLATION LEVEL SERIALIZABLE</span>
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>
+<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
+</pre>
 
 <h2 id="label-Automatically+Restarting+Transactions">Automatically Restarting Transactions<span><a href="#label-Automatically+Restarting+Transactions">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> offers the ability to automatically restart transactions if specific types of errors are detected.  For example, if you want to automatically restart a transaction if a serialization failure is detected:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">isolation:</span> <span class="ruby-value">:serializable</span>, <span class="ruby-value">retry_on:</span> [<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">isolation:</span> <span class="ruby-value">:serializable</span>, <span class="ruby-value">retry_on:</span> [<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>At the serializable transaction isolation level, find_or_create may raises a Sequel::SerializationFailure exception if multiple threads simultaneously run that code.  With the :retry_on option set, the transaction will be automatically retried until it succeeds.</p>
 
 <p>Note that automatic retrying should not be used unless the entire transaction block is idempotent, as otherwise it can cause non-idempotent behavior to execute multiple times.  For example, with the following code:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">isolation:</span> <span class="ruby-value">:serializable</span>, <span class="ruby-value">retry_on:</span> [<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">logger</span>.<span class="ruby-identifier">info</span> <span class="ruby-string">&#39;Ensuring existence of ModelClass with name Foo&#39;</span>&#x000A;  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">isolation:</span> <span class="ruby-value">:serializable</span>, <span class="ruby-value">retry_on:</span> [<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">logger</span>.<span class="ruby-identifier">info</span> <span class="ruby-string">&#39;Ensuring existence of ModelClass with name Foo&#39;</span>
+  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>The logger.info method will be called multiple times if there is a serialization failure.</p>
 
@@ -180,7 +325,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

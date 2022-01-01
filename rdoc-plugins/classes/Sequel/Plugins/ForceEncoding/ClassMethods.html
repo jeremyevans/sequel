@@ -77,7 +77,12 @@ Sequel::Plugins::ForceEncoding::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/force_encoding.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">o</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">o</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:force_hash_encoding</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">o</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/force_encoding.rb</span>
+<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">values</span>)
+<span class="line-num">39</span>   <span class="ruby-identifier">o</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">40</span>   <span class="ruby-identifier">o</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:force_hash_encoding</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">values</span>)
+<span class="line-num">41</span>   <span class="ruby-identifier">o</span>
+<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -89,7 +94,7 @@ Sequel::Plugins::ForceEncoding::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

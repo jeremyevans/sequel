@@ -59,16 +59,24 @@ Sequel::SQL::QualifyingMethods
 </div>
 <div class='description'>
 
-<p>If no arguments are given, return an SQL::ColumnAll:</p>
+<p>If no arguments are given, return an <a href="ColumnAll.html"><code>SQL::ColumnAll</code></a>:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">*</span>  <span class="ruby-comment"># a.*</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">*</span>  <span class="ruby-comment"># a.*</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2A-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-2A-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">921</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;<span class="line-num">922</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">923</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">924</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">925</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">926</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">927</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-2A-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">921</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
+<span class="line-num">922</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
+<span class="line-num">923</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">924</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">925</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">926</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">927</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -81,14 +89,20 @@ Sequel::SQL::QualifyingMethods
 
 <p>Qualify the receiver with the given <code>qualifier</code> (table for column/schema for table).</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>]          <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>]          <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>] <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>]          <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>]          <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>] <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">943</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">identifier</span>)&#x000A;<span class="line-num">944</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">identifier</span>)&#x000A;<span class="line-num">945</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">943</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">identifier</span>)
+<span class="line-num">944</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">identifier</span>)
+<span class="line-num">945</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-qualify'>
@@ -101,14 +115,20 @@ Sequel::SQL::QualifyingMethods
 
 <p>Qualify the receiver with the given <code>qualifier</code> (table for column/schema for table).</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>)                  <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:schema</span>)                  <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">:column</span>).<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>)                  <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>
+<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:schema</span>)                  <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">:column</span>).<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-qualify-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-qualify-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">934</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualify</span>(<span class="ruby-identifier">qualifier</span>)&#x000A;<span class="line-num">935</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">936</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-qualify-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">934</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualify</span>(<span class="ruby-identifier">qualifier</span>)
+<span class="line-num">935</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">936</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -120,7 +140,7 @@ Sequel::SQL::QualifyingMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -38,11 +38,12 @@ Last Update:
 <div id='description'>
 <p>The schema_dumper extension supports dumping tables and indexes in a <a href="../../../../classes/Sequel/Migration.html"><code>Sequel::Migration</code></a> format, so they can be restored on another database (which can be the same type or a different type than the current database).  The main interface is through Sequel::Database#dump_schema_migration.</p>
 
-<p>The schema_dumper extension is quite limited in what types of database objects it supports.  In general, it only supports dumping tables, columns, primary key and foreign key constraints, and some indexes.  It does not support most table options, CHECK constraints, partial indexes, database functions, triggers, security grants/revokes, and a wide variety of other useful database properties.  Be aware of the limitations when using the schema_dumper extension. If you are dumping the schema to restore to the same database type, it is recommended to use your database&#39;s dump and restore programs instead of the schema_dumper extension.</p>
+<p>The schema_dumper extension is quite limited in what types of database objects it supports.  In general, it only supports dumping tables, columns, primary key and foreign key constraints, and some indexes.  It does not support most table options, CHECK constraints, partial indexes, database functions, triggers, security grants/revokes, and a wide variety of other useful database properties.  Be aware of the limitations when using the schema_dumper extension. If you are dumping the schema to restore to the same database type, it is recommended to use your database’s dump and restore programs instead of the schema_dumper extension.</p>
 
 <p>To load the extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:schema_dumper</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:schema_dumper</span>
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/SchemaDumper.html"><code>Sequel::SchemaDumper</code></a></p>
 </div>
@@ -55,7 +56,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

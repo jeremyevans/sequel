@@ -40,29 +40,46 @@ Last Update:
 <ul><li>
 <p>A dirty plugin has been added, which saves the initial value of the column when the column is changed, similar to ActiveModel::Dirty:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;Bar&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">initial_value</span>(<span class="ruby-value">:name</span>)   <span class="ruby-comment"># &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_change</span>(<span class="ruby-value">:name</span>)   <span class="ruby-comment"># [&#39;Foo&#39;, &#39;Bar&#39;]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># {:name =&gt; [&#39;Foo&#39;, &#39;Bar&#39;]}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">reset_column</span>(<span class="ruby-value">:name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># =&gt; {}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">previous_changes</span>       <span class="ruby-comment"># =&gt; {:name=&gt;[&#39;Foo&#39;, &#39;Bar&#39;]}</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;Bar&#39;</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">initial_value</span>(<span class="ruby-value">:name</span>)   <span class="ruby-comment"># &#39;Foo&#39;</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_change</span>(<span class="ruby-value">:name</span>)   <span class="ruby-comment"># [&#39;Foo&#39;, &#39;Bar&#39;]</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># {:name =&gt; [&#39;Foo&#39;, &#39;Bar&#39;]}</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># true</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">reset_column</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># false</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># =&gt; {}</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">previous_changes</span>       <span class="ruby-comment"># =&gt; {:name=&gt;[&#39;Foo&#39;, &#39;Bar&#39;]}</span>
+</pre>
 </li><li>
 <p>Database#create_table now respects an :as option to create a database based on the results of a query.  The :as option value should either be an SQL string or a dataset.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:new_foos</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:new</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:new_foos</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:new</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>))
+</pre>
 </li><li>
-<p>The json_serializer and xml_serializer plugins can now serialize arbitrary arrays of model objects by passing an :array option to the to_json class method.  This works around an issue in ruby&#39;s JSON library where Array#to_json does not pass arguments given to it to the members of the array.</p>
+<p>The json_serializer and xml_serializer plugins can now serialize arbitrary arrays of model objects by passing an :array option to the to_json class method.  This works around an issue in ruby’s JSON library where Array#to_json does not pass arguments given to it to the members of the array.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-value">:array</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]], <span class="ruby-value">:include</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-value">:array</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]], <span class="ruby-value">:include</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>)
+</pre>
 </li><li>
 <p>You can now use the % (modulus) operator in the same way you can use the bitwise operators in Sequel:</p>
 
-<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">%</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (column % 1)</span></pre>
+<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">%</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (column % 1)</span>
+</pre>
 </li><li>
 <p>On PostgreSQL, you can now provide :only, :cascade, and :restart options to Dataset#truncate to use ONLY, CASCADE, and RESTART IDENTITY.  Additionally, you can now truncate multiple tables at the same time:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>).<span class="ruby-identifier">truncate</span>(<span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>).<span class="ruby-identifier">truncate</span>(<span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+</pre>
 </li><li>
 <p>The :index option when creating columns in the schema generator can now take a hash of index options:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:foo</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:bar</span>, <span class="ruby-value">:index</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:foo</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:bar</span>, <span class="ruby-value">:index</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}}
+</pre>
 </li><li>
-<p>A Database#cache_schema accessor has been added, it can be set to false to have the Database never cache schema results.  This can be useful in Rails development mode, so that you don&#39;t need to restart a running server to have models pick up the new schema.</p>
+<p>A Database#cache_schema accessor has been added, it can be set to false to have the Database never cache schema results.  This can be useful in Rails development mode, so that you don’t need to restart a running server to have models pick up the new schema.</p>
 </li><li>
 <p>Database#log_exception has been added for easier instrumentation. It is called with the exception and SQL query string for all queries that raise an exception.</p>
 </li><li>
@@ -71,15 +88,15 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Many theoretical thread-safety issues have been fixed for ruby implementations that don&#39;t use a global interpreter lock. Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> relied on MRI&#39;s global interpreter lock for part of its thread safety, now it does manually locking in more places to avoid thread-safety issues on JRuby (and other ruby implementations without a global interpreter lock).</p>
+<p>Many theoretical thread-safety issues have been fixed for ruby implementations that don’t use a global interpreter lock. Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> relied on MRI’s global interpreter lock for part of its thread safety, now it does manually locking in more places to avoid thread-safety issues on JRuby (and other ruby implementations without a global interpreter lock).</p>
 
 <p>No <a href="../../../classes/Sequel.html"><code>Sequel</code></a> user ever reported a production error related to the previous thread-safety issues, and most of the issues fixed were so difficult to hit that even tests specifically designed to raise errors were unable to do so.</p>
 </li><li>
 <p>Sequel.single_threaded = true now disables the mutex synchronization that enforces thread safety for additional performance in single threaded mode.</p>
 </li><li>
-<p>Sequel&#39;s migrators now only attempt to use transactions by default if the underlying database supports transactional DDL. SQLite does support transactional DDL, but <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not use transactions for SQLite migrations as it causes issues when emulating alter_table operations for tables with foreign keys.</p>
+<p>Sequel’s migrators now only attempt to use transactions by default if the underlying database supports transactional DDL. SQLite does support transactional DDL, but <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not use transactions for SQLite migrations as it causes issues when emulating alter_table operations for tables with foreign keys.</p>
 </li><li>
-<p>Errors that occur when rolling back database transactions are now handled correctly.  Previously, the underlying exception was raised, it wasn&#39;t correctly wrapped in a Sequel::DatabaseError, and if it was due to a database disconnection, the connection wasn&#39;t removed from the pool.</p>
+<p>Errors that occur when rolling back database transactions are now handled correctly.  Previously, the underlying exception was raised, it wasn’t correctly wrapped in a Sequel::DatabaseError, and if it was due to a database disconnection, the connection wasn’t removed from the pool.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer sets ruby instance variables on java objects, fixing warnings on JRuby 1.7 and attempting to be forward compatible with JRuby 2.0.</p>
 </li><li>
@@ -127,7 +144,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

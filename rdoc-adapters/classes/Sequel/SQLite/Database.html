@@ -91,7 +91,7 @@ Superclass:
 
 <p>Connect to the database. Since <a href="../SQLite.html"><code>SQLite</code></a> is a file based database, available options are limited:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:database </td><td>
-<p>database name (filename or &#39;:memory:&#39; or file: URI)</p>
+<p>database name (filename or ‘:memory:’ or file: URI)</p>
 </td></tr><tr><td class='label'>:readonly </td><td>
 <p>open database in read-only mode; useful for reading static data that you do not want to modify</p>
 </td></tr><tr><td class='label'>:timeout </td><td>
@@ -103,7 +103,28 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-connect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-connect-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">109</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">110</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">111</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>] = <span class="ruby-string">&#39;:memory:&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>])&#x000A;<span class="line-num">112</span>   <span class="ruby-identifier">sqlite3_opts</span> = {}&#x000A;<span class="line-num">113</span>   <span class="ruby-identifier">sqlite3_opts</span>[<span class="ruby-value">:readonly</span>] = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:readonly</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:readonly</span>)&#x000A;<span class="line-num">114</span>   <span class="ruby-identifier">db</span> = <span class="ruby-operator">::</span><span class="ruby-constant">SQLite3</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>].<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">sqlite3_opts</span>)&#x000A;<span class="line-num">115</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">busy_timeout</span>(<span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:timeout</span>, <span class="ruby-value">5000</span>)))&#x000A;<span class="line-num">116</span> &#x000A;<span class="line-num">117</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">USE_EXTENDED_RESULT_CODES</span>&#x000A;<span class="line-num">118</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extended_result_codes</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">119</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">120</span>   &#x000A;<span class="line-num">121</span>   <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db</span>){<span class="ruby-identifier">db</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">s</span>)}}&#x000A;<span class="line-num">122</span>   &#x000A;<span class="line-num">123</span>   <span class="ruby-keyword">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">db</span>&#x000A;<span class="line-num">124</span>     <span class="ruby-identifier">attr_reader</span> <span class="ruby-value">:prepared_statements</span>&#x000A;<span class="line-num">125</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">126</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {})&#x000A;<span class="line-num">127</span>   &#x000A;<span class="line-num">128</span>   <span class="ruby-identifier">db</span>&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-connect-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">109</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">110</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">111</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>] = <span class="ruby-string">&#39;:memory:&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>])
+<span class="line-num">112</span>   <span class="ruby-identifier">sqlite3_opts</span> = {}
+<span class="line-num">113</span>   <span class="ruby-identifier">sqlite3_opts</span>[<span class="ruby-value">:readonly</span>] = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:readonly</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:readonly</span>)
+<span class="line-num">114</span>   <span class="ruby-identifier">db</span> = <span class="ruby-operator">::</span><span class="ruby-constant">SQLite3</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>].<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">sqlite3_opts</span>)
+<span class="line-num">115</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">busy_timeout</span>(<span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:timeout</span>, <span class="ruby-value">5000</span>)))
+<span class="line-num">116</span> 
+<span class="line-num">117</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">USE_EXTENDED_RESULT_CODES</span>
+<span class="line-num">118</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extended_result_codes</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">119</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">120</span>   
+<span class="line-num">121</span>   <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db</span>){<span class="ruby-identifier">db</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">s</span>)}}
+<span class="line-num">122</span>   
+<span class="line-num">123</span>   <span class="ruby-keyword">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">db</span>
+<span class="line-num">124</span>     <span class="ruby-identifier">attr_reader</span> <span class="ruby-value">:prepared_statements</span>
+<span class="line-num">125</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">126</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {})
+<span class="line-num">127</span>   
+<span class="line-num">128</span>   <span class="ruby-identifier">db</span>
+<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disconnect_connection'>
@@ -121,7 +142,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-disconnect_connection-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-disconnect_connection-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect_connection</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="line-num">133</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">close</span>}&#x000A;<span class="line-num">134</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">close</span>&#x000A;<span class="line-num">135</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-disconnect_connection-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect_connection</span>(<span class="ruby-identifier">c</span>)
+<span class="line-num">133</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">close</span>}
+<span class="line-num">134</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">close</span>
+<span class="line-num">135</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute'>
@@ -139,7 +164,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">139</span>   <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:select</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">139</span>   <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:select</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_ddl'>
@@ -150,14 +178,21 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Drop any prepared statements on the connection when executing DDL.  This is because prepared statements lock the table in such a way that you can&#39;t drop or alter the table while a prepared statement that references it still exists.</p>
+<p>Drop any prepared statements on the connection when executing DDL.  This is because prepared statements lock the table in such a way that you can’t drop or alter the table while a prepared statement that references it still exists.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_ddl-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute_ddl-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">151</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">152</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">cps</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cps</span>.<span class="ruby-identifier">close</span>}&#x000A;<span class="line-num">153</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">clear</span>&#x000A;<span class="line-num">154</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">155</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">156</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute_ddl-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">151</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">152</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">cps</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cps</span>.<span class="ruby-identifier">close</span>}
+<span class="line-num">153</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">clear</span>
+<span class="line-num">154</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">155</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">156</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_dui'>
@@ -175,7 +210,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_dui-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute_dui-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">143</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">144</span>   <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:update</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">145</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute_dui-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">143</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">144</span>   <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:update</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">145</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_insert'>
@@ -191,7 +229,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_insert-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute_insert-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">159</span>   <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute_insert-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">159</span>   <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -207,7 +248,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">162</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">163</span>   <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">164</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">162</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">163</span>   <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">164</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_application_timestamp'>
@@ -225,7 +270,19 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_application_timestamp-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">169</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;<span class="line-num">170</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;<span class="line-num">171</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">172</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;<span class="line-num">173</span>     <span class="ruby-keyword">super</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)&#x000A;<span class="line-num">174</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;<span class="line-num">175</span>     <span class="ruby-keyword">super</span>(<span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)&#x000A;<span class="line-num">176</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">177</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to : #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;<span class="line-num">178</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
+<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">169</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>
+<span class="line-num">170</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>
+<span class="line-num">171</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">172</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>
+<span class="line-num">173</span>     <span class="ruby-keyword">super</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)
+<span class="line-num">174</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>
+<span class="line-num">175</span>     <span class="ruby-keyword">super</span>(<span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)
+<span class="line-num">176</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">177</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to : #{s.inspect} (#{s.class.inspect})&quot;</span>
+<span class="line-num">178</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -237,7 +294,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

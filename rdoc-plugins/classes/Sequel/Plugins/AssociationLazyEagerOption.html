@@ -37,15 +37,23 @@ Sequel::Plugins::AssociationLazyEagerOption
 <div id='description'>
 <p>The association_lazy_eager_option plugin supports passing an <code>:eager</code> option to an association method.  If the related association is already cached, the cached version will be returned.  If the association is not already cached, it will be loaded, and the value of the <code>:eager</code> option will be used to perform an eager load of the given associations. the plural versions.</p>
 
-<p>With Sequel&#39;s default behavior, you can already perform an eager load when lazy loading using a block:</p>
+<p>With Sequel’s default behavior, you can already perform an eager load when lazy loading using a block:</p>
 
-<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">association</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:nested_association</span>)}</pre>
+<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">association</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:nested_association</span>)}
+</pre>
 
 <p>However, this will ignore any cached version.  In more complex software, the association may already be cached and have the nested association cached inside of it, and using this callback approach then requires 2 unnecessary queries. This plugin will not perform any queries if the association is already cached, preventing duplicate work. However, you should make sure that an already loaded association has the nested association already eagerly loaded.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support the :eager association</span>&#x000A;<span class="ruby-comment"># method option (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support the :eager association</span>&#x000A;<span class="ruby-comment"># method option</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support the :eager association</span>
+<span class="ruby-comment"># method option (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span>
+
+<span class="ruby-comment"># Make the Album class support the :eager association</span>
+<span class="ruby-comment"># method option</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -64,7 +72,7 @@ Sequel::Plugins::AssociationLazyEagerOption
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

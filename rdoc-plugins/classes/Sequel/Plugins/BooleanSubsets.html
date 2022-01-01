@@ -41,7 +41,19 @@ Sequel::Plugins::BooleanSubsets
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Add boolean subset methods for all columns of type :boolean</span>&#x000A;<span class="ruby-comment"># in all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span>&#x000A;&#x000A;<span class="ruby-comment"># Add subsets for all boolean columns in the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:boolean_subsets</span>)&#x000A;&#x000A;<span class="ruby-comment"># Remove is_ from the front of the column name when creating the subset</span>&#x000A;<span class="ruby-comment"># method name, and use (column = &#39;Y&#39;) as the filter conditions</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;  [<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp">/\Ais_/</span>, <span class="ruby-string">&#39;&#39;</span>), {<span class="ruby-identifier">column</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Y&#39;</span>}]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Add boolean subset methods for all columns of type :boolean</span>
+<span class="ruby-comment"># in all model subclasses (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span>
+
+<span class="ruby-comment"># Add subsets for all boolean columns in the Album class</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:boolean_subsets</span>)
+
+<span class="ruby-comment"># Remove is_ from the front of the column name when creating the subset</span>
+<span class="ruby-comment"># method name, and use (column = &#39;Y&#39;) as the filter conditions</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_subsets</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>
+  [<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp">/\Ais_/</span>, <span class="ruby-string">&#39;&#39;</span>), {<span class="ruby-identifier">column</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Y&#39;</span>}]
+<span class="ruby-keyword">end</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +88,16 @@ Sequel::Plugins::BooleanSubsets
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/boolean_subsets.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">35</span>       <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_subset_args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">36</span>       <span class="ruby-identifier">singleton_class</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:private</span>, <span class="ruby-value">:boolean_subset_args</span>)&#x000A;<span class="line-num">37</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">38</span>     <span class="ruby-identifier">create_boolean_subsets</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">39</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/boolean_subsets.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">34</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">35</span>       <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_subset_args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">36</span>       <span class="ruby-identifier">singleton_class</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:private</span>, <span class="ruby-value">:boolean_subset_args</span>)
+<span class="line-num">37</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">38</span>     <span class="ruby-identifier">create_boolean_subsets</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
+<span class="line-num">39</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -88,7 +109,7 @@ Sequel::Plugins::BooleanSubsets
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

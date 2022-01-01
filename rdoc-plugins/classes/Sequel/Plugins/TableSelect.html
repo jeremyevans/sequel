@@ -35,11 +35,16 @@ Sequel::Plugins::TableSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The table_select plugin changes the default selection for a model dataset from <code>*</code> to <code>table.*</code>. This makes it so that if you join the model&#39;s dataset to other tables, columns in the other tables do not appear in the result sets (and possibly overwrite columns in the current model with the same name).</p>
+<p>The table_select plugin changes the default selection for a model dataset from <code>*</code> to <code>table.*</code>. This makes it so that if you join the model’s dataset to other tables, columns in the other tables do not appear in the result sets (and possibly overwrite columns in the current model with the same name).</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclasses select table.*</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:table_select</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class select albums.*</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:table_select</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses select table.*</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:table_select</span>
+
+<span class="ruby-comment"># Make the Album class select albums.*</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:table_select</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -67,14 +72,19 @@ Sequel::Plugins::TableSelect
 </div>
 <div class='description'>
 
-<p>Modify the current model&#39;s dataset selection, if the model has a dataset.</p>
+<p>Modify the current model’s dataset selection, if the model has a dataset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/table_select.rb</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">24</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">25</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/table_select.rb</span>
+<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">24</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
+<span class="line-num">25</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -86,7 +96,7 @@ Sequel::Plugins::TableSelect
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

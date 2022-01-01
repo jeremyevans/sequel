@@ -43,12 +43,17 @@ Last Update:
 
 <p>To use the new JDBC support, the database connection string you give <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now passed directly to JDBC, here are a few examples:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgresql://host/database?user=*&amp;password=*&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:mysql://host/database?user=*&amp;password=*&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite::memory:&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite:relative/path.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite:/absolute/path.db&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgresql://host/database?user=*&amp;password=*&#39;</span>)
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:mysql://host/database?user=*&amp;password=*&#39;</span>)
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite::memory:&#39;</span>)
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite:relative/path.db&#39;</span>)
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite:/absolute/path.db&#39;</span>)
+</pre>
 
 <p>Single Gem</p>
 <hr>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now distributed as a single gem named sequel, by combining the previous sequel_core and sequel gems.  You can still just “require &#39;sequel_core&#39;” if you don&#39;t want the model functionality.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now distributed as a single gem named sequel, by combining the previous sequel_core and sequel gems.  You can still just “require ‘sequel_core’” if you don’t want the model functionality.</p>
 
 <p>Database Adapter Improvements</p>
 <hr>
@@ -101,7 +106,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

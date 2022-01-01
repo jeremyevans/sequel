@@ -58,14 +58,22 @@ Sequel::ExcludeOrNull
 
 <p>Performs the inverse of Dataset#where, but also excludes rows where the given condition IS NULL.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">exclude_or_null</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;software&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE NOT coalesce((category = &#39;software&#39;), false)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">exclude_or_null</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;software&#39;</span>, <span class="ruby-value">id:</span> <span class="ruby-value">3</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE NOT coalesce(((category = &#39;software&#39;) AND (id = 3)), false)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">exclude_or_null</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;software&#39;</span>)
+<span class="ruby-comment"># SELECT * FROM items WHERE NOT coalesce((category = &#39;software&#39;), false)</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">exclude_or_null</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;software&#39;</span>, <span class="ruby-value">id:</span> <span class="ruby-value">3</span>)
+<span class="ruby-comment"># SELECT * FROM items WHERE NOT coalesce(((category = &#39;software&#39;) AND (id = 3)), false)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exclude_or_null-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-exclude_or_null-source'>   <span class="ruby-comment"># File lib/sequel/extensions/exclude_or_null.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude_or_null</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-identifier">add_filter</span>(<span class="ruby-value">:where</span>, <span class="ruby-identifier">cond</span>, <span class="ruby-value">:or_null</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-exclude_or_null-source'>   <span class="ruby-comment"># File lib/sequel/extensions/exclude_or_null.rb</span>
+<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude_or_null</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">42</span>   <span class="ruby-identifier">add_filter</span>(<span class="ruby-value">:where</span>, <span class="ruby-identifier">cond</span>, <span class="ruby-value">:or_null</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-exclude_or_null_having'>
@@ -78,14 +86,19 @@ Sequel::ExcludeOrNull
 
 <p>The same as <a href="ExcludeOrNull.html#method-i-exclude_or_null"><code>exclude_or_null</code></a>, but affecting the HAVING clause instead of the WHERE clause.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select_group</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">exclude_or_null_having</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>}&#x000A;<span class="ruby-comment"># SELECT name FROM items GROUP BY name HAVING NOT coalesce((count(name) &lt; 2), true)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select_group</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">exclude_or_null_having</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>}
+<span class="ruby-comment"># SELECT name FROM items GROUP BY name HAVING NOT coalesce((count(name) &lt; 2), true)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exclude_or_null_having-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-exclude_or_null_having-source'>   <span class="ruby-comment"># File lib/sequel/extensions/exclude_or_null.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude_or_null_having</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-identifier">add_filter</span>(<span class="ruby-value">:having</span>, <span class="ruby-identifier">cond</span>, <span class="ruby-value">:or_null</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-exclude_or_null_having-source'>   <span class="ruby-comment"># File lib/sequel/extensions/exclude_or_null.rb</span>
+<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude_or_null_having</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">51</span>   <span class="ruby-identifier">add_filter</span>(<span class="ruby-value">:having</span>, <span class="ruby-identifier">cond</span>, <span class="ruby-value">:or_null</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -97,7 +110,7 @@ Sequel::ExcludeOrNull
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

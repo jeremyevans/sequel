@@ -37,13 +37,24 @@ Sequel::Plugins::AccessedColumns
 <div id='description'>
 <p>The accessed_columns plugin records which columns have been accessed for a model instance.  This is useful if you are looking to remove other columns from being SELECTed by the dataset that retrieved the instance, which can significantly improve performance:</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name, :artist_id]</span></pre>
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># []</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name]</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">artist_id</span>
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name, :artist_id]</span>
+</pre>
 
 <p>Note that this plugin should probably not be used in production, as it causes a performance hit.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances record accessed columns (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:accessed_columns</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album instances record accessed columns</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:accessed_columns</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances record accessed columns (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:accessed_columns</span>
+
+<span class="ruby-comment"># Make the Album instances record accessed columns</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:accessed_columns</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -62,7 +73,7 @@ Sequel::Plugins::AccessedColumns
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

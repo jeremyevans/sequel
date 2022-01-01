@@ -40,15 +40,19 @@ Last Update:
 <ul><li>
 <p>An async_thread_pool Database extension has been added, which executes queries and processes results using a separate thread pool.  This allows you do do things like:</p>
 
-<pre class="ruby"><span class="ruby-identifier">foos</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-identifier">bars</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_map</span>(<span class="ruby-value">:name</span>)&#x000A;<span class="ruby-identifier">foo_bars</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo_bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">x</span>}</pre>
+<pre class="ruby"><span class="ruby-identifier">foos</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">bars</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_map</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-identifier">foo_bars</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foo_bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">x</span>}
+</pre>
 
 <p>and have the three method calls (all, select_map, and each) execute concurrently.  On Ruby implementations without a global VM lock, such as JRuby, it will allow for parallel execution of the method calls.  On CRuby, the main benefit will be for cases where query execution takes a long time or there is significant latency between the application and the database.</p>
 
-<p>When you call a method on foos, bars, or foo_bars, if the thread pool hasn&#39;t finished processing the method, the calling code will block until the method call has finished.</p>
+<p>When you call a method on foos, bars, or foo_bars, if the thread pool hasn’t finished processing the method, the calling code will block until the method call has finished.</p>
 
 <p>By default, for consistency, calling code will not preempt the async thread pool.  For example, if you do:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">size</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">size</span>
+</pre>
 
 <p>The calling code will always wait for the async thread pool to run the all method, and then the calling code will call size on the result.  This ensures that async queries will not use the same connection as the the calling thread, even if calling thread has a connection checked out.</p>
 
@@ -66,13 +70,25 @@ Last Update:
 </li><li>
 <p>Dataset methods executed asynchronously should never ignore their return value.  Code such as:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>)
+</pre>
 
 <p>is probablematic because without storing the return value, you have no way to block until the insert has been completed.</p>
 </li><li>
 <p>The returned object for Dataset methods executed asynchronously is a proxy object (promise).  So you should never do:</p>
 
-<pre class="ruby"><span class="ruby-identifier">row</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">if</span> <span class="ruby-identifier">row</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># or:</span>&#x000A;&#x000A;<span class="ruby-identifier">bool</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:boolean_column</span>)&#x000A;<span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">if</span> <span class="ruby-identifier">bool</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">row</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-keyword">if</span> <span class="ruby-identifier">row</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-comment"># or:</span>
+
+<span class="ruby-identifier">bool</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:boolean_column</span>)
+<span class="ruby-comment"># ...</span>
+<span class="ruby-keyword">if</span> <span class="ruby-identifier">bool</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>because the if branches will always be taken as row and bool will never be nil or false.  If you want to get the underlying value, call itself on the proxy object (or __value if using Ruby &lt;2.2).</p>
 
@@ -81,7 +97,7 @@ Last Update:
 <p>Dataset methods executed asynchronously that include blocks have the block executed asynchronously as well, assuming that the method calls the block.  Because these blocks are executed in a separate thread, you cannot use control flow modifiers such as break or return in them.</p>
 </li></ul>
 </li><li>
-<p>An async_thread_pool model plugin has been added.  This requires the async_thread_pool extension has been loaded into the model&#39;s Database object, and allows you to call Model.async instead of Model.dataset.async.  It also adds async support to the destroy, with_pk, and with_pk! model dataset methods.</p>
+<p>An async_thread_pool model plugin has been added.  This requires the async_thread_pool extension has been loaded into the model’s Database object, and allows you to call Model.async instead of Model.dataset.async.  It also adds async support to the destroy, with_pk, and with_pk! model dataset methods.</p>
 </li><li>
 <p>Model#to_json_data has been added to the json_serializer plugin, for returning a hash of data that can be converted to JSON, instead of a JSON string.</p>
 </li><li>
@@ -108,7 +124,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

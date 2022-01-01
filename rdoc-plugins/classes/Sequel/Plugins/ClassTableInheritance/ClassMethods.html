@@ -142,7 +142,10 @@ Sequel::Plugins::ClassTableInheritance::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cti_table_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cti_table_name-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>&#x000A;<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cti_table_name</span>&#x000A;<span class="line-num">292</span>   <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cti_table_name-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>
+<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cti_table_name</span>
+<span class="line-num">292</span>   <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">last</span>
+<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -160,7 +163,16 @@ Sequel::Plugins::ClassTableInheritance::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>&#x000A;<span class="line-num">269</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">270</span>   <span class="ruby-ivar">@cti_models</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">271</span>   <span class="ruby-ivar">@cti_tables</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">272</span>   <span class="ruby-ivar">@cti_table_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">273</span>   <span class="ruby-ivar">@cti_table_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">274</span>   <span class="ruby-ivar">@cti_ignore_subclass_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">275</span> &#x000A;<span class="line-num">276</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>
+<span class="line-num">269</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">270</span>   <span class="ruby-ivar">@cti_models</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">271</span>   <span class="ruby-ivar">@cti_tables</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">272</span>   <span class="ruby-ivar">@cti_table_columns</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">273</span>   <span class="ruby-ivar">@cti_table_map</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">274</span>   <span class="ruby-ivar">@cti_ignore_subclass_columns</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">275</span> 
+<span class="line-num">276</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_class_from_key'>
@@ -178,7 +190,10 @@ Sequel::Plugins::ClassTableInheritance::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sti_class_from_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sti_class_from_key-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>&#x000A;<span class="line-num">296</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_class_from_key</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">297</span>   <span class="ruby-identifier">sti_class</span>(<span class="ruby-identifier">sti_model_map</span>[<span class="ruby-identifier">key</span>])&#x000A;<span class="line-num">298</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sti_class_from_key-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>
+<span class="line-num">296</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_class_from_key</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">297</span>   <span class="ruby-identifier">sti_class</span>(<span class="ruby-identifier">sti_model_map</span>[<span class="ruby-identifier">key</span>])
+<span class="line-num">298</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-table_name'>
@@ -189,14 +204,21 @@ Sequel::Plugins::ClassTableInheritance::ClassMethods
 </div>
 <div class='description'>
 
-<p>The table name for the current model class&#39;s main table.</p>
+<p>The table name for the current model class’s main table.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-table_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-table_name-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>&#x000A;<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_name</span>&#x000A;<span class="line-num">283</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cti_tables</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;<span class="line-num">284</span>     <span class="ruby-ivar">@cti_alias</span>&#x000A;<span class="line-num">285</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">286</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">287</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">288</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-table_name-source'>    <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb</span>
+<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_name</span>
+<span class="line-num">283</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cti_tables</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+<span class="line-num">284</span>     <span class="ruby-ivar">@cti_alias</span>
+<span class="line-num">285</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">286</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">287</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">288</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -208,7 +230,7 @@ Sequel::Plugins::ClassTableInheritance::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

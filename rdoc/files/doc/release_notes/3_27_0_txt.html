@@ -38,17 +38,26 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Model.dataset_module has been added for easily adding methods to a model&#39;s dataset:</p>
+<p>Model.dataset_module has been added for easily adding methods to a model’s dataset:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_name_like</span>(<span class="ruby-identifier">x</span>)&#x000A;    <span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">x</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">selling_at_least</span>(<span class="ruby-identifier">x</span>)&#x000A;    <span class="ruby-identifier">filter</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">x</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_name_like</span>(<span class="ruby-string">&#39;Foo%&#39;</span>).<span class="ruby-identifier">selling_at_least</span>(<span class="ruby-value">100000</span>).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_name_like</span>(<span class="ruby-identifier">x</span>)
+    <span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">x</span>))
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">selling_at_least</span>(<span class="ruby-identifier">x</span>)
+    <span class="ruby-identifier">filter</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">x</span>}
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_name_like</span>(<span class="ruby-string">&#39;Foo%&#39;</span>).<span class="ruby-identifier">selling_at_least</span>(<span class="ruby-value">100000</span>).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>Previously, you could use def_dataset_method to accomplish the same thing.  dataset_module is generally cleaner, plus you are using actual methods instead of blocks, so calling the methods is faster on some ruby implementations.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a <a href="../../../classes/Sequel/SQLTime.html"><code>Sequel::SQLTime</code></a> class (a subclass of Time) when dealing with values for SQL time columns (which don&#39;t have a date component).  These values are handled correctly when used in filters or insert/update statements (using only the time component), so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now successfully round trip values for time columns.  Not all adapters support returning time column values as SQLTime instances, but the most common ones do.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a <a href="../../../classes/Sequel/SQLTime.html"><code>Sequel::SQLTime</code></a> class (a subclass of Time) when dealing with values for SQL time columns (which don’t have a date component).  These values are handled correctly when used in filters or insert/update statements (using only the time component), so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now successfully round trip values for time columns.  Not all adapters support returning time column values as SQLTime instances, but the most common ones do.</p>
 </li><li>
 <p>You can now drop foreign key, primary key, and unique constraints on MySQL by passing the :type=&gt;(:foreign_key|:primary_key|:unique) option to Database#drop_constraint.</p>
 </li><li>
-<p>The ODBC adapter now has initial support for the DB2 database, use the :db_type=&gt;&#39;db2&#39; option to load the support.</p>
+<p>The ODBC adapter now has initial support for the DB2 database, use the :db_type=&gt;‘db2’ option to load the support.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -61,13 +70,14 @@ Last Update:
 </li><li>
 <p>When converting a Date object to a DateTime object, the resulting DateTime object now has no fractional day components.  Previously, depending on your timezone settings, it could have had fractional day components.</p>
 </li><li>
-<p>The mysql2 adapter now supports stored procedures, as long as they don&#39;t return results.</p>
+<p>The mysql2 adapter now supports stored procedures, as long as they don’t return results.</p>
 </li><li>
 <p>Mass assignment protection now handles including modules in model classes and extending model instances with modules.  Previously, if you defined a setter method in a module, access to it may have been restricted.</p>
 </li><li>
 <p>The prepared_statements_safe plugin now works on classes without datasets, so you can now do the following to load it for all models:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements_safe</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements_safe</span>
+</pre>
 </li><li>
 <p>Dataset#hash now works correctly when handling SQL::Expression instances.</p>
 </li><li>
@@ -80,11 +90,13 @@ Last Update:
 <ul><li>
 <p>If you were previously setting primary key values manually for new model objects and then calling exists? to see if the instance is already in the database, you need to change your code from:</p>
 
-<pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">exists?</span></pre>
+<pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">exists?</span>
+</pre>
 
 <p>to:</p>
 
-<pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">nil?</span></pre>
+<pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">nil?</span>
+</pre>
 </li></ul>
 </div>
 <div id='context'>
@@ -96,7 +108,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

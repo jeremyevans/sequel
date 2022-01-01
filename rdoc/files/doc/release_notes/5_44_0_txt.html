@@ -40,7 +40,8 @@ Last Update:
 <ul><li>
 <p>A concurrent_eager_loading plugin has been added.  This plugin builds on top of the async_thread_pool Database extension and allows eager loading multiple associations concurrently in separate threads.  With this plugin, you can mark datasets for concurrent eager loading using eager_load_concurrently:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_load_concurrently</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:genre</span>, <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_load_concurrently</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:genre</span>, <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>Datasets that are marked for concurrent eager loading will use concurrent eager loading if they are eager loading more than one association.  If you would like to make concurrent eager loading the default, you can load the plugin with the :always option.</p>
 
@@ -63,7 +64,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

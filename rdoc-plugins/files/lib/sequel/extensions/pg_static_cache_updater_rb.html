@@ -40,13 +40,36 @@ Last Update:
 
 <p>Before using the extension in production, you have to add triggers to the tables for the classes where you want the caches updated automatically.  You would generally do this during a migration:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_function</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-value">:table_1</span>)&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-value">:table_2</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">drop_trigger</span>(<span class="ruby-value">:table_2</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_trigger</span>(<span class="ruby-value">:table_1</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_function</span>(<span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>
+    <span class="ruby-identifier">create_static_cache_update_function</span>
+    <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-value">:table_1</span>)
+    <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-value">:table_2</span>)
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>
+    <span class="ruby-identifier">drop_trigger</span>(<span class="ruby-value">:table_2</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)
+    <span class="ruby-identifier">drop_trigger</span>(<span class="ruby-value">:table_1</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)
+    <span class="ruby-identifier">drop_function</span>(<span class="ruby-identifier">default_static_cache_update_name</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>After the triggers have been added, in your application process, after setting up your models, you need to listen for changes to the underlying tables:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Model1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:table_1</span>)&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Model2</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:table_2</span>)&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen_for_static_cache_updates</span>([<span class="ruby-constant">Model1</span>, <span class="ruby-constant">Model2</span>])</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Model1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:table_1</span>)
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Model2</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:table_2</span>)
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache</span>
+<span class="ruby-keyword">end</span>
 
-<p>When an INSERT/UPDATE/DELETE happens on the underlying table, the trigger will send a notification with the table&#39;s OID. The application(s) listening on that channel will receive the notification, check the oid to see if it matches one for the model tables it is interested in, and tell that model to reload the cache if there is a match.</p>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen_for_static_cache_updates</span>([<span class="ruby-constant">Model1</span>, <span class="ruby-constant">Model2</span>])
+</pre>
+
+<p>When an INSERT/UPDATE/DELETE happens on the underlying table, the trigger will send a notification with the table’s OID. The application(s) listening on that channel will receive the notification, check the oid to see if it matches one for the model tables it is interested in, and tell that model to reload the cache if there is a match.</p>
 
 <p>Note that listen_for_static_cache_updates spawns a new thread which will reserve its own database connection.  This thread runs until the application process is shutdown.</p>
 
@@ -72,7 +95,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -55,14 +55,22 @@ Sequel::Plugins::TypecastOnLoad::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Call the setter method for each of the model&#39;s typecast_on_load_columns with the current value, so it can be typecasted correctly.</p>
+<p>Call the setter method for each of the model’s typecast_on_load_columns with the current value, so it can be typecasted correctly.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-load_typecast-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-load_typecast-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_typecast</span>&#x000A;<span class="line-num">63</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">typecast_on_load_columns</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">64</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">c</span>]&#x000A;<span class="line-num">65</span>       <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{c}=&quot;</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">66</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">67</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">68</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-load_typecast-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>
+<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_typecast</span>
+<span class="line-num">63</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">typecast_on_load_columns</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">64</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">c</span>]
+<span class="line-num">65</span>       <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{c}=&quot;</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">66</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">67</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">68</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +82,7 @@ Sequel::Plugins::TypecastOnLoad::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

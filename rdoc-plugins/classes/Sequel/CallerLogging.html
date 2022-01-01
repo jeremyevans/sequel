@@ -103,7 +103,13 @@ Sequel::CallerLogging
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-log_connection_yield-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-log_connection_yield-source'>   <span class="ruby-comment"># File lib/sequel/extensions/caller_logging.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@loggers</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">external_caller</span> = <span class="ruby-identifier">external_caller_for_log</span>)&#x000A;<span class="line-num">49</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;#{external_caller} #{sql}&quot;</span>&#x000A;<span class="line-num">50</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">51</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-log_connection_yield-source'>   <span class="ruby-comment"># File lib/sequel/extensions/caller_logging.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">48</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@loggers</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">external_caller</span> = <span class="ruby-identifier">external_caller_for_log</span>)
+<span class="line-num">49</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;#{external_caller} #{sql}&quot;</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">51</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -115,7 +121,7 @@ Sequel::CallerLogging
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

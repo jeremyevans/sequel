@@ -40,7 +40,12 @@ Last Update:
 <ul><li>
 <p>Delayed evaluation blocks can now accept the dataset literalizing the delayed evaluation as an argument.  This makes it so the delayed evaluation result can depend on the dataset doing the literalization:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first_source</span>, <span class="ruby-value">:col</span>)<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span>          <span class="ruby-comment"># SELECT * FROM a WHERE (a.col = 1)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM b WHERE (b.col = 1)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  {<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first_source</span>, <span class="ruby-value">:col</span>)<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}
+<span class="ruby-keyword">end</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span>          <span class="ruby-comment"># SELECT * FROM a WHERE (a.col = 1)</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM b WHERE (b.col = 1)</span>
+</pre>
 </li><li>
 <p>Database#create_trigger on PostgreSQL now supports a :when option to create a filter for the trigger, so that it is only triggered when the filter condition is true.</p>
 </li><li>
@@ -49,7 +54,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>You can now pass arbitrary types to Dataset#where and related methods.  Previously, if a type was not explicitly handled, an exception would be raised.  Now you can pass any object that can be literalized.  The only exception is that you can&#39;t pass Numeric objects, since where and similar methods should only deal with boolean expressions.</p>
+<p>You can now pass arbitrary types to Dataset#where and related methods.  Previously, if a type was not explicitly handled, an exception would be raised.  Now you can pass any object that can be literalized.  The only exception is that you can’t pass Numeric objects, since where and similar methods should only deal with boolean expressions.</p>
 </li><li>
 <p>association_join and related methods now work correctly if the dataset already has an explicit selection.</p>
 </li><li>
@@ -82,7 +87,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

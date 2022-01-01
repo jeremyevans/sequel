@@ -63,7 +63,12 @@ Sequel::Plugins::ConcurrentEagerLoading::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-eager_load_concurrently-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-eager_load_concurrently-source'>    <span class="ruby-comment"># File lib/sequel/plugins/concurrent_eager_loading.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eager_load_concurrently</span>&#x000A;<span class="line-num">125</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_eager_load_concurrently</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">126</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:eager_load_concurrently</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">127</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-eager_load_concurrently-source'>    <span class="ruby-comment"># File lib/sequel/plugins/concurrent_eager_loading.rb</span>
+<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eager_load_concurrently</span>
+<span class="line-num">125</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_eager_load_concurrently</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">126</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:eager_load_concurrently</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">127</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-eager_load_serially'>
@@ -74,14 +79,19 @@ Sequel::Plugins::ConcurrentEagerLoading::DatasetMethods
 </div>
 <div class='description'>
 
-<p>Return a cloned dataset that will noteager load associated results concurrently using the async thread pool. Only useful if the current dataset has been marked as loading concurrently, or loading concurrently is the model&#39;s default behavior.</p>
+<p>Return a cloned dataset that will noteager load associated results concurrently using the async thread pool. Only useful if the current dataset has been marked as loading concurrently, or loading concurrently is the model’s default behavior.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-eager_load_serially-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-eager_load_serially-source'>    <span class="ruby-comment"># File lib/sequel/plugins/concurrent_eager_loading.rb</span>&#x000A;<span class="line-num">133</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eager_load_serially</span>&#x000A;<span class="line-num">134</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_eager_load_serially</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">135</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:eager_load_concurrently</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="line-num">136</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">137</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-eager_load_serially-source'>    <span class="ruby-comment"># File lib/sequel/plugins/concurrent_eager_loading.rb</span>
+<span class="line-num">133</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eager_load_serially</span>
+<span class="line-num">134</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_eager_load_serially</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">135</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:eager_load_concurrently</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="line-num">136</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">137</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +103,7 @@ Sequel::Plugins::ConcurrentEagerLoading::DatasetMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

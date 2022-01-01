@@ -77,7 +77,18 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1038</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">1039</span>   <span class="ruby-identifier">size</span> = <span class="ruby-identifier">length</span>&#x000A;<span class="line-num">1040</span> &#x000A;<span class="line-num">1041</span>   <span class="ruby-identifier">content</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">20</span>&#x000A;<span class="line-num">1042</span>     <span class="ruby-node">&quot;start=#{self[0...10].to_s.inspect} end=#{self[-10..-1].to_s.inspect}&quot;</span>&#x000A;<span class="line-num">1043</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1044</span>     <span class="ruby-node">&quot;content=#{super}&quot;</span>&#x000A;<span class="line-num">1045</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1046</span> &#x000A;<span class="line-num">1047</span>   <span class="ruby-node">&quot;#&lt;#{self.class}:0x#{&quot;%x&quot; % object_id} bytes=#{size} #{content}&gt;&quot;</span>&#x000A;<span class="line-num">1048</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1038</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">1039</span>   <span class="ruby-identifier">size</span> = <span class="ruby-identifier">length</span>
+<span class="line-num">1040</span> 
+<span class="line-num">1041</span>   <span class="ruby-identifier">content</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">20</span>
+<span class="line-num">1042</span>     <span class="ruby-node">&quot;start=#{self[0...10].to_s.inspect} end=#{self[-10..-1].to_s.inspect}&quot;</span>
+<span class="line-num">1043</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1044</span>     <span class="ruby-node">&quot;content=#{super}&quot;</span>
+<span class="line-num">1045</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1046</span> 
+<span class="line-num">1047</span>   <span class="ruby-node">&quot;#&lt;#{self.class}:0x#{&quot;%x&quot; % object_id} bytes=#{size} #{content}&gt;&quot;</span>
+<span class="line-num">1048</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
@@ -95,7 +106,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lit-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lit-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1032</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1033</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1034</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lit-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1032</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">1033</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">1034</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -113,7 +127,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_sequel_blob-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_sequel_blob-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1051</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;<span class="line-num">1052</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">1053</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_sequel_blob-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1051</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>
+<span class="line-num">1052</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1053</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -125,7 +142,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

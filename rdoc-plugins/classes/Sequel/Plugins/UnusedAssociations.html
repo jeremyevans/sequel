@@ -41,23 +41,33 @@ Sequel::Plugins::UnusedAssociations
 
 <h1 id="module-Sequel::Plugins::UnusedAssociations-label-Basic+Usage">Basic Usage<span><a href="#module-Sequel::Plugins::UnusedAssociations-label-Basic+Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p>The expected usage of the unused_associations plugin is to load it into the base class for models in your application, which will often be Sequel::Model:</p>
+<p>The expected usage of the unused_associations plugin is to load it into the base class for models in your application, which will often be <a href="../Model.html"><code>Sequel::Model</code></a>:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>
+</pre>
 
 <p>Then you run your test suite with method coverage enabled, passing the coverage result to <code>update_associations_coverage</code>. <code>update_associations_coverage</code> returns a data structure containing method coverage information for all subclasses of the base class. You can pass the coverage information to <code>update_unused_associations_data</code>, which will return a data structure with information on unused associations.</p>
 
-<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;coverage&#39;</span>&#x000A;<span class="ruby-constant">Coverage</span>.<span class="ruby-identifier">start</span>(<span class="ruby-value">methods:</span> <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># load sequel after starting coverage, then run your tests</span>&#x000A;<span class="ruby-identifier">cov_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span>&#x000A;<span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>(<span class="ruby-value">coverage_data:</span> <span class="ruby-identifier">cov_data</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;coverage&#39;</span>
+<span class="ruby-constant">Coverage</span>.<span class="ruby-identifier">start</span>(<span class="ruby-value">methods:</span> <span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># load sequel after starting coverage, then run your tests</span>
+<span class="ruby-identifier">cov_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span>
+<span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>(<span class="ruby-value">coverage_data:</span> <span class="ruby-identifier">cov_data</span>)
+</pre>
 
 <p>You can take that unused association data and pass it to the <code>unused_associations</code> method to get a array of information on associations which have not been used.  Each entry in the array will contain a class name and association name for each unused association, both as a string:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_associations</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)&#x000A;<span class="ruby-comment"># =&gt; [[&quot;Class1&quot;, &quot;assoc1&quot;], ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_associations</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)
+<span class="ruby-comment"># =&gt; [[&quot;Class1&quot;, &quot;assoc1&quot;], ...]</span>
+</pre>
 
 <p>You can use the output of the <code>unused_associations</code> method to determine which associations are not used at all in your application, and can be eliminiated.</p>
 
 <p>You can also take that unused association data and pass it to the <code>unused_association_options</code> method, which will return an array of information on associations which are used, but have related methods defined that are not used. The first two entries in each array are the class name and association name as a string, and the third entry is a hash of association options:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_association_options</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)&#x000A;<span class="ruby-comment"># =&gt; [[&quot;Class2&quot;, &quot;assoc2&quot;, {:read_only=&gt;true}], ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_association_options</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)
+<span class="ruby-comment"># =&gt; [[&quot;Class2&quot;, &quot;assoc2&quot;, {:read_only=&gt;true}], ...]</span>
+</pre>
 
 <p>You can use the output of the <code>unused_association_options</code> to find out which association options can be provided when defining the association so that the association method will not define methods that are not used.</p>
 
@@ -67,15 +77,22 @@ Sequel::Plugins::UnusedAssociations
 
 <p>The unused_associations plugin supports combining multiple coverage results using the :coverage_file plugin option:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,&#x000A;  <span class="ruby-value">coverage_file:</span> <span class="ruby-string">&#39;unused_associations_coverage.json&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,
+  <span class="ruby-value">coverage_file:</span> <span class="ruby-string">&#39;unused_associations_coverage.json&#39;</span>
+</pre>
 
 <p>With the coverage file option, <code>update_associations_coverage</code> will look in the given file for existing coverage information, if it exists.  If the file exists, the data from it will be merged with the coverage result passed to the method. Before returning, the coverage file will be updated with the merged result.  When using the :coverage_file plugin option, you can each of your test suites update the coverage information:</p>
 
-<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;coverage&#39;</span>&#x000A;<span class="ruby-constant">Coverage</span>.<span class="ruby-identifier">start</span>(<span class="ruby-value">methods:</span> <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># run this test suite</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span></pre>
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;coverage&#39;</span>
+<span class="ruby-constant">Coverage</span>.<span class="ruby-identifier">start</span>(<span class="ruby-value">methods:</span> <span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># run this test suite</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span>
+</pre>
 
 <p>After all test suites have been run, you can run <code>update_unused_associations_data</code>, without an argument:</p>
 
-<pre class="ruby"><span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span></pre>
+<pre class="ruby"><span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>
+</pre>
 
 <p>With no argument, <code>update_unused_associations_data</code> will get the coverage data from the coverage file, and then use that to prepare the information.  You can then use the returned value the same as before to get the data on unused associations. To prevent stale coverage information, calling <code>update_unused_associations_data</code> when using the :coverage_file plugin option will remove the coverage file by default (you can use the :keep_coverage option to prevent the deletion of the coverage file).</p>
 
@@ -85,15 +102,21 @@ Sequel::Plugins::UnusedAssociations
 
 <p>To use this option, you first need to save the unused association data previously prepared.  You can do this by passing an :file option when loading the plugin.</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,&#x000A;  <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,
+  <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>
+</pre>
 
 <p>With the :file option provided, you no longer need to use the return value of <code>update_unused_associations_data</code>, as the file will be updated with the information:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>(<span class="ruby-value">coverage_data:</span> <span class="ruby-identifier">cov_data</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>(<span class="ruby-value">coverage_data:</span> <span class="ruby-identifier">cov_data</span>)
+</pre>
 
 <p>Then, to use the saved unused associations data, add the :modify_associations plugin option:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,&#x000A;  <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>,&#x000A;  <span class="ruby-value">modify_associations:</span> <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,
+  <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>,
+  <span class="ruby-value">modify_associations:</span> <span class="ruby-keyword">true</span>
+</pre>
 
 <p>With the :modify_associations used, and the unused association data file is available, when subclasses attempt to create an unused association, the attempt will be ignored.  If the subclasses attempt to create an association where not all association methods are used, the plugin will automatically set the appropriate options so that the unused association methods are not defined.</p>
 
@@ -103,15 +126,20 @@ Sequel::Plugins::UnusedAssociations
 
 <p>If you have multiple test suites and want to automatically use the unused association data, you should provide both :file and :coverage_file options when loading the plugin:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,&#x000A;  <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>,&#x000A;  <span class="ruby-value">coverage_file:</span> <span class="ruby-string">&#39;unused_associations_coverage.json&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>,
+  <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>,
+  <span class="ruby-value">coverage_file:</span> <span class="ruby-string">&#39;unused_associations_coverage.json&#39;</span>
+</pre>
 
 <p>Then each test suite just needs to run <code>update_associations_coverage</code> to update the coverage information:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span>
+</pre>
 
 <p>After all test suites have been run, you can run <code>update_unused_associations_data</code> to update the unused association data file (and remove the coverage file):</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>
+</pre>
 
 <p>Then you can add the :modify_associations plugin option to automatically use the unused association data.</p>
 
@@ -121,7 +149,7 @@ Sequel::Plugins::UnusedAssociations
 
 <p>This plugin does not handle anonymous classes. Any unused associations defined in anonymous classes will not be reported by this plugin.</p>
 
-<p>This plugin only considers the public instance methods the association defines, and direct access to the related association reflection via Sequel::Model.association_reflection to determine if the association was used.  If the association metadata was accessed another way, it&#39;s possible this plugin will show the association as unused.</p>
+<p>This plugin only considers the public instance methods the association defines, and direct access to the related association reflection via Sequel::Model.association_reflection to determine if the association was used.  If the association metadata was accessed another way, it’s possible this plugin will show the association as unused.</p>
 
 <p>As this relies on the method coverage added in Ruby 2.5, it does not work on older versions of Ruby.  It also does not work on JRuby, as JRuby does not implement method coverage.</p>
 </div>
@@ -159,7 +187,10 @@ Sequel::Plugins::UnusedAssociations
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">230</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">231</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="line-num">232</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>
+<span class="line-num">230</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">231</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>
+<span class="line-num">232</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -186,7 +217,20 @@ Sequel::Plugins::UnusedAssociations
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>&#x000A;<span class="line-num">248</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">249</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">250</span>     <span class="ruby-ivar">@unused_associations_coverage_file</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:coverage_file</span>]&#x000A;<span class="line-num">251</span>     <span class="ruby-ivar">@unused_associations_file</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:file</span>]&#x000A;<span class="line-num">252</span>     <span class="ruby-ivar">@unused_associations_data</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:modify_associations</span>]&#x000A;<span class="line-num">253</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:unused_associations_data</span>]&#x000A;<span class="line-num">254</span>         <span class="ruby-identifier">opts</span>[<span class="ruby-value">:unused_associations_data</span>]&#x000A;<span class="line-num">255</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:file</span>])&#x000A;<span class="line-num">256</span>         <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">binread</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:file</span>]))&#x000A;<span class="line-num">257</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">258</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">259</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">260</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>    <span class="ruby-comment"># File lib/sequel/plugins/unused_associations.rb</span>
+<span class="line-num">248</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">249</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">250</span>     <span class="ruby-ivar">@unused_associations_coverage_file</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:coverage_file</span>]
+<span class="line-num">251</span>     <span class="ruby-ivar">@unused_associations_file</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:file</span>]
+<span class="line-num">252</span>     <span class="ruby-ivar">@unused_associations_data</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:modify_associations</span>]
+<span class="line-num">253</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:unused_associations_data</span>]
+<span class="line-num">254</span>         <span class="ruby-identifier">opts</span>[<span class="ruby-value">:unused_associations_data</span>]
+<span class="line-num">255</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:file</span>])
+<span class="line-num">256</span>         <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">binread</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:file</span>]))
+<span class="line-num">257</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">258</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">259</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">260</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -198,7 +242,7 @@ Sequel::Plugins::UnusedAssociations
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

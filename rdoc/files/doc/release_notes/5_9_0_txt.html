@@ -40,11 +40,30 @@ Last Update:
 <ul><li>
 <p>An escaped_like extension has been added, for the creation of LIKE/ILIKE expressions with placeholders in patterns without access to a dataset.  This adds escaped_like and escaped_ilike methods to the same <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression objects that support like and ilike.  These methods take two arguments, the first being the pattern, with ? placeholders, and the second being the placeholder value (which can be an array for multiple placeholders):</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:escaped_like</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">string_column</span>.<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-identifier">user_input</span>)}&#x000A;<span class="ruby-comment"># user_input is &#39;foo&#39;:</span>&#x000A;<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;foo%&#39;</span>&#x000A;<span class="ruby-comment"># user_input is &#39;%foo&#39;:</span>&#x000A;<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;\%foo%&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:escaped_like</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">string_column</span>.<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-identifier">user_input</span>)}
+<span class="ruby-comment"># user_input is &#39;foo&#39;:</span>
+<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;foo%&#39;</span>
+<span class="ruby-comment"># user_input is &#39;%foo&#39;:</span>
+<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;\%foo%&#39;</span>
+</pre>
 </li><li>
 <p>Generated columns on MySQL 5.7+ and MariaDB 5.2+ are now supported using the :generated_always_as option when creating the column. The :generated_type option can also be used to specify the type of generated column (virtual or stored).  Examples:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-string">+&#39;b&#39;</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>&#x000A;<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;))</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-string">+&#39;b&#39;</span>,&#x000A;  <span class="ruby-value">generated_type:</span> <span class="ruby-value">:virtual</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>&#x000A;<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;)) VIRTUAL</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-string">+&#39;b&#39;</span>,&#x000A;  <span class="ruby-value">generated_type:</span> <span class="ruby-value">:stored</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>&#x000A;<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;)) STORED</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-string">+&#39;b&#39;</span>
+<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>
+<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;))</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-string">+&#39;b&#39;</span>,
+  <span class="ruby-value">generated_type:</span> <span class="ruby-value">:virtual</span>
+<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>
+<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;)) VIRTUAL</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-string">+&#39;b&#39;</span>,
+  <span class="ruby-value">generated_type:</span> <span class="ruby-value">:stored</span>
+<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>
+<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;)) STORED</span>
+</pre>
 </li><li>
 <p>Sequel::Model.has_dataset? has been added for checking whether the model class has an associated dataset.  This will generally be true for most model classes, but will be false for abstract model classes (such as <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself).</p>
 </li><li>
@@ -89,7 +108,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

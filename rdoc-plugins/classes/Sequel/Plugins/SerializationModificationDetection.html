@@ -35,13 +35,22 @@ Sequel::Plugins::SerializationModificationDetection
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This plugin extends the serialization plugin and enables it to detect changes in serialized values by checking whether the current deserialized value is the same as the original deserialized value. The serialization plugin does not do such checks by default, as they often aren&#39;t needed and can hurt performance.</p>
+<p>This plugin extends the serialization plugin and enables it to detect changes in serialized values by checking whether the current deserialized value is the same as the original deserialized value. The serialization plugin does not do such checks by default, as they often aren’t needed and can hurt performance.</p>
 
 <p>Note that for this plugin to work correctly, the values you are serializing must roundtrip correctly (i.e. deserialize(serialize(value)) should equal value).  This is true in most cases, but not in all.  For example, ruby symbols round trip through yaml, but not json (as they get turned into strings in json).</p>
 
 <h2 id="module-Sequel::Plugins::SerializationModificationDetection-label-Example">Example<span><a href="#module-Sequel::Plugins::SerializationModificationDetection-label-Example">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;json&#39;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>, <span class="ruby-value">:json</span>, <span class="ruby-value">:permissions</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization_modification_detection</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">permissions:</span> {})&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">permissions</span>[<span class="ruby-value">:global</span>] = <span class="ruby-string">&#39;read-only&#39;</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save_changes</span></pre>
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>
+<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;json&#39;</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>, <span class="ruby-value">:json</span>, <span class="ruby-value">:permissions</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization_modification_detection</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">permissions:</span> {})
+<span class="ruby-identifier">user</span>.<span class="ruby-identifier">permissions</span>[<span class="ruby-value">:global</span>] = <span class="ruby-string">&#39;read-only&#39;</span>
+<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save_changes</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +85,10 @@ Sequel::Plugins::SerializationModificationDetection
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>
+<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>
+<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -88,7 +100,7 @@ Sequel::Plugins::SerializationModificationDetection
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

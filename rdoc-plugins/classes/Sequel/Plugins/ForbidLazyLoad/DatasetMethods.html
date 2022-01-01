@@ -64,7 +64,17 @@ Sequel::Plugins::ForbidLazyLoad::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">184</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>&#x000A;<span class="line-num">185</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>&#x000A;<span class="line-num">186</span>     <span class="ruby-keyword">super</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">187</span>       <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">forbid_lazy_load</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">InstanceMethods</span>)&#x000A;<span class="line-num">188</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">189</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">190</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">191</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">192</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>
+<span class="line-num">184</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
+<span class="line-num">185</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
+<span class="line-num">186</span>     <span class="ruby-keyword">super</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span>
+<span class="line-num">187</span>       <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">forbid_lazy_load</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">InstanceMethods</span>)
+<span class="line-num">188</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span>
+<span class="line-num">189</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">190</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">191</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">192</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_each'>
@@ -82,7 +92,17 @@ Sequel::Plugins::ForbidLazyLoad::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_sql_each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_sql_each-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_each</span>(<span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">197</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>&#x000A;<span class="line-num">198</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">199</span>       <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">forbid_lazy_load</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">InstanceMethods</span>)&#x000A;<span class="line-num">200</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">201</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">203</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">204</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">205</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_sql_each-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>
+<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_each</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">197</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
+<span class="line-num">198</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span>
+<span class="line-num">199</span>       <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">forbid_lazy_load</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">InstanceMethods</span>)
+<span class="line-num">200</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span>
+<span class="line-num">201</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">202</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">203</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">204</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">205</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_first'>
@@ -100,7 +120,12 @@ Sequel::Plugins::ForbidLazyLoad::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_sql_first-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_sql_first-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_first</span>(<span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">209</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">210</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">allow_lazy_load</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">InstanceMethods</span>)&#x000A;<span class="line-num">211</span>   <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">212</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_sql_first-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>
+<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_first</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">209</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">210</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">allow_lazy_load</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">InstanceMethods</span>)
+<span class="line-num">211</span>   <span class="ruby-identifier">obj</span>
+<span class="line-num">212</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -112,7 +137,7 @@ Sequel::Plugins::ForbidLazyLoad::DatasetMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

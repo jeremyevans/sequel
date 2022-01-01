@@ -39,7 +39,17 @@ Sequel::Plugins::Timestamps
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Timestamp all model instances using +created_at+ and +updated_at+</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:timestamps</span>&#x000A;&#x000A;<span class="ruby-comment"># Timestamp Album instances, with custom column names</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:timestamps</span>, <span class="ruby-value">create:</span> <span class="ruby-value">:created_on</span>, <span class="ruby-value">update:</span> <span class="ruby-value">:updated_on</span>&#x000A;&#x000A;<span class="ruby-comment"># Timestamp Artist instances, forcing an overwrite of the create</span>&#x000A;<span class="ruby-comment"># timestamp, and setting the update timestamp when creating</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:timestamps</span>, <span class="ruby-value">force:</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">update_on_create:</span> <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Timestamp all model instances using +created_at+ and +updated_at+</span>
+<span class="ruby-comment"># (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:timestamps</span>
+
+<span class="ruby-comment"># Timestamp Album instances, with custom column names</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:timestamps</span>, <span class="ruby-value">create:</span> <span class="ruby-value">:created_on</span>, <span class="ruby-value">update:</span> <span class="ruby-value">:updated_on</span>
+
+<span class="ruby-comment"># Timestamp Artist instances, forcing an overwrite of the create</span>
+<span class="ruby-comment"># timestamp, and setting the update timestamp when creating</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:timestamps</span>, <span class="ruby-value">force:</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">update_on_create:</span> <span class="ruby-keyword">true</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -86,7 +96,16 @@ Sequel::Plugins::Timestamps
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-ivar">@allow_manual_timestamp_update</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_manual_update</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">35</span>     <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>&#x000A;<span class="line-num">36</span>     <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>&#x000A;<span class="line-num">37</span>     <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">38</span>     <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">39</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">34</span>     <span class="ruby-ivar">@allow_manual_timestamp_update</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_manual_update</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>
+<span class="line-num">35</span>     <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>
+<span class="line-num">36</span>     <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>
+<span class="line-num">37</span>     <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>
+<span class="line-num">38</span>     <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>
+<span class="line-num">39</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -98,7 +117,7 @@ Sequel::Plugins::Timestamps
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

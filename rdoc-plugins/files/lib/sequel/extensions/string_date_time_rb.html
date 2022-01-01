@@ -30,7 +30,7 @@ lib/sequel/extensions/string_date_time.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2016-01-25 14:10:57 -0800</span>
+<span class='datetime'>2021-12-17 16:59:47 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -38,9 +38,12 @@ Last Update:
 <div id='description'>
 <p>The string_date_time extension provides <a href="../../../../classes/String.html"><code>String</code></a> instance methods for converting the strings to a date (e.g. <a href="../../../../classes/String.html#method-i-to_date"><code>String#to_date</code></a>), allowing for backwards compatibility with legacy <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> code.</p>
 
+<p>These methods calls <code>parse</code> on the related class, and as such, can result in denial of service in older versions of Ruby for large untrusted input, and raise exceptions in newer versions of Ruby. </p>
+
 <p>To load the extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_date_time</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_date_time</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -51,7 +54,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

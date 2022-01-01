@@ -65,7 +65,11 @@ Sequel::Plugins::AccessedColumns::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="line-num">32</span>   (<span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">c</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frozen?</span>&#x000A;<span class="line-num">33</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>
+<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">c</span>)
+<span class="line-num">32</span>   (<span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">c</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frozen?</span>
+<span class="line-num">33</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-accessed_columns'>
@@ -83,7 +87,10 @@ Sequel::Plugins::AccessedColumns::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-accessed_columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-accessed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">accessed_columns</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">:</span> []&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-accessed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>
+<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">accessed_columns</span>
+<span class="line-num">44</span>   <span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">:</span> []
+<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-after_save'>
@@ -101,7 +108,11 @@ Sequel::Plugins::AccessedColumns::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_save-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>&#x000A;<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;<span class="line-num">38</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">39</span>   <span class="ruby-ivar">@accessed_columns</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_save-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>
+<span class="line-num">38</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">39</span>   <span class="ruby-ivar">@accessed_columns</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-initialize_copy'>
@@ -119,7 +130,11 @@ Sequel::Plugins::AccessedColumns::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-initialize_copy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-initialize_copy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize_copy</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">49</span>   <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@accessed_columns</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>&#x000A;<span class="line-num">50</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-initialize_copy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb</span>
+<span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize_copy</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">49</span>   <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@accessed_columns</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -131,7 +146,7 @@ Sequel::Plugins::AccessedColumns::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

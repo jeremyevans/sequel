@@ -38,17 +38,21 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A core_refinements extension has been added, which offers refinement versions of Sequel&#39;s core extensions.  This requires the new experimental refinement support added in ruby 2.0, and allows you to use the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> DSL methods in a file without actually modifying the Symbol, String, Array, and Hash classes.</p>
+<p>A core_refinements extension has been added, which offers refinement versions of Sequel’s core extensions.  This requires the new experimental refinement support added in ruby 2.0, and allows you to use the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> DSL methods in a file without actually modifying the Symbol, String, Array, and Hash classes.</p>
 </li><li>
 <p>A date_arithmetic extension has been added for performing database-independent date calculations (adding/subtracting an interval to/from a date):</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:date_arithmetic</span>&#x000A;<span class="ruby-identifier">e</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(<span class="ruby-value">:date_column</span>, <span class="ruby-value">:years</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:months</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>, <span class="ruby-value">:days</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-identifier">e</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:date_arithmetic</span>
+<span class="ruby-identifier">e</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(<span class="ruby-value">:date_column</span>, <span class="ruby-value">:years</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:months</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>, <span class="ruby-value">:days</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-identifier">e</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span>)
+</pre>
 
 <p>In addition to providing the interval as a hash, you can also provide it as an ActiveSupport::Duration object.  This extension is supported on 11 database types.</p>
 </li><li>
 <p>Dataset#get can now take an array of multiple expressions to get an array of values, similar to map/select_map:</p>
 
-<pre class="ruby"><span class="ruby-identifier">value1</span>, <span class="ruby-identifier">value2</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>([<span class="ruby-value">:column1</span>, <span class="ruby-value">:column2</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">value1</span>, <span class="ruby-identifier">value2</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>([<span class="ruby-value">:column1</span>, <span class="ruby-value">:column2</span>])
+</pre>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now handle [host.]database.schema.table qualified tables on Microsoft SQL Server.  To implement this support, the split_qualifiers method has been added to Database and Dataset for taking a possibly qualified identifier and splitting it into an array of identifier strings.</p>
 </li><li>
@@ -88,9 +92,10 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The meta_def method that was defined on Database, Dataset, and Model classes and instances has been moved to an extension named meta_def, and is no longer loaded by default.  This method was previously used internally, and it wasn&#39;t designed for external use.  If you have code that uses meta_def, you should now load the extension manually:</p>
+<p>The meta_def method that was defined on Database, Dataset, and Model classes and instances has been moved to an extension named meta_def, and is no longer loaded by default.  This method was previously used internally, and it wasn’t designed for external use.  If you have code that uses meta_def, you should now load the extension manually:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:meta_def</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:meta_def</span>
+</pre>
 </li><li>
 <p>The private _*_dataset_helper model association methods are no longer defined.  The AssociationReflection#dataset_helper_method public method is also no longer defined.</p>
 </li><li>
@@ -98,11 +103,13 @@ Last Update:
 </li><li>
 <p>Using a conditions specifier array with Dataset#get no longer works due to the new multiple values support in Database#get. So code such as:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>([[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>]])</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>([[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>]])
+</pre>
 
 <p>should be changed to:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>([[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>]]))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>([[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>]]))
+</pre>
 </li></ul>
 </div>
 <div id='context'>
@@ -114,7 +121,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

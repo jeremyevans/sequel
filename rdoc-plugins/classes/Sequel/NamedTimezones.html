@@ -63,7 +63,8 @@ Sequel::NamedTimezones
 <td class='context-item-desc'>
 <p>Handles TZInfo::AmbiguousTime exceptions automatically by providing a proc called with both the datetime value being converted as well as the array of TZInfo::TimezonePeriod results. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">tzinfo_disambiguator</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">datetime</span>, <span class="ruby-identifier">periods</span><span class="ruby-operator">|</span> <span class="ruby-identifier">periods</span>.<span class="ruby-identifier">first</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">tzinfo_disambiguator</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">datetime</span>, <span class="ruby-identifier">periods</span><span class="ruby-operator">|</span> <span class="ruby-identifier">periods</span>.<span class="ruby-identifier">first</span>}
+</pre>
 </td>
 </tr>
 </table>
@@ -77,7 +78,7 @@ Sequel::NamedTimezones
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

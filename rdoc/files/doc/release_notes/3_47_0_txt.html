@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>An auto_validations plugin has been added, which automatically adds not null, type, and unique validations based on information obtained from parsing the database schema.  If you don&#39;t require customization of the validation error message per column, this can significantly DRY up validation code.  Currently this plugin requires the database support index parsing; that restriction will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
+<p>An auto_validations plugin has been added, which automatically adds not null, type, and unique validations based on information obtained from parsing the database schema.  If you don’t require customization of the validation error message per column, this can significantly DRY up validation code.  Currently this plugin requires the database support index parsing; that restriction will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
 <p>An input_transformer plugin has been added, for automatically running a transformation proc on all model column setter input before use.  This is a generalization of the string_stripper plugin, allowing arbitrary modifications to the input.</p>
 </li><li>
@@ -49,7 +49,8 @@ Last Update:
 <ul><li>
 <p>Database.extension has been added, allowing you to load an extension into all future databases.  This is similar to loading a plugin into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself.  For example, if you want all Database instances to use the query_literals extension, run the following before creating your Database instances:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_literals</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_literals</span>
+</pre>
 </li><li>
 <p>Database.after_initialize has been added for running a hook on all new databases created.</p>
 </li><li>
@@ -59,7 +60,7 @@ Last Update:
 
 <p>Previously, you had to override a private method to get the same behavior, this just offers a nicer API for that.</p>
 </li><li>
-<p>A :keep_reference Database option has been added.  When set to false, a reference to the Database instance is not kept in Sequel::DATABASES.  This is designed for Database instances created by libraries, so they don&#39;t accidentally get chosen as the default <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> database.</p>
+<p>A :keep_reference Database option has been added.  When set to false, a reference to the Database instance is not kept in Sequel::DATABASES.  This is designed for Database instances created by libraries, so they don’t accidentally get chosen as the default <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> database.</p>
 </li><li>
 <p>Model#modified! now accepts a column and marks that column as changed.  This is useful if you plan on mutating the column value as opposed to reassigning it.</p>
 </li><li>
@@ -83,7 +84,8 @@ Last Update:
 </li><li>
 <p>The pg_array extension can now register array types on a per-Database basis via Database#register_array_type. Previously, only global registration of array types was allowed.  Additionally, when registering array types on a per-Database basis, the oids can be looked up automatically, making it possible to register array types with just a type name:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_array_type</span>(<span class="ruby-value">:interval</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_array_type</span>(<span class="ruby-value">:interval</span>)
+</pre>
 </li><li>
 <p>The pg_array extension now automatically creates conversion procs for array types of all named types used by the database.  This means that if you use the pg_array and pg_hstore extensions, the hstore[] type is now handled correctly.</p>
 </li><li>
@@ -116,11 +118,11 @@ Last Update:
 </li><li>
 <p>When using the update_primary_key plugin, if the primary key changes, clear the associations cache of all non-many_to_one associations (since those will likely be based on the primary key).</p>
 </li><li>
-<p>The pg_typecast_on_load plugin no longer errors if given a column that doesn&#39;t have a matching oid conversion proc.</p>
+<p>The pg_typecast_on_load plugin no longer errors if given a column that doesn’t have a matching oid conversion proc.</p>
 </li><li>
 <p>Handling of domain types on PostgreSQL has been significantly improved.  Domain type columns now have correct model typecasting, and the pg_row extension correctly sets up conversion procs for domain types inside composite types.</p>
 </li><li>
-<p>Postgres::HStoreOp#- now automatically casts string input to text, so that PostgreSQL doesn&#39;t assume the string is an hstore.</p>
+<p>Postgres::HStoreOp#- now automatically casts string input to text, so that PostgreSQL doesn’t assume the string is an hstore.</p>
 </li><li>
 <p>Postgres::PGRangeOp#starts_before and ends_after have been renamed to ends_before and starts_after.  The previous names were misleading.  The old names are still available for backwards compatibility, but they will be removed in the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
@@ -134,7 +136,7 @@ Last Update:
 </li><li>
 <p>The jdbc adapter now references the driver class before loading subadapter specific code, which can fix issues if the database tries to connect on initialization (such as the jdbc/postgres adapter if the pg_hstore extension is loaded previously).</p>
 </li><li>
-<p>A guide describing Sequel&#39;s support for advanced PostgreSQL features has been added.</p>
+<p>A guide describing Sequel’s support for advanced PostgreSQL features has been added.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -145,17 +147,18 @@ Last Update:
 </li><li>
 <p>Sequel::Postgres.use_iso_date_format is now only defined if you are using the postgres adapter.  Previously, it could be defined when using other adapters with a pg_* extension, even though the setting had no effect in that case.</p>
 </li><li>
-<p>The validation_class_methods plugin now copies validations into the subclass upon inheritance, instead of recursing into the superclass on validation.  This makes it more similar to how all the other <a href="../../../classes/Sequel.html"><code>Sequel</code></a> plugins work.  However, it also means that if you add validations to a superclass after creating a subclass, the subclass won&#39;t have those validations.  Additionally if you skip superclass validations in a child class after creating a grandchild class, the grandchild class could still have the parent class&#39;s validations.</p>
+<p>The validation_class_methods plugin now copies validations into the subclass upon inheritance, instead of recursing into the superclass on validation.  This makes it more similar to how all the other <a href="../../../classes/Sequel.html"><code>Sequel</code></a> plugins work.  However, it also means that if you add validations to a superclass after creating a subclass, the subclass won’t have those validations.  Additionally if you skip superclass validations in a child class after creating a grandchild class, the grandchild class could still have the parent class’s validations.</p>
 </li><li>
 <p>The validates_unique validation in validation_helpers no longer attempts to do the uniqueness query if the underlying columns have validation errors.  The reasoning behind this is that if the underlying columns are not valid, the uniqueness query can cause a DatabaseError.</p>
 </li><li>
 <p>If you were passing strings in hstore format to Postgres::HStoreOp#-, you should manually cast them to hstore:</p>
 
-<pre class="ruby"><span class="ruby-identifier">hstore_op</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;a=&gt;b&#39;</span>, <span class="ruby-value">:hstore</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">hstore_op</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;a=&gt;b&#39;</span>, <span class="ruby-value">:hstore</span>)
+</pre>
 </li><li>
 <p>The default validation error message for validates_type has been modified.</p>
 </li><li>
-<p>Database#schema_column_type was made public accidently by an adapter and a few extensions.  That has been fixed, but if you were calling it with an explicit receiver and it happened to work by accident before, you&#39;ll need to update your code.</p>
+<p>Database#schema_column_type was made public accidently by an adapter and a few extensions.  That has been fixed, but if you were calling it with an explicit receiver and it happened to work by accident before, you’ll need to update your code.</p>
 </li></ul>
 
 <h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -172,7 +175,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

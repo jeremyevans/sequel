@@ -66,7 +66,15 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql-source'>   <span class="ruby-comment"># File lib/sequel/extensions/error_sql.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql</span>&#x000A;<span class="line-num">40</span>   <span class="ruby-comment"># We store the error SQL in the wrapped exception instead of the</span>&#x000A;<span class="line-num">41</span>   <span class="ruby-comment"># current exception, since when the error SQL is originally associated</span>&#x000A;<span class="line-num">42</span>   <span class="ruby-comment"># with the wrapped exception, the current exception doesn&#39;t exist.  It&#39;s</span>&#x000A;<span class="line-num">43</span>   <span class="ruby-comment"># possible to copy the error SQL into the current exception, but there</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-comment"># doesn&#39;t seem to be a reason to do that.</span>&#x000A;<span class="line-num">45</span>   <span class="ruby-identifier">wrapped_exception</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@sequel_error_sql</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">wrapped_exception</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql-source'>   <span class="ruby-comment"># File lib/sequel/extensions/error_sql.rb</span>
+<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql</span>
+<span class="line-num">40</span>   <span class="ruby-comment"># We store the error SQL in the wrapped exception instead of the</span>
+<span class="line-num">41</span>   <span class="ruby-comment"># current exception, since when the error SQL is originally associated</span>
+<span class="line-num">42</span>   <span class="ruby-comment"># with the wrapped exception, the current exception doesn&#39;t exist.  It&#39;s</span>
+<span class="line-num">43</span>   <span class="ruby-comment"># possible to copy the error SQL into the current exception, but there</span>
+<span class="line-num">44</span>   <span class="ruby-comment"># doesn&#39;t seem to be a reason to do that.</span>
+<span class="line-num">45</span>   <span class="ruby-identifier">wrapped_exception</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@sequel_error_sql</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">wrapped_exception</span>
+<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -78,7 +86,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

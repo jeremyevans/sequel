@@ -76,7 +76,17 @@ Sequel::Dataset::ColumnsLimit1
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-columns-21-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-columns-21-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/columns_limit_1.rb</span>&#x000A;<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns!</span>&#x000A;<span class="line-num">11</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">clone</span>(<span class="ruby-constant">COLUMNS_CLONE_OPTIONS</span>)&#x000A;<span class="line-num">12</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span>{<span class="ruby-keyword">break</span>}&#x000A;<span class="line-num">13</span> &#x000A;<span class="line-num">14</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">cache</span>[<span class="ruby-value">:_columns</span>]&#x000A;<span class="line-num">15</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="line-num">16</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">17</span>     []&#x000A;<span class="line-num">18</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">19</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-columns-21-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/columns_limit_1.rb</span>
+<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns!</span>
+<span class="line-num">11</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">clone</span>(<span class="ruby-constant">COLUMNS_CLONE_OPTIONS</span>)
+<span class="line-num">12</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span>{<span class="ruby-keyword">break</span>}
+<span class="line-num">13</span> 
+<span class="line-num">14</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">cache</span>[<span class="ruby-value">:_columns</span>]
+<span class="line-num">15</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span>
+<span class="line-num">16</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">17</span>     []
+<span class="line-num">18</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">19</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -88,7 +98,7 @@ Sequel::Dataset::ColumnsLimit1
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

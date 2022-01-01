@@ -57,14 +57,19 @@ Sequel::Plugins::SingularTableNames::ClassMethods
 
 <p>Returns the implicit table name for the model class, which is the demodulized, underscored, name of the class.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">implicit_table_name</span> <span class="ruby-comment"># =&gt; :artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">ArtistAlias</span>.<span class="ruby-identifier">implicit_table_name</span> <span class="ruby-comment"># =&gt; :artist_alias</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">implicit_table_name</span> <span class="ruby-comment"># =&gt; :artist</span>
+<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">ArtistAlias</span>.<span class="ruby-identifier">implicit_table_name</span> <span class="ruby-comment"># =&gt; :artist_alias</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-implicit_table_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-implicit_table_name-source'>   <span class="ruby-comment"># File lib/sequel/plugins/singular_table_names.rb</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">implicit_table_name</span>&#x000A;<span class="line-num">28</span>   <span class="ruby-identifier">underscore</span>(<span class="ruby-identifier">demodulize</span>(<span class="ruby-identifier">name</span>)).<span class="ruby-identifier">to_sym</span>&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-implicit_table_name-source'>   <span class="ruby-comment"># File lib/sequel/plugins/singular_table_names.rb</span>
+<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">implicit_table_name</span>
+<span class="line-num">28</span>   <span class="ruby-identifier">underscore</span>(<span class="ruby-identifier">demodulize</span>(<span class="ruby-identifier">name</span>)).<span class="ruby-identifier">to_sym</span>
+<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -76,7 +81,7 @@ Sequel::Plugins::SingularTableNames::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

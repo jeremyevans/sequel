@@ -38,31 +38,44 @@ Last Update:
 <div id='description'>
 <h1 id="label-Fork+Safety">Fork Safety<span><a href="#label-Fork+Safety">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p>If you are forking or using a library that forks after you have created a <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, then you must disconnect database connections before forking. If you don&#39;t do this, you can end up with child processes sharing database connections and all sorts of weird behavior, including crashes.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically create new connections on an as needed basis in the child processes, so you only need to do the following in the parent process:</p>
+<p>If you are forking or using a library that forks after you have created a <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, then you must disconnect database connections before forking. If you don’t do this, you can end up with child processes sharing database connections and all sorts of weird behavior, including crashes.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically create new connections on an as needed basis in the child processes, so you only need to do the following in the parent process:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span>
+</pre>
 
 <p>Or if you have connections to multiple databases:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+</pre>
 
 <h2 id="label-Puma">Puma<span><a href="#label-Puma">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>When using the Puma web server in clustered mode (which is the default behavior in Puma 5+ when using multiple processes), you should disconnect inside the <code>before_fork</code> hook in your Puma config:</p>
 
-<pre class="ruby"><span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h2 id="label-Unicorn">Unicorn<span><a href="#label-Unicorn">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>When using the Unicorn web server and preloading the application (+preload_app true+ in the Unicorn config), you should disconnect inside the <code>before_fork</code> hook in the Unicorn config:</p>
 
-<pre class="ruby"><span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h2 id="label-Passenger">Passenger<span><a href="#label-Passenger">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>In Passenger web server, you should disconnect inside the <code>starting_worker_process</code> event hook:</p>
 
-<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PhusionPassenger</span>)&#x000A;  <span class="ruby-constant">PhusionPassenger</span>.<span class="ruby-identifier">on_event</span>(<span class="ruby-value">:starting_worker_process</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">forked</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">forked</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PhusionPassenger</span>)
+  <span class="ruby-constant">PhusionPassenger</span>.<span class="ruby-identifier">on_event</span>(<span class="ruby-value">:starting_worker_process</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">forked</span><span class="ruby-operator">|</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">forked</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Note that this disconnects after forking instead of before forking.  Passenger does not offer a before fork hook.</p>
 
@@ -70,7 +83,12 @@ Last Update:
 
 <p>In Spring application preloader, you should disconnect inside the <code>after_fork</code> hook:</p>
 
-<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Spring</span>)&#x000A;  <span class="ruby-constant">Spring</span>.<span class="ruby-identifier">after_fork</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Spring</span>)
+  <span class="ruby-constant">Spring</span>.<span class="ruby-identifier">after_fork</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>As the method indicates, this disconnects after forking instead of before forking. Spring does not offer a before fork hook.</p>
 
@@ -78,19 +96,26 @@ Last Update:
 
 <p>In Resque, you should disconnect inside the <code>before_fork</code> hook:</p>
 
-<pre class="ruby"><span class="ruby-constant">Resque</span>.<span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">job</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Resque</span>.<span class="ruby-identifier">before_fork</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">job</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <h2 id="label-Parallel">Parallel<span><a href="#label-Parallel">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>If you&#39;re using the Parallel gem with processes, you should disconnect before calling it:</p>
+<p>If you’re using the Parallel gem with processes, you should disconnect before calling it:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)&#x000A;<span class="ruby-constant">Parallel</span>.<span class="ruby-identifier">map</span>([<span class="ruby-string">&#39;a&#39;</span>,<span class="ruby-string">&#39;b&#39;</span>,<span class="ruby-string">&#39;c&#39;</span>], <span class="ruby-value">in_processes:</span> <span class="ruby-value">3</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">one_letter</span><span class="ruby-operator">|</span> }</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-constant">Parallel</span>.<span class="ruby-identifier">map</span>([<span class="ruby-string">&#39;a&#39;</span>,<span class="ruby-string">&#39;b&#39;</span>,<span class="ruby-string">&#39;c&#39;</span>], <span class="ruby-value">in_processes:</span> <span class="ruby-value">3</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">one_letter</span><span class="ruby-operator">|</span> }
+</pre>
 
 <h2 id="label-Other+Libraries+Calling+fork">Other Libraries Calling fork<span><a href="#label-Other+Libraries+Calling+fork">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>For any other library that calls fork, you should disconnect before calling a method that forks:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)&#x000A;<span class="ruby-constant">SomeLibrary</span>.<span class="ruby-identifier">method_that_forks</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
+<span class="ruby-constant">SomeLibrary</span>.<span class="ruby-identifier">method_that_forks</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -101,7 +126,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

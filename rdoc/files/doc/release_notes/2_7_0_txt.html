@@ -61,21 +61,29 @@ Last Update:
 <ul><li>
 <p>Dataset#set_graph_aliases now allows you to supply a third argument for each column you want graph into the dataset, allowing you to use arbitrary SQL expressions that are graphed into the correct table:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">set_graph_aliases!</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>], <span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:e</span>, <span class="ruby-value">:f</span>, <span class="ruby-value">42</span>])&#x000A;<span class="ruby-comment"># SELECT b.c AS a, 42 AS d FROM ...</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first</span> <span class="ruby-comment"># =&gt; {:b=&gt;{:c=&gt;?}, :e=&gt;{:f=&gt;42}}</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">set_graph_aliases!</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>], <span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:e</span>, <span class="ruby-value">:f</span>, <span class="ruby-value">42</span>])
+<span class="ruby-comment"># SELECT b.c AS a, 42 AS d FROM ...</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first</span> <span class="ruby-comment"># =&gt; {:b=&gt;{:c=&gt;?}, :e=&gt;{:f=&gt;42}}</span>
+</pre>
 </li><li>
-<p>Dataset#add_graph_aliases was added, that adds additional graph aliases instead of replacing the existing ones (as set_graph_aliases does).  It&#39;s basically the equivalent of select_more for graphs.</p>
+<p>Dataset#add_graph_aliases was added, that adds additional graph aliases instead of replacing the existing ones (as set_graph_aliases does).  It’s basically the equivalent of select_more for graphs.</p>
 </li><li>
-<p>Dataset#join_table changed it&#39;s final argument from a symbol specifying a table name to an option hash (with backwards compatibility kept), and adds support for a :implicit_qualifier option, which it uses instead of the last joined table to qualify columns.</p>
+<p>Dataset#join_table changed it’s final argument from a symbol specifying a table name to an option hash (with backwards compatibility kept), and adds support for a :implicit_qualifier option, which it uses instead of the last joined table to qualify columns.</p>
 </li><li>
-<p>Association&#39;s :after_load callbacks are now called when eager loading via eager (but not when eager loading via eager_graph).</p>
+<p>Association’s :after_load callbacks are now called when eager loading via eager (but not when eager loading via eager_graph).</p>
 </li><li>
 <p>Any expression can now be used as the argument to Symbol#like, which means that you can pattern match columns to other columns. Before, it always transformed the argument to a string.</p>
 
-<pre class="ruby"><span class="ruby-value">:a</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:b</span>)&#x000A;<span class="ruby-comment"># 2.6.0: a LIKE &#39;b&#39;</span>&#x000A;<span class="ruby-comment"># 2.7.0: a LIKE b</span></pre>
+<pre class="ruby"><span class="ruby-value">:a</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:b</span>)
+<span class="ruby-comment"># 2.6.0: a LIKE &#39;b&#39;</span>
+<span class="ruby-comment"># 2.7.0: a LIKE b</span>
+</pre>
 </li><li>
 <p>Array#sql_array was added, allowing you to specify that an array in ruby be treated like an array in SQL.  This is true anyway, except for arrays of all two pairs, which are treated like hashes, for specifying multiple conditions with the same key:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">filter</span>([<span class="ruby-value">:a</span>,<span class="ruby-value">:b</span>] <span class="ruby-operator">=&gt;</span> [[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>],[<span class="ruby-value">3</span>,<span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_array</span>)&#x000A;<span class="ruby-comment"># =&gt; SELECT * FROM foo WHERE ((a, b) IN ((1, 2), (3, 4)))</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">filter</span>([<span class="ruby-value">:a</span>,<span class="ruby-value">:b</span>] <span class="ruby-operator">=&gt;</span> [[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>],[<span class="ruby-value">3</span>,<span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_array</span>)
+<span class="ruby-comment"># =&gt; SELECT * FROM foo WHERE ((a, b) IN ((1, 2), (3, 4)))</span>
+</pre>
 </li><li>
 <p>ComplexExpression#== and sql? were added, allowing for easier testing.</p>
 </li><li>
@@ -99,7 +107,7 @@ Last Update:
 </li><li>
 <p>A corner case in eager_graph where the wrong table name would be used to qualify a column name has been fixed.</p>
 </li><li>
-<p>Dataset&#39;s cached column information is no longer modified if each is called with an option that modifies the columns.</p>
+<p>Dataset’s cached column information is no longer modified if each is called with an option that modifies the columns.</p>
 </li><li>
 <p>You should now be able to connect to Oracle via the JDBC adapter, and with the same support it has when using the oracle adapter.</p>
 </li><li>
@@ -115,7 +123,8 @@ Last Update:
 <ul><li>
 <p>The first argument to Model#initialize must be a hash, you can no longer use nil.  For example, the following code will break if :album is not in params:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">params</span>[<span class="ruby-value">:album</span>])</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">params</span>[<span class="ruby-value">:album</span>])
+</pre>
 
 <p>Additionally, Model#initialize does not call the block if the second argument is true.</p>
 </li><li>
@@ -147,7 +156,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

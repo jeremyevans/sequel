@@ -63,7 +63,14 @@ Sequel::JDBC::SQLServer::DatabaseMethods::MetadataDatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-basic_type_convertor-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-basic_type_convertor-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">basic_type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">68</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;<span class="line-num">69</span>     <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;<span class="line-num">70</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">71</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">72</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-basic_type_convertor-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb</span>
+<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">basic_type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)
+<span class="line-num">68</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>
+<span class="line-num">69</span>     <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]
+<span class="line-num">70</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">71</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">72</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-type_convertor'>
@@ -79,7 +86,14 @@ Sequel::JDBC::SQLServer::DatabaseMethods::MetadataDatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-type_convertor-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-type_convertor-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">60</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;<span class="line-num">61</span>     <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">63</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">64</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-type_convertor-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb</span>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)
+<span class="line-num">60</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>
+<span class="line-num">61</span>     <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]
+<span class="line-num">62</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">63</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">64</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -91,7 +105,7 @@ Sequel::JDBC::SQLServer::DatabaseMethods::MetadataDatasetMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

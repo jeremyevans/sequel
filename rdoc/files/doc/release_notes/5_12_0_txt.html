@@ -40,37 +40,58 @@ Last Update:
 <ul><li>
 <p>An eager_graph_eager plugin has been added, which allows you to chain eager loads using separate queries to an existing dataset that uses eager_graph.  Given the following model associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span></pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>
+</pre>
 
-<p>Let&#39;s say you wanted to return bands ordered by album name, and eagerly load those albums, you can do that using:</p>
+<p>Let’s say you wanted to return bands ordered by album name, and eagerly load those albums, you can do that using:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}
+</pre>
 
-<p>Let&#39;s say you also wanted to eagerly load the tracks for each album. You could just add them to the eager_graph call:</p>
+<p>Let’s say you also wanted to eagerly load the tracks for each album. You could just add them to the eager_graph call:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}
+</pre>
 
-<p>However, the bloats the result set, and you aren&#39;t ordering by the track information, so a join is not required.  The eager_graph_eager plugin allows you to specify that the tracks be eagerly loaded in a separate query after the eager_graph load of albums:</p>
+<p>However, the bloats the result set, and you aren’t ordering by the track information, so a join is not required.  The eager_graph_eager plugin allows you to specify that the tracks be eagerly loaded in a separate query after the eager_graph load of albums:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).&#x000A;  <span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">:tracks</span>).&#x000A;  <span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).
+  <span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">:tracks</span>).
+  <span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}
+</pre>
 
-<p>eager_graph_eager&#39;s first argument is a dependency chain, specified as an array of symbols.  This specifies the point at which to perform the eager load. The remaining arguments are arguments that could be passed to Dataset#eager to specify what dependent associations should be loaded at that point.</p>
+<p>eager_graph_eager’s first argument is a dependency chain, specified as an array of symbols.  This specifies the point at which to perform the eager load. The remaining arguments are arguments that could be passed to Dataset#eager to specify what dependent associations should be loaded at that point.</p>
 </li><li>
 <p>A caller_logging Database extension has been added, which logs caller information before queries, filtering out the internal <a href="../../../classes/Sequel.html"><code>Sequel</code></a> callers.  Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:caller_logging</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># Logger:</span>&#x000A;<span class="ruby-comment"># (0.000041s) (source: /path/to/app/foo/t.rb:12 in `get_first`)</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table LIMIT 1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:caller_logging</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># Logger:</span>
+<span class="ruby-comment"># (0.000041s) (source: /path/to/app/foo/t.rb:12 in `get_first`)</span>
+<span class="ruby-comment"># SELECT * FROM table LIMIT 1</span>
+</pre>
 
 <p>You can further filter the caller lines by setting Database#caller_logging_ignore to a regexp of additional caller lines to ignore.  This is useful if you have specific methods or internal extensions/plugins that you would also like to ignore as they obscure the code actually making the request.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_ignore</span> = <span class="ruby-regexp">%r{/path/to/app/lib/plugins}</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_ignore</span> = <span class="ruby-regexp">%r{/path/to/app/lib/plugins}</span>
+</pre>
 
 <p>You can also format the caller before it is placed in the logger, using caller_logging_formatter:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_formatter</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">caller</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-node">&quot;(#{caller.sub(/\A\/path\/to\/app\//, &#39;&#39;)})&quot;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># Logger:</span>&#x000A;<span class="ruby-comment"># (0.000041s) (foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">caller_logging_formatter</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">caller</span><span class="ruby-operator">|</span>
+  <span class="ruby-node">&quot;(#{caller.sub(/\A\/path\/to\/app\//, &#39;&#39;)})&quot;</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># Logger:</span>
+<span class="ruby-comment"># (0.000041s) (foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1</span>
+</pre>
 </li><li>
 <p>Database#call_procedure has been added to the postgres adapter, and is usable on PostgreSQL 11+ for calling procedures created with CREATE PROCEDURE.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_procedure</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">1</span>, <span class="ruby-string">&quot;bar&quot;</span>)&#x000A;<span class="ruby-comment"># CALL foo(1, &#39;bar&#39;)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_procedure</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">1</span>, <span class="ruby-string">&quot;bar&quot;</span>)
+<span class="ruby-comment"># CALL foo(1, &#39;bar&#39;)</span>
+</pre>
 
 <p>This method will return a hash of results if the procedure returns a result, or nil if it does not return a result.</p>
 </li></ul>
@@ -79,13 +100,20 @@ Last Update:
 <ul><li>
 <p>It is now possible to use Dataset#eager_graph in an eager load callback for associations that use join tables.  This allows you to eager load some associations using separate queries and other associations using joins.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:tracks</span>)})</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:tracks</span>)})
+</pre>
 
 <p>Will load the bands in one query, and load the albums and tracks in a separate query using a join.  Previously, this construction worked only for associations that did not use join tables.  It now works for associations that use join tables, as long as existing selected columns are not removed inside the callback.</p>
 </li><li>
 <p>The tactical_eager_loading plugin now handles automatic eager loading for associated objects that were created during the load of dataset that uses eager_graph.  When using the plugin, the following code will now only execute 2 queries, instead of issuing a separate query for each album to get the tracks for the album.</p>
 
-<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>Calling Dataset#graph with a dataset with existing selections where the column aliases cannot be determined automatically now works correctly by using a subselect.  Previously, attempting to do this would raise an exception.  This allows the following code to work:</p>
 
@@ -120,7 +148,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

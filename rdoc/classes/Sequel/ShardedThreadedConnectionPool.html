@@ -89,7 +89,19 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">19</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">20</span>   <span class="ruby-ivar">@available_connections</span> = {}&#x000A;<span class="line-num">21</span>   <span class="ruby-ivar">@connections_to_remove</span> = []&#x000A;<span class="line-num">22</span>   <span class="ruby-ivar">@connections_to_disconnect</span> = []&#x000A;<span class="line-num">23</span>   <span class="ruby-ivar">@servers</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:servers_hash</span>, <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:default</span>))&#x000A;<span class="line-num">24</span>   <span class="ruby-identifier">remove_instance_variable</span>(<span class="ruby-value">:@waiter</span>)&#x000A;<span class="line-num">25</span>   <span class="ruby-ivar">@waiters</span> = {}&#x000A;<span class="line-num">26</span> &#x000A;<span class="line-num">27</span>   <span class="ruby-identifier">add_servers</span>([<span class="ruby-value">:default</span>])&#x000A;<span class="line-num">28</span>   <span class="ruby-identifier">add_servers</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>].<span class="ruby-identifier">keys</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>]&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">19</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">20</span>   <span class="ruby-ivar">@available_connections</span> = {}
+<span class="line-num">21</span>   <span class="ruby-ivar">@connections_to_remove</span> = []
+<span class="line-num">22</span>   <span class="ruby-ivar">@connections_to_disconnect</span> = []
+<span class="line-num">23</span>   <span class="ruby-ivar">@servers</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:servers_hash</span>, <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:default</span>))
+<span class="line-num">24</span>   <span class="ruby-identifier">remove_instance_variable</span>(<span class="ruby-value">:@waiter</span>)
+<span class="line-num">25</span>   <span class="ruby-ivar">@waiters</span> = {}
+<span class="line-num">26</span> 
+<span class="line-num">27</span>   <span class="ruby-identifier">add_servers</span>([<span class="ruby-value">:default</span>])
+<span class="line-num">28</span>   <span class="ruby-identifier">add_servers</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>].<span class="ruby-identifier">keys</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>]
+<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -108,7 +120,19 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-add_servers-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_servers</span>(<span class="ruby-identifier">servers</span>)&#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">35</span>     <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">server</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">36</span>       <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">37</span>         <span class="ruby-ivar">@servers</span>[<span class="ruby-identifier">server</span>] = <span class="ruby-identifier">server</span>&#x000A;<span class="line-num">38</span>         <span class="ruby-ivar">@available_connections</span>[<span class="ruby-identifier">server</span>] = []&#x000A;<span class="line-num">39</span>         <span class="ruby-ivar">@allocated</span>[<span class="ruby-identifier">server</span>] = {}&#x000A;<span class="line-num">40</span>         <span class="ruby-ivar">@waiters</span>[<span class="ruby-identifier">server</span>] = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="line-num">41</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">42</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">43</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-add_servers-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_servers</span>(<span class="ruby-identifier">servers</span>)
+<span class="line-num">34</span>   <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
+<span class="line-num">35</span>     <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">server</span><span class="ruby-operator">|</span>
+<span class="line-num">36</span>       <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">37</span>         <span class="ruby-ivar">@servers</span>[<span class="ruby-identifier">server</span>] = <span class="ruby-identifier">server</span>
+<span class="line-num">38</span>         <span class="ruby-ivar">@available_connections</span>[<span class="ruby-identifier">server</span>] = []
+<span class="line-num">39</span>         <span class="ruby-ivar">@allocated</span>[<span class="ruby-identifier">server</span>] = {}
+<span class="line-num">40</span>         <span class="ruby-ivar">@waiters</span>[<span class="ruby-identifier">server</span>] = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">41</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">42</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">43</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-all_connections'>
@@ -119,14 +143,25 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Yield all of the available connections, and the ones currently allocated to this thread.  This will not yield connections currently allocated to other threads, as it is not safe to operate on them.  This holds the mutex while it is yielding all of the connections, which means that until the method&#39;s block returns, the pool is locked.</p>
+<p>Yield all of the available connections, and the ones currently allocated to this thread.  This will not yield connections currently allocated to other threads, as it is not safe to operate on them.  This holds the mutex while it is yielding all of the connections, which means that until the method’s block returns, the pool is locked.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-all_connections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-all_connections-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>&#x000A;<span class="line-num">60</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">62</span>     <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">threads</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">63</span>       <span class="ruby-identifier">threads</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">thread</span>, <span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">64</span>         <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">thread</span>&#x000A;<span class="line-num">65</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">66</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">67</span>     <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>}}&#x000A;<span class="line-num">68</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-all_connections-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>
+<span class="line-num">60</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>
+<span class="line-num">61</span>   <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
+<span class="line-num">62</span>     <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">threads</span><span class="ruby-operator">|</span>
+<span class="line-num">63</span>       <span class="ruby-identifier">threads</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">thread</span>, <span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">64</span>         <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">thread</span>
+<span class="line-num">65</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">66</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">67</span>     <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>}}
+<span class="line-num">68</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-allocated'>
@@ -144,7 +179,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-allocated-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-allocated-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">allocated</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-ivar">@allocated</span>[<span class="ruby-identifier">server</span>]&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-allocated-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">allocated</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)
+<span class="line-num">51</span>   <span class="ruby-ivar">@allocated</span>[<span class="ruby-identifier">server</span>]
+<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-available_connections'>
@@ -162,7 +200,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-available_connections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-available_connections-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">available_connections</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">76</span>   <span class="ruby-ivar">@available_connections</span>[<span class="ruby-identifier">server</span>]&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-available_connections-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">available_connections</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)
+<span class="line-num">76</span>   <span class="ruby-ivar">@available_connections</span>[<span class="ruby-identifier">server</span>]
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disconnect'>
@@ -185,7 +226,12 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-disconnect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-disconnect-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num"> 96</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num"> 97</span>   (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">keys</span>}).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num"> 98</span>     <span class="ruby-identifier">disconnect_connections</span>(<span class="ruby-identifier">sync</span>{<span class="ruby-identifier">disconnect_server_connections</span>(<span class="ruby-identifier">s</span>)})&#x000A;<span class="line-num"> 99</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">100</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-disconnect-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num"> 96</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num"> 97</span>   (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">keys</span>}).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span>
+<span class="line-num"> 98</span>     <span class="ruby-identifier">disconnect_connections</span>(<span class="ruby-identifier">sync</span>{<span class="ruby-identifier">disconnect_server_connections</span>(<span class="ruby-identifier">s</span>)})
+<span class="line-num"> 99</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">100</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -201,7 +247,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">103</span>   <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">104</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">105</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">103</span>   <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">104</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">105</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hold'>
@@ -214,7 +264,8 @@ Superclass:
 
 <p>Chooses the first available connection to the given server, or if none are available, creates a new connection.  Passes the connection to the supplied block:</p>
 
-<pre class="ruby"><span class="ruby-identifier">pool</span>.<span class="ruby-identifier">hold</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&#39;DROP TABLE posts&#39;</span>)}</pre>
+<pre class="ruby"><span class="ruby-identifier">pool</span>.<span class="ruby-identifier">hold</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&#39;DROP TABLE posts&#39;</span>)}
+</pre>
 
 <p>Pool#hold is re-entrant, meaning it can be called recursively in the same thread without blocking.</p>
 
@@ -225,7 +276,26 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hold-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hold-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">120</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">121</span>   <span class="ruby-identifier">server</span> = <span class="ruby-identifier">pick_server</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">122</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>&#x000A;<span class="line-num">123</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>, <span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">124</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)&#x000A;<span class="line-num">125</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">126</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">127</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">acquire</span>(<span class="ruby-identifier">t</span>, <span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">128</span>     <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>&#x000A;<span class="line-num">129</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">130</span>     <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@connections_to_remove</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">conn</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;<span class="line-num">131</span>     <span class="ruby-identifier">raise</span>&#x000A;<span class="line-num">132</span>   <span class="ruby-keyword">ensure</span>&#x000A;<span class="line-num">133</span>     <span class="ruby-identifier">sync</span>{<span class="ruby-identifier">release</span>(<span class="ruby-identifier">t</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">server</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>&#x000A;<span class="line-num">134</span>     <span class="ruby-keyword">while</span> <span class="ruby-identifier">dconn</span> = <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@connections_to_disconnect</span>.<span class="ruby-identifier">shift</span>}&#x000A;<span class="line-num">135</span>       <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">dconn</span>)&#x000A;<span class="line-num">136</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">137</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hold-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">120</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)
+<span class="line-num">121</span>   <span class="ruby-identifier">server</span> = <span class="ruby-identifier">pick_server</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">122</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>
+<span class="line-num">123</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>, <span class="ruby-identifier">server</span>)
+<span class="line-num">124</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)
+<span class="line-num">125</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">126</span>   <span class="ruby-keyword">begin</span>
+<span class="line-num">127</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">acquire</span>(<span class="ruby-identifier">t</span>, <span class="ruby-identifier">server</span>)
+<span class="line-num">128</span>     <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>
+<span class="line-num">129</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">130</span>     <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@connections_to_remove</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">conn</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)
+<span class="line-num">131</span>     <span class="ruby-identifier">raise</span>
+<span class="line-num">132</span>   <span class="ruby-keyword">ensure</span>
+<span class="line-num">133</span>     <span class="ruby-identifier">sync</span>{<span class="ruby-identifier">release</span>(<span class="ruby-identifier">t</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">server</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>
+<span class="line-num">134</span>     <span class="ruby-keyword">while</span> <span class="ruby-identifier">dconn</span> = <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@connections_to_disconnect</span>.<span class="ruby-identifier">shift</span>}
+<span class="line-num">135</span>       <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">dconn</span>)
+<span class="line-num">136</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">137</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pool_type'>
@@ -241,7 +311,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pool_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pool_type-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>&#x000A;<span class="line-num">169</span>   <span class="ruby-value">:sharded_threaded</span>&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pool_type-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>
+<span class="line-num">169</span>   <span class="ruby-value">:sharded_threaded</span>
+<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-remove_servers'>
@@ -259,7 +332,26 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-remove_servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-remove_servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">143</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove_servers</span>(<span class="ruby-identifier">servers</span>)&#x000A;<span class="line-num">144</span>   <span class="ruby-identifier">conns</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">145</span>   <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">146</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot remove default server&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">147</span>     <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">server</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">148</span>       <span class="ruby-keyword">if</span> <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">149</span>         <span class="ruby-identifier">conns</span> = <span class="ruby-identifier">disconnect_server_connections</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">150</span>         <span class="ruby-ivar">@waiters</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">151</span>         <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">152</span>         <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">153</span>         <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">154</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">155</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">156</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">157</span> &#x000A;<span class="line-num">158</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">conns</span>&#x000A;<span class="line-num">159</span>     <span class="ruby-identifier">disconnect_connections</span>(<span class="ruby-identifier">conns</span>)&#x000A;<span class="line-num">160</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-remove_servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">143</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove_servers</span>(<span class="ruby-identifier">servers</span>)
+<span class="line-num">144</span>   <span class="ruby-identifier">conns</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">145</span>   <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
+<span class="line-num">146</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot remove default server&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:default</span>)
+<span class="line-num">147</span>     <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">server</span><span class="ruby-operator">|</span>
+<span class="line-num">148</span>       <span class="ruby-keyword">if</span> <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">149</span>         <span class="ruby-identifier">conns</span> = <span class="ruby-identifier">disconnect_server_connections</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">150</span>         <span class="ruby-ivar">@waiters</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">151</span>         <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">152</span>         <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">153</span>         <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">154</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">155</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">156</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">157</span> 
+<span class="line-num">158</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">conns</span>
+<span class="line-num">159</span>     <span class="ruby-identifier">disconnect_connections</span>(<span class="ruby-identifier">conns</span>)
+<span class="line-num">160</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-servers'>
@@ -277,7 +369,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>&#x000A;<span class="line-num">165</span>   <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">keys</span>}&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>
+<span class="line-num">165</span>   <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">keys</span>}
+<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-size'>
@@ -295,7 +390,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-size-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-size-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>&#x000A;<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">83</span>   <span class="ruby-ivar">@mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">_size</span>(<span class="ruby-identifier">server</span>)}&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-size-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_threaded.rb</span>
+<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)
+<span class="line-num">83</span>   <span class="ruby-ivar">@mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">_size</span>(<span class="ruby-identifier">server</span>)}
+<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -307,7 +405,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

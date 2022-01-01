@@ -36,15 +36,17 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The eval_inspect extension changes inspect for <a href="../../../../classes/Sequel/SQL/Expression.html"><code>Sequel::SQL::Expression</code></a> subclasses to return a string suitable for ruby&#39;s eval, such that</p>
+<p>The eval_inspect extension changes inspect for <a href="../../../../classes/Sequel/SQL/Expression.html"><code>Sequel::SQL::Expression</code></a> subclasses to return a string suitable for ruby’s eval, such that</p>
 
-<pre class="ruby"><span class="ruby-identifier">eval</span>(<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">inspect</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">obj</span></pre>
+<pre class="ruby"><span class="ruby-identifier">eval</span>(<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">inspect</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">obj</span>
+</pre>
 
-<p>is true.  The above code is true for most of ruby&#39;s simple classes such as <a href="../../../../classes/String.html"><code>String</code></a>, Integer, Float, and <a href="../../../../classes/Symbol.html"><code>Symbol</code></a>, but it&#39;s not true for classes such as Time, Date, and BigDecimal.  <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> attempts to handle situations where instances of these classes are a component of a <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression.</p>
+<p>is true.  The above code is true for most of ruby’s simple classes such as <a href="../../../../classes/String.html"><code>String</code></a>, Integer, Float, and <a href="../../../../classes/Symbol.html"><code>Symbol</code></a>, but it’s not true for classes such as Time, Date, and BigDecimal.  <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> attempts to handle situations where instances of these classes are a component of a <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression.</p>
 
 <p>To load the extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:eval_inspect</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:eval_inspect</span>
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/EvalInspect.html"><code>Sequel::EvalInspect</code></a></p>
 </div>
@@ -57,7 +59,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

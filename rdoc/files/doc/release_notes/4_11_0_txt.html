@@ -72,7 +72,9 @@ Last Update:
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports derived column lists (table aliases that include column aliases) via Sequel.as and SQL::AliasedMethods#as:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">:alias</span>, [<span class="ruby-value">:c1</span>, <span class="ruby-value">:c2</span>])&#x000A;<span class="ruby-comment"># table AS alias(c1, c2)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">:alias</span>, [<span class="ruby-value">:c1</span>, <span class="ruby-value">:c2</span>])
+<span class="ruby-comment"># table AS alias(c1, c2)</span>
+</pre>
 
 <p>Not all databases support this, but it is in SQL92 and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports it by default.  Derived column lists make it easier to alias columns when using set-returning functions.</p>
 
@@ -91,7 +93,7 @@ Last Update:
 <ul><li>
 <p>Dataset#import now supports a default slice size, which <a href="../../../classes/Sequel.html"><code>Sequel</code></a> sets to 500 on SQLite as that is the limit that SQLite supports in a single statement.</p>
 </li><li>
-<p>The serialization plugin now only modifies changed_columns in the setter method if the deserialized value has changed, similar to how Sequel&#39;s standard column setters work.  Note that if you are mutating the deserialized value (i.e. not calling the setter method), you still need to use the serialization_modification_detection plugin.</p>
+<p>The serialization plugin now only modifies changed_columns in the setter method if the deserialized value has changed, similar to how Sequel’s standard column setters work.  Note that if you are mutating the deserialized value (i.e. not calling the setter method), you still need to use the serialization_modification_detection plugin.</p>
 </li><li>
 <p>Plugins that set column values for new objects before creation now use before_validation instead of before_create, which works better when the auto_validations plugin is used.</p>
 </li><li>
@@ -130,7 +132,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

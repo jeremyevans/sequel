@@ -35,11 +35,34 @@ Sequel::Plugins::ValidateAssociated
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The validates_associated plugin allows you to validate associated objects.  It also offers the ability to delay the validation of associated objects until the current object is validated. If the associated object is invalid, validation error messages from the associated object will be added to the current object&#39;s validation errors.</p>
+<p>The validates_associated plugin allows you to validate associated objects.  It also offers the ability to delay the validation of associated objects until the current object is validated. If the associated object is invalid, validation error messages from the associated object will be added to the current object’s validation errors.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass support validating associated objects</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support validating associated objects</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>&#x000A;&#x000A;  <span class="ruby-comment"># Always validate associated artist when saving the album</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">artist</span>&#x000A;      <span class="ruby-identifier">validate_associated_object</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:artist</span>), <span class="ruby-identifier">artist</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># When saving after calling this method, validate the given tag as well.</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_tag!</span>(<span class="ruby-identifier">tag</span>)&#x000A;    <span class="ruby-identifier">delay_validate_associated_object</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:tags</span>), <span class="ruby-identifier">tag</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass support validating associated objects</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>
+
+<span class="ruby-comment"># Make the Album class support validating associated objects</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>
+
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>
+  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>
+  <span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>
+
+  <span class="ruby-comment"># Always validate associated artist when saving the album</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">artist</span>
+      <span class="ruby-identifier">validate_associated_object</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:artist</span>), <span class="ruby-identifier">artist</span>)
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># When saving after calling this method, validate the given tag as well.</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_tag!</span>(<span class="ruby-identifier">tag</span>)
+    <span class="ruby-identifier">delay_validate_associated_object</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:tags</span>), <span class="ruby-identifier">tag</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -74,7 +97,10 @@ Sequel::Plugins::ValidateAssociated
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/validate_associated.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_hooks</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/validate_associated.rb</span>
+<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)
+<span class="line-num">40</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_hooks</span>
+<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -86,7 +112,7 @@ Sequel::Plugins::ValidateAssociated
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

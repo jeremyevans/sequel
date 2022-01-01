@@ -58,14 +58,18 @@ Sequel::Plugins::Tree::DatasetMethods
 
 <p>Returns list of all root nodes (those with no parent nodes).</p>
 
-<pre class="ruby"><span class="ruby-constant">TreeClass</span>.<span class="ruby-identifier">roots</span> <span class="ruby-comment"># =&gt; [root1, root2]</span></pre>
+<pre class="ruby"><span class="ruby-constant">TreeClass</span>.<span class="ruby-identifier">roots</span> <span class="ruby-comment"># =&gt; [root1, root2]</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-roots-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-roots-source'>    <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots</span>&#x000A;<span class="line-num">152</span>   <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-roots-source'>    <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>
+<span class="line-num">151</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots</span>
+<span class="line-num">152</span>   <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>
+<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-roots_dataset'>
@@ -78,14 +82,20 @@ Sequel::Plugins::Tree::DatasetMethods
 
 <p>Returns the dataset for retrieval of all root nodes</p>
 
-<pre class="ruby"><span class="ruby-constant">TreeClass</span>.<span class="ruby-identifier">roots_dataset</span> <span class="ruby-comment"># =&gt; Sequel::Dataset instance</span></pre>
+<pre class="ruby"><span class="ruby-constant">TreeClass</span>.<span class="ruby-identifier">roots_dataset</span> <span class="ruby-comment"># =&gt; Sequel::Dataset instance</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-roots_dataset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-roots_dataset-source'>    <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>&#x000A;<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots_dataset</span>&#x000A;<span class="line-num">159</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;<span class="line-num">160</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">tree_order</span>&#x000A;<span class="line-num">161</span>   <span class="ruby-identifier">ds</span>&#x000A;<span class="line-num">162</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-roots_dataset-source'>    <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>
+<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots_dataset</span>
+<span class="line-num">159</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_parent_column</span>).<span class="ruby-identifier">zip</span>([])))
+<span class="line-num">160</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">tree_order</span>
+<span class="line-num">161</span>   <span class="ruby-identifier">ds</span>
+<span class="line-num">162</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -97,7 +107,7 @@ Sequel::Plugins::Tree::DatasetMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

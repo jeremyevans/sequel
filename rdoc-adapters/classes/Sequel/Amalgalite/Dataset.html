@@ -70,7 +70,18 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-fetch_rows-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-fetch_rows-source'>    <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">152</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">153</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">result_fields</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="line-num">154</span>     <span class="ruby-identifier">col_count</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>&#x000A;<span class="line-num">155</span>     <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">156</span>       <span class="ruby-identifier">row</span> = {}&#x000A;<span class="line-num">157</span>       <span class="ruby-identifier">col_count</span>.<span class="ruby-identifier">times</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[<span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]] = <span class="ruby-identifier">result</span>[<span class="ruby-identifier">i</span>]}&#x000A;<span class="line-num">158</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>&#x000A;<span class="line-num">159</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">160</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-fetch_rows-source'>    <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">149</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">150</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>
+<span class="line-num">151</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">result_fields</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>)}
+<span class="line-num">152</span>     <span class="ruby-identifier">col_count</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>
+<span class="line-num">153</span>     <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span>
+<span class="line-num">154</span>       <span class="ruby-identifier">row</span> = {}
+<span class="line-num">155</span>       <span class="ruby-identifier">col_count</span>.<span class="ruby-identifier">times</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[<span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]] = <span class="ruby-identifier">result</span>[<span class="ruby-identifier">i</span>]}
+<span class="line-num">156</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
+<span class="line-num">157</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">158</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">159</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -82,7 +93,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -44,24 +44,42 @@ Last Update:
 
 <p>If you use a deprecated method or feature, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will by default print a deprecation message and 10 lines of backtrace to stderr to easily allow you to figure out which code needs to be updated.  You can change where the deprecation messages go and how many lines of backtrace are given using the following:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Turn off all deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span>&#x000A;&#x000A;<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-comment"># Select which backtrace lines to output</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = \&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line_no</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">3</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/my_app/</span>}</pre>
+<pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)
+
+<span class="ruby-comment"># Turn off all deprecation logging</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span>
+
+<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">5</span>
+
+<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">true</span>
+
+<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">false</span>
+
+<span class="ruby-comment"># Select which backtrace lines to output</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = \
+  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line_no</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">3</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/my_app/</span>}
+</pre>
 
 <h2 id="label-Major+Change">Major Change<span><a href="#label-Major+Change">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>The core extensions will no longer be loaded by default. You will have to use `Sequel.extension :core_extensions` to load the core extensions.</p>
+<p>The core extensions will no longer be loaded by default. You will have to use ‘Sequel.extension :core_extensions` to load the core extensions.</p>
 </li><li>
-<p>The Symbol#[] and Symbol#{&lt;,&gt;,&lt;=,&gt;=} methods will no longer be provided by the core extensions on ruby 1.8. You will have to use `Sequel.extension :ruby18_symbol_extensions` to use them.</p>
+<p>The Symbol#[] and Symbol#{&lt;,&gt;,&lt;=,&gt;=} methods will no longer be provided by the core extensions on ruby 1.8. You will have to use ‘Sequel.extension :ruby18_symbol_extensions` to use them.</p>
 </li></ul>
 
 <h2 id="label-Core+Behavior+Changes">Core Behavior Changes<span><a href="#label-Core+Behavior+Changes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>Dataset#filter becomes an alias for where, and exclude becomes an alias for exclude_where. You will have to use `DB.extension :filter_having` to get the previous behavior. Dataset#and and or will also only affect the WHERE clause.</p>
+<p>Dataset#filter becomes an alias for where, and exclude becomes an alias for exclude_where. You will have to use ‘DB.extension :filter_having` to get the previous behavior. Dataset#and and or will also only affect the WHERE clause.</p>
 </li><li>
 <p>Dataset#and, or, and invert will not raise errors for no existing filter.</p>
 </li><li>
 <p>Dataset#select_more becomes an alias for select_append.</p>
 </li><li>
-<p>Dataset#select and from will not longer consider a hash argument as an alias specification. You will have to use `DB.extension :hash_aliases` to get the previous behavior.</p>
+<p>Dataset#select and from will not longer consider a hash argument as an alias specification. You will have to use ‘DB.extension :hash_aliases` to get the previous behavior.</p>
 </li><li>
 <p>Database#dataset and Dataset.new will not take an options hash.</p>
 </li><li>
@@ -73,7 +91,7 @@ Last Update:
 </li><li>
 <p>Dataset#set_overrides and set_defaults will move to the set_overrides extension.</p>
 </li><li>
-<p>Sequel.empty_array_handle_nulls will be removed.  To get the empty_array_handle_nulls = false behavior, you will have to use `DB.extension :empty_array_ignore_nulls`.</p>
+<p>Sequel.empty_array_handle_nulls will be removed.  To get the empty_array_handle_nulls = false behavior, you will have to use ‘DB.extension :empty_array_ignore_nulls`.</p>
 </li><li>
 <p>The second argument to Dataset union, intersect, and except must be an options hash if it is given.</p>
 </li><li>
@@ -156,9 +174,9 @@ Last Update:
 </li><li>
 <p>Remove save taking multiple arguments for the columns to save. Add Model#save :columns option for saving specific columns. </p>
 </li><li>
-<p>Don&#39;t automatically choose a reciprocal association with a condition or block.</p>
+<p>Don’t automatically choose a reciprocal association with a condition or block.</p>
 </li><li>
-<p>Don&#39;t automatically set up reciprocal associations if multiple ones match.</p>
+<p>Don’t automatically set up reciprocal associations if multiple ones match.</p>
 </li><li>
 <p>Model::Errors#[] will no longer modify the receiver.  If you want autovivification, use the active_model plugin. </p>
 </li><li>
@@ -223,13 +241,13 @@ Last Update:
 </li><li>
 <p>Model#save will no longer call Model#_refresh or Model#set_values internally after an insert.  Manually refreshes will be treated differently than after creation refreshes in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
-<p>On SQLite, integer_booleans will be true by default.  Set this to false to get the current behavior of &#39;t&#39; for true and &#39;f&#39; for false.</p>
+<p>On SQLite, integer_booleans will be true by default.  Set this to false to get the current behavior of ‘t’ for true and ‘f’ for false.</p>
 </li><li>
 <p>On SQLite, use_timestamp_timezones will be false by default.  Set this to true to get the current behavior with timezone information in timestamps.</p>
 </li><li>
 <p>The default value for most option hash arguments will be an empty frozen hash.  If you are overriding methods and modifying option hashes, fix your code.</p>
 </li><li>
-<p>The defaults_setter plugin will work in a lazy manner instead of an eager manner.  If you must have the values hash contain defaults for new objects (instead of just getting defaults from getter methods), you&#39;ll need to fork the current plugin.</p>
+<p>The defaults_setter plugin will work in a lazy manner instead of an eager manner.  If you must have the values hash contain defaults for new objects (instead of just getting defaults from getter methods), you’ll need to fork the current plugin.</p>
 </li><li>
 <p>Model#set_all will allow setting the primary key columns.</p>
 </li><li>
@@ -264,9 +282,12 @@ Last Update:
 </li><li>
 <p>Sequel.object_to_json and Sequel.json_parser_error_class have been added and all internal json usage uses them, so you can now override these methods if you want to use an alternative json library with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li><li>
-<p>The association_proxies plugin now accepts a block allowing the user control over which methods are proxied to the dataset or the cached array of instances.  You can base the decision on where to send the method using a variety of factors including the method name, the method arguments, the state of the current instance, or the related association.  Here&#39;s an example of a simple case just depending on the name of the method; </p>
+<p>The association_proxies plugin now accepts a block allowing the user control over which methods are proxied to the dataset or the cached array of instances.  You can base the decision on where to send the method using a variety of factors including the method name, the method arguments, the state of the current instance, or the related association.  Here’s an example of a simple case just depending on the name of the method; </p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_proxies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opts</span><span class="ruby-operator">|</span>&#x000A; [<span class="ruby-value">:find</span>, <span class="ruby-value">:where</span>, <span class="ruby-value">:create</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:method</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_proxies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opts</span><span class="ruby-operator">|</span>
+ [<span class="ruby-value">:find</span>, <span class="ruby-value">:where</span>, <span class="ruby-value">:create</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:method</span>])
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>If the block returns true, the method is sent to the dataset, otherwise it is sent to the array of associated objects.</p>
 </li><li>
@@ -276,19 +297,28 @@ Last Update:
 </li><li>
 <p>The constraint_validations plugin now reflects validations, using Model.constraint_validation_reflections.</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">constraint_validation_reflections</span>[<span class="ruby-value">:column</span>]&#x000A;<span class="ruby-comment"># =&gt; [[:presence, {}],</span>&#x000A;<span class="ruby-comment">#     [:max_length, {:argument=&gt;255, :message=&gt;&#39;just too long&#39;}]]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">constraint_validation_reflections</span>[<span class="ruby-value">:column</span>]
+<span class="ruby-comment"># =&gt; [[:presence, {}],</span>
+<span class="ruby-comment">#     [:max_length, {:argument=&gt;255, :message=&gt;&#39;just too long&#39;}]]</span>
+</pre>
 </li><li>
 <p>The constraint_validations plugin can now be set to pass specific validations options to the validation_helpers plugin.  This can be useful if using the auto_validations plugin with this plugin to avoid duplicate error messages for nil values:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:constraint_validations</span>,&#x000A;  <span class="ruby-value">:validates_options</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:presence</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:allow_nil</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}}</pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:constraint_validations</span>,
+  <span class="ruby-value">:validates_options</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:presence</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:allow_nil</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}}
+</pre>
 </li><li>
 <p>The named_timezones extension can now be loaded as a database extension, which allows for automatic conversions of string timezones:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span>
+</pre>
 </li><li>
 <p>Offsets are now emulated by Microsoft Access using a combination of reverse orders and total counts.  This is slow, especially on large datasets, but probably better than having no support at all. It is also possible to use the same code to support Microsoft SQL Server 2000, but as <a href="../../../classes/Sequel.html"><code>Sequel</code></a> does not support that (minimum supported version is 2005), you have to do it manually:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;adapters/utils/emulate_offset_with_reverse_and_count&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">EmulateOffsetWithReverseAndCount</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;adapters/utils/emulate_offset_with_reverse_and_count&#39;</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">EmulateOffsetWithReverseAndCount</span>
+</pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -301,7 +331,7 @@ Last Update:
 </li><li>
 <p>Dataset#or now just clones if given an empty argument, similar to Dataset#where.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now correctly frees statements after using them in the ibmdb adapter.  Previously, they weren&#39;t freed until GC, which could result in errors if all available handles are in use.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now correctly frees statements after using them in the ibmdb adapter.  Previously, they weren’t freed until GC, which could result in errors if all available handles are in use.</p>
 </li><li>
 <p>Dataset creation is now faster on Microsoft SQL Server.</p>
 </li><li>
@@ -309,7 +339,7 @@ Last Update:
 </li><li>
 <p>The ado adapter now handles disconnecting an already disconnected connection.</p>
 </li><li>
-<p>The auto_validations plugin now works on databases that don&#39;t support index parsing.  However, it will not set up automatic uniqueness validations on such databases.</p>
+<p>The auto_validations plugin now works on databases that don’t support index parsing.  However, it will not set up automatic uniqueness validations on such databases.</p>
 </li><li>
 <p>The validation_helpers is more strict in some cases when checking for nil values, using a specific nil check instead of general falsely check.</p>
 </li><li>
@@ -350,7 +380,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

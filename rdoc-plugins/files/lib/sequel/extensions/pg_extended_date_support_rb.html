@@ -36,15 +36,17 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_extended_date_support extension allows support for BC dates/timestamps by default, and infinite dates/timestamps if configured.  Without this extension, BC and infinite dates/timestamps will be handled incorrectly or raise an error.  This behavior isn&#39;t the default because it can hurt performance, and few users need support for BC and infinite dates/timestamps.</p>
+<p>The pg_extended_date_support extension allows support for BC dates/timestamps by default, and infinite dates/timestamps if configured.  Without this extension, BC and infinite dates/timestamps will be handled incorrectly or raise an error.  This behavior isn’t the default because it can hurt performance, and few users need support for BC and infinite dates/timestamps.</p>
 
 <p>To load the extension into the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_extended_date_support</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_extended_date_support</span>
+</pre>
 
 <p>To enable support for infinite dates/timestamps:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-string">&#39;string&#39;</span> <span class="ruby-comment"># or &#39;nil&#39; or &#39;float&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-string">&#39;string&#39;</span> <span class="ruby-comment"># or &#39;nil&#39; or &#39;float&#39;</span>
+</pre>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/ExtendedDateSupport.html"><code>Sequel::Postgres::ExtendedDateSupport</code></a></p>
 </div>
@@ -57,7 +59,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

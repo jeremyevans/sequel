@@ -38,11 +38,17 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A modification_detection plugin has been added, for automatic detection of in-place column value modifications.  This makes it so you don&#39;t have to call Model#modified! manually when changing a value in place.</p>
+<p>A modification_detection plugin has been added, for automatic detection of in-place column value modifications.  This makes it so you don’t have to call Model#modified! manually when changing a value in place.</p>
 </li><li>
 <p>A column_select plugin has been added, for automatically selecting explicitly qualified columns in model datasets. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT albums.id, albums.name, albums.artist_id</span>&#x000A;<span class="ruby-comment"># FROM albums</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT albums.id, albums.name, albums.artist_id</span>
+<span class="ruby-comment"># FROM albums</span>
+</pre>
 </li><li>
 <p>An insert_returning_select plugin has been added, for automatically setting up RETURNING clauses for models that select explicit columns.  This is useful when using the column_select or lazy_attributes plugins.</p>
 </li><li>
@@ -52,7 +58,13 @@ Last Update:
 </li><li>
 <p>A dataset_source_alias extension has been added, for automatically aliasing datasets to their first source, instead of using t1, t2. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:dataset_source_alias</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS b</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>]).<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS t1</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:dataset_source_alias</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>]).<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS b</span>
+</pre>
 </li><li>
 <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now emulates RETURNING support using the OUTPUT clause, as long as only simple column references are used.</p>
 </li></ul>
@@ -69,7 +81,7 @@ Last Update:
 </li><li>
 <p>When looking up model instances by primary key, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a qualified primary key if the model uses a joined dataset.</p>
 </li><li>
-<p>For associations that require joins, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now use the associated model&#39;s selection directly (instead of associated_table.*) if the associated model&#39;s selection consists solely of qualified columns.</p>
+<p>For associations that require joins, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now use the associated model’s selection directly (instead of associated_table.*) if the associated model’s selection consists solely of qualified columns.</p>
 
 <p>Among other things, this means that a many_to_many association to  a model that uses lazy attributes will not eagerly load the lazy attributes by default.</p>
 </li><li>
@@ -83,7 +95,7 @@ Last Update:
 </li><li>
 <p>The Dataset#unqualified_column_for helper method has been added, returning the unqualified version of a possibly qualified column.</p>
 </li><li>
-<p>The composition and serialization plugins now support validations on the underlying columns.  Previously, they didn&#39;t update the underlying columns until after validations were performed.  This works better when using the auto_validations plugin.</p>
+<p>The composition and serialization plugins now support validations on the underlying columns.  Previously, they didn’t update the underlying columns until after validations were performed.  This works better when using the auto_validations plugin.</p>
 </li><li>
 <p>The class_table_inheritance plugin now uses JOIN ON instead of JOIN USING, which makes it work on all databases that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> supports.  Additionally, the plugin now explicitly selects qualified columns from all of the tables.</p>
 </li><li>
@@ -112,11 +124,11 @@ Last Update:
 </li><li>
 <p>Add the sequel lib directory as an absolute path, fixing cases where you later change the current directory.</p>
 </li><li>
-<p>Require sequel later in the code, so that bin/sequel -h doesn&#39;t need to require sequel, and full backtrace is not printed if requiring sequel raises an error (unless -t is used).</p>
+<p>Require sequel later in the code, so that bin/sequel -h doesn’t need to require sequel, and full backtrace is not printed if requiring sequel raises an error (unless -t is used).</p>
 </li><li>
 <p>If an exception is raised, put a newline between the exception message and backtrace.</p>
 </li><li>
-<p>Don&#39;t allow usage of -C with any of -cdDmS.</p>
+<p>Don’t allow usage of -C with any of -cdDmS.</p>
 </li><li>
 <p>If sequel -v is given along with a database or code string to execute, print the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> version but also continue, similar to how ruby -v works.</p>
 </li></ul>
@@ -137,7 +149,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

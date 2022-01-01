@@ -54,11 +54,19 @@ Last Update:
 <ul><li>
 <p>The JDBC, PostgreSQL, MySQL, and SQLite adapters all now have a Database#indexes method that returns indexes for a given table:</p>
 
-<pre>DB.indexes(:songs)&#x000A;=&gt; {:songs_name_index=&gt;{:unique=&gt;true, :columns=&gt;[:name]},&#x000A;    :songs_lyricid_index=&gt;{:unique=&gt;false, :columns=&gt;[:lyricid]}}</pre>
+<pre>DB.indexes(:songs)
+=&gt; {:songs_name_index=&gt;{:unique=&gt;true, :columns=&gt;[:name]},
+    :songs_lyricid_index=&gt;{:unique=&gt;false, :columns=&gt;[:lyricid]}}</pre>
 </li><li>
 <p>A schema_dumper extension was added to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.  It supports dumping the schema of a table (including indexes) as a string that can be evaluated in the context of a Database object to create the table. It also supports dumping all tables in the database as a string containing a Migration subclass that will rebuild the database.</p>
 
-<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/extensions/schema_dumper&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_table_schema</span>(<span class="ruby-value">:table</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>(<span class="ruby-value">:same_db</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>(<span class="ruby-value">:indexes</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_indexes_migration</span></pre>
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/extensions/schema_dumper&#39;</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_table_schema</span>(<span class="ruby-value">:table</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>(<span class="ruby-value">:same_db</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_migration</span>(<span class="ruby-value">:indexes</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_indexes_migration</span>
+</pre>
 
 <p>The :same_db option causes <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to not translate column types to generic column types.  By default, the migration created will use generic types so it will run on other databases.  However, if you only want to support a single database, using the :same_db option will make the migration use the exact database type parsed from the database.</p>
 
@@ -66,11 +74,22 @@ Last Update:
 </li><li>
 <p>Using options with the generic database types is now supported to a limited extent.  For example, the following code now works:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:a</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">50</span>               <span class="ruby-comment"># varchar(50)</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:b</span>, <span class="ruby-value">:text</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>             <span class="ruby-comment"># text</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:c</span>, <span class="ruby-value">:fixed</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">30</span> <span class="ruby-comment"># char(30)</span>&#x000A;  <span class="ruby-constant">Time</span> <span class="ruby-value">:ts</span>                           <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:only_time</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>          <span class="ruby-comment"># time</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:a</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">50</span>               <span class="ruby-comment"># varchar(50)</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:b</span>, <span class="ruby-value">:text</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>             <span class="ruby-comment"># text</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:c</span>, <span class="ruby-value">:fixed</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">30</span> <span class="ruby-comment"># char(30)</span>
+  <span class="ruby-constant">Time</span> <span class="ruby-value">:ts</span>                           <span class="ruby-comment"># timestamp</span>
+  <span class="ruby-constant">Time</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:only_time</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>          <span class="ruby-comment"># time</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>Using Dataset#filter and related methods with multiple arguments now works much more intuitively:</p>
 
-<pre class="ruby"><span class="ruby-comment"># 2.12.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a IS NULL AND (b = 1) IS NULL</span>&#x000A;<span class="ruby-comment"># 3.0.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a AND b = 1</span></pre>
+<pre class="ruby"><span class="ruby-comment"># 2.12.0</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a IS NULL AND (b = 1) IS NULL</span>
+<span class="ruby-comment"># 3.0.0</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a AND b = 1</span>
+</pre>
 </li><li>
 <p>You can now create temporary tables by passing the :temp=&gt;true option to Database#create_table.</p>
 </li><li>
@@ -78,19 +97,21 @@ Last Update:
 </li><li>
 <p>The Database#database_type method was added that returns a symbol specifying the database type being used.  This can be different than Database.adapter_scheme if you are using an adapter like JDBC that allows connecting to multiple different types of databases.</p>
 </li><li>
-<p>Database#drop_index and related methods now support an options hash that respects the :name option, so they can now be used to drop an index that doesn&#39;t use the default index name.</p>
+<p>Database#drop_index and related methods now support an options hash that respects the :name option, so they can now be used to drop an index that doesn’t use the default index name.</p>
 </li><li>
 <p>The PostgreSQL shared adapter now supports a Database#reset_primary_key_sequence method to reset the primary key sequence for a given table, based on code from ActiveRecord.</p>
 </li><li>
 <p>SQL::QualifiedIdentifiers can now be qualified, allowing you to do:</p>
 
-<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:schema</span>)</pre>
+<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:schema</span>)
+</pre>
 </li><li>
-<p>Using the :db_type=&gt;&#39;mssql&#39; option with the DBI adapter will now load the MSSQL support.</p>
+<p>Using the :db_type=&gt;‘mssql’ option with the DBI adapter will now load the MSSQL support.</p>
 </li><li>
 <p>The MySQL shared adapter now supports Dataset#full_text_sql, which you can use in queries like the following:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:table</span>.<span class="ruby-identifier">*</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">full_text_sql</span>(<span class="ruby-value">:column</span>, <span class="ruby-string">&#39;value&#39;</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:ft</span>))</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:table</span>.<span class="ruby-identifier">*</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">full_text_sql</span>(<span class="ruby-value">:column</span>, <span class="ruby-string">&#39;value&#39;</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:ft</span>))
+</pre>
 </li></ul>
 
 <p>Other Improvements</p>
@@ -98,29 +119,31 @@ Last Update:
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now release connections from the connection pool automatically if they are held by a dead thread.  This can happen if you are using MRI 1.8 and you are heavily multithreaded or you call Thread#exit! or similar method explicitly.  Those methods skip the execution of ensure blocks which normally release the connections when the threads exit.</p>
 </li><li>
-<p>Model#save will now always use the same server when refreshing data after an insert.  This fixes an issue when Sequel&#39;s master/slave database support is used with models.</p>
+<p>Model#save will now always use the same server when refreshing data after an insert.  This fixes an issue when Sequel’s master/slave database support is used with models.</p>
 </li><li>
 <p>SQL Array references are now quoted correctly, so code like this now works:</p>
 
-<pre class="ruby"><span class="ruby-value">:table__column</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-value">:table__column</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>)
+</pre>
 </li><li>
 <p>The PostgreSQL shared adapter now handles sequences that need to be quoted correctly (previously these were quoted twice).</p>
 </li><li>
 <p>String quoting on Oracle no longer doubles backslashes. </p>
 </li><li>
-<p>Database#count now works correctly when used on MSSQL when using an adapter that doesn&#39;t handle unnamed columns.</p>
+<p>Database#count now works correctly when used on MSSQL when using an adapter that doesn’t handle unnamed columns.</p>
 </li><li>
 <p>Full text searching in the MySQL adapter now works correctly when multiple search terms are used.</p>
 </li><li>
-<p>Altering a column&#39;s name, type, default, or NULL/NOT NULL status on MySQL now keeps other relevent column information.  For example, if you alter a column&#39;s type, it&#39;ll keep an existing default. This functionality isn&#39;t complete, there may be other column information that is lost.</p>
+<p>Altering a column’s name, type, default, or NULL/NOT NULL status on MySQL now keeps other relevent column information.  For example, if you alter a column’s type, it’ll keep an existing default. This functionality isn’t complete, there may be other column information that is lost.</p>
 </li><li>
-<p>Fix creation of an index with a given type on MySQL, since MySQL&#39;s documentation lies.</p>
+<p>Fix creation of an index with a given type on MySQL, since MySQL’s documentation lies.</p>
 </li><li>
 <p>The schema parser now handles decimal types with size specifiers, fixing use on MySQL.</p>
 </li><li>
 <p>Dataset#quote_identifier now works correctly when given an SQL::Identifier.  This allows you to do:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">hours</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">hours</span>)}</pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">hours</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">hours</span>)}
+</pre>
 </li></ul>
 
 <p>Backwards Compatibility</p>
@@ -128,21 +151,30 @@ Last Update:
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now use instance_eval on all virtual row blocks without an argument.  This can lead to much nicer code:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}&#x000A;<span class="ruby-comment"># WHERE number &gt; 10 AND name &gt; &#39;M&#39;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}
+<span class="ruby-comment"># WHERE number &gt; 10 AND name &gt; &#39;M&#39;</span>
+</pre>
 
-<p><a href="2_12_0_txt.html">2.12.0</a> raised a deprecation warning if you used a virtual row block without an argument and you hadn&#39;t set Sequel.virtual_row_instance_eval = true.</p>
+<p><a href="2_12_0_txt.html">2.12.0</a> raised a deprecation warning if you used a virtual row block without an argument and you hadn’t set Sequel.virtual_row_instance_eval = true.</p>
 </li><li>
 <p>Dataset#exclude now inverts the given argument, instead of negating it. This only changes its behavior if it is called with a hash or array of all two pairs that have more than one element.</p>
 
-<pre class="ruby"><span class="ruby-comment"># 2.12.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a != 1 AND b != 1</span>&#x000A;<span class="ruby-comment"># 3.0.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a != 1 OR b != 1</span></pre>
+<pre class="ruby"><span class="ruby-comment"># 2.12.0</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a != 1 AND b != 1</span>
+<span class="ruby-comment"># 3.0.0</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># a != 1 OR b != 1</span>
+</pre>
 
 <p>This was done for consistency, since exclude would only negate a hash if it was given an argument, it would invert the same hash if you used a block:</p>
 
-<pre class="ruby"><span class="ruby-comment"># 2.12.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>{{<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}} <span class="ruby-comment"># a != 1 OR b != 1</span></pre>
+<pre class="ruby"><span class="ruby-comment"># 2.12.0</span>
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>{{<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}} <span class="ruby-comment"># a != 1 OR b != 1</span>
+</pre>
 
 <p>If you want the previous behavior, change the code to the following:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>({<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">sql_negate</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>({<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">sql_negate</span>)
+</pre>
 </li><li>
 <p>As noted above, the methods/features deprecated in <a href="2_12_0_txt.html">2.12.0</a> were removed.</p>
 </li><li>
@@ -154,7 +186,8 @@ Last Update:
 </li><li>
 <p>The Firebird adapter no longer translates the text database specific type.  Use the following instead:</p>
 
-<pre class="ruby"><span class="ruby-constant">String</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:text</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">String</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:text</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>
+</pre>
 </li><li>
 <p>The MySQL shared adapter used to use the timestamp type for Time, now it uses datetime.  This is because the timestamp type cannot represent everything that the ruby Time class can represent.</p>
 </li><li>
@@ -172,7 +205,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

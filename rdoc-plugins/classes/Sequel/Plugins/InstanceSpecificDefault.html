@@ -39,15 +39,40 @@ Sequel::Plugins::InstanceSpecificDefault
 
 <p>Associations are instance-specific if their block calls a model instance method, or where the value of the block varies based on runtime state, and the variance is outside of a delayed evaluation. For example, with the following three associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:last_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-identifier">num_tracks</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:last_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-identifier">num_tracks</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p><code>first_track</code> is not instance specific, but <code>last_track</code> and <code>recent_tracks</code> are. <code>last_trac</code> is because the <code>num_tracks</code> call in the block is calling <code>Album#num_tracks</code>.  <code>recent_tracks</code> is because the value will change over time. This plugin allows you to find these cases, and set the :instance_specific option appropriately for them:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:last_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-identifier">num_tracks</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)
+<span class="ruby-keyword">end</span>
 
-<p>For the <code>recent_tracks</code> association, instead of marking it instance_specific, you could also use a delayed evaluation, since it doesn&#39;t actually contain instance-specific code:</p>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:last_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-identifier">num_tracks</span>)
+<span class="ruby-keyword">end</span>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">true</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>For the <code>recent_tracks</code> association, instead of marking it instance_specific, you could also use a delayed evaluation, since it doesn’t actually contain instance-specific code:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:recent_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">date_updated</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">10</span>}}
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Possible arguments to provide when loading the plugin:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>true </td><td>
@@ -66,7 +91,15 @@ Sequel::Plugins::InstanceSpecificDefault
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Set how to handle associations that could be instance specific</span>&#x000A;<span class="ruby-comment"># but did not specify an :instance_specific option, for all subclasses</span>&#x000A;<span class="ruby-comment"># (set before creating subclasses).</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_specific_default</span>, <span class="ruby-value">:warn</span>&#x000A;&#x000A;<span class="ruby-comment"># Set how to handle associations that could be instance specific</span>&#x000A;<span class="ruby-comment"># but did not specify an :instance_specific option, for the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_specific_default</span>, <span class="ruby-value">:warn</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Set how to handle associations that could be instance specific</span>
+<span class="ruby-comment"># but did not specify an :instance_specific option, for all subclasses</span>
+<span class="ruby-comment"># (set before creating subclasses).</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_specific_default</span>, <span class="ruby-value">:warn</span>
+
+<span class="ruby-comment"># Set how to handle associations that could be instance specific</span>
+<span class="ruby-comment"># but did not specify an :instance_specific option, for the Album class</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_specific_default</span>, <span class="ruby-value">:warn</span>
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -101,7 +134,10 @@ Sequel::Plugins::InstanceSpecificDefault
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_specific_default.rb</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">default</span>)&#x000A;<span class="line-num">84</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@instance_specific_default</span>, <span class="ruby-identifier">default</span>)&#x000A;<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_specific_default.rb</span>
+<span class="line-num">83</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">default</span>)
+<span class="line-num">84</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@instance_specific_default</span>, <span class="ruby-identifier">default</span>)
+<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -113,7 +149,7 @@ Sequel::Plugins::InstanceSpecificDefault
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

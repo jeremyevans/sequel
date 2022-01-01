@@ -89,7 +89,11 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1341</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">callable</span>)&#x000A;<span class="line-num">1342</span>   <span class="ruby-ivar">@callable</span> = <span class="ruby-identifier">callable</span>&#x000A;<span class="line-num">1343</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">1344</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1341</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">callable</span>)
+<span class="line-num">1342</span>   <span class="ruby-ivar">@callable</span> = <span class="ruby-identifier">callable</span>
+<span class="line-num">1343</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1344</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -108,7 +112,14 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1349</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;<span class="line-num">1350</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;<span class="line-num">1351</span>     <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;<span class="line-num">1352</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1353</span>     <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">1354</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1355</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1349</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">1350</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">1351</span>     <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">1352</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1353</span>     <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>
+<span class="line-num">1354</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1355</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -120,7 +131,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

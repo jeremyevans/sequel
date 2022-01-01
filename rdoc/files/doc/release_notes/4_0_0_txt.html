@@ -46,11 +46,13 @@ Last Update:
 </li><li>
 <p>Model#save no longer calls Model#_refresh or Model#set_values internally after an insert.  Manual refreshes are now treated differently than after creation refreshes.</p>
 </li><li>
-<p>On SQLite, integer_booleans now defaults to true.  Set this to false to get the previous behavior of &#39;t&#39; for true and &#39;f&#39; for false.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not automatically upgrade your data, users are responsible for doing that if they want to switch the integer_booleans setting.  Note that regardless of the setting, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will return the correct ruby values when retrieving the rows.</p>
+<p>On SQLite, integer_booleans now defaults to true.  Set this to false to get the previous behavior of ‘t’ for true and ‘f’ for false.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not automatically upgrade your data, users are responsible for doing that if they want to switch the integer_booleans setting.  Note that regardless of the setting, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will return the correct ruby values when retrieving the rows.</p>
 
 <p>Example Code to Migrate Existing Data:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;t&#39;</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;t&#39;</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>)
+</pre>
 </li><li>
 <p>On SQLite, use_timestamp_timezones is now false by default.  Set this to true to get the previous behavior with timezone information in timestamps. <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not automatically upgrade your data, users are responsible for doing that if they want to switch the use_timestamp_timezones setting.  Note that regardless of the setting, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will return the correct ruby values when retrieving the rows.</p>
 </li><li>
@@ -72,11 +74,13 @@ Last Update:
 </li><li>
 <p>Calling ungraphed on an eager_graph dataset will restore the row_proc for that dataset.  This is not backwards compatible if your method chain does:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">eager_graph</span>.<span class="ruby-identifier">naked</span>.<span class="ruby-identifier">ungraphed</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">eager_graph</span>.<span class="ruby-identifier">naked</span>.<span class="ruby-identifier">ungraphed</span>
+</pre>
 
 <p>Switch such code to:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">eager_graph</span>.<span class="ruby-identifier">ungraphed</span>.<span class="ruby-identifier">naked</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">eager_graph</span>.<span class="ruby-identifier">ungraphed</span>.<span class="ruby-identifier">naked</span>
+</pre>
 </li><li>
 <p>The Model#set_restricted and update_restricted private methods have a slightly different API now.</p>
 </li><li>
@@ -103,7 +107,21 @@ Last Update:
 <ul><li>
 <p>A pg_array_associations plugin has been added, for creating an association based on a PostgreSQL array column containing foreign keys.  Example:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#   tags                albums</span>&#x000A;<span class="ruby-comment">#   :id (int4) &lt;--\    :id</span>&#x000A;<span class="ruby-comment">#   :name          \-- :tag_ids (int4[])</span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>&#x000A;  <span class="ruby-identifier">pg_array_to_many</span> <span class="ruby-value">:tags</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Tag</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>&#x000A;  <span class="ruby-identifier">many_to_pg_array</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Database schema:</span>
+<span class="ruby-comment">#   tags                albums</span>
+<span class="ruby-comment">#   :id (int4) &lt;--\    :id</span>
+<span class="ruby-comment">#   :name          \-- :tag_ids (int4[])</span>
+<span class="ruby-comment">#                      :name</span>
+
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>
+  <span class="ruby-identifier">pg_array_to_many</span> <span class="ruby-value">:tags</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Tag</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>
+  <span class="ruby-identifier">many_to_pg_array</span> <span class="ruby-value">:albums</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>This operates similarly to a many_to_many association, but does not require a join table.  All of the usual <a href="../../../classes/Sequel.html"><code>Sequel</code></a> association features are supported, such as adding, removing, and clearing associations, eager loading via eager and eager_graph, filtering by associations, and dataset associations.</p>
 
@@ -111,17 +129,23 @@ Last Update:
 </li><li>
 <p>Dataset#from now accepts virtual_row blocks, making it easy to use with table returning functions:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg</span>)}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg</span>)}
+</pre>
 </li><li>
 <p>Sequel.deep_qualify has been added, for easily doing a deep qualification of objects:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(<span class="ruby-value">:table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">+</span>(<span class="ruby-value">:column</span>, <span class="ruby-value">1</span>))&#x000A;<span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; + 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(<span class="ruby-value">:table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;b&#39;</span>))&#x000A;<span class="ruby-comment"># (&quot;table&quot;.&quot;a&quot; LIKE &#39;b&#39; ESCAPE &#39;\&#39;)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(<span class="ruby-value">:table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">+</span>(<span class="ruby-value">:column</span>, <span class="ruby-value">1</span>))
+<span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; + 1)</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(<span class="ruby-value">:table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;b&#39;</span>))
+<span class="ruby-comment"># (&quot;table&quot;.&quot;a&quot; LIKE &#39;b&#39; ESCAPE &#39;\&#39;)</span>
+</pre>
 </li><li>
 <p>The prepared_statements_associations plugin now handles one_to_one associations.</p>
 </li><li>
 <p>SQL::Subscript objects now handle ruby range arguments, operating as an SQL array slice:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># a[1:2]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># a[1:2]</span>
+</pre>
 </li><li>
 <p>Database#create_view now accepts a :columns option to provide explicit column names for the view.</p>
 </li><li>
@@ -133,7 +157,7 @@ Last Update:
 </li><li>
 <p>You can now provide the :owner option to Database#create_schema on PostgreSQL to specify the owner of the schema.</p>
 </li><li>
-<p>You can now provide the :if_exists option to Database#drop_view on PostgreSQL to not raise an error if the view doesn&#39;t exist.</p>
+<p>You can now provide the :if_exists option to Database#drop_view on PostgreSQL to not raise an error if the view doesn’t exist.</p>
 </li><li>
 <p>The pg_json extension now handles non-JSON plain strings, integers and floats in PostgreSQL JSON columns.</p>
 </li></ul>
@@ -193,7 +217,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

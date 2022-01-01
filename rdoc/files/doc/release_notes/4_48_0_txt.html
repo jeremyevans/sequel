@@ -56,13 +56,13 @@ Last Update:
 </li><li>
 <p>Using global conversion procs added by the pg_* extensions, without loading the pg_* extension into the Database instance, are now deprecated.  Additionally, using PGArray.register or PGRange.register to register global types is now also deprecated.  Use Database#register_array_type or Database#register_range_type instead to register the types on a per-Database basis.</p>
 </li><li>
-<p>Treating :natural_inner join type as NATURAL LEFT JOIN on MySQL is now deprecated.  MySQL doesn&#39;t support NATURAL INNER JOIN, but if you were going to convert it, NATURAL JOIN would make more sense.</p>
+<p>Treating :natural_inner join type as NATURAL LEFT JOIN on MySQL is now deprecated.  MySQL doesn’t support NATURAL INNER JOIN, but if you were going to convert it, NATURAL JOIN would make more sense.</p>
 </li><li>
 <p>Unexpected values passed to Dataset#insert_conflict on SQLite are now deprecated.  Only values that result in one of the following strings will be allowed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5: ROLLBACK, ABORT, FAIL, IGNORE, and REPLACE.</p>
 </li><li>
 <p>The Dataset#and, exclude_where, interval, and range methods are now deprecated.  Undeprecated copies are now available in the new sequel_4_dataset_methods extension.</p>
 </li><li>
-<p>Model.<< is now deprecated.  Intuitivately, you would except this to call Model.create and return the Model class, but it calls &lt;&lt; on the model&#39;s dataset and returns the dataset.</p>
+<p>Model.<< is now deprecated.  Intuitivately, you would except this to call Model.create and return the Model class, but it calls &lt;&lt; on the model’s dataset and returns the dataset.</p>
 </li><li>
 <p>The Sequel::Postgres::PG_TYPES constant is now deprecated.  All conversion procs should now be added on a per-Database basis using add_conversion_proc or add_named_conversion_proc.  The following private Database methods related to conversion procs are now deprecated, though some are still called internally and therefore do not have deprecation warnings:</p>
 <ul><li>
@@ -140,11 +140,15 @@ Last Update:
 
 <p>In order to implement this, Sequel.object_to_json now passes any block given to the to_json call on the object.  If you are overriding Sequel.object_to_json, you are responsible for making sure the block is passed appropriately.</p>
 </li><li>
-<p>The association_pks plugin now supports a :association_pks_use_associated_table association option for many_to_many associations.  If this option is used, instead of just looking at the join table, the association_pks getter will get the primary keys from the associated table.  This can be useful if the association&#39;s right_primary_key does not match the associated model&#39;s primary key, and you are interested in the primary keys of the associated objects.  If this option is used, no association_pks setter method is created.</p>
+<p>The association_pks plugin now supports a :association_pks_use_associated_table association option for many_to_many associations.  If this option is used, instead of just looking at the join table, the association_pks getter will get the primary keys from the associated table.  This can be useful if the association’s right_primary_key does not match the associated model’s primary key, and you are interested in the primary keys of the associated objects.  If this option is used, no association_pks setter method is created.</p>
 </li><li>
 <p>Dataset#as_hash has been added as a replacement to to_hash. If you want, you can now undef_method :to_hash and use as_hash and things will work.  Doing so can work around problems when using keyword argument splats in ruby 2.0+. For example:</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">**</span><span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">foo</span>(<span class="ruby-constant">City</span>.<span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>))</pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foo</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">**</span><span class="ruby-identifier">b</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-identifier">foo</span>(<span class="ruby-constant">City</span>.<span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>))
+</pre>
 
 <p>results in foo being called with a being [] and b being City.order(:id).to_hash, which is unexpected and undesired behavior.  If you want to use keyword argument splats or other places where ruby will call to_hash implicitly if it is defined, using undef_method :to_hash is recommended.</p>
 </li><li>
@@ -176,7 +180,7 @@ Last Update:
 </li><li>
 <p>Model.skip_auto_validations(:not_null) in the auto_validations plugin now skips not null checks for columns with default values, in addition to skipping not null checks for columns without default values.</p>
 </li><li>
-<p>The static_cache plugin now supports the options hash argument to to_hash and to_hash_groups.  Currently, it only supports the :hash option, since the :all option doesn&#39;t make sense.</p>
+<p>The static_cache plugin now supports the options hash argument to to_hash and to_hash_groups.  Currently, it only supports the :hash option, since the :all option doesn’t make sense.</p>
 </li><li>
 <p>When touching associations in the touch plugin, clear the cached association, because otherwise the cached values will be stale.</p>
 </li><li>
@@ -235,7 +239,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

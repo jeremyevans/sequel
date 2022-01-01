@@ -165,9 +165,9 @@ Last Update:
 </li><li>
 <p>Deprecate using subtype conversion procs added after registering composite type in the pg_row extension (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t try canceling copy in Database#copy_into if copier is not created yet (aakashAu) (#1384)</p>
+<p>Don’t try canceling copy in Database#copy_into if copier is not created yet (aakashAu) (#1384)</p>
 </li><li>
-<p>Deprecate global conversion procs added by pg_* extensions, when extension isn&#39;t loaded into Database instance (jeremyevans)</p>
+<p>Deprecate global conversion procs added by pg_* extensions, when extension isn’t loaded into Database instance (jeremyevans)</p>
 </li><li>
 <p>Deprecate Sequel::Postgres::PGRange.register in the pg_range extension (jeremyevans)</p>
 </li><li>
@@ -179,7 +179,7 @@ Last Update:
 </li><li>
 <p>Deprecate meta_def extension (jeremyevans)</p>
 </li><li>
-<p>Make class_table_inheritance plugin with :alias option not use subquery for datasets that don&#39;t join (jeremyevans)</p>
+<p>Make class_table_inheritance plugin with :alias option not use subquery for datasets that don’t join (jeremyevans)</p>
 </li><li>
 <p>Deprecate hash_aliases extension (jeremyevans)</p>
 </li><li>
@@ -257,7 +257,7 @@ Last Update:
 </li><li>
 <p>Deprecate calling Dataset#set_graph_aliases before Dataset#graph (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t swallow exception if there is an exception when rolling back a transaction when using :rollback=&gt;:always option (jeremyevans)</p>
+<p>Don’t swallow exception if there is an exception when rolling back a transaction when using :rollback=&gt;:always option (jeremyevans)</p>
 </li><li>
 <p>Deprecate passing 2 arguments to Database#alter_table (jeremyevans)</p>
 </li><li>
@@ -295,7 +295,7 @@ Last Update:
 </li><li>
 <p>Deprecate calling filtering methods without an argument or a block (jeremyevans)</p>
 </li><li>
-<p>Deprecate Sequel::VirtualRow#` to create literal SQL, use Sequel.lit instead (jeremyevans)</p>
+<p>Deprecate Sequel::VirtualRow#‘ to create literal SQL, use Sequel.lit instead (jeremyevans)</p>
 </li><li>
 <p>Add auto_literal_strings extensions for treating plain strings passed to filtering/update methods as literal SQL (jeremyevans)</p>
 </li><li>
@@ -321,7 +321,7 @@ Last Update:
 </li><li>
 <p>Deprecate conversion of - to _ in adapter schemes (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t quote function names that are SQL::Identifiers, unless SQL::Function#quoted is used (jeremyevans)</p>
+<p>Don’t quote function names that are SQL::Identifiers, unless SQL::Function#quoted is used (jeremyevans)</p>
 </li><li>
 <p>Deprecate splitting virtual row method names (jeremyevans)</p>
 </li><li>
@@ -329,7 +329,7 @@ Last Update:
 </li><li>
 <p>Deprecate Sequel::SQL::Expression#sql_literal and lit (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t issue deprecation warnings on ruby 1.8.7, as <a href="../../classes/Sequel.html"><code>Sequel</code></a> 5 is dropping support for it (jeremyevans)</p>
+<p>Don’t issue deprecation warnings on ruby 1.8.7, as <a href="../../classes/Sequel.html"><code>Sequel</code></a> 5 is dropping support for it (jeremyevans)</p>
 </li><li>
 <p>Deprecate Sequel::BasicObject#remove_methods! (jeremyevans)</p>
 </li><li>
@@ -611,7 +611,7 @@ Last Update:
 </li><li>
 <p>Add dataset_module methods such as select and order that define dataset methods which support caching for frozen datasets (jeremyevans)</p>
 </li><li>
-<p>Cache subset datasets if they don&#39;t use blocks or procs for frozen model datasets (jeremyevans)</p>
+<p>Cache subset datasets if they don’t use blocks or procs for frozen model datasets (jeremyevans)</p>
 </li><li>
 <p>Cache intermediate dataset used in Dataset#{last,paged_each} for frozen model datasets without an order (jeremyevans)</p>
 </li><li>
@@ -672,7 +672,7 @@ Last Update:
 </li><li>
 <p>Make association dataset method correctly handle cases where key fields are nil (jeremyevans)</p>
 </li><li>
-<p>Handle pure java exceptions that don&#39;t support message= when reraising the exception in the jdbc adapter (jeremyevans)</p>
+<p>Handle pure java exceptions that don’t support message= when reraising the exception in the jdbc adapter (jeremyevans)</p>
 </li><li>
 <p>Add support for :offset_strategy Database option on DB2, with :limit_offset and :offset_fetch values, to disable OFFSET emulation (#1254) (jeremyevans)</p>
 </li><li>
@@ -681,11 +681,11 @@ Last Update:
 
 <h3 id="label-4.40.0+-282016-10-28-29"><a href="release_notes/4_40_0_txt.html">4.40.0</a> (2016-10-28)<span><a href="#label-4.40.0+-282016-10-28-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Make column_select plugin not raise an exception if the model&#39;s table does not exist (jeremyevans)</p>
+<p>Make column_select plugin not raise an exception if the model’s table does not exist (jeremyevans)</p>
 </li><li>
 <p>Make dataset_associations plugin correctly handle (many|one)_through_many associations with single join table (jeremyevans) (#1253)</p>
 </li><li>
-<p>Add s extension, with adds Sequel::S module that includes private #S method for calling Sequel.expr, including use as refinement (jeremyevans)</p>
+<p>Add s extension, with adds Sequel::S module that includes private S method for calling Sequel.expr, including use as refinement (jeremyevans)</p>
 </li><li>
 <p>Add symbol_as and symbol_as_refinement extensions so that :column.as(:alias) is treated as Sequel.as(:column, :alias) (jeremyevans)</p>
 </li><li>
@@ -697,7 +697,7 @@ Last Update:
 </li><li>
 <p>Do not attempt to combine non-associative operators (jeremyevans) (#1246)</p>
 </li><li>
-<p>Automatically add NOT NULL to columns when adding primary keys if the database doesn&#39;t handle it (jeremyevans)</p>
+<p>Automatically add NOT NULL to columns when adding primary keys if the database doesn’t handle it (jeremyevans)</p>
 </li><li>
 <p>Make <a href="prepared_statements_rdoc.html">prepared_statements</a> plugin correctly handle lookup on joined datasets (jeremyevans) (#1244)</p>
 </li><li>
@@ -747,7 +747,7 @@ Last Update:
 <ul><li>
 <p>Support :driver_options option when using the postgres adapter with pg driver (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t use after commit/rollback database hooks if the model instance methods are not overridden (jeremyevans)</p>
+<p>Don’t use after commit/rollback database hooks if the model instance methods are not overridden (jeremyevans)</p>
 </li><li>
 <p>Add SQL::NumericMethods#coerce, allowing code such as Sequel.expr{1 - x} (jeremyevans)</p>
 </li><li>
@@ -779,11 +779,11 @@ Last Update:
 <ul><li>
 <p>Deprecate use of Bignum class as generic type, since the behavior will change in ruby 2.4 (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t hold connection pool mutex while disconnecting connections (jeremyevans)</p>
+<p>Don’t hold connection pool mutex while disconnecting connections (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t hold references to disconnected connections in the connection_validator extension (jeremyevans)</p>
+<p>Don’t hold references to disconnected connections in the connection_validator extension (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t overwrite existing connection_validation_timeout when loading connection_validator extension multiple times (jeremyevans)</p>
+<p>Don’t overwrite existing connection_validation_timeout when loading connection_validator extension multiple times (jeremyevans)</p>
 </li><li>
 <p>Add connection_expiration extension, for automatically removing connections open for too long (pdrakeweb) (#1208, #1209)</p>
 </li><li>
@@ -874,9 +874,9 @@ Last Update:
 </li><li>
 <p>The boolean_readers, boolean_subsets, and class_table_inheritance plugins no longer do blind rescues (jeremyevans) (#1162)</p>
 </li><li>
-<p>Add Model.require_valid_table setting, if set to true doesn&#39;t swallow any errors for invalid tables (jeremyevans)</p>
+<p>Add Model.require_valid_table setting, if set to true doesn’t swallow any errors for invalid tables (jeremyevans)</p>
 </li><li>
-<p>Creating model classes inside a transaction when the table doesn&#39;t exist no longer rolls back the transaction on PostgreSQL (jeremyevans) (#1160)</p>
+<p>Creating model classes inside a transaction when the table doesn’t exist no longer rolls back the transaction on PostgreSQL (jeremyevans) (#1160)</p>
 </li><li>
 <p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> no longer swallows many errors when subclassing or setting datasets (jeremyevans) (#1160)</p>
 </li><li>
@@ -951,7 +951,7 @@ Last Update:
 </li><li>
 <p>Make Database#schema :db_type entries include sizes for string types on DB2 (jeremyevans)</p>
 </li><li>
-<p>Make Database#schema :db_type entries include sizes for string and decimal types in the jdbc adapter&#39;s schema parsing (jeremyevans)</p>
+<p>Make Database#schema :db_type entries include sizes for string and decimal types in the jdbc adapter’s schema parsing (jeremyevans)</p>
 </li><li>
 <p>Recognize another disconnect error in the tinytds adapter (jeremyevans)</p>
 </li></ul>
@@ -974,7 +974,7 @@ Last Update:
 </li><li>
 <p>Allow for external adapters to implement Dataset#date_add_sql_append to integrate with the date_arithmetic extension (jeremyevans)</p>
 </li><li>
-<p>Add Dataset#insert_empty_columns_values private method for easy overriding for databases that don&#39;t support INSERT with DEFAULT VALUES (jeremyevans)</p>
+<p>Add Dataset#insert_empty_columns_values private method for easy overriding for databases that don’t support INSERT with DEFAULT VALUES (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-4.28.0+-282015-11-02-29"><a href="release_notes/4_28_0_txt.html">4.28.0</a> (2015-11-02)<span><a href="#label-4.28.0+-282015-11-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -987,14 +987,14 @@ Last Update:
 </li><li>
 <p>Make to_csv for model datasets call instance methods, just like Model#to_csv, in the csv_serializer plugin (skrobul) (#1088)</p>
 </li><li>
-<p>Raise Sequel::NoExistingObject instead of generic error if Model#refresh can&#39;t find the related row (jeremyevans)</p>
+<p>Raise Sequel::NoExistingObject instead of generic error if Model#refresh can’t find the related row (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-4.27.0+-282015-10-01-29"><a href="release_notes/4_27_0_txt.html">4.27.0</a> (2015-10-01)<span><a href="#label-4.27.0+-282015-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Don&#39;t stub Sequel.synchronize on MRI (YorickPeterse) (#1083)</p>
+<p>Don’t stub Sequel.synchronize on MRI (YorickPeterse) (#1083)</p>
 </li><li>
-<p>Make bin/sequel warn if given arguments that it doesn&#39;t use (jeremyevans)</p>
+<p>Make bin/sequel warn if given arguments that it doesn’t use (jeremyevans)</p>
 </li><li>
 <p>Fix the order of referenced composite keys returned by Database#foreign_key_list on PostgreSQL (jeremyevans) (#1081)</p>
 </li><li>
@@ -1012,7 +1012,7 @@ Last Update:
 </li><li>
 <p>Add before_after_save plugin, for refreshing created objects and resetting modified flag before calling after_create/update/save hooks (jeremyevans)</p>
 </li><li>
-<p>Add Dataset#single_record! and single_value! which don&#39;t require cloning the receiver (jeremyevans)</p>
+<p>Add Dataset#single_record! and single_value! which don’t require cloning the receiver (jeremyevans)</p>
 </li><li>
 <p>Dataset#with_sql_single_value now works correctly for model datasets (jeremyevans)</p>
 </li><li>
@@ -1087,7 +1087,7 @@ Last Update:
 
 <h3 id="label-4.24.0+-282015-07-01-29"><a href="release_notes/4_24_0_txt.html">4.24.0</a> (2015-07-01)<span><a href="#label-4.24.0+-282015-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Allow class_table_inheritance plugin to support subclasses that don&#39;t add additional columns (QuinnHarris, jeremyevans) (#1030)</p>
+<p>Allow class_table_inheritance plugin to support subclasses that don’t add additional columns (QuinnHarris, jeremyevans) (#1030)</p>
 </li><li>
 <p>Add :columns option to update_refresh plugin, specifying the columns to include in the RETURNING clause (celsworth) (#1029)</p>
 </li><li>
@@ -1141,7 +1141,7 @@ Last Update:
 </li><li>
 <p>Avoid hash allocations and rehashes (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t silently ignore :jdbc_properties Database option in jdbc adapter (jeremyevans)</p>
+<p>Don’t silently ignore :jdbc_properties Database option in jdbc adapter (jeremyevans)</p>
 </li><li>
 <p>Make tree plugin set reciprocal association for children association correctly (lpil, jeremyevans) (#995)</p>
 </li><li>
@@ -1213,7 +1213,7 @@ Last Update:
 </li><li>
 <p>Have swift adapter respect database and application timezone settings (asppsa, jeremyevans) (#946)</p>
 </li><li>
-<p>Don&#39;t have the static cache plugin attempt to validate objects (jeremyevans)</p>
+<p>Don’t have the static cache plugin attempt to validate objects (jeremyevans)</p>
 </li><li>
 <p>Make freeze not validate objects if their errors are already frozen (jeremyevans)</p>
 </li><li>
@@ -1287,13 +1287,13 @@ Last Update:
 </li><li>
 <p>Recognize disconnect errors in the postgres adapter when SSL is used (jeremyevans) (#900)</p>
 </li><li>
-<p>Stop converting &#39;&#39; default values to nil default values on MySQL (jeremyevans)</p>
+<p>Stop converting ” default values to nil default values on MySQL (jeremyevans)</p>
 </li><li>
 <p>Add Model#qualified_pk_hash, for returning a hash with qualified pk keys (jeremyevans)</p>
 </li><li>
 <p>Make validates_unique use a qualified primary key if the dataset is joined (jeremyevans) (#895)</p>
 </li><li>
-<p>Make Sequel::Model.cache_associations = false skip the database&#39;s schema cache when loading the schema (jeremyevans)</p>
+<p>Make Sequel::Model.cache_associations = false skip the database’s schema cache when loading the schema (jeremyevans)</p>
 </li><li>
 <p>Make Database#foreign_key_list work on Microsoft SQL Server 2005 (jeremyevans)</p>
 </li><li>
@@ -1310,7 +1310,7 @@ Last Update:
 </li><li>
 <p>Add support for creating foreign tables on PostgreSQL using :foreign and :options create_table options (jeremyevans)</p>
 </li><li>
-<p>Raise Error if a primary key is necessary to use an association, but the model doesn&#39;t have a primary key (jeremyevans)</p>
+<p>Raise Error if a primary key is necessary to use an association, but the model doesn’t have a primary key (jeremyevans)</p>
 </li><li>
 <p>Make tactical_eager_loading plugin work for limited associations (jeremyevans)</p>
 </li><li>
@@ -1402,7 +1402,7 @@ Last Update:
 </li><li>
 <p>Add column_select plugin, for using explicit column selections in model datasets (jeremyevans)</p>
 </li><li>
-<p>Use associated model&#39;s existing selection for join associations if it consists solely of explicitly quailfied columns (jeremyevans)</p>
+<p>Use associated model’s existing selection for join associations if it consists solely of explicitly quailfied columns (jeremyevans)</p>
 </li><li>
 <p>Add round_timestamps extension for automatically rounding timestamp values to database precision before literalizing (jeremyevans)</p>
 </li><li>
@@ -1447,7 +1447,7 @@ Last Update:
 </li><li>
 <p>Associate reciprocal object before saving associated object when creating new objects in nested_attributes (chanks, jeremyevans) (#831)</p>
 </li><li>
-<p>Handle intervals containing more than 100 hours in the pg_interval extension&#39;s parser (will) (#827)</p>
+<p>Handle intervals containing more than 100 hours in the pg_interval extension’s parser (will) (#827)</p>
 </li><li>
 <p>Remove methods/class deprecated in <a href="release_notes/4_11_0_txt.html">4.11.0</a> (jeremyevans)</p>
 </li><li>
@@ -1460,7 +1460,7 @@ Last Update:
 
 <h3 id="label-4.11.0+-282014-06-03-29"><a href="release_notes/4_11_0_txt.html">4.11.0</a> (2014-06-03)<span><a href="#label-4.11.0+-282014-06-03-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Add :model_map option to class_table_inheritance plugin so class names don&#39;t need to be stored in the database (jeremyevans)</p>
+<p>Add :model_map option to class_table_inheritance plugin so class names don’t need to be stored in the database (jeremyevans)</p>
 </li><li>
 <p>Set version when using for MySQL/SQLite emulation in the mock adapter (jeremyevans)</p>
 </li><li>
@@ -1583,7 +1583,7 @@ Last Update:
 </li><li>
 <p>Handle placeholder literalizer arguments when emulating offsets (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t attempt to emulate offsets if the dataset uses literal SQL (jeremyevans)</p>
+<p>Don’t attempt to emulate offsets if the dataset uses literal SQL (jeremyevans)</p>
 </li><li>
 <p>Use a UNION-based strategy by default to eagerly load limited associations (jeremyevans)</p>
 </li><li>
@@ -1602,7 +1602,7 @@ Last Update:
 </li><li>
 <p>Do not attempt to eager load when calling Dataset#columns in the eager_each plugin (jeremyevans)</p>
 </li><li>
-<p>Support :driver option for jdbc adapter, for specifying driver class for cases where getConnection doesn&#39;t work (jeremyevans) (#785)</p>
+<p>Support :driver option for jdbc adapter, for specifying driver class for cases where getConnection doesn’t work (jeremyevans) (#785)</p>
 </li><li>
 <p>Massive speedup for PostgreSQL array parser (jeremyevans) (#788)</p>
 </li><li>
@@ -1610,7 +1610,7 @@ Last Update:
 </li><li>
 <p>Recognize additional unique constraint violations on SQLite (jeremyevans) (#782)</p>
 </li><li>
-<p>Don&#39;t remove column value when validating nested attributes for one_to_* association where association foreign key is the model&#39;s primary key (jeremyevans)</p>
+<p>Don’t remove column value when validating nested attributes for one_to_* association where association foreign key is the model’s primary key (jeremyevans)</p>
 </li><li>
 <p>Add Dataset#disable_insert_returning on PostgreSQL for skipping implicit use of RETURNING (jeremyevans)</p>
 </li><li>
@@ -1638,7 +1638,7 @@ Last Update:
 </li><li>
 <p>Add Database#create_join_table? and create_join_table! for consistency (jeremyevans)</p>
 </li><li>
-<p>Add Dataset#where_current_of to the postgres adapter for supporting updating rows based on a cursor&#39;s current position (jeremyevans)</p>
+<p>Add Dataset#where_current_of to the postgres adapter for supporting updating rows based on a cursor’s current position (jeremyevans)</p>
 </li><li>
 <p>Add Dataset#use_cursor :hold option in the postgres adapter for supporting cursor use outside of a transaction (jeremyevans)</p>
 </li><li>
@@ -1694,7 +1694,7 @@ Last Update:
 
 <h3 id="label-4.7.0+-282014-02-01-29"><a href="release_notes/4_7_0_txt.html">4.7.0</a> (2014-02-01)<span><a href="#label-4.7.0+-282014-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Don&#39;t swallow underlying exception if there is an exception closing the cursor on PostgreSQL (jeremyevans) (#761)</p>
+<p>Don’t swallow underlying exception if there is an exception closing the cursor on PostgreSQL (jeremyevans) (#761)</p>
 </li><li>
 <p>Recognize primary key unique constraint violations on MSSQL and SQLAnywhere (jeremyevans)</p>
 </li><li>
@@ -1708,11 +1708,11 @@ Last Update:
 </li><li>
 <p>Add SQL::Function#over for easier creation of window functions (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t clear validation instance_hooks until after a successful save (jeremyevans)</p>
+<p>Don’t clear validation instance_hooks until after a successful save (jeremyevans)</p>
 </li><li>
 <p>Support :raise_on_save_failure option for one_to_many, pg_array_to_many, and many_to_pg_array associations (jeremyevans)</p>
 </li><li>
-<p>Make SQLTime#to_s return a string in HH:MM:SS format, since it shouldn&#39;t include date information (jeremyevans)</p>
+<p>Make SQLTime#to_s return a string in HH:MM:SS format, since it shouldn’t include date information (jeremyevans)</p>
 </li><li>
 <p>Support the Database#tables :schema option in the jdbc adapter (robbiegill, jeremyevans) (#755)</p>
 </li><li>
@@ -1748,7 +1748,7 @@ Last Update:
 </li><li>
 <p>Copy unique constraints when emulating alter_table operations on SQLite (jeremyevans) (#735)</p>
 </li><li>
-<p>Don&#39;t return clob column values as SQL::Blob instances in the db2 and ibmdb adapters unless use_clob_as_blob is true (jeremyevans)</p>
+<p>Don’t return clob column values as SQL::Blob instances in the db2 and ibmdb adapters unless use_clob_as_blob is true (jeremyevans)</p>
 </li><li>
 <p>Make use_clob_as_blob false by default on DB2 (jeremyevans)</p>
 </li><li>
@@ -1763,11 +1763,11 @@ Last Update:
 <ul><li>
 <p>Make Database#tables not show tables in the recycle bin on Oracle (jeremyevans) (#728)</p>
 </li><li>
-<p>Don&#39;t automatically order on all columns when emulating offsets for unordered datasets on DB2 (jeremyevans)</p>
+<p>Don’t automatically order on all columns when emulating offsets for unordered datasets on DB2 (jeremyevans)</p>
 </li><li>
 <p>Improve PostgreSQL type support in the jdbc/postgresql adapter (jeremyevans)</p>
 </li><li>
-<p>Make offset emulation on Oracle work when using columns that can&#39;t be ordered (jeremyevans, sdeming) (#724, #725)</p>
+<p>Make offset emulation on Oracle work when using columns that can’t be ordered (jeremyevans, sdeming) (#724, #725)</p>
 </li><li>
 <p>Make filter by associations support handle associations with :conditions or block (jeremyevans)</p>
 </li><li>
@@ -1831,7 +1831,7 @@ Last Update:
 </li><li>
 <p>Add implementations of Model#dup and Model#clone (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t have partial_indexes returned by Database#indexes on MSSQL 2008+ (jeremyevans)</p>
+<p>Don’t have partial_indexes returned by Database#indexes on MSSQL 2008+ (jeremyevans)</p>
 </li><li>
 <p>Support partial indexes on SQLite <a href="release_notes/3_8_0_txt.html">3.8.0</a>+ (jeremyevans)</p>
 </li><li>
@@ -1883,7 +1883,7 @@ Last Update:
 </li><li>
 <p>Convert Java::JavaUtil::HashMap to ruby Hash in jdbc adapter, for better handling of PostgreSQL hstore type (jeremyevans) (#686)</p>
 </li><li>
-<p>Raise NoMatchingRow if calling add_association with a primary key value that doesn&#39;t match an existing row (jeremyevans)</p>
+<p>Raise NoMatchingRow if calling add_association with a primary key value that doesn’t match an existing row (jeremyevans)</p>
 </li><li>
 <p>Allow PostgreSQL add_constraint to support :not_valid option (jeremyevans)</p>
 </li><li>
@@ -1942,7 +1942,7 @@ Last Update:
 </li><li>
 <p>Raise exception for infinite and NaN floats on MySQL (jeremyevans) (#677)</p>
 </li><li>
-<p>Make dataset string literalization that requires database connection use dataset&#39;s chosen server (jeremyevans)</p>
+<p>Make dataset string literalization that requires database connection use dataset’s chosen server (jeremyevans)</p>
 </li><li>
 <p>Make sure an offset without a limit is handled correctly when eager loading (jeremyevans)</p>
 </li><li>
@@ -2069,9 +2069,9 @@ Last Update:
 </li><li>
 <p>Deprecate Model.set_primary_key taking multiple arguments (jeremyevans)</p>
 </li><li>
-<p>Make auto_validations plugin work with databases that don&#39;t support index parsing (jeremyevans)</p>
+<p>Make auto_validations plugin work with databases that don’t support index parsing (jeremyevans)</p>
 </li><li>
-<p>Model classes will no longer call Database#schema if it isn&#39;t supported (jeremyevans)</p>
+<p>Model classes will no longer call Database#schema if it isn’t supported (jeremyevans)</p>
 </li><li>
 <p>Speed up Model.with_pk and with_pk! class methods (jeremyevans)</p>
 </li><li>
@@ -2109,7 +2109,7 @@ Last Update:
 </li><li>
 <p>Deprecate casting via __type suffix for prepared type placeholders in the postgres adapter (jeremyevans)</p>
 </li><li>
-<p>Deprecate json_serializer&#39;s Model.json_create (jeremyevans)</p>
+<p>Deprecate json_serializer’s Model.json_create (jeremyevans)</p>
 </li><li>
 <p>Deprecate json_serializer from_json and xml_serializer from_xml :all_columns and :all_associations options (jeremyevans)</p>
 </li><li>
@@ -2189,7 +2189,7 @@ Last Update:
 </li><li>
 <p>Deprecate Database#do as an alias to execute/execute_dui in some adapters (jeremyevans)</p>
 </li><li>
-<p>Deprecate modifying initial Dataset hash if the hash wasn&#39;t provided as an argument (jeremyevans)</p>
+<p>Deprecate modifying initial Dataset hash if the hash wasn’t provided as an argument (jeremyevans)</p>
 </li><li>
 <p>Make active_model plugin use an errors class with autovivification (jeremyevans)</p>
 </li><li>
@@ -2229,7 +2229,7 @@ Last Update:
 </li><li>
 <p>Allow specifying explicit columns to update in Model#save via the :columns option (jeremyevans)</p>
 </li><li>
-<p>Add ability set the default for join_table&#39;s :qualify option via Dataset#default_join_table_qualification (jeremyevans)</p>
+<p>Add ability set the default for join_table’s :qualify option via Dataset#default_join_table_qualification (jeremyevans)</p>
 </li><li>
 <p>Deprecated :root=&gt;true meaning :root=&gt;:both in the json_serializer (jeremyevans)</p>
 </li><li>
@@ -2242,7 +2242,7 @@ Last Update:
 
 <h3 id="label-3.47.0+-282013-05-01-29"><a href="release_notes/3_47_0_txt.html">3.47.0</a> (2013-05-01)<span><a href="#label-3.47.0+-282013-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Don&#39;t fail for missing conversion proc in pg_typecast_on_load plugin (jeremyevans)</p>
+<p>Don’t fail for missing conversion proc in pg_typecast_on_load plugin (jeremyevans)</p>
 </li><li>
 <p>Rename PGRangeOp starts_before and ends_after to ends_before and starts_after (soupmatt) (#655)</p>
 </li><li>
@@ -2250,7 +2250,7 @@ Last Update:
 </li><li>
 <p>Handle hstore[] types on PostgreSQL if using pg_array and pg_hstore extensions (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t reset conversion procs when loading pg_* extensions (jeremyevans)</p>
+<p>Don’t reset conversion procs when loading pg_* extensions (jeremyevans)</p>
 </li><li>
 <p>Handle domain types when parsing the schema on PostgreSQL (jeremyevans)</p>
 </li><li>
@@ -2394,7 +2394,7 @@ Last Update:
 </li><li>
 <p>Add Dataset#escape_like, for escaping LIKE metacharacters (jeremyevans) (#614)</p>
 </li><li>
-<p>The LIKE operators now use an explicit ESCAPE &#39;&#39; clause for similar behavior across databases (jeremyevans)</p>
+<p>The LIKE operators now use an explicit ESCAPE ‘&#39; clause for similar behavior across databases (jeremyevans)</p>
 </li><li>
 <p>Make Database#tables and views accept a :qualify option on PostgreSQL to return qualified identifiers (jeremyevans)</p>
 </li><li>
@@ -2427,7 +2427,7 @@ Last Update:
 </li><li>
 <p>Expand columns_introspection extension to handle subselects (jeremyevans)</p>
 </li><li>
-<p>Have last and paged_each for model datasets order by the model&#39;s primary key by default (jeremyevans)</p>
+<p>Have last and paged_each for model datasets order by the model’s primary key by default (jeremyevans)</p>
 </li><li>
 <p>Improve emulated offset support to handle subqueries (jeremyevans)</p>
 </li><li>
@@ -2456,7 +2456,7 @@ Last Update:
 </li><li>
 <p>Fix Database#copy_into on jdbc/postgres when an exception is raised (jeremyevans)</p>
 </li><li>
-<p>Add core_refinements extension, providing refinement versions of Sequel&#39;s core extensions (jeremyevans)</p>
+<p>Add core_refinements extension, providing refinement versions of Sequel’s core extensions (jeremyevans)</p>
 </li><li>
 <p>Make Database#copy_into raise a DatabaseError if the database signals an error in the postgres adapter (jeremyevans)</p>
 </li><li>
@@ -2497,7 +2497,7 @@ Last Update:
 </li><li>
 <p>Support setting default string column sizes on a per-Database basis via default_string_column_size (jeremyevans)</p>
 </li><li>
-<p>Reset Model.instance_dataset when extending the model&#39;s dataset (jeremyevans)</p>
+<p>Reset Model.instance_dataset when extending the model’s dataset (jeremyevans)</p>
 </li><li>
 <p>Make the force_encoding plugin work with frozen strings (jeremyevans)</p>
 </li><li>
@@ -2634,7 +2634,7 @@ Last Update:
 </li><li>
 <p>No longer handle model instances in plain (non-model) datasets when inserting (jeremyevans)</p>
 </li><li>
-<p>Use subselects for model classes as tables in join methods in model datasets if the model&#39;s dataset isn&#39;t a simple select (jeremyevans)</p>
+<p>Use subselects for model classes as tables in join methods in model datasets if the model’s dataset isn’t a simple select (jeremyevans)</p>
 </li><li>
 <p>No longer handle model classes as tables in join/graph methods in plain (non-model) datasets (jeremyevans)</p>
 </li><li>
@@ -2669,7 +2669,7 @@ Last Update:
 </li><li>
 <p>When loading multiple pg_* extensions via Database#extension, only reset the conversion procs once (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t allow model typecasting from string to postgres array, hstore, or composite types (jeremyevans)</p>
+<p>Don’t allow model typecasting from string to postgres array, hstore, or composite types (jeremyevans)</p>
 </li><li>
 <p>Add pg_typecast_on_load plugin for converting advanced PostgreSQL types on load the {jdbc,do,swift}/postgres adapters (jeremyevans)</p>
 </li><li>
@@ -2687,11 +2687,11 @@ Last Update:
 </li><li>
 <p>Remove Sequel::SQL::IdentifierMethods (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t have the schema_dumper extension produce code that relies on the <a href="core_extensions_rdoc.html">core_extensions</a> (jeremyevans)</p>
+<p>Don’t have the schema_dumper extension produce code that relies on the <a href="core_extensions_rdoc.html">core_extensions</a> (jeremyevans)</p>
 </li><li>
 <p>Fix dropping of columns with constraints on Microsoft SQL Server (mluu, jeremyevans) (#515, #518)</p>
 </li><li>
-<p>Don&#39;t have pg_* extensions add methods to core classes unless the <a href="core_extensions_rdoc.html">core_extensions</a> extension is loaded (jeremyevans)</p>
+<p>Don’t have pg_* extensions add methods to core classes unless the <a href="core_extensions_rdoc.html">core_extensions</a> extension is loaded (jeremyevans)</p>
 </li><li>
 <p>Use real boolean literals on derby 10.7+ (jeremyevans, matthauck) (#514)</p>
 </li><li>
@@ -2724,7 +2724,7 @@ Last Update:
 </li><li>
 <p>Save a new one_to_one associated object once instead of twice in the nested_attributes plugin (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t add unnecessary filter condition when passing a new object to a one_to_one setter method (jeremyevans)</p>
+<p>Don’t add unnecessary filter condition when passing a new object to a one_to_one setter method (jeremyevans)</p>
 </li><li>
 <p>Differentiate between column references and method references in many_through_many associations (jeremyevans)</p>
 </li><li>
@@ -2824,7 +2824,7 @@ Last Update:
 </li><li>
 <p>Fix typecasting of time columns on jdbc/postgres, before could be off by a millisecond (jeremyevans)</p>
 </li><li>
-<p>Add document explaining Sequel&#39;s object model (jeremyevans)</p>
+<p>Add document explaining Sequel’s object model (jeremyevans)</p>
 </li><li>
 <p>Attempt to detect more disconnect errors in the mysql2 adapter (jeremyevans)</p>
 </li><li>
@@ -2834,7 +2834,7 @@ Last Update:
 </li><li>
 <p>Add pg_inet extension, for working with PostgreSQL inet and cidr types (jeremyevans)</p>
 </li><li>
-<p>Fix bug in model column setters when passing an object that raises an exception for ==(&#39;&#39;) (jeremyevans)</p>
+<p>Fix bug in model column setters when passing an object that raises an exception for ==(”) (jeremyevans)</p>
 </li><li>
 <p>Add eager_each plugin, which makes each on an eagerly loaded dataset do eager loading (jeremyevans)</p>
 </li><li>
@@ -2850,7 +2850,7 @@ Last Update:
 </li><li>
 <p>Support savepoints in prepared transactions on MySQL 5.5.23+ (jeremyevans)</p>
 </li><li>
-<p>Add pg_json extension, for working with PostgreSQL 9.2&#39;s new json type (jeremyevans)</p>
+<p>Add pg_json extension, for working with PostgreSQL 9.2’s new json type (jeremyevans)</p>
 </li><li>
 <p>In the optimistic locking plugin, make refresh and save after a failed save work correctly (jeremyevans)</p>
 </li><li>
@@ -2870,7 +2870,7 @@ Last Update:
 </li><li>
 <p>Apply :timeout MySQL connection setting on do, jdbc, and swift adapters (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t set Sequel::Model.db automatically when creating an anonymous class with an associated database object (jeremyevans)</p>
+<p>Don’t set Sequel::Model.db automatically when creating an anonymous class with an associated database object (jeremyevans)</p>
 </li><li>
 <p>Add :connection_handling=&gt;:queue option to the threaded connection pools, may reduce chance of stale connections (jeremyevans) (#481)</p>
 </li><li>
@@ -2909,7 +2909,7 @@ Last Update:
 </li><li>
 <p>Recognize identity type in the schema dumper (jeremyevans) (#468)</p>
 </li><li>
-<p>Don&#39;t assign instance variables to Java objects, for future JRuby 2.0 support (jeremyevans) (#466)</p>
+<p>Don’t assign instance variables to Java objects, for future JRuby 2.0 support (jeremyevans) (#466)</p>
 </li><li>
 <p>Use date and timestamp formats that are multilanguage and not DATEFORMAT dependent on Microsoft SQL Server (jeremyevans)</p>
 </li><li>
@@ -2919,7 +2919,7 @@ Last Update:
 </li><li>
 <p>Add Database#supports_transactional_ddl? for checking if DDL statements can be rolled back in transactions (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t use auto parameterization when using cursors in the pg_auto_parameterize extension (jeremyevans) (#463)</p>
+<p>Don’t use auto parameterization when using cursors in the pg_auto_parameterize extension (jeremyevans) (#463)</p>
 </li><li>
 <p>No longer escape backslashes in strings by default, fixes doubled backslashes on some adapters (jeremyevans)</p>
 </li><li>
@@ -2951,17 +2951,17 @@ Last Update:
 </li><li>
 <p>Actually use RETURNING for deletes/updates on PostgreSQL 8.2-9.0 (jeremyevans)</p>
 </li><li>
-<p>You can now require &#39;sequel/no_core_ext&#39; to load <a href="../../classes/Sequel.html"><code>Sequel</code></a> without the core extensions (jeremyevans)</p>
+<p>You can now require ‘sequel/no_core_ext’ to load <a href="../../classes/Sequel.html"><code>Sequel</code></a> without the core extensions (jeremyevans)</p>
 </li><li>
 <p>The core extensions have now been made a real <a href="../../classes/Sequel.html"><code>Sequel</code></a> extension (still loaded by default) (jeremyevans)</p>
 </li><li>
-<p>VirtualRow#` has been added for creating literal strings (jeremyevans)</p>
+<p>VirtualRow#‘ has been added for creating literal strings (jeremyevans)</p>
 </li><li>
 <p>VirtualRow instances now have operator methods defined {+,-,*,/,&amp;,|,~,&gt;,&lt;,&gt;=,&lt;=} (jeremyevans)</p>
 </li><li>
 <p>Array#all_two_pairs? is now deprecated and will be removed after <a href="release_notes/3_34_0_txt.html">3.34.0</a> is released (jeremyevans)</p>
 </li><li>
-<p>All of Sequel&#39;s core extensions now have equivalent methods defined on the <a href="../../classes/Sequel.html"><code>Sequel</code></a> module (jeremyevans)</p>
+<p>All of Sequel’s core extensions now have equivalent methods defined on the <a href="../../classes/Sequel.html"><code>Sequel</code></a> module (jeremyevans)</p>
 </li><li>
 <p>Add Sequel.core_extensions? for checking if the core extensions are enabled (jeremyevans)</p>
 </li><li>
@@ -2979,7 +2979,7 @@ Last Update:
 </li><li>
 <p>Add select_remove extension which adds Dataset#select_remove for removing columns/expressions from a dataset selection (jeremyevans)</p>
 </li><li>
-<p>Add static_cache plugin, for staticly caching all model instances, useful for model tables that don&#39;t change (jeremyevans)</p>
+<p>Add static_cache plugin, for staticly caching all model instances, useful for model tables that don’t change (jeremyevans)</p>
 </li><li>
 <p>Add Model#freeze implementation to get a working frozen model object (jeremyevans)</p>
 </li><li>
@@ -2991,7 +2991,7 @@ Last Update:
 </li><li>
 <p>Dump foreign key constraints by default when using the schema dumper extension (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t raise an error when no indexes exist for a table when calling Database#indexes on the jdbc/sqlite adapter (jeremyevans)</p>
+<p>Don’t raise an error when no indexes exist for a table when calling Database#indexes on the jdbc/sqlite adapter (jeremyevans)</p>
 </li><li>
 <p>Copy composite foreign key constraints when emulating alter_table on SQLite (jeremyevans)</p>
 </li><li>
@@ -3120,7 +3120,7 @@ Last Update:
 </li><li>
 <p>Make foreign key creation work on MySQL with InnoDB engine without specifying :key option (jeremyevans)</p>
 </li><li>
-<p>Allow disabling use of sudo with SUDO=&#39;&#39; when running the rake install/uninstall tasks (jeremyevans) (#433)</p>
+<p>Allow disabling use of sudo with SUDO=” when running the rake install/uninstall tasks (jeremyevans) (#433)</p>
 </li></ul>
 
 <h3 id="label-3.32.0+-282012-02-01-29"><a href="release_notes/3_32_0_txt.html">3.32.0</a> (2012-02-01)<span><a href="#label-3.32.0+-282012-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -3159,7 +3159,7 @@ Last Update:
 </li><li>
 <p>Qualify identifiers when filtering/excluding by associations (jeremyevans)</p>
 </li><li>
-<p>Make table_exists? better handle tables where you don&#39;t have permissions for all columns (jeremyevans) (#422)</p>
+<p>Make table_exists? better handle tables where you don’t have permissions for all columns (jeremyevans) (#422)</p>
 </li><li>
 <p>Using new association options, support associations based on columns that clash with ruby method names (jeremyevans) (#417)</p>
 </li><li>
@@ -3268,7 +3268,7 @@ Last Update:
 </li><li>
 <p>Make like case sensitive on SQLite and Microsoft SQL Server (use ilike for case insensitive matching) (jeremyevans)</p>
 </li><li>
-<p>Add Database#extend_datasets for the equivalent of extending of the Database object&#39;s datasets with a module (jeremyevans)</p>
+<p>Add Database#extend_datasets for the equivalent of extending of the Database object’s datasets with a module (jeremyevans)</p>
 </li><li>
 <p>Speed up Dataset map, to_hash, and related methods if an array of symbols is given (jeremyevans)</p>
 </li><li>
@@ -3278,7 +3278,7 @@ Last Update:
 </li><li>
 <p>Speed up loading model objects from the database by up to 7-16% (jeremyevans)</p>
 </li><li>
-<p>Create accessor methods for all columns in a model&#39;s table, even if the dataset doesn&#39;t select the columns (jeremyevans)</p>
+<p>Create accessor methods for all columns in a model’s table, even if the dataset doesn’t select the columns (jeremyevans)</p>
 </li><li>
 <p>Add mock adapter for better mocking of a database connection (jeremyevans)</p>
 </li><li>
@@ -3288,11 +3288,11 @@ Last Update:
 </li><li>
 <p>Significant improvements to the db2 adapter (jeremyevans)</p>
 </li><li>
-<p>Handle methods with names that can&#39;t be called directly in Model.def_dataset_method (jeremyevans)</p>
+<p>Handle methods with names that can’t be called directly in Model.def_dataset_method (jeremyevans)</p>
 </li><li>
 <p>Add dataset_associations plugin for making dataset methods that return datasets of associated objects (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t allow Model.def_dataset_method to override private model methods (jeremyevans)</p>
+<p>Don’t allow Model.def_dataset_method to override private model methods (jeremyevans)</p>
 </li><li>
 <p>Parsing primary key information from system tables in the shared MSSQL adapter (jeremyevans)</p>
 </li><li>
@@ -3344,7 +3344,7 @@ Last Update:
 </li><li>
 <p>Much better support for Oracle in both the oci8-based oracle adapter and the jdbc oracle subadapter (jeremyevans)</p>
 </li><li>
-<p>Handle CTEs in subselects in more places on databases that don&#39;t natively support CTEs in subselects (jeremyevans)</p>
+<p>Handle CTEs in subselects in more places on databases that don’t natively support CTEs in subselects (jeremyevans)</p>
 </li><li>
 <p>Change Dataset#to_hash to not call the row_proc if 2 arguments are given (jeremyevans)</p>
 </li><li>
@@ -3411,13 +3411,13 @@ Last Update:
 </li><li>
 <p>Speed up SQL operator methods by using module_eval instead of define_method (jeremyevans)</p>
 </li><li>
-<p>Support sql_(boolean,number,string) methods on ComplexExpressions, allowing you do to (x + 1).sql_string + &#39;a&#39; for (x + 1) || &#39;a&#39; (jeremyevans)</p>
+<p>Support sql_(boolean,number,string) methods on ComplexExpressions, allowing you do to (x + 1).sql_string + ‘a’ for (x + 1) || ‘a’ (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t disallow SQL expression creation based on types, leave that to the database server (jeremyevans)</p>
+<p>Don’t disallow SQL expression creation based on types, leave that to the database server (jeremyevans)</p>
 </li><li>
 <p>Make :column [&amp;|] 1 use an SQL bitwise [&amp;|] expression instead of a logical (AND|OR) expression (jeremyevans)</p>
 </li><li>
-<p>Make :column + &#39;a&#39; use an SQL string concatenation expression instead of an addition expression (jeremyevans)</p>
+<p>Make :column + ‘a’ use an SQL string concatenation expression instead of an addition expression (jeremyevans)</p>
 </li><li>
 <p>Fix :time typecasting from Time to SQLTime for fractional seconds on ruby 1.9 (jeremyevans)</p>
 </li><li>
@@ -3457,7 +3457,7 @@ Last Update:
 </li><li>
 <p>Emulate handling of extract on SQLite, but you need to set Database#use_timestamp_timezones = false (jeremyevans)</p>
 </li><li>
-<p>Abstract handling of ComplexExpressionMethods#extract so that it can work on databases that don&#39;t implement extract (jeremyevans)</p>
+<p>Abstract handling of ComplexExpressionMethods#extract so that it can work on databases that don’t implement extract (jeremyevans)</p>
 </li><li>
 <p>Emulate xor operator on SQLite (jeremyevans)</p>
 </li><li>
@@ -3503,7 +3503,7 @@ Last Update:
 </li><li>
 <p>Replace internal implementation of eager_graph with much faster version (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t treat strings with leading zeros as octal format in the default typecasting (jeremyevans)</p>
+<p>Don’t treat strings with leading zeros as octal format in the default typecasting (jeremyevans)</p>
 </li><li>
 <p>Fix literalization of Date, Time, and DateTime values on Microsoft Access (jeremyevans)</p>
 </li><li>
@@ -3538,7 +3538,7 @@ Last Update:
 </li><li>
 <p>Support :cascade option to drop_table, drop_view, drop_column, and drop_constraint for using CASCADE (jeremyevans)</p>
 </li><li>
-<p>If validation error messages are LiteralStrings, don&#39;t add the column name to them in Errors#full_messages (jeremyevans)</p>
+<p>If validation error messages are LiteralStrings, don’t add the column name to them in Errors#full_messages (jeremyevans)</p>
 </li><li>
 <p>Fix bug loading plugins on 1.9 where ::ClassMethods, ::InstanceMethods, or ::DatasetMethods is defined (jeremyevans)</p>
 </li><li>
@@ -3627,7 +3627,7 @@ Last Update:
 </li><li>
 <p>Add support for filtering by associations to model datasets (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t call insert_select when saving a model that doesn&#39;t select all columns of the table (jeremyevans)</p>
+<p>Don’t call insert_select when saving a model that doesn’t select all columns of the table (jeremyevans)</p>
 </li><li>
 <p>Fix bug when using :select=&gt;[] option for a many_to_many association (jeremyevans)</p>
 </li><li>
@@ -3645,7 +3645,7 @@ Last Update:
 </li><li>
 <p>Support dynamic callbacks to customize eager loading at query time (jfirebaugh, jeremyevans)</p>
 </li><li>
-<p>Fix bug in the identity_map plugin for many_to_one associations when the association reflection hadn&#39;t been filled in yet (funny-falcon)</p>
+<p>Fix bug in the identity_map plugin for many_to_one associations when the association reflection hadn’t been filled in yet (funny-falcon)</p>
 </li><li>
 <p>Add serialization_modification_detection plugin for detecting changes in serialized columns (jeremyevans) (#333)</p>
 </li></ul>
@@ -3658,15 +3658,15 @@ Last Update:
 </li><li>
 <p>Fix ODBC::Time instance handling in the odbc adapter (jeremyevans)</p>
 </li><li>
-<p>Use Sequel.application_timezone when connecting in the oracle adapter to set the connection&#39;s session&#39;s timezone (jmthomas)</p>
+<p>Use Sequel.application_timezone when connecting in the oracle adapter to set the connection’s session’s timezone (jmthomas)</p>
 </li><li>
-<p>In the ADO adapter, assume access to SQL Server if a :conn_string option is given that doesn&#39;t indicate Access/Jet (damir.si) (#332)</p>
+<p>In the ADO adapter, assume access to SQL Server if a :conn_string option is given that doesn’t indicate Access/Jet (damir.si) (#332)</p>
 </li><li>
 <p>Use the correct class when loading instances for descendents of model classes that use single table inheritance (jeremyevans)</p>
 </li><li>
 <p>Support for COLLATE in column definitions (jfirebaugh)</p>
 </li><li>
-<p>Don&#39;t use a schema when creating a temporary table (jeremyevans)</p>
+<p>Don’t use a schema when creating a temporary table (jeremyevans)</p>
 </li><li>
 <p>Make migrator work correctly when a default_schema is set (jeremyevans) (#331)</p>
 </li></ul>
@@ -3742,7 +3742,7 @@ Last Update:
 
 <h3 id="label-3.18.0+-282010-12-01-29"><a href="release_notes/3_18_0_txt.html">3.18.0</a> (2010-12-01)<span><a href="#label-3.18.0+-282010-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Allow the user to control how the connection pool deals with attempts to access shards that aren&#39;t configured (jeremyevans)</p>
+<p>Allow the user to control how the connection pool deals with attempts to access shards that aren’t configured (jeremyevans)</p>
 </li><li>
 <p>Typecast columns when creating model objects from JSON in the json_serializer plugin (jeremyevans)</p>
 </li><li>
@@ -3769,7 +3769,7 @@ Last Update:
 </li><li>
 <p>Correctly handle nil values in the xml_serializer plugin, instead of converting them to empty strings (george.haff) (#313)</p>
 </li><li>
-<p>Use a default wait_timeout that&#39;s allowed on Windows for the mysql and mysql2 adapters (jeremyevans) (#314)</p>
+<p>Use a default wait_timeout that’s allowed on Windows for the mysql and mysql2 adapters (jeremyevans) (#314)</p>
 </li><li>
 <p>Add support for connecting to MySQL over SSL using the :sslca, :sslkey, and related options (jeremyevans)</p>
 </li><li>
@@ -3779,7 +3779,7 @@ Last Update:
 </li><li>
 <p>Allow cloning of many_through_many associations (gucki, jeremyevans)</p>
 </li><li>
-<p>In the nested_attributes plugin, don&#39;t make unnecessary update calls to modify associated objects that are about to be deleted (jeremyevans, gucki)</p>
+<p>In the nested_attributes plugin, don’t make unnecessary update calls to modify associated objects that are about to be deleted (jeremyevans, gucki)</p>
 </li><li>
 <p>Allow Dataset#(add|set)_graph_aliases to accept as hash values symbols and arrays with a single element (jeremyevans)</p>
 </li><li>
@@ -3819,7 +3819,7 @@ Last Update:
 </li><li>
 <p>Handle a many_to_many :join_table option that uses an implicit alias (mluu, jeremyevans)</p>
 </li><li>
-<p>Work around bug in Microsoft&#39;s SQL Server JDBC Adapter version 3.0 (jfirebaugh)</p>
+<p>Work around bug in Microsoft’s SQL Server JDBC Adapter version 3.0 (jfirebaugh)</p>
 </li><li>
 <p>Make eager graphing a model that uses an aliased table name work correctly (jeremyevans)</p>
 </li><li>
@@ -3868,7 +3868,7 @@ Last Update:
 </li><li>
 <p>Fix Database#each_server when using a connection string to connect (jeremyevans)</p>
 </li><li>
-<p>Make Model dataset&#39;s destroy method respect the model&#39;s use_transactions setting, instead of always using a transaction (jeremyevans)</p>
+<p>Make Model dataset’s destroy method respect the model’s use_transactions setting, instead of always using a transaction (jeremyevans)</p>
 </li><li>
 <p>Add Database#adapter_scheme, for checking which adapter a Database uses (jeremyevans)</p>
 </li><li>
@@ -3909,7 +3909,7 @@ Last Update:
 </li><li>
 <p>Add a List plugin for treating model objects as being part of a list (jeremyevans, aemadrid)</p>
 </li><li>
-<p>Don&#39;t attempt to use class polymorphism in the class_table_inheritance plugin if no cti_key is defined (jeremyevans)</p>
+<p>Don’t attempt to use class polymorphism in the class_table_inheritance plugin if no cti_key is defined (jeremyevans)</p>
 </li><li>
 <p>Add a XmlSerializer plugin for serializing/deserializing model objects to/from XML (jeremyevans)</p>
 </li><li>
@@ -3973,7 +3973,7 @@ Last Update:
 </li><li>
 <p>No longer apply association options to join table dataset when removing all many_to_many associated objects (jeremyevans)</p>
 </li><li>
-<p>Log the execution times of migrations to the database&#39;s loggers (jeremyevans)</p>
+<p>Log the execution times of migrations to the database’s loggers (jeremyevans)</p>
 </li><li>
 <p>Add a TimestampMigrator that can work with migrations where versions are timestamps, and handle migrations applied out of order (jeremyevans)</p>
 </li><li>
@@ -4006,9 +4006,9 @@ Last Update:
 </li><li>
 <p>Make Database#disconnect not raise an exception when using the unsharded single connection pool (jeremyevans)</p>
 </li><li>
-<p>Attempt to handle JDBC connection problems in cases where driver auto loading doesn&#39;t work (e.g. Tomcat) (elskwid)</p>
+<p>Attempt to handle JDBC connection problems in cases where driver auto loading doesn’t work (e.g. Tomcat) (elskwid)</p>
 </li><li>
-<p>Make native MySQL adapter&#39;s tinyint to boolean conversion only convert tinyint(1) columns and not larger tinyint columns (roland.swingler) (#294)</p>
+<p>Make native MySQL adapter’s tinyint to boolean conversion only convert tinyint(1) columns and not larger tinyint columns (roland.swingler) (#294)</p>
 </li><li>
 <p>Fix use of limit with distinct on Microsoft SQL Server (jeremyevans) (#297)</p>
 </li><li>
@@ -4026,7 +4026,7 @@ Last Update:
 </li><li>
 <p>Fix leak of ResultSets when getting metadata in the jdbc adapter (jrun)</p>
 </li><li>
-<p>Make Dataset#filter and related methods just clone receiver if given an empty argument, such as {}, [], or &#39;&#39; (jeremyevans)</p>
+<p>Make Dataset#filter and related methods just clone receiver if given an empty argument, such as {}, [], or ” (jeremyevans)</p>
 </li><li>
 <p>Add instance_filters plugin, for adding arbitrary filters when updating/destroying the instance (jeremyevans)</p>
 </li><li>
@@ -4073,7 +4073,7 @@ Last Update:
 </li><li>
 <p>Add Sequel::BasicObject.remove_methods!, useful on 1.8 if libraries required after <a href="../../classes/Sequel.html"><code>Sequel</code></a> add methods to Object (jeremyevans)</p>
 </li><li>
-<p>Change Sequel.connect with a block to return the block&#39;s value (jonas11235)</p>
+<p>Change Sequel.connect with a block to return the block’s value (jonas11235)</p>
 </li><li>
 <p>Add an rcte_tree plugin, which uses recursive common table expressions for loading trees stored as adjacency lists (jeremyevans)</p>
 </li><li>
@@ -4111,7 +4111,7 @@ Last Update:
 </li><li>
 <p>Add Dataset#for_update as a standard dataset method (jeremyevans)</p>
 </li><li>
-<p>Add composition plugin, simlar to ActiveRecord&#39;s composed_of (jeremyevans)</p>
+<p>Add composition plugin, simlar to ActiveRecord’s composed_of (jeremyevans)</p>
 </li><li>
 <p>Combine multiple complex expressions for simpler SQL and object tree (jeremyevans)</p>
 </li><li>
@@ -4126,11 +4126,11 @@ Last Update:
 </li><li>
 <p>Make limit and offset work as bound variables in prepared statements (jeremyevans)</p>
 </li><li>
-<p>In the single_table_inheritance plugin, handle case where the sti_key is nil or &#39;&#39; specially (jeremyevans) (#287)</p>
+<p>In the single_table_inheritance plugin, handle case where the sti_key is nil or ” specially (jeremyevans) (#287)</p>
 </li><li>
 <p>Handle IN/NOT IN with an empty array (jeremyevans)</p>
 </li><li>
-<p>Emulate IN/NOT IN with multiple columns where the database doesn&#39;t support it and a dataset is given (jeremyevans)</p>
+<p>Emulate IN/NOT IN with multiple columns where the database doesn’t support it and a dataset is given (jeremyevans)</p>
 </li><li>
 <p>Add Dataset#unused_table_alias, for generating a table alias that has not yet been used in the query (jeremyevans)</p>
 </li><li>
@@ -4148,7 +4148,7 @@ Last Update:
 </li><li>
 <p>Correctly create foreign key constraints on MySQL with the InnoDB engine, but you must specify the :key option (jeremyevans)</p>
 </li><li>
-<p>Add an optimistic_locking plugin for models, similar to ActiveRecord&#39;s optimistic locking support (jeremyevans)</p>
+<p>Add an optimistic_locking plugin for models, similar to ActiveRecord’s optimistic locking support (jeremyevans)</p>
 </li><li>
 <p>Handle implicitly qualified symbols in UPDATE statements, useful for updating joined datasets (jeremyevans)</p>
 </li><li>
@@ -4171,9 +4171,9 @@ Last Update:
 
 <h3 id="label-3.8.0+-282010-01-04-29"><a href="release_notes/3_8_0_txt.html">3.8.0</a> (2010-01-04)<span><a href="#label-3.8.0+-282010-01-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Catch cases in the postgres adapter where exceptions weren&#39;t converted or raised appropriately (jeremyevans)</p>
+<p>Catch cases in the postgres adapter where exceptions weren’t converted or raised appropriately (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t double escape backslashes in string literals in the mssql shared adapter (john_firebaugh)</p>
+<p>Don’t double escape backslashes in string literals in the mssql shared adapter (john_firebaugh)</p>
 </li><li>
 <p>Fix order of ORDER and HAVING clauses in the mssql shared adapter (mluu)</p>
 </li><li>
@@ -4181,11 +4181,11 @@ Last Update:
 </li><li>
 <p>Attempt to detect database disconnects in the JDBC adapter (john_firebaugh)</p>
 </li><li>
-<p>Add Sequel::SQL::Expression#==, so arbtirary expressions can be compared by value (dlee)</p>
+<p>Add <a href="../../classes/Sequel/SQL/Expression.html#method-i-3D-3D"><code>Sequel::SQL::Expression#==</code></a>, so arbtirary expressions can be compared by value (dlee)</p>
 </li><li>
 <p>Respect the :size option for the generic File type on MySQL to create tinyblob, mediumblob, and longblob (ibc)</p>
 </li><li>
-<p>Don&#39;t use the OUTPUT clause on SQL Server versions that don&#39;t support it (pre-2005) (jeremyevans) (#281)</p>
+<p>Don’t use the OUTPUT clause on SQL Server versions that don’t support it (pre-2005) (jeremyevans) (#281)</p>
 </li><li>
 <p>Raise DatabaseConnectionErrors in the single-threaded connection pool if unable to connect (jeremyevans)</p>
 </li><li>
@@ -4213,7 +4213,7 @@ Last Update:
 </li><li>
 <p>Handle multiple statements in a single query in the native MySQL adapter in all cases, not just when selecting via Dataset#each (jeremyevans)</p>
 </li><li>
-<p>In the boolean_readers plugin, don&#39;t raise an error if the model&#39;s columns can&#39;t be determined (jeremyevans)</p>
+<p>In the boolean_readers plugin, don’t raise an error if the model’s columns can’t be determined (jeremyevans)</p>
 </li><li>
 <p>In the identity_map plugin, remove instances from the cache if they are deleted/destroyed (jeremyevans)</p>
 </li><li>
@@ -4242,7 +4242,7 @@ Last Update:
 </li><li>
 <p>If a transaction is being used, raise_on_save_failure is false, and a before hook returns false, rollback the transaction (john_firebaugh, jeremyevans)</p>
 </li><li>
-<p>In the schema_dumper, explicitly specify the :type option if it isn&#39;t Integer (jeremyevans)</p>
+<p>In the schema_dumper, explicitly specify the :type option if it isn’t Integer (jeremyevans)</p>
 </li><li>
 <p>On postgres, use bigserial type if :type=&gt;Bignum is given as an option to primary_key (jeremyevans)</p>
 </li><li>
@@ -4259,19 +4259,19 @@ Last Update:
 </li><li>
 <p>Make nested_attributes plugin add newly created objects to cached association array immediately (jeremyevans)</p>
 </li><li>
-<p>Make add_ association method not add the associated object to the cached array if it&#39;s already there (jeremyevans)</p>
+<p>Make add_ association method not add the associated object to the cached array if it’s already there (jeremyevans)</p>
 </li><li>
 <p>Add Model#modified! for explicitly marking an object as modified, so save_changes/update will run callbacks even if no columns have been modified (jeremyevans)</p>
 </li><li>
 <p>Add support for a :fields option in the nested attributes plugin, and only allow updating of the fields specified (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t allow modifying keys related to the association when updating existing objects in the nested_attributes plugin (jeremyevans)</p>
+<p>Don’t allow modifying keys related to the association when updating existing objects in the nested_attributes plugin (jeremyevans)</p>
 </li><li>
 <p>Add associated_object_keys method to AssociationReflection objects, specifying the key(s) in the associated model table related to the association (jeremyevans)</p>
 </li><li>
 <p>Support the memcached protocol in the caching plugin via the new :ignore_exceptions option (EppO, jeremyevans)</p>
 </li><li>
-<p>Don&#39;t modify array with a string and placeholders passed to Dataset#filter or related methods (jeremyevans)</p>
+<p>Don’t modify array with a string and placeholders passed to Dataset#filter or related methods (jeremyevans)</p>
 </li><li>
 <p>Speed up Amalgalite adapter (copiousfreetime)</p>
 </li><li>
@@ -4299,7 +4299,7 @@ Last Update:
 </li><li>
 <p>Dataset#window for PostgreSQL datasets now respects previous windows (jeremyevans)</p>
 </li><li>
-<p>Dataset#simple_select_all? now ignores options that don&#39;t affect the SQL being issued (jeremyevans)</p>
+<p>Dataset#simple_select_all? now ignores options that don’t affect the SQL being issued (jeremyevans)</p>
 </li><li>
 <p>Account for table aliases in eager_graph (mluu)</p>
 </li><li>
@@ -4311,7 +4311,7 @@ Last Update:
 </li><li>
 <p>Correct JDBC binding for Time objects in prepared statements (jfirebaugh, jeremyevans)</p>
 </li><li>
-<p>Emulate JOIN USING clause poorly using JOIN ON if the database doesn&#39;t support JOIN USING (e.g. MSSQL, H2) (jfirebaugh, jeremyevans)</p>
+<p>Emulate JOIN USING clause poorly using JOIN ON if the database doesn’t support JOIN USING (e.g. MSSQL, H2) (jfirebaugh, jeremyevans)</p>
 </li><li>
 <p>Support column aliases in Dataset#group_and_count (jfirebaugh)</p>
 </li><li>
@@ -4339,13 +4339,13 @@ Last Update:
 </li><li>
 <p>Add Dataset#use_cursor to the native postgres adapter, for processing large datasets (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t ignore Class.inherited in Sequel::Model.inherited (antage) (#277)</p>
+<p>Don’t ignore Class.inherited in Sequel::Model.inherited (antage) (#277)</p>
 </li><li>
 <p>Optimize JDBC::MySQL::DatabaseMethods#last_insert_id to prevent additional queries (tmm1)</p>
 </li><li>
 <p>Fix use of MSSQL with ruby 1.9 (cult hero)</p>
 </li><li>
-<p>Don&#39;t try to load associated objects when the current object has NULL for one of the key fields (jeremyevans)</p>
+<p>Don’t try to load associated objects when the current object has NULL for one of the key fields (jeremyevans)</p>
 </li><li>
 <p>No longer require GROUP BY to use HAVING, except on SQLite (jeremyevans)</p>
 </li><li>
@@ -4354,7 +4354,7 @@ Last Update:
 <p>Add emulated support for ilike on MSSQL and H2 (jeremyevans)</p>
 </li><li>
 <p>Add a :distinct option for all associations, which uses the SQL DISTINCT clause (jeremyevans)</p>
-</li><li><table class="rdoc-list note-list"><tbody><tr><td class='label'>Don&#39;t require </td><td>
+</li><li><table class="rdoc-list note-list"><tbody><tr><td class='label'>Don’t require </td><td>
 <p>prefix for constant lookups in instance_evaled virtual row blocks on ruby 1.9 (jeremyevans)</p>
 </td></tr></tbody></table>
 </li></ul>
@@ -4393,9 +4393,9 @@ Last Update:
 </li><li>
 <p>Allow Dataset delete, update, and insert to respect existing WITH clauses on MSSQL (dlee, jeremyevans)</p>
 </li><li>
-<p>Add touch plugin, which adds Model#touch for updating an instance&#39;s timestamp, as well as touching associations when an instance is updated or destroyed (jeremyevans)</p>
+<p>Add touch plugin, which adds Model#touch for updating an instance’s timestamp, as well as touching associations when an instance is updated or destroyed (jeremyevans)</p>
 </li><li>
-<p>Add sql_expr extension, which adds the sql_expr to all objects, giving them easy access to Sequel&#39;s DSL (jeremyevans)</p>
+<p>Add sql_expr extension, which adds the sql_expr to all objects, giving them easy access to Sequel’s DSL (jeremyevans)</p>
 </li><li>
 <p>Add active_model plugin, which gives <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> an ActiveModel compliant API, passes the ActiveModel::Lint tests (jeremyevans)</p>
 </li><li>
@@ -4403,7 +4403,7 @@ Last Update:
 </li><li>
 <p>Allow splitting of multiple result sets into separate arrays when using multiple statements in a single query in the native MySQL adapter (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t include primary key indexes when parsing MSSQL indexes on JDBC (jeremyevans)</p>
+<p>Don’t include primary key indexes when parsing MSSQL indexes on JDBC (jeremyevans)</p>
 </li><li>
 <p>Make Dataset#insert_select return nil on PostgreSQL if disable_insert_returning is used (jeremyevans)</p>
 </li><li>
@@ -4429,7 +4429,7 @@ Last Update:
 </li><li>
 <p>Typecast before checking current model attribute value, instead of after (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t attempt to use unparseable defaults as literals when dumping the schema for a MySQL database (jeremyevans)</p>
+<p>Don’t attempt to use unparseable defaults as literals when dumping the schema for a MySQL database (jeremyevans)</p>
 </li><li>
 <p>Handle MySQL enum defaults in the schema dumper (jeremyevans)</p>
 </li><li>
@@ -4466,7 +4466,7 @@ Last Update:
 </li><li>
 <p>Fix using multiple emulated ALTER TABLE statements (e.g. drop_column) in a single alter_table block on SQLite (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t allow inserting on a grouped dataset or a dataset that selects from multiple tables (jeremyevans)</p>
+<p>Don’t allow inserting on a grouped dataset or a dataset that selects from multiple tables (jeremyevans)</p>
 </li><li>
 <p>Allow class Item &lt; Sequel::Model(DB2) to work (jeremyevans)</p>
 </li><li>
@@ -4541,34 +4541,34 @@ Last Update:
 </li><li>
 <p>Support adding a column with a primary key or unique constraint to an existing table on SQLite (jeremyevans)</p>
 </li><li>
-<p>Support altering a column&#39;s type, null status, or default on SQLite (jeremyevans)</p>
+<p>Support altering a column’s type, null status, or default on SQLite (jeremyevans)</p>
 </li><li>
 <p>Fix renaming a NOT NULL column without a default on MySQL (nougad, jeremyevans) (#273)</p>
 </li><li>
-<p>Don&#39;t swallow DatabaseConnectionErrors when creating model subclasses (tommy.midttveit)</p>
+<p>Don’t swallow DatabaseConnectionErrors when creating model subclasses (tommy.midttveit)</p>
 </li></ul>
 
 <h3 id="label-3.2.0+-282009-07-02-29"><a href="release_notes/3_2_0_txt.html">3.2.0</a> (2009-07-02)<span><a href="#label-3.2.0+-282009-07-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>In the STI plugin, don&#39;t overwrite the STI field if it is already set (jeremyevans)</p>
+<p>In the STI plugin, don’t overwrite the STI field if it is already set (jeremyevans)</p>
 </li><li>
 <p>Add support for Common Table Expressions, which use the SQL WITH clause (jeremyevans)</p>
 </li><li>
 <p>Add SQL::WindowFunction, expand virtual row blocks to support them and other constructions (jeremyevans)</p>
 </li><li>
-<p>Add Model#autoincrementing_primary_key, for when the autoincrementing key isn&#39;t the same as the primary key (jeremyevans)</p>
+<p>Add Model#autoincrementing_primary_key, for when the autoincrementing key isn’t the same as the primary key (jeremyevans)</p>
 </li><li>
 <p>Add Dataset#ungraphed, to remove the splitting of results into subhashes or associated records (jeremyevans)</p>
 </li><li>
 <p>Support :opclass option for PostgreSQL indexes (tmi, jeremyevans)</p>
 </li><li>
-<p>Make parsing of server&#39;s version more reliable for PostgreSQL (jeremyevans)</p>
+<p>Make parsing of server’s version more reliable for PostgreSQL (jeremyevans)</p>
 </li><li>
 <p>Add Dataset#qualify, which is qualify_to with a first_source default (jeremyevans)</p>
 </li><li>
 <p>Add :ruby_default to parsed schema information, which contains a ruby object representing the database default (jeremyevans)</p>
 </li><li>
-<p>Fix changing a column&#39;s name, type, or null status on MySQL when column has a string default (jeremyevans)</p>
+<p>Fix changing a column’s name, type, or null status on MySQL when column has a string default (jeremyevans)</p>
 </li><li>
 <p>Remove Dataset#to_table_reference protected method, no longer used (jeremyevans)</p>
 </li><li>
@@ -4635,7 +4635,7 @@ Last Update:
 </li><li>
 <p>All the use of sql_subscript on most SQL::* objects, and support non-integer subscript values (jeremyevans)</p>
 </li><li>
-<p>Add <a href="reflection_rdoc.html">reflection.rdoc</a> file which explains and gives examples of many of Sequel&#39;s reflection methods (jeremyevans)</p>
+<p>Add <a href="reflection_rdoc.html">reflection.rdoc</a> file which explains and gives examples of many of Sequel’s reflection methods (jeremyevans)</p>
 </li><li>
 <p>Add many_through_many plugin, allowing you to construct an association to multiple objects through multiple join tables (jeremyevans)</p>
 </li><li>
@@ -4645,9 +4645,9 @@ Last Update:
 </li><li>
 <p>Make eager_unique_table_alias consider joined tables as well as tables in the FROM clause (jeremyevans)</p>
 </li><li>
-<p>Make add_graph_aliases work correctly even if set_graph_aliases hasn&#39;t been used (jeremyevans)</p>
+<p>Make add_graph_aliases work correctly even if set_graph_aliases hasn’t been used (jeremyevans)</p>
 </li><li>
-<p>Fix using :conditions that are a placeholder string in an association (e.g. :conditions=&gt;[&#39;a = ?&#39;, 42]) (jeremyevans)</p>
+<p>Fix using :conditions that are a placeholder string in an association (e.g. :conditions=&gt;[‘a = ?’, 42]) (jeremyevans)</p>
 </li><li>
 <p>On MySQL, make Dataset#insert_ignore affect insert as well as multi_insert and import (jeremyevans, tmm1)</p>
 </li><li>
@@ -4655,7 +4655,7 @@ Last Update:
 </li><li>
 <p>Make schema_dumper extension ignore errors with indexes unless it is dumping in the database-specific type format (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t dump partial indexes in the MySQL adapter (jeremyevans)</p>
+<p>Don’t dump partial indexes in the MySQL adapter (jeremyevans)</p>
 </li><li>
 <p>Add :ignore_index_errors option to Database#create_table and :ignore_errors option to Database#add_index (jeremyevans)</p>
 </li><li>
@@ -4667,15 +4667,15 @@ Last Update:
 </li><li>
 <p>On PostgreSQL, assume the public schema if one is not given and there is no default in Database#tables (jeremyevans)</p>
 </li><li>
-<p>Ignore a :default value if creating a String :text=&gt;true or File column on MySQL, since it doesn&#39;t support defaults on text/blob columns (jeremyevans)</p>
+<p>Ignore a :default value if creating a String :text=&gt;true or File column on MySQL, since it doesn’t support defaults on text/blob columns (jeremyevans)</p>
 </li><li>
 <p>On PostgreSQL, do not raise an error when attempting to reset the primary key sequence for a table without a primary key (jeremyevans)</p>
 </li><li>
 <p>Allow plugins to have a configure method that is called on every attempt to load them (jeremyevans)</p>
 </li><li>
-<p>Attempting to load an already loaded plugin no longer calls the plugin&#39;s apply method (jeremyevans)</p>
+<p>Attempting to load an already loaded plugin no longer calls the plugin’s apply method (jeremyevans)</p>
 </li><li>
-<p>Make plugin&#39;s plugin_opts methods return an array of arguments if multiple arguments were given, instead of just the first argument (jeremyevans)</p>
+<p>Make plugin’s plugin_opts methods return an array of arguments if multiple arguments were given, instead of just the first argument (jeremyevans)</p>
 </li><li>
 <p>Keep track of loaded plugins at Model.plugins, allows plugins to depend on other plugins (jeremyevans)</p>
 </li><li>
@@ -4683,9 +4683,9 @@ Last Update:
 </li><li>
 <p>Add lazy_attributes plugin, for creating attributes that can be lazily loaded from the database (jeremyevans)</p>
 </li><li>
-<p>Add tactical_eager_loading plugin, similar to DataMapper&#39;s strategic eager loading (jeremyevans)</p>
+<p>Add tactical_eager_loading plugin, similar to DataMapper’s strategic eager loading (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t raise an error when loading a plugin with DatasetMethods where none of the methods are public (jeremyevans)</p>
+<p>Don’t raise an error when loading a plugin with DatasetMethods where none of the methods are public (jeremyevans)</p>
 </li><li>
 <p>Add identity_map plugin, for creating temporary thread-local identity maps with some caching (jeremyevans)</p>
 </li><li>
@@ -4693,7 +4693,7 @@ Last Update:
 </li><li>
 <p>Add -C option to bin/sequel that copies one database to another (jeremyevans)</p>
 </li><li>
-<p>In the schema_dumper extension, don&#39;t include defaults that contain literal strings unless the DBs are the same (jeremyevans)</p>
+<p>In the schema_dumper extension, don’t include defaults that contain literal strings unless the DBs are the same (jeremyevans)</p>
 </li><li>
 <p>Only include valid non-partial indexes of simple column references in the PostgreSQL adapter (jeremyevans)</p>
 </li><li>
@@ -4705,7 +4705,7 @@ Last Update:
 </li><li>
 <p>Add Model.create_table? to the schema plugin, similar to Database#create_table? (jeremyevans)</p>
 </li><li>
-<p>Add Database#create_table?, which creates the table if it doesn&#39;t already exist (jeremyevans)</p>
+<p>Add Database#create_table?, which creates the table if it doesn’t already exist (jeremyevans)</p>
 </li><li>
 <p>Handle ordered and limited datasets correctly when using UNION, INTERSECT, or EXCEPT (jeremyevans)</p>
 </li><li>
@@ -4713,7 +4713,7 @@ Last Update:
 </li><li>
 <p>Make the schema_dumper extension dump tables in alphabetical order in migrations (jeremyevans)</p>
 </li><li>
-<p>Add Sequel.extension method for loading extensions, so you don&#39;t have to use require (jeremyevans)</p>
+<p>Add Sequel.extension method for loading extensions, so you don’t have to use require (jeremyevans)</p>
 </li><li>
 <p>Allow bin/sequel to respect multiple -L options instead of ignoring all but the last one (jeremyevans)</p>
 </li><li>
@@ -4750,13 +4750,13 @@ Last Update:
 </li><li>
 <p>Allow Dataset#from to remove existing FROM tables when called without an argument, instead of raising an error later (jeremyevans)</p>
 </li><li>
-<p>Fix string quoting on Oracle so it doesn&#39;t double backslashes (jeremyevans)</p>
+<p>Fix string quoting on Oracle so it doesn’t double backslashes (jeremyevans)</p>
 </li><li>
 <p>Alias the count function call in Dataset#count, fixes use on MSSQL (akitaonrails, jeremyevans)</p>
 </li><li>
 <p>Allow QualifiedIdentifiers to be qualified, to allow :column.qualify(:table).qualify(:schema) (jeremyevans)</p>
 </li><li>
-<p>Allow :db_type=&gt;&#39;mssql&#39; option to be respected when using the DBI adapter (akitaonrails)</p>
+<p>Allow :db_type=&gt;‘mssql’ option to be respected when using the DBI adapter (akitaonrails)</p>
 </li><li>
 <p>Add schema_dumper extension, for dumping schema of tables (jeremyevans)</p>
 </li><li>
@@ -4793,11 +4793,11 @@ Last Update:
 <ul><li>
 <p>Deprecate Java::JavaSQL::Timestamp#usec (jeremyevans)</p>
 </li><li>
-<p>Fix Model.[] optimization introduced in <a href="release_notes/2_11_0_txt.html">2.11.0</a> for databases that don&#39;t use LIMIT (jacaetevha)</p>
+<p>Fix Model.[] optimization introduced in <a href="release_notes/2_11_0_txt.html">2.11.0</a> for databases that don’t use LIMIT (jacaetevha)</p>
 </li><li>
-<p>Don&#39;t use the model association plugin if SEQUEL_NO_ASSOCIATIONS constant or environment variable is defined (jeremyevans)</p>
+<p>Don’t use the model association plugin if SEQUEL_NO_ASSOCIATIONS constant or environment variable is defined (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t require core_sql if SEQUEL_NO_CORE_EXTENSIONS constant or environment variable is defined (jeremyevans)</p>
+<p>Don’t require core_sql if SEQUEL_NO_CORE_EXTENSIONS constant or environment variable is defined (jeremyevans)</p>
 </li><li>
 <p>Add validation_helpers model plugin, which adds instance level validation support similar to previously standard validations, with a different API (jeremyevans)</p>
 </li><li>
@@ -4813,7 +4813,7 @@ Last Update:
 </li><li>
 <p>Eliminate internal dependence on core_sql extensions (jeremyevans)</p>
 </li><li>
-<p>Deprecate Migration and Migrator, require &#39;sequel/extensions/migration&#39; if you want them (jeremyevans)</p>
+<p>Deprecate Migration and Migrator, require ‘sequel/extensions/migration’ if you want them (jeremyevans)</p>
 </li><li>
 <p>Denamespace <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> decendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback) (jeremyevans)</p>
 </li><li>
@@ -4831,7 +4831,7 @@ Last Update:
 </li><li>
 <p>Make Dataset#where always affect the WHERE clause (jeremyevans)</p>
 </li><li>
-<p>Deprecate Object#blank? and related extensions, require &#39;sequel/extensions/blank&#39; to get them back (jeremyevans)</p>
+<p>Deprecate Object#blank? and related extensions, require ‘sequel/extensions/blank’ to get them back (jeremyevans)</p>
 </li><li>
 <p>Move lib/sequel_core into lib/sequel and lib/sequel_model into lib/sequel/model (jeremyevans)</p>
 </li><li>
@@ -4841,17 +4841,17 @@ Last Update:
 </li><li>
 <p>Fix saving a newly inserted record in an after_create or after_save hook (jeremyevans)</p>
 </li><li>
-<p>Deprecate Dataset#print and PrettyTable, require &#39;sequel/extensions/pretty_table&#39; if you want them (jeremyevans)</p>
+<p>Deprecate Dataset#print and PrettyTable, require ‘sequel/extensions/pretty_table’ if you want them (jeremyevans)</p>
 </li><li>
-<p>Deprecate Database#query and Dataset#query, require &#39;sequel/extensions/query&#39; if you want them (jeremyevans)</p>
+<p>Deprecate Database#query and Dataset#query, require ‘sequel/extensions/query’ if you want them (jeremyevans)</p>
 </li><li>
-<p>Deprecate Dataset#paginate and each_page, require &#39;sequel/extensions/pagination&#39; if you want them (jeremyevans)</p>
+<p>Deprecate Dataset#paginate and each_page, require ‘sequel/extensions/pagination’ if you want them (jeremyevans)</p>
 </li><li>
 <p>Fix ~{:bool_col=&gt;true} and related inversions of boolean values (jeremyevans)</p>
 </li><li>
 <p>Add disable_insert_returning method to PostgreSQL datasets, so they fallback to just using INSERT (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t use savepoints by default on PostgreSQL, use the :savepoint option to Database#transaction to use a savepoint (jeremyevans)</p>
+<p>Don’t use savepoints by default on PostgreSQL, use the :savepoint option to Database#transaction to use a savepoint (jeremyevans)</p>
 </li><li>
 <p>Deprecate Database#transaction accepting a server symbol argument, use an options hash with the :server option (jeremyevans)</p>
 </li><li>
@@ -4859,7 +4859,7 @@ Last Update:
 </li><li>
 <p>Deprecate Model::Validation::Errors, use Model::Errors (jeremyevans)</p>
 </li><li>
-<p>Deprecate string inflection methods, require &#39;sequel/extensions/inflector&#39; if you use them (jeremyevans)</p>
+<p>Deprecate string inflection methods, require ‘sequel/extensions/inflector’ if you use them (jeremyevans)</p>
 </li><li>
 <p>Deprecate Model validation class methods, override Model#validate instead or Model.plugin validation_class_methods (jeremyevans)</p>
 </li><li>
@@ -4875,7 +4875,7 @@ Last Update:
 </li><li>
 <p>Move most model class methods into Model::ClassMethods, for easier overriding of class methods for all models (jeremyevans)</p>
 </li><li>
-<p>Deprecate String#to_date, to_datetime, to_time, and to_sequel_time, use require &#39;sequel/extensions/string_date_time&#39; if you want them (jeremyevans)</p>
+<p>Deprecate String#to_date, to_datetime, to_time, and to_sequel_time, use require ‘sequel/extensions/string_date_time’ if you want them (jeremyevans)</p>
 </li><li>
 <p>Deprecate Array#extract_options! and Object#is_one_of? (jeremyevans)</p>
 </li><li>
@@ -4964,7 +4964,7 @@ Last Update:
 </li><li>
 <p>Add Dataset#with_sql, which returns a clone of the dataset with static SQL (jeremyevans)</p>
 </li><li>
-<p>Refactor Dataset#literal so it doesn&#39;t need to be overridden in subadapters, for a 20-25% performance increase (jeremyevans)</p>
+<p>Refactor Dataset#literal so it doesn’t need to be overridden in subadapters, for a 20-25% performance increase (jeremyevans)</p>
 </li><li>
 <p>Remove SQL::IrregularFunction, no longer used internally (jeremyevans)</p>
 </li><li>
@@ -5011,21 +5011,21 @@ Last Update:
 
 <h3 id="label-2.10.0+-282009-02-03-29"><a href="release_notes/2_10_0_txt.html">2.10.0</a> (2009-02-03)<span><a href="#label-2.10.0+-282009-02-03-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Don&#39;t use a default schema any longer in the shared PostgreSQL adapter (jeremyevans)</p>
+<p>Don’t use a default schema any longer in the shared PostgreSQL adapter (jeremyevans)</p>
 </li><li>
 <p>Make Dataset#quote_identifier return LiteralStrings as-is (jeremyevans)</p>
 </li><li>
-<p>Support symbol keys and unnested hashes in the sequel command line tool&#39;s yaml config support (jeremyevans)</p>
+<p>Support symbol keys and unnested hashes in the sequel command line tool’s yaml config support (jeremyevans)</p>
 </li><li>
 <p>Add schema parsing support to the JDBC adapter (jeremyevans)</p>
 </li><li>
 <p>Add per-database type translation support for schema changes, translating ruby classes to database specific types (jeremyevans)</p>
 </li><li>
-<p>Add Sequel::DatabaseConnectionError, for indicating that <a href="../../classes/Sequel.html"><code>Sequel</code></a> wasn&#39;t able to connect to the database (jeremyevans)</p>
+<p>Add Sequel::DatabaseConnectionError, for indicating that <a href="../../classes/Sequel.html"><code>Sequel</code></a> wasn’t able to connect to the database (jeremyevans)</p>
 </li><li>
 <p>Add validates_not_string validation, useful in conjunction with raise_on_typecast_failure = false (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t modify Model#new? and Model#changed_columns when saving a record until after the after hooks have been run (tamas, jeremyevans)</p>
+<p>Don’t modify Model#new? and Model#changed_columns when saving a record until after the after hooks have been run (tamas, jeremyevans)</p>
 </li><li>
 <p>Database#quote_identifiers= now affects future schema modification statements, even if it is not used before one of the schema modification statements (jeremyevans)</p>
 </li><li>
@@ -5045,7 +5045,7 @@ Last Update:
 </li><li>
 <p>Add :allow_missing validation option, useful if the database provides a good default (jeremyevans)</p>
 </li><li>
-<p>Fix literalization of SQL::Blobs in DataObjects and JDBC adapter&#39;s postgresql subadapters when ruby 1.9 is used (jeremyevans)</p>
+<p>Fix literalization of SQL::Blobs in DataObjects and JDBC adapter’s postgresql subadapters when ruby 1.9 is used (jeremyevans)</p>
 </li><li>
 <p>When using standard strings in the postgres adapter with the postgres-pr driver, use custom string escaping to prevent errors (jeremyevans)</p>
 </li><li>
@@ -5053,7 +5053,7 @@ Last Update:
 </li><li>
 <p>Add Firebird adapter, requires Firebird ruby driver located at <a target="_top" href="http://github.com/wishdev/fb">github.com/wishdev/fb</a> (wishdev)</p>
 </li><li>
-<p>Don&#39;t clobber the following Symbol instance methods when using ruby 1.9: [], &lt;, &lt;=, &gt;, &gt;= (jeremyevans)</p>
+<p>Don’t clobber the following Symbol instance methods when using ruby 1.9: [], &lt;, &lt;=, &gt;, &gt;= (jeremyevans)</p>
 </li><li>
 <p>Quote the table name and the index for PostgreSQL index creation (jeremyevans)</p>
 </li><li>
@@ -5070,7 +5070,7 @@ Last Update:
 <ul><li>
 <p>Add -L option to sequel command line tool to load all .rb files in the given directory (pkondzior, jeremyevans)</p>
 </li><li>
-<p>Fix Dataset#destroy for model datasets that can&#39;t handle nested queries (jeremyevans)</p>
+<p>Fix Dataset#destroy for model datasets that can’t handle nested queries (jeremyevans)</p>
 </li><li>
 <p>Improve the error messages in parts of <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (jeremyevans, pusewicz)</p>
 </li><li>
@@ -5088,7 +5088,7 @@ Last Update:
 </li><li>
 <p>Add <a href="../../classes/Sequel/ValidationFailed.html"><code>Sequel::ValidationFailed</code></a> exception to be raised when a record fails because a validation fails (bougyman)</p>
 </li><li>
-<p>Make Database#schema raise an error if given a table that doesn&#39;t exist (jeremyevans) (#255)</p>
+<p>Make Database#schema raise an error if given a table that doesn’t exist (jeremyevans) (#255)</p>
 </li><li>
 <p>Make Model#inspect call Model#inspect_values private method for easier overloading (bougyman)</p>
 </li><li>
@@ -5096,7 +5096,7 @@ Last Update:
 </li><li>
 <p>Fix Dataset#count when using UNION, EXCEPT, or INTERSECT (jeremyevans)</p>
 </li><li>
-<p>Make SQLite keep table&#39;s primary key information when dropping columns (jmhodges)</p>
+<p>Make SQLite keep table’s primary key information when dropping columns (jmhodges)</p>
 </li><li>
 <p>Support dropping indicies on SQLite (jmhodges)</p>
 </li></ul>
@@ -5115,7 +5115,7 @@ Last Update:
 </li><li>
 <p>Add stored procedure support for the MySQL and JDBC adapters (jeremyevans, krsgoss) (#252)</p>
 </li><li>
-<p>Support options when altering a column&#39;s type (for changing enums, varchar size, etc.) (jeremyevans)</p>
+<p>Support options when altering a column’s type (for changing enums, varchar size, etc.) (jeremyevans)</p>
 </li><li>
 <p>Support AliasedExpressions in tables when using implicitly qualified arguments in joins (jeremyevans)</p>
 </li><li>
@@ -5127,7 +5127,7 @@ Last Update:
 </li><li>
 <p>Support aliasing subselects in the Oracle adapter (jeremyevans)</p>
 </li><li>
-<p>Add a subadapter for the Progress RDBMS to the ODBC adapter (:db_type=&gt;&#39;progress&#39;) (groveriffic) (#251)</p>
+<p>Add a subadapter for the Progress RDBMS to the ODBC adapter (:db_type=&gt;‘progress’) (groveriffic) (#251)</p>
 </li><li>
 <p>Make MySQL and Oracle adapters raise an Error if asked to do a SELECT DISTINCT ON (jeremyevans)</p>
 </li><li>
@@ -5153,14 +5153,14 @@ Last Update:
 </li><li>
 <p>More optimization of Model#initialize (jeremyevans)</p>
 </li><li>
-<p>Treat interval as it&#39;s own type, not an integer type (jeremyevans)</p>
+<p>Treat interval as it’s own type, not an integer type (jeremyevans)</p>
 </li><li>
 <p>Allow use of implicitly qualified symbol as argument to Symbol#qualify (:a.qualify(:b__c)=&gt;b.c.a), fixes model associations in different schemas (jeremyevans) (#246)</p>
 </li></ul>
 
 <h3 id="label-2.7.1+-282008-11-04-29">2.7.1 (2008-11-04)<span><a href="#label-2.7.1+-282008-11-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Fix PostgreSQL Date optimization so that it doesn&#39;t reject dates like 11/03/2008 (jeremyevans)</p>
+<p>Fix PostgreSQL Date optimization so that it doesn’t reject dates like 11/03/2008 (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-2.7.0+-282008-11-03-29"><a href="release_notes/2_7_0_txt.html">2.7.0</a> (2008-11-03)<span><a href="#label-2.7.0+-282008-11-03-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -5207,7 +5207,7 @@ Last Update:
 </li><li>
 <p>Major performance enhancement when fetching rows using PostgreSQL (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t typecast serialized columns in models (jeremyevans)</p>
+<p>Don’t typecast serialized columns in models (jeremyevans)</p>
 </li><li>
 <p>Add Array#sql_array to handle ruby arrays of all two pairs as SQL arrays (jeremyevans) (#245)</p>
 </li><li>
@@ -5217,7 +5217,7 @@ Last Update:
 </li><li>
 <p>PostgreSQL full text search queries with multiple columns are joined with space to prevent joining border words to one (michalbugno)</p>
 </li><li>
-<p>Don&#39;t modify a dataset&#39;s cached column information if calling each with an option that modifies the columns (jeremyevans)</p>
+<p>Don’t modify a dataset’s cached column information if calling each with an option that modifies the columns (jeremyevans)</p>
 </li><li>
 <p>The PostgreSQL adapter will now generally default to using a unix socket in /tmp if no host is specified, instead of a tcp socket to localhost (jeremyevans)</p>
 </li><li>
@@ -5242,7 +5242,7 @@ Last Update:
 </li><li>
 <p>Fix constraint generation when not using a proc or interpolated string (jeremyevans)</p>
 </li><li>
-<p>Make eager_graph respect associations&#39; :order options (use :order_eager_graph=&gt;false to disable) (jeremyevans)</p>
+<p>Make eager_graph respect associations’ :order options (use :order_eager_graph=&gt;false to disable) (jeremyevans)</p>
 </li><li>
 <p>Cache negative lookup when eagerly loading many_to_one associations where no objects have an associated object (jeremyevans)</p>
 </li><li>
@@ -5283,7 +5283,7 @@ Last Update:
 </li><li>
 <p>Allow Models to use the RETURNING clause when inserting records on PostgreSQL (jeremyevans)</p>
 </li><li>
-<p>Raise Sequel::DatabaseError instead of generic <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> for database errors, don&#39;t swallow tracebacks (jeremyevans)</p>
+<p>Raise Sequel::DatabaseError instead of generic <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> for database errors, don’t swallow tracebacks (jeremyevans)</p>
 </li><li>
 <p>Use INSERT … RETURNING … with PostgreSQL 8.2 and higher (jeremyevans)</p>
 </li><li>
@@ -5291,7 +5291,7 @@ Last Update:
 </li><li>
 <p>Default to converting 2 digit years, use Sequel.convert_two_digit_years = false to get back the old behavior (jeremyevans)</p>
 </li><li>
-<p>Make the PostgreSQL adapter with the pg driver use async_exec, so it doesn&#39;t block the entire interpreter (jeremyevans)</p>
+<p>Make the PostgreSQL adapter with the pg driver use async_exec, so it doesn’t block the entire interpreter (jeremyevans)</p>
 </li><li>
 <p>Make the schema generators support composite primary and foreign keys and unique constraints (jarredholman)</p>
 </li><li>
@@ -5301,7 +5301,7 @@ Last Update:
 </li><li>
 <p>Quote index names when creating or dropping indexes (jeremyevans, SanityInAnarchy)</p>
 </li><li>
-<p>Don&#39;t have column accessor methods override plugin instance methods (jeremyevans)</p>
+<p>Don’t have column accessor methods override plugin instance methods (jeremyevans)</p>
 </li><li>
 <p>Allow validation of multiple attributes at once, with built in support for uniqueness checking of multiple columns (jeremyevans)</p>
 </li><li>
@@ -5324,7 +5324,7 @@ Last Update:
 </li><li>
 <p>Fix anonymous column names in the ADO adapter (nusco)</p>
 </li><li>
-<p>Remove odbc_mssql adapter, use :db_type=&gt;&#39;mssql&#39; option instead (jeremyevans)</p>
+<p>Remove odbc_mssql adapter, use :db_type=&gt;‘mssql’ option instead (jeremyevans)</p>
 </li><li>
 <p>Split MSSQL specific syntax into separate file, usable by ADO and ODBC adapters (nusco, jeremyevans)</p>
 </li></ul>
@@ -5333,7 +5333,7 @@ Last Update:
 <ul><li>
 <p>Enable almost full support for MySQL using JDBC (jeremyevans)</p>
 </li><li>
-<p>Fix ODBC adapter&#39;s conversion of ::ODBC::Time values (Michael Xavier)</p>
+<p>Fix ODBC adapter’s conversion of ::ODBC::Time values (Michael Xavier)</p>
 </li><li>
 <p>Enable full support for SQLite-JDBC using the JDBC adapter (jeremyevans)</p>
 </li><li>
@@ -5341,7 +5341,7 @@ Last Update:
 </li><li>
 <p>Make Database#disconnect work for the ADO adapter (spicyj)</p>
 </li><li>
-<p>Don&#39;t raise an exception in the ADO adapter if the dataset contains no records (nusco)</p>
+<p>Don’t raise an exception in the ADO adapter if the dataset contains no records (nusco)</p>
 </li><li>
 <p>Enable almost full support of PostgreSQL-JDBC using the JDBC adapter (jeremyevans)</p>
 </li><li>
@@ -5355,7 +5355,7 @@ Last Update:
 </li><li>
 <p>Make Oracle adapter work with a nonstandard Oracle database port (pavel.lukin)</p>
 </li><li>
-<p>Typecast &#39;&#39; to nil by default for non-string non-blob columns, add typecast_empty_string_to_nil= model class and instance methods (jeremyevans)</p>
+<p>Typecast ” to nil by default for non-string non-blob columns, add typecast_empty_string_to_nil= model class and instance methods (jeremyevans)</p>
 </li><li>
 <p>Use a simpler select in Dataset#empty?, fixes use with MySQL (jeremyevans)</p>
 </li><li>
@@ -5396,7 +5396,7 @@ Last Update:
 </li><li>
 <p>Add :graph_block and :graph_join_table_block association options (jeremyevans)</p>
 </li><li>
-<p>Set the model&#39;s dataset&#39;s columns in addition to the model&#39;s columns when loading the schema for a model (jeremyevans)</p>
+<p>Set the model’s dataset’s columns in addition to the model’s columns when loading the schema for a model (jeremyevans)</p>
 </li><li>
 <p>Make caching work correctly with subclasses (jeremyevans)</p>
 </li><li>
@@ -5430,13 +5430,13 @@ Last Update:
 </li><li>
 <p>Database#add_index is now supported in the SQLite adapter (abhay)</p>
 </li><li>
-<p>Sequel&#39;s MySQL adapter should no longer conflict with ActiveRecord&#39;s use of MySQL (careo)</p>
+<p>Sequel’s MySQL adapter should no longer conflict with ActiveRecord’s use of MySQL (careo)</p>
 </li><li>
 <p>Treat Hash as expression instead of column alias when used in DISTINCT, ORDER BY, and GROUP BY clauses (jeremyevans)</p>
 </li><li>
 <p>PostgreSQL bytea fields are now fully supported (dlee)</p>
 </li><li>
-<p>For PostgreSQL, don&#39;t raise an error when assigning a value to a SERIAL PRIMARY KEY field when inserting records (jeremyevans)</p>
+<p>For PostgreSQL, don’t raise an error when assigning a value to a SERIAL PRIMARY KEY field when inserting records (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-2.1.0+-282008-06-17-29"><a href="release_notes/2_1_0_txt.html">2.1.0</a> (2008-06-17)<span><a href="#label-2.1.0+-282008-06-17-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -5447,7 +5447,7 @@ Last Update:
 </li><li>
 <p>Raise errors when using association methods on objects without valid primary keys (jeremyevans)</p>
 </li><li>
-<p>The model&#39;s primary key is a restricted column by default, Add model.unrestrict_primary_key to get the old behavior (jeremyevans)</p>
+<p>The model’s primary key is a restricted column by default, Add model.unrestrict_primary_key to get the old behavior (jeremyevans)</p>
 </li><li>
 <p>Add Model.set_(allowed|restricted)_columns, which affect which columns create/new/set/update/etc. modify (jeremyevans)</p>
 </li><li>
@@ -5465,7 +5465,7 @@ Last Update:
 </li><li>
 <p>Add Model.set_sti_key, for easily setting up single table inheritance (jeremyevans)</p>
 </li><li>
-<p>Make all associations support a :read_only option, which doesn&#39;t add methods that modify the database (jeremyevans)</p>
+<p>Make all associations support a :read_only option, which doesn’t add methods that modify the database (jeremyevans)</p>
 </li><li>
 <p>Make *_to_many associations support a :limit option, for specifying a limit to the resulting records (and possibly an offset) (jeremyevans)</p>
 </li><li>
@@ -5542,7 +5542,7 @@ Last Update:
 </li><li>
 <p>Add StringMethods.ilike, for case insensitive pattern matching (jeremyevans)</p>
 </li><li>
-<p>Refactor ComplexExpression into three subclasses and a few modules, so operators that don&#39;t make sense are not defined for the class (jeremyevans)</p>
+<p>Refactor ComplexExpression into three subclasses and a few modules, so operators that don’t make sense are not defined for the class (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-2.0.0+-282008-06-01-29"><a href="release_notes/2_0_0_txt.html">2.0.0</a> (2008-06-01)<span><a href="#label-2.0.0+-282008-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -5611,7 +5611,7 @@ Last Update:
 </li><li>
 <p>Passing an array to Dataset#order and Dataset#select no longer works, you need to pass multiple arguments (jeremyevans)</p>
 </li><li>
-<p>You should use &#39;?&#39; instead of &#39;(?)&#39; when using interpolated strings with array arguments (jeremyevans)</p>
+<p>You should use ‘?’ instead of ‘(?)’ when using interpolated strings with array arguments (jeremyevans)</p>
 </li><li>
 <p>Dataset.literal now surrounds the literalization of arrays with parentheses (jeremyevans)</p>
 </li><li>
@@ -5649,9 +5649,9 @@ Last Update:
 </li><li>
 <p>Make some Dataset instance methods private: invert_order, insert_default_values_sql (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t add methods that depend on ParseTree unless you can load ParseTree (jeremyevans)</p>
+<p>Don’t add methods that depend on ParseTree unless you can load ParseTree (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t wipeout the cached columns every time a dataset is cloned, but only on changes to :select, :sql, :from, or :join (jeremyevans)</p>
+<p>Don’t wipeout the cached columns every time a dataset is cloned, but only on changes to :select, :sql, :from, or :join (jeremyevans)</p>
 </li><li>
 <p>Fix Oracle Adapter (yasushi.abe)</p>
 </li><li>
@@ -5665,7 +5665,7 @@ Last Update:
 </li><li>
 <p>Fix Range#interval so that it returns 1 less for an exclusive range</p>
 </li><li>
-<p>Change SQLite adapter so it doesn&#39;t swallow exceptions other than SQLite3::Exception (such as Interrupt) (jeremyevans)</p>
+<p>Change SQLite adapter so it doesn’t swallow exceptions other than SQLite3::Exception (such as Interrupt) (jeremyevans)</p>
 </li><li>
 <p>Change PostgreSQL and MySQL adapters to raise <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> instead of database specific errors if a database error occurs (jeremyevans)</p>
 </li><li>
@@ -5745,7 +5745,7 @@ Last Update:
 </li><li>
 <p>Fix many_to_many associations with classes inside modules without an explicit join table (jeremyevans)</p>
 </li><li>
-<p>Allow creation of new records that don&#39;t have primary keys when the cache is on (jeremyevans) (#213)</p>
+<p>Allow creation of new records that don’t have primary keys when the cache is on (jeremyevans) (#213)</p>
 </li><li>
 <p>Make Model#initialize, Model#set, and Model#update_with_params invulnerable to memory exhaustion (jeremyevans) (#210)</p>
 </li><li>
@@ -5775,7 +5775,7 @@ Last Update:
 </li><li>
 <p>Deprecate including ColumnMethods in Object, include it in Symbol, String, and <a href="../../classes/Sequel/SQL/Expression.html"><code>Sequel::SQL::Expression</code></a> (jeremyevans)</p>
 </li><li>
-<p>Deprecate Symbol#method_missing, and #AS, #DESC, #ASC, #ALL, and all from ColumnMethods (jeremyevans)</p>
+<p>Deprecate Symbol#method_missing, and AS, DESC, ASC, ALL, and all from ColumnMethods (jeremyevans)</p>
 </li><li>
 <p>Fix table joining in MySQL (jeremyevans)</p>
 </li><li>
@@ -5807,7 +5807,7 @@ Last Update:
 </li><li>
 <p>Add attr_accessor for dataset row_proc (jeremyevans)</p>
 </li><li>
-<p>Don&#39;t redefine Dataset#each when adding a transform or row_proc (jeremyevans)</p>
+<p>Don’t redefine Dataset#each when adding a transform or row_proc (jeremyevans)</p>
 </li><li>
 <p>Remove array_keys.rb from sequel_core, it was partially broken (since the arrays came from hashes), and redefined Dataset#each (jeremyevans)</p>
 </li><li>
@@ -5817,18 +5817,18 @@ Last Update:
 </li><li>
 <p>Fix renaming columns on MySQL with type :varchar (jeremyevans) (#206)</p>
 </li><li>
-<p>Add Sequel::SQL::Function#==, for comparing SQL Functions (jeremyevans) (#209)</p>
+<p>Add <a href="../../classes/Sequel/SQL/Expression.html#method-i-3D-3D"><code>Sequel::SQL::Function#==</code></a>, for comparing SQL Functions (jeremyevans) (#209)</p>
 </li><li>
 <p>Update Informix adapter to work with Ruby/Informix 0.7.0 (gerardo.santana@gmail.com)</p>
 </li><li>
-<p>Remove sequel_core&#39;s knowledge of <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (jeremyevans)</p>
+<p>Remove sequel_core’s knowledge of <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (jeremyevans)</p>
 </li><li>
 <p>Use “n” instead of $/ (since $/ can be redefined in ways we do not want) (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-1.4.0+-282008-04-08-29+"><a href="release_notes/1_4_0_txt.html">1.4.0</a> (2008-04-08) <span><a href="#label-1.4.0+-282008-04-08-29+">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Don&#39;t mark a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).</p>
+<p>Don’t mark a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).</p>
 </li><li>
 <p>Switch gem name from “sequel_model” to just “sequel”, which required large version bump (jeremyevans).</p>
 </li><li>
@@ -5948,7 +5948,7 @@ Last Update:
 </li><li>
 <p>Implemented Dataset#get, a replacement for <a href="column">select(column).first</a>.</p>
 </li><li>
-<p>Implemented Dataset#grep method, poor man&#39;s text search.</p>
+<p>Implemented Dataset#grep method, poor man’s text search.</p>
 </li></ul>
 
 <h3 id="label-1.0.10+-282008-02-13-29">1.0.10 (2008-02-13)<span><a href="#label-1.0.10+-282008-02-13-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -6196,7 +6196,7 @@ Last Update:
 </li><li>
 <p>Fixed Dataset#count to work properly with datasets with fixed SQL (when using fetch).</p>
 </li><li>
-<p>Added Model.create_with_params method that filters the given parameters accordring to the model&#39;s columns (thanks Aman Gupta). </p>
+<p>Added Model.create_with_params method that filters the given parameters accordring to the model’s columns (thanks Aman Gupta). </p>
 </li></ul>
 
 <h3 id="label-0.4.2.1+-282007-12-09-29">0.4.2.1 (2007-12-09)<span><a href="#label-0.4.2.1+-282007-12-09-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -6224,7 +6224,7 @@ Last Update:
 </li><li>
 <p>Added adapter skeleton as starting point for new adapters.</p>
 </li><li>
-<p>Cleaned-up adapters and moved automatic requiring of &#39;sequel&#39; to adapter stubs.</p>
+<p>Cleaned-up adapters and moved automatic requiring of ‘sequel’ to adapter stubs.</p>
 </li></ul>
 
 <h3 id="label-0.4.1.3+-282007-12-05-29">0.4.1.3 (2007-12-05)<span><a href="#label-0.4.1.3+-282007-12-05-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -6256,7 +6256,7 @@ Last Update:
 
 <h3 id="label-0.4.1+-282007-11-25-29">0.4.1 (2007-11-25)<span><a href="#label-0.4.1+-282007-11-25-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Put adapter files in lib/sequel/adapters. Requiring sequel/&lt;adapter&gt; is now deprecated. Users can now just require &#39;sequel&#39; and adapters are automagically loaded (#93).</p>
+<p>Put adapter files in lib/sequel/adapters. Requiring sequel/&lt;adapter&gt; is now deprecated. Users can now just require ‘sequel’ and adapters are automagically loaded (#93).</p>
 </li></ul>
 
 <h3 id="label-0.4.0+-282007-11-24-29">0.4.0 (2007-11-24)<span><a href="#label-0.4.0+-282007-11-24-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -6356,9 +6356,9 @@ Last Update:
 <ul><li>
 <p>Typo fixes (#79).</p>
 </li><li>
-<p>Added require &#39;yaml&#39; to dataset.rb (#78).</p>
+<p>Added require ‘yaml’ to dataset.rb (#78).</p>
 </li><li>
-<p>Changed postgres adapter to use the ruby-postgres library&#39;s type conversion if available (#76).</p>
+<p>Changed postgres adapter to use the ruby-postgres library’s type conversion if available (#76).</p>
 </li><li>
 <p>Fixed string literalization in mysql adapter for strings with comment backslashes in them (#75).</p>
 </li><li>
@@ -6500,7 +6500,7 @@ Last Update:
 </li><li>
 <p>Add support for ternary operator to Sequelizer.</p>
 </li><li>
-<p>Fixed sequelizer to evaluate expressions if they don&#39;t involve symbols or literal strings.</p>
+<p>Fixed sequelizer to evaluate expressions if they don’t involve symbols or literal strings.</p>
 </li><li>
 <p>Added protection against using each, delete, insert, update inside query blocks.</p>
 </li><li>
@@ -6643,7 +6643,7 @@ Last Update:
 
 <h3 id="label-0.1.9.11+-282007-08-24-29">0.1.9.11 (2007-08-24)<span><a href="#label-0.1.9.11+-282007-08-24-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Changed Dataset#set_model to allow supplying additional arguments to the model&#39;s initialize method (#35). Thanks Sunny Hirai.</p>
+<p>Changed Dataset#set_model to allow supplying additional arguments to the model’s initialize method (#35). Thanks Sunny Hirai.</p>
 </li></ul>
 
 <h3 id="label-0.1.9.10+-282007-08-22-29">0.1.9.10 (2007-08-22)<span><a href="#label-0.1.9.10+-282007-08-22-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -6656,7 +6656,7 @@ Last Update:
 </li><li>
 <p>Removed Database#literal and included Dataset::SQL instead.</p>
 </li><li>
-<p>Sequel::Dataset:SQL#field_name can now take a hash (as well as select and any method that uses field_name) for aliasing column names.  E.g. <a href=":test">DB</a>.select(:_qqa =&gt; &#39;Date&#39;).sql #=&gt; &#39;SELECT _qqa AS Date FROM test&#39;.</p>
+<p><a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a>:SQL#field_name can now take a hash (as well as select and any method that uses field_name) for aliasing column names.  E.g. <a href=":test">DB</a>.select(:_qqa =&gt; ‘Date’).sql #=&gt; ‘SELECT _qqa AS Date FROM test’.</p>
 </li><li>
 <p>Moved SingleThreadedPool to lib/sequel/connection_pool.rb.</p>
 </li><li>
@@ -6827,11 +6827,11 @@ Last Update:
 </li><li>
 <p>Changed default join type to INNER JOIN (thanks snok.)</p>
 </li><li>
-<p>Added support for literal expressions, e.g. <a href=":items">DB</a>.filter(:col1 =&gt; &#39;col2 - 10&#39;.expr).</p>
+<p>Added support for literal expressions, e.g. <a href=":items">DB</a>.filter(:col1 =&gt; ‘col2 - 10’.expr).</p>
 </li><li>
 <p>Added Dataset#and.</p>
 </li><li>
-<p>SQLite adapter opens a memory DB if no database is specified, e.g. Sequel.open &#39;sqlite:/&#39;.</p>
+<p>SQLite adapter opens a memory DB if no database is specified, e.g. Sequel.open ‘sqlite:/’.</p>
 </li><li>
 <p>Added Dataset#or, pretty nifty.</p>
 </li></ul>
@@ -6849,7 +6849,9 @@ Last Update:
 </li><li>
 <p>Improved Schema generator to support data types as method names: DB.create_table :test do</p>
 
-<pre>integer :abc&#x000A;text :def&#x000A;...</pre>
+<pre>integer :abc
+text :def
+...</pre>
 
 <p>end</p>
 </li><li>
@@ -6905,7 +6907,7 @@ Last Update:
 
 <h3 id="label-0.1.0">0.1.0<span><a href="#label-0.1.0">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Changed Database#create_table to only accept a block. Nobody&#39;s gonna use the other way.</p>
+<p>Changed Database#create_table to only accept a block. Nobody’s gonna use the other way.</p>
 </li><li>
 <p>Removed Dataset#[]= method. Too confusing and not really useful.</p>
 </li><li>
@@ -6917,7 +6919,7 @@ Last Update:
 </li><li>
 <p>Added like? and in? Proc expression operators.</p>
 </li><li>
-<p>Added require &#39;date&#39; in dataset.rb. Is this a 1.8.5 thing?</p>
+<p>Added require ‘date’ in dataset.rb. Is this a 1.8.5 thing?</p>
 </li><li>
 <p>Refactored Dataset to use literal strings instead of format strings (slight performance improvement and better readability.)</p>
 </li><li>
@@ -6951,7 +6953,7 @@ Last Update:
 </li><li>
 <p>Fixed Dataset#order and Dataset#group to behave correctly when supplied with qualified field name symbols.</p>
 </li><li>
-<p>Removed Database#literal. Shouldn&#39;t have been there.</p>
+<p>Removed Database#literal. Shouldn’t have been there.</p>
 </li><li>
 <p>Added SQLite::Dataset#explain. Returns an array of opcode hashes.</p>
 </li><li>
@@ -7012,7 +7014,7 @@ Last Update:
 
 <h3 id="label-0.0.14">0.0.14<span><a href="#label-0.0.14">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Fixed Model&#39;s attribute accessors (hopefully for the last time).</p>
+<p>Fixed Model’s attribute accessors (hopefully for the last time).</p>
 </li><li>
 <p>Changed Model.db and Model.db= to allow different databases for different model classes.</p>
 </li><li>
@@ -7045,7 +7047,7 @@ Last Update:
 </li><li>
 <p>Improved Model class to allow descendants of model clases (thanks Pedro Gutierrez.)</p>
 </li><li>
-<p>Removed require &#39;postgres&#39; in schema.rb (thanks Douglas Koszerek.)</p>
+<p>Removed require ‘postgres’ in schema.rb (thanks Douglas Koszerek.)</p>
 </li></ul>
 
 <h3 id="label-0.0.10">0.0.10<span><a href="#label-0.0.10">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -7065,7 +7067,7 @@ Last Update:
 </li><li>
 <p>Changed behavior of Dataset#literal to regard symbols as field names.</p>
 </li><li>
-<p>Refactored and DRY&#39;d Dataset#literal and overrides therof. Added support for subqueries in where clause.</p>
+<p>Refactored and DRY’d Dataset#literal and overrides therof. Added support for subqueries in where clause.</p>
 </li></ul>
 
 <h3 id="label-0.0.8">0.0.8<span><a href="#label-0.0.8">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -7086,7 +7088,7 @@ Last Update:
 <ul><li>
 <p>Added Dataset#sql as alias to Dataset#select_sql.</p>
 </li><li>
-<p>Dataset#where and Dataset#exclude can now be used for refining dataset conditions, enabling stuff like posts.where(:title =&gt; &#39;abcdef&#39;).exclude(:user_id =&gt; 3).</p>
+<p>Dataset#where and Dataset#exclude can now be used for refining dataset conditions, enabling stuff like posts.where(:title =&gt; ‘abcdef’).exclude(:user_id =&gt; 3).</p>
 </li><li>
 <p>Implemented Dataset#exclude method.</p>
 </li><li>
@@ -7103,7 +7105,7 @@ Last Update:
 </li><li>
 <p>Renamed Pool#conn_maker to Pool#connection_proc.</p>
 </li><li>
-<p>Added automatic require &#39;sequel&#39; to all adapters for convenience.</p>
+<p>Added automatic require ‘sequel’ to all adapters for convenience.</p>
 </li></ul>
 
 <h3 id="label-0.0.4">0.0.4<span><a href="#label-0.0.4">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -7119,7 +7121,7 @@ Last Update:
 </li><li>
 <p>Added support for exclusive ranges (thanks Christian Neukirchen.)</p>
 </li><li>
-<p>Added sequel console for quick&#39;n&#39;dirty access to databases.</p>
+<p>Added sequel console for quick’n’dirty access to databases.</p>
 </li><li>
 <p>Fixed small bug in Dataset#qualified_field_name for better join support.</p>
 </li></ul>
@@ -7128,7 +7130,7 @@ Last Update:
 <ul><li>
 <p>Added Sequel.open as alias to Sequel.connect.</p>
 </li><li>
-<p>Refactored Dataset#where_equal_condition into Dataset#where_condition, allowing arrays and ranges, e.g. posts.filter(:stamp =&gt; (3.days.ago)..(1.day.ago)), or posts.filter(:category =&gt; [&#39;ruby&#39;, &#39;postgres&#39;, &#39;linux&#39;]).</p>
+<p>Refactored Dataset#where_equal_condition into Dataset#where_condition, allowing arrays and ranges, e.g. posts.filter(:stamp =&gt; (3.days.ago)..(1.day.ago)), or posts.filter(:category =&gt; [‘ruby’, ‘postgres’, ‘linux’]).</p>
 </li><li>
 <p>Added Model#[]= method for changing column values and Model#save </p>
 </li></ul>
@@ -7272,7 +7274,7 @@ Last Update:
 </li><li>
 <p>Removed examples from sequel core.</p>
 </li><li>
-<p>Additional specs. We&#39;re now at 100% coverage.</p>
+<p>Additional specs. We’re now at 100% coverage.</p>
 </li><li>
 <p>Refactored hooks code. Hooks are now inheritable, and can be defined by supplying a block or a method name, or by overriding the hook instance method. Hook chains can now be broken by returning false (#111, #112).</p>
 </li></ul>
@@ -7291,7 +7293,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

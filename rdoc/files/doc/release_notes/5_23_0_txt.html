@@ -40,7 +40,13 @@ Last Update:
 <ul><li>
 <p>An insert_conflict plugin has been added for automatically handling constraint conflicts when saving new model instances.  It is supported on PostgreSQL 9.5+ and SQLite <a href="3_24_0_txt.html">3.24.0</a>+.</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>, <span class="ruby-value">copies_sold:</span> <span class="ruby-value">1000</span>).&#x000A;  <span class="ruby-identifier">insert_conflict</span>(&#x000A;    <span class="ruby-value">target:</span> <span class="ruby-value">:name</span>,&#x000A;    <span class="ruby-value">update:</span> {<span class="ruby-value">copies_sold:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}&#x000A;  ).&#x000A;  <span class="ruby-identifier">save</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>, <span class="ruby-value">copies_sold:</span> <span class="ruby-value">1000</span>).
+  <span class="ruby-identifier">insert_conflict</span>(
+    <span class="ruby-value">target:</span> <span class="ruby-value">:name</span>,
+    <span class="ruby-value">update:</span> {<span class="ruby-value">copies_sold:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}
+  ).
+  <span class="ruby-identifier">save</span>
+</pre>
 </li><li>
 <p>On Microsoft SQL Server, the Database :ansi option has been added, which sets the following ANSI related options:</p>
 <ul><li>
@@ -60,7 +66,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Sequel.datetime_class = Time is now supported when using the named_timezones extension.  For backwards compatibility, the named_timezones extension still sets Sequel.datetime_class = DateTime.  When using Ruby 2.6+, the Time instances have the timezone set on them using Ruby 2.6+&#39;s timezone support, but basic support works correctly in earlier versions of Ruby.</p>
+<p>Sequel.datetime_class = Time is now supported when using the named_timezones extension.  For backwards compatibility, the named_timezones extension still sets Sequel.datetime_class = DateTime.  When using Ruby 2.6+, the Time instances have the timezone set on them using Ruby 2.6+‘s timezone support, but basic support works correctly in earlier versions of Ruby.</p>
 </li><li>
 <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles parsing schema for tables in another database on the same server or in a database on a linked server.</p>
 </li><li>
@@ -86,7 +92,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

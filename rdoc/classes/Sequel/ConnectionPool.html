@@ -166,7 +166,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">94</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="line-num">95</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;<span class="line-num">96</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>]&#x000A;<span class="line-num">97</span>   <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
+<span class="line-num">93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">94</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
+<span class="line-num">95</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]
+<span class="line-num">96</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>]
+<span class="line-num">97</span>   <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -185,7 +191,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>&#x000A;<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>&#x000A;<span class="line-num">102</span>   [<span class="ruby-value">:default</span>]&#x000A;<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
+<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>
+<span class="line-num">102</span>   [<span class="ruby-value">:default</span>]
+<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -197,7 +206,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

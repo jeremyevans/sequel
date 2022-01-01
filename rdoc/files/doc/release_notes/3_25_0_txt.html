@@ -40,27 +40,46 @@ Last Update:
 <ul><li>
 <p>drop_table, drop_view, drop_column, and drop_constraint all now support a :cascade option for using CASCADE.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:tab</span>, <span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># DROP TABLE tab CASCADE</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_column</span>(<span class="ruby-value">:tab</span>, <span class="ruby-value">:col</span>, <span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># ALTER TABLE tab DROP COLUMN col CASCADE</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:tab</span>, <span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># DROP TABLE tab CASCADE</span>
 
-<p>A few databases support CASCADE for dropping tables and views, but only PostgreSQL appears to support it for columns and constraints.  Using the :cascade option when the underlying database doesn&#39;t support it will probably result in a DatabaseError being raised.</p>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_column</span>(<span class="ruby-value">:tab</span>, <span class="ruby-value">:col</span>, <span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># ALTER TABLE tab DROP COLUMN col CASCADE</span>
+</pre>
+
+<p>A few databases support CASCADE for dropping tables and views, but only PostgreSQL appears to support it for columns and constraints.  Using the :cascade option when the underlying database doesn’t support it will probably result in a DatabaseError being raised.</p>
 </li><li>
 <p>You can now use datasets as expressions, allowing things such as:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-constant">DB</span>[<span class="ruby-value">:table2</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column2</span>)&#x000A;<span class="ruby-comment"># (SELECT column1 FROM table1) &gt; (SELECT column2 FROM table2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column1</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)&#x000A;<span class="ruby-comment"># CAST((SELECT column1 FROM table1) AS integer)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-constant">DB</span>[<span class="ruby-value">:table2</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column2</span>)
+<span class="ruby-comment"># (SELECT column1 FROM table1) &gt; (SELECT column2 FROM table2)</span>
+
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column1</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)
+<span class="ruby-comment"># CAST((SELECT column1 FROM table1) AS integer)</span>
+</pre>
 </li><li>
 <p>Dataset#select_group has been added for grouping and selecting on the same columns.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">select_group</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>)&#x000A;<span class="ruby-comment"># SELECT b, c FROM a GROUP BY b, c</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">select_group</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>)
+<span class="ruby-comment"># SELECT b, c FROM a GROUP BY b, c</span>
+</pre>
 </li><li>
-<p>Dataset#exclude_where and exclude_having methods have been added, allowing you to specify which clause to affect.  exclude&#39;s behavior is still to add to the HAVING clause if one is present, and use the WHERE clause otherwise.</p>
+<p>Dataset#exclude_where and exclude_having methods have been added, allowing you to specify which clause to affect.  exclude’s behavior is still to add to the HAVING clause if one is present, and use the WHERE clause otherwise.</p>
 </li><li>
 <p>Dataset#select_all now accepts optional arguments and will select all columns from those arguments if present:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:a</span>)&#x000A;<span class="ruby-comment"># SELECT a.* FROM a</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>).<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)&#x000A;<span class="ruby-comment"># SELECT a.*, b.* FROM a, b</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:a</span>)
+<span class="ruby-comment"># SELECT a.* FROM a</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>).<span class="ruby-identifier">select_all</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)
+<span class="ruby-comment"># SELECT a.*, b.* FROM a, b</span>
+</pre>
 </li><li>
 <p>Dataset#group and group_and_count now both accept virtual row blocks:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">group</span>{<span class="ruby-identifier">c</span>(<span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># SELECT b FROM a GROUP BY c(d)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">group</span>{<span class="ruby-identifier">c</span>(<span class="ruby-identifier">d</span>)}
+<span class="ruby-comment"># SELECT b FROM a GROUP BY c(d)</span>
+</pre>
 </li><li>
 <p>If you use a LiteralString as a validation error message,  Errors#full_messages will now not add the related column name to the start of the error message.</p>
 </li><li>
@@ -69,7 +88,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The association_pks plugin&#39;s setter method will now automatically convert a given array of strings to an array of integers if the primary key field is an integer field, which should make it easier to use in web applications.</p>
+<p>The association_pks plugin’s setter method will now automatically convert a given array of strings to an array of integers if the primary key field is an integer field, which should make it easier to use in web applications.</p>
 </li><li>
 <p>nil bound variable, prepared statement, and stored procedure arguments are now handled correctly in the JDBC adapter.</p>
 </li><li>
@@ -94,7 +113,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

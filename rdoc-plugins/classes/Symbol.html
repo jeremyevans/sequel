@@ -115,7 +115,15 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/extensions/symbol_aref.rb</span>&#x000A;<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">46</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>&#x000A;<span class="line-num">47</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">49</span>     <span class="ruby-identifier">aref_before_sequel</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">50</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/extensions/symbol_aref.rb</span>
+<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">45</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">46</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
+<span class="line-num">47</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">48</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">49</span>     <span class="ruby-identifier">aref_before_sequel</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">50</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-identifier'>
@@ -128,14 +136,18 @@ Superclass:
 
 <p>Returns receiver wrapped in an <code>Sequel::SQL::Identifier</code>.</p>
 
-<pre class="ruby"><span class="ruby-value">:a</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># SQL: &quot;a&quot;</span></pre>
+<pre class="ruby"><span class="ruby-value">:a</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># SQL: &quot;a&quot;</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-identifier-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-identifier-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>&#x000A;<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">identifier</span>&#x000A;<span class="line-num">210</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">211</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-identifier-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>
+<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">identifier</span>
+<span class="line-num">210</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">211</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_function'>
@@ -148,14 +160,20 @@ Superclass:
 
 <p>Returns a <code>Sequel::SQL::Function</code> with this as the function name, and the given arguments.</p>
 
-<pre class="ruby"><span class="ruby-value">:now</span>.<span class="ruby-identifier">sql_function</span> <span class="ruby-comment"># SQL: now()</span>&#x000A;<span class="ruby-value">:sum</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># SQL: sum(a)</span>&#x000A;<span class="ruby-value">:concat</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>) <span class="ruby-comment"># SQL: concat(a, b)</span></pre>
+<pre class="ruby"><span class="ruby-value">:now</span>.<span class="ruby-identifier">sql_function</span> <span class="ruby-comment"># SQL: now()</span>
+<span class="ruby-value">:sum</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># SQL: sum(a)</span>
+<span class="ruby-value">:concat</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>) <span class="ruby-comment"># SQL: concat(a, b)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_function-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_function-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>&#x000A;<span class="line-num">219</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">220</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">221</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_function-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>
+<span class="line-num">219</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">220</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">221</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -167,7 +185,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

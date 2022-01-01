@@ -55,20 +55,31 @@ Sequel::DatasetQuery
 </div>
 <div class='description'>
 
-<p>Translates a query block into a dataset. Query blocks are an alternative to Sequel&#39;s usual method chaining, by using instance_exec with a proxy object:</p>
+<p>Translates a query block into a dataset. Query blocks are an alternative to Sequel’s usual method chaining, by using instance_exec with a proxy object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">select</span> <span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>&#x000A;  <span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}&#x000A;  <span class="ruby-identifier">reverse</span> <span class="ruby-value">:z</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">select</span> <span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>
+  <span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}
+  <span class="ruby-identifier">reverse</span> <span class="ruby-value">:z</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Which is the same as:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>).<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">reverse</span>(<span class="ruby-value">:z</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>).<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">reverse</span>(<span class="ruby-value">:z</span>)
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-query-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-query-source'>   <span class="ruby-comment"># File lib/sequel/extensions/query.rb</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">query</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">query</span> = <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Query</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">query</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">query</span>.<span class="ruby-identifier">dataset</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-query-source'>   <span class="ruby-comment"># File lib/sequel/extensions/query.rb</span>
+<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">query</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">54</span>   <span class="ruby-identifier">query</span> = <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Query</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">55</span>   <span class="ruby-identifier">query</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">56</span>   <span class="ruby-identifier">query</span>.<span class="ruby-identifier">dataset</span>
+<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -80,7 +91,7 @@ Sequel::DatasetQuery
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

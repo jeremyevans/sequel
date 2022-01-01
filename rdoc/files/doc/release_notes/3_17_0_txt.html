@@ -42,7 +42,12 @@ Last Update:
 </li><li>
 <p>You can now specify graph aliases where the alias would be the same as the table column name using just the table name symbol, instead having to repeat the alias as the second element of an array.  More clearly:</p>
 
-<pre class="ruby"><span class="ruby-comment"># &lt; 3.17.0:</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>).&#x000A;  <span class="ruby-identifier">set_graph_aliases</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:a</span>, <span class="ruby-value">:c</span>], <span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:b</span>, <span class="ruby-value">:d</span>])&#x000A;<span class="ruby-comment"># &gt;= 3.17.0:</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>).<span class="ruby-identifier">set_graph_aliases</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>, <span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># &lt; 3.17.0:</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>).
+  <span class="ruby-identifier">set_graph_aliases</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:a</span>, <span class="ruby-value">:c</span>], <span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:b</span>, <span class="ruby-value">:d</span>])
+<span class="ruby-comment"># &gt;= 3.17.0:</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:a_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>).<span class="ruby-identifier">set_graph_aliases</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>, <span class="ruby-value">:d</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)
+</pre>
 
 <p>Both of these now yield the SQL:</p>
 
@@ -83,7 +88,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

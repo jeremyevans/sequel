@@ -40,35 +40,46 @@ Last Update:
 <ul><li>
 <p>An unused_associations plugin has been added, which allows you to determine which associations and association methods are not used. You can use this to avoid defining the unused associations and association methods, which can save memory.</p>
 
-<p>This plugin is supported on Ruby 2.5+, and uses method coverage to determine if the plugin&#39;s methods are called.  Because <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> adds association methods to an anonymous module included in the class, directly using the method coverage data to determine which associations are used is challenging.</p>
+<p>This plugin is supported on Ruby 2.5+, and uses method coverage to determine if the plugin’s methods are called.  Because <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> adds association methods to an anonymous module included in the class, directly using the method coverage data to determine which associations are used is challenging.</p>
 
 <p>This plugin is mostly designed for reporting.  You can have a test suite that runs with method coverage enabled, and use the coverage information to get data on unused associations:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Calls Coverage.result</span>&#x000A;<span class="ruby-identifier">cov_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span>&#x000A;<span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>(<span class="ruby-value">coverage_data:</span> <span class="ruby-identifier">cov_data</span>)&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_associations</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)&#x000A;<span class="ruby-comment"># =&gt; [[&quot;Class1&quot;, &quot;assoc1&quot;], ...]</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Calls Coverage.result</span>
+<span class="ruby-identifier">cov_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_associations_coverage</span>
+<span class="ruby-identifier">unused_associations_data</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">update_unused_associations_data</span>(<span class="ruby-value">coverage_data:</span> <span class="ruby-identifier">cov_data</span>)
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_associations</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)
+<span class="ruby-comment"># =&gt; [[&quot;Class1&quot;, &quot;assoc1&quot;], ...]</span>
+</pre>
 
 <p>unused_associations returns an array of two element arrays, where the first element is the class name and the second element is the association name.  The returned values will be associations where all of the association methods are not used.</p>
 
 <p>In addition to determining which associations are not used, you can also use this to determine if you are defining association methods that are not used:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_association_options</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)&#x000A;<span class="ruby-comment"># =&gt; [[&quot;Class2&quot;, &quot;assoc2&quot;, {:read_only=&gt;true}], ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unused_association_options</span>(<span class="ruby-value">unused_associations_data:</span> <span class="ruby-identifier">unused_associations_data</span>)
+<span class="ruby-comment"># =&gt; [[&quot;Class2&quot;, &quot;assoc2&quot;, {:read_only=&gt;true}], ...]</span>
+</pre>
 
-<p>unused_association_options is similar to unused_associations, but returns an array of three element arrays, where the third element is a hash of association options that should be used to avoid defining the unused association methods.  It&#39;s common in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to define associations and only use them for reading data and not for modifications, and you can use this to easily see which associations are only used for reading data.</p>
+<p>unused_association_options is similar to unused_associations, but returns an array of three element arrays, where the third element is a hash of association options that should be used to avoid defining the unused association methods.  It’s common in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to define associations and only use them for reading data and not for modifications, and you can use this to easily see which associations are only used for reading data.</p>
 
 <p>As the determination of whether associations are used is based on method coverage, this will report as unused any associations that are used but where the association methods are not called.  These cases are rare, but can happen if you have libraries that use the association reflection metadata without calling the association methods, or use the association only in combination with another plugin such as dataset_associations.  You can set the :is_used association option to explicitly mark an association as used, and have this plugin avoid reporting it as unused.</p>
 
 <p>In addition to just reporting on unused associations, you can also directly use the unused associations metadata to automatically avoid defining unused associations or unused associations methods.  You can set a :file option when loading the plugin:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>, <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>, <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>
+</pre>
 
 <p>Then run the method coverage testing.  This will save the unused associations metadata to the file.  Then you can use this metadata automatically by also setting the :modify_associations option:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>, <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>,&#x000A;  <span class="ruby-value">modify_associations:</span> <span class="ruby-keyword">true</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>, <span class="ruby-value">file:</span> <span class="ruby-string">&#39;unused_associations.json&#39;</span>,
+  <span class="ruby-value">modify_associations:</span> <span class="ruby-keyword">true</span>
+</pre>
 
 <p>With the :modify_associations option, unused associations are skipped instead of being defined, and the options returned by unused_association_options are automatically used.  Note that using the :modify_associations option is risky unless you have complete  coverage and do not have cases where the associations are used without calling methods.</p>
 
 <p>It is common to have multiple test suites where you need to combine coverage.  The plugin supports this by using a :coverage_file option:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>, <span class="ruby-value">coverage_file:</span> <span class="ruby-string">&#39;unused_associations_coverage.json&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:unused_associations</span>, <span class="ruby-value">coverage_file:</span> <span class="ruby-string">&#39;unused_associations_coverage.json&#39;</span>
+</pre>
 
 <p>In this case, you would run update_associations_coverage after each test suite, and update_unused_associations_data only after all test suites have been run.</p>
 </li><li>
@@ -84,7 +95,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

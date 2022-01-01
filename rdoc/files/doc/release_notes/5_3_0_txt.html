@@ -40,15 +40,27 @@ Last Update:
 <ul><li>
 <p>An :extensions Database option is now supported, which will load the named extensions into the Database before any connections are initiated:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;mock:///&#39;</span>, <span class="ruby-value">:extensions</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:error_sql</span>, <span class="ruby-value">:synchronize_sql</span>])&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;mock:///?extensions=error_sql,synchronize_sql&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;mock:///&#39;</span>, <span class="ruby-value">:extensions</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:error_sql</span>, <span class="ruby-value">:synchronize_sql</span>])
+<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;mock:///?extensions=error_sql,synchronize_sql&#39;</span>)
+</pre>
 </li><li>
 <p>A :connect_sqls Database option is now supported, which will issue the given queries on all new connections:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres:///&#39;</span>, <span class="ruby-value">:connect_sqls</span><span class="ruby-operator">=&gt;</span>[&#x000A;    <span class="ruby-string">&#39;SET random_page_cost = 1.0&#39;</span>,&#x000A;    <span class="ruby-string">&quot;SET default_tablespace = &#39;foo&#39;&quot;</span>&#x000A;  ])</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres:///&#39;</span>, <span class="ruby-value">:connect_sqls</span><span class="ruby-operator">=&gt;</span>[
+    <span class="ruby-string">&#39;SET random_page_cost = 1.0&#39;</span>,
+    <span class="ruby-string">&quot;SET default_tablespace = &#39;foo&#39;&quot;</span>
+  ])
+</pre>
 </li><li>
 <p>DatasetModule#reverse has been added for simpler use of descending orders:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">reverse</span> <span class="ruby-value">:newest_first</span>, <span class="ruby-value">:created_at</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">newest_first</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">10</span>)</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">reverse</span> <span class="ruby-value">:newest_first</span>, <span class="ruby-value">:created_at</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">newest_first</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">10</span>)
+</pre>
 </li><li>
 <p>A synchronize_sql extension has been added.  This extension checks out a connection around SQL string creation, and is useful in the cases where escaping values in the query requires a connection and a large number of values need to be escaped.</p>
 </li><li>
@@ -58,7 +70,7 @@ Last Update:
 </li><li>
 <p>Window functions.</p>
 </li><li>
-<p>Dropping CHECK constraints. Older versions of MariaDB/MySQL ignored CHECK constraints that were added, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> did not attempt to filter them out, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> did not require changes to add CHECK constraints.  MariaDB 10.2 CHECK constraints work correctly with Sequel&#39;s constraint_validations extension/plugin.</p>
+<p>Dropping CHECK constraints. Older versions of MariaDB/MySQL ignored CHECK constraints that were added, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> did not attempt to filter them out, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> did not require changes to add CHECK constraints.  MariaDB 10.2 CHECK constraints work correctly with Sequel’s constraint_validations extension/plugin.</p>
 </li><li>
 <p>Raising CHECK constraint violations as Sequel::CheckConstraintViolation instances.</p>
 </li><li>
@@ -67,7 +79,8 @@ Last Update:
 </li><li>
 <p>Date::Infinity values are now supported in the pg_extended_date_support extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-value">:date</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-value">:date</span>
+</pre>
 
 <p>This returns infinite dates/timestamps as Date::Infinity instances, and literalizes Date::Infinity instances correctly.</p>
 </li></ul>
@@ -76,7 +89,7 @@ Last Update:
 <ul><li>
 <p>Database#reset_primary_key_sequence now works correctly on PostgreSQL 10.</p>
 </li><li>
-<p>If a commit or rollback raises an exception when using the postgres adapter, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will check the connection&#39;s current transaction status and only send another rollback if the connection is currently inside a transaction.  This fixes a warning that is issued in most cases if a commit or rollback fails.</p>
+<p>If a commit or rollback raises an exception when using the postgres adapter, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will check the connection’s current transaction status and only send another rollback if the connection is currently inside a transaction.  This fixes a warning that is issued in most cases if a commit or rollback fails.</p>
 </li><li>
 <p>The jdbc/postgresql adapter now forces JDBC PreparedStatement instances created by Dataset#call to never be prepared server side, working around an caching issue in the jdbc-postgres drier in versions greater than 9.4.1200.</p>
 </li><li>
@@ -95,9 +108,16 @@ Last Update:
 <ul><li>
 <p>Calling a filtering method with no argument and a virtual row block that returns nil on a dataset with no existing filter is deprecated in this version and will emit a warning.  The behavior in this version remains the same, where the dataset is not modified. The behavior will change in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_4_0_txt.html">5.4.0</a> so that a WHERE NULL filter will be added in that case, instead of the filter being ignored, so that the behavior is similar to calling the filtering method with a nil argument.</p>
 
-<pre class="ruby"><span class="ruby-comment"># Sequel 5.3.0</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>{<span class="ruby-keyword">nil</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM a</span>&#x000A;&#x000A;<span class="ruby-comment"># Sequel 5.4.0</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>{<span class="ruby-keyword">nil</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE NULL</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Sequel 5.3.0</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>{<span class="ruby-keyword">nil</span>}
+<span class="ruby-comment"># SELECT * FROM a</span>
+
+<span class="ruby-comment"># Sequel 5.4.0</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>{<span class="ruby-keyword">nil</span>}
+<span class="ruby-comment"># SELECT * FROM a WHERE NULL</span>
+</pre>
 </li><li>
-<p>Support for PostgreSQL &lt;8.1 has been dropped from Database#indexes. Sequel&#39;s PostgreSQL support requires &gt;=8.2 for Dataset#insert to work, so it doesn&#39;t make sense to support earlier versions in other cases.</p>
+<p>Support for PostgreSQL &lt;8.1 has been dropped from Database#indexes. Sequel’s PostgreSQL support requires &gt;=8.2 for Dataset#insert to work, so it doesn’t make sense to support earlier versions in other cases.</p>
 </li></ul>
 </div>
 <div id='context'>
@@ -109,7 +129,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

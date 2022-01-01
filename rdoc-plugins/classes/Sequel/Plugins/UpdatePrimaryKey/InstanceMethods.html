@@ -63,7 +63,11 @@ Sequel::Plugins::UpdatePrimaryKey::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_primary_key.rb</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;<span class="line-num">28</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">29</span>   <span class="ruby-ivar">@pk_hash</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_primary_key.rb</span>
+<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>
+<span class="line-num">28</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">29</span>   <span class="ruby-ivar">@pk_hash</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pk_hash'>
@@ -81,7 +85,10 @@ Sequel::Plugins::UpdatePrimaryKey::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pk_hash-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pk_hash-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_primary_key.rb</span>&#x000A;<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk_hash</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-ivar">@pk_hash</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pk_hash-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_primary_key.rb</span>
+<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk_hash</span>
+<span class="line-num">34</span>   <span class="ruby-ivar">@pk_hash</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>
+<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +100,7 @@ Sequel::Plugins::UpdatePrimaryKey::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -88,7 +88,14 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/exceptions.rb</span>&#x000A;<span class="line-num">104</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">msg</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">105</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">msg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>)&#x000A;<span class="line-num">106</span>     <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">msg</span>&#x000A;<span class="line-num">107</span>     <span class="ruby-identifier">msg</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">108</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">109</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/exceptions.rb</span>
+<span class="line-num">104</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">msg</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">105</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">msg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>)
+<span class="line-num">106</span>     <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">msg</span>
+<span class="line-num">107</span>     <span class="ruby-identifier">msg</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">108</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">109</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">110</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -100,7 +107,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

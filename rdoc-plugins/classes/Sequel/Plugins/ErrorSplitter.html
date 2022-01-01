@@ -37,25 +37,34 @@ Sequel::Plugins::ErrorSplitter
 <div id='description'>
 <p>The error_splitter plugin automatically splits errors entries related to multiple columns to have separate error entries, one per column.  For example, a multiple column uniqueness entry:</p>
 
-<pre class="ruby"><span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>])
+</pre>
 
 <p>would by default result in errors entries such as:</p>
 
-<pre class="ruby">{[<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>}</pre>
+<pre class="ruby">{[<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>}
+</pre>
 
 <p>This plugin transforms those errors into:</p>
 
-<pre class="ruby">{<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>}</pre>
+<pre class="ruby">{<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>}
+</pre>
 
-<p>The main reason to split errors is if you have a list of fields that you are checking for validation errors.  If you don&#39;t split the errors, then:</p>
+<p>The main reason to split errors is if you have a list of fields that you are checking for validation errors.  If you don’t split the errors, then:</p>
 
-<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:artist_id</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:artist_id</span>)
+</pre>
 
 <p>would not return the uniqueness error.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances split errors (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:error_splitter</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class split errors</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:error_splitter</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances split errors (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:error_splitter</span>
+
+<span class="ruby-comment"># Make the Album class split errors</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:error_splitter</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -74,7 +83,7 @@ Sequel::Plugins::ErrorSplitter
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

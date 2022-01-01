@@ -40,11 +40,22 @@ Last Update:
 <ul><li>
 <p>A throw_failures plugin has been added for throwing ValidationFailed and HookFailed exceptions instead of raising them.  This can improve performance by up to 10x on JRuby and 10-15% on CRuby.  However, you would need to modify your exception handling from:</p>
 
-<pre class="ruby"><span class="ruby-keyword">begin</span>&#x000A;  <span class="ruby-comment"># model.save</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-comment"># handle failure</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">begin</span>
+  <span class="ruby-comment"># model.save</span>
+<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+  <span class="ruby-comment"># handle failure</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>to:</p>
 
-<pre class="ruby"><span class="ruby-identifier">e</span> = <span class="ruby-identifier">catch</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># model.save</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">if</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span>)&#x000A;  <span class="ruby-comment"># handle failure</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">e</span> = <span class="ruby-identifier">catch</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># model.save</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-keyword">if</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span>)
+  <span class="ruby-comment"># handle failure</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>The throw_failures plugin will still work if you are not catching the exception, falling back to the default behavior of raising the exception.</p>
 </li><li>
@@ -97,7 +108,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

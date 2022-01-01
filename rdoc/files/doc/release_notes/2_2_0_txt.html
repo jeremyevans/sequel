@@ -39,17 +39,26 @@ Last Update:
 <p>The Most Powerful and Flexible Associations of Any Ruby ORM</p>
 <hr>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now support any association type supported by ActiveRecord, and many association types ActiveRecord doesn&#39;t support.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now support any association type supported by ActiveRecord, and many association types ActiveRecord doesn’t support.</p>
 
 <p>Association callbacks (:before_add, :after_add, :before_remove, :after_remove) have been added, and work for all association types.  Each of the callback options can be a Symbol specifying an instance method that takes one argument (the associated object), or a Proc that takes two arguments (the current object and the associated object), or an array of Symbols and Procs.  Additionally, an :after_load callback is available, which is running after loading the associated record(s) from the database.</p>
 
 <p>Association extensions are now supported:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">FindOrCreate</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_create</span>(<span class="ruby-identifier">vals</span>)&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:authorships</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">FindOrCreate</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">FindOrCreate</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_create</span>(<span class="ruby-identifier">vals</span>)
+    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:authorships</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">FindOrCreate</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)
+</pre>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> has been able to support most has_many :through style associations since <a href="1_3_txt.html">1.3</a>, via many_to_many (since it doesn&#39;t break on join tables that are also model tables, unlike ActiveRecord&#39;s has_and_belongs_to_many).  Now it can also support has_many :through style associations where it goes through a has_many association.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> has been able to support most has_many :through style associations since <a href="1_3_txt.html">1.3</a>, via many_to_many (since it doesn’t break on join tables that are also model tables, unlike ActiveRecord’s has_and_belongs_to_many).  Now it can also support has_many :through style associations where it goes through a has_many association.</p>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now support polymorphic associations.  Polymorphic associations are really a design flaw, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn&#39;t support them directly, but the tools that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> gives you make them pretty easy to implement.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now support polymorphic associations.  Polymorphic associations are really a design flaw, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t support them directly, but the tools that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> gives you make them pretty easy to implement.</p>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can also support associations that ActiveRecord does not.  For example, a belongs_to association where the column referenced in the associated table is not the primary key, an association that depends on multiple columns in each table, or even situations where the association has a column in the primary table that can be referenced by any of multiple columns in a second table that has a has_one style association with the table you want to associate with.</p>
 
@@ -61,51 +70,101 @@ Last Update:
 
 <p>Finally, just to show off the power that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> gives you when eager loading, here is example code that will eagerly load all descendants and ancestors in a tree structure, without knowing the depth of the tree:</p>
 
-<pre>class Node &lt; Sequel::Model&#x000A;  set_schema do&#x000A;    primary_key :id&#x000A;    foreign_key :parent_id, :nodes&#x000A;  end&#x000A;  create_table&#x000A;  many_to_one :parent&#x000A;  one_to_many :children, :key=&gt;:parent_id&#x000A;&#x000A;  # Only useful when eager loading&#x000A;  many_to_one :ancestors, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
+<pre>class Node &lt; Sequel::Model
+  set_schema do
+    primary_key :id
+    foreign_key :parent_id, :nodes
+  end
+  create_table
+  many_to_one :parent
+  one_to_many :children, :key=&gt;:parent_id
+
+  # Only useful when eager loading
+  many_to_one :ancestors, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
 
 <p>associations|</p>
 
-<pre class="ruby"><span class="ruby-comment"># Handle cases where the root node has the same parent_id as</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Handle cases where the root node has the same parent_id as</span>
+</pre>
 
 <p>primary_key</p>
 
-<pre># and also when it is NULL&#x000A;non_root_nodes = nodes.reject do |n|&#x000A;  if [nil, n.pk].include?(n.parent_id)&#x000A;    # Make sure root nodes have their parent association set to</pre>
+<pre># and also when it is NULL
+non_root_nodes = nodes.reject do |n|
+  if [nil, n.pk].include?(n.parent_id)
+    # Make sure root nodes have their parent association set to</pre>
 
 <p>nil</p>
 
-<pre>    n.associations[:parent] = nil&#x000A;    true&#x000A;  else&#x000A;    false&#x000A;  end&#x000A;end&#x000A;unless non_root_nodes.empty?&#x000A;  id_map = {}&#x000A;  # Create an map of parent_ids to nodes that have that parent id&#x000A;  non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) &lt;&lt; n}&#x000A;  # Doesn&#39;t cause an infinte loop, because when only the root node&#x000A;  # is left, this is not called.&#x000A;  Node.filter(Node.primary_key=&gt;id_map.keys).eager(:ancestors).all</pre>
+<pre>    n.associations[:parent] = nil
+    true
+  else
+    false
+  end
+end
+unless non_root_nodes.empty?
+  id_map = {}
+  # Create an map of parent_ids to nodes that have that parent id
+  non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) &lt;&lt; n}
+  # Doesn&#39;t cause an infinte loop, because when only the root node
+  # is left, this is not called.
+  Node.filter(Node.primary_key=&gt;id_map.keys).eager(:ancestors).all</pre>
 
 <p>do |node|</p>
 
-<pre>      # Populate the parent association for each node&#x000A;      id_map[node.pk].each{|n| n.associations[:parent] = node}&#x000A;    end&#x000A;  end&#x000A;end)&#x000A;many_to_one :descendants, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
+<pre>      # Populate the parent association for each node
+      id_map[node.pk].each{|n| n.associations[:parent] = node}
+    end
+  end
+end)
+many_to_one :descendants, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
 
 <p>associations|</p>
 
-<pre>id_map = {}&#x000A;nodes.each do |n|&#x000A;  # Initialize an empty array of child associations for each</pre>
+<pre>id_map = {}
+nodes.each do |n|
+  # Initialize an empty array of child associations for each</pre>
 
 <p>parent node</p>
 
-<pre>  n.associations[:children] = []&#x000A;  # Populate identity map of nodes&#x000A;  id_map[n.pk] = n&#x000A;end&#x000A;# Doesn&#39;t cause an infinite loop, because the :eager_loader is not</pre>
+<pre>  n.associations[:children] = []
+  # Populate identity map of nodes
+  id_map[n.pk] = n
+end
+# Doesn&#39;t cause an infinite loop, because the :eager_loader is not</pre>
 
 <p>called</p>
 
-<pre class="ruby"><span class="ruby-comment"># if no records are returned.  Exclude id = parent_id to avoid</span></pre>
+<pre class="ruby"><span class="ruby-comment"># if no records are returned.  Exclude id = parent_id to avoid</span>
+</pre>
 
 <p>infinite loop</p>
 
-<pre class="ruby"><span class="ruby-comment"># if the root note is one of the returned records and it has</span></pre>
+<pre class="ruby"><span class="ruby-comment"># if the root note is one of the returned records and it has</span>
+</pre>
 
 <p>parent_id = id</p>
 
-<pre class="ruby"><span class="ruby-comment"># instead of parent_id = NULL.</span>&#x000A;<span class="ruby-constant">Node</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:parent_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:parent_id</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:descendants</span>).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-comment"># instead of parent_id = NULL.</span>
+<span class="ruby-constant">Node</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:parent_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:parent_id</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:descendants</span>).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>do |node|</p>
 
-<pre class="ruby"><span class="ruby-comment"># Get the parent from the identity map</span>&#x000A;<span class="ruby-identifier">parent</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent_id</span>]&#x000A;<span class="ruby-comment"># Set the child&#39;s parent association to the parent</span>&#x000A;<span class="ruby-identifier">node</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:parent</span>] = <span class="ruby-identifier">parent</span>&#x000A;<span class="ruby-comment"># Add the child association to the array of children in the</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Get the parent from the identity map</span>
+<span class="ruby-identifier">parent</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent_id</span>]
+<span class="ruby-comment"># Set the child&#39;s parent association to the parent</span>
+<span class="ruby-identifier">node</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:parent</span>] = <span class="ruby-identifier">parent</span>
+<span class="ruby-comment"># Add the child association to the array of children in the</span>
+</pre>
 
 <p>parent</p>
 
-<pre>      parent.associations[:children] &lt;&lt; node&#x000A;    end&#x000A;  end)&#x000A;end&#x000A;nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
+<pre>      parent.associations[:children] &lt;&lt; node
+    end
+  end)
+end
+nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
 
 <p>New Adapter Features</p>
 <hr>
@@ -130,7 +189,7 @@ Last Update:
 </li><li>
 <p>You can now call Model.to_hash to get an identity map for all rows (before this required Model.dataset.to_hash).</p>
 </li><li>
-<p>A model that can get it&#39;s column information from the schema will set it in the dataset, potentially saving many queries.</p>
+<p>A model that can get it’s column information from the schema will set it in the dataset, potentially saving many queries.</p>
 </li><li>
 <p>Model.validates_presence_of now works correctly for boolean columns.</p>
 </li></ul>
@@ -162,26 +221,39 @@ Last Update:
 <ul><li>
 <p>ParseTree support, deprecated in <a href="2_1_0_txt.html">2.1.0</a>, has been removed in 2.2.0. You should use the expression filter syntax instead, perferably without the block (though it can be used inside a block as well). This usually involves the following types of changes:</p>
 
-<pre>filter{:x == :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &lt;&lt; :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &amp;&amp; :y} =&gt; filter(:x &amp; :y) # Don&#39;t forget about change&#x000A;filter{:x || :y} =&gt; filter(:x | :y) #  in operator precedence&#x000A;filter{:x.like?(&#39;%blah%&#39;)} =&gt; filter(:x.like(&#39;%blah%&#39;))&#x000A;filter do =&gt; filter((:x &gt; 1) &amp; (:y &lt; 2))&#x000A;  :x &gt; 1&#x000A;  :y &lt; 2&#x000A;end</pre>
+<pre>filter{:x == :y} =&gt; filter(:x =&gt; :y)
+filter{:x &lt;&lt; :y} =&gt; filter(:x =&gt; :y)
+filter{:x &amp;&amp; :y} =&gt; filter(:x &amp; :y) # Don&#39;t forget about change
+filter{:x || :y} =&gt; filter(:x | :y) #  in operator precedence
+filter{:x.like?(&#39;%blah%&#39;)} =&gt; filter(:x.like(&#39;%blah%&#39;))
+filter do =&gt; filter((:x &gt; 1) &amp; (:y &lt; 2))
+  :x &gt; 1
+  :y &lt; 2
+end</pre>
 </li><li>
 <p>Attempts to save an invalid Model instance will raise an error by default.  To revert to returning a nil value, use:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Instance</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Class</span>
+<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Instance</span>
+</pre>
 
 <p>Note that before, save would return false where now it returns nil if you disable raising on save failure.</p>
 </li><li>
-<p>Dataset#update no longer takes a block, as it&#39;s use of the block depended on ParseTree.  With the introduction of the expression syntax in <a href="2_0_0_txt.html">2.0.0</a>, it&#39;s no longer necessary.  You should use a hash with an expression as the value instead:</p>
+<p>Dataset#update no longer takes a block, as it’s use of the block depended on ParseTree.  With the introduction of the expression syntax in <a href="2_0_0_txt.html">2.0.0</a>, it’s no longer necessary.  You should use a hash with an expression as the value instead:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)
+</pre>
 </li><li>
 <p>validates_presence of now considers false as present instead of absent.  This is so it works with boolean columns.</p>
 </li><li>
 <p>Dataset#graph ignores any previously selected columns when it is called for the first time.</p>
 </li><li>
-<p>Dataset#columns ignores any filtering, ordering, or distinct clauses.  This shouldn&#39;t cause issues unless you were using SQL functions with side effects and expecting them to be called when columns was called (unlikely at best).</p>
+<p>Dataset#columns ignores any filtering, ordering, or distinct clauses.  This shouldn’t cause issues unless you were using SQL functions with side effects and expecting them to be called when columns was called (unlikely at best).</p>
 </li></ul>
 
-<p>One significant point of note is that the <a href="2_2_0_txt.html">2.2.0</a> release will be the last release with both a sequel_core and sequel gem.  Starting with <a href="2_3_0_txt.html">2.3.0</a> they will be combined into one sequel gem.  You will still be able to get just the sequel_core part by requiring &#39;sequel_core&#39;, but they will be packaged together.</p>
+<p>One significant point of note is that the <a href="2_2_0_txt.html">2.2.0</a> release will be the last release with both a sequel_core and sequel gem.  Starting with <a href="2_3_0_txt.html">2.3.0</a> they will be combined into one sequel gem.  You will still be able to get just the sequel_core part by requiring ‘sequel_core’, but they will be packaged together.</p>
 </div>
 <div id='context'>
 </div>
@@ -192,7 +264,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

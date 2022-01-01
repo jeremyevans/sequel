@@ -38,31 +38,49 @@ Last Update:
 <div id='description'>
 <p>The string_agg extension adds the ability to perform database-independent aggregate string concatentation.  For example, with a table like:</p>
 
-<pre class="ruby"><span class="ruby-identifier">c1</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">c2</span>&#x000A;<span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">+</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span>&#x000A;<span class="ruby-identifier">a</span>  <span class="ruby-operator">|</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">a</span>  <span class="ruby-operator">|</span> <span class="ruby-value">2</span>&#x000A;<span class="ruby-identifier">a</span>  <span class="ruby-operator">|</span> <span class="ruby-value">3</span>&#x000A;<span class="ruby-identifier">b</span>  <span class="ruby-operator">|</span> <span class="ruby-value">4</span></pre>
+<pre class="ruby"><span class="ruby-identifier">c1</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">c2</span>
+<span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">+</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span><span class="ruby-operator">-</span>
+<span class="ruby-identifier">a</span>  <span class="ruby-operator">|</span> <span class="ruby-value">1</span>
+<span class="ruby-identifier">a</span>  <span class="ruby-operator">|</span> <span class="ruby-value">2</span>
+<span class="ruby-identifier">a</span>  <span class="ruby-operator">|</span> <span class="ruby-value">3</span>
+<span class="ruby-identifier">b</span>  <span class="ruby-operator">|</span> <span class="ruby-value">4</span>
+</pre>
 
 <p>You can return a result set like:</p>
 
-<pre>c1 | c2s&#x000A;---+---&#x000A;a  | 1,2,3&#x000A;b  | 4</pre>
+<pre>c1 | c2s
+---+---
+a  | 1,2,3
+b  | 4</pre>
 
 <p>First, you need to load the extension into the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_agg</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_agg</span>
+</pre>
 
 <p>Then you can use the Sequel.string_agg method to return a <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression:</p>
 
-<pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>)&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;-&#39;</span>) <span class="ruby-comment"># custom separator</span></pre>
+<pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>)
+<span class="ruby-comment"># or:</span>
+<span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;-&#39;</span>) <span class="ruby-comment"># custom separator</span>
+</pre>
 
 <p>You can specify the order in which the concatention happens by calling <code>order</code> on the expression:</p>
 
-<pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:other_column</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:other_column</span>)
+</pre>
 
 <p>Additionally, if you want to have the concatenation only operate on distinct values, you can call distinct:</p>
 
-<pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:other_column</span>).<span class="ruby-identifier">distinct</span></pre>
+<pre class="ruby"><span class="ruby-identifier">sa</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:column_name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:other_column</span>).<span class="ruby-identifier">distinct</span>
+</pre>
 
 <p>These expressions can be used in your datasets, or anywhere else that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions are allowed:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].&#x000A;  <span class="ruby-identifier">select_group</span>(<span class="ruby-value">:c1</span>).&#x000A;  <span class="ruby-identifier">select_append</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c2</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].
+  <span class="ruby-identifier">select_group</span>(<span class="ruby-value">:c1</span>).
+  <span class="ruby-identifier">select_append</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c2</span>))
+</pre>
 
 <p>This extension currenly supports the following databases:</p>
 <ul><li>
@@ -92,7 +110,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

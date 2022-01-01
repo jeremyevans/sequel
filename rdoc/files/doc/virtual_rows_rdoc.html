@@ -44,23 +44,48 @@ Last Update:
 
 <p>Virtual rows offer a less verbose way to express many queries.  For example, by default if you want to express an inequality filter in <a href="../../classes/Sequel.html"><code>Sequel</code></a>, you can do:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>))&#x000A;<span class="ruby-comment"># WHERE (a &gt; b(c))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>))
+<span class="ruby-comment"># WHERE (a &gt; b(c))</span>
+</pre>
 
 <p>With virtual rows, you can use the less verbose:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="ruby-comment"># WHERE (a &gt; b(c))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>)}
+<span class="ruby-comment"># WHERE (a &gt; b(c))</span>
+</pre>
 
 <h2 id="label-Regular+Procs+vs+Instance+Evaled+Procs">Regular Procs vs Instance Evaled Procs<span><a href="#label-Regular+Procs+vs+Instance+Evaled+Procs">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Virtual row blocks behave differently depending on whether the block accepts an argument.  If the block accepts an argument, it is called with an instance of <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a>.  If it does not accept an argument, it is evaluated in the context of an instance of <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a>.</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]&#x000A;<span class="ruby-comment"># Regular block</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE (column &gt; 1)</span>&#x000A;&#x000A;<span class="ruby-comment"># Instance-evaled block</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE (column &gt; 1)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]
+<span class="ruby-comment"># Regular block</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-comment"># WHERE (column &gt; 1)</span>
 
-<p>If you aren&#39;t familiar with the difference between regular blocks and instance evaled blocks, inside regular blocks methods called without an explicit receiver call the method on the receiver in the surrounding scope, while instance evaled blocks call the method on the receiver of the instance_eval call (the <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a> instance in this case).</p>
+<span class="ruby-comment"># Instance-evaled block</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-comment"># WHERE (column &gt; 1)</span>
+</pre>
+
+<p>If you aren’t familiar with the difference between regular blocks and instance evaled blocks, inside regular blocks methods called without an explicit receiver call the method on the receiver in the surrounding scope, while instance evaled blocks call the method on the receiver of the instance_eval call (the <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a> instance in this case).</p>
 
 <p>in both cases, local variables available in the surrounding scope will be available inside the block.  However, instance variables in the surrounding scope will not be available inside the block if using an instance evaled block, and methods called without an explicit receiver inside an instance evaled block will not call methods in the surrounding scope. For example:</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">a</span>&#x000A;  <span class="ruby-value">42</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>&#x000A;<span class="ruby-ivar">@d</span> = <span class="ruby-value">100</span>&#x000A;&#x000A;<span class="ruby-comment"># Regular block</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@d</span>}&#x000A;<span class="ruby-comment"># WHERE (c &gt; 110)</span>&#x000A;&#x000A;<span class="ruby-comment"># Instance-evaled block</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@d</span>}&#x000A;<span class="ruby-comment"># WHERE (c &gt; ((a - 32) + NULL))</span></pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">a</span>
+  <span class="ruby-value">42</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>
+<span class="ruby-ivar">@d</span> = <span class="ruby-value">100</span>
+
+<span class="ruby-comment"># Regular block</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@d</span>}
+<span class="ruby-comment"># WHERE (c &gt; 110)</span>
+
+<span class="ruby-comment"># Instance-evaled block</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@d</span>}
+<span class="ruby-comment"># WHERE (c &gt; ((a - 32) + NULL))</span>
+</pre>
 
 <p>There are three related differences here:</p>
 <ul><li>
@@ -73,7 +98,7 @@ Last Update:
 
 <p>In the regular block, you need to call <code>c</code> with an explicit receiver (the virtual row block argument), while in the instance evaled block <code>c</code> can be called directly, as the default receiver has changed inside the block.</p>
 
-<p>For <code>a</code>, note how ruby calls the method on the receiver of the surrounding scope in the regular block, which returns an integer, and does the subtraction before <a href="../../classes/Sequel.html"><code>Sequel</code></a> gets access to it.  In the instance evaled block, calling <code>a</code> without a receiver calls the a method on the VirtualRow instance. For @d, note that in a regular block, the value hasn&#39;t changed, but in the instance evaled block, instance variable access returns nil. For <code>b</code>, note that it operates the same in both cases, as it is a local variable.</p>
+<p>For <code>a</code>, note how ruby calls the method on the receiver of the surrounding scope in the regular block, which returns an integer, and does the subtraction before <a href="../../classes/Sequel.html"><code>Sequel</code></a> gets access to it.  In the instance evaled block, calling <code>a</code> without a receiver calls the a method on the VirtualRow instance. For @d, note that in a regular block, the value hasn’t changed, but in the instance evaled block, instance variable access returns nil. For <code>b</code>, note that it operates the same in both cases, as it is a local variable.</p>
 
 <p>The choice for whether to use a regular block or an instance evaled block is up to you.  The same things can be accomplished with both. Instance evaled block tend to produce shorter code, but by modifying the scope can be more difficult to understand.</p>
 
@@ -83,11 +108,17 @@ Last Update:
 
 <p>If you have a method that accepts 0 arguments and has the same name as a local variable, you can call it with () to differentiate the method call from the local variable access.  This is mostly useful in instance evaled blocks:</p>
 
-<pre class="ruby"><span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">b</span>() <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}&#x000A;<span class="ruby-comment"># WHERE b &gt; 32</span></pre>
+<pre class="ruby"><span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">b</span>() <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}
+<span class="ruby-comment"># WHERE b &gt; 32</span>
+</pre>
 
-<p>It&#39;s also possible to use an explicit self receiver in instance evaled blocks:</p>
+<p>It’s also possible to use an explicit self receiver in instance evaled blocks:</p>
 
-<pre class="ruby"><span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}&#x000A;<span class="ruby-comment"># WHERE b &gt; 32</span></pre>
+<pre class="ruby"><span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}
+<span class="ruby-comment"># WHERE b &gt; 32</span>
+</pre>
 
 <h2 id="label-VirtualRow+Methods">VirtualRow Methods<span><a href="#label-VirtualRow+Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -97,47 +128,90 @@ Last Update:
 
 <p>SQL::Identifiers can be thought of as regular column references in SQL, not qualified by any table. You get an SQL::Identifier if the method is called without arguments:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE (column &gt; 1)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-comment"># WHERE (column &gt; 1)</span>
+</pre>
 
 <h2 id="label-SQL-3A-3AQualifiedIdentifiers+-+Qualified+columns">SQL::QualifiedIdentifiers - Qualified columns<span><a href="#label-SQL-3A-3AQualifiedIdentifiers+-+Qualified+columns">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>You can qualified identifiers by calling [] on an identifier:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE table.column &gt; 1</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-comment"># WHERE table.column &gt; 1</span>
+</pre>
 
 <h2 id="label-SQL-3A-3AFunctions+-+SQL+function+calls">SQL::Functions - SQL function calls<span><a href="#label-SQL-3A-3AFunctions+-+SQL+function+calls">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>SQL::Functions can be thought of as function calls in SQL.  You get a simple function call if you call a method with arguments:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE function(1) &gt; 1</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-comment"># WHERE function(1) &gt; 1</span>
+</pre>
 
 <p>To call a SQL function with multiple arguments, just use those arguments in your function call:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE function(1, a) &gt; 1</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">function</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}
+<span class="ruby-comment"># WHERE function(1, a) &gt; 1</span>
+</pre>
 
 <p>If the SQL function does not accept any arguments, create an identifier, then call the function method on it to produce a function:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">version</span>.<span class="ruby-identifier">function</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">version</span>.<span class="ruby-identifier">function</span>}&#x000A;<span class="ruby-comment"># SELECT version()</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">version</span>.<span class="ruby-identifier">function</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">version</span>.<span class="ruby-identifier">function</span>}
+<span class="ruby-comment"># SELECT version()</span>
+</pre>
 
 <p>To use the SQL wildcard (*) as the sole argument in a function call, create a function without arguments, then call the * method on the function:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>}&#x000A;<span class="ruby-comment"># SELECT count(*)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>}
+<span class="ruby-comment"># SELECT count(*)</span>
+</pre>
 
 <p>To append the DISTINCT keyword before the method arguments, just call the distinct method on the returned Function:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1, col2)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}
+<span class="ruby-comment"># SELECT count(DISTINCT col1)</span>
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}
+<span class="ruby-comment"># SELECT count(DISTINCT col1, col2)</span>
+</pre>
 
 <h2 id="label-SQL-3A-3AFunctions+with+windows+-+SQL+window+function+calls">SQL::Functions with windows - SQL window function calls<span><a href="#label-SQL-3A-3AFunctions+with+windows+-+SQL+window+function+calls">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>To create a window function call, just call the over method on the Function object returned, with the options for the window:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT rank() OVER ()</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT count(*) OVER ()</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">partition:</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>, <span class="ruby-value">order:</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">partition:</span> <span class="ruby-identifier">col2</span>, <span class="ruby-value">order:</span> <span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-comment"># SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}
+<span class="ruby-comment"># SELECT rank() OVER ()</span>
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>.<span class="ruby-identifier">over</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">*</span>.<span class="ruby-identifier">over</span>}
+<span class="ruby-comment"># SELECT count(*) OVER ()</span>
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">partition:</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>, <span class="ruby-value">order:</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col3</span>)}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">partition:</span> <span class="ruby-identifier">col2</span>, <span class="ruby-value">order:</span> <span class="ruby-identifier">col3</span>)}
+<span class="ruby-comment"># SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)</span>
+</pre>
 
 <h2 id="label-Operators">Operators<span><a href="#label-Operators">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>VirtualRows use method_missing to handle almost all method calls.  Since the objects given by method_missing are SQL::Identifiers or SQL::Functions, you can use all operators that they provide (see <a target="_top" href="http://sequel.jeremyevans.net/rdoc/files/doc/dataset_filtering_rdoc.html#label-Filtering+using+expressions">DatasetFiltering</a>):</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-comment"># SELECT (price - 100)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">tax</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">23</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">tax</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0.23</span>)}&#x000A;<span class="ruby-comment"># WHERE ((price &lt; 200) AND ((tax * 100) &gt;= 0.23))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span>}
+<span class="ruby-comment"># SELECT (price - 100)</span>
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">tax</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">23</span>)}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">tax</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0.23</span>)}
+<span class="ruby-comment"># WHERE ((price &lt; 200) AND ((tax * 100) &gt;= 0.23))</span>
+</pre>
 
 <p>However, VirtualRows have special handling of some operator methods to make certain things easier.  The operators all use a prefix form.</p>
 
@@ -145,43 +219,66 @@ Last Update:
 
 <p>The standard +, -, *, and / mathematical operators are defined:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">b</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">b</span>)}&#x000A;<span class="ruby-comment"># SELECT (1 - a) AS b</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">b</span>)}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">b</span>)}
+<span class="ruby-comment"># SELECT (1 - a) AS b</span>
+</pre>
 
 <h3 id="label-Boolean+Operators">Boolean Operators<span><a href="#label-Boolean+Operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>The &amp; and | methods are defined to use AND and OR:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">a:</span> <span class="ruby-value">:b</span>}, <span class="ruby-value">:c</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">a:</span> <span class="ruby-value">:b</span>}, <span class="ruby-value">:c</span>)}&#x000A;<span class="ruby-comment"># WHERE ((a = b) AND c)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">a:</span> <span class="ruby-value">:b</span>}, <span class="ruby-value">:c</span>)}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">a:</span> <span class="ruby-value">:b</span>}, <span class="ruby-value">:c</span>)}
+<span class="ruby-comment"># WHERE ((a = b) AND c)</span>
+</pre>
 
 <p>The ~ method is defined to do inversion:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">~</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>})}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">~</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>})}&#x000A;<span class="ruby-comment"># WHERE ((a != 1) OR (b != 2))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">~</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>})}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">~</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>})}
+<span class="ruby-comment"># WHERE ((a != 1) OR (b != 2))</span>
+</pre>
 
 <h3 id="label-Inequality+Operators">Inequality Operators<span><a href="#label-Inequality+Operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>The standard &gt;, &lt;, &gt;=, and &lt;= inequality operators are defined:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&gt;</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:c</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">&gt;</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:c</span>)}&#x000A;<span class="ruby-comment"># WHERE (1 &gt; c)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">&gt;</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:c</span>)}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">&gt;</span>(<span class="ruby-value">1</span>, <span class="ruby-value">:c</span>)}
+<span class="ruby-comment"># WHERE (1 &gt; c)</span>
+</pre>
 
 <h2 id="label-Returning+multiple+values">Returning multiple values<span><a href="#label-Returning+multiple+values">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>It&#39;s common when using select and order virtual row blocks to want to return multiple values.  If you want to do that, you just need to return an  array:</p>
+<p>It’s common when using select and order virtual row blocks to want to return multiple values.  If you want to do that, you just need to return an  array:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">o</span>.<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>)]}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">sum</span>(<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">sum</span>)]}&#x000A;<span class="ruby-comment"># SELECT column1, sum(column2) AS sum</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">o</span>.<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>)]}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">sum</span>(<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">sum</span>)]}
+<span class="ruby-comment"># SELECT column1, sum(column2) AS sum</span>
+</pre>
 
-<p>Note that if you forget the array brackets, you&#39;ll end up with a syntax error:</p>
+<p>Note that if you forget the array brackets, you’ll end up with a syntax error:</p>
 
-<pre># Invalid ruby syntax&#x000A;ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}&#x000A;ds.select{column1, sum(column2).as(sum)}</pre>
+<pre># Invalid ruby syntax
+ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}
+ds.select{column1, sum(column2).as(sum)}</pre>
 
 <h2 id="label-Split+symbols">Split symbols<span><a href="#label-Split+symbols">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Note that if you turn on symbol splitting for backwards compatibility, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will split virtual row methods with double underscores and return them as qualified identifiers:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table__column</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table__column</span>}&#x000A;<span class="ruby-constant">WHERE</span> <span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table__column</span>}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table__column</span>}
+<span class="ruby-constant">WHERE</span> <span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span>
+</pre>
 
-<p>It&#39;s not recommended that you rely on this, it&#39;s better to convert the calls to the recommended form:</p>
+<p>It’s not recommended that you rely on this, it’s better to convert the calls to the recommended form:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]}</pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]}
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]}
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -192,7 +289,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

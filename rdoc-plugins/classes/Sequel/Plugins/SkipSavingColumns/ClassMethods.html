@@ -72,14 +72,18 @@ Sequel::Plugins::SkipSavingColumns::ClassMethods
 </div>
 <div class='description'>
 
-<p>Over the default array of columns to skip.  Once overridden, future changes to the class&#39;s dataset and future subclasses will automatically use these overridden columns, instead of introspecting the database schema.</p>
+<p>Over the default array of columns to skip.  Once overridden, future changes to the class’s dataset and future subclasses will automatically use these overridden columns, instead of introspecting the database schema.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-skip_saving_columns-3D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-skip_saving_columns-3D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/skip_saving_columns.rb</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_saving_columns=</span>(<span class="ruby-identifier">v</span>) &#x000A;<span class="line-num">55</span>   <span class="ruby-ivar">@_skip_saving_columns_no_override</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-ivar">@skip_saving_columns</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-skip_saving_columns-3D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/skip_saving_columns.rb</span>
+<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_saving_columns=</span>(<span class="ruby-identifier">v</span>) 
+<span class="line-num">55</span>   <span class="ruby-ivar">@_skip_saving_columns_no_override</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">56</span>   <span class="ruby-ivar">@skip_saving_columns</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -91,7 +95,7 @@ Sequel::Plugins::SkipSavingColumns::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

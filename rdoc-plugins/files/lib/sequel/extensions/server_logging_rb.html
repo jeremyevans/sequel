@@ -40,7 +40,16 @@ Last Update:
 
 <p>Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]&#x000A;<span class="ruby-comment"># {:read_only=&gt;{}, :b=&gt;{}}</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_logging</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># (0.000005s) (conn: 1014942550, server: read_only) SELECT * FROM a</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># (0.000004s) (conn: 997304100, server: b) SELECT * FROM a</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-comment"># (0.000004s) (conn: 1014374750, server: default) INSERT INTO a DEFAULT VALUES</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
+<span class="ruby-comment"># {:read_only=&gt;{}, :b=&gt;{}}</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_logging</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># (0.000005s) (conn: 1014942550, server: read_only) SELECT * FROM a</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># (0.000004s) (conn: 997304100, server: b) SELECT * FROM a</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">insert</span>
+<span class="ruby-comment"># (0.000004s) (conn: 1014374750, server: default) INSERT INTO a DEFAULT VALUES</span>
+</pre>
 
 <p>In order for the server/shard to be correct for all connections, you need to use this before connections to the database are made, or you need to call <code>Database#disconnect</code> after loading this extension.</p>
 
@@ -55,7 +64,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

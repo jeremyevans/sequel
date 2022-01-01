@@ -65,7 +65,18 @@ Sequel::Plugins::CsvSerializer::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_csv-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_csv-source'>    <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>&#x000A;<span class="line-num">182</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_csv</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">183</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>({<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">columns</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="line-num">184</span>   <span class="ruby-identifier">items</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:array</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">185</span>   <span class="ruby-identifier">headers</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>]&#x000A;<span class="line-num">186</span> &#x000A;<span class="line-num">187</span>   <span class="ruby-constant">CsvSerializer</span>.<span class="ruby-identifier">csv_call</span>(<span class="ruby-value">:generate</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">188</span>     <span class="ruby-identifier">items</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">189</span>       <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">headers</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">header</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">header</span>)}&#x000A;<span class="line-num">190</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">191</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">192</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_csv-source'>    <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>
+<span class="line-num">182</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_csv</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">183</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>({<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">columns</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))
+<span class="line-num">184</span>   <span class="ruby-identifier">items</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:array</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>
+<span class="line-num">185</span>   <span class="ruby-identifier">headers</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>]
+<span class="line-num">186</span> 
+<span class="line-num">187</span>   <span class="ruby-constant">CsvSerializer</span>.<span class="ruby-identifier">csv_call</span>(<span class="ruby-value">:generate</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>
+<span class="line-num">188</span>     <span class="ruby-identifier">items</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span><span class="ruby-operator">|</span>
+<span class="line-num">189</span>       <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">headers</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">header</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">header</span>)}
+<span class="line-num">190</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">191</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">192</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -77,7 +88,7 @@ Sequel::Plugins::CsvSerializer::DatasetMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

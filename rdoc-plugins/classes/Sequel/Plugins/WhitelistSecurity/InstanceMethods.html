@@ -60,14 +60,20 @@ Sequel::Plugins::WhitelistSecurity::InstanceMethods
 
 <p>Set all values using the entries in the hash, ignoring any setting of allowed_columns in the model.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-value">:num_albums</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_all</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-value">:num_albums</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_all</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_all-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_all-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_all</span>(<span class="ruby-identifier">hash</span>)&#x000A;<span class="line-num">68</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:all</span>)&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_all-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>
+<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_all</span>(<span class="ruby-identifier">hash</span>)
+<span class="line-num">68</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:all</span>)
+<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_only'>
@@ -80,14 +86,21 @@ Sequel::Plugins::WhitelistSecurity::InstanceMethods
 
 <p>Set the values using the entries in the hash, only if the key is included in only.  It may be a better idea to use <code>set_fields</code> instead of this method.</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({<span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;LA&#39;</span>}, <span class="ruby-value">:name</span>) <span class="ruby-comment"># Raise Error</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:name</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span>
+
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({<span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;LA&#39;</span>}, <span class="ruby-value">:name</span>) <span class="ruby-comment"># Raise Error</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_only-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_only-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_only</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">only</span>)&#x000A;<span class="line-num">80</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_only-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>
+<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_only</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">only</span>)
+<span class="line-num">80</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)
+<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_all'>
@@ -100,14 +113,19 @@ Sequel::Plugins::WhitelistSecurity::InstanceMethods
 
 <p>Update all values using the entries in the hash, ignoring any setting of <code>allowed_columns</code> in the model.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-value">:num_albums</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_all</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-value">:num_albums</span>)
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_all</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_all-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update_all-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>&#x000A;<span class="line-num">88</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_all</span>(<span class="ruby-identifier">hash</span>)&#x000A;<span class="line-num">89</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:all</span>)&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update_all-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>
+<span class="line-num">88</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_all</span>(<span class="ruby-identifier">hash</span>)
+<span class="line-num">89</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:all</span>)
+<span class="line-num">90</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_only'>
@@ -120,14 +138,21 @@ Sequel::Plugins::WhitelistSecurity::InstanceMethods
 
 <p>Update the values using the entries in the hash, only if the key is included in only.  It may be a better idea to use <code>update_fields</code> instead of this method.</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:name</span>)&#x000A;<span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({<span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;LA&#39;</span>}, <span class="ruby-value">:name</span>) <span class="ruby-comment"># Raise Error</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:name</span>)
+<span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>
+
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({<span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;LA&#39;</span>}, <span class="ruby-value">:name</span>) <span class="ruby-comment"># Raise Error</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_only-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update_only-source'>    <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>&#x000A;<span class="line-num">100</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_only</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">only</span>)&#x000A;<span class="line-num">101</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="line-num">102</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update_only-source'>    <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>
+<span class="line-num">100</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_only</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">only</span>)
+<span class="line-num">101</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)
+<span class="line-num">102</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -139,7 +164,7 @@ Sequel::Plugins::WhitelistSecurity::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

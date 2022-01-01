@@ -73,7 +73,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">recorder</span>, <span class="ruby-identifier">pos</span>, <span class="ruby-identifier">transformer</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-ivar">@recorder</span> = <span class="ruby-identifier">recorder</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-ivar">@pos</span> = <span class="ruby-identifier">pos</span>&#x000A;<span class="line-num">53</span>   <span class="ruby-ivar">@transformer</span> = <span class="ruby-identifier">transformer</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
+<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">recorder</span>, <span class="ruby-identifier">pos</span>, <span class="ruby-identifier">transformer</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">51</span>   <span class="ruby-ivar">@recorder</span> = <span class="ruby-identifier">recorder</span>
+<span class="line-num">52</span>   <span class="ruby-ivar">@pos</span> = <span class="ruby-identifier">pos</span>
+<span class="line-num">53</span>   <span class="ruby-ivar">@transformer</span> = <span class="ruby-identifier">transformer</span>
+<span class="line-num">54</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -92,7 +98,14 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_literal_append-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">60</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:placeholder_literal_null</span>]&#x000A;<span class="line-num">61</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:literal_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">63</span>     <span class="ruby-ivar">@recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-ivar">@transformer</span>)&#x000A;<span class="line-num">64</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_literal_append-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">60</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:placeholder_literal_null</span>]
+<span class="line-num">61</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:literal_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-keyword">nil</span>)
+<span class="line-num">62</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">63</span>     <span class="ruby-ivar">@recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-ivar">@transformer</span>)
+<span class="line-num">64</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-transform'>
@@ -110,7 +123,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-transform-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-transform-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transform</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">70</span>   <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@recorder</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-transform-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
+<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transform</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">70</span>   <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@recorder</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-identifier">block</span>)
+<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -122,7 +138,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

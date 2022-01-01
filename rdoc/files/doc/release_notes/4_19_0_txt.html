@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Model#get_column_value and set_column_value have been added for getting/setting column values.  Historically, to get column values, you would just send the column name, and to set column values you would send the column name suffixed by =.  However, this doesn&#39;t work when such methods are already defined by ruby or <a href="../../../classes/Sequel.html"><code>Sequel</code></a> itself (e.g. class, model, object_id).</p>
+<p>Model#get_column_value and set_column_value have been added for getting/setting column values.  Historically, to get column values, you would just send the column name, and to set column values you would send the column name suffixed by =.  However, this doesn’t work when such methods are already defined by ruby or <a href="../../../classes/Sequel.html"><code>Sequel</code></a> itself (e.g. class, model, object_id).</p>
 
 <p>Both get_column_value and set_column_value are just aliases to send, but you can safely override the methods to handle column names that conflict with existing method names.  Both the core model code and all of the plugins that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been updated to use these new methods.  External plugins are strongly encouraged to switch to these new methods.</p>
 </li><li>
@@ -67,7 +67,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -40,7 +40,9 @@ Last Update:
 <ul><li>
 <p>On SQLite <a href="3_33_0_txt.html">3.33.0</a>+, the UPDATE FROM syntax is now supported. This allows you to update one table based on a join to another table. The SQLite syntax is based on the PostgreSQL syntax, and the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> API is the same for both.  You need to pass multiple tables to Dataset#from.  The first table is the table to update, and the remaining tables are used to construct the UPDATE FROM clause:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">a</span>[<span class="ruby-value">:c</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">b</span>[<span class="ruby-value">:d</span>]}}.<span class="ruby-identifier">update</span>(<span class="ruby-value">:e</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;f&#39;</span>)&#x000A;<span class="ruby-comment"># UPDATE a SET e = &#39;f&#39; FROM b WHERE (a.c = b.d)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">a</span>[<span class="ruby-value">:c</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">b</span>[<span class="ruby-value">:d</span>]}}.<span class="ruby-identifier">update</span>(<span class="ruby-value">:e</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;f&#39;</span>)
+<span class="ruby-comment"># UPDATE a SET e = &#39;f&#39; FROM b WHERE (a.c = b.d)</span>
+</pre>
 
 <p>Unlike PostgreSQL, SQLite does not support the deletion of joined datasets.  Related to this, the following methods for testing database support for modifying joined datasets have been added:</p>
 <ul><li>
@@ -80,7 +82,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

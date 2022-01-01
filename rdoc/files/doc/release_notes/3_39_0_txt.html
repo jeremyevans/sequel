@@ -42,19 +42,34 @@ Last Update:
 
 <p>The extension is designed to be used in your migrations/schema modification code:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:constraint_validations</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_constraint_validations_table</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:foos</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:constraint_validations</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_constraint_validations_table</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:foos</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>
+
+  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:name</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>This creates a database CHECK constraint that ensures that the minimum length for the column is 5 characters.  It also adds metadata about the validation to the sequel_constraint_validations table.</p>
 
 <p>To have the model class automatically create validations, just include the plugin in the model:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:constraint_validations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:constraint_validations</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Note that MySQL does not enforce CHECK constraints (it parses but ignores them), so using the extension on MySQL does not actually enforce constraints at the database level, though it still does support the automatic model validations if the plugin is used.</p>
 </li><li>
 <p>Dataset#count now takes an argument or a virtual row block, allowing you to do:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">count</span>(<span class="ruby-value">:column_name</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">count</span>{<span class="ruby-identifier">function_name</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">count</span>(<span class="ruby-value">:column_name</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">count</span>{<span class="ruby-identifier">function_name</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)}
+</pre>
 
 <p>When count is given an argument, instead of returning the total number of rows, it returns the number of rows where the argument has a non-NULL value.</p>
 </li><li>
@@ -62,15 +77,21 @@ Last Update:
 </li><li>
 <p>set_table_not_null has been added to the alter table generator, for a nicer API:</p>
 
-<pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_not_null</span> <span class="ruby-value">:col</span>}&#x000A;<span class="ruby-comment"># instead of</span>&#x000A;<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:col</span>, <span class="ruby-keyword">false</span>}</pre>
+<pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_not_null</span> <span class="ruby-value">:col</span>}
+<span class="ruby-comment"># instead of</span>
+<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:col</span>, <span class="ruby-keyword">false</span>}
+</pre>
 
 <p>Additionally, set_column_allow_null now defaults the second argument to true for a nicer API:</p>
 
-<pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:col</span>}&#x000A;<span class="ruby-comment"># instead of</span>&#x000A;<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:col</span>, <span class="ruby-keyword">true</span>}</pre>
+<pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:col</span>}
+<span class="ruby-comment"># instead of</span>
+<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-identifier">set_column_allow_null</span> <span class="ruby-value">:col</span>, <span class="ruby-keyword">true</span>}
+</pre>
 </li><li>
 <p>Database#supports_regexp? has been added for checking if the database supports Regexp in filters.  Currently, only MySQL and PostgreSQL support Regexps.</p>
 
-<p>Attempting to use a Regexp on a database that doesn&#39;t support it now raises an error when attempting to generate the SQL, instead of sending invalid SQL to the database.</p>
+<p>Attempting to use a Regexp on a database that doesn’t support it now raises an error when attempting to generate the SQL, instead of sending invalid SQL to the database.</p>
 </li><li>
 <p>Sequel.char_length has been added for a cross platform char_length function (emulated when char_length is not supported natively by the database).</p>
 </li><li>
@@ -86,7 +107,7 @@ Last Update:
 </li><li>
 <p>The pg_row_op extension now has support for PGRowOp#*, for referencing the members of the composite type as separate columns.</p>
 </li><li>
-<p>MySQL&#39;s set type and default value are now recognized.</p>
+<p>MySQL’s set type and default value are now recognized.</p>
 </li><li>
 <p>bin/sequel now accepts a -c argument for running an arbitrary code string instead of using an IRB prompt.</p>
 </li></ul>
@@ -101,7 +122,7 @@ Last Update:
 </li><li>
 <p>On MySQL and PostgreSQL, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now by default attempt to combine multiple alter_table operations into a single query where it believes it can do so correctly.  This can potentially improve performance ~N times, where N is the number of alter table operations.</p>
 
-<p>This can change the SQL used for old migrations (though it shouldn&#39;t change the result), and is a potentially risky change.  This may be disabled by default in future versions if it causes problems.</p>
+<p>This can change the SQL used for old migrations (though it shouldn’t change the result), and is a potentially risky change.  This may be disabled by default in future versions if it causes problems.</p>
 </li><li>
 <p>The defaults_setter plugin now correctly sets false default values.</p>
 </li><li>
@@ -125,7 +146,8 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel/SQL/NegativeBooleanConstant.html"><code>Sequel::SQL::NegativeBooleanConstant</code></a> now inherits from Constant instead of BooleanConstant.  This means that</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NOTNULL</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NOTNULL</span>
+</pre>
 
 <p>is now false instead of true.</p>
 </li><li>
@@ -142,13 +164,14 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The defaults_setter plugin&#39;s behavior changed due to the  current date/timestamp support.  Previously, it would not set a value for the column, since the default wasn&#39;t recognized. Therefore, the database would use the default value on insert, which would be the database&#39;s current timestamp.</p>
+<p>The defaults_setter plugin’s behavior changed due to the  current date/timestamp support.  Previously, it would not set a value for the column, since the default wasn’t recognized. Therefore, the database would use the default value on insert, which would be the database’s current timestamp.</p>
 
-<p>Now, the value is set to the current Date/Time/DateTime on model object instantiation, so the database wouldn&#39;t use the column default.  Instead of the database&#39;s current timestamp on insert, the column value will be the application&#39;s current timestamp on model instantiation.</p>
+<p>Now, the value is set to the current Date/Time/DateTime on model object instantiation, so the database wouldn’t use the column default.  Instead of the database’s current timestamp on insert, the column value will be the application’s current timestamp on model instantiation.</p>
 
-<p>Users who don&#39;t want this behavior can remove the default values in the model:</p>
+<p>Users who don’t want this behavior can remove the default values in the model:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_values</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:column_name</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_values</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:column_name</span>)
+</pre>
 </li><li>
 <p>Plain (non-model) datasets no longer allow insert to accept a single model instance argument.  Also, they no longer call values on a single argument if the object responds to it.</p>
 </li><li>
@@ -170,7 +193,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

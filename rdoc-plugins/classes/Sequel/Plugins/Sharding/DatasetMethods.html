@@ -62,7 +62,20 @@ Sequel::Plugins::Sharding::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-row_proc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-row_proc-source'>    <span class="ruby-comment"># File lib/sequel/plugins/sharding.rb</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">row_proc</span>&#x000A;<span class="line-num">111</span>   <span class="ruby-identifier">rp</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">112</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span>&#x000A;<span class="line-num">113</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:pick_server</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>])&#x000A;<span class="line-num">114</span>     <span class="ruby-keyword">when</span> <span class="ruby-keyword">nil</span>, <span class="ruby-value">:default</span>, <span class="ruby-value">:read_only</span>&#x000A;<span class="line-num">115</span>       <span class="ruby-comment"># nothing</span>&#x000A;<span class="line-num">116</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">117</span>       <span class="ruby-identifier">old_rp</span> = <span class="ruby-identifier">rp</span>&#x000A;<span class="line-num">118</span>       <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">old_rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">server</span>)}&#x000A;<span class="line-num">119</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">120</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">121</span>   <span class="ruby-identifier">rp</span> &#x000A;<span class="line-num">122</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-row_proc-source'>    <span class="ruby-comment"># File lib/sequel/plugins/sharding.rb</span>
+<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">row_proc</span>
+<span class="line-num">111</span>   <span class="ruby-identifier">rp</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">112</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span>
+<span class="line-num">113</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:pick_server</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>])
+<span class="line-num">114</span>     <span class="ruby-keyword">when</span> <span class="ruby-keyword">nil</span>, <span class="ruby-value">:default</span>, <span class="ruby-value">:read_only</span>
+<span class="line-num">115</span>       <span class="ruby-comment"># nothing</span>
+<span class="line-num">116</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">117</span>       <span class="ruby-identifier">old_rp</span> = <span class="ruby-identifier">rp</span>
+<span class="line-num">118</span>       <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">old_rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">server</span>)}
+<span class="line-num">119</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">120</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">121</span>   <span class="ruby-identifier">rp</span> 
+<span class="line-num">122</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -74,7 +87,7 @@ Sequel::Plugins::Sharding::DatasetMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

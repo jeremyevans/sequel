@@ -37,33 +37,58 @@ Sequel::Plugins::EagerGraphEager
 <div id='description'>
 <p>The eager_graph_eager plugin allows for chaining eager loads after eager_graph loads.  Given the following model associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span></pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>
+</pre>
 
-<p>Let&#39;s say you wanted to return bands ordered by album name, and eagerly load those albums, you can do that using:</p>
+<p>Let’s say you wanted to return bands ordered by album name, and eagerly load those albums, you can do that using:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}
+</pre>
 
-<p>Let&#39;s say you also wanted to eagerly load the tracks for each album. You could just add them to the eager_graph call:</p>
+<p>Let’s say you also wanted to eagerly load the tracks for each album. You could just add them to the eager_graph call:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}
+</pre>
 
-<p>However, the bloats the result set, and you aren&#39;t ordering by the track information, so a join is not required.  The eager_graph_eager plugin allows you to specify that the tracks be eagerly loaded in a separate query after the eager_graph load of albums:</p>
+<p>However, the bloats the result set, and you aren’t ordering by the track information, so a join is not required.  The eager_graph_eager plugin allows you to specify that the tracks be eagerly loaded in a separate query after the eager_graph load of albums:</p>
 
-<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
+<pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}
+</pre>
 
-<p><code>Dataset#eager_graph_eager</code>&#39;s first argument is a dependency chain, specified as an array of symbols.  This specifies the point at which to perform the eager load. The remaining arguments are arguments that could be passed to Dataset#eager to specify what dependent associations should be loaded at that point.</p>
+<p><code>Dataset#eager_graph_eager</code>‘s first argument is a dependency chain, specified as an array of symbols.  This specifies the point at which to perform the eager load. The remaining arguments are arguments that could be passed to Dataset#eager to specify what dependent associations should be loaded at that point.</p>
 
 <p>If you also have the following model association:</p>
 
-<pre class="ruby"><span class="ruby-constant">Track</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:lyrics</span></pre>
+<pre class="ruby"><span class="ruby-constant">Track</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:lyrics</span>
+</pre>
 
-<p>Here&#39;s some different ways of performing eager loading:</p>
+<p>Here’s some different ways of performing eager loading:</p>
 
-<pre class="ruby"><span class="ruby-comment"># 4 Queries: bands, albums, tracks, lyrics</span>&#x000A;<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">albums:</span> {<span class="ruby-value">tracks:</span> <span class="ruby-value">:lyrics</span>})&#x000A;&#x000A;<span class="ruby-comment"># 1 Query: bands+albums+tracks+lyrics</span>&#x000A;<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> {<span class="ruby-value">tracks:</span> <span class="ruby-value">:lyrics</span>})&#x000A;&#x000A;<span class="ruby-comment"># 3 Queries: bands+albums, tracks, lyrics</span>&#x000A;<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">tracks:</span> <span class="ruby-value">:lyrics</span>)&#x000A;&#x000A;<span class="ruby-comment"># 2 Queries: bands+albums+tracks, lyrics</span>&#x000A;<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>, <span class="ruby-value">:tracks</span>], <span class="ruby-value">:lyrics</span>)&#x000A;&#x000A;<span class="ruby-comment"># 2 Queries: bands+albums, tracks+lyrics</span>&#x000A;<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">tracks:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:lyrics</span>)})</pre>
+<pre class="ruby"><span class="ruby-comment"># 4 Queries: bands, albums, tracks, lyrics</span>
+<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">albums:</span> {<span class="ruby-value">tracks:</span> <span class="ruby-value">:lyrics</span>})
+
+<span class="ruby-comment"># 1 Query: bands+albums+tracks+lyrics</span>
+<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> {<span class="ruby-value">tracks:</span> <span class="ruby-value">:lyrics</span>})
+
+<span class="ruby-comment"># 3 Queries: bands+albums, tracks, lyrics</span>
+<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">tracks:</span> <span class="ruby-value">:lyrics</span>)
+
+<span class="ruby-comment"># 2 Queries: bands+albums+tracks, lyrics</span>
+<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>, <span class="ruby-value">:tracks</span>], <span class="ruby-value">:lyrics</span>)
+
+<span class="ruby-comment"># 2 Queries: bands+albums, tracks+lyrics</span>
+<span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">tracks:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:lyrics</span>)})
+</pre>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Support eager_graph_eager in all subclass datasets (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:eager_graph_eager</span>&#x000A;&#x000A;<span class="ruby-comment"># Support eager_graph_eager in Album class datasets</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:eager_graph_eager</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Support eager_graph_eager in all subclass datasets (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:eager_graph_eager</span>
+
+<span class="ruby-comment"># Support eager_graph_eager in Album class datasets</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:eager_graph_eager</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -82,7 +107,7 @@ Sequel::Plugins::EagerGraphEager
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

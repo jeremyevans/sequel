@@ -63,7 +63,18 @@ Sequel::Plugins::ForbidLazyLoad::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-allow_lazy_load_for_static_cache_associations-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-allow_lazy_load_for_static_cache_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">113</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">allow_lazy_load_for_static_cache_associations</span>&#x000A;<span class="line-num">114</span>   <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">115</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">StaticCache</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)&#x000A;<span class="line-num">116</span>   <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">117</span>     <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ref</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">118</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">StaticCache</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)&#x000A;<span class="line-num">119</span>         <span class="ruby-identifier">ref</span>[<span class="ruby-value">:forbid_lazy_load</span>] = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">120</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">121</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">122</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-allow_lazy_load_for_static_cache_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>
+<span class="line-num">113</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">allow_lazy_load_for_static_cache_associations</span>
+<span class="line-num">114</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">115</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">StaticCache</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)
+<span class="line-num">116</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">117</span>     <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ref</span><span class="ruby-operator">|</span>
+<span class="line-num">118</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">StaticCache</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)
+<span class="line-num">119</span>         <span class="ruby-identifier">ref</span>[<span class="ruby-value">:forbid_lazy_load</span>] = <span class="ruby-keyword">false</span>
+<span class="line-num">120</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">121</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">122</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-finalize_associations'>
@@ -81,7 +92,11 @@ Sequel::Plugins::ForbidLazyLoad::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-finalize_associations-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-finalize_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">finalize_associations</span>&#x000A;<span class="line-num">127</span>   <span class="ruby-identifier">allow_lazy_load_for_static_cache_associations</span>&#x000A;<span class="line-num">128</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-finalize_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>
+<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">finalize_associations</span>
+<span class="line-num">127</span>   <span class="ruby-identifier">allow_lazy_load_for_static_cache_associations</span>
+<span class="line-num">128</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +108,7 @@ Sequel::Plugins::ForbidLazyLoad::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

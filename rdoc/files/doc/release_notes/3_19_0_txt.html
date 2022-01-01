@@ -40,18 +40,24 @@ Last Update:
 <ul><li>
 <p>The add_* association methods now accept a primary key, and associates the receiver to the associated model object with that primary key:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">42</span>)&#x000A;<span class="ruby-comment"># equivalent to: artist.add_album(Album[42])</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">42</span>)
+<span class="ruby-comment"># equivalent to: artist.add_album(Album[42])</span>
+</pre>
 </li><li>
 <p>The validation_class_methods plugin now has the ability to reflect on validations:</p>
 
-<pre>Album.plugin :validation_class_methods&#x000A;Album.validates_acceptance_of(:a)&#x000A;Album.validation_reflections&#x000A;# =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,&#x000A;            :message=&gt;&quot;is not accepted&quot;, :accept=&gt;&quot;1&quot;}]]}</pre>
+<pre>Album.plugin :validation_class_methods
+Album.validates_acceptance_of(:a)
+Album.validation_reflections
+# =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,
+            :message=&gt;&quot;is not accepted&quot;, :accept=&gt;&quot;1&quot;}]]}</pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>In the postgres, mysql, and sqlite adapters, typecasting now uses methods instead of procs.  Since methods aren&#39;t closures (while procs are), this makes typecasting faster (up to 15%).</p>
+<p>In the postgres, mysql, and sqlite adapters, typecasting now uses methods instead of procs.  Since methods aren’t closures (while procs are), this makes typecasting faster (up to 15%).</p>
 </li><li>
-<p>When typecasting model column values, the classes of the new and existing values are checked in addition to the values themselves. Previously, if the new and existing values were equal (i.e. <a href="1_0_txt.html">1.0</a> and 1), it wouldn&#39;t update the value.  Now, if the classes are different, it always updates the value.</p>
+<p>When typecasting model column values, the classes of the new and existing values are checked in addition to the values themselves. Previously, if the new and existing values were equal (i.e. <a href="1_0_txt.html">1.0</a> and 1), it wouldn’t update the value.  Now, if the classes are different, it always updates the value.</p>
 </li><li>
 <p>Date and DateTime objects are now handled correctly when using prepared statements/bound variables in the jdbc adapter.</p>
 </li><li>
@@ -84,7 +90,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

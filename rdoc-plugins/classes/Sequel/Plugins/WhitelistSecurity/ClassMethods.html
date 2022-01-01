@@ -80,7 +80,11 @@ Sequel::Plugins::WhitelistSecurity::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">28</span>   <span class="ruby-ivar">@allowed_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">29</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>
+<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">28</span>   <span class="ruby-ivar">@allowed_columns</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">29</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_allowed_columns'>
@@ -95,14 +99,21 @@ Sequel::Plugins::WhitelistSecurity::ClassMethods
 
 <p>It may be better to use <code>set_fields</code> which lets you specify the allowed fields per call.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:hometown</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">records_sold:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:hometown</span>)
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">records_sold:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_allowed_columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_allowed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_allowed_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">clear_setter_methods_cache</span>&#x000A;<span class="line-num">45</span>   <span class="ruby-ivar">@allowed_columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_allowed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb</span>
+<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_allowed_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)
+<span class="line-num">44</span>   <span class="ruby-identifier">clear_setter_methods_cache</span>
+<span class="line-num">45</span>   <span class="ruby-ivar">@allowed_columns</span> = <span class="ruby-identifier">cols</span>
+<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -114,7 +125,7 @@ Sequel::Plugins::WhitelistSecurity::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

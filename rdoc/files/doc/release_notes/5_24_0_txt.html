@@ -42,13 +42,15 @@ Last Update:
 
 <p>To create the metadata file, load the plugin into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (or whatever class you are using as the base class for your model classes) with the :cache_file option, and after loading all of the subclasses of that class, run:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dump_pg_auto_constraint_validations_cache</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dump_pg_auto_constraint_validations_cache</span>
+</pre>
 
 <p>As when using the schema_caching and index_caching extensions, it is up to the user to ensure that the cached metadata matches the current database schema.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> does no checking of this, as checking would take more time, and the point of this plugin is to improve startup performance.</p>
 </li><li>
 <p>A static_cache_cache plugin has been added.  This plugin allows for caching rows for models using the static_cache plugin. This prevents the need to issue a query at model creation time to get the rows.  This plugin should be loaded into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (or whatever class you are using as the base class for your model classes) before loading the models using the static_cache plugin.  To create the metadata file, after all subclasses of that class have been loaded, run:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dump_static_cache_cache</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dump_static_cache_cache</span>
+</pre>
 </li><li>
 <p>:unique_deferrable and :primary_key_deferrable column options are now supported on PostgreSQL 9+ and Oracle. This allows you to created deferrable unique and primary key column constraints.  You could already create deferrable table constraints using the :deferrable option to the primary_key and unique methods.</p>
 </li><li>
@@ -73,7 +75,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

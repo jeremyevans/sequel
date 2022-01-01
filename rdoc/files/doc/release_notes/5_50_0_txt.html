@@ -42,11 +42,14 @@ Last Update:
 
 <p>You can create multiranges using Sequel.pg_multirange, passing an array of ranges and a multirange type:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_multirange</span>&#x000A;<span class="ruby-identifier">multirange</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_multirange</span>(<span class="ruby-identifier">array_of_date_ranges</span>, <span class="ruby-value">:datemultirange</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_multirange</span>
+<span class="ruby-identifier">multirange</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_multirange</span>(<span class="ruby-identifier">array_of_date_ranges</span>, <span class="ruby-value">:datemultirange</span>)
+</pre>
 
 <p>Sequel.pg_multirange returns a PGMultiRange, which operates as a delegate to an array of PGRange objects.  Behavior of the object is similar to an array, except that cover? is supported, which will test if any of the included ranges covers the argument:</p>
 
-<pre class="ruby"><span class="ruby-identifier">multirange</span>.<span class="ruby-identifier">cover?</span>(<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">multirange</span>.<span class="ruby-identifier">cover?</span>(<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>)
+</pre>
 
 <p>Like the pg_range extension, this also supports registering custom multirange types, and using multirange types as bound variables.</p>
 
@@ -61,9 +64,17 @@ Last Update:
 </li><li>
 <p>An sql_log_normalizer extension has been added for normalizing logged SQL, replacing numbers and strings inside the SQL string with question marks.  This is useful for analytics and sensitive data.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)&#x000A;<span class="ruby-comment"># Without sql_log_normalizer extension, logged SQL is:</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = 1) AND (&quot;b&quot; = &#39;something&#39;)) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:sql_log_normalizer</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)&#x000A;<span class="ruby-comment"># With sql_log_normalizer_extension, logged SQL is:</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = ?) AND (&quot;b&quot; = ?)) LIMIT ?</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)
+<span class="ruby-comment"># Without sql_log_normalizer extension, logged SQL is:</span>
+<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = 1) AND (&quot;b&quot; = &#39;something&#39;)) LIMIT 1</span>
 
-<p>This extension scans the logged SQL for numbers and strings, attempting to support the database&#39;s rules for string quoting.  This means it should work with SQL that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> didn&#39;t itself create. However, there are corner cases that the extension doesn&#39;t handle, such as the use of apostrophes inside quoted identifiers, and potentially other cases of database specific SQL where the normal string quoting rules are changed, such as the use of escape strings on PostgreSQL (E&#39;escape string&#39;).</p>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:sql_log_normalizer</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)
+<span class="ruby-comment"># With sql_log_normalizer_extension, logged SQL is:</span>
+<span class="ruby-comment"># SELECT * FROM &quot;table&quot; WHERE ((&quot;a&quot; = ?) AND (&quot;b&quot; = ?)) LIMIT ?</span>
+</pre>
+
+<p>This extension scans the logged SQL for numbers and strings, attempting to support the database’s rules for string quoting.  This means it should work with SQL that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> didn’t itself create. However, there are corner cases that the extension doesn’t handle, such as the use of apostrophes inside quoted identifiers, and potentially other cases of database specific SQL where the normal string quoting rules are changed, such as the use of escape strings on PostgreSQL (E’escape string’).</p>
 </li><li>
 <p>A :before_preconnect Database option has been added.  This is useful for configuring extensions added via :preconnect_extensions before the connection takes place.</p>
 </li></ul>
@@ -86,7 +97,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -41,33 +41,52 @@ Last Update:
 <ul><li>
 <p>Dataset#each_server was added, allowing you to run the same query (most likely insert/update/delete) on all shards.  This is useful if you have a sharded database but have lookup tables that should be identical on all shards.  It works by yielding copies of the current dataset that are tied to each server/shard:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each_server</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each_server</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;foo&#39;</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>Database#each_server was added, allowing you to run schema modification methods on all shards.  It works by yielding a new <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object for each shard, that will connect to only that shard:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">each_server</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:num</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">each_server</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:num</span>}
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>You can now add and remove servers/shards from the connection pool while <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is running:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_servers</span>(<span class="ruby-value">:shard1</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;s1&#39;</span>}, <span class="ruby-value">:shard2</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;s2&#39;</span>})&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">remove_servers</span>(<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_servers</span>(<span class="ruby-value">:shard1</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;s1&#39;</span>}, <span class="ruby-value">:shard2</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;s2&#39;</span>})
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">remove_servers</span>(<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>)
+</pre>
 </li><li>
-<p>When you attempt to disconnect from a server that has connections currently in use, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now schedule those connections to be disconnected when they are returned to the pool.  Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> disconnected available connections, but ignored connections currently in use, so it wasn&#39;t possible to guarantee complete disconnection from the server.  Even with this new feature, you can only guarantee eventual disconnection, since disconnection of connections in use happens asynchronously.</p>
+<p>When you attempt to disconnect from a server that has connections currently in use, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now schedule those connections to be disconnected when they are returned to the pool.  Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> disconnected available connections, but ignored connections currently in use, so it wasn’t possible to guarantee complete disconnection from the server.  Even with this new feature, you can only guarantee eventual disconnection, since disconnection of connections in use happens asynchronously.</p>
 </li><li>
 <p>Database#disconnect now accepts a :servers option specifying the server(s) from which to disconnect.  This should be a symbol or array of symbols representing servers/shards.  Only those specified will be disconnected:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span>(<span class="ruby-value">:servers</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>])</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span>(<span class="ruby-value">:servers</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>])
+</pre>
 </li><li>
 <p>A validates_type validation was added to the validation_helpers plugin.  It allows you to check that a given column contains the correct type.  I can be helpful if you are also using the serialization plugin to store serialized ruby objects, by making sure that the objects are of the correct type (e.g. Hash):</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">validates_type</span>(<span class="ruby-constant">Hash</span>, <span class="ruby-value">:options</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+  <span class="ruby-identifier">validates_type</span>(<span class="ruby-constant">Hash</span>, <span class="ruby-value">:options</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
-<p>Sequel::SQL::Expression#== is now supported for all expressions:</p>
+<p><a href="../../../classes/Sequel/SQL/Expression.html#method-i-3D-3D"><code>Sequel::SQL::Expression#==</code></a> is now supported for all expressions:</p>
 
-<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>) <span class="ruby-operator">==</span> \&#x000A;  <span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>)&#x000A;<span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>) <span class="ruby-operator">==</span> \&#x000A;  <span class="ruby-value">:other_column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>)&#x000A;<span class="ruby-comment"># =&gt; false</span></pre>
+<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>) <span class="ruby-operator">==</span> \
+  <span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>)
+<span class="ruby-comment"># =&gt; true</span>
+<span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>) <span class="ruby-operator">==</span> \
+  <span class="ruby-value">:other_column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>)
+<span class="ruby-comment"># =&gt; false</span>
+</pre>
 </li><li>
 <p>When using the generic File type to create blob columns on MySQL, you can specify the specific database type by using the :size option (with :tiny, :medium, and :long values recognized):</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:docs</span>){<span class="ruby-constant">File</span> <span class="ruby-value">:body</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:long</span>} <span class="ruby-comment"># longblob</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:docs</span>){<span class="ruby-constant">File</span> <span class="ruby-value">:body</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:long</span>} <span class="ruby-comment"># longblob</span>
+</pre>
 </li><li>
 <p>The mysql adapter will now default to using mysqlplus, falling back to use mysql.  mysqlplus is significantly better for threaded code because queries do not block the entire interpreter.</p>
 </li><li>
@@ -101,7 +120,7 @@ Last Update:
 </li><li>
 <p>64-bit integers are now handled correctly in JDBC prepared statements.</p>
 </li><li>
-<p>In the boolean_readers plugin, correctly handle columns not in the db_schema, and don&#39;t raise an error if the model&#39;s columns can&#39;t be determined.</p>
+<p>In the boolean_readers plugin, correctly handle columns not in the db_schema, and don’t raise an error if the model’s columns can’t be determined.</p>
 </li><li>
 <p>In the identity_map plugin, remove instances from the cache if they are deleted or destroyed.</p>
 </li></ul>
@@ -127,7 +146,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

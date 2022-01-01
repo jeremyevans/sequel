@@ -39,23 +39,40 @@ Last Update:
 <p>New Plugins</p>
 <hr>
 
-<p>3 new plugins were added that implement features supported by DataMapper: identity_map, tactical_eager_loading, and lazy_attributes.  These plugins don&#39;t add any real new features,  since you can do most of what they allow before simply by being a little more explicit in your <a href="../../../classes/Sequel.html"><code>Sequel</code></a> code. However, some people prefer a less explicit approach that uses a bit more magic, and now <a href="../../../classes/Sequel.html"><code>Sequel</code></a> can accomodate them.</p>
+<p>3 new plugins were added that implement features supported by DataMapper: identity_map, tactical_eager_loading, and lazy_attributes.  These plugins don’t add any real new features,  since you can do most of what they allow before simply by being a little more explicit in your <a href="../../../classes/Sequel.html"><code>Sequel</code></a> code. However, some people prefer a less explicit approach that uses a bit more magic, and now <a href="../../../classes/Sequel.html"><code>Sequel</code></a> can accomodate them.</p>
 <ul><li>
 <p>The identity_map plugin allows you to create a 1-1 correspondence of model objects to database rows via a temporary thread-local identity map.  It makes the following statment true:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">object_id</span> <span class="ruby-operator">==</span> \&#x000A;    <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">object_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">object_id</span> <span class="ruby-operator">==</span> \
+    <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">object_id</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>As the code above implies, you need to use the with_identity_map method with a block to use the identity mapping feature.</p>
 
-<p>By itself, identity maps don&#39;t offer much, but <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses them as a cache when looking up objects by primary key or looking up many_to_one associated objects.  Basically, it can be used as a performance enhancer, and it also allows the support of the lazy_attributes plugin.</p>
+<p>By itself, identity maps don’t offer much, but <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses them as a cache when looking up objects by primary key or looking up many_to_one associated objects.  Basically, it can be used as a performance enhancer, and it also allows the support of the lazy_attributes plugin.</p>
 
-<p>The identity_map plugin is expected to be most useful in web applications.  With that in mind, here&#39;s a Rack middleware that wraps each request in a with_identity_map call, so the identity_map features are available inside the web app:</p>
+<p>The identity_map plugin is expected to be most useful in web applications.  With that in mind, here’s a Rack middleware that wraps each request in a with_identity_map call, so the identity_map features are available inside the web app:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:identity_map</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">SequelIdentityMap</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">app</span>)&#x000A;    <span class="ruby-ivar">@app</span> = <span class="ruby-identifier">app</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">env</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span>{<span class="ruby-ivar">@app</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">env</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:identity_map</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">SequelIdentityMap</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">app</span>)
+    <span class="ruby-ivar">@app</span> = <span class="ruby-identifier">app</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">env</span>)
+    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span>{<span class="ruby-ivar">@app</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">env</span>)}
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>The tactical_eager_loading plugin allows you to eagerly load an association for all models retrieved in the same group whenever one of the models accesses the association:</p>
 
-<pre class="ruby"><span class="ruby-comment"># 2 queries total</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># 2 queries total</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">artists</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>In order for this correctly, you must use Dataset#all to load the records, you cannot iterate over them via Dataset#each.  This is because eager loading requires that you have all records in advance, and when using Dataset#each you cannot know about later records in the dataset.</p>
 
@@ -63,17 +80,52 @@ Last Update:
 </li><li>
 <p>The lazy_attributes plugin builds on the identity_map and tactical_eager_loading plugins and allows you to create attributes that are lazily loaded from the database:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>
+</pre>
 
-<p>This will remove the :review attribute from being selected by default.  If you try to access the attribute after it is selected, it&#39;ll retrieve the value from the database.  If the object was retrieved with a group of other objects and an identity map is in use, it&#39;ll retrieve the lazy attribute for the entire group of objects at once, similar to the tatical_eager_loading plugin:</p>
+<p>This will remove the :review attribute from being selected by default.  If you try to access the attribute after it is selected, it’ll retrieve the value from the database.  If the object was retrieved with a group of other objects and an identity map is in use, it’ll retrieve the lazy attribute for the entire group of objects at once, similar to the tatical_eager_loading plugin:</p>
 
-<pre class="ruby"><span class="ruby-comment"># 2 queries total</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">a</span>.<span class="ruby-identifier">review</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># 2 queries total</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">a</span>.<span class="ruby-identifier">review</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Before, you could just set the default selected columns for a model to not include the lazy attributes, and just use select_more to add them to any query where the resulting model objects will need the attributes.</p>
 </li><li>
 <p>A many_through_many plugin was also added.  This very powerful plugin allows you to create associations to multiple objects through multiple join tables.  Here are some examples:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Assume the following many to many associations:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>&#x000A;&#x000A;<span class="ruby-comment"># Same as Artist.many_to_many :albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:albums</span>,&#x000A;  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All tags associated to any album this artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tags</span>,&#x000A;  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],&#x000A;   [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],&#x000A;   [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All artists associated to any album this artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>,&#x000A;  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],&#x000A;   [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],&#x000A;   [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All albums by artists that are associated to any album this</span>&#x000A;<span class="ruby-comment"># artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artist_albums</span>,&#x000A;  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],&#x000A;   [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],&#x000A;   [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>],&#x000A;   [<span class="ruby-value">:artists</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],&#x000A;   [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]]</pre>
+<pre class="ruby"><span class="ruby-comment"># Assume the following many to many associations:</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:albums</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>
+
+<span class="ruby-comment"># Same as Artist.many_to_many :albums</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:albums</span>,
+  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]]
+
+<span class="ruby-comment"># All tags associated to any album this artist is associated to</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tags</span>,
+  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],
+   [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],
+   [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]
+
+<span class="ruby-comment"># All artists associated to any album this artist is associated to</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artists</span>,
+  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],
+   [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],
+   [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]]
+
+<span class="ruby-comment"># All albums by artists that are associated to any album this</span>
+<span class="ruby-comment"># artist is associated to</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:artist_albums</span>,
+  [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],
+   [<span class="ruby-value">:albums</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],
+   [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>],
+   [<span class="ruby-value">:artists</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:id</span>],
+   [<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]]
+</pre>
 
 <p>Basically, for each join table between this model and the associated model, you use an array with a join table name, left key name (key closer to this model), and right key name (key closer to the associated model).</p>
 
@@ -105,35 +157,49 @@ Last Update:
 
 <p>For example, take this dataset:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM albums WHERE (id = 1) ORDER BY name</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-comment"># SELECT name FROM albums WHERE (id = 1) ORDER BY name</span>
+</pre>
 
-<p>Let&#39;s say you want to join it to the artists table:</p>
+<p>Let’s say you want to join it to the artists table:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM albums</span>&#x000A;<span class="ruby-comment">#  INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment">#  WHERE (id = 1) ORDER BY name</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist_id</span>)
+<span class="ruby-comment"># SELECT name FROM albums</span>
+<span class="ruby-comment">#  INNER JOIN artists ON (artists.id = albums.artist_id)</span>
+<span class="ruby-comment">#  WHERE (id = 1) ORDER BY name</span>
+</pre>
 
-<p>That&#39;s going to give you an error, as the artists table already has columns named id and name.  This new feature allows you to do the following:</p>
+<p>That’s going to give you an error, as the artists table already has columns named id and name.  This new feature allows you to do the following:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">qualify_to_first_source</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT albums.name FROM albums</span>&#x000A;<span class="ruby-comment">#  INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment">#  WHERE (albums.id = 1) ORDER BY albums.name</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">qualify_to_first_source</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">:artists</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist_id</span>)
+<span class="ruby-comment"># SELECT albums.name FROM albums</span>
+<span class="ruby-comment">#  INNER JOIN artists ON (artists.id = albums.artist_id)</span>
+<span class="ruby-comment">#  WHERE (albums.id = 1) ORDER BY albums.name</span>
+</pre>
 
-<p>By doing this, all unqualified columns are qualified, so you get a usable query.  This is expected to be most useful for users that have a default order or filter on their models and want to join the model to another table.  Before you had to replace the filters, selection, etc. manually, or use qualified columns by default even though the weren&#39;t needed in most cases.</p>
+<p>By doing this, all unqualified columns are qualified, so you get a usable query.  This is expected to be most useful for users that have a default order or filter on their models and want to join the model to another table.  Before you had to replace the filters, selection, etc. manually, or use qualified columns by default even though the weren’t needed in most cases.</p>
 </li><li>
 <p>Savepoints are now supported using SQLite and MySQL, assuming you are using a database version that supports them.  You need to pass the :savepoint option to Database#transaction to use a savepoint.</p>
 </li><li>
-<p>Model plugins can now depend on other plugins, simply by calling the Model.plugin method inside the plugin&#39;s apply method:</p>
+<p>Model plugins can now depend on other plugins, simply by calling the Model.plugin method inside the plugin’s apply method:</p>
 
-<pre>module LazyAttributes&#x000A;  def self.apply(model)&#x000A;    model.plugin :tactical_eager_loading&#x000A;  end</pre>
+<pre>module LazyAttributes
+  def self.apply(model)
+    model.plugin :tactical_eager_loading
+  end</pre>
 </li><li>
-<p>Model.plugin now takes a block with is passed to the plugin&#39;s apply and configure method (see Backwards Compatibility section for more information on the configure method).</p>
+<p>Model.plugin now takes a block with is passed to the plugin’s apply and configure method (see Backwards Compatibility section for more information on the configure method).</p>
 </li><li>
 <p>You can see which plugins are loaded for a model by using Model.plugins.</p>
 </li><li>
 <p>You can use Sequel.extension method to load extensions:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pagination</span>, <span class="ruby-value">:query</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pagination</span>, <span class="ruby-value">:query</span>
+</pre>
 
 <p>This will only load extensions that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, unlike the Model.plugin method which will also load external plugins.</p>
 </li><li>
-<p>You can now use Database#create_table? to create the table if it doesn&#39;t already exist (a very common need, it seems).  The schema plugin now supports Model.create_table? as well.</p>
+<p>You can now use Database#create_table? to create the table if it doesn’t already exist (a very common need, it seems).  The schema plugin now supports Model.create_table? as well.</p>
 </li><li>
 <p>sql_subscript is now an allowed method on most SQL expression objects that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> generates.  Also, arguments to sql_subscript can now be other expressions instead of just integers.</p>
 </li><li>
@@ -141,7 +207,7 @@ Last Update:
 </li><li>
 <p>On MySQL, Dataset#insert_ignore now affects insert as well as multi_insert and import.</p>
 </li><li>
-<p>Database#create_table now supports an :ignore_index_errors option, and Database#add_index now supports an :ignore_errors option. These are used by the schema_dumper when dumping an database schema to be restored on another database type, since indexes aren&#39;t usually required for proper operation and some indexes can&#39;t be transferred.</p>
+<p>Database#create_table now supports an :ignore_index_errors option, and Database#add_index now supports an :ignore_errors option. These are used by the schema_dumper when dumping an database schema to be restored on another database type, since indexes aren’t usually required for proper operation and some indexes can’t be transferred.</p>
 </li><li>
 <p>The ADO adapter now takes a :provider option, which can be used to set the provider.</p>
 </li><li>
@@ -153,27 +219,34 @@ Last Update:
 <p>Other Improvements</p>
 <hr>
 <ul><li>
-<p>MySQL “commands out of sync” errors should no longer occur unless you are nesting queries (calling Dataset#each inside Dataset#each). A bug dating at least to 2007 and possibly since the initial creation of the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> MySQL adapter was the cause.  Before, SQL that caused a result set that was sent using a method where <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn&#39;t yield a result set would cause the “commands out of sync” error on the following query.  For example, the following code would cause the error:</p>
+<p>MySQL “commands out of sync” errors should no longer occur unless you are nesting queries (calling Dataset#each inside Dataset#each). A bug dating at least to 2007 and possibly since the initial creation of the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> MySQL adapter was the cause.  Before, SQL that caused a result set that was sent using a method where <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t yield a result set would cause the “commands out of sync” error on the following query.  For example, the following code would cause the error:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;SHOW DATABASES&quot;</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;SHOW DATABASES&quot;</span>
+</pre>
 
-<p>If for some reason a “commands out of sync” error does occur, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will disconnect the connection from the connection pool, so it won&#39;t continually stay in the pool and raise errors every time it is used.</p>
+<p>If for some reason a “commands out of sync” error does occur, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will disconnect the connection from the connection pool, so it won’t continually stay in the pool and raise errors every time it is used.</p>
 </li><li>
-<p>The schema_dumper extension is much better about parsing defaults from the database.  It can now correctly parse most defaults on MySQL, SQLite, and PostgreSQL databases.  It no longer includes defaults that it can&#39;t parse to a ruby object unless a database- specific dump is requested.</p>
+<p>The schema_dumper extension is much better about parsing defaults from the database.  It can now correctly parse most defaults on MySQL, SQLite, and PostgreSQL databases.  It no longer includes defaults that it can’t parse to a ruby object unless a database- specific dump is requested.</p>
 </li><li>
 <p>The schema_dumper extension now dumps tables in alphabetical order.</p>
 </li><li>
 <p>Ordered and limited datasets are now handled correctly when using union, intersect, and except.  Also, union, intersect, and except now always return a from_self dataset, so further limiting, filtering, and ordering of them now works as expected.</p>
 </li><li>
-<p>Dataset#graph now works correctly with a complex dataset without having to use from_self.  Before, code like the following didn&#39;t do what was expected:</p>
+<p>Dataset#graph now works correctly with a complex dataset without having to use from_self.  Before, code like the following didn’t do what was expected:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].&#x000A;  <span class="ruby-identifier">graph</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:artists</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist_id</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].
+  <span class="ruby-identifier">graph</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:artists</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist_id</span>)
+</pre>
 
 <p>Before, the filter on <a href=":artists">DB</a> would be dropped.  Now, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> correctly uses a subselect.</p>
 </li><li>
 <p>You can now specify serialization formats per column in the serialization plugin, either by calling the plugin multiple times or by using the new serialize_attributes method:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialize_attributes</span> <span class="ruby-value">:marshal</span>, <span class="ruby-value">:review</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialize_attributes</span> <span class="ruby-value">:yaml</span>, <span class="ruby-value">:name</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialization_map</span> <span class="ruby-comment">#{:name=&gt;:yaml, :review=&gt;:marshal}</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialize_attributes</span> <span class="ruby-value">:marshal</span>, <span class="ruby-value">:review</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialize_attributes</span> <span class="ruby-value">:yaml</span>, <span class="ruby-value">:name</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">serialization_map</span> <span class="ruby-comment">#{:name=&gt;:yaml, :review=&gt;:marshal}</span>
+</pre>
 
 <p>The public API for the serialization plugin is still backwards compatible, but the internals have changed slightly to support this new feature.</p>
 </li><li>
@@ -181,7 +254,7 @@ Last Update:
 </li><li>
 <p>The :eager_graph association option now works when lazily-loading many_to_many associations.</p>
 </li><li>
-<p>Dataset#add_graph_aliases now works correctly even if set_graph_aliases hasn&#39;t been used.</p>
+<p>Dataset#add_graph_aliases now works correctly even if set_graph_aliases hasn’t been used.</p>
 </li><li>
 <p>The PostgreSQL Database#tables method now assumes the public schema if a schema is not given and there is no default_schema.</p>
 </li><li>
@@ -189,11 +262,11 @@ Last Update:
 </li><li>
 <p>The MySQL Database#indexes method no longer returns indexes on partial columns (prefix indexes).</p>
 </li><li>
-<p>Default values for String :text=&gt;true and File columns on MySQL are ignored, since MySQL doesn&#39;t support them.  They are not ignored if you use text and blob, since then you are using the database-specific syntax and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn&#39;t do translation when the database-specific syntax is used.</p>
+<p>Default values for String :text=&gt;true and File columns on MySQL are ignored, since MySQL doesn’t support them.  They are not ignored if you use text and blob, since then you are using the database-specific syntax and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t do translation when the database-specific syntax is used.</p>
 </li><li>
 <p>On PostgreSQL, attempting the reset the primary key sequence for a table without a primary key no longer causes an error.</p>
 </li><li>
-<p>Using a placeholder string in an association&#39;s :condition option now works correctly (e.g. :conditions=&gt;[&#39;n = ?&#39;, 1])</p>
+<p>Using a placeholder string in an association’s :condition option now works correctly (e.g. :conditions=&gt;[‘n = ?’, 1])</p>
 </li><li>
 <p>An error is no longer raised if you attempt to load a plugin that has a DatasetMethods module but no public dataset methods.</p>
 </li><li>
@@ -201,13 +274,13 @@ Last Update:
 </li><li>
 <p>On PostgreSQL, Dataset#insert with static SQL now works correctly.</p>
 </li><li>
-<p>A <a href="../reflection_rdoc.html">reflection.rdoc</a> file was added giving an overview of Sequel&#39;s reflection support.</p>
+<p>A <a href="../reflection_rdoc.html">reflection.rdoc</a> file was added giving an overview of Sequel’s reflection support.</p>
 </li><li>
 <p>The Migrator now works correctly with file names like 001_12312412_file_name.rb.</p>
 </li><li>
 <p>The association code now requires the classes match when looking for a reciprocal association.</p>
 </li><li>
-<p>An unlikely threading bug (race condition) was possible when using the validation_class_methods plugin. The plugin was refactored and now uses a mutex to avoid the issue.  One of the refactoring changes makes it so that you can no longer use a class level vaildation inside a Class.new block (since inherited isn&#39;t called until the block finishes).</p>
+<p>An unlikely threading bug (race condition) was possible when using the validation_class_methods plugin. The plugin was refactored and now uses a mutex to avoid the issue.  One of the refactoring changes makes it so that you can no longer use a class level vaildation inside a Class.new block (since inherited isn’t called until the block finishes).</p>
 </li><li>
 <p>The exception messages when Sequel.string_to_* fail have been fixed.</p>
 </li><li>
@@ -217,15 +290,15 @@ Last Update:
 <p>Backwards Compatibility</p>
 <hr>
 <ul><li>
-<p>A plugin&#39;s apply method is now only called the first time a plugin is loaded.  Plugins can now have a configure method that is called every time the plugin is loaded, and is always called after the instance methods, class methods, and dataset method submodules have been added to the model.  This is different from apply, which is called before the submodules are loaded.</p>
+<p>A plugin’s apply method is now only called the first time a plugin is loaded.  Plugins can now have a configure method that is called every time the plugin is loaded, and is always called after the instance methods, class methods, and dataset method submodules have been added to the model.  This is different from apply, which is called before the submodules are loaded.</p>
 
-<p>If you are a plugin author, please check your implementation to make sure this doesn&#39;t cause problems for you.  If you have questions, please post on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> mailing list.</p>
+<p>If you are a plugin author, please check your implementation to make sure this doesn’t cause problems for you.  If you have questions, please post on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> mailing list.</p>
 
 <p>This new plugin feature will make certain things a lot easier, and it should be mostly backwards compatible.  However, if a plugin was previously expected to be loaded multiple times with the apply method called each time, it will no longer work correctly.</p>
 </li><li>
 <p>The plugin_opts methods defined now include multiple args in an array if multiple args are given.  Before, the plugin_opts methods just returned the first argument.</p>
 </li><li>
-<p>Database#table_exists? no longer checks the cached schema information.  By default, it will always do a database query (unless overridden in an adapter).  This shouldn&#39;t affect the results, but if were using the method a lot and expecting it to use cached information, it doesn&#39;t have the same performance characteristics.</p>
+<p>Database#table_exists? no longer checks the cached schema information.  By default, it will always do a database query (unless overridden in an adapter).  This shouldn’t affect the results, but if were using the method a lot and expecting it to use cached information, it doesn’t have the same performance characteristics.</p>
 </li><li>
 <p>The internal storage of the :select option for datasets have changed.  You can no longer use a hash as a way of aliasing columns.  Dataset#select now does the translation from the hash to SQL::AliasedExpression instances.  Basically, if you were using Dataset#clone directly with a :select option with hashes for aliasing, you should switch to using Dataset#select or changing the hashes to AliasedExpressions yourself.</p>
 </li></ul>
@@ -239,7 +312,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

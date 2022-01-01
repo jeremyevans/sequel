@@ -39,7 +39,16 @@ Sequel::Plugins::BooleanReaders
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Add boolean attribute? methods for all columns of type :boolean</span>&#x000A;<span class="ruby-comment"># in all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_readers</span>&#x000A;&#x000A;<span class="ruby-comment"># Add boolean readers for all tinyint columns in the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:boolean_readers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db_schema</span>[<span class="ruby-identifier">c</span>][<span class="ruby-value">:db_type</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Atinyint/</span>}&#x000A;&#x000A;<span class="ruby-comment"># Add a boolean reader for a specific columns in the Artist class</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:boolean_readers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> [<span class="ruby-value">:column1</span>, <span class="ruby-value">:column2</span>, <span class="ruby-value">:column3</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}</pre>
+<pre class="ruby"><span class="ruby-comment"># Add boolean attribute? methods for all columns of type :boolean</span>
+<span class="ruby-comment"># in all model subclasses (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:boolean_readers</span>
+
+<span class="ruby-comment"># Add boolean readers for all tinyint columns in the Album class</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:boolean_readers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db_schema</span>[<span class="ruby-identifier">c</span>][<span class="ruby-value">:db_type</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Atinyint/</span>}
+
+<span class="ruby-comment"># Add a boolean reader for a specific columns in the Artist class</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:boolean_readers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> [<span class="ruby-value">:column1</span>, <span class="ruby-value">:column2</span>, <span class="ruby-value">:column3</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -83,14 +92,20 @@ Sequel::Plugins::BooleanReaders
 </div>
 <div class='description'>
 
-<p>Add the boolean_attribute? class method to the model, and create attribute? boolean reader methods for the class&#39;s columns if the class has a dataset.</p>
+<p>Add the boolean_attribute? class method to the model, and create attribute? boolean reader methods for the class’s columns if the class has a dataset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/boolean_readers.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">32</span>     <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_attribute?</span>, <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_BOOLEAN_ATTRIBUTE_PROC</span>))&#x000A;<span class="line-num">33</span>     <span class="ruby-identifier">send</span>(<span class="ruby-value">:create_boolean_readers</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/boolean_readers.rb</span>
+<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">32</span>     <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_attribute?</span>, <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_BOOLEAN_ATTRIBUTE_PROC</span>))
+<span class="line-num">33</span>     <span class="ruby-identifier">send</span>(<span class="ruby-value">:create_boolean_readers</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
+<span class="line-num">34</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -102,7 +117,7 @@ Sequel::Plugins::BooleanReaders
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

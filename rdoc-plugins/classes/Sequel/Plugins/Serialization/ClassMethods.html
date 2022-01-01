@@ -90,7 +90,14 @@ Sequel::Plugins::Serialization::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>&#x000A;<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">118</span>   <span class="ruby-ivar">@deserialization_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">119</span>   <span class="ruby-ivar">@serialization_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">120</span>   <span class="ruby-ivar">@serialization_module</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@serialization_module</span>&#x000A;<span class="line-num">121</span> &#x000A;<span class="line-num">122</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>
+<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">118</span>   <span class="ruby-ivar">@deserialization_map</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">119</span>   <span class="ruby-ivar">@serialization_map</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">120</span>   <span class="ruby-ivar">@serialization_module</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@serialization_module</span>
+<span class="line-num">121</span> 
+<span class="line-num">122</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-serialize_attributes'>
@@ -108,7 +115,17 @@ Sequel::Plugins::Serialization::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-serialize_attributes-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-serialize_attributes-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>&#x000A;<span class="line-num">127</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serialize_attributes</span>(<span class="ruby-identifier">format</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">128</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">format</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;<span class="line-num">129</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>]}&#x000A;<span class="line-num">130</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported serialization format: #{format} (valid formats: #{Sequel.synchronize{REGISTERED_FORMATS.keys}.inspect})&quot;</span>)&#x000A;<span class="line-num">131</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">132</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">133</span>   <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span> = <span class="ruby-identifier">format</span>&#x000A;<span class="line-num">134</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No columns given.  The serialization plugin requires you specify which columns to serialize&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">135</span>   <span class="ruby-identifier">define_serialized_attribute_accessor</span>(<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-serialize_attributes-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>
+<span class="line-num">127</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serialize_attributes</span>(<span class="ruby-identifier">format</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)
+<span class="line-num">128</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">format</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
+<span class="line-num">129</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>]}
+<span class="line-num">130</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported serialization format: #{format} (valid formats: #{Sequel.synchronize{REGISTERED_FORMATS.keys}.inspect})&quot;</span>)
+<span class="line-num">131</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">132</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">133</span>   <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span> = <span class="ruby-identifier">format</span>
+<span class="line-num">134</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No columns given.  The serialization plugin requires you specify which columns to serialize&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">135</span>   <span class="ruby-identifier">define_serialized_attribute_accessor</span>(<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)
+<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -120,7 +137,7 @@ Sequel::Plugins::Serialization::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

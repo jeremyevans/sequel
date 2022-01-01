@@ -37,7 +37,17 @@ Sequel::Plugins::AssociationPks
 <div id='description'>
 <p>The association_pks plugin adds association_pks, association_pks=, and association_pks_dataset instance methods to the model class for each one_to_many and many_to_many association added.  These methods allow for easily returning the primary keys of the associated objects, and easily modifying which objects are associated:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks_dataset</span>&#x000A;<span class="ruby-comment"># SELECT id FROM albums WHERE (albums.artist_id = 1)</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [1, 2, 3]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> = [<span class="ruby-value">2</span>, <span class="ruby-value">4</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [2, 4]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-comment"># Persist changes</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>
+<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks_dataset</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (albums.artist_id = 1)</span>
+
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [1, 2, 3]</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> = [<span class="ruby-value">2</span>, <span class="ruby-value">4</span>]
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [2, 4]</span>
+<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span>
+<span class="ruby-comment"># Persist changes</span>
+</pre>
 
 <p>Note that it uses the singular form of the association name. Also note that the setter both associates to new primary keys not in the assocation and disassociates from primary keys not provided to the method.</p>
 
@@ -53,7 +63,14 @@ Sequel::Plugins::AssociationPks
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_pks</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before the association methods)</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_pks</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass *_to_many associations have association_pks</span>
+<span class="ruby-comment"># methods (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_pks</span>
+
+<span class="ruby-comment"># Make the Album *_to_many associations have association_pks</span>
+<span class="ruby-comment"># methods (called before the association methods)</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_pks</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -73,7 +90,7 @@ Sequel::Plugins::AssociationPks
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

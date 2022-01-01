@@ -1,10 +1,10 @@
-Wed, 01 Dec 2021 08:37:48 -0800
+Sat, 01 Jan 2022 14:54:44 -0800
 lib/sequel/adapters/ado.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/ado/access.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/ado/mssql.rb	Mon, 28 Jan 2019 08:29:19 -0800
-lib/sequel/adapters/amalgalite.rb	Thu, 24 May 2018 16:51:22 -0700
+lib/sequel/adapters/amalgalite.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/adapters/ibmdb.rb	Tue, 21 Sep 2021 14:24:30 -0700
-lib/sequel/adapters/jdbc.rb	Tue, 21 Sep 2021 14:24:30 -0700
+lib/sequel/adapters/jdbc.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/adapters/jdbc/db2.rb	Sun, 24 Feb 2019 17:45:08 -0800
 lib/sequel/adapters/jdbc/derby.rb	Wed, 13 Oct 2021 12:18:25 -0700
 lib/sequel/adapters/jdbc/h2.rb	Fri, 29 Sep 2017 08:29:39 -0700
@@ -19,25 +19,25 @@ lib/sequel/adapters/jdbc/sqlite.rb	Thu, 18 Jul 2019 16:06:01 -0700
 lib/sequel/adapters/jdbc/sqlserver.rb	Mon, 25 Feb 2019 08:20:33 -0800
 lib/sequel/adapters/jdbc/transactions.rb	Fri, 07 Dec 2018 10:50:17 -0800
 lib/sequel/adapters/mock.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/adapters/mysql.rb	Tue, 21 Sep 2021 14:24:30 -0700
-lib/sequel/adapters/mysql2.rb	Tue, 21 Sep 2021 14:24:30 -0700
+lib/sequel/adapters/mysql.rb	Fri, 17 Dec 2021 16:59:47 -0800
+lib/sequel/adapters/mysql2.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/adapters/odbc.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/odbc/db2.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/odbc/mssql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/odbc/oracle.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/oracle.rb	Tue, 21 Sep 2021 14:24:30 -0700
-lib/sequel/adapters/postgres.rb	Thu, 30 Sep 2021 11:19:59 -0700
+lib/sequel/adapters/postgres.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/adapters/postgresql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/shared/access.rb	Wed, 13 Oct 2021 12:18:25 -0700
 lib/sequel/adapters/shared/db2.rb	Wed, 13 Oct 2021 12:18:25 -0700
 lib/sequel/adapters/shared/mssql.rb	Fri, 13 Aug 2021 18:22:05 -0700
-lib/sequel/adapters/shared/mysql.rb	Mon, 15 Nov 2021 14:34:50 -0800
+lib/sequel/adapters/shared/mysql.rb	Wed, 15 Dec 2021 14:22:43 -0800
 lib/sequel/adapters/shared/oracle.rb	Wed, 07 Oct 2020 15:45:35 -0700
-lib/sequel/adapters/shared/postgres.rb	Wed, 03 Nov 2021 13:00:48 -0700
+lib/sequel/adapters/shared/postgres.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Wed, 13 Oct 2021 12:18:25 -0700
 lib/sequel/adapters/shared/sqlite.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/sqlanywhere.rb	Tue, 21 Sep 2021 14:24:30 -0700
-lib/sequel/adapters/sqlite.rb	Thu, 09 May 2019 16:09:48 -0700
+lib/sequel/adapters/sqlite.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/adapters/tinytds.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/utils/columns_limit_1.rb	Wed, 13 Oct 2021 12:18:25 -0700
 lib/sequel/adapters/utils/emulate_offset_with_reverse_and_count.rb	Fri, 03 Aug 2018 16:28:24 -0700

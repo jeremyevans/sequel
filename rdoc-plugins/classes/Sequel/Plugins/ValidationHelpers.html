@@ -37,7 +37,14 @@ Sequel::Plugins::ValidationHelpers
 <div id='description'>
 <p>The validation_helpers plugin contains validate_* methods designed to be called inside Model#validate to perform validations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">1</span>, <span class="ruby-value">:num_tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+    <span class="ruby-keyword">super</span>
+    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">1</span>, <span class="ruby-value">:num_tracks</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>The validates_unique method has a unique API, but the other validations have the API explained here:</p>
 
@@ -50,7 +57,7 @@ Sequel::Plugins::ValidationHelpers
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_blank </td><td>
 <p>Whether to skip the validation if the value is blank.</p>
 </td></tr><tr><td class='label'>:allow_missing </td><td>
-<p>Whether to skip the validation if the attribute isn&#39;t a key in the values hash.  This is different from allow_nil, because <a href="../../Sequel.html"><code>Sequel</code></a> only sends the attributes in the values when doing an insert or update.  If the attribute is not present, <a href="../../Sequel.html"><code>Sequel</code></a> doesn&#39;t specify it, so the database will use the table&#39;s default value.  This is different from having an attribute in values with a value of nil, which <a href="../../Sequel.html"><code>Sequel</code></a> will send as NULL. If your database table has a non NULL default, this may be a good option to use.  You don&#39;t want to use allow_nil, because if the attribute is in values but has a value nil, <a href="../../Sequel.html"><code>Sequel</code></a> will attempt to insert a NULL value into the database, instead of using the database&#39;s default.</p>
+<p>Whether to skip the validation if the attribute isn’t a key in the values hash.  This is different from allow_nil, because <a href="../../Sequel.html"><code>Sequel</code></a> only sends the attributes in the values when doing an insert or update.  If the attribute is not present, <a href="../../Sequel.html"><code>Sequel</code></a> doesn’t specify it, so the database will use the table’s default value.  This is different from having an attribute in values with a value of nil, which <a href="../../Sequel.html"><code>Sequel</code></a> will send as NULL. If your database table has a non NULL default, this may be a good option to use.  You don’t want to use allow_nil, because if the attribute is in values but has a value nil, <a href="../../Sequel.html"><code>Sequel</code></a> will attempt to insert a NULL value into the database, instead of using the database’s default.</p>
 </td></tr><tr><td class='label'>:allow_nil </td><td>
 <p>Whether to skip the validation if the value is nil.</p>
 </td></tr><tr><td class='label'>:from </td><td>
@@ -63,15 +70,38 @@ Sequel::Plugins::ValidationHelpers
 
 <p>The default validation options for all models can be modified by overridding the Model#default_validation_helpers_options private method. By changing the default options, you can setup internationalization of the error messages.  For example, you would modify the default options:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_validation_helpers_options</span>(<span class="ruby-identifier">type</span>)&#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:exact_length</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">exact</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.exact_length&quot;</span>, <span class="ruby-value">exact:</span> <span class="ruby-identifier">exact</span>)}}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:integer</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.integer&quot;</span>)}}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">private</span>
+
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_validation_helpers_options</span>(<span class="ruby-identifier">type</span>)
+    <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-value">:exact_length</span>
+      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">exact</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.exact_length&quot;</span>, <span class="ruby-value">exact:</span> <span class="ruby-identifier">exact</span>)}}
+    <span class="ruby-keyword">when</span> <span class="ruby-value">:integer</span>
+      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.integer&quot;</span>)}}
+    <span class="ruby-keyword">else</span>
+      <span class="ruby-keyword">super</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>and then use something like this in your yaml translation file:</p>
 
-<pre>en:&#x000A;  errors:&#x000A;    exact_length: &quot;is not %{exact} characters&quot;&#x000A;    integer: &quot;is not a number&quot;</pre>
+<pre>en:
+  errors:
+    exact_length: &quot;is not %{exact} characters&quot;
+    integer: &quot;is not a number&quot;</pre>
 
-<p>Note that if you want to support internationalization of Errors#full_messages, it is easiest to override Errors#full_message (note singular form and not plural form). Here&#39;s an example:</p>
+<p>Note that if you want to support internationalization of Errors#full_messages, it is easiest to override Errors#full_message (note singular form and not plural form). Here’s an example:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">Errors</span>&#x000A;  <span class="ruby-identifier">private</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_message</span>(<span class="ruby-identifier">attribute</span>, <span class="ruby-identifier">error_msg</span>)&#x000A;    <span class="ruby-node">&quot;#{Array(attribute).join(I18n.t(&#39;errors.joiner&#39;))} #{error_msg}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">Errors</span>
+  <span class="ruby-identifier">private</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_message</span>(<span class="ruby-identifier">attribute</span>, <span class="ruby-identifier">error_msg</span>)
+    <span class="ruby-node">&quot;#{Array(attribute).join(I18n.t(&#39;errors.joiner&#39;))} #{error_msg}&quot;</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -119,7 +149,7 @@ Sequel::Plugins::ValidationHelpers
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

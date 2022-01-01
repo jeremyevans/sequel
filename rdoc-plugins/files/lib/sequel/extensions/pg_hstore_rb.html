@@ -38,25 +38,33 @@ Last Update:
 <div id='description'>
 <p>The pg_hstore extension adds support for the PostgreSQL hstore type to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  hstore is an extension that ships with PostgreSQL, and the hstore type stores an arbitrary key-value table, where the keys are strings and the values are strings or NULL.</p>
 
-<p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when hstore fields are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/HStore.html"><code>Sequel::Postgres::HStore</code></a>.  HStore is a DelegateClass of <a href="../../../../classes/Hash.html"><code>Hash</code></a>, so it mostly acts like a hash, but not completely (is_a?(<a href="../../../../classes/Hash.html"><code>Hash</code></a>) is false).  If you want the actual hash, you can call HStore#to_hash.  This is done so that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does not treat a HStore like a <a href="../../../../classes/Hash.html"><code>Hash</code></a> by default, which would cause issues.</p>
+<p>This extension integrates with Sequel’s native postgres and jdbc/postgresql adapters, so that when hstore fields are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/HStore.html"><code>Sequel::Postgres::HStore</code></a>.  HStore is a DelegateClass of <a href="../../../../classes/Hash.html"><code>Hash</code></a>, so it mostly acts like a hash, but not completely (is_a?(<a href="../../../../classes/Hash.html"><code>Hash</code></a>) is false).  If you want the actual hash, you can call HStore#to_hash.  This is done so that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does not treat a HStore like a <a href="../../../../classes/Hash.html"><code>Hash</code></a> by default, which would cause issues.</p>
 
 <p>In addition to the parsers, this extension comes with literalizers for HStore using the standard <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> literalization callbacks, so they work with on all adapters.</p>
 
 <p>To turn an existing <a href="../../../../classes/Hash.html"><code>Hash</code></a> into an HStore, use Sequel.hstore:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">hash</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">hash</span>)
+</pre>
 
 <p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Hash.html#method-i-hstore"><code>Hash#hstore</code></a>:</p>
 
-<pre class="ruby"><span class="ruby-identifier">hash</span>.<span class="ruby-identifier">hstore</span></pre>
+<pre class="ruby"><span class="ruby-identifier">hash</span>.<span class="ruby-identifier">hstore</span>
+</pre>
 
 <p>Since the hstore type only supports strings, non string keys and values are converted to strings</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-value">foo:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>({})&#x000A;<span class="ruby-identifier">v</span>[<span class="ruby-value">:foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-value">foo:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>
+<span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>({})
+<span class="ruby-identifier">v</span>[<span class="ruby-value">:foo</span>] = <span class="ruby-value">1</span>
+<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>
+</pre>
 
 <p>However, to make life easier, lookups by key are converted to strings (even when accessing the underlying hash directly):</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>)[<span class="ruby-value">:foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">to_hash</span>[<span class="ruby-value">:foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>)[<span class="ruby-value">:foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">to_hash</span>[<span class="ruby-value">:foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>
+</pre>
 
 <p>HStore instances mostly just delegate to the underlying hash instance, so <a href="../../../../classes/Hash.html"><code>Hash</code></a> methods that modify the receiver or returned modified copies of the receiver may not do string conversion. The following methods will handle string conversion, and more can be added later if desired:</p>
 <ul><li>
@@ -99,15 +107,18 @@ Last Update:
 
 <p>If you want to insert a hash into an hstore database column:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>))
+</pre>
 
 <p>To use this extension, first load it into your <a href="../../../../classes/Database.html"><code>Sequel::Database</code></a> instance:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_hstore</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_hstore</span>
+</pre>
 
 <p>This extension integrates with the pg_array extension.  If you plan to use arrays of hstore types, load the pg_array extension before the pg_interval extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_hstore</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_hstore</span>
+</pre>
 
 <p>See the schema modification guide for details on using hstore columns in CREATE/ALTER TABLE statements.</p>
 
@@ -131,7 +142,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -63,7 +63,11 @@ Sequel::Plugins::Timestamps::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>&#x000A;<span class="line-num">75</span>   <span class="ruby-identifier">set_update_timestamp</span>&#x000A;<span class="line-num">76</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>
+<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>
+<span class="line-num">75</span>   <span class="ruby-identifier">set_update_timestamp</span>
+<span class="line-num">76</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_validation'>
@@ -81,7 +85,11 @@ Sequel::Plugins::Timestamps::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_validation-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_validation-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;<span class="line-num">81</span>   <span class="ruby-identifier">set_create_timestamp</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span>&#x000A;<span class="line-num">82</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_validation-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>
+<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
+<span class="line-num">81</span>   <span class="ruby-identifier">set_create_timestamp</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span>
+<span class="line-num">82</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -93,7 +101,7 @@ Sequel::Plugins::Timestamps::InstanceMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

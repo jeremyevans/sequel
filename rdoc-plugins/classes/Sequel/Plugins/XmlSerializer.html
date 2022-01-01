@@ -39,51 +39,107 @@ Sequel::Plugins::XmlSerializer
 
 <p>Basic Example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">puts</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-comment"># Output:</span>&#x000A;<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>&#x000A;<span class="ruby-comment"># &lt;album&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;id&gt;1&lt;/id&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;artist_id&gt;2&lt;/artist_id&gt;</span>&#x000A;<span class="ruby-comment"># &lt;/album&gt;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">puts</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>
+<span class="ruby-comment"># Output:</span>
+<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="ruby-comment"># &lt;album&gt;</span>
+<span class="ruby-comment">#   &lt;id&gt;1&lt;/id&gt;</span>
+<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>
+<span class="ruby-comment">#   &lt;artist_id&gt;2&lt;/artist_id&gt;</span>
+<span class="ruby-comment"># &lt;/album&gt;</span>
+</pre>
 
 <p>You can provide options to control the XML output:</p>
 
-<pre class="ruby"><span class="ruby-identifier">puts</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">only:</span> <span class="ruby-value">:name</span>)&#x000A;<span class="ruby-identifier">puts</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">except:</span> [<span class="ruby-value">:id</span>, <span class="ruby-value">:artist_id</span>])&#x000A;<span class="ruby-comment"># Output:</span>&#x000A;<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>&#x000A;<span class="ruby-comment"># &lt;album&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>&#x000A;<span class="ruby-comment"># &lt;/album&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">include:</span> <span class="ruby-value">:artist</span>)&#x000A;<span class="ruby-comment"># Output:</span>&#x000A;<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>&#x000A;<span class="ruby-comment"># &lt;album&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;id&gt;1&lt;/id&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;artist_id&gt;2&lt;/artist_id&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;artist&gt;</span>&#x000A;<span class="ruby-comment">#     &lt;id&gt;2&lt;/id&gt;</span>&#x000A;<span class="ruby-comment">#     &lt;name&gt;YJM&lt;/name&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;/artist&gt;</span>&#x000A;<span class="ruby-comment"># &lt;/album&gt;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">puts</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">only:</span> <span class="ruby-value">:name</span>)
+<span class="ruby-identifier">puts</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">except:</span> [<span class="ruby-value">:id</span>, <span class="ruby-value">:artist_id</span>])
+<span class="ruby-comment"># Output:</span>
+<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="ruby-comment"># &lt;album&gt;</span>
+<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>
+<span class="ruby-comment"># &lt;/album&gt;</span>
+
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">include:</span> <span class="ruby-value">:artist</span>)
+<span class="ruby-comment"># Output:</span>
+<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="ruby-comment"># &lt;album&gt;</span>
+<span class="ruby-comment">#   &lt;id&gt;1&lt;/id&gt;</span>
+<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>
+<span class="ruby-comment">#   &lt;artist_id&gt;2&lt;/artist_id&gt;</span>
+<span class="ruby-comment">#   &lt;artist&gt;</span>
+<span class="ruby-comment">#     &lt;id&gt;2&lt;/id&gt;</span>
+<span class="ruby-comment">#     &lt;name&gt;YJM&lt;/name&gt;</span>
+<span class="ruby-comment">#   &lt;/artist&gt;</span>
+<span class="ruby-comment"># &lt;/album&gt;</span>
+</pre>
 
 <p>You can use a hash value with <code>:include</code> to pass options to associations:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">include:</span> {<span class="ruby-value">artist:</span> {<span class="ruby-value">only:</span> <span class="ruby-value">:name</span>}})&#x000A;<span class="ruby-comment"># Output:</span>&#x000A;<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>&#x000A;<span class="ruby-comment"># &lt;album&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;id&gt;1&lt;/id&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;artist_id&gt;2&lt;/artist_id&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;artist&gt;</span>&#x000A;<span class="ruby-comment">#     &lt;name&gt;YJM&lt;/name&gt;</span>&#x000A;<span class="ruby-comment">#   &lt;/artist&gt;</span>&#x000A;<span class="ruby-comment"># &lt;/album&gt;</span></pre>
+<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">include:</span> {<span class="ruby-value">artist:</span> {<span class="ruby-value">only:</span> <span class="ruby-value">:name</span>}})
+<span class="ruby-comment"># Output:</span>
+<span class="ruby-comment"># &lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="ruby-comment"># &lt;album&gt;</span>
+<span class="ruby-comment">#   &lt;id&gt;1&lt;/id&gt;</span>
+<span class="ruby-comment">#   &lt;name&gt;RF&lt;/name&gt;</span>
+<span class="ruby-comment">#   &lt;artist_id&gt;2&lt;/artist_id&gt;</span>
+<span class="ruby-comment">#   &lt;artist&gt;</span>
+<span class="ruby-comment">#     &lt;name&gt;YJM&lt;/name&gt;</span>
+<span class="ruby-comment">#   &lt;/artist&gt;</span>
+<span class="ruby-comment"># &lt;/album&gt;</span>
+</pre>
 
 <p><code>to_xml</code> also exists as a class and dataset method, both of which return all objects in the dataset:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">include:</span> <span class="ruby-value">:tags</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_xml</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">include:</span> <span class="ruby-value">:tags</span>)
+</pre>
 
 <p>If you have an existing array of model instances you want to convert to XML, you can call the class to_xml method with the :array option:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">array:</span> [<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Album</span>[<span class="ruby-value">2</span>]])</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_xml</span>(<span class="ruby-value">array:</span> [<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Album</span>[<span class="ruby-value">2</span>]])
+</pre>
 
 <p>In addition to creating XML, this plugin also enables <a href="../Model.html"><code>Sequel::Model</code></a> classes to create instances directly from XML using the from_xml class method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">xml</span> = <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">xml</span> = <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>
+<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>)
+</pre>
 
 <p>The array_from_xml class method exists to parse arrays of model instances from xml:</p>
 
-<pre class="ruby"><span class="ruby-identifier">xml</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">array_from_xml</span>(<span class="ruby-identifier">xml</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">xml</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>
+<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">array_from_xml</span>(<span class="ruby-identifier">xml</span>)
+</pre>
 
 <p>These does not necessarily round trip, since doing so would let users create model objects with arbitrary values.  By default, from_xml will call set using values from the tags in the xml.  If you want to specify the allowed fields, you can use the :fields option, which will call set_fields with the given fields:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>, <span class="ruby-value">fields:</span> <span class="ruby-node">%w&#39;id name&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>, <span class="ruby-value">fields:</span> <span class="ruby-node">%w&#39;id name&#39;</span>)
+</pre>
 
 <p>If you want to update an existing instance, you can use the from_xml instance method:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>)
+</pre>
 
 <p>Both of these allow creation of cached associated objects, if you provide the :associations option:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-value">associations:</span> <span class="ruby-value">:artist</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-value">associations:</span> <span class="ruby-value">:artist</span>)
+</pre>
 
 <p>You can even provide options when setting up the associated objects:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-value">associations:</span> {<span class="ruby-value">artist:</span> {<span class="ruby-value">fields:</span> <span class="ruby-node">%w&#39;id name&#39;</span>, <span class="ruby-value">associations:</span> <span class="ruby-value">:tags</span>}})</pre>
+<pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-value">associations:</span> {<span class="ruby-value">artist:</span> {<span class="ruby-value">fields:</span> <span class="ruby-node">%w&#39;id name&#39;</span>, <span class="ruby-value">associations:</span> <span class="ruby-value">:tags</span>}})
+</pre>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Add XML output capability to all model subclass instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:xml_serializer</span>&#x000A;&#x000A;<span class="ruby-comment"># Add XML output capability to Album class instances</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:xml_serializer</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Add XML output capability to all model subclass instances (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:xml_serializer</span>
+
+<span class="ruby-comment"># Add XML output capability to Album class instances</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:xml_serializer</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -104,7 +160,7 @@ Sequel::Plugins::XmlSerializer
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

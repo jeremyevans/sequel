@@ -38,27 +38,51 @@ Last Update:
 <div id='description'>
 <p>The arbitrary_servers extension allows you to connect to arbitrary servers/shards that were not defined when you created the database. To use it, you first load the extension into the Database object:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:arbitrary_servers</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:arbitrary_servers</span>
+</pre>
 
 <p>Then you can pass arbitrary connection options for the server/shard to use as a hash:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>Because <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> can never be sure that the connection will be reused, arbitrary connections are disconnected as soon as the outermost block that uses them exits.  So this example uses the same connection:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-comment"># c == c2</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>
+    <span class="ruby-comment"># c == c2</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>But this example does not:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># c != c2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">server:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>
+  <span class="ruby-comment"># c != c2</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You can use this extension in conjunction with the server_block extension:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># All of these use the host/database given to with_server</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">c:</span> <span class="ruby-value">1</span>)&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">c:</span> <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">all</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># All of these use the host/database given to with_server</span>
+    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">c:</span> <span class="ruby-value">1</span>)
+    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">c:</span> <span class="ruby-value">2</span>)
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span>
+    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">all</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
-<p>Anyone using this extension in conjunction with the server_block extension may want to do the following to so that you don&#39;t need to call synchronize separately:</p>
+<p>Anyone using this extension in conjunction with the server_block extension may want to do the following to so that you don’t need to call synchronize separately:</p>
 
-<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>){<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+  <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>){<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Note that this extension only works with the sharded threaded connection pool.  If you are using the sharded single connection pool, you need to switch to the sharded threaded connection pool before using this extension.</p>
 
@@ -73,7 +97,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

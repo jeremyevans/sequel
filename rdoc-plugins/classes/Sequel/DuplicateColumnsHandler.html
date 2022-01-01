@@ -78,7 +78,11 @@ Sequel::DuplicateColumnsHandler
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-on_duplicate_columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-on_duplicate_columns-source'>   <span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">on_duplicate_columns</span>(<span class="ruby-identifier">handler</span> = (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide either an argument or a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>); <span class="ruby-keyword">nil</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both an argument and a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">handler</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">49</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:on_duplicate_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">handler</span><span class="ruby-operator">||</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-on_duplicate_columns-source'>   <span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">on_duplicate_columns</span>(<span class="ruby-identifier">handler</span> = (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide either an argument or a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>); <span class="ruby-keyword">nil</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">48</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both an argument and a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">handler</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>
+<span class="line-num">49</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:on_duplicate_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">handler</span><span class="ruby-operator">||</span><span class="ruby-identifier">block</span>)
+<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -90,7 +94,7 @@ Sequel::DuplicateColumnsHandler
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

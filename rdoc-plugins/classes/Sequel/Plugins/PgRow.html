@@ -43,31 +43,50 @@ Sequel::Plugins::PgRow
 <div id='description'>
 <p>The pg_row plugin allows you to use <a href="../Model.html"><code>Sequel::Model</code></a> classes as composite type classes, via the pg_row extension.  So if you have an address table:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:address</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:street</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:city</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:zip</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:address</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:street</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:city</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:zip</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>and a company table with an address:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:company</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-identifier">address</span> <span class="ruby-value">:address</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:company</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>
+  <span class="ruby-identifier">address</span> <span class="ruby-value">:address</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>You can create a <a href="../Model.html"><code>Sequel::Model</code></a> for the address table, and load the plugin, which registers the row type:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Address</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:address</span>)&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_row</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Address</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:address</span>)
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_row</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Then when you select from the company table (even using a plain dataset), it will return address values as instances of Address:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:company</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&#39;MS&#39;, :address=&gt;</span>&#x000A;<span class="ruby-comment">#  Address.load(:street=&gt;&#39;123 Foo St&#39;, :city=&gt;&#39;Bar Town&#39;, :zip=&gt;&#39;12345&#39;)}</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:company</span>].<span class="ruby-identifier">first</span>
+<span class="ruby-comment"># =&gt; {:name=&gt;&#39;MS&#39;, :address=&gt;</span>
+<span class="ruby-comment">#  Address.load(:street=&gt;&#39;123 Foo St&#39;, :city=&gt;&#39;Bar Town&#39;, :zip=&gt;&#39;12345&#39;)}</span>
+</pre>
 
 <p>If you want a lot of your models to be used as row types, you can load the plugin into <a href="../Model.html"><code>Sequel::Model</code></a> itself:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_row</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_row</span>
+</pre>
 
 <p>And then call register_row_type in the class</p>
 
-<pre class="ruby"><span class="ruby-constant">Address</span>.<span class="ruby-identifier">register_row_type</span></pre>
+<pre class="ruby"><span class="ruby-constant">Address</span>.<span class="ruby-identifier">register_row_type</span>
+</pre>
 
 <p>In addition to returning row-valued/composite types as instances of <a href="../Model.html"><code>Sequel::Model</code></a>, this also lets you use model instances in datasets when inserting, updating, and filtering:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:company</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;MS&#39;</span>, <span class="ruby-value">address:</span>&#x000A;  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(<span class="ruby-value">street:</span> <span class="ruby-string">&#39;123 Foo St&#39;</span>, <span class="ruby-value">city:</span> <span class="ruby-string">&#39;Bar Town&#39;</span>, <span class="ruby-value">zip:</span> <span class="ruby-string">&#39;12345&#39;</span>))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:company</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;MS&#39;</span>, <span class="ruby-value">address:</span>
+  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(<span class="ruby-value">street:</span> <span class="ruby-string">&#39;123 Foo St&#39;</span>, <span class="ruby-value">city:</span> <span class="ruby-string">&#39;Bar Town&#39;</span>, <span class="ruby-value">zip:</span> <span class="ruby-string">&#39;12345&#39;</span>))
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -104,7 +123,11 @@ Sequel::Plugins::PgRow
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/pg_row.rb</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_row</span>, <span class="ruby-value">:_model_pg_row</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">register_row_type</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@dataset</span>)&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/pg_row.rb</span>
+<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">55</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_row</span>, <span class="ruby-value">:_model_pg_row</span>)
+<span class="line-num">56</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">register_row_type</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@dataset</span>)
+<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -116,7 +139,7 @@ Sequel::Plugins::PgRow
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

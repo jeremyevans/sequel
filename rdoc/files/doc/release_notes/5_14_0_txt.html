@@ -40,7 +40,10 @@ Last Update:
 <ul><li>
 <p>The :nulls option when creating ordered expressions is now supported on all databases that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> ships support for.  For databases that do not support NULLS FIRST/NULLS LAST, support is emulated.</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>))&#x000A;<span class="ruby-comment"># When emulated:</span>&#x000A;<span class="ruby-comment"># ORDER BY (CASE WHEN (name IS NULL) THEN 2 ELSE 1 END), name ASC</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>))
+<span class="ruby-comment"># When emulated:</span>
+<span class="ruby-comment"># ORDER BY (CASE WHEN (name IS NULL) THEN 2 ELSE 1 END), name ASC</span>
+</pre>
 </li><li>
 <p>Model#pk_equal? has been added as a more descriptive name for Model#===.  Model#=== is now an alias of Model#pk_equal?.</p>
 </li><li>
@@ -51,7 +54,14 @@ Last Update:
 <ul><li>
 <p>Inverting expressions using the ANY/SOME/ALL SQL operators now works correctly:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Sequel &lt;5.14.0</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:any</span>, <span class="ruby-value">:x</span>))&#x000A;<span class="ruby-comment"># &quot;(a != any(x))&quot;</span>&#x000A;&#x000A;<span class="ruby-comment"># Sequel &gt;=5.14.0</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:any</span>, <span class="ruby-value">:x</span>))&#x000A;<span class="ruby-comment"># &quot;NOT (a = any(x))&quot;</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Sequel &lt;5.14.0</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:any</span>, <span class="ruby-value">:x</span>))
+<span class="ruby-comment"># &quot;(a != any(x))&quot;</span>
+
+<span class="ruby-comment"># Sequel &gt;=5.14.0</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:any</span>, <span class="ruby-value">:x</span>))
+<span class="ruby-comment"># &quot;NOT (a = any(x))&quot;</span>
+</pre>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> has always tried to push inversion down to create SQL that is easier to reason about.  However, inversion cannot be pushed down if an ANY/SOME/ALL SQL operator is used, because that is a different type of operation that just happens to use the same syntax.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids inversion push down for boolean operators where the right hand side is an SQL::Function, LiteralString, or SQL::PlaceholderLiteralString.</p>
 </li><li>
@@ -77,7 +87,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

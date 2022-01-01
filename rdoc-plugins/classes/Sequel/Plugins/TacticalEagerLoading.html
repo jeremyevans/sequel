@@ -37,39 +37,84 @@ Sequel::Plugins::TacticalEagerLoading
 <div id='description'>
 <p>The tactical_eager_loading plugin allows you to eagerly load an association for all objects retrieved from the same dataset without calling <code>eager</code> on the dataset.  If you attempt to load associated objects for a record and the association for that object is currently not cached, it assumes you want to get the associated objects for all objects retrieved with the dataset that retrieved the current object.</p>
 
-<p>Tactical eager loading only takes affect if you retrieved the current object with Dataset#all, it doesn&#39;t work if you retrieved the current object with Dataset#each.</p>
+<p>Tactical eager loading only takes affect if you retrieved the current object with Dataset#all, it doesn’t work if you retrieved the current object with Dataset#each.</p>
 
 <p>Basically, this allows the following code to issue only two queries:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (id &lt; 100)</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">artists</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-comment"># SELECT * FROM albums WHERE (id &lt; 100)</span>
+<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>
+</pre>
 
 <p>Note that if you are passing a callback to the association method via a block or :callback option, or using the :reload option to reload the association, eager loading will not be done.</p>
 
 <p>You can use the :eager_reload option to reload the association for all objects that the current object was retrieved with:</p>
 
-<pre class="ruby"><span class="ruby-comment"># SELECT * FROM albums WHERE (id &lt; 100)</span>&#x000A;<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Eagerly load all artists for these albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>&#x000A;<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>&#x000A;&#x000A;<span class="ruby-comment"># Do something that may affect which artists are associated to the albums</span>&#x000A;&#x000A;<span class="ruby-comment"># Eagerly reload all artists for these albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>&#x000A;<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager_reload:</span> <span class="ruby-keyword">true</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># SELECT * FROM albums WHERE (id &lt; 100)</span>
+<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>
+
+<span class="ruby-comment"># Eagerly load all artists for these albums</span>
+<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>
+<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>
+
+<span class="ruby-comment"># Do something that may affect which artists are associated to the albums</span>
+
+<span class="ruby-comment"># Eagerly reload all artists for these albums</span>
+<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>
+<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager_reload:</span> <span class="ruby-keyword">true</span>)
+</pre>
 
 <p>You can also use the :eager option to specify dependent associations to eager load:</p>
 
-<pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A; <span class="ruby-comment"># Eager load all artists for these albums, and all albums for those artists</span>&#x000A; <span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>&#x000A; <span class="ruby-comment"># SELECT * FROM albums WHERE artist_id IN (...)</span>&#x000A; <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager:</span> <span class="ruby-value">:albums</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>
+
+ <span class="ruby-comment"># Eager load all artists for these albums, and all albums for those artists</span>
+ <span class="ruby-comment"># SELECT * FROM artists WHERE id IN (...)</span>
+ <span class="ruby-comment"># SELECT * FROM albums WHERE artist_id IN (...)</span>
+ <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager:</span> <span class="ruby-value">:albums</span>)
+</pre>
 
 <p>You can also use :eager to specify an eager callback. For example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Eagerly load all artists whose name starts with A-M for these albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt; &#39;N&#39; AND id IN (...)</span>&#x000A;<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;N&#39;</span>)})</pre>
+<pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>
+
+<span class="ruby-comment"># Eagerly load all artists whose name starts with A-M for these albums</span>
+<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt; &#39;N&#39; AND id IN (...)</span>
+<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;N&#39;</span>)})
+</pre>
 
 <p>Note that the :eager option only takes effect if the association has not already been loaded for the model.</p>
 
 <p>The tactical_eager_loading plugin also allows transparent eager loading when calling association methods on associated objects eagerly loaded via Dataset#eager_graph.  This can reduce N queries to a single query when iterating over all associated objects. Consider the following code:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>By default this will issue a single query to load the artists and albums, and then one query for each album to load the tracks for the album:</p>
 
-<pre># SELECT artists.id, ...&#x000A;         albums.id, ...&#x000A;# FROM artists&#x000A;# LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);&#x000A;# SELECT * FROM tracks WHERE album_id = 1;&#x000A;# SELECT * FROM tracks WHERE album_id = 2;&#x000A;# SELECT * FROM tracks WHERE album_id = 10;&#x000A;# ...</pre>
+<pre># SELECT artists.id, ...
+         albums.id, ...
+# FROM artists
+# LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);
+# SELECT * FROM tracks WHERE album_id = 1;
+# SELECT * FROM tracks WHERE album_id = 2;
+# SELECT * FROM tracks WHERE album_id = 10;
+# ...</pre>
 
 <p>With the tactical_eager_loading plugin, this uses the same query to load the artists and albums, but then issues a single query to load the tracks for all albums.</p>
 
-<pre># SELECT artists.id, ...&#x000A;         albums.id, ...&#x000A;# FROM artists&#x000A;# LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);&#x000A;# SELECT * FROM tracks WHERE (tracks.album_id IN (1, 2, 10, ...));</pre>
+<pre># SELECT artists.id, ...
+         albums.id, ...
+# FROM artists
+# LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);
+# SELECT * FROM tracks WHERE (tracks.album_id IN (1, 2, 10, ...));</pre>
 
 <p>Note that transparent eager loading for associated objects loaded by eager_graph will only take place if the associated classes also use the tactical_eager_loading plugin.</p>
 
@@ -77,7 +122,12 @@ Sequel::Plugins::TacticalEagerLoading
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances use tactical eager loading (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use tactical eager loading</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances use tactical eager loading (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>
+
+<span class="ruby-comment"># Make the Album class use tactical eager loading</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -97,7 +147,7 @@ Sequel::Plugins::TacticalEagerLoading
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

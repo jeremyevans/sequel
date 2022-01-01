@@ -40,11 +40,16 @@ Last Update:
 <ul><li>
 <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin makes <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> classes use prepared statements for creating, updating, and destroying model instances, as well as looking up model objects by primary key. With this plugin, all of the following will use prepared statements:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">destroy</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)
+<span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">destroy</span>
+</pre>
 </li><li>
 <p>The prepared_statements_safe plugin reduces the number of prepared statements that can be created by doing two things. First, it makes the INSERT statements used when creating instances to use as many columns as possible, setting specific values for all columns with parseable default values.  Second, it changes save_changes to just use save, saving all columns instead of just the changed ones.</p>
 
-<p>The reason for this plugin is that Sequel&#39;s default behavior of using only the values specifically set when creating instances and having update only set changed columns by default can lead to a large number of prepared statements being created.</p>
+<p>The reason for this plugin is that Sequel’s default behavior of using only the values specifically set when creating instances and having update only set changed columns by default can lead to a large number of prepared statements being created.</p>
 
 <p>For prepared statements to be used, each set of columns in the insert and update statements needs to have its own prepared statement.  If you have a table with 1 primary key column and 4 other columns, you can have up to 2^4 = 16 prepared statements created, one for each subset of the 4 columns.  If you have 1 primary key column and 20 other columns, there are over a million subsets, and you could hit your database limit for prepared statements (a denial of service attack).</p>
 
@@ -52,54 +57,73 @@ Last Update:
 </li><li>
 <p>The prepared_statements_associations plugin allows normal association method calls to use prepared statements if possible. For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements_associations</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums</span></pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements_associations</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:albums</span>
+<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums</span>
+</pre>
 
 <p>Will use a prepared statement to return the albums for that artist. This plugin works for all supported association types.  There are some associations (filtered and custom associations) that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> cannot currently use a prepared statement reliably, for those <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will use a regular query.</p>
 </li><li>
 <p>The prepared_statements_with_pk plugin allows the new Dataset#with_pk method (explained below) to use prepared statements. For example:</p>
 
-<pre>Artist.plugin :prepared_statements_with_pk&#x000A;Artist.filter(...).with_pk(1)</pre>
+<pre>Artist.plugin :prepared_statements_with_pk
+Artist.filter(...).with_pk(1)</pre>
 
 <p>Will use a prepared statement for this query.  The most benefit from prepared statements come from queries that are expensive to parse and plan but quick to execute, so using this plugin with a complex filter can in certain cases yield significant performance improvements.</p>
 
 <p>However, this plugin should be considered unsafe as it is possible that it will create an unbounded number of prepared statements. It extracts parameters from the dataset using Dataset#unbind (explained below), so if your code has conditions that vary per query but that Dataset#unbind does not handle, an unbounded number of prepared statements can be created.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>).<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>}.<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>).<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>}.<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]
+</pre>
 
 <p>are safe, but:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>]).<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>}.<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>]).<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>}.<span class="ruby-identifier">with_pk</span>[<span class="ruby-value">1</span>]
+</pre>
 
 <p>are not.  For queries that are not safe, Dataset#with_pk should not be used with this plugin, you should switch to looking up by primary key manually (for a regular query):</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>])[<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>]</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>])[<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>]
+</pre>
 
 <p>or using the prepared statement API to create a custom prepared statement:</p>
 
-<pre class="ruby"><span class="ruby-comment"># PS = {}</span>&#x000A;<span class="ruby-constant">PS</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">:$b</span>], <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$id</span>).&#x000A;       <span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:name</span>)&#x000A;<span class="ruby-constant">PS</span>[<span class="ruby-value">:name</span>].<span class="ruby-identifier">call</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-comment"># PS = {}</span>
+<span class="ruby-constant">PS</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">:$b</span>], <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$id</span>).
+       <span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:name</span>)
+<span class="ruby-constant">PS</span>[<span class="ruby-value">:name</span>].<span class="ruby-identifier">call</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">to_i</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+</pre>
 </li></ul>
 
 <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p>Filtering by associations got a lot more powerful.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_23_0_txt.html">3.23.0</a> introduced filtering by associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)
+</pre>
 
 <p>This capability is much expanded in <a href="3_24_0_txt.html">3.24.0</a>, allowing you to exclude by associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)
+</pre>
 
 <p>This will match all albums not by that artist.</p>
 
 <p>You can also filter or exclude by multiple associated objects:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">artist1</span>, <span class="ruby-identifier">artist2</span>])&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">artist1</span>, <span class="ruby-identifier">artist2</span>])</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">artist1</span>, <span class="ruby-identifier">artist2</span>])
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">artist1</span>, <span class="ruby-identifier">artist2</span>])
+</pre>
 
 <p>The filtered dataset will match all albums by either of those two artists, and the excluded dataset will match all albums not by either of those two artists.</p>
 
 <p>You can also filter or exclude by using a model dataset:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>))).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>))).<span class="ruby-identifier">all</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>))).<span class="ruby-identifier">all</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>))).<span class="ruby-identifier">all</span>
+</pre>
 
 <p>Here the filtered dataset will match all albums where the associated artist has a name that begins with A, and the excluded dataset will match all albums where the associated artist does not have a name that begins with A.</p>
 
@@ -107,61 +131,90 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports around hooks, which wrap the related before hook, behavior, and after hook.  Like other <a href="../../../classes/Sequel.html"><code>Sequel</code></a> hooks, these are implemented as instance methods.  For example, if you wanted to log DatabaseErrors raised during save:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">around_save</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-comment"># log the error</span>&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">around_save</span>
+    <span class="ruby-keyword">super</span>
+  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+    <span class="ruby-comment"># log the error</span>
+    <span class="ruby-identifier">raise</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
-<p>All around hooks should call super, not yield.  If an around hook doesn&#39;t call super or yield, it is treated as a hook failure, similar to before hooks returning false.</p>
+<p>All around hooks should call super, not yield.  If an around hook doesn’t call super or yield, it is treated as a hook failure, similar to before hooks returning false.</p>
 
-<p>For around_validation, the return value of super should be whether the object is valid.  For other around hooks, the return value of super is currently true, but it&#39;s possible that will change in the future.</p>
+<p>For around_validation, the return value of super should be whether the object is valid.  For other around hooks, the return value of super is currently true, but it’s possible that will change in the future.</p>
 </li><li>
 <p>Dataset#with_pk has been added to model datasets that allows you to find the object with the matching primary key:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)
+</pre>
 
 <p>This should make easier the common case where you want to find a particular object that is associated to another object:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">2</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">2</span>)
+</pre>
 
 <p>Before, there was no way to do that without manually specifying the primary key:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>[<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>]</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>[<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>]
+</pre>
 
 <p>To use a composite primary key with with_pk, you have to provide an array:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">with_pk</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">with_pk</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])
+</pre>
 </li><li>
 <p>Dataset#[] for model datasets will now call with_pk if given a single Integer argument.  This makes the above case even easier:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>[<span class="ruby-value">2</span>]</pre>
+<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>[<span class="ruby-value">2</span>]
+</pre>
 
 <p>Note that for backwards compatibility, this only works for single integer primary keys.  If you have a composite primary key or a string/varchar primary key, you have to use with_pk.</p>
 </li><li>
 <p>Dataset#unbind has been added, which allows you to take a dataset that uses static bound values and convert them to placeholders. Currently, the only cases handled are SQL::ComplexExpression objects that use a =, !=, &lt;, &gt;, &lt;=, or &gt;= operator where the first argument is a Symbol, SQL::Indentifier, or SQL::QualifiedIdentifier, and the second argument is a Numeric, String, Date, or Time.  Dataset#unbind returns a two element array, where the first element is a modified copy of the receiver, and the second element is a bound variable hash:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>, <span class="ruby-identifier">bv</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">unbind</span>&#x000A;<span class="ruby-identifier">ds</span> <span class="ruby-comment"># DB[:table].filter(:a=&gt;:$a)</span>&#x000A;<span class="ruby-identifier">bv</span> <span class="ruby-comment"># {:a=&gt;1}</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>, <span class="ruby-identifier">bv</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">unbind</span>
+<span class="ruby-identifier">ds</span> <span class="ruby-comment"># DB[:table].filter(:a=&gt;:$a)</span>
+<span class="ruby-identifier">bv</span> <span class="ruby-comment"># {:a=&gt;1}</span>
+</pre>
 
 <p>The purpose of doing this is that you can then use prepare or call on the returned dataset with the returned bound variables:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-identifier">bv</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (a = ?); [1]</span>&#x000A;&#x000A;<span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:ps_name</span>)&#x000A;<span class="ruby-comment"># PREPARE ps_name AS SELECT * FROM table WHERE (a = ?)</span>&#x000A;<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bv</span>)&#x000A;<span class="ruby-comment"># EXECUTE ps_name(1)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-identifier">bv</span>)
+<span class="ruby-comment"># SELECT * FROM table WHERE (a = ?); [1]</span>
+
+<span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:ps_name</span>)
+<span class="ruby-comment"># PREPARE ps_name AS SELECT * FROM table WHERE (a = ?)</span>
+<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bv</span>)
+<span class="ruby-comment"># EXECUTE ps_name(1)</span>
+</pre>
 
 <p>Basically, Dataset#unbind takes a specific statement and attempts to turn it into a generic statement, along with the placeholder values it extracted.</p>
 
 <p>Unfortunately, Dataset#unbind cannot handle all cases.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>}.<span class="ruby-identifier">unbind</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>}.<span class="ruby-identifier">unbind</span>
+</pre>
 
 <p>will not unbind any values.  Also, if you have a query with multiple different values for a variable, it will raise an UnbindDuplicate exception:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">or</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">unbind</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">or</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">unbind</span>
+</pre>
 </li><li>
 <p>A defaults_setter plugin has been added that makes it easy to automatically set default values when creating new objects.  This plugin makes <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> behave more like ActiveRecord in that new model instances (before saving) will have default values parsed from the database.  Unlike ActiveRecord, only values with non-NULL defaults are set.  Also, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> allows you to easily modify the default values used:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:default_values</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:copies_sold =&gt; 0}</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">default_values</span>[<span class="ruby-value">:copies_sold</span>] = <span class="ruby-value">42</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:copies_sold =&gt; 42}</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:default_values</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:copies_sold =&gt; 0}</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">default_values</span>[<span class="ruby-value">:copies_sold</span>] = <span class="ruby-value">42</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:copies_sold =&gt; 42}</span>
+</pre>
 
-<p>Before, this was commonly done in an after_initialize hook, but that&#39;s slower as it is also called for model instances loaded from the database.</p>
+<p>Before, this was commonly done in an after_initialize hook, but that’s slower as it is also called for model instances loaded from the database.</p>
 </li><li>
 <p>A Database#views method has been added that returns an array of symbols representing view names in the database.  This works just like Database#tables except it returns views.</p>
 </li><li>
-<p>A <a href="../../../classes/Sequel/ASTTransformer.html"><code>Sequel::ASTTransformer</code></a> class was added that makes it easy to write custom transformers of Sequel&#39;s internal abstract syntax trees.  Dataset#qualify now uses a subclass of ASTTransformer to do its transformations, as does the new Dataset#unbind.</p>
+<p>A <a href="../../../classes/Sequel/ASTTransformer.html"><code>Sequel::ASTTransformer</code></a> class was added that makes it easy to write custom transformers of Sequel’s internal abstract syntax trees.  Dataset#qualify now uses a subclass of ASTTransformer to do its transformations, as does the new Dataset#unbind.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -174,7 +227,11 @@ Last Update:
 </li><li>
 <p>You can now correctly invert SQL::Constant instances:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span> <span class="ruby-comment"># TRUE</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span> <span class="ruby-comment"># FALSE</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-comment"># NULL</span>
+<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-comment"># NOT NULL</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span> <span class="ruby-comment"># TRUE</span>
+<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span> <span class="ruby-comment"># FALSE</span>
+</pre>
 </li><li>
 <p>A bug in the association_pks plugin has been fixed in the case where the associated table had a different primary key column name than the current table.</p>
 </li><li>
@@ -190,9 +247,9 @@ Last Update:
 </li><li>
 <p>A small bug when creating anonymous subclasses of <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> on ruby 1.9 has been fixed.</p>
 </li><li>
-<p>If Thread#kill is used inside a transaction on ruby 1.8 or rubinius, the transaction is rolled back.  This situation is not handled correctly on JRuby or ruby 1.9, and I&#39;m not sure it&#39;s possible to handle correctly on those implementations.</p>
+<p>If Thread#kill is used inside a transaction on ruby 1.8 or rubinius, the transaction is rolled back.  This situation is not handled correctly on JRuby or ruby 1.9, and I’m not sure it’s possible to handle correctly on those implementations.</p>
 </li><li>
-<p>The postgres adapter now supports the Sequel::Postgres::PG_NAMED_TYPES hash for associating conversion procs for custom types that don&#39;t necessarily have the same type oid on different databases.  This hash uses symbol keys and proc values:</p>
+<p>The postgres adapter now supports the Sequel::Postgres::PG_NAMED_TYPES hash for associating conversion procs for custom types that don’t necessarily have the same type oid on different databases.  This hash uses symbol keys and proc values:</p>
 
 <pre>Sequel::Postgres::PG_NAMED_TYPES[:interval] = proc{|v| ...}</pre>
 
@@ -202,15 +259,21 @@ Last Update:
 </li><li>
 <p>On SQLite and MSSQL, literalization of true and false values given directly to Dataset#filter has been fixed.  So the following now works correctly on those databases:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-keyword">false</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-keyword">true</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-keyword">false</span>)
+</pre>
 
-<p>Unfortunately, because SQLite and MSSQL don&#39;t have a real boolean type, these will not work:</p>
+<p>Unfortunately, because SQLite and MSSQL don’t have a real boolean type, these will not work:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">false</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">true</span>}
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">false</span>}
+</pre>
 
 <p>You currently have to work around the issue by doing:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span>}&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">FALSE</span>}</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span>}
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">FALSE</span>}
+</pre>
 
 <p>It is possible that a future version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will remove the need for this workaround, but that requires having a separate literalization method specific to filters.</p>
 </li><li>
@@ -224,7 +287,7 @@ Last Update:
 </li><li>
 <p>Dataset#limit now works correctly on DB2, using the FETCH FIRST syntax.</p>
 </li><li>
-<p>The jdbc mssql subadapter was split into separate subadapters for sqlserver (using Microsoft&#39;s driver) and jtds (using the open source JTDS driver).</p>
+<p>The jdbc mssql subadapter was split into separate subadapters for sqlserver (using Microsoft’s driver) and jtds (using the open source JTDS driver).</p>
 </li><li>
 <p>The jdbc jtds subadapter now supports converting Java CLOB objects to ruby strings.</p>
 </li><li>
@@ -245,11 +308,11 @@ Last Update:
 <ul><li>
 <p>Model#save no longer calls Model#valid?.  It now calls the Model#_valid? private method that Model#valid? also calls.  To mark a model instance invalid, you should override the Model#validate method and add validation errors to the object.</p>
 </li><li>
-<p>The BeforeHookFailure exception class has been renamed to HookFailure since hook failures can now be raised by around hooks that don&#39;t call super.  BeforeHookFailure is now an alias to HookFailure, so no code should break, but you should update your code to reflect the new name.</p>
+<p>The BeforeHookFailure exception class has been renamed to HookFailure since hook failures can now be raised by around hooks that don’t call super.  BeforeHookFailure is now an alias to HookFailure, so no code should break, but you should update your code to reflect the new name.</p>
 </li><li>
 <p>Any custom argument mappers used for prepared statements now need to implement the prepared_arg? private instance method and have it return true.</p>
 </li><li>
-<p>If your databases uses bit as a boolean type and isn&#39;t MSSQL, it&#39;s possible that those columns will no longer be treated as booleans. Please report such an issue on the bugtracker.</p>
+<p>If your databases uses bit as a boolean type and isn’t MSSQL, it’s possible that those columns will no longer be treated as booleans. Please report such an issue on the bugtracker.</p>
 </li><li>
 <p>It is possible that the filtering and excluding by association datasets will break backwards compatibility in some apps.  This can only occur if you are using a symbol with the same name as an association with a model dataset whose model is the same as the associated class.  As associations almost never have the same names as columns, this would require either aliasing or joining to another table.  If for some reason this does break your app, you can work around it by changing the symbol to an SQL::Identifier or a literal string.</p>
 </li><li>
@@ -267,7 +330,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

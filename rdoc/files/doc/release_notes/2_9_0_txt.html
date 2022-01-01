@@ -41,9 +41,15 @@ Last Update:
 <ul><li>
 <p>Compound SQL statement (i.e. UNION, EXCEPT, and INTERSECT) support is much improved.  Chaining compound statement calls now longer wipes out previous compound statements calls of the same type. Also, the ordering of the compound statements is no longer fixed per adapter, it now reflects the order they were called on the object.  For example, the following now work as expected:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)
+<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds3</span>)
+<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds3</span>)
+<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds3</span>)
+<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds3</span>)
+<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)
+</pre>
 </li><li>
-<p>Exception classes ValidationFailure and BeforeHookFailure were added so it is eaiser to catch a failed validation.  These are both subclasses of <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a>, so there shouldn&#39;t be any backwards compatibility issues.  Error messages are also improved, as the ValidationFailure message is a string containing all validation failures and the BeforeHookFailure message contains which hook type caused the failure (i.e. before_save, before_create, or before_validate).</p>
+<p>Exception classes ValidationFailure and BeforeHookFailure were added so it is eaiser to catch a failed validation.  These are both subclasses of <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a>, so there shouldn’t be any backwards compatibility issues.  Error messages are also improved, as the ValidationFailure message is a string containing all validation failures and the BeforeHookFailure message contains which hook type caused the failure (i.e. before_save, before_create, or before_validate).</p>
 </li><li>
 <p>The sequel command line tool now has a -L option to load all files in the given directory.  This is mainly useful for loading a directory of model files. The files are loaded after the database connection is set up.</p>
 </li><li>
@@ -53,15 +59,18 @@ Last Update:
 <p>Other Improvements</p>
 <hr>
 <ul><li>
-<p>Database#schema now raises an error if you pass a table that doesn&#39;t exist.  Before, some adapters would return an empty schema. The bigger problem with this is that it made table_exists? return the wrong value, since it looks at the Database&#39;s schema. Generally, this bug would show up in the following code:</p>
+<p>Database#schema now raises an error if you pass a table that doesn’t exist.  Before, some adapters would return an empty schema. The bigger problem with this is that it made table_exists? return the wrong value, since it looks at the Database’s schema. Generally, this bug would show up in the following code:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Blah</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Blah</span>.<span class="ruby-identifier">table_exists?</span> <span class="ruby-comment"># True even if blahs is not a table</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Blah</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-constant">Blah</span>.<span class="ruby-identifier">table_exists?</span> <span class="ruby-comment"># True even if blahs is not a table</span>
+</pre>
 </li><li>
 <p>AlterTableGenerator#add_foreign_key now works for MySQL.</p>
 </li><li>
 <p>Error messages in model association methods that add/remove an associated object are now more descriptive.</p>
 </li><li>
-<p>Dataset#destroy for model datasets now works with databases that can&#39;t handle nested queries.  However, it now loads all model objects being destroyed before attempting to destroy any of them.</p>
+<p>Dataset#destroy for model datasets now works with databases that can’t handle nested queries.  However, it now loads all model objects being destroyed before attempting to destroy any of them.</p>
 </li><li>
 <p>Dataset#count now works correctly for compound SQL statements (i.e. UNION, EXCEPT, and INTERSECT).</p>
 </li><li>
@@ -71,7 +80,7 @@ Last Update:
 </li><li>
 <p>The SQLite adapter now supports dropping indicies.</p>
 </li><li>
-<p>A bug in the MSSQL adapter&#39;s literalization of LiteralStrings has been fixed.</p>
+<p>A bug in the MSSQL adapter’s literalization of LiteralStrings has been fixed.</p>
 </li><li>
 <p>The literalization of blobs on PostgreSQL (bytea columns) has been fixed.</p>
 </li><li>
@@ -79,7 +88,9 @@ Last Update:
 </li><li>
 <p>The native postgresql adapter has been changed to only log client messages of level WARNING by default.  You can modify this via:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">client_min_messages</span> = <span class="ruby-keyword">nil</span> <span class="ruby-comment"># Use Server Default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">client_min_messages</span> = <span class="ruby-value">:notice</span> <span class="ruby-comment"># Use NOTICE level</span></pre>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">client_min_messages</span> = <span class="ruby-keyword">nil</span> <span class="ruby-comment"># Use Server Default</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">client_min_messages</span> = <span class="ruby-value">:notice</span> <span class="ruby-comment"># Use NOTICE level</span>
+</pre>
 </li><li>
 <p>Model#inspect now calls Model#inspect_values for easier overloading.</p>
 </li></ul>
@@ -101,7 +112,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

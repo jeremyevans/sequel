@@ -37,17 +37,35 @@ Sequel::Plugins::PgArrayAssociations
 <div id='description'>
 <p>This plugin allows you to create associations where the foreign keys are stored in a PostgreSQL array column in one of the tables.  The model with the table containing the array column has a pg_array_to_many association to the associated model, and the model with the table containing the primary key referenced by elements in the array column has a many_to_pg_array association to the associated model.</p>
 
-<pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#   tags                albums</span>&#x000A;<span class="ruby-comment">#   :id (int4) &lt;--\    :id</span>&#x000A;<span class="ruby-comment">#   :name          \-- :tag_ids (int4[])</span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>&#x000A;  <span class="ruby-identifier">pg_array_to_many</span> <span class="ruby-value">:tags</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Tag</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>&#x000A;  <span class="ruby-identifier">many_to_pg_array</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Database schema:</span>
+<span class="ruby-comment">#   tags                albums</span>
+<span class="ruby-comment">#   :id (int4) &lt;--\    :id</span>
+<span class="ruby-comment">#   :name          \-- :tag_ids (int4[])</span>
+<span class="ruby-comment">#                      :name</span>
 
-<p>These association types work similarly to Sequel&#39;s other association types, so you can use them as you would any other association. Unlike other associations, they do not support composite keys.</p>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>
+  <span class="ruby-identifier">pg_array_to_many</span> <span class="ruby-value">:tags</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Tag</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>
+  <span class="ruby-identifier">many_to_pg_array</span> <span class="ruby-value">:albums</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>These association types work similarly to Sequel’s other association types, so you can use them as you would any other association. Unlike other associations, they do not support composite keys.</p>
 
 <p>One thing that is different is that the modification methods for pg_array_to_many associations do not affect the database, since they operate purely on the receiver.  For example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_tag</span>(<span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]
+<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_tag</span>(<span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>])
+</pre>
 
 <p>does not save the album.  This allows you to call add_tag repeatedly and the save after to combine all changes into a single query.  Note that the many_to_pg_array association modification methods do save, so:</p>
 
-<pre class="ruby"><span class="ruby-identifier">tag</span> = <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-identifier">tag</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>])</pre>
+<pre class="ruby"><span class="ruby-identifier">tag</span> = <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]
+<span class="ruby-identifier">tag</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>])
+</pre>
 
 <p>will save the changes to the album.</p>
 
@@ -104,7 +122,10 @@ Sequel::Plugins::PgArrayAssociations
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb</span>&#x000A;<span class="line-num">301</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">302</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_array</span>)&#x000A;<span class="line-num">303</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb</span>
+<span class="line-num">301</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">302</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_array</span>)
+<span class="line-num">303</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -116,7 +137,7 @@ Sequel::Plugins::PgArrayAssociations
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

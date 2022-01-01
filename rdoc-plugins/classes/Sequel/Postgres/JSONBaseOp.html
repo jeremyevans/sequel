@@ -43,7 +43,8 @@ Superclass:
 
 <p>In the method documentation examples, assume that:</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>(<span class="ruby-value">:json</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>(<span class="ruby-value">:json</span>)
+</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -129,14 +130,24 @@ Superclass:
 
 <p>Get JSON array element or object field as json.  If an array is given, gets the object at the specified path.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># (json -&gt; 1)</span>&#x000A;<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;a&#39;</span>] <span class="ruby-comment"># (json -&gt; &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>[<span class="ruby-node">%w&#39;a b&#39;</span>] <span class="ruby-comment"># (json #&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># (json -&gt; 1)</span>
+<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;a&#39;</span>] <span class="ruby-comment"># (json -&gt; &#39;a&#39;)</span>
+<span class="ruby-identifier">json_op</span>[<span class="ruby-node">%w&#39;a b&#39;</span>] <span class="ruby-comment"># (json #&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">160</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">161</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))&#x000A;<span class="line-num">162</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">163</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">164</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">160</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">161</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
+<span class="line-num">162</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">163</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">164</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_elements'>
@@ -149,14 +160,18 @@ Superclass:
 
 <p>Returns a set of json values for the elements in the json array.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_elements</span> <span class="ruby-comment"># json_array_elements(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_elements</span> <span class="ruby-comment"># json_array_elements(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-array_elements-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-array_elements-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements</span>&#x000A;<span class="line-num">172</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements</span>)&#x000A;<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-array_elements-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements</span>
+<span class="line-num">172</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements</span>)
+<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_elements_text'>
@@ -169,14 +184,18 @@ Superclass:
 
 <p>Returns a set of text values for the elements in the json array.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_elements_text</span> <span class="ruby-comment"># json_array_elements_text(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_elements_text</span> <span class="ruby-comment"># json_array_elements_text(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-array_elements_text-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-array_elements_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements_text</span>&#x000A;<span class="line-num">179</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements_text</span>)&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-array_elements_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements_text</span>
+<span class="line-num">179</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements_text</span>)
+<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_length'>
@@ -189,14 +208,18 @@ Superclass:
 
 <p>Get the length of the outermost json array.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_length</span> <span class="ruby-comment"># json_array_length(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_length</span> <span class="ruby-comment"># json_array_length(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-array_length-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-array_length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>&#x000A;<span class="line-num">186</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>))&#x000A;<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-array_length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>
+<span class="line-num">186</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>))
+<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -209,14 +232,18 @@ Superclass:
 
 <p>Returns a set of key and value pairs, where the keys are text and the values are JSON.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">each</span> <span class="ruby-comment"># json_each(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">each</span> <span class="ruby-comment"># json_each(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>&#x000A;<span class="line-num">194</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)&#x000A;<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
+<span class="line-num">194</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)
+<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each_text'>
@@ -229,14 +256,18 @@ Superclass:
 
 <p>Returns a set of key and value pairs, where the keys and values are both text.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">each_text</span> <span class="ruby-comment"># json_each_text(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">each_text</span> <span class="ruby-comment"># json_each_text(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each_text-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-each_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_text</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each_text</span>)&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-each_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_text</span>
+<span class="line-num">202</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each_text</span>)
+<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extract'>
@@ -249,14 +280,19 @@ Superclass:
 
 <p>Returns a json value for the object at the given path.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># json_extract_path(json, &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path(json, &#39;a&#39;, &#39;b&#39;)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># json_extract_path(json, &#39;a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path(json, &#39;a&#39;, &#39;b&#39;)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-extract-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-extract-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="line-num">210</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))&#x000A;<span class="line-num">211</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-extract-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">210</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
+<span class="line-num">211</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extract_text'>
@@ -269,14 +305,19 @@ Superclass:
 
 <p>Returns a text value for the object at the given path.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract_text</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># json_extract_path_text(json, &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract_text</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path_text(json, &#39;a&#39;, &#39;b&#39;)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract_text</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># json_extract_path_text(json, &#39;a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract_text</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path_text(json, &#39;a&#39;, &#39;b&#39;)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-extract_text-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-extract_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">217</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract_text</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="line-num">218</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path_text</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))&#x000A;<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-extract_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">217</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract_text</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">218</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path_text</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
+<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-get_text'>
@@ -289,14 +330,24 @@ Superclass:
 
 <p>Get JSON array element or object field as text.  If an array is given, gets the object at the specified path.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># (json -&gt;&gt; 1)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (json -&gt;&gt; &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-node">%w&#39;a b&#39;</span>) <span class="ruby-comment"># (json #&gt;&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># (json -&gt;&gt; 1)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (json -&gt;&gt; &#39;a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-node">%w&#39;a b&#39;</span>) <span class="ruby-comment"># (json #&gt;&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_text-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-get_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">227</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_text</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">228</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">229</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))&#x000A;<span class="line-num">230</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">231</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">232</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-get_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">227</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_text</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">228</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">229</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
+<span class="line-num">230</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">231</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">232</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-keys'>
@@ -309,14 +360,18 @@ Superclass:
 
 <p>Returns a set of keys AS text in the json object.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">keys</span> <span class="ruby-comment"># json_object_keys(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">keys</span> <span class="ruby-comment"># json_object_keys(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-keys-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-keys-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">238</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>&#x000A;<span class="line-num">239</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:object_keys</span>)&#x000A;<span class="line-num">240</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-keys-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">238</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
+<span class="line-num">239</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:object_keys</span>)
+<span class="line-num">240</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-populate'>
@@ -329,14 +384,18 @@ Superclass:
 
 <p>Expands the given argument using the columns in the json.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">populate</span>(<span class="ruby-identifier">arg</span>) <span class="ruby-comment"># json_populate_record(arg, json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">populate</span>(<span class="ruby-identifier">arg</span>) <span class="ruby-comment"># json_populate_record(arg, json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-populate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-populate-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">246</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_record</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-populate-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">246</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_record</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-populate_set'>
@@ -349,14 +408,18 @@ Superclass:
 
 <p>Expands the given argument using the columns in the json.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">populate_set</span>(<span class="ruby-identifier">arg</span>) <span class="ruby-comment"># json_populate_recordset(arg, json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">populate_set</span>(<span class="ruby-identifier">arg</span>) <span class="ruby-comment"># json_populate_recordset(arg, json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-populate_set-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-populate_set-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate_set</span>(<span class="ruby-identifier">arg</span>)&#x000A;<span class="line-num">253</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_recordset</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">254</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-populate_set-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate_set</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">253</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_recordset</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">254</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-strip_nulls'>
@@ -369,14 +432,18 @@ Superclass:
 
 <p>Returns a json value stripped of all internal null values.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">strip_nulls</span> <span class="ruby-comment"># json_strip_nulls(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">strip_nulls</span> <span class="ruby-comment"># json_strip_nulls(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-strip_nulls-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-strip_nulls-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">strip_nulls</span>&#x000A;<span class="line-num">260</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:strip_nulls</span>))&#x000A;<span class="line-num">261</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-strip_nulls-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">strip_nulls</span>
+<span class="line-num">260</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:strip_nulls</span>))
+<span class="line-num">261</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_record'>
@@ -389,14 +456,18 @@ Superclass:
 
 <p>Builds arbitrary record from json object.  You need to define the structure of the record using as on the resulting object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">to_record</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:x</span>, [<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a integer&#39;</span>), <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;b text&#39;</span>)]) <span class="ruby-comment"># json_to_record(json) AS x(a integer, b text)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">to_record</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:x</span>, [<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a integer&#39;</span>), <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;b text&#39;</span>)]) <span class="ruby-comment"># json_to_record(json) AS x(a integer, b text)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_record-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_record-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">267</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_record</span>&#x000A;<span class="line-num">268</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_record</span>)&#x000A;<span class="line-num">269</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_record-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">267</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_record</span>
+<span class="line-num">268</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_record</span>)
+<span class="line-num">269</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_recordset'>
@@ -409,14 +480,18 @@ Superclass:
 
 <p>Builds arbitrary set of records from json array of objects.  You need to define the structure of the records using as on the resulting object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">to_recordset</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:x</span>, [<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a integer&#39;</span>), <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;b text&#39;</span>)]) <span class="ruby-comment"># json_to_recordset(json) AS x(a integer, b text)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">to_recordset</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:x</span>, [<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a integer&#39;</span>), <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;b text&#39;</span>)]) <span class="ruby-comment"># json_to_recordset(json) AS x(a integer, b text)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_recordset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_recordset-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">275</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_recordset</span>&#x000A;<span class="line-num">276</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_recordset</span>)&#x000A;<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_recordset-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">275</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_recordset</span>
+<span class="line-num">276</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_recordset</span>)
+<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-typeof'>
@@ -429,14 +504,18 @@ Superclass:
 
 <p>Returns the type of the outermost json value as text.</p>
 
-<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">typeof</span> <span class="ruby-comment"># json_typeof(json)</span></pre>
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">typeof</span> <span class="ruby-comment"># json_typeof(json)</span>
+</pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-typeof-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-typeof-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typeof</span>&#x000A;<span class="line-num">283</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:typeof</span>)&#x000A;<span class="line-num">284</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-typeof-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typeof</span>
+<span class="line-num">283</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:typeof</span>)
+<span class="line-num">284</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -448,7 +527,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -102,14 +102,17 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Don&#39;t set transaction use by default.</p>
+<p>Don’t set transaction use by default.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>&#x000A;<span class="line-num">102</span>   <span class="ruby-ivar">@use_transactions</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
+<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>
+<span class="line-num">102</span>   <span class="ruby-ivar">@use_transactions</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -128,7 +131,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-apply-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">107</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)&#x000A;<span class="line-num">108</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;Invalid migration direction specified (#{direction.inspect})&quot;</span>) <span class="ruby-keyword">unless</span> [<span class="ruby-value">:up</span>, <span class="ruby-value">:down</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">direction</span>)&#x000A;<span class="line-num">109</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">prok</span> = <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">direction</span>)&#x000A;<span class="line-num">110</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">prok</span>)&#x000A;<span class="line-num">111</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-apply-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
+<span class="line-num">107</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)
+<span class="line-num">108</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;Invalid migration direction specified (#{direction.inspect})&quot;</span>) <span class="ruby-keyword">unless</span> [<span class="ruby-value">:up</span>, <span class="ruby-value">:down</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">direction</span>)
+<span class="line-num">109</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">prok</span> = <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">direction</span>)
+<span class="line-num">110</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">prok</span>)
+<span class="line-num">111</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -140,7 +149,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

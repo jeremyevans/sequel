@@ -40,17 +40,43 @@ Last Update:
 <ul><li>
 <p>Dataset#grep now accepts :all_patterns, :all_columns, and :case_insensitive options.  Previously, grep would use a case sensitive search where it would match if any pattern matched any column.  These three options give you more control over how the pattern matching will work:</p>
 
-<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>)&#x000A;<span class="ruby-comment"># WHERE ((a LIKE &#39;%test%&#39;) OR (a LIKE &#39;foo&#39;)</span>&#x000A;<span class="ruby-comment">#    OR (b LIKE &#39;%test%&#39;) OR (b LIKE &#39;foo&#39;))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, <span class="ruby-value">:all_patterns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%foo%&#39;))</span>&#x000A;<span class="ruby-comment">#   AND ((a LIKE &#39;%bar%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, <span class="ruby-value">:all_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (a LIKE &#39;%bar%&#39;))</span>&#x000A;<span class="ruby-comment">#   AND ((b LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>,&#x000A;             <span class="ruby-value">:all_patterns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>,<span class="ruby-value">:all_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE ((a LIKE &#39;%foo%&#39;) AND (b LIKE &#39;%foo%&#39;)</span>&#x000A;<span class="ruby-comment">#   AND (a LIKE &#39;%bar%&#39;) AND (b LIKE &#39;%bar%&#39;))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>, <span class="ruby-value">:case_insensitive</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE ((a ILIKE &#39;%test%&#39;) OR (a ILIKE &#39;foo&#39;)</span>&#x000A;<span class="ruby-comment">#    OR (b ILIKE &#39;%test%&#39;) OR (b ILIKE &#39;foo&#39;))</span></pre>
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>)
+<span class="ruby-comment"># WHERE ((a LIKE &#39;%test%&#39;) OR (a LIKE &#39;foo&#39;)</span>
+<span class="ruby-comment">#    OR (b LIKE &#39;%test%&#39;) OR (b LIKE &#39;foo&#39;))</span>
+
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, <span class="ruby-value">:all_patterns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%foo%&#39;))</span>
+<span class="ruby-comment">#   AND ((a LIKE &#39;%bar%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>
+
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, <span class="ruby-value">:all_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (a LIKE &#39;%bar%&#39;))</span>
+<span class="ruby-comment">#   AND ((b LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>
+
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>,
+             <span class="ruby-value">:all_patterns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>,<span class="ruby-value">:all_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># WHERE ((a LIKE &#39;%foo%&#39;) AND (b LIKE &#39;%foo%&#39;)</span>
+<span class="ruby-comment">#   AND (a LIKE &#39;%bar%&#39;) AND (b LIKE &#39;%bar%&#39;))</span>
+
+<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>, <span class="ruby-value">:case_insensitive</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># WHERE ((a ILIKE &#39;%test%&#39;) OR (a ILIKE &#39;foo&#39;)</span>
+<span class="ruby-comment">#    OR (b ILIKE &#39;%test%&#39;) OR (b ILIKE &#39;foo&#39;))</span>
+</pre>
 </li><li>
 <p>When using the schema plugin, you can now provide a block to the create_table methods to set the schema and create the table in the same call:</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">create_table</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">create_table</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
+    <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 </li><li>
 <p>The tree plugin now accepts a :single_root option, which uses a before_save hook to attempt to ensure that there is only a single root in the tree.  It also adds a Model.root method to get the single root of the tree.</p>
 </li><li>
 <p>The tree plugin now adds a Model#root? instance method to check if the current node is a root of the tree.</p>
 </li><li>
-<p>Model#save now takes a :raise_on_failure option which will override the object&#39;s raise_on_save_failure setting.  This makes it easier to get the desired behavior (raise or just return false) in library code without using a begin/ensure block.</p>
+<p>Model#save now takes a :raise_on_failure option which will override the object’s raise_on_save_failure setting.  This makes it easier to get the desired behavior (raise or just return false) in library code without using a begin/ensure block.</p>
 </li><li>
 <p>The Database#adapter_scheme instance method was added, which operates the same as the class method.</p>
 </li><li>
@@ -67,7 +93,7 @@ Last Update:
 </li><li>
 <p>Database#each_server now works correctly when a connection string is used to connect, instead of an options hash.</p>
 </li><li>
-<p>Model#destroy now respects the object&#39;s use_transactions setting, instead of always using a transaction.</p>
+<p>Model#destroy now respects the object’s use_transactions setting, instead of always using a transaction.</p>
 </li><li>
 <p>Model#exists? now uses a simpler and faster query.</p>
 </li><li>
@@ -94,7 +120,7 @@ Last Update:
 </li><li>
 <p>The LOCAL_DATETIME_OFFSET_SECS and LOCAL_DATETIME_OFFSET constants have been removed from the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses obj.to_json instead of JSON.generate(obj).  This shouldn&#39;t affect backwards compatibility, but did fix a bug in certain cases.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses obj.to_json instead of JSON.generate(obj).  This shouldn’t affect backwards compatibility, but did fix a bug in certain cases.</p>
 </li></ul>
 </div>
 <div id='context'>
@@ -106,7 +132,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

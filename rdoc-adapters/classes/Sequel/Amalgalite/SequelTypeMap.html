@@ -39,7 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Type conversion map class for Sequel&#39;s use of Amalgamite</p>
+<p>Type conversion map class for Sequel’s use of Amalgamite</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +76,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">20</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">21</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">20</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">21</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
+<span class="line-num">22</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -95,7 +98,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-blob-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-blob-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">blob</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">27</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-blob-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">26</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">blob</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">27</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-datetime'>
@@ -113,7 +119,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-datetime-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-datetime-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">datetime</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">38</span>   <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-datetime-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">datetime</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">38</span>   <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-decimal'>
@@ -131,7 +140,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-decimal-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-decimal-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">decimal</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-constant">BigDecimal</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-decimal-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">decimal</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">33</span>   <span class="ruby-constant">BigDecimal</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-result_value_of'>
@@ -142,14 +154,23 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Don&#39;t raise an error if the value is a string and the declared type doesn&#39;t match a known type, just return the value.</p>
+<p>Don’t raise an error if the value is a string and the declared type doesn’t match a known type, just return the value.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-result_value_of-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-result_value_of-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">result_value_of</span>(<span class="ruby-identifier">declared_type</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>)&#x000A;<span class="line-num">49</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>)&#x000A;<span class="line-num">50</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">declared_type</span>&#x000A;<span class="line-num">51</span>     (<span class="ruby-identifier">meth</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">sql_to_method</span>(<span class="ruby-identifier">declared_type</span>.<span class="ruby-identifier">downcase</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">value</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">value</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">53</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-result_value_of-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">result_value_of</span>(<span class="ruby-identifier">declared_type</span>, <span class="ruby-identifier">value</span>)
+<span class="line-num">48</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>)
+<span class="line-num">49</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>)
+<span class="line-num">50</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">declared_type</span>
+<span class="line-num">51</span>     (<span class="ruby-identifier">meth</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">sql_to_method</span>(<span class="ruby-identifier">declared_type</span>.<span class="ruby-identifier">downcase</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">value</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">value</span>
+<span class="line-num">52</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">53</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">54</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-time'>
@@ -165,7 +186,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-time-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-time-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">time</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-time-source'>   <span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb</span>
+<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">time</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">42</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -177,7 +201,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

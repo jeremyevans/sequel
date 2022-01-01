@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v5.51.0</h2>
+    <h2>Sequel::Model Plugins for v5.52.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -156,6 +156,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/List.html">list</a>: Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingularTableNames.html">singular_table_names</a>: Makes Sequel default to not pluralizing table names.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/SqlComments.html">sql_comments</a>: Supports automatically adding comments to queries to show which class, instance, dataset, or association method triggered the query.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses</a>: Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
 </ul></li>
@@ -232,6 +233,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_logging_rb.html">server_logging</a>: Include server/shard information when logging queries.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Database#with_comments method, for automatically using comments for queries exceuted inside a block.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_log_normalizer_rb.html">sql_log_normalizer</a>: Normalizes SQL before logging, helpful for analytics and sensitive data.</li>
 </ul>
 
@@ -276,6 +278,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>: Adds refinement versions of Sequel's core extensions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/escaped_like_rb.html">escaped_like</a>: Support creation of LIKE expressions with placeholders in the pattern without access to a dataset.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/date_parse_input_handler_rb.html">date_parse_input_handler</a>: Allows for custom handling of input strings to the date parsing methods.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/datetime_parse_to_time_rb.html">datetime_parse_to_time</a>: Uses DateTime.parse.to_time to parse timestamp strings without offset information where such timestamps are assumed to be in UTC.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency</a>: Uses Fiber.current instead of Thread.current as the key for checking out connections.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>

@@ -80,7 +80,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">stmt</span>)&#x000A;<span class="line-num">125</span>   <span class="ruby-ivar">@stmt</span> = <span class="ruby-identifier">stmt</span>&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">stmt</span>)
+<span class="line-num">125</span>   <span class="ruby-ivar">@stmt</span> = <span class="ruby-identifier">stmt</span>
+<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -99,7 +102,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-affected-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-affected-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">affected</span>&#x000A;<span class="line-num">130</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">num_rows</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-affected-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">129</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">affected</span>
+<span class="line-num">130</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">num_rows</span>(<span class="ruby-ivar">@stmt</span>)
+<span class="line-num">131</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute'>
@@ -117,7 +123,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">135</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">136</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">137</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">135</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">136</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">values</span>)
+<span class="line-num">137</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-fetch_array'>
@@ -135,7 +144,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-fetch_array-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-fetch_array-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">140</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_array</span>&#x000A;<span class="line-num">141</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">fetch_array</span>(<span class="ruby-ivar">@stmt</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@stmt</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-fetch_array-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">140</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_array</span>
+<span class="line-num">141</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">fetch_array</span>(<span class="ruby-ivar">@stmt</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@stmt</span>
+<span class="line-num">142</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-field_name'>
@@ -153,7 +165,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-field_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-field_name-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">145</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">field_name</span>(<span class="ruby-identifier">ind</span>)&#x000A;<span class="line-num">146</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_name</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">ind</span>)&#x000A;<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-field_name-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">145</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">field_name</span>(<span class="ruby-identifier">ind</span>)
+<span class="line-num">146</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_name</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">ind</span>)
+<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-field_precision'>
@@ -171,7 +186,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-field_precision-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-field_precision-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">155</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">field_precision</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">156</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_precision</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">157</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-field_precision-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">155</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">field_precision</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">156</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_precision</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">157</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-field_type'>
@@ -189,7 +207,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-field_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-field_type-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">field_type</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">151</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_type</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">152</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-field_type-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">field_type</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">151</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">field_type</span>(<span class="ruby-ivar">@stmt</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">152</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-free'>
@@ -207,7 +228,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-free-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-free-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">free</span>&#x000A;<span class="line-num">161</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">free_stmt</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="line-num">162</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-free-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">160</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">free</span>
+<span class="line-num">161</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">free_stmt</span>(<span class="ruby-ivar">@stmt</span>)
+<span class="line-num">162</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-free_result'>
@@ -225,7 +249,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-free_result-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-free_result-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">free_result</span>&#x000A;<span class="line-num">167</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">free_result</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-free_result-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">166</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">free_result</span>
+<span class="line-num">167</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">free_result</span>(<span class="ruby-ivar">@stmt</span>)
+<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-num_fields'>
@@ -243,7 +270,10 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-num_fields-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-num_fields-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">num_fields</span>&#x000A;<span class="line-num">172</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">num_fields</span>(<span class="ruby-ivar">@stmt</span>)&#x000A;<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-num_fields-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
+<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">num_fields</span>
+<span class="line-num">172</span>   <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">num_fields</span>(<span class="ruby-ivar">@stmt</span>)
+<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -255,7 +285,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

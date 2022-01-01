@@ -39,19 +39,28 @@ Sequel::Plugins::UpdateOrCreate
 
 <p>You can call update_or_create with a block:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>or provide two hashes, with the second one being the attributes to set.</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Hello&#39;</span>}, <span class="ruby-value">num_copies_sold:</span> <span class="ruby-value">1000</span>)</pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Hello&#39;</span>}, <span class="ruby-value">num_copies_sold:</span> <span class="ruby-value">1000</span>)
+</pre>
 
 <p>In both cases, this will check the database to find the album with the name “Hello”. If such an album exists, it will be updated to set num_copies_sold to 1000.  If no such album exists, an album with the name “Hello” and num_copies_sold 1000 will be created.</p>
 
-<p>The second method is find_or_new, which returns the object from the database if it exists, or returns a new (unsaved) object if not. It has the same API as update_or_create, and operates identically to update_or_create except that it doesn&#39;t persist any changes.</p>
+<p>The second method is find_or_new, which returns the object from the database if it exists, or returns a new (unsaved) object if not. It has the same API as update_or_create, and operates identically to update_or_create except that it doesn’t persist any changes.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Make all model subclass support update_or_create</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_or_create</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support update_or_create</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_or_create</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass support update_or_create</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_or_create</span>
+
+<span class="ruby-comment"># Make the Album class support update_or_create</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_or_create</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -70,7 +79,7 @@ Sequel::Plugins::UpdateOrCreate
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

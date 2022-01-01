@@ -35,13 +35,17 @@ Sequel::Plugins::TypecastOnLoad
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The typecast_on_load plugin exists because most of Sequel&#39;s database adapters don&#39;t have complete control over typecasting, and may return columns that aren&#39;t typecast correctly (with correct being defined as how the model object would typecast the same column values).</p>
+<p>The typecast_on_load plugin exists because most of Sequel’s database adapters don’t have complete control over typecasting, and may return columns that aren’t typecast correctly (with correct being defined as how the model object would typecast the same column values).</p>
 
 <p>This plugin makes model loading call the setter methods (which typecast by default) for all columns given.  You can either specify the columns to typecast on load in the plugin call itself, or afterwards using  add_typecast_on_load_columns:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:typecast_on_load</span>, <span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:typecast_on_load</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_typecast_on_load_columns</span> <span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span></pre>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:typecast_on_load</span>, <span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>
+<span class="ruby-comment"># or:</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:typecast_on_load</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_typecast_on_load_columns</span> <span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>
+</pre>
 
-<p>If the database returns release_date and record_date columns as strings instead of dates, this will ensure that if you access those columns through the model object, you&#39;ll get Date objects instead of strings.</p>
+<p>If the database returns release_date and record_date columns as strings instead of dates, this will ensure that if you access those columns through the model object, you’ll get Date objects instead of strings.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -77,7 +81,13 @@ Sequel::Plugins::TypecastOnLoad
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>&#x000A;<span class="line-num">25</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">26</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">27</span>     <span class="ruby-ivar">@typecast_on_load_columns</span> <span class="ruby-operator">||=</span> []&#x000A;<span class="line-num">28</span>     <span class="ruby-identifier">add_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">29</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>
+<span class="line-num">25</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)
+<span class="line-num">26</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">27</span>     <span class="ruby-ivar">@typecast_on_load_columns</span> <span class="ruby-operator">||=</span> []
+<span class="line-num">28</span>     <span class="ruby-identifier">add_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)
+<span class="line-num">29</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -89,7 +99,7 @@ Sequel::Plugins::TypecastOnLoad
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -44,31 +44,36 @@ Last Update:
 
 <p>You can get the adapter in use using Database#adapter_scheme:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-comment"># :postgres, :jdbc, :odbc</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-comment"># :postgres, :jdbc, :odbc</span>
+</pre>
 
 <h2 id="label-Database+Connected+To">Database Connected To<span><a href="#label-Database+Connected+To">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>In some cases, the adapter scheme will be the same as the database to which you are connecting.  However, many adapters support multiple databases.  You can use the Database#database_type method to get the type of database to which you are connecting:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-comment"># :postgres, :h2, :mssql</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-comment"># :postgres, :h2, :mssql</span>
+</pre>
 
 <h2 id="label-Tables+in+the+Database">Tables in the Database<span><a href="#label-Tables+in+the+Database">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Database#tables gives an array of table name symbols:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span> <span class="ruby-comment"># [:table1, :table2, :table3, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span> <span class="ruby-comment"># [:table1, :table2, :table3, ...]</span>
+</pre>
 
 <h2 id="label-Views+in+the+Database">Views in the Database<span><a href="#label-Views+in+the+Database">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Database#views and gives an array of view name symbols:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">views</span> <span class="ruby-comment"># [:view1, :view2, :view3, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">views</span> <span class="ruby-comment"># [:view1, :view2, :view3, ...]</span>
+</pre>
 
 <h2 id="label-Indexes+on+a+table">Indexes on a table<span><a href="#label-Indexes+on+a+table">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Database#indexes takes a table name gives a hash of index information.  Keys are index names, values are subhashes with the keys :columns and :unique :</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">indexes</span>(<span class="ruby-value">:table1</span>) <span class="ruby-comment"># {:index1=&gt;{:columns=&gt;[:column1], :unique=&gt;false}, :index2=&gt;{:columns=&gt;[:column2, :column3], :unique=&gt;true}}</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">indexes</span>(<span class="ruby-value">:table1</span>) <span class="ruby-comment"># {:index1=&gt;{:columns=&gt;[:column1], :unique=&gt;false}, :index2=&gt;{:columns=&gt;[:column2, :column3], :unique=&gt;true}}</span>
+</pre>
 
 <p>Index information generally does not include partial indexes, functional indexes, or indexes on the primary key of the table.</p>
 
@@ -76,7 +81,8 @@ Last Update:
 
 <p>Database#foreign_key_list takes a table name and gives an array of hashes of foreign key information:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-value">:table1</span>) <span class="ruby-comment"># [{:columns=&gt;[:column1], :table=&gt;:referenced_table, :key=&gt;[:referenced_column1]}]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-value">:table1</span>) <span class="ruby-comment"># [{:columns=&gt;[:column1], :table=&gt;:referenced_table, :key=&gt;[:referenced_column1]}]</span>
+</pre>
 
 <p>At least the following entries will be present in the hash:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:columns </td><td>
@@ -117,27 +123,32 @@ Last Update:
 
 <p>Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-value">:table</span>) <span class="ruby-comment"># [[:column1, {:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}], ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-value">:table</span>) <span class="ruby-comment"># [[:column1, {:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}], ...]</span>
+</pre>
 
 <h2 id="label-Column+Information+for+a+Model">Column Information for a Model<span><a href="#label-Column+Information+for+a+Model">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Model#db_schema returns pretty much the same information, except it returns it as a hash with column keys instead of an array of two element arrays.</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db_schema</span> <span class="ruby-comment"># {:column1=&gt;{:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}, ...}</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db_schema</span> <span class="ruby-comment"># {:column1=&gt;{:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}, ...}</span>
+</pre>
 
 <h2 id="label-Columns+used+by+a+dataset-2Fmodel">Columns used by a dataset/model<span><a href="#label-Columns+used+by+a+dataset-2Fmodel">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>Dataset#columns returns the columns of the current dataset as an array of symbols:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">columns</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">columns</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span>
+</pre>
 
 <p>Dataset#columns! does the same thing, except it ignores any cached value.  In general, the cached value should never be incorrect, unless the database schema is changed after the dataset is created.</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">columns!</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">columns!</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span>
+</pre>
 
-<p>Model.columns does the same thing as Dataset#columns, using the model&#39;s dataset:</p>
+<p>Model.columns does the same thing as Dataset#columns, using the model’s dataset:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">columns</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">columns</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span>
+</pre>
 
 <h2 id="label-Associations+Defined">Associations Defined<span><a href="#label-Associations+Defined">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -145,29 +156,35 @@ Last Update:
 
 <p>You can get an array of association symbols with Model.associations:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">associations</span> <span class="ruby-comment"># [:association1, :association2, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">associations</span> <span class="ruby-comment"># [:association1, :association2, ...]</span>
+</pre>
 
 <p>You can get the association reflection for a single association via the Model.association_reflection.  Association reflections are subclasses of hash:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:association1</span>) <span class="ruby-comment"># #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:association1</span>) <span class="ruby-comment"># #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;</span>
+</pre>
 
 <p>You can get an array of all association reflections via Model.all_association_reflections:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">all_association_reflections</span> <span class="ruby-comment"># [#&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;, ...]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">all_association_reflections</span> <span class="ruby-comment"># [#&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;, ...]</span>
+</pre>
 
 <p>Finally, you can get a hash of association reflections via Model.association_reflections:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflections</span> <span class="ruby-comment"># {:association1=&gt;#&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;, ...}</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflections</span> <span class="ruby-comment"># {:association1=&gt;#&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;, ...}</span>
+</pre>
 
 <h2 id="label-Validations+Defined">Validations Defined<span><a href="#label-Validations+Defined">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>When using the validation_class_methods plugin, you can use the validation_reflections class method to get a hash with validation reflection information.  This returns a hash keyed on the column name symbol:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">validation_reflections</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># =&gt; [[:presence, {}], [:length, {:maximum=&gt;255, :message=&gt;&#39;is just too long&#39;}]]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">validation_reflections</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># =&gt; [[:presence, {}], [:length, {:maximum=&gt;255, :message=&gt;&#39;is just too long&#39;}]]</span>
+</pre>
 
 <p>Similarly, when using the constraint_validations plugin, you can use the constraint_validation_reflections class method:</p>
 
-<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">constraint_validation_reflections</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># =&gt; [[:presence, {}], [:max_length, {:argument=&gt;255, :message=&gt;&#39;is just too long&#39;}]]</span></pre>
+<pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">constraint_validation_reflections</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># =&gt; [[:presence, {}], [:max_length, {:argument=&gt;255, :message=&gt;&#39;is just too long&#39;}]]</span>
+</pre>
 </div>
 <div id='context'>
 </div>
@@ -178,7 +195,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>

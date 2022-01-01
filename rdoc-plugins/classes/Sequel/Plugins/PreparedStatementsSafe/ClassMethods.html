@@ -79,7 +79,12 @@ Sequel::Plugins::PreparedStatementsSafe::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">43</span>   <span class="ruby-ivar">@prepared_statements_column_defaults</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@prepared_statements_column_defaults</span>&#x000A;<span class="line-num">44</span> &#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>
+<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">43</span>   <span class="ruby-ivar">@prepared_statements_column_defaults</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@prepared_statements_column_defaults</span>
+<span class="line-num">44</span> 
+<span class="line-num">45</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -91,7 +96,7 @@ Sequel::Plugins::PreparedStatementsSafe::ClassMethods
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
 </div>
 </body>
 </html>
