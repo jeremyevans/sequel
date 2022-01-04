@@ -356,7 +356,7 @@ module Sequel
 
         # Keys should be an array of arrays containing key_id, key string, auth_data, and padding.
         def initialize(keys)
-          if keys.empty?
+          if !keys || keys.empty?
             raise Error, "Cannot initialize encryptor without encryption key"
           end
 

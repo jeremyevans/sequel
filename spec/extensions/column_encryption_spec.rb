@@ -193,6 +193,17 @@ describe "column_encryption plugin" do
     proc{obj.enc}.must_raise Sequel::Error
   end
 
+  it "should raise an error when trying to decrypt without any keys set" do
+    @model = Class.new(Sequel::Model)
+    @model.set_dataset @db[:ce_test]
+    @model.columns :id, :not_enc, :enc
+    proc do
+      @model.plugin :column_encryption do |enc|
+        enc.column :enc
+      end
+    end.must_raise Sequel::Error
+  end
+
   it "should raise an error when trying to decrypt with invalid key" do
     @model.plugin :column_encryption do |enc|
       enc.key 0, "1"*32

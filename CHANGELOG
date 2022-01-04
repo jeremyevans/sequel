@@ -1,3 +1,7 @@
+=== master
+
+* Fix error handling if trying to setup column_encryption plugin without keys (jeremyevans) (#1815)
+
 === 5.52.0 (2022-01-01)
 
 * Use Class#subclasses if available in the subclasses plugin, instead of a custom Model.subclasses accessor (jeremyevans)
