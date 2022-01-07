@@ -24,6 +24,7 @@ module Sequel
 
         def freeze
           h2_version
+          version2?
           super
         end
 
@@ -140,13 +141,36 @@ module Sequel
           DATABASE_ERROR_REGEXPS
         end
 
-        # Use IDENTITY() to get the last inserted id.
+        def execute_statement_insert(stmt, sql)
+          stmt.executeUpdate(sql, JavaSQL::Statement::RETURN_GENERATED_KEYS)
+        end
+
+        def prepare_jdbc_statement(conn, sql, opts)
+          opts[:type] == :insert ? conn.prepareStatement(sql, JavaSQL::Statement::RETURN_GENERATED_KEYS) : super
+        end
+
+        # Get the last inserted id using getGeneratedKeys, scope_identity, or identity.
         def last_insert_id(conn, opts=OPTS)
-          statement(conn) do |stmt|
-            sql = 'SELECT IDENTITY();'
-            rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
-            rs.next
-            rs.getLong(1)
+          if stmt = opts[:stmt]
+            rs = stmt.getGeneratedKeys
+            begin
+              if rs.next
+                begin
+                  rs.getLong(1)
+                rescue
+                  rs.getObject(1) rescue nil
+                end
+              end
+            ensure
+              rs.close
+            end
+          elsif !version2?
+            statement(conn) do |stmt|
+              sql = 'SELECT IDENTITY()'
+              rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
+              rs.next
+              rs.getLong(1)
+            end
           end
         end
         
@@ -161,7 +185,12 @@ module Sequel
 
         # Use BIGINT IDENTITY for identity columns that use :Bignum type
         def type_literal_generic_bignum_symbol(column)
-          column[:identity] ? 'BIGINT IDENTITY' : super
+          column[:identity] ? 'BIGINT AUTO_INCREMENT' : super
+        end
+
+        def version2?
+          return @version2 if defined?(@version2)
+          @version2 = h2_version.to_i >= 2
         end
       end
       
@@ -209,9 +238,21 @@ module Sequel
 
         # H2 expects hexadecimal strings for blob values
         def literal_blob_append(sql, v)
-          sql << "'" << v.unpack("H*").first << "'"
+          if db.send(:version2?)
+            super
+          else
+            sql << "'" << v.unpack("H*").first << "'"
+          end
+        end
+
+        def literal_false
+          'FALSE'
         end
         
+        def literal_true
+          'TRUE'
+        end
+
         # H2 handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
           v.strftime("'%H:%M:%S'")
@@ -223,8 +264,12 @@ module Sequel
         end
 
         def select_only_offset_sql(sql)
-          sql << " LIMIT -1 OFFSET "
-          literal_append(sql, @opts[:offset])
+          if db.send(:version2?)
+            super
+          else
+            sql << " LIMIT -1 OFFSET "
+            literal_append(sql, @opts[:offset])
+          end
         end
 
         # H2 supports quoted function names.
