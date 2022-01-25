@@ -108,7 +108,7 @@ module Sequel
 
       # Call the ANY function:
       #
-      #   array_op.all # ANY(array)
+      #   array_op.any # ANY(array)
       #
       # Usually used like:
       #
