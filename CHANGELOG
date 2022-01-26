@@ -1,5 +1,7 @@
 === master
 
+* Fix prepared statements in the mysql2 adapter to reuse native prepared statements (jeremyevans) (#1832)
+
 * Support H2 version 2+ in the jdbc/h2 adapter (jeremyevans) (#1817)
 
 * Work around active_support breaking subclasses plugin on Ruby <3.1 (jeremyevans) (#1816)

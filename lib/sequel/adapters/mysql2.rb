@@ -86,20 +86,26 @@ module Sequel
       if NativePreparedStatements
         # Use a native mysql2 prepared statement to implement prepared statements.
         def execute_prepared_statement(ps_name, opts, &block)
-          ps = prepared_statement(ps_name)
+          if ps_name.is_a?(Sequel::Dataset::ArgumentMapper)
+            ps = ps_name
+            ps_name = ps.prepared_statement_name
+          else
+            ps = prepared_statement(ps_name) 
+          end
           sql = ps.prepared_sql
 
           synchronize(opts[:server]) do |conn|
             stmt, ps_sql = conn.prepared_statements[ps_name]
             unless ps_sql == sql
               stmt.close if stmt
-              stmt = log_connection_yield(conn, "Preparing #{ps_name}: #{sql}"){conn.prepare(sql)}
+              stmt = log_connection_yield("Preparing #{ps_name}: #{sql}", conn){conn.prepare(sql)}
               conn.prepared_statements[ps_name] = [stmt, sql]
             end
 
-            if ps.log_sql
-              opts = Hash[opts]
-              opts = opts[:log_sql] = " (#{sql})"
+            opts = Hash[opts]
+            opts[:sql] = "Executing #{ps_name || sql}"
+            if ps_name && ps.log_sql
+              opts[:log_sql] = " (#{sql})"
             end
 
             _execute(conn, stmt, opts, &block)
@@ -120,6 +126,7 @@ module Sequel
           case sql
           when ::Mysql2::Statement
             stmt = sql
+            sql = opts[:sql] || ''
           when Dataset
             sql = sql.sql
             close_stmt = true

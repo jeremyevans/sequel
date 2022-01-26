@@ -34,7 +34,7 @@ module Sequel
         def execute(sql, opts=OPTS, &block)
           if opts[:sproc]
             call_sproc(sql, opts, &block)
-          elsif sql.is_a?(Symbol)
+          elsif sql.is_a?(Symbol) || sql.is_a?(Sequel::Dataset::ArgumentMapper)
             execute_prepared_statement(sql, opts, &block)
           else
             synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
