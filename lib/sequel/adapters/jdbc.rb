@@ -188,12 +188,12 @@ module Sequel
         args = opts[:args] || []
         sql = "{call #{name}(#{args.map{'?'}.join(',')})}"
         synchronize(opts[:server]) do |conn|
-          cps = conn.prepareCall(sql)
-
-          i = 0
-          args.each{|arg| set_ps_arg(cps, arg, i+=1)}
-
           begin
+            cps = conn.prepareCall(sql)
+
+            i = 0
+            args.each{|arg| set_ps_arg(cps, arg, i+=1)}
+
             if defined?(yield)
               yield log_connection_yield(sql, conn){cps.executeQuery}
             else
@@ -205,7 +205,7 @@ module Sequel
           rescue *DATABASE_ERROR_CLASSES => e
             raise_error(e)
           ensure
-            cps.close
+            cps.close if cps
           end
         end
       end
