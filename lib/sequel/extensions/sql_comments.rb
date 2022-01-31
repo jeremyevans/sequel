@@ -170,6 +170,8 @@ module Sequel
     module DatasetSQLComments
       include Sequel::SQLComments
 
+      private
+
       # Include comments added via Database#with_comments in the output SQL.
       def _sql_comment
         specific_comment = super

@@ -1,5 +1,7 @@
 === master
 
+* Make Dataset#_sql_comment private when using the Database sql_comments extension (jeremyevans)
+
 * Fix prepared statements in the mysql2 adapter to reuse native prepared statements (jeremyevans) (#1832)
 
 * Support H2 version 2+ in the jdbc/h2 adapter (jeremyevans) (#1817)
