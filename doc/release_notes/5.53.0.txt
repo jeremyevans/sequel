@@ -1,0 +1,23 @@
+= Improvements
+
+* The jdbc/h2 subadapter now supports H2 version 2.0.  It continues to
+  support H2 versions 1.3 and 1.4.
+
+* The mysql2 adapter's prepared statement support now reuses existing
+  native prepared statements, instead of only binding variables on
+  newly prepared statements.  This was the intended behavior
+  previously, and should result in increased performance in cases
+  where preparing a query takes significant time.
+
+* The subclasses plugin now ignores an existing Class#subclasses
+  method if it is defined in Ruby.  This fixes cases where usage of
+  ActiveSupport would break the subclasses plugin.
+
+* Database#call_sproc in the jdbc adapter will now always close the
+  prepared call it creates.  Before, if there was an exception raised
+  when setting the arguments for the prepared call, the prepared call
+  would not be closed.
+
+* A more appropriate error is now issued if you try to use the
+  column_encryption plugin to encrypt a column without setting up an
+  encryption key.
