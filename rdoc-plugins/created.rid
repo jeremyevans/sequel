@@ -1,4 +1,4 @@
-Sat, 01 Jan 2022 14:54:49 -0800
+Tue, 01 Feb 2022 08:13:11 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -43,7 +43,7 @@ lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/null_dataset.rb	Fri, 08 Dec 2017 12:55:50 -0800
 lib/sequel/extensions/pagination.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/extensions/pg_array.rb	Fri, 04 Dec 2020 13:44:07 -0800
-lib/sequel/extensions/pg_array_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
+lib/sequel/extensions/pg_array_ops.rb	Tue, 25 Jan 2022 08:40:33 -0800
 lib/sequel/extensions/pg_enum.rb	Fri, 09 Apr 2021 07:38:35 -0700
 lib/sequel/extensions/pg_extended_date_support.rb	Wed, 22 Sep 2021 11:50:26 -0700
 lib/sequel/extensions/pg_hstore.rb	Mon, 16 Mar 2020 11:01:23 -0700
@@ -73,7 +73,7 @@ lib/sequel/extensions/sequel_4_dataset_methods.rb	Thu, 10 Jan 2019 07:53:39 -080
 lib/sequel/extensions/server_block.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/extensions/server_logging.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/extensions/split_array_nil.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/extensions/sql_comments.rb	Thu, 02 Dec 2021 16:40:01 -0800
+lib/sequel/extensions/sql_comments.rb	Tue, 01 Feb 2022 08:07:06 -0800
 lib/sequel/extensions/sql_expr.rb	Fri, 14 Oct 2016 13:06:50 -0700
 lib/sequel/extensions/sql_log_normalizer.rb	Mon, 11 Oct 2021 08:09:16 -0700
 lib/sequel/extensions/string_agg.rb	Tue, 21 Sep 2021 14:24:30 -0700
@@ -104,7 +104,7 @@ lib/sequel/plugins/boolean_subsets.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/plugins/caching.rb	Fri, 25 Oct 2019 08:54:59 -0700
 lib/sequel/plugins/class_table_inheritance.rb	Thu, 01 Oct 2020 08:09:24 -0700
 lib/sequel/plugins/column_conflicts.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/column_encryption.rb	Tue, 21 Sep 2021 14:24:30 -0700
+lib/sequel/plugins/column_encryption.rb	Tue, 04 Jan 2022 16:14:46 -0800
 lib/sequel/plugins/column_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/columns_updated.rb	Tue, 28 Mar 2017 16:44:29 -0700
 lib/sequel/plugins/composition.rb	Wed, 27 Oct 2021 08:42:57 -0700
@@ -157,7 +157,7 @@ lib/sequel/plugins/sql_comments.rb	Thu, 02 Dec 2021 16:23:35 -0800
 lib/sequel/plugins/static_cache.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/plugins/static_cache_cache.rb	Tue, 06 Aug 2019 13:51:01 -0700
 lib/sequel/plugins/string_stripper.rb	Thu, 09 Jul 2020 12:21:33 -0700
-lib/sequel/plugins/subclasses.rb	Mon, 20 Dec 2021 12:57:43 -0800
+lib/sequel/plugins/subclasses.rb	Wed, 05 Jan 2022 16:06:20 -0800
 lib/sequel/plugins/subset_conditions.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/table_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/tactical_eager_loading.rb	Fri, 19 Nov 2021 23:55:56 -0800

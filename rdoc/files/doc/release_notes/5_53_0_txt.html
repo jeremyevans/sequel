@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.53.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.53.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.53.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-02-01 08:07:06 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The jdbc/h2 subadapter now supports H2 version 2.0.  It continues to support H2 versions <a href="1_3_txt.html">1.3</a> and 1.4.</p>
+</li><li>
+<p>The mysql2 adapter’s prepared statement support now reuses existing native prepared statements, instead of only binding variables on newly prepared statements.  This was the intended behavior previously, and should result in increased performance in cases where preparing a query takes significant time.</p>
+</li><li>
+<p>The subclasses plugin now ignores an existing Class#subclasses method if it is defined in Ruby.  This fixes cases where usage of ActiveSupport would break the subclasses plugin.</p>
+</li><li>
+<p>Database#call_sproc in the jdbc adapter will now always close the prepared call it creates.  Before, if there was an exception raised when setting the arguments for the prepared call, the prepared call would not be closed.</p>
+</li><li>
+<p>A more appropriate error is now issued if you try to use the column_encryption plugin to encrypt a column without setting up an encryption key.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-12-30 13:02:13 -0800</span>
+<span class='datetime'>2022-02-01 08:07:06 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.53.0+-282022-02-01-29"><a href="doc/release_notes/5_53_0_txt.html">5.53.0</a> (2022-02-01)<span><a href="#label-5.53.0+-282022-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make Dataset#_sql_comment private when using the Database sql_comments extension (jeremyevans)</p>
+</li><li>
+<p>Fix prepared statements in the mysql2 adapter to reuse native prepared statements (jeremyevans) (#1832)</p>
+</li><li>
+<p>Support H2 version 2+ in the jdbc/h2 adapter (jeremyevans) (#1817)</p>
+</li><li>
+<p>Work around active_support breaking subclasses plugin on Ruby &lt;3.1 (jeremyevans) (#1816)</p>
+</li><li>
+<p>Fix error handling if trying to setup column_encryption plugin without keys (jeremyevans) (#1815)</p>
+</li></ul>
+
 <h3 id="label-5.52.0+-282022-01-01-29"><a href="doc/release_notes/5_52_0_txt.html">5.52.0</a> (2022-01-01)<span><a href="#label-5.52.0+-282022-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Use Class#subclasses if available in the subclasses plugin, instead of a custom Model.subclasses accessor (jeremyevans)</p>

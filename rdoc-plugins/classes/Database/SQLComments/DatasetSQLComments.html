@@ -35,13 +35,6 @@ Database::SQLComments::DatasetSQLComments
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
-<div id='method-list'>
-<h2>Methods</h2>
-<h3>Public Instance</h3>
-<ol>
-<li><a href="#method-i-_sql_comment">_sql_comment</a></li>
-</ol>
-</div>
 <div id='context'>
 <div id='includes'>
 <h2>Included modules</h2>
@@ -51,49 +44,6 @@ Database::SQLComments::DatasetSQLComments
 </div>
 </div>
 <div id='section'>
-<div id='methods'>
-<h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-_sql_comment'>
-<a name='method-i-_sql_comment'></a>
-<div class='synopsis'>
-<span class='name'>_sql_comment</span><span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Include comments added via Database#with_comments in the output SQL.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_sql_comment-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-_sql_comment-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sql_comments.rb</span>
-<span class="line-num">174</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_sql_comment</span>
-<span class="line-num">175</span>   <span class="ruby-identifier">specific_comment</span> = <span class="ruby-keyword">super</span>
-<span class="line-num">176</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">specific_comment</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:append_sql</span>]
-<span class="line-num">177</span> 
-<span class="line-num">178</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>
-<span class="line-num">179</span>   <span class="ruby-identifier">hashes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">comment_hashes</span>
-<span class="line-num">180</span>   <span class="ruby-identifier">block_comment</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">comment_hash</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">hashes</span>[<span class="ruby-identifier">t</span>]}
-<span class="line-num">181</span>     <span class="ruby-identifier">comment_array</span> = <span class="ruby-identifier">comment_hash</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{k}:#{v}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}
-<span class="line-num">182</span>     <span class="ruby-identifier">comment_array</span>.<span class="ruby-identifier">compact!</span>
-<span class="line-num">183</span>     <span class="ruby-identifier">comment_array</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;,&quot;</span>)
-<span class="line-num">184</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">185</span> 
-<span class="line-num">186</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_comment</span>
-<span class="line-num">187</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">specific_comment</span>
-<span class="line-num">188</span>       <span class="ruby-identifier">format_sql_comment</span>(<span class="ruby-identifier">block_comment</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">specific_comment</span>)
-<span class="line-num">189</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">190</span>       <span class="ruby-identifier">format_sql_comment</span>(<span class="ruby-identifier">block_comment</span>)
-<span class="line-num">191</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">192</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">193</span>     <span class="ruby-identifier">specific_comment</span>
-<span class="line-num">194</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-</div>
 </div>
 
 </div>
