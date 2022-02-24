@@ -1,3 +1,7 @@
+=== master
+
+* Add enum plugin for treating columns as enums in a model (jeremyevans) (#1839)
+
 === 5.53.0 (2022-02-01)
 
 * Make Dataset#_sql_comment private when using the Database sql_comments extension (jeremyevans)
