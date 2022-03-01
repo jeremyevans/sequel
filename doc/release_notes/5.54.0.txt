@@ -1,0 +1,27 @@
+= New Feature
+
+* An enum plugin has been added.  This plugin allows you to create
+  model-level enums, giving names to underlying values of a column.
+  For example:
+
+    Album.plugin :enum
+    Album.enum :status_id, good: 1, bad: 2
+
+  Adds Album#good! and Album#bad! for changing the status_id to 1 or 
+  2 respectively.  It adds Album#good? and Album#bad? for checking
+  whether the status_id is 1 or 2 respectively.  It overrides
+  Album#status_id to return :good or :bad instead of 1 or 2,
+  respectively, and overrides Album#status_id= to accept :good or
+  :bad instead of 1 or 2 respectively.
+
+  Additionally, it adds good and bad dataset methods for filtering
+  the model's dataset to records where status_id is 1 or 2
+  respectively. It also adds not_good and not_bad dataset methods
+  for filtering the model's dataset to records where status_id is not
+  1 or not 2 respectively.
+
+  You can use :prefix and :suffix options when calling enum to
+  add a prefix or suffix to the method names created.  You can
+  set the :override_accessors option to false to not override
+  the accessor methods for the column, and set the :dataset_methods
+  option to false to not add dataset methods.
