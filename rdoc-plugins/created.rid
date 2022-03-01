@@ -1,4 +1,4 @@
-Tue, 01 Feb 2022 08:13:11 -0800
+Tue, 01 Mar 2022 08:14:46 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -119,6 +119,7 @@ lib/sequel/plugins/dirty.rb	Mon, 05 Oct 2020 18:05:43 -0700
 lib/sequel/plugins/eager_each.rb	Fri, 16 Jun 2017 12:40:57 -0700
 lib/sequel/plugins/eager_graph_eager.rb	Mon, 06 Aug 2018 08:40:06 -0700
 lib/sequel/plugins/empty_failure_backtraces.rb	Wed, 08 Jan 2020 16:27:45 -0800
+lib/sequel/plugins/enum.rb	Thu, 24 Feb 2022 13:38:42 -0800
 lib/sequel/plugins/error_splitter.rb	Mon, 09 Apr 2018 12:34:09 -0700
 lib/sequel/plugins/finder.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/forbid_lazy_load.rb	Thu, 09 Jul 2020 12:21:33 -0700

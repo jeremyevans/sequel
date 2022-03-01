@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::Enum</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::Enum
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/enum_rb.html">lib/sequel/plugins/enum.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The enum plugin allows for easily adding methods to modify the value of a column.  It allows treating the column itself as an enum, returning a symbol for the related enum value.  It also allows for setting up dataset methods to easily find records having or not having each enum value.</p>
+
+<p>After loading the plugin, you can call the <code>enum</code> method to define the methods.  The <code>enum</code> method accepts a symbol for the underlying database column, and a hash with symbol keys for the enum values. For example, the following call:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">enum</span> <span class="ruby-value">:status_id</span>, <span class="ruby-value">good:</span> <span class="ruby-value">1</span>, <span class="ruby-value">bad:</span> <span class="ruby-value">2</span>
+</pre>
+
+<p>Will define the following instance methods:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>Album#good! </td><td>
+<p>Change <code>status_id</code> to <code>1</code> (does not save the receiver)</p>
+</td></tr><tr><td class='label'>Album#bad! </td><td>
+<p>Change <code>status_id</code> to <code>2</code> (does not save the receiver)</p>
+</td></tr><tr><td class='label'>Album#good? </td><td>
+<p>Return whether <code>status_id</code> is <code>1</code></p>
+</td></tr><tr><td class='label'>Album#bad? </td><td>
+<p>Return whether <code>status_id</code> is <code>2</code></p>
+</td></tr></tbody></table>
+
+<p>It will override the following instance methods:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>Album#status_id </td><td>
+<p>Return <code>:good</code>/<code>:bad</code> instead of <code>1</code>/<code>2</code> (other values returned as-is)</p>
+</td></tr><tr><td class='label'>Album#status_id= </td><td>
+<p>Allow calling with <code>:good</code>/<code>:bad</code> to set <code>status_id</code> to <code>1</code>/<code>2</code> (other values, such as <code>&#39;good&#39;</code>/<code>&#39;bad&#39;</code> set as-is)</p>
+</td></tr></tbody></table>
+
+<p>If will define the following dataset methods:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>Album.dataset.good </td><td>
+<p>Return a dataset filtered to rows where <code>status_id</code> is <code>1</code></p>
+</td></tr><tr><td class='label'>Album.dataset.not_good </td><td>
+<p>Return a dataset filtered to rows where <code>status_id</code> is not <code>1</code></p>
+</td></tr><tr><td class='label'>Album.dataset.bad</td><td>
+<p>Return a dataset filtered to rows where <code>status_id</code> is <code>2</code></p>
+</td></tr><tr><td class='label'>Album.dataset.not_bad</td><td>
+<p>Return a dataset filtered to rows where <code>status_id</code> is not <code>2</code></p>
+</td></tr></tbody></table>
+
+<p>When calling <code>enum</code>, you can also provide the following options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:prefix </td><td>
+<p>Use a prefix for methods defined for each enum value. If <code>true</code> is provided at the value, use the column name as the prefix. For example, with <code>prefix: &#39;status&#39;</code>, the instance methods defined above would be <code>status_good?</code>, <code>status_bad?</code>, <code>status_good!</code>, and <code>status_bad!</code>, and the dataset methods defined would be <code>status_good</code>, <code>status_not_good</code>, <code>status_bad</code>, and <code>status_not_bad</code>.</p>
+</td></tr><tr><td class='label'>:suffix </td><td>
+<p>Use a suffix for methods defined for each enum value. If <code>true</code> is provided at the value, use the column name as the suffix. For example, with <code>suffix: &#39;status&#39;</code>, the instance methods defined above would be <code>good_status?</code>, <code>bad_status?</code>, <code>good_status!</code>, and <code>bad_status!</code>, and the dataset methods defined would be <code>good_status</code>, <code>not_good_status</code>, <code>bad_status</code>, and <code>not_bad_status</code>.</p>
+</td></tr><tr><td class='label'>:override_accessors </td><td>
+<p>Set to <code>false</code> to not override the column accessor methods.</p>
+</td></tr><tr><td class='label'>:dataset_methods </td><td>
+<p>Set to <code>false</code> to not define dataset methods.</p>
+</td></tr></tbody></table>
+
+<p>Note that this does not use a true enum column in the database.  If you are looking for enum support in the database, and your are using PostgreSQL, <a href="../../Sequel.html"><code>Sequel</code></a> supports that via the pg_enum <a href="../../Database.html"><code>Database</code></a> extension.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses handle enums</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:enum</span>
+
+<span class="ruby-comment"># Make the Album class handle enums</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:enum</span>
+</pre>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Enum/ClassMethods.html">Sequel::Plugins::Enum::ClassMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
