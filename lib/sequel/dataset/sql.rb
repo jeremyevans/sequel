@@ -894,9 +894,10 @@ module Sequel
     # Clone of this dataset usable in aggregate operations.  Does
     # a from_self if dataset contains any parameters that would
     # affect normal aggregation, or just removes an existing
-    # order if not.
+    # order if not. Also removes the row_proc, which isn't needed
+    # for aggregate calculations.
     def aggregate_dataset
-      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self : unordered
+      (options_overlap(COUNT_FROM_SELF_OPTS) ? from_self : unordered).naked
     end
 
     # Append aliasing expression to SQL string.
