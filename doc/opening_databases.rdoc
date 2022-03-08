@@ -383,6 +383,9 @@ The following additional options are supported:
 
 :readonly :: open database in read-only mode
 :timeout :: the busy timeout to use in milliseconds (default: 5000).
+:setup_regexp_function :: Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so
+                          allows you to use regexp support in dataset expressions.  Note that this creates a new
+                          Regexp object per call to the function, so it is not an efficient implementation.
 
 Note that SQLite memory databases are restricted to a single connection by
 default.  This is because SQLite does not allow multiple connections to

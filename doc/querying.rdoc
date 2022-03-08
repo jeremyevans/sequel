@@ -357,7 +357,9 @@ For ranges, Sequel uses a pair of inequality statements:
   # SELECT * FROM artists WHERE ((id >= 1) AND (id < 5))
 
 Finally, for regexps, Sequel uses an SQL regular expression.  Note that this
-is probably only supported on PostgreSQL and MySQL.
+is only supported by default on PostgreSQL and MySQL.  It can also be supported
+on SQLite when using the sqlite adapter with the :setup_regexp_function
+Database option.
 
   Artist.where(name: /JM$/)
   # SELECT * FROM artists WHERE (name ~ 'JM$')

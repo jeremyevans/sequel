@@ -298,7 +298,7 @@ describe "An SQLite dataset" do
     proc{@d.literal(Sequel.expr(:x).like(/a/i))}.must_raise(Sequel::InvalidOperation)
     proc{@d.literal(~Sequel.expr(:x).like(/a/i))}.must_raise(Sequel::InvalidOperation)
   end
-end
+end unless DB.adapter_scheme == :sqlite && DB.opts[:setup_regexp_function]
 
 describe "SQLite::Dataset#delete" do
   before do

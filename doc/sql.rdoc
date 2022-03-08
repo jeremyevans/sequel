@@ -528,7 +528,7 @@ Inverting the LIKE operator works like other inversions:
 
   ~Sequel.like(:name, 'A%') # ("name" NOT LIKE 'A%' ESCAPE '\')
 
-Sequel also supports SQL regular expressions on MySQL and PostgreSQL.  You can use these by passing a Ruby regular expression to +like+ or +ilike+, or by making the regular expression a hash value:
+Sequel also supports SQL regular expressions on MySQL and PostgreSQL (and SQLite when using the sqlite adapter with the :setup_regexp_function Database option).  You can use these by passing a Ruby regular expression to +like+ or +ilike+, or by making the regular expression a hash value:
 
   Sequel.like(:name, /^A/) # ("name" ~ '^A')
   ~Sequel.ilike(:name, /^A/) # ("name" !~* '^A')

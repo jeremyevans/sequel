@@ -1,5 +1,7 @@
 === master
 
+* Support :setup_regexp_function Database option in the sqlite adapter to allow the use of regexps when querying (jeremyevans)
+
 * Add auto_restrict_eager_graph plugin for automatically disallow eager_graph with associations needing but lacking graph options (jeremyevans)
 
 * Fix placeholder literalizer optimization for dataset aggregate methods on a model dataset (belousovAV) (#1847, #1848)

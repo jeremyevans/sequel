@@ -98,6 +98,11 @@ module Sequel
       # The conversion procs to use for this database
       attr_reader :conversion_procs
 
+      def initialize(opts = OPTS)
+        super
+        @allow_regexp = typecast_value_boolean(opts[:setup_regexp_function])
+      end
+
       # Connect to the database. Since SQLite is a file based database,
       # available options are limited:
       #
@@ -119,6 +124,12 @@ module Sequel
         end
         
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
+
+        if typecast_value_boolean(opts[:setup_regexp_function])
+          db.create_function("regexp", 2) do |func, regexp_str, string|
+            func.result = Regexp.new(regexp_str).match(string) ? 1 : 0
+          end
+        end
         
         class << db
           attr_reader :prepared_statements
@@ -126,6 +137,12 @@ module Sequel
         db.instance_variable_set(:@prepared_statements, {})
         
         db
+      end
+
+      # Whether this Database instance is setup to allow regexp matching.
+      # True if the :setup_regexp_function option was passed when creating the Database.
+      def allow_regexp?
+        @allow_regexp
       end
 
       # Disconnect given connections from the database.
@@ -321,6 +338,28 @@ module Sequel
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
       PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 
+      # Support regexp functions if using :setup_regexp_function Database option.
+      def complex_expression_sql_append(sql, op, args)
+        case op
+        when :~, :'!~', :'~*', :'!~*'
+          return super unless supports_regexp?
+
+          case_insensitive = [:'~*', :'!~*'].include?(op)
+          sql << 'NOT ' if [:'!~', :'!~*'].include?(op)
+          sql << '('
+          sql << 'LOWER(' if case_insensitive
+          literal_append(sql, args[0])
+          sql << ')' if case_insensitive
+          sql << ' REGEXP '
+          sql << 'LOWER(' if case_insensitive
+          literal_append(sql, args[1])
+          sql << ')' if case_insensitive
+          sql << ')'
+        else
+          super
+        end
+      end
+
       def fetch_rows(sql)
         execute(sql) do |result|
           cps = db.conversion_procs
@@ -343,6 +382,11 @@ module Sequel
             yield row
           end
         end
+      end
+
+      # Support regexp if using :setup_regexp_function Database option.
+      def supports_regexp?
+        db.allow_regexp?
       end
       
       private
