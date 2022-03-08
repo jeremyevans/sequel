@@ -1,3 +1,7 @@
+=== master
+
+* Fix placeholder literalizer optimization for dataset aggregate methods on a model dataset (belousovAV) (#1847, #1848)
+
 === 5.54.0 (2022-03-01)
 
 * Add enum plugin for treating columns as enums in a model (jeremyevans) (#1839)

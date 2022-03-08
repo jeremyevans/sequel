@@ -143,4 +143,11 @@ describe Sequel::Model, "class dataset methods"  do
     sc.unlimited.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a ORDER BY a'
     sc.dataset.graph(:a).ungraphed.opts[:graph].must_be_nil
   end
+
+  it 'should not initialize model for aggregate methods when placeholder cached' do
+    @c.define_singleton_method(:call) { |*| raise 'Should not be called for aggregate methods' }
+    5.times do
+      @c.max(:id)
+    end
+  end
 end

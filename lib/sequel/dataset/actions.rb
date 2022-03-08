@@ -1016,7 +1016,7 @@ module Sequel
     # Cached placeholder literalizer for methods that return values using aggregate functions.
     def _aggregate(function, arg)
       if loader = cached_placeholder_literalizer(:"_#{function}_loader") do |pl|
-            aggregate_dataset.limit(1).select(SQL::Function.new(function, pl.arg).as(function))
+            aggregate_dataset.naked.limit(1).select(SQL::Function.new(function, pl.arg).as(function))
           end
         loader.get(arg)
       else
