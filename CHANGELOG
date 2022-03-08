@@ -1,5 +1,7 @@
 === master
 
+* Add auto_restrict_eager_graph plugin for automatically disallow eager_graph with associations needing but lacking graph options (jeremyevans)
+
 * Fix placeholder literalizer optimization for dataset aggregate methods on a model dataset (belousovAV) (#1847, #1848)
 
 === 5.54.0 (2022-03-01)
