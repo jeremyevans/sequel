@@ -6,6 +6,9 @@ module Sequel
     # :section: 6 - Miscellaneous methods
     # These methods don't fit cleanly into another section.
     # ---------------------
+
+    # The number of calls after which the placeholder_literalizer is cached
+    CALLS_NUMBER_TO_CACHE_PLACEHOLDER = 3
     
     # The database related to this dataset.  This is the Database instance that
     # will execute all of this dataset's queries.
@@ -295,7 +298,7 @@ module Sequel
         return loader unless loader.is_a?(Integer)
         loader += 1
 
-        if loader >= 3
+        if loader >= CALLS_NUMBER_TO_CACHE_PLACEHOLDER
           loader = Sequel::Dataset::PlaceholderLiteralizer.loader(self){|pl, _| yield pl}
           cache_set(key, loader)
         else
