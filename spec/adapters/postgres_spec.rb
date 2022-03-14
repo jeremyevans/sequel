@@ -1533,6 +1533,14 @@ SQL
     @db.call_procedure(:test_procedure_posts, 3, nil).must_equal(:a=>6, :b=>1)
   end
 
+  # Remove after release of pg 1.3.5
+  skip_due_to_pg_bug = defined?(Sequel::Postgres::USES_PG) && 
+    Sequel::Postgres::USES_PG &&
+    DB.respond_to?(:stream_all_queries) &&
+    DB.stream_all_queries &&
+    defined?(PG::VERSION) &&
+    PG::VERSION == '1.3.4'
+
   it "#call_procedure should call a procedure without arguments" do
     @args = ''
     @db.run <<SQL
@@ -1546,7 +1554,7 @@ $$;
 SQL
     @db.call_procedure(:test_procedure_posts).must_be_nil
     @db[:posts].select_order_map(:a).must_equal [1, 2]
-  end
+  end unless skip_due_to_pg_bug
 
   it "#call_procedure should call a procedure with output parameters" do
     @db.run <<SQL
@@ -1572,7 +1580,7 @@ $$;
 SQL
     @db.call_procedure(:test_procedure_posts, 1, nil).must_be_nil
     @db.call_procedure(:test_procedure_posts, 3, nil).must_be_nil
-  end
+  end unless skip_due_to_pg_bug
 
   it "#call_procedure should call a procedure that accepts text" do
     @args = 'text'
