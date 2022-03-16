@@ -55,7 +55,7 @@ platforms :ruby do
 
   # Test current sequel_pg on half of the MRIs, and pure-ruby on the other half
   if sequel_pg
-    gem 'sequel_pg', github: 'jeremyevans/sequel_pg', require: 'sequel'
+    gem 'sequel_pg', git: 'https://github.com/jeremyevans/sequel_pg', require: 'sequel'
   end
 end
 

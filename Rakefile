@@ -145,11 +145,11 @@ task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
 
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
     ENV['SEQUEL_SQLITE_URL'] = "jdbc:sqlite::memory:"
-    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost/#{pg_database}?user=postgres"
+    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost/#{pg_database}?user=postgres&password=postgres"
     ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://#{mysql_host}/sequel_test?user=root#{mysql_password}&useSSL=false&allowPublicKeyRetrieval=true"
   else
     ENV['SEQUEL_SQLITE_URL'] = "sqlite:/"
-    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost/#{pg_database}?user=postgres"
+    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost/#{pg_database}?user=postgres&password=postgres"
     ENV['SEQUEL_MYSQL_URL'] = "mysql2://#{mysql_host}/sequel_test?user=root#{mysql_password}&useSSL=false"
   end
 
