@@ -45,8 +45,6 @@ module Sequel
     #   Album.plugin :auto_restrict_eager_graph
     module AutoRestrictEagerGraph
       module ClassMethods
-        private
-
         # When defining an association, if a block is given for the association, but
         # a :graph_* option is not used, disallow the use of eager_graph.
         def associate(type, name, opts = OPTS, &block)
