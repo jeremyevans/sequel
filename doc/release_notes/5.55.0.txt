@@ -1,0 +1,21 @@
+= New Features
+
+* An auto_restrict_eager_graph plugin has been added for automatically
+  disallowing the use of eager_graph with associations using blocks but
+  lacking graph_* options.  This can prevent potentionally invalid usage,
+  as the restrictions added by the block are not used by eager_graph.
+
+* The sqlite adapter now supports the :setup_regexp_function
+  Database option. This option will define a REGEXP function in the
+  database that will allow regexp support in queries, such as:
+
+    DB[:table].where(column: /(some|pattern)/)
+
+  Note that this creates a Ruby Regexp object per column value tested,
+  so it isn't the most optimal approach. 
+
+= Other Improvements
+
+* Calling dataset aggregate methods such as #max on a model dataset now
+  works correctly. Previously, it could fail if called enough times to
+  optimize using a placeholder literalizer.

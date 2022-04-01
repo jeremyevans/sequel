@@ -1,4 +1,4 @@
-=== master
+=== 5.55.0 (2022-04-01)
 
 * Support :setup_regexp_function Database option in the sqlite adapter to allow the use of regexps when querying (jeremyevans)
 
