@@ -30,7 +30,7 @@ doc/querying.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-08-16 14:01:55 -0700</span>
+<span class='datetime'>2022-03-08 13:17:00 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -355,7 +355,7 @@ Last Update:
 <span class="ruby-comment"># SELECT * FROM artists WHERE ((id &gt;= 1) AND (id &lt; 5))</span>
 </pre>
 
-<p>Finally, for regexps, <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses an SQL regular expression.  Note that this is probably only supported on PostgreSQL and MySQL.</p>
+<p>Finally, for regexps, <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses an SQL regular expression.  Note that this is only supported by default on PostgreSQL and MySQL.  It can also be supported on SQLite when using the sqlite adapter with the :setup_regexp_function Database option.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-regexp">/JM$/</span>)
 <span class="ruby-comment"># SELECT * FROM artists WHERE (name ~ &#39;JM$&#39;)</span>

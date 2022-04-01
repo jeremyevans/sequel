@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.55.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.55.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.55.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-04-01 08:49:06 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An auto_restrict_eager_graph plugin has been added for automatically disallowing the use of eager_graph with associations using blocks but lacking graph_* options.  This can prevent potentionally invalid usage, as the restrictions added by the block are not used by eager_graph.</p>
+</li><li>
+<p>The sqlite adapter now supports the :setup_regexp_function Database option. This option will define a REGEXP function in the database that will allow regexp support in queries, such as:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">column:</span> <span class="ruby-regexp">/(some|pattern)/</span>)
+</pre>
+
+<p>Note that this creates a Ruby Regexp object per column value tested, so it isn’t the most optimal approach. </p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Calling dataset aggregate methods such as max on a model dataset now works correctly. Previously, it could fail if called enough times to optimize using a placeholder literalizer.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -30,7 +30,7 @@ doc/sql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-07-23 10:14:17 -0700</span>
+<span class='datetime'>2022-03-08 13:17:00 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -644,7 +644,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># (&quot;name&quot; NOT LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</span>
 </pre>
 
-<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also supports SQL regular expressions on MySQL and PostgreSQL.  You can use these by passing a Ruby regular expression to <code>like</code> or <code>ilike</code>, or by making the regular expression a hash value:</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also supports SQL regular expressions on MySQL and PostgreSQL (and SQLite when using the sqlite adapter with the :setup_regexp_function Database option).  You can use these by passing a Ruby regular expression to <code>like</code> or <code>ilike</code>, or by making the regular expression a hash value:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:name</span>, <span class="ruby-regexp">/^A/</span>) <span class="ruby-comment"># (&quot;name&quot; ~ &#39;^A&#39;)</span>
 <span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-value">:name</span>, <span class="ruby-regexp">/^A/</span>) <span class="ruby-comment"># (&quot;name&quot; !~* &#39;^A&#39;)</span>

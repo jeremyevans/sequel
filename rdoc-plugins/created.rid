@@ -1,4 +1,4 @@
-Tue, 01 Mar 2022 08:14:46 -0800
+Fri, 01 Apr 2022 08:52:29 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -95,6 +95,7 @@ lib/sequel/plugins/association_multi_add_remove.rb	Thu, 16 Apr 2020 13:01:31 -07
 lib/sequel/plugins/association_pks.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/association_proxies.rb	Wed, 02 Dec 2020 15:37:08 -0800
 lib/sequel/plugins/async_thread_pool.rb	Thu, 22 Apr 2021 14:46:05 -0700
+lib/sequel/plugins/auto_restrict_eager_graph.rb	Wed, 30 Mar 2022 08:39:42 -0700
 lib/sequel/plugins/auto_validations.rb	Mon, 13 Sep 2021 12:29:18 -0700
 lib/sequel/plugins/auto_validations_constraint_validations_presence_message.rb	Tue, 18 May 2021 16:04:04 -0700
 lib/sequel/plugins/before_after_save.rb	Tue, 01 Aug 2017 08:12:01 -0700
