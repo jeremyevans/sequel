@@ -119,12 +119,12 @@ require_relative 'spec_helper'
       ds.entries.__value.must_equal [{:v=>1}]
       ds.grep_v(//).__value.must_equal [{:v=>1}] if RUBY_VERSION >= '2.3'
       ds.include?(:v=>1).__value.must_equal true
-      ds.inject.__value.must_equal(:v=>1)
+      ds.inject{}.__value.must_equal(:v=>1)
       ds.member?(:v=>1).__value.must_equal true
       ds.minmax.__value.must_equal([{:v=>1}, {:v=>1}])
       ds.none?.__value.must_equal false
       ds.one?.__value.must_equal true
-      ds.reduce.__value.must_equal(:v=>1)
+      ds.reduce{}.__value.must_equal(:v=>1)
       ds.sort.__value.must_equal [{:v=>1}]
       ds.take(1).__value.must_equal [{:v=>1}]
       ds.tally.__value.must_equal({:v=>1}=>1) if RUBY_VERSION >= '2.7'
