@@ -1,3 +1,7 @@
+=== master
+
+* Recognize "INTEGER" type same as "integer" type in the schema dumper, helpful on SQLite 3.37.0+ (jeremyevans)
+
 === 5.55.0 (2022-04-01)
 
 * Support :setup_regexp_function Database option in the sqlite adapter to allow the use of regexps when querying (jeremyevans)

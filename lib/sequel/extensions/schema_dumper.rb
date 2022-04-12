@@ -183,7 +183,7 @@ END_MIG
       if options[:single_pk] && schema_autoincrementing_primary_key?(schema)
         type_hash = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
         [:table, :key, :on_delete, :on_update, :deferrable].each{|f| type_hash[f] = schema[f] if schema[f]}
-        if type_hash == {:type=>Integer} || type_hash == {:type=>"integer"}
+        if type_hash == {:type=>Integer} || type_hash == {:type=>"integer"} || type_hash == {:type=>"INTEGER"}
           type_hash.delete(:type)
         elsif options[:same_db] && type_hash == {:type=>type_literal_generic_bignum_symbol(type_hash).to_s}
           type_hash[:type] = :Bignum
@@ -225,7 +225,7 @@ END_MIG
         col_opts[:null] = false if schema[:allow_null] == false
         if table = schema[:table]
           [:key, :on_delete, :on_update, :deferrable].each{|f| col_opts[f] = schema[f] if schema[f]}
-          col_opts[:type] = type unless type == Integer || type == 'integer'
+          col_opts[:type] = type unless type == Integer || type == 'integer' || type == 'INTEGER'
           gen.foreign_key(name, table, col_opts)
         else
           gen.column(name, type, col_opts)
