@@ -34,6 +34,8 @@ describe "bin/sequel" do
     File.read(OUTPUT)
   end
 
+  int_type = DB.sqlite_version >= 33700 ? "INTEGER" : 'integer'
+
   after do
     DB.disconnect
     DB2.disconnect
@@ -91,8 +93,8 @@ END
     DB2.tables.sort_by{|t| t.to_s}.must_equal [:a, :b]
     DB[:a].all.must_equal [{:a=>1, :name=>'foo'}]
     DB[:b].all.must_equal [{:a=>1}]
-    DB2.schema(:a).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, false, nil, true, "integer", :integer, nil], [:name, true, nil, false, "varchar(255)", :string, nil]]
-    DB2.schema(:b).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, true, nil, false, "integer", :integer, nil]]
+    DB2.schema(:a).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, false, nil, true, int_type, :integer, nil], [:name, true, nil, false, "varchar(255)", :string, nil]]
+    DB2.schema(:b).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, true, nil, false, int_type, :integer, nil]]
     DB2.indexes(:a).must_equal({})
     DB2.indexes(:b).must_equal(:b_a_index=>{:unique=>false, :columns=>[:a]})
     DB2.foreign_key_list(:a).must_equal []
@@ -195,7 +197,7 @@ END
     column, schema = h.values.first.first
     column.must_equal :a
     schema.delete(:generated) # May be present on SQLite 3.31+
-    schema.must_equal(:type=>:integer, :db_type=>"integer", :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false)
+    schema.must_equal(:type=>:integer, :db_type=>int_type, :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false)
   end
 
   it "-X should dump the index cache" do

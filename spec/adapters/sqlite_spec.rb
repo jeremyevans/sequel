@@ -158,7 +158,9 @@ describe "An SQLite database" do
     @db[:fk].insert(:a=>100, :b=>10)
     @db[:fk].select_order_map([:a, :b, :c, :d, :e]).must_equal [[100, 10, 211, 212, 213]]
 
-    @db.schema(:fk).map{|_,v| v[:generated]}.must_equal [false, false, true, true, true]
+    # Generated columns do not show up in schema on SQLite 3.37.0 (or maybe 3.38.0)
+    expected = DB.sqlite_version >= 33700 ? [false, false] : [false, false, true, true, true]
+    @db.schema(:fk).map{|_,v| v[:generated]}.must_equal expected
   end if DB.sqlite_version >= 33100
 end
 
