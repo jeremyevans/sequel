@@ -172,3 +172,12 @@ desc "Check syntax of all .rb files"
 task :check_syntax do
   Dir['**/*.rb'].each{|file| print `#{FileUtils::RUBY} -c #{file} | fgrep -v "Syntax OK"`}
 end
+
+desc "Check documentation for plugin/extension files"
+task :check_plugin_doc do
+  text = File.binread('www/pages/plugins.html.erb')
+  skip = %w'before_after_save freeze_datasets from_block no_auto_literal_strings'
+  Dir['lib/sequel/{plugins,extensions}/*.rb'].map{|f| File.basename(f).sub('.rb', '') if File.size(f)}.sort.each do |f|
+    puts f if !f.start_with?('_') && !skip.include?(f) && !text.include?(f)
+  end
+end
