@@ -29,7 +29,7 @@ module Sequel
     #   end
     #
     # +first_track+ is not instance specific, but +last_track+ and +recent_tracks+ are.
-    # +last_trac+ is because the +num_tracks+ call in the block is calling
+    # +last_track+ is because the +num_tracks+ call in the block is calling
     # <tt>Album#num_tracks</tt>.  +recent_tracks+ is because the value will change over
     # time. This plugin allows you to find these cases, and set the :instance_specific
     # option appropriately for them:
