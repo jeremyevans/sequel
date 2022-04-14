@@ -25,7 +25,10 @@ else
   gem 'activemodel'
 end
 
-if RUBY_VERSION < '2.0.0'
+if RUBY_VERSION < '3.1.0' && RUBY_VERSION >= '3.0.0'
+  gem 'json', '2.5.1'
+  gem 'rake'
+elsif RUBY_VERSION < '2.0.0'
   gem 'json', '<1.8.5'
   gem 'rake', '<10.0.0'
 else
