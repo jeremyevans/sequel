@@ -1,5 +1,7 @@
 === master
 
+* Add sqlite_json_ops extension for DSL support for JSON functions and operators added in SQLite 3.38.0 (jeremyevans)
+
 * Recognize "INTEGER" type same as "integer" type in the schema dumper, helpful on SQLite 3.37.0+ (jeremyevans)
 
 === 5.55.0 (2022-04-01)

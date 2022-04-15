@@ -1,7 +1,7 @@
 require_relative "spec_helper"
 
 if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_ENGINE == 'jruby' && (JRUBY_VERSION >= '9.3' || (JRUBY_VERSION.match(/\A9\.2\.(\d+)/) && $1.to_i >= 7)))
-Sequel.extension :core_refinements, :pg_array, :pg_hstore, :pg_row, :pg_range, :pg_multirange, :pg_row_ops, :pg_range_ops, :pg_array_ops, :pg_hstore_ops, :pg_json, :pg_json_ops
+Sequel.extension :core_refinements, :pg_array, :pg_hstore, :pg_row, :pg_range, :pg_multirange, :pg_row_ops, :pg_range_ops, :pg_array_ops, :pg_hstore_ops, :pg_json, :pg_json_ops, :sqlite_json_ops
 using Sequel::CoreRefinements
 
 describe "Core refinements" do
@@ -460,7 +460,7 @@ describe "Symbol" do
   end
 end
 
-describe "Postgres extensions integration" do
+describe "Postgres/SQLite extensions integration" do
   before do
     @db = Sequel.mock
   end
@@ -523,6 +523,11 @@ describe "Postgres extensions integration" do
   it "Range#pg_range should return an PGRange" do
     @db.literal((1..2).pg_range).must_equal "'[1,2]'"
     @db.literal((1..2).pg_range(:int4range)).must_equal "int4range(1,2,'[]')"
+  end
+
+  it "Symbol#sqlite_json_opt should return an SQLite::JSONOp" do
+    @db.literal(:a.sqlite_json_op[1]).must_equal "(a ->> 1)"
+    @db.literal(:a.sqlite_json_op.minify).must_equal "json(a)"
   end
 end
 end

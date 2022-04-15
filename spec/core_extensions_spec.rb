@@ -590,10 +590,10 @@ describe "Symbol" do
   end
 end
 
-describe "Postgres extensions integration" do
+describe "Postgres/SQLite extensions integration" do
   before do
     @db = Sequel.mock
-    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_json_ops, :pg_range, :pg_range_ops, :pg_row, :pg_row_ops, :pg_inet_ops)
+    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_json_ops, :pg_range, :pg_range_ops, :pg_row, :pg_row_ops, :pg_inet_ops, :sqlite_json_ops)
   end
 
   it "Symbol#pg_array should return an ArrayOp" do
@@ -658,6 +658,11 @@ describe "Postgres extensions integration" do
   it "Range#pg_range should return an PGRange" do
     @db.literal((1..2).pg_range).must_equal "'[1,2]'"
     @db.literal((1..2).pg_range(:int4range)).must_equal "int4range(1,2,'[]')"
+  end
+
+  it "Symbol#sqlite_json_opt should return an SQLite::JSONOp" do
+    @db.literal(:a.sqlite_json_op[1]).must_equal "(a ->> 1)"
+    @db.literal(:a.sqlite_json_op.minify).must_equal "json(a)"
   end
 end
 
