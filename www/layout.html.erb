@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" class="html">
 <head>
-  <title>Sequel: The Database Toolkit for Ruby<%= " - #{title.capitalize}" unless title == 'index' %></title>
+  <title><%= "#{title.capitalize} — " unless title == 'index' %>Sequel: The Database Toolkit for Ruby</title>
 
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
@@ -14,34 +14,84 @@
   <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
 
   <link href="css/application.css" media="screen" rel="stylesheet" type="text/css" />
-  <link href="css/ruby.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="css/<%= title.capitalize %>.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
-<body>
-  <div id="header">
-    <a href="index.html" id="logo"><img src="images/ruby-sequel.png" alt="Ruby Sequel Logo" /></a>
-    <h1>The Database Toolkit for Ruby</h1>
-    <div id="navigation">
-      <ul>
-        <li><a href="development.html">Development</a></li>
-        <li><a href="documentation.html">Documentation</a></li>
-        <li><a href="plugins.html">Plugins</a></li>
-        <li><a href="press.html">Press</a></li>
-        <li><a href="blog.html">Blog</a></li>
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="index.html">
+        <img src="images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="media.html" class="nav__a">Media</a>
+        </li>
       </ul>
       <form action="http://www.google.com/search">
         <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
-        <input id="searchbox" type="search" placeholder="Site Search" name="q" value="" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
       </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <%= content %>
     </div>
-    <br style="clear: both;" />
-  </div>
+  </main>
 
-  <hr />
-
-  <div id="content">
-    <br style="clear: both;" />
-    <%= content %>
-    <br style="clear: both;" />
-  </div>
+  <footer class="footer">
+    <nav class="nav">
+      <a href="/">
+        <img src="images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="documentation.html" class="nav__a">Documentation</a>
+          <a href="documentation.html#general-overview" class="a">General Overview</a>
+          <a href="documentation.html#databases" class="a">Databases</a>
+          <a href="documentation.html#datasets" class="a">Datasets</a>
+          <a href="documentation.html#models" class="a">Models</a>
+          <a href="documentation.html#misc" class="a">Misc</a>
+          <a href="documentation.html#rdoc" class="a">RDoc</a>
+        </li>
+        <li class="nav__li">
+          <a href="plugins.html" class="nav__a">Plugins</a>
+          <a href="plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="development.html" class="nav__a">Development</a>
+          <a href="development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="development.html#contribute" class="a">Contribute</a>
+          <a href="development.html#code" class="a">Source Code</a>
+          <a href="development.html#license" class="a">License</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a" target="_blank">GitHub</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a" target="_blank">RubyGems</a>
+          <a href="https://sequel.jeremyevans.net/blog.html" class="a" target="_blank">Blog</a>
+        </li>
+        <li class="nav__li">
+          <a href="media.html" class="nav__a">Media</a>
+          <a href="media.html#articles" class="a">Articles</a>
+          <a href="media.html#presentations" class="a">Presentations</a>
+          <a href="media.html#using-sequel" class="a">Using Sequel</a>
+          <a href="media.html#logos" class="a">Logos &amp; Badges</a>
+        </li>
+      </ul>
+      <form action="http://www.google.com/search">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </footer>
 </body>
 </html>

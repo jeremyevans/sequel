@@ -1,0 +1,146 @@
+section.index {
+	color: #FFF;
+	background-color: var(--red-primary);
+	border-radius: 12px;
+	margin-bottom: 64px;
+}
+
+div.index__hero {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	justify-content: center;
+	row-gap: 8px;
+	height: clamp(480px, 75vh, 600px);
+}
+
+h1.index__h1 {
+	font-size: 64px;
+	padding: 0 var(--gap);
+	font-weight: 300;
+	margin: 0;
+	letter-spacing: -0.03em;
+}
+
+a.index__a {
+	display: inline-block;
+	width: max-content;
+	margin-left: auto;
+	margin-right: auto;
+	color: #FFF;
+	opacity: 0.55;
+	font-size: 20px;
+	text-decoration: none;
+	border-bottom: 1px solid #FFF;
+}
+
+a.index__a:hover {
+	opacity: 1;
+}
+
+nav.index__nav {
+	display: inline-flex;
+	align-items: center;
+	column-gap: calc(var(--gap) / 4);
+	margin-top: var(--gap);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+a.index__button {
+	display: block;
+	padding: 16px 32px;
+	text-decoration: none;
+	font-weight: 600;
+	border-radius: 6px;
+	line-height: 1em;
+	color: var(--ivory);
+	background-color: var(--graphite);
+	border: 2px solid transparent;
+}
+
+a.index__button:hover {
+	background-color: #222;
+}
+
+a.index__button--secondary {
+	color: var(--ivory);
+	background-color: transparent;
+	border-color: var(--ivory);
+}
+
+a.index__button--secondary:hover {
+	color: var(--ivory);
+	background-color: rgba(255,255,255,.05)
+}
+
+ul.index__ul {
+	margin: 0 calc(var(--gap) * 2);
+	padding: 0;
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	column-gap: var(--gap);
+}
+
+li.index__li {
+	padding-left: var(--gap);
+	border-left: 1px solid rgba(255,255,255,.25);
+	line-height: 1.55em;
+}
+
+li.index__li:first-child {
+	padding-left: 0px;
+	border-left: none;
+}
+
+pre.pre {
+	padding: var(--gap);
+	margin: 0;
+}
+code {
+	font-family: 'SF Mono';
+	font-style: italic;
+	color: #ffdead;
+	background: #222;
+	display: block;
+	font-family: 'Monaco', monospace;
+	font-size: 14px;
+	font-style: normal;
+	overflow: auto;
+	padding: var(--gap);
+	margin: 0;
+	border-radius: 6px;
+	box-shadow: 0 24px 64px rgba(0,0,0,.45);
+	margin-bottom: calc(var(--gap) * -2);
+}
+.ruby .keyword {
+	color: #faa;
+}
+.ruby .punct {
+	color: #faa;
+}
+.ruby .class {
+	color: #7fffd4;
+}
+.ruby .constant {
+	color: #34db9e;
+}
+.ruby .ident {
+	color: var(--ivory);
+}
+.ruby .comment {
+	color: #666;
+}
+.ruby .symbol {
+	color: #7fffd4;
+}
+.ruby .string {
+	color: #ffa07a;
+}
+.ruby .regex {
+	color: #bf8060;
+}
+.ruby .number {
+	color: #23acce;
+}
