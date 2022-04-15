@@ -727,6 +727,36 @@ describe "SQLite", 'INSERT ON CONFLICT' do
   end
 end if DB.sqlite_version >= 32400
 
+describe 'SQLite STRICT tables' do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table?(:strict_table)
+  end
+
+  it "supports creation via :strict option" do
+    @db = DB
+    @db.create_table(:strict_table, :strict=>true) do
+      primary_key :id
+      int :a
+      integer :b
+      real :c
+      text :d
+      blob :e
+      any :f
+    end
+    ds = @db[:strict_table]
+    ds.insert(:id=>1, :a=>2, :b=>3, :c=>1.2, :d=>'foo', :e=>Sequel.blob("\0\1\2\3"), :f=>'f')
+    ds.all.must_equal [{:id=>1, :a=>2, :b=>3, :c=>1.2, :d=>'foo', :e=>Sequel.blob("\0\1\2\3"), :f=>'f'}]
+    proc{ds.insert(:a=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:b=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:c=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:d=>Sequel.blob("\0\1\2\3"))}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:e=>1)}.must_raise Sequel::ConstraintViolation
+  end
+end if DB.sqlite_version >= 33700
+
 describe 'SQLite Database' do
   it 'supports operations/functions with sqlite_json_ops' do
     Sequel.extension :sqlite_json_ops

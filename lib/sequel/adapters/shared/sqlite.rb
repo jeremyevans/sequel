@@ -337,6 +337,11 @@ module Sequel
         ps
       end
 
+      # Support creating STRICT tables via :strict option
+      def create_table_sql(name, generator, options)
+        "#{super}#{' STRICT' if options[:strict]}"
+      end
+
       # SQLite support creating temporary views.
       def create_view_prefix_sql(name, options)
         create_view_sql_append_columns("CREATE #{'TEMPORARY 'if options[:temp]}VIEW #{quote_schema_table(name)}", options[:columns])
@@ -347,6 +352,7 @@ module Sequel
         /foreign key constraint failed\z/i => ForeignKeyConstraintViolation,
         /\A(SQLITE ERROR 275 \(CONSTRAINT_CHECK\) : )?CHECK constraint failed/ => CheckConstraintViolation,
         /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
+        /\Acannot store [A-Z]+ value in [A-Z]+ column / => ConstraintViolation,
         /may not be NULL\z|NOT NULL constraint failed: .+\z/ => NotNullConstraintViolation,
         /\ASQLITE ERROR \d+ \(\) : CHECK constraint failed: / => CheckConstraintViolation
       }.freeze
