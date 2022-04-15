@@ -99,12 +99,11 @@ pre.pre {
 	margin: 0;
 }
 code {
-	font-family: 'SF Mono';
+	font-family: 'Monaco', monospace;
 	font-style: italic;
 	color: #ffdead;
 	background: #222;
 	display: block;
-	font-family: 'Monaco', monospace;
 	font-size: 14px;
 	font-style: normal;
 	overflow: auto;

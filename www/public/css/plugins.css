@@ -1,0 +1,29 @@
+section.plugins {
+	background-color: #FFF;
+	border-radius: 12px;
+	box-shadow: 0 24px 64px rgba(0,0,0,.15);
+}
+
+code.plugins__code {
+	background-color: #eaeaea;
+	border-radius: 4px;
+	padding: 2px 4px;
+}
+
+div.sidebar {
+	display: grid;
+	grid-template-columns: 1fr 4fr;
+	margin-top: var(--gap);
+	border-top: 1px solid var(--border);
+}
+
+aside.sidebar__aside {
+	position: sticky;
+	top: 0;
+	max-height: 100vh;
+	border-right: 2px dotted var(--border);
+	padding-bottom: var(--gap);
+	padding-top: var(--gap);
+	padding-left: var(--gap);
+	padding-right: var(--gap);
+}
