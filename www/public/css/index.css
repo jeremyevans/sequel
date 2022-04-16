@@ -13,17 +13,32 @@ div.index__hero {
 	row-gap: 8px;
 	height: clamp(480px, 75vh, 600px);
 }
+@media (max-width: 640px) {
+	div.index__hero {
+		height: max-content;
+		padding-top: 64px;
+		padding-bottom: 64px;
+	}
+}
 
 h1.index__h1 {
 	font-size: 64px;
-	padding: 0 var(--gap);
+	padding-left: var(--gap);
+	padding-right: var(--gap);
 	font-weight: 300;
 	margin: 0;
 	letter-spacing: -0.03em;
 }
+@media (max-width: 960px) {
+	h1.index__h1 {
+		padding-top: var(--gap);
+		padding-bottom: var(--gap);
+		font-size: 48px;
+	}
+}
 @media (max-width: 640px) {
 	h1.index__h1 {
-		font-size: 48px;
+		font-size: 40px;
 	}
 }
 
@@ -44,12 +59,17 @@ a.index__a:hover {
 }
 
 nav.index__nav {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	column-gap: calc(var(--gap) / 4);
+	gap: calc(var(--gap) / 4);
 	margin-top: var(--gap);
 	margin-left: auto;
 	margin-right: auto;
+}
+@media (max-width: 640px) {
+	nav.index__nav {
+		flex-direction: column;
+	}
 }
 
 a.index__button {
@@ -85,13 +105,12 @@ ul.index__ul {
 	list-style: none;
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	column-gap: var(--gap);
+	gap: var(--gap);
 }
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
 	ul.index__ul {
 		grid-template-columns: 1fr;
 		grid-template-rows: auto;
-		row-gap: calc(var(--gap) / 2);
 	}
 
 	ul.index__ul {
@@ -100,14 +119,14 @@ ul.index__ul {
 }
 
 li.index__li {
-	padding-left: calc(var(--gap) / 2);
+	padding-left: var(--gap);
 	line-height: 1.55em;
 	border-left: 1px solid rgba(255,255,255,.25);
 }
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
 	li.index__li {
 		padding-left: 0px;
-		padding-top: calc(var(--gap) / 2);
+		padding-top: var(--gap);
 		border-left: none;
 		border-top: 1px solid rgba(255,255,255,.25);
 	}
@@ -133,10 +152,10 @@ code {
 	font-size: 14px;
 	font-style: normal;
 	overflow: auto;
-	padding: var(--gap);
-	margin: 0;
 	border-radius: 6px;
 	box-shadow: 0 24px 64px rgba(0,0,0,.45);
+	padding: var(--gap);
+	margin: 0;
 	margin-bottom: calc(var(--gap) * -2);
 }
 .ruby .keyword {

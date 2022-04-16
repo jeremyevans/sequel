@@ -26,7 +26,7 @@ aside.plugins__sidebar-aside {
 	position: sticky;
 	top: 0;
 	max-height: 100vh;
-	border-right: 2px dotted var(--border);
+	border-right: 1px solid var(--border);
 	padding-bottom: var(--gap);
 	padding-top: var(--gap);
 	padding-left: var(--gap);
@@ -36,6 +36,6 @@ aside.plugins__sidebar-aside {
 	aside.plugins__sidebar-aside {
 		position: inherit;
 		border-right: none;
-		border-bottom: 2px dotted var(--border);
+		border-bottom: 1px solid var(--border);
 	}
 }
