@@ -1,5 +1,6 @@
 :root {
-	--font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	--font-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	--font-monospace: "Monado", monospace;
 	--ivory: #FFFFF0;
 	--graphite: #333;
 	--red-primary: #B33D34;
@@ -16,7 +17,7 @@ html.html {
 }
 
 body.body {
-	font-family: var(--font-family);
+	font-family: var(--font-sans-serif);
 	font-size: 14px;
 	font-weight: 400;
 	background-color: var(--ivory);
@@ -124,7 +125,7 @@ a.a--dead {
 }
 
 input.nav__input {
-	font-family: var(--font-family);
+	font-family: var(--font-sans-serif);
 	padding: 16px;
 	background-color: rgba(0, 0, 0, 0.05);
 	border-radius: 6px;
@@ -244,10 +245,29 @@ div.row:last-child {
 }
 
 div.row--grid {
-	grid-template-columns: repeat(2, 1fr);
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
 }
 
 div.row:last-child {
 	padding-bottom: var(--gap);
+}
+
+div.sidebar {
+	display: grid;
+	grid-template-columns: 1fr 4fr;
+	margin-top: var(--gap);
+	border-top: 1px solid var(--border);
+}
+
+aside.sidebar__aside {
+	position: sticky;
+	top: 0;
+	max-height: 100vh;
+	border-right: 2px dotted var(--border);
+	padding-bottom: var(--gap);
+	padding-top: var(--gap);
+	padding-left: var(--gap);
+	padding-right: var(--gap);
 }
 

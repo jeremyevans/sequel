@@ -99,7 +99,7 @@ pre.pre {
 	margin: 0;
 }
 code {
-	font-family: 'Monaco', monospace;
+	font-family: var(--font-monospace);
 	font-style: italic;
 	color: #ffdead;
 	background: #222;
