@@ -183,6 +183,15 @@ module Sequel
     #             keys.
     # :tablespace :: The tablespace to use for the table.
     #
+    # SQLite specific options:
+    # :strict :: Create a STRICT table, which checks that the values for the columns
+    #            are the correct type (similar to all other SQL databases). Note that
+    #            when using this option, all column types used should be one of the
+    #            following: +int+, +integer+, +real+, +text+, +blob+, and +any+.
+    #            The +any+ type is treated like a SQLite column in a non-strict table,
+    #            allowing any type of data to be stored. This option is supported on
+    #            SQLite 3.37.0+.
+    #
     # See <tt>Schema::CreateTableGenerator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)
       remove_cached_schema(name)

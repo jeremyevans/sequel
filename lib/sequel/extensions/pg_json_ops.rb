@@ -3,7 +3,8 @@
 # The pg_json_ops extension adds support to Sequel's DSL to make
 # it easier to call PostgreSQL JSON functions and operators (added
 # first in PostgreSQL 9.3).  It also supports the JSONB functions
-# and operators added in PostgreSQL 9.4.
+# and operators added in PostgreSQL 9.4, as well as additional
+# functions and operators added in later versions.
 #
 # To load the extension:
 #

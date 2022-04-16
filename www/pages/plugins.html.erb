@@ -581,7 +581,7 @@
 
 <a name="extensions"></a>
 
-<h2 class="h2">Sequel Extensions <span class="h2__span">are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions). <span>
+<h2 class="h2">Sequel Extensions <span class="h2__span">are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions). <span class="ul__span">
 </h2>
 
 <div class="row">
@@ -833,107 +833,111 @@
 
 <ul class="ul ul--grid">
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>
 <span class="ul__span">Adds blank? instance methods to all objects.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions</a>
 <span class="ul__span">Extends the Array, Hash, String, and Symbol classes with methods that return Sequel expression objects.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>
 <span class="ul__span">Adds refinement versions of Sequel's core extensions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>
 <span class="ul__span">Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/escaped_like_rb.html">escaped_like </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/escaped_like_rb.html">escaped_like</a>
 <span class="ul__span">Support creation of LIKE expressions with placeholders in the pattern without access to a dataset.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/date_parse_input_handler_rb.html">date_parse_input_handler </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/date_parse_input_handler_rb.html">date_parse_input_handler</a>
 <span class="ul__span">Allows for custom handling of input strings to the date parsing methods.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/datetime_parse_to_time_rb.html">datetime_parse_to_time </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/datetime_parse_to_time_rb.html">datetime_parse_to_time</a>
 <span class="ul__span">Uses DateTime.parse.to_time to parse timestamp strings without offset information where such timestamps are assumed to be in UTC.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency</a>
 <span class="ul__span">Uses Fiber.current instead of Thread.current as the key for checking out connections.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>
 <span class="ul__span">Adds instance-level inflection methods to String.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>
 <span class="ul__span">Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones </a>
-<span class="ul__span">Allows you to use named timezones instead of just :local and :utc (requires <a class="a" href="http://tzinfo.github.io/">TZInfo</a>). </span>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>
+<span class="ul__span">Allows you to use named timezones instead of just :local and :utc (requires <a href="http://tzinfo.github.io/">TZInfo</a>).</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>
 <span class="ul__span">Adds DSL support for calling PostgreSQL array operators and functions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>
 <span class="ul__span">Adds DSL support for calling PostgreSQL hstore operators and functions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_ops_rb.html">pg_inet_ops </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_ops_rb.html">pg_inet_ops</a>
 <span class="ul__span">Adds DSL support for calling PostgreSQL inet/cidr operators and functions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a>
 <span class="ul__span">Adds DSL support for calling PostgreSQL json operators and functions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>
 <span class="ul__span">Adds DSL support for calling PostgreSQL range and multirange operators and functions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>
 <span class="ul__span">Adds DSL support for dealing with PostgreSQL row-valued/composite types.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/s_rb.html">s </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/s_rb.html">s</a>
 <span class="ul__span">Adds Sequel::S module with #S private method for easily calling Sequel.expr, including use as a refinement.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>
 <span class="ul__span">Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sqlite_json_ops_rb.html">sqlite_json_ops</a>
+<span class="ul__span">Adds DSL support for calling SQLite json operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>
 <span class="ul__span">Adds instance methods to String for converting the string into a Date/Time/DateTime.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_rb.html">symbol_aref </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_rb.html">symbol_aref</a>
 <span class="ul__span">Extends Symbol#[] to create a qualified identifier if given a symbol, identifier, or qualified identifier.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_refinement_rb.html">symbol_aref_refinement </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_refinement_rb.html">symbol_aref_refinement</a>
 <span class="ul__span">Adds refinement version of symbol_aref extension.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_rb.html">symbol_as </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_rb.html">symbol_as</a>
 <span class="ul__span">Adds Symbol#as to create aliased expressions.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_refinement_rb.html">symbol_as_refinement </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_refinement_rb.html">symbol_as_refinement</a>
 <span class="ul__span">Adds refinement version of symbol_as extension.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones</a>
 <span class="ul__span">Allows for per-thread overrides of the global timezone settings.</span>
 </li>
 <li class="ul__li ul__li--grid">
-<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/virtual_row_method_block_rb.html">virtual_row_method_block </a>
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/virtual_row_method_block_rb.html">virtual_row_method_block</a>
 <span class="ul__span">Supports passing blocks to virtual row method for terser SQL function creation.</span>
 </li>
 </ul>

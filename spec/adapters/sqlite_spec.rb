@@ -726,3 +726,138 @@ describe "SQLite", 'INSERT ON CONFLICT' do
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
   end
 end if DB.sqlite_version >= 32400
+
+describe 'SQLite STRICT tables' do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table?(:strict_table)
+  end
+
+  it "supports creation via :strict option" do
+    @db = DB
+    @db.create_table(:strict_table, :strict=>true) do
+      primary_key :id
+      int :a
+      integer :b
+      real :c
+      text :d
+      blob :e
+      any :f
+    end
+    ds = @db[:strict_table]
+    ds.insert(:id=>1, :a=>2, :b=>3, :c=>1.2, :d=>'foo', :e=>Sequel.blob("\0\1\2\3"), :f=>'f')
+    ds.all.must_equal [{:id=>1, :a=>2, :b=>3, :c=>1.2, :d=>'foo', :e=>Sequel.blob("\0\1\2\3"), :f=>'f'}]
+    proc{ds.insert(:a=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:b=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:c=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:d=>Sequel.blob("\0\1\2\3"))}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:e=>1)}.must_raise Sequel::ConstraintViolation
+  end
+end if DB.sqlite_version >= 33700
+
+describe 'SQLite Database' do
+  it 'supports operations/functions with sqlite_json_ops' do
+    Sequel.extension :sqlite_json_ops
+    @db = DB
+    jo = Sequel.sqlite_json_op('{"a": 1 ,"b": {"c": 2, "d": {"e": 3}}}')
+    ja = Sequel.sqlite_json_op('[2, 3, ["a", "b"]]')
+
+    @db.get(jo['a']).must_equal 1
+    @db.get(jo.get('b')['c']).must_equal 2
+    @db.get(jo['$.b.c']).must_equal 2
+    @db.get(jo['b'].get_json('$.d.e')).must_equal "3"
+    @db.get(jo['$.b.d'].get_json('e')).must_equal "3"
+    @db.get(ja[1]).must_equal 3
+    @db.get(ja['$[2][1]']).must_equal 'b'
+
+    @db.get(ja.get_json(1)).must_equal '3'
+    @db.get(ja.get_json('$[2][1]')).must_equal '"b"'
+
+    @db.get(jo.extract('$.a')).must_equal 1
+    @db.get(jo.extract('$.a', '$.b.c')).must_equal '[1,2]'
+    @db.get(jo.extract('$.a', '$.b.d.e')).must_equal '[1,3]'
+
+    @db.get(ja.array_length).must_equal 3
+    @db.get(ja.array_length('$[2]')).must_equal 2
+
+    @db.get(jo.type).must_equal 'object'
+    @db.get(ja.type).must_equal 'array'
+    @db.get(jo.typeof).must_equal 'object'
+    @db.get(ja.typeof).must_equal 'array'
+    @db.get(jo.type('$.a')).must_equal 'integer'
+    @db.get(ja.typeof('$[2][1]')).must_equal 'text'
+
+    @db.from(jo.each).all.must_equal [
+      {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>nil, :fullkey=>"$.a", :path=>"$"},
+      {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>nil, :fullkey=>"$.b", :path=>"$"}]
+    @db.from(jo.each('$.b')).all.must_equal [
+      {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>nil, :fullkey=>"$.b.c", :path=>"$.b"},
+      {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>nil, :fullkey=>"$.b.d", :path=>"$.b"}]
+    @db.from(ja.each).all.must_equal [
+      {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
+      {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>2, :parent=>nil, :fullkey=>"$[1]", :path=>"$"},
+      {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>nil, :fullkey=>"$[2]", :path=>"$"}]
+    @db.from(ja.each('$[2]')).all.must_equal [
+      {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>nil, :fullkey=>"$[2][0]", :path=>"$[2]"},
+      {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>nil, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+
+    @db.from(jo.tree).all.must_equal [
+      {:key=>nil, :value=>"{\"a\":1,\"b\":{\"c\":2,\"d\":{\"e\":3}}}", :type=>"object", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
+      {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>0, :fullkey=>"$.a", :path=>"$"},
+      {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>0, :fullkey=>"$.b", :path=>"$"},
+      {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>4, :fullkey=>"$.b.c", :path=>"$.b"},
+      {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>4, :fullkey=>"$.b.d", :path=>"$.b"},
+      {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>10, :parent=>8, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
+    @db.from(jo.tree('$.b')).all.must_equal [
+      {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>nil, :fullkey=>"$.b", :path=>"$"},
+      {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>4, :fullkey=>"$.b.c", :path=>"$.b"},
+      {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>4, :fullkey=>"$.b.d", :path=>"$.b"},
+      {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>10, :parent=>8, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
+    @db.from(ja.tree).all.must_equal [
+      {:key=>nil, :value=>"[2,3,[\"a\",\"b\"]]", :type=>"array", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
+      {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>0, :fullkey=>"$[0]", :path=>"$"},
+      {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>2, :parent=>0, :fullkey=>"$[1]", :path=>"$"},
+      {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>0, :fullkey=>"$[2]", :path=>"$"},
+      {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>3, :fullkey=>"$[2][0]", :path=>"$[2]"},
+      {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>3, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+    @db.from(ja.tree('$[2]')).all.must_equal [
+      {:key=>nil, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
+      {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>3, :fullkey=>"$[0][0]", :path=>"$[0]"},
+      {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>3, :fullkey=>"$[0][1]", :path=>"$[0]"}]
+
+    @db.get(jo.json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+    @db.get(ja.minify).must_equal '[2,3,["a","b"]]'
+
+    @db.get(ja.insert('$[1]', 5)).must_equal '[2,3,["a","b"]]'
+    @db.get(ja.replace('$[1]', 5)).must_equal '[2,5,["a","b"]]'
+    @db.get(ja.set('$[1]', 5)).must_equal '[2,5,["a","b"]]'
+    @db.get(ja.insert('$[3]', 5)).must_equal '[2,3,["a","b"],5]'
+    @db.get(ja.replace('$[3]', 5)).must_equal '[2,3,["a","b"]]'
+    @db.get(ja.set('$[3]', 5)).must_equal '[2,3,["a","b"],5]'
+    @db.get(ja.insert('$[1]', 5, '$[3]', 6)).must_equal '[2,3,["a","b"],6]'
+    @db.get(ja.replace('$[1]', 5, '$[3]', 6)).must_equal '[2,5,["a","b"]]'
+    @db.get(ja.set('$[1]', 5, '$[3]', 6)).must_equal '[2,5,["a","b"],6]'
+
+    @db.get(jo.insert('$.f', 4)).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}},"f":4}'
+    @db.get(jo.replace('$.f', 4)).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+    @db.get(jo.set('$.f', 4)).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}},"f":4}'
+    @db.get(jo.insert('$.a', 4)).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+    @db.get(jo.replace('$.a', 4)).must_equal '{"a":4,"b":{"c":2,"d":{"e":3}}}'
+    @db.get(jo.set('$.a', 4)).must_equal '{"a":4,"b":{"c":2,"d":{"e":3}}}'
+    @db.get(jo.insert('$.f', 4, '$.a', 5)).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}},"f":4}'
+    @db.get(jo.replace('$.f', 4, '$.a', 5)).must_equal '{"a":5,"b":{"c":2,"d":{"e":3}}}'
+    @db.get(jo.set('$.f', 4, '$.a', 5)).must_equal '{"a":5,"b":{"c":2,"d":{"e":3}},"f":4}'
+
+    @db.get(jo.patch('{"e": 4, "b": 5, "a": null}')).must_equal '{"b":5,"e":4}'
+
+    @db.get(ja.remove('$[1]')).must_equal '[2,["a","b"]]'
+    @db.get(ja.remove('$[1]', '$[1]')).must_equal '[2]'
+    @db.get(jo.remove('$.a')).must_equal '{"b":{"c":2,"d":{"e":3}}}'
+    @db.get(jo.remove('$.a', '$.b.c')).must_equal '{"b":{"d":{"e":3}}}'
+
+    @db.get(jo.valid).must_equal 1
+    @db.get(ja.valid).must_equal 1
+  end
+end if DB.sqlite_version >= 33800
