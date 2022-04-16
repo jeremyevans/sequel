@@ -29,9 +29,31 @@ main.main,
 footer.footer {
 	padding: 64px 128px 0 128px;
 }
+@media (max-width: 960px) {
+	header.header,
+	main.main,
+	footer.footer {
+		padding-left: 64px;
+		padding-right: 64px;
+	}
+}
+
+@media (max-width: 640px) {
+	header.header,
+	main.main,
+	footer.footer {
+		padding-left: 32px;
+		padding-right: 32px;
+	}
+}
 
 main.main {
 	padding-bottom: 64px;
+}
+@media (max-width: 960px) {
+	main.main {
+		padding-top: 16px;
+	}
 }
 
 div.main__container,
@@ -45,7 +67,12 @@ nav.nav {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	column-gap: 64px;
+	gap: 64px;
+}
+@media (max-width: 1280px) {
+	nav.nav {
+		flex-direction: column;
+	}
 }
 
 nav.nav--header {
@@ -131,6 +158,13 @@ input.nav__input {
 	border-radius: 6px;
 	border: 2px solid transparent;
 	min-width: 256px;
+}
+@media (max-width: 1280px) {
+	form.nav__form,
+	input.nav__input {
+		display: block;
+		width: 100%;
+	}
 }
 
 input.nav__input:focus {
@@ -220,10 +254,20 @@ li.ul__li {
 	display: flex;
 	column-gap: 16px;
 }
+@media (max-width: 960px) {
+	li.ul__li {
+		display: block;
+	}
+}
 
 li.ul__li--grid {
 	display: grid;
 	grid-template-columns: 1fr 3fr;
+}
+@media (max-width: 960px) {
+	li.ul__li--grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 div.row {
@@ -251,23 +295,5 @@ div.row--grid {
 
 div.row:last-child {
 	padding-bottom: var(--gap);
-}
-
-div.sidebar {
-	display: grid;
-	grid-template-columns: 1fr 4fr;
-	margin-top: var(--gap);
-	border-top: 1px solid var(--border);
-}
-
-aside.sidebar__aside {
-	position: sticky;
-	top: 0;
-	max-height: 100vh;
-	border-right: 2px dotted var(--border);
-	padding-bottom: var(--gap);
-	padding-top: var(--gap);
-	padding-left: var(--gap);
-	padding-right: var(--gap);
 }
 

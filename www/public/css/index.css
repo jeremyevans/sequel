@@ -21,6 +21,11 @@ h1.index__h1 {
 	margin: 0;
 	letter-spacing: -0.03em;
 }
+@media (max-width: 640px) {
+	h1.index__h1 {
+		font-size: 48px;
+	}
+}
 
 a.index__a {
 	display: inline-block;
@@ -82,16 +87,37 @@ ul.index__ul {
 	grid-template-columns: repeat(4, 1fr);
 	column-gap: var(--gap);
 }
+@media (max-width: 1024px) {
+	ul.index__ul {
+		grid-template-columns: 1fr;
+		grid-template-rows: auto;
+		row-gap: calc(var(--gap) / 2);
+	}
+
+	ul.index__ul {
+		margin: 0 var(--gap);
+	}
+}
 
 li.index__li {
-	padding-left: var(--gap);
-	border-left: 1px solid rgba(255,255,255,.25);
+	padding-left: calc(var(--gap) / 2);
 	line-height: 1.55em;
+	border-left: 1px solid rgba(255,255,255,.25);
+}
+@media (max-width: 1024px) {
+	li.index__li {
+		padding-left: 0px;
+		padding-top: calc(var(--gap) / 2);
+		border-left: none;
+		border-top: 1px solid rgba(255,255,255,.25);
+	}
 }
 
 li.index__li:first-child {
+	border-top: 0px;
 	padding-left: 0px;
 	border-left: none;
+	border-bottom: none;
 }
 
 pre.pre {
