@@ -1,44 +1,47 @@
 <section class="index">
-  <div class="index__hero">
-    <h1 class="index__h1"><strong>Sequel:</strong> The Database Toolkit for Ruby</h1>
-    <a href="https://github.com/jeremyevans/sequel/" class="index__a" target="_blank">v<%= Sequel::VERSION %></a>
-    <nav class="index__nav">
-      <a href="documentation.html" class="index__button">Documentation</a>
-      <a href="index.html#example" class="index__button index__button--secondary">Code Sample</a>
-    </nav>
-  </div>
+<div class="index__hero">
 
-  <ul class="index__ul">
-    <li class="index__li">Thread safety, connection pooling and a concise DSL for constructing SQL queries and table schemas.</li>
-    <li class="index__li">Comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
-    <li class="index__li">Advanced database features such as prepared statements, bound variables, stored procedures, savepoints, two-phase commit, transaction isolation, primary/replica configurations, and database sharding.</li>
-    <li class="index__li">With adapters for ADO, Amalgalite, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle, PostgreSQL, SQLAnywhere, SQLite3, and TinyTDS.</li>
-  </ul>
+<h1 class="index__h1"><strong>Sequel:</strong> The Database Toolkit for Ruby</h1>
 
-  <a name="example"></a>
-  <pre class="pre"><code class="ruby" lang="ruby"><span class="ident">require</span> <span class="punct">&quot;</span><span class="string">sequel</span><span class="punct">&quot;</span>
+<a href="https://github.com/jeremyevans/sequel/" class="index__a" target="_blank">v<%= Sequel::VERSION %></a>
 
-  <span class="comment"># connect to an in-memory database</span>
-  <span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">sqlite</span>
+<nav class="index__nav">
+<a href="documentation.html" class="index__button">Documentation</a>
+<a href="index.html#example" class="index__button index__button--secondary">Code Sample</a>
+</nav>
+</div>
 
-  <span class="comment"># create an items table</span>
-  <span class="constant">DB</span><span class="punct">.</span><span class="ident">create_table</span> <span class="symbol">:items</span> <span class="keyword">do</span>
-    <span class="ident">primary_key</span> <span class="symbol">:id</span>
-    <span class="ident">String</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">unique:</span> <span class="keyword">true</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
-    <span class="ident">Float</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
-  <span class="keyword">end</span>
+<ul class="index__ul">
+<li class="index__li">Thread safety, connection pooling and a concise DSL for constructing SQL queries and table schemas.</li>
+<li class="index__li">Comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
+<li class="index__li">Advanced database features such as prepared statements, bound variables, stored procedures, savepoints, two-phase commit, transaction isolation, primary/replica configurations, and database sharding.</li>
+<li class="index__li">With adapters for ADO, Amalgalite, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle, PostgreSQL, SQLAnywhere, SQLite3, and TinyTDS.</li>
+</ul>
 
-  <span class="comment"># create a dataset from the items table</span>
-  <span class="ident">items</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:items</span><span class="punct">]</span>
+<a name="example"></a>
+<pre class="pre"><code class="ruby" lang="ruby"><span class="ident">require</span> <span class="punct">&quot;</span><span class="string">sequel</span><span class="punct">&quot;</span>
 
-  <span class="comment"># populate the table</span>
-  <span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">abc</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
-  <span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">def</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
-  <span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">ghi</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="comment"># connect to an in-memory database</span>
+<span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">sqlite</span>
 
-  <span class="comment"># print out the number of records</span>
-  <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Item count: <span class="expr">#{items.count}</span></span><span class="punct">&quot;</span>
+<span class="comment"># create an items table</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">create_table</span> <span class="symbol">:items</span> <span class="keyword">do</span>
+<span class="ident">primary_key</span> <span class="symbol">:id</span>
+<span class="ident">String</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">unique:</span> <span class="keyword">true</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
+<span class="ident">Float</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
+<span class="keyword">end</span>
 
-  <span class="comment"># print out the average price</span>
-  <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">The average price is: <span class="expr">#{items.avg(:price)}</span></span><span class="punct">&quot;</span></code></pre>
+<span class="comment"># create a dataset from the items table</span>
+<span class="ident">items</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:items</span><span class="punct">]</span>
+
+<span class="comment"># populate the table</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">abc</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">def</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">ghi</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+
+<span class="comment"># print out the number of records</span>
+<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Item count: <span class="expr">#{items.count}</span></span><span class="punct">&quot;</span>
+
+<span class="comment"># print out the average price</span>
+<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">The average price is: <span class="expr">#{items.avg(:price)}</span></span><span class="punct">&quot;</span></code></pre>
 </section>
