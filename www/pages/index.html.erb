@@ -19,29 +19,29 @@
 </ul>
 
 <a name="example"></a>
-<pre class="pre"><code class="ruby" lang="ruby"><span class="ident">require</span> <span class="punct">&quot;</span><span class="string">sequel</span><span class="punct">&quot;</span>
+<pre class="pre"><code class="ruby" lang="ruby"><span class="ident">require</span> <span class="punct">"</span><span class="string">sequel</span><span class="punct">"</span>
 
 <span class="comment"># connect to an in-memory database</span>
 <span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">sqlite</span>
 
 <span class="comment"># create an items table</span>
 <span class="constant">DB</span><span class="punct">.</span><span class="ident">create_table</span> <span class="symbol">:items</span> <span class="keyword">do</span>
-<span class="ident">primary_key</span> <span class="symbol">:id</span>
-<span class="ident">String</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">unique:</span> <span class="keyword">true</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
-<span class="ident">Float</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
+  <span class="ident">primary_key</span> <span class="symbol">:id</span>
+  <span class="ident">String</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">unique:</span> <span class="keyword">true</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
+  <span class="ident">Float</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
 <span class="keyword">end</span>
 
 <span class="comment"># create a dataset from the items table</span>
 <span class="ident">items</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:items</span><span class="punct">]</span>
 
 <span class="comment"># populate the table</span>
-<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">abc</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
-<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">def</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
-<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">&#39;</span><span class="string">ghi</span><span class="punct">&#39;,</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">'</span><span class="string">abc</span><span class="punct">',</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">'</span><span class="string">def</span><span class="punct">',</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">'</span><span class="string">ghi</span><span class="punct">',</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
 
 <span class="comment"># print out the number of records</span>
-<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Item count: <span class="expr">#{items.count}</span></span><span class="punct">&quot;</span>
+<span class="ident">puts</span> <span class="punct">"</span><span class="string">Item count: <span class="expr">#{items.count}</span></span><span class="punct">"</span>
 
 <span class="comment"># print out the average price</span>
-<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">The average price is: <span class="expr">#{items.avg(:price)}</span></span><span class="punct">&quot;</span></code></pre>
+<span class="ident">puts</span> <span class="punct">"</span><span class="string">The average price is: <span class="expr">#{items.avg(:price)}</span></span><span class="punct">"</span></code></pre>
 </section>
