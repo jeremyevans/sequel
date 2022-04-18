@@ -1,309 +1,1087 @@
-<h2>Sequel::Model Plugins for v<%= Sequel.version %></h2>
+<section class="plugins">
 
-<p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
+<h1 class="h1">Sequel::Model Plugins for v<%= Sequel.version %></h1>
 
-<h3>Plugins that ship with Sequel</h3>
+<div class="plugins__sidebar">
+<aside class="plugins__sidebar-aside">
+<nav class="nav">
+<ul class="nav__ul nav__ul--column">
 
-<ul>
-<li>Associations:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationDependencies.html">association_dependencies</a>: Allows easy deleting, destroying, or nullifying associated objects when destroying a model object.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationLazyEagerOption.html">association_lazy_eager_option</a>: Support :eager option when calling association method, for per-call eager loading when association is not cached.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationMultiAddRemove.html">association_multi_add_remove</a>: Allows adding/removing multiple associated objects in a single method call.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationPks.html">association_pks</a>: Adds the association_pks and association_pks= to *_to_many associations.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationProxies.html">association_proxies</a>: Changes the *_to_many association method to return a proxy instead of an array of objects.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoRestrictEagerGraph.html">auto_restrict_eager_graph</a>: Automatically disallow the use of eager_graph for associations with blocks but without :graph_* conditions.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ConcurrentEagerLoading.html">concurrent_eager_loading</a>: Allows you to concurrently eagerly load multiple associations using the async_thread_pool Database extension.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/DatasetAssociations.html">dataset_associations</a>: Adds association methods to datasets that return datasets of associated objects.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/DelayAddAssociation.html">delay_add_association</a>: Delay add_<i>association</i> calls on new objects until after after the object is saved.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/EagerEach.html">eager_each</a>: Makes each on an eagerly loaded dataset do eager loading.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/EagerGraphEager.html">eager_graph_eager</a>: Allows chaining eager loads to associations loaded by eager_graph.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ForbidLazyLoad.html">forbid_lazy_load</a>: Forbids lazy loading of associations in cases where they could cause N+1 query issues.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceSpecificDefault.html">instance_specific_default</a>: Find associations that would benefit from having the :instance_specific option specified.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association through multiple join tables.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/PgArrayAssociations.html">pg_array_associations</a>: Adds associations types to handle the case where foreign keys are stored in a PostgreSQL array in one of the tables.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree</a>: Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading</a>: Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Tree.html">tree</a>: Allows you to treat model objects as being part of a tree, finding ancestors, descendants, siblings, and tree roots.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/UnusedAssociations.html">unused_associations</a>: Determines which associations and association methods you can skip defining to save on memory.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidateAssociated.html">validate_associated</a>: Supports validating associated objects at the same time as the current object.</li>
-</ul></li>
-<li>Attributes:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AccessedColumns.html">accessed_columns</a>: Records which columns have been accessed for a given model instance.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/BlacklistSecurity.html">blacklist_security</a>: Adds blacklist-based model mass-assignment protection.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/BooleanReaders.html">boolean_readers</a>: Adds attribute? methods for all boolean columns.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ColumnConflicts.html">column_conflicts</a>: Automatically handles column names that conflict with Ruby/Sequel method names.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ColumnEncryption.html">column_encryption</a>: Encrypt column values stored in the database.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Dirty.html">dirty</a>: Allows you get get initial values of columns after changing the values.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/DefaultsSetter.html">defaults_setter</a>: Get default values for new models before saving.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Enum.html">enum</a>: Allows for treating a column as a enum.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ForceEncoding.html">force_encoding</a>: Forces the all model column string values to a given encoding.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InputTransformer.html">input_transformer</a>: Automatically transform input to model column setters.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/LazyAttributes.html">lazy_attributes</a>: Allows you to set some attributes that should not be loaded by default, but only loaded when an object requests them.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ModificationDetection.html">modification_detection</a>: Automatically detect in-place changes to column values.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SplitValues.html">split_values</a>: Splits noncolumn entries from values hash into separate hash.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/StringStripper.html">string_stripper</a>: Strips strings assigned to model attributes.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Uuid.html">uuid</a>: Automatically sets UUID attribute when creating model objects.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/WhitelistSecurity.html">whitelist_security</a>: Adds whitelist-based model mass-assignment protection.</li>
-</ul></li>
-<li>Caching:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Caching.html">caching</a>: Supports caching primary key lookups of model objects to any object that supports the Ruby-Memcache API.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/StaticCache.html">static_cache</a>: Caches all model instances, improving performance for static models.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/StaticCacheCache.html">static_cache_cache</a>: Support caching rows for static_cache models to a file to avoid database queries during model initialization.</li>
-</ul></li>
-<li>Hooks:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AfterInitialize.html">after_initialize</a>: Adds an after_initialize hook to model objects, called for both new objects and those loaded from the database.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/HookClassMethods.html">hook_class_methods</a>: Adds backwards compatiblity for the legacy class-level hook methods (e.g. before_save :do_something).</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceHooks.html">instance_hooks</a>: Allows you to add hooks to specific model instances.</li>
-</ul></li>
-<li>Inheritance:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ClassTableInheritance.html">class_table_inheritance</a>: Supports inheritance in the database by using a single database table for each class in a class hierarchy.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance</a>: Supports inheritance in the database by using a single table for all classes in a class hierarchy.</li>
-</ul></li>
-<li>Prepared Statements:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements</a>: Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsSafe.html">prepared_statements_safe</a>: Makes use of prepared_statements plugin more safe by setting explicit defaults for model columns when inserting and saving whole rows instead of changed columns.</li>
-</ul></li>
-<li>Saving:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ColumnsUpdated.html">columns_updated</a>: Makes columns hash used for updates available in after_update and after_save hooks.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InsertConflict.html">insert_conflict</a>: Allows handling unique constraint conflicts when saving new model instances on PostgreSQL 9.5+ and SQLite 3.24.0+.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/MssqlOptimisticLocking.html">mssql_optimistic_locking</a>: Uses a timestamp/rowversion column on Microsoft SQL Server to prevent concurrent updates overwriting changes.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding</a>: Additional model support for Sequel's sharding support.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SkipCreateRefresh.html">skip_create_refresh</a>: Allows you to skip the refresh when saving new model objects.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SkipSavingColumns.html">skip_saving_columns</a>: Allows for marking columns to skip when saving model objects, and skips the saving of generated columns by default.</li>
-<li><a href='rdoc-plugins/classes/Sequel/Plugins/Timestamps.html'>timestamps</a>: Creates hooks for automatically setting create and update timestamps.</li>
-<li><a href='rdoc-plugins/classes/Sequel/Plugins/Touch.html'>touch</a>: Allows easily updating timestamps via Model#touch, as well as touching associations when model instances are updated or destroyed.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/UnlimitedUpdate.html">unlimited_update</a>: Works around MySQL warnings when using replication due to LIMIT clause use when updating model instances.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdateOrCreate.html">update_or_create</a>: Adds helper methods for updating an object if it exists, or creating such an object if it does not.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdatePrimaryKey.html">update_primary_key</a>: Allows you to safely update the primary key of a model object.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdateRefresh.html">update_refresh</a>: Refreshes a model object when updating it.</li>
-</ul></li>
-<li>Selection:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ColumnSelect.html">column_select</a>: Selects explicitly qualified columns (table.column1, table.column2, ...) instead of just * for model datasets.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InsertReturningSelect.html">insert_returning_select</a>: Automatically sets RETURNING clause for INSERT queries for models that use an explicit column selection.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/TableSelect.html">table_select</a>: Selects table.* instead of just * for model datasets.</li>
-</ul></li>
-<li>Serialization:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Composition.html">composition</a>: Supports defining getters/setters for objects with data backed by the model's columns.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/CsvSerializer.html">csv_serializer</a>: Allows you to serialize/deserialize model objects to/from CSV.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/JsonSerializer.html">json_serializer</a>: Allows you to serialize/deserialize model objects to/from JSON.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SerializationModificationDetection.html">serialization_modification_detection</a>: Allows you to detect changes to serialized columns.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/XmlSerializer.html">xml_serializer</a>: Allows you to serialize/deserialize model objects to/from XML.</li>
-</ul></li>
-<li>Subsets:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/BooleanSubsets.html">boolean_subsets</a>: Automatically creates a subset method for each boolean column.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/DefDatasetMethod.html">def_dataset_method</a>: Adds Model.def_dataset_method and Model.subset for backwards compatibility.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InvertedSubsets.html">inverted_subsets</a>: Creates an additional method for each subset, that inverts the subset's conditions.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SubsetConditions.html">subset_conditions</a>: Creates an additional method for each subset, returning the filter conditions used for the subset.</li>
-</ul></li>
-<li>Validations:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence/not_null, max length, type, and unique validations based on the model's schema.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidationsConstraintValidationsPresenceMessage.html">auto_validations_constraint_validations_presence_message</a>: Use more specific constraint_validations error message instead of generic auto_validations in certain cases.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations</a>: Setup automatic validations for constraints added via the <a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/EmptyFailureBacktraces.html">empty_failure_backtraces</a>: Uses empty backtraces for ValidationFailed and HookFailed exceptions, for much better performance on JRuby.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter</a>: Splits multi-column errors entries into separate errors, one per column.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/PgAutoConstraintValidations.html">pg_auto_constraint_validations</a>: Automatically convert constraint violations during INSERT/UPDATE on PostgreSQL to validation failures.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ThrowFailures.html">throw_failures</a>: Throws ValidationFailed and HookFailed exceptions instead of raising them, if a matching catch block is used.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationContexts.html">validation_contexts</a>: Allow specifying a context to use during validations.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>
-</ul></li>
-<li>Other:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model</a>: Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3+.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AsyncThreadPool.html">async_thread_pool</a>: Adds better support for model classes to use the async_thread_pool Database extension.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Finder.html">finder</a>: Adds Model.finder and Model.prepared_finder methods for defining optimized lookup methods.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/List.html">list</a>: Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SingularTableNames.html">singular_table_names</a>: Makes Sequel default to not pluralizing table names.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SqlComments.html">sql_comments</a>: Supports automatically adding comments to queries to show which class, instance, dataset, or association method triggered the query.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses</a>: Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</li>
-<li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
-</ul></li>
+<li class="nav__li">
+<a href="plugins.html#plugins" class="nav__a">Sequel Plugins</a>
+<a href="plugins.html#plugins-sequel" class="a">Plugins that ship with Sequel</a>
+<a href="plugins.html#plugins-external" class="a">External Plugins</a>
+</li>
+
+<li class="nav__li">
+<a href="plugins.html#extensions" class="nav__a">Sequel Extensions</a>
+<a href="plugins.html#extensions-database-sequel" class="a">Database extensions that ship with Sequel</a>
+<a href="plugins.html#extensions-dataset-sequel" class="a">Dataset extensions that ship with Sequel</a>
+<a href="plugins.html#extensions-global-sequel" class="a">Global extensions that ship with Sequel</a>
+<a href="plugins.html#extensions-external" class="a">External Extensions</a>
+<a href="plugins.html#extensions-external-adapters" class="a">External Adapters</a>
+</li>
+
+<li class="nav__li">
+<a href="plugins.html#submit" class="nav__a">Submit your Plugin, Extension or Adapter</a>
+</li>
+
+</ul>
+</nav>
+</aside>
+
+<div class="plugins__sidebar-content">
+<a name="plugins"></a>
+
+<h2 class="h2">Sequel::Model <span class="h2__span">has a standardized and very flexible plugin architecture, see the <a class="a" href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed. </span>
+</h2>
+
+<div class="row">
+<div class="row__item">
+<a name="plugins-sequel"></a>
+
+<h3 class="h3">Plugins that ship with Sequel</h3>
+
+<h4 class="h4">Associations</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AssociationDependencies.html">association_dependencies </a>
+<span class="ul__span">Allows easy deleting, destroying, or nullifying associated objects when destroying a model object.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AssociationLazyEagerOption.html">association_lazy_eager_option </a>
+<span class="ul__span">Support :eager option when calling association method, for per-call eager loading when association is not cached.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AssociationMultiAddRemove.html">association_multi_add_remove </a>
+<span class="ul__span">Allows adding/removing multiple associated objects in a single method call.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AssociationPks.html">association_pks </a>
+<span class="ul__span">Adds the association_pks and association_pks= to *_to_many associations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AssociationProxies.html">association_proxies </a>
+<span class="ul__span">Changes the *_to_many association method to return a proxy instead of an array of objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ConcurrentEagerLoading.html">concurrent_eager_loading </a>
+<span class="ul__span">Allows you to concurrently eagerly load multiple associations using the async_thread_pool Database extension.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/DatasetAssociations.html">dataset_associations </a>
+<span class="ul__span">Adds association methods to datasets that return datasets of associated objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/DelayAddAssociation.html">delay_add_association </a>
+<span class="ul__span">Delay add_<i>association</i> calls on new objects until after after the object is saved. </span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/EagerEach.html">eager_each </a>
+<span class="ul__span">Makes each on an eagerly loaded dataset do eager loading.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/EagerGraphEager.html">eager_graph_eager </a>
+<span class="ul__span">Allows chaining eager loads to associations loaded by eager_graph.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ForbidLazyLoad.html">forbid_lazy_load </a>
+<span class="ul__span">Forbids lazy loading of associations in cases where they could cause N+1 query issues.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many </a>
+<span class="ul__span">Allows you to create an association through multiple join tables.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes </a>
+<span class="ul__span">Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PgArrayAssociations.html">pg_array_associations </a>
+<span class="ul__span">Adds associations types to handle the case where foreign keys are stored in a PostgreSQL array in one of the tables.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree </a>
+<span class="ul__span">Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading </a>
+<span class="ul__span">Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Tree.html">tree </a>
+<span class="ul__span">Allows you to treat model objects as being part of a tree, finding ancestors, descendants, siblings, and tree roots.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/UnusedAssociations.html">unused_associations </a>
+<span class="ul__span">Determines which associations and association methods you can skip defining to save on memory.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidateAssociated.html">validate_associated </a>
+<span class="ul__span">Supports validating associated objects at the same time as the current object.</span>
+</li>
 </ul>
 
-<h3>External Plugins</h3>
+<h4 class="h4">Attributes</h4>
 
-<ul>
-<li><a href='http://github.com/jeremyevans/forme'>forme</a>: HTML forms library for ruby that integrates with Sequel::Model for easy form creation.</li>
-<li><a href='https://github.com/kenaniah/sequel-active_record'>sequel-active_record</a>: Provides ActiveRecord compatibility to ease transitions to Sequel.</li>
-<li><a href='http://github.com/gucki/sequel_bulk_attributes'>sequel_bulk_attributes</a>: Provides bulk assignment functionality for one_to_many associations.</li>
-<li><a href='http://github.com/sdepold/sequel-bit_fields'>sequel-bit_fields</a>: Allows treating an integer column as a bitfield of many boolean settings.</li>
-<li><a href='http://github.com/monterail/sequel-combine'/>sequel-combine</a>: Provides functionality of composing with childrens, parents or any object where exists any relationship. Now it is possible in one query.</li>
-<li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
-<li><a href='http://github.com/mig-hub/sequel-crushyform'>sequel_crushyform</a>: Builds forms for you</li>
-<li><a href='http://github.com/jrgns/sequel-elasticsearch'>sequel-elasticsearch</a>: Sync Sequel models to Elasticsearch.</li>
-<li><a href='https://github.com/AlexWayfer/sequel-enum_values'>sequel-enum_values</a>: Provides <code>enum_values(field_name)</code> method for model class and optional optional instance predicate methods like <code>created?</code>.</li>
-<li><a href='https://github.com/adam12/sequel-hash_id'>sequel-hash_id</a>: Obscure your primary keys with a hashid.</li>
-<li><a href='http://github.com/gucki/sequel_mappable'>sequel_mappable</a>: Provides geocoding functionality to model and dataset.</li>
-<li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
-<li><a href='https://github.com/dashingrocket/sequel-nonsequential_id'>sequel-nonsequential_id</a>: Automatically generate non-sequential (pseudo-random) IDs for Sequel Models.</li>
-<li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
-<li><a href='http://github.com/gucki/sequel_paperclip'>sequel_paperclip</a>: Provides attachment functionality for models, including post processing (thumbnail generation, etc.).</li>
-<li><a href='https://github.com/yuryroot/sequel-pg_advisory_lock'>sequel-pg_advisory_lock</a>: Allows you to use PostgreSQL advisory locks for application-level mutexes.</li>
-<li><a href='https://github.com/tycooon/sequel_pretty_print'>sequel_pretty_print</a>: Adds Ruby PrettyPrint support to models (works in Pry console).</li>
-<li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
-<li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Lets you add procs that automatically rescue and fix model errors.</li>
-<li><a href='https://github.com/mlen/sequel_secure_password'>sequel_secure_password</a>: Adds bcrypt authentication and password hashing to models.</li>
-<li><a href='http://github.com/gucki/sequel_sexy_validations'>sequel_sexy_validations</a>: Provides sexy validations (like those in rails 3) for models.</li>
-<li><a href='http://github.com/tadman/sequel_simple_callbacks'>sequel_simple_callbacks</a>: Enables ActiveRecord-compatible class-level before and after filter declarations for models with support for conditional execution.</li>
-<li><a href='http://github.com/pk/sequel_sluggable'>sequel_sluggable</a>: Easy slug behaviour for any model.</li>
-<li><a href='https://github.com/QuinnHarris/sequel-table_inheritance'>sequel-table_inheritance</a>: Combines the functionality of the single table inheritance and class table inheritance plugins.</li>
-<li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
-<li><a href='https://github.com/kenaniah/sequel-through'>sequel-through</a>: Adds support for :through associations between models.</li>
-<li><a href='http://github.com/jeremyevans/sequel_validation_helpers_block'>sequel_validation_helpers_block</a>: Allows easy determination of which validation rules apply to a given column, at the expense of increased verbosity.</li>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AccessedColumns.html">accessed_columns </a>
+<span class="ul__span">Records which columns have been accessed for a given model instance.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/BlacklistSecurity.html">blacklist_security </a>
+<span class="ul__span">Adds blacklist-based model mass-assignment protection.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/BooleanReaders.html">boolean_readers </a>
+<span class="ul__span">Adds attribute? methods for all boolean columns.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ColumnConflicts.html">column_conflicts </a>
+<span class="ul__span">Automatically handles column names that conflict with Ruby/Sequel method names.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ColumnEncryption.html">column_encryption </a>
+<span class="ul__span">Encrypt column values stored in the database.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Dirty.html">dirty </a>
+<span class="ul__span">Allows you get get initial values of columns after changing the values.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/DefaultsSetter.html">defaults_setter </a>
+<span class="ul__span">Get default values for new models before saving.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Enum.html">enum </a>
+<span class="ul__span">Allows for treating a column as a enum.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ForceEncoding.html">force_encoding </a>
+<span class="ul__span">Forces the all model column string values to a given encoding.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InputTransformer.html">input_transformer </a>
+<span class="ul__span">Automatically transform input to model column setters.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/LazyAttributes.html">lazy_attributes </a>
+<span class="ul__span">Allows you to set some attributes that should not be loaded by default, but only loaded when an object requests them.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ModificationDetection.html">modification_detection </a>
+<span class="ul__span">Automatically detect in-place changes to column values.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SplitValues.html">split_values </a>
+<span class="ul__span">Splits noncolumn entries from values hash into separate hash.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/StringStripper.html">string_stripper </a>
+<span class="ul__span">Strips strings assigned to model attributes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Uuid.html">uuid </a>
+<span class="ul__span">Automatically sets UUID attribute when creating model objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/WhitelistSecurity.html">whitelist_security </a>
+<span class="ul__span">Adds whitelist-based model mass-assignment protection.</span>
+</li>
 </ul>
 
-<h2>Sequel Extensions</h2>
+<h4 class="h4">Caching</h4>
 
-<p>Extensions are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions).</p>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Caching.html">caching </a>
+<span class="ul__span">Supports caching primary key lookups of model objects to any object that supports the Ruby-Memcache API.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/StaticCache.html">static_cache </a>
+<span class="ul__span">Caches all model instances, improving performance for static models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/StaticCacheCache.html">static_cache_cache </a>
+<span class="ul__span">Support caching rows for static_cache models to a file to avoid database queries during model initialization.</span>
+</li>
+</ul>
+<h4 class="h4">Hooks</h4>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AfterInitialize.html">after_initialize </a>
+<span class="ul__span">Adds an after_initialize hook to model objects, called for both new objects and those loaded from the database.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/HookClassMethods.html">hook_class_methods </a>
+<span class="ul__span">Adds backwards compatiblity for the legacy class-level hook methods (e.g. before_save :do_something).</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InstanceHooks.html">instance_hooks </a>
+<span class="ul__span">Allows you to add hooks to specific model instances.</span>
+</li>
+</ul>
 
-<h3>Database extensions that ship with Sequel</h3>
+<h4 class="h4">Inheritance</h4>
 
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ClassTableInheritance.html">class_table_inheritance </a>
+<span class="ul__span">Supports inheritance in the database by using a single database table for each class in a class hierarchy.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance </a>
+<span class="ul__span">Supports inheritance in the database by using a single table for all classes in a class hierarchy.</span>
+</li>
+</ul>
+
+<h4 class="h4">Prepared Statements</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements </a>
+<span class="ul__span">Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsSafe.html">prepared_statements_safe </a>
+<span class="ul__span">Makes use of prepared_statements plugin more safe by setting explicit defaults for model columns when inserting and saving whole rows instead of changed columns.</span>
+</li>
+</ul>
+
+<h4 class="h4">Saving</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ColumnsUpdated.html">columns_updated </a>
+<span class="ul__span">Makes columns hash used for updates available in after_update and after_save hooks.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InsertConflict.html">insert_conflict </a>
+<span class="ul__span">Allows handling unique constraint conflicts when saving new model instances on PostgreSQL 9.5+ and SQLite 3.24.0+.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters </a>
+<span class="ul__span">Allows you to add per instance filters that are used when updating or destroying the instance.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/MssqlOptimisticLocking.html">mssql_optimistic_locking </a>
+<span class="ul__span">Uses a timestamp/rowversion column on Microsoft SQL Server to prevent concurrent updates overwriting changes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking </a>
+<span class="ul__span">Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding </a>
+<span class="ul__span">Additional model support for Sequel's sharding support.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SkipCreateRefresh.html">skip_create_refresh </a>
+<span class="ul__span">Allows you to skip the refresh when saving new model objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SkipSavingColumns.html">skip_saving_columns </a>
+<span class="ul__span">Allows for marking columns to skip when saving model objects, and skips the saving of generated columns by default.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Timestamps.html">timestamps </a>
+<span class="ul__span">Creates hooks for automatically setting create and update timestamps.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Touch.html">touch </a>
+<span class="ul__span">Allows easily updating timestamps via Model#touch, as well as touching associations when model instances are updated or destroyed.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/UnlimitedUpdate.html">unlimited_update </a>
+<span class="ul__span">Works around MySQL warnings when using replication due to LIMIT clause use when updating model instances.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/UpdateOrCreate.html">update_or_create </a>
+<span class="ul__span">Adds helper methods for updating an object if it exists, or creating such an object if it does not.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/UpdatePrimaryKey.html">update_primary_key </a>
+<span class="ul__span">Allows you to safely update the primary key of a model object.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/UpdateRefresh.html">update_refresh </a>
+<span class="ul__span">Refreshes a model object when updating it.</span>
+</li>
+</ul>
+
+<h4 class="h4">Selection</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ColumnSelect.html">column_select </a>
+<span class="ul__span">Selects explicitly qualified columns (table.column1, table.column2, ...) instead of just * for model datasets.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InsertReturningSelect.html">insert_returning_select </a>
+<span class="ul__span">Automatically sets RETURNING clause for INSERT queries for models that use an explicit column selection.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/TableSelect.html">table_select </a>
+<span class="ul__span">Selects table.* instead of just * for model datasets.</span>
+</li>
+</ul>
+
+<h4 class="h4">Serialization</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Composition.html">composition </a>
+<span class="ul__span">Supports defining getters/setters for objects with data backed by the model's columns.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/CsvSerializer.html">csv_serializer </a>
+<span class="ul__span">Allows you to serialize/deserialize model objects to/from CSV.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/JsonSerializer.html">json_serializer </a>
+<span class="ul__span">Allows you to serialize/deserialize model objects to/from JSON.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization </a>
+<span class="ul__span">Supports serializing column values and storing them as either marshal, yaml, or json in the database.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SerializationModificationDetection.html">serialization_modification_detection </a>
+<span class="ul__span">Allows you to detect changes to serialized columns.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/XmlSerializer.html">xml_serializer </a>
+<span class="ul__span">Allows you to serialize/deserialize model objects to/from XML.</span>
+</li>
+</ul>
+
+<h4 class="h4">Subsets</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/BooleanSubsets.html">boolean_subsets </a>
+<span class="ul__span">Automatically creates a subset method for each boolean column.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/DefDatasetMethod.html">def_dataset_method </a>
+<span class="ul__span">Adds Model.def_dataset_method and Model.subset for backwards compatibility.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InvertedSubsets.html">inverted_subsets </a>
+<span class="ul__span">Creates an additional method for each subset, that inverts the subset's conditions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SubsetConditions.html">subset_conditions </a>
+<span class="ul__span">Creates an additional method for each subset, returning the filter conditions used for the subset.</span>
+</li>
+</ul>
+
+<h4 class="h4">Validations</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations </a>
+<span class="ul__span">Automatically add presence/not_null, max length, type, and unique validations based on the model's schema.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations </a>
+<span class="ul__span">Setup automatic validations for constraints added via the <a class="a" href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>. </span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/EmptyFailureBacktraces.html">empty_failure_backtraces </a>
+<span class="ul__span">Uses empty backtraces for ValidationFailed and HookFailed exceptions, for much better performance on JRuby.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter </a>
+<span class="ul__span">Splits multi-column errors entries into separate errors, one per column.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PgAutoConstraintValidations.html">pg_auto_constraint_validations </a>
+<span class="ul__span">Automatically convert constraint violations during INSERT/UPDATE on PostgreSQL to validation failures.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ThrowFailures.html">throw_failures </a>
+<span class="ul__span">Throws ValidationFailed and HookFailed exceptions instead of raising them, if a matching catch block is used.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods </a>
+<span class="ul__span">Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidationContexts.html">validation_contexts </a>
+<span class="ul__span">Allow specifying a context to use during validations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers </a>
+<span class="ul__span">The preferred default validations plugin, which uses instance-level methods.</span>
+</li>
+</ul>
+
+<h4 class="h4">Other</h4>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model </a>
+<span class="ul__span">Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3+.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AsyncThreadPool.html">async_thread_pool </a>
+<span class="ul__span">Adds better support for model classes to use the async_thread_pool Database extension.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Finder.html">finder </a>
+<span class="ul__span">Adds Model.finder and Model.prepared_finder methods for defining optimized lookup methods.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/List.html">list </a>
+<span class="ul__span">Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row </a>
+<span class="ul__span">Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SingularTableNames.html">singular_table_names </a>
+<span class="ul__span">Makes Sequel default to not pluralizing table names.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SqlComments.html">sql_comments </a>
+<span class="ul__span">Supports automatically adding comments to queries to show which class, instance, dataset, or association method triggered the query.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses </a>
+<span class="ul__span">Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html">typecast_on_load </a>
+<span class="ul__span">Fixes bad database typecasting when loading model objects.</span>
+</li>
+</ul>
+
+<a name="plugins-external"></a>
+
+<h3 class="h3">External Plugins</h3>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jeremyevans/forme">forme </a>
+<span class="ul__span">HTML forms library for ruby that integrates with Sequel::Model for easy form creation.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/kenaniah/sequel-active_record">sequel-active_record </a>
+<span class="ul__span">Provides ActiveRecord compatibility to ease transitions to Sequel.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gucki/sequel_bulk_attributes">sequel_bulk_attributes </a>
+<span class="ul__span">Provides bulk assignment functionality for one_to_many associations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/sdepold/sequel-bit_fields">sequel-bit_fields </a>
+<span class="ul__span">Allows treating an integer column as a bitfield of many boolean settings.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/monterail/sequel-combine">sequel-combine </a>
+<span class="ul__span">Provides functionality of composing with childrens, parents or any object where exists any relationship. Now it is possible in one query.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/sbfaulkner/sequel_container">sequel_container </a>
+<span class="ul__span">Contained documents (i.e. attachments) for models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/mig-hub/sequel-crushyform">sequel_crushyform </a>
+<span class="ul__span">Builds forms for you
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jrgns/sequel-elasticsearch">sequel-elasticsearch </a>
+<span class="ul__span">Sync Sequel models to Elasticsearch.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/AlexWayfer/sequel-enum_values">sequel-enum_values </a>
+<span class="ul__span">Provides <code class="plugins__code">enum_values(field_name)</code> method for model class and optional optional instance predicate methods like <code class="plugins__code">created?</code>. </span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/adam12/sequel-hash_id">sequel-hash_id </a>
+<span class="ul__span">Obscure your primary keys with a hashid.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gucki/sequel_mappable">sequel_mappable </a>
+<span class="ul__span">Provides geocoding functionality to model and dataset.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/pkondzior/sequel_nested_set">sequel_nested_set </a>
+<span class="ul__span">Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/dashingrocket/sequel-nonsequential_id">sequel-nonsequential_id </a>
+<span class="ul__span">Automatically generate non-sequential (pseudo-random) IDs for Sequel Models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/boof/sequel_notnaughty">sequel_notnaughty </a>
+<span class="ul__span">Port of the NotNaughty validation framework.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gucki/sequel_paperclip">sequel_paperclip </a>
+<span class="ul__span">Provides attachment functionality for models, including post processing (thumbnail generation, etc.).</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/yuryroot/sequel-pg_advisory_lock">sequel-pg_advisory_lock </a>
+<span class="ul__span">Allows you to use PostgreSQL advisory locks for application-level mutexes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/tycooon/sequel_pretty_print">sequel_pretty_print </a>
+<span class="ul__span">Adds Ruby PrettyPrint support to models (works in Pry console).</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jackdempsey/sequel_polymorphic">sequel_polymorphic </a>
+<span class="ul__span">Lets you easily create polymorphic associations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/daicoden/sequel_proc_error_handling">sequel_proc_error_handling </a>
+<span class="ul__span">Lets you add procs that automatically rescue and fix model errors.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/mlen/sequel_secure_password">sequel_secure_password </a>
+<span class="ul__span">Adds bcrypt authentication and password hashing to models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gucki/sequel_sexy_validations">sequel_sexy_validations </a>
+<span class="ul__span">Provides sexy validations (like those in rails 3) for models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/tadman/sequel_simple_callbacks">sequel_simple_callbacks </a>
+<span class="ul__span">Enables ActiveRecord-compatible class-level before and after filter declarations for models with support for conditional execution.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/pk/sequel_sluggable">sequel_sluggable </a>
+<span class="ul__span">Easy slug behaviour for any model.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/QuinnHarris/sequel-table_inheritance">sequel-table_inheritance </a>
+<span class="ul__span">Combines the functionality of the single table inheritance and class table inheritance plugins.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jackdempsey/sequel_taggable">sequel_taggable </a>
+<span class="ul__span">Allows easily adding tags to any model.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/kenaniah/sequel-through">sequel-through </a>
+<span class="ul__span">Adds support for :through associations between models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jeremyevans/sequel_validation_helpers_block">sequel_validation_helpers_block </a>
+<span class="ul__span">Allows easy determination of which validation rules apply to a given column, at the expense of increased verbosity.</span>
+</li>
+</ul>
+</div>
+</div>
+
+<hr class="hr" />
+
+<a name="extensions"></a>
+
+<h2 class="h2">Sequel Extensions <span class="h2__span">are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions). <span class="ul__span">
+</h2>
+
+<div class="row">
+<div class="row__item">
+<a name="extensions-database-sequel"></a>
+
+<h3 class="h3">Database extensions that ship with Sequel</h3>
 <p>Database extensions can be loaded into a single Sequel::Database object via Sequel::Database#extension, or to all databases by using Sequel::Database.extension.</p>
 
-<ul>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/arbitrary_servers_rb.html">arbitrary_servers</a>: Adds ability to connection to arbitrary servers (instead of just preconfigured ones) in the sharding support.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a>: Adds support for running queries asynchronously using a thread pool.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/caller_logging_rb.html">caller_logging</a>: Include caller information when logging queries.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_expiration_rb.html">connection_expiration</a>: Automatically removes connections from the pool after they have been open longer than a timeout.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_validator_rb.html">connection_validator</a>: Automatically validates connections on pool checkout and handles disconnections transparently.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/constant_sql_override_rb.html">constant_sql_override</a>: Override generated SQL for Sequel constants with configurable strings.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a>: Creates database constraints when creating/altering tables, with metadata for <a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">automatic model validations via the constraint_validations plugin</a>.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/error_sql_rb.html">error_sql</a>: Makes DatabaseError#sql return the SQL query that caused the underlying exception.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/identifier_mangling_rb.html">identifier_mangling</a>: Support modification for the default identifier mangling for the database.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/index_caching_rb.html">index_caching</a>: Speeds up loading index information by saving/loading database index metadata to a file.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/integer64_rb.html">integer64</a>: Treats the Integer class as a 64-bit integer instead of a 32-bit integer when used as a generic database type.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting</a>: Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Adds support for PostgreSQL arrays.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_enum_rb.html">pg_enum</a>: Adds support for PostgreSQL enums.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_extended_date_support_rb.html">pg_extended_date_support</a>: Adds support for PostgreSQL infinite and BC date/timestamp support.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore</a>: Adds support for the PostgreSQL hstore type.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_rb.html">pg_inet</a>: Adds support for the PostgreSQL inet and cidr types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_interval_rb.html">pg_interval</a>: Adds support for the PostgreSQL interval type.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html">pg_json</a>: Adds support for the PostgreSQL json type.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_loose_count_rb.html">pg_loose_count</a>: Adds Database#loose_count for fast approximate counts of whole tables on PostgreSQL.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_multirange_rb.html">pg_multirange</a>: Adds support for PostgreSQL multirange types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_rb.html">pg_range</a>: Adds support for PostgreSQL range types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_static_cache_updater_rb.html">pg_static_cache_updater</a>: Listens for changes to underlying tables in order to automatically update models using the static_cache plugin.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_timestamptz_rb.html">pg_timestamptz</a>: Uses timestamptz (timestamp with time zone) as the generic timestamp type used for Time and DateTime classes.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/run_transaction_hooks_rb.html">run_transaction_hooks</a>: Support running after_commit and after_rollback transaction hooks before transaction commit/rollback, designed for transactional testing.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/server_logging_rb.html">server_logging</a>: Include server/shard information when logging queries.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Database#with_comments method, for automatically using comments for queries exceuted inside a block.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_log_normalizer_rb.html">sql_log_normalizer</a>: Normalizes SQL before logging, helpful for analytics and sensitive data.</li>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/arbitrary_servers_rb.html">arbitrary_servers </a>
+<span class="ul__span">Adds ability to connection to arbitrary servers (instead of just preconfigured ones) in the sharding support.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool </a>
+<span class="ul__span">Adds support for running queries asynchronously using a thread pool.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/caller_logging_rb.html">caller_logging </a>
+<span class="ul__span">Include caller information when logging queries.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/connection_expiration_rb.html">connection_expiration </a>
+<span class="ul__span">Automatically removes connections from the pool after they have been open longer than a timeout.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/connection_validator_rb.html">connection_validator </a>
+<span class="ul__span">Automatically validates connections on pool checkout and handles disconnections transparently.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/constant_sql_override_rb.html">constant_sql_override </a>
+<span class="ul__span">Override generated SQL for Sequel constants with configurable strings.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations </a>
+<span class="ul__span">Creates database constraints when creating/altering tables, with metadata for <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">automatic model validations via the constraint_validations plugin</a>. </span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/error_sql_rb.html">error_sql </a>
+<span class="ul__span">Makes DatabaseError#sql return the SQL query that caused the underlying exception.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/identifier_mangling_rb.html">identifier_mangling </a>
+<span class="ul__span">Support modification for the default identifier mangling for the database.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/index_caching_rb.html">index_caching </a>
+<span class="ul__span">Speeds up loading index information by saving/loading database index metadata to a file.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/integer64_rb.html">integer64 </a>
+<span class="ul__span">Treats the Integer class as a 64-bit integer instead of a 32-bit integer when used as a generic database type.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting </a>
+<span class="ul__span">Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array </a>
+<span class="ul__span">Adds support for PostgreSQL arrays.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_enum_rb.html">pg_enum </a>
+<span class="ul__span">Adds support for PostgreSQL enums.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_extended_date_support_rb.html">pg_extended_date_support </a>
+<span class="ul__span">Adds support for PostgreSQL infinite and BC date/timestamp support.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore </a>
+<span class="ul__span">Adds support for the PostgreSQL hstore type.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_rb.html">pg_inet </a>
+<span class="ul__span">Adds support for the PostgreSQL inet and cidr types.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_interval_rb.html">pg_interval </a>
+<span class="ul__span">Adds support for the PostgreSQL interval type.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html">pg_json </a>
+<span class="ul__span">Adds support for the PostgreSQL json type.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_loose_count_rb.html">pg_loose_count </a>
+<span class="ul__span">Adds Database#loose_count for fast approximate counts of whole tables on PostgreSQL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_multirange_rb.html">pg_multirange </a>
+<span class="ul__span">Adds support for PostgreSQL multirange types.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_range_rb.html">pg_range </a>
+<span class="ul__span">Adds support for PostgreSQL range types.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row </a>
+<span class="ul__span">Adds support for PostgreSQL row-valued/composite types.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_static_cache_updater_rb.html">pg_static_cache_updater </a>
+<span class="ul__span">Listens for changes to underlying tables in order to automatically update models using the static_cache plugin.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_timestamptz_rb.html">pg_timestamptz </a>
+<span class="ul__span">Uses timestamptz (timestamp with time zone) as the generic timestamp type used for Time and DateTime classes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/run_transaction_hooks_rb.html">run_transaction_hooks </a>
+<span class="ul__span">Support running after_commit and after_rollback transaction hooks before transaction commit/rollback, designed for transactional testing.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching </a>
+<span class="ul__span">Speeds up loading a large number of models by caching database schema and loading it from a file.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper </a>
+<span class="ul__span">Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block </a>
+<span class="ul__span">Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/server_logging_rb.html">server_logging </a>
+<span class="ul__span">Include server/shard information when logging queries.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments </a>
+<span class="ul__span">Adds Database#with_comments method, for automatically using comments for queries exceuted inside a block.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sql_log_normalizer_rb.html">sql_log_normalizer </a>
+<span class="ul__span">Normalizes SQL before logging, helpful for analytics and sensitive data.</span>
+</li>
 </ul>
 
-<h3>Dataset extensions that ship with Sequel</h3>
+<a name="extensions-dataset-sequel"></a>
 
-<p>Dataset extensions can be loaded into a single Sequel::Database object via Sequel::Dataset#extension, or to all datasets for a given database via Sequel::Database#extension, or all datasets for all databases by using Sequel::Database.extension.</p>
+<h3 class="h3">Dataset extensions that ship with Sequel</h3>
+<p class="p">Dataset extensions can be loaded into a single Sequel::Database object via Sequel::Dataset#extension, or to all datasets for a given database via Sequel::Database#extension, or all datasets for all databases by using Sequel::Database.extension.</p>
 
-<ul>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/any_not_empty_rb.html">any_not_empty</a>: Make Dataset#any? without block mean !empty?.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/auto_literal_strings_rb.html">auto_literal_strings</a>: Automatically treats string arguments passed to filter methods as literal SQL.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/current_datetime_timestamp_rb.html">current_datetime_timestamp</a>: Creates current Time/DateTime objects that are literalized as CURRENT_TIMESTAMP.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/dataset_source_alias_rb.html">dataset_source_alias</a>: Automatically aliases datasets to their source instead of using t1, t2, etc.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/duplicate_columns_handler_rb.html">duplicate_columns_handler</a>: Allows you to raise or warn if the dataset returns multiple columns with the same name when returning the results.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_consider_nulls_rb.html">empty_array_consider_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty array use a NULL expression for NULL column values.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/exclude_or_null_rb.html">exclude_or_null</a>: Add Dataset#exclude_or_null for only including rows where condition is false or NULL.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/implicit_subquery_rb.html">implicit_subquery</a>: Makes dataset methods that return datasets with modified SQL use a subquery implicitly if the current dataset uses raw SQL.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/mssql_emulate_lateral_with_apply_rb.html">mssql_emulate_lateral_with_apply</a>: Emulates LATERAL queries using CROSS/OUTER APPLY on Microsoft SQL Server.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/round_timestamps_rb.html">round_timestamps</a>: Automatically round timestamp values to database supported precision before literalizing them.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove</a>: Adds Dataset#select_remove to remove selected columns from a dataset.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sequel_4_dataset_methods_rb.html">sequel_4_dataset_methods</a>: Adds #and, #exclude_where, #interval, and #range dataset methods.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Dataset#comment method, for setting an SQL comment in the queries created by the dataset.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/string_agg_rb.html">string_agg</a>: Adds generic database support for aggregate string concatentation.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/synchronize_sql_rb.html">synchronize_sql</a>: Checks out a connection while generating SQL strings, improving performance in some cases.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot</a>: Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</li>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/any_not_empty_rb.html">any_not_empty </a>
+<span class="ul__span">Make Dataset#any? without block mean !empty?.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/auto_literal_strings_rb.html">auto_literal_strings </a>
+<span class="ul__span">Automatically treats string arguments passed to filter methods as literal SQL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection </a>
+<span class="ul__span">Attemps to skip database queries by introspecting the selected columns if possible.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/current_datetime_timestamp_rb.html">current_datetime_timestamp </a>
+<span class="ul__span">Creates current Time/DateTime objects that are literalized as CURRENT_TIMESTAMP.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/dataset_source_alias_rb.html">dataset_source_alias </a>
+<span class="ul__span">Automatically aliases datasets to their source instead of using t1, t2, etc.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic </a>
+<span class="ul__span">Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/duplicate_columns_handler_rb.html">duplicate_columns_handler </a>
+<span class="ul__span">Allows you to raise or warn if the dataset returns multiple columns with the same name when returning the results.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/empty_array_consider_nulls_rb.html">empty_array_consider_nulls </a>
+<span class="ul__span">Makes Sequel's handling of IN/NOT IN with an empty array use a NULL expression for NULL column values.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/exclude_or_null_rb.html">exclude_or_null </a>
+<span class="ul__span">Add Dataset#exclude_or_null for only including rows where condition is false or NULL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each </a>
+<span class="ul__span">Makes Dataset#each split returned results by table when using Dataset#graph.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/implicit_subquery_rb.html">implicit_subquery </a>
+<span class="ul__span">Makes dataset methods that return datasets with modified SQL use a subquery implicitly if the current dataset uses raw SQL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset </a>
+<span class="ul__span">Adds Dataset#nullify to get a dataset that will never issue a query.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/mssql_emulate_lateral_with_apply_rb.html">mssql_emulate_lateral_with_apply </a>
+<span class="ul__span">Emulates LATERAL queries using CROSS/OUTER APPLY on Microsoft SQL Server.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination </a>
+<span class="ul__span">Adds Dataset#paginate for easier pagination of datasets.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table </a>
+<span class="ul__span">Adds Dataset#print for printing a dataset as a simple plain-text table.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query </a>
+<span class="ul__span">Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/round_timestamps_rb.html">round_timestamps </a>
+<span class="ul__span">Automatically round timestamp values to database supported precision before literalizing them.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove </a>
+<span class="ul__span">Adds Dataset#select_remove to remove selected columns from a dataset.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sequel_4_dataset_methods_rb.html">sequel_4_dataset_methods </a>
+<span class="ul__span">Adds #and, #exclude_where, #interval, and #range dataset methods.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil </a>
+<span class="ul__span">Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments </a>
+<span class="ul__span">Adds Dataset#comment method, for setting an SQL comment in the queries created by the dataset.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/string_agg_rb.html">string_agg </a>
+<span class="ul__span">Adds generic database support for aggregate string concatentation.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/synchronize_sql_rb.html">synchronize_sql </a>
+<span class="ul__span">Checks out a connection while generating SQL strings, improving performance in some cases.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot </a>
+<span class="ul__span">Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</span>
+</li>
 </ul>
 
-<h3>Global extensions that ship with Sequel</h3>
+<a name="extensions-global-sequel"></a>
 
-<p>Global extensions can affect other parts of Sequel or the general ruby environment, and are loaded with Sequel.extension.</p>
+<h3 class="h3">Global extensions that ship with Sequel</h3>
+<p class="p">Global extensions can affect other parts of Sequel or the general ruby environment, and are loaded with Sequel.extension.</p>
 
-<ul>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>: Adds blank? instance methods to all objects.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions</a>: Extends the Array, Hash, String, and Symbol classes with methods that return Sequel expression objects.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>: Adds refinement versions of Sequel's core extensions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/escaped_like_rb.html">escaped_like</a>: Support creation of LIKE expressions with placeholders in the pattern without access to a dataset.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/date_parse_input_handler_rb.html">date_parse_input_handler</a>: Allows for custom handling of input strings to the date parsing methods.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/datetime_parse_to_time_rb.html">datetime_parse_to_time</a>: Uses DateTime.parse.to_time to parse timestamp strings without offset information where such timestamps are assumed to be in UTC.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency</a>: Uses Fiber.current instead of Thread.current as the key for checking out connections.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>: Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>: Allows you to use named timezones instead of just :local and :utc (requires <a href="http://tzinfo.github.io/">TZInfo</a>).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>: Adds DSL support for calling PostgreSQL array operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>: Adds DSL support for calling PostgreSQL hstore operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_ops_rb.html">pg_inet_ops</a>: Adds DSL support for calling PostgreSQL inet/cidr operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a>: Adds DSL support for calling PostgreSQL json operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range and multirange operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/s_rb.html">s</a>: Adds Sequel::S module with #S private method for easily calling Sequel.expr, including use as a refinement.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sqlite_json_ops_rb.html">sqlite_json_ops</a>: Adds DSL support for calling SQLite json operators and functions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>: Adds instance methods to String for converting the string into a Date/Time/DateTime.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_rb.html">symbol_aref</a>: Extends Symbol#[] to create a qualified identifier if given a symbol, identifier, or qualified identifier.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_refinement_rb.html">symbol_aref_refinement</a>: Adds refinement version of symbol_aref extension.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_rb.html">symbol_as</a>: Adds Symbol#as to create aliased expressions.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_refinement_rb.html">symbol_as_refinement</a>: Adds refinement version of symbol_as extension.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones</a>: Allows for per-thread overrides of the global timezone settings.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/virtual_row_method_block_rb.html">virtual_row_method_block</a>: Supports passing blocks to virtual row method for terser SQL function creation.</li>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>
+<span class="ul__span">Adds blank? instance methods to all objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/core_extensions_rb.html">core_extensions</a>
+<span class="ul__span">Extends the Array, Hash, String, and Symbol classes with methods that return Sequel expression objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a>
+<span class="ul__span">Adds refinement versions of Sequel's core extensions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>
+<span class="ul__span">Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/escaped_like_rb.html">escaped_like</a>
+<span class="ul__span">Support creation of LIKE expressions with placeholders in the pattern without access to a dataset.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/date_parse_input_handler_rb.html">date_parse_input_handler</a>
+<span class="ul__span">Allows for custom handling of input strings to the date parsing methods.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/datetime_parse_to_time_rb.html">datetime_parse_to_time</a>
+<span class="ul__span">Uses DateTime.parse.to_time to parse timestamp strings without offset information where such timestamps are assumed to be in UTC.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency</a>
+<span class="ul__span">Uses Fiber.current instead of Thread.current as the key for checking out connections.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>
+<span class="ul__span">Adds instance-level inflection methods to String.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>
+<span class="ul__span">Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>
+<span class="ul__span">Allows you to use named timezones instead of just :local and :utc (requires <a class="a" href="http://tzinfo.github.io/">TZInfo</a>).</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_array_ops_rb.html">pg_array_ops</a>
+<span class="ul__span">Adds DSL support for calling PostgreSQL array operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_ops_rb.html">pg_hstore_ops</a>
+<span class="ul__span">Adds DSL support for calling PostgreSQL hstore operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_ops_rb.html">pg_inet_ops</a>
+<span class="ul__span">Adds DSL support for calling PostgreSQL inet/cidr operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a>
+<span class="ul__span">Adds DSL support for calling PostgreSQL json operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>
+<span class="ul__span">Adds DSL support for calling PostgreSQL range and multirange operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>
+<span class="ul__span">Adds DSL support for dealing with PostgreSQL row-valued/composite types.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/s_rb.html">s</a>
+<span class="ul__span">Adds Sequel::S module with #S private method for easily calling Sequel.expr, including use as a refinement.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>
+<span class="ul__span">Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/sqlite_json_ops_rb.html">sqlite_json_ops</a>
+<span class="ul__span">Adds DSL support for calling SQLite json operators and functions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>
+<span class="ul__span">Adds instance methods to String for converting the string into a Date/Time/DateTime.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_rb.html">symbol_aref</a>
+<span class="ul__span">Extends Symbol#[] to create a qualified identifier if given a symbol, identifier, or qualified identifier.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_aref_refinement_rb.html">symbol_aref_refinement</a>
+<span class="ul__span">Adds refinement version of symbol_aref extension.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_rb.html">symbol_as</a>
+<span class="ul__span">Adds Symbol#as to create aliased expressions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/symbol_as_refinement_rb.html">symbol_as_refinement</a>
+<span class="ul__span">Adds refinement version of symbol_as extension.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones</a>
+<span class="ul__span">Allows for per-thread overrides of the global timezone settings.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/virtual_row_method_block_rb.html">virtual_row_method_block</a>
+<span class="ul__span">Supports passing blocks to virtual row method for terser SQL function creation.</span>
+</li>
 </ul>
 
-<h3>External Extensions</h3>
+<a name="extensions-external"></a>
 
-<ul>
-<li><a href='http://github.com/kennym/annotate-sequel'>annotate-sequel</a>: Generates model annotations for Sequel models.</li>
-<li><a href='http://github.com/jeremyevans/fixture_dependencies'>fixture_dependencies</a>: YAML fixture loader that handles dependencies/associated objects, respecting foreign key constraints.</li>
-<li><a href='http://github.com/gucki/i18n_backend_sequel'>i18n_backend_sequel</a>: Allows Sequel to be a backend for i18n translations.</li>
-<li><a href='https://github.com/raxoft/miguel'>miguel</a>: Allows management of database schemas, including auto generation/application of migrations.</li>
-<li><a href='http://github.com/pusewicz/rails_sequel/'>rails_sequel</a>: Rails 2 plugin that allows you to use Sequel instead of ActiveRecord.</li>
-<li><a href='https://github.com/refile/refile-sequel'>refile-sequel</a>: Provides an extension for using Refile with Sequel.</li>
-<li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
-<li><a href='https://github.com/janko/sequel-activerecord_connection'>sequel-activerecord_connection</a>: Allows Sequel to use ActiveRecord's connection for database interaction.</li>
-<li><a href='https://github.com/jeremyevans/sequel-annotate'>sequel-annotate</a>: Generates model annotations for Sequel models, including constraint and trigger information on PostgreSQL.</li>
-<li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
-<li><a href='https://github.com/nickgartmann/sequel-location'>sequel-location</a>: Easy setup and syntax for doing geolocation search on PostgreSQL.</li>
-<li><a href='http://github.com/jeremyevans/sequel_pg'>sequel_pg</a>: Faster SELECTs when using Sequel with pg.</li>
-<li><a href='https://github.com/celsworth/sequel-pg_advisory_locking'>sequel-pg_advisory_locking</a>: Adds PostreSQL advisory locking support.</li>
-<li><a href='http://github.com/mpalmer/sequel-pg-comment'>sequel-pg-comment</a>: Document your schema by setting comments on all your PgSQL objects.</li>
-<li><a href='http://github.com/mwlang/sequel_plus'>sequel_plus</a>: Collection of sequel extensions.</li>
-<li><a href='http://github.com/jeremyevans/sequel_postgresql_triggers'>sequel_postgresql_triggers</a>: Database enforced timestamps, immutable columns, and counter/sum caches.</li>
-<li><a href='http://github.com/brasten/sequel-rails'>sequel-rails</a>: Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</li>
-<li><a href='http://github.com/gucki/sequel_rails3'>sequel_rails3</a>: Another Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</li>
-<li><a href='https://github.com/pabloh/sequel-force-hooks'>sequel-force-hooks</a>: Have after_commit/after_rollback hooks apply to current savepoint instead of transaction.</li>
-<li><a href='https://github.com/earaujoassis/sequel-seed'>sequel-seed</a>: A Sequel extension to make seeds/fixtures manageable like migrations.</li>
-<li><a href='http://github.com/jsvd/sequel_vectorized'>sequel_vectorized</a>: Allows Sequel::Dataset to be exported as an Hash of Arrays and NArrays.</li>
+<h3 class="h3">External Extensions</h3>
+
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/kennym/annotate-sequel">annotate-sequel </a>
+<span class="ul__span">Generates model annotations for Sequel models.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jeremyevans/fixture_dependencies">fixture_dependencies </a>
+<span class="ul__span">YAML fixture loader that handles dependencies/associated objects, respecting foreign key constraints.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gucki/i18n_backend_sequel">i18n_backend_sequel </a>
+<span class="ul__span">Allows Sequel to be a backend for i18n translations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/raxoft/miguel">miguel </a>
+<span class="ul__span">Allows management of database schemas, including auto generation/application of migrations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/pusewicz/rails_sequel/">rails_sequel </a>
+<span class="ul__span">Rails 2 plugin that allows you to use Sequel instead of ActiveRecord.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/refile/refile-sequel">refile-sequel </a>
+<span class="ul__span">Provides an extension for using Refile with Sequel.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/openhood/rspec_sequel_matchers">rspec_sequel_matchers </a>
+<span class="ul__span">RSpec matchers for Sequel validations, associations, and columns.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/janko/sequel-activerecord_connection">sequel-activerecord_connection </a>
+<span class="ul__span">Allows Sequel to use ActiveRecord's connection for database interaction.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/jeremyevans/sequel-annotate">sequel-annotate </a>
+<span class="ul__span">Generates model annotations for Sequel models, including constraint and trigger information on PostgreSQL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gyordanov/sequel_extjs">sequel_extjs </a>
+<span class="ul__span">Generates JSON from datasets that is consumable by the ExtJS JsonStore.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/nickgartmann/sequel-location">sequel-location </a>
+<span class="ul__span">Easy setup and syntax for doing geolocation search on PostgreSQL.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jeremyevans/sequel_pg">sequel_pg </a>
+<span class="ul__span">Faster SELECTs when using Sequel with pg.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/celsworth/sequel-pg_advisory_locking">sequel-pg_advisory_locking </a>
+<span class="ul__span">Adds PostreSQL advisory locking support.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/mpalmer/sequel-pg-comment">sequel-pg-comment </a>
+<span class="ul__span">Document your schema by setting comments on all your PgSQL objects.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/mwlang/sequel_plus">sequel_plus </a>
+<span class="ul__span">Collection of sequel extensions.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jeremyevans/sequel_postgresql_triggers">sequel_postgresql_triggers </a>
+<span class="ul__span">Database enforced timestamps, immutable columns, and counter/sum caches.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/brasten/sequel-rails">sequel-rails </a>
+<span class="ul__span">Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/gucki/sequel_rails3">sequel_rails3 </a>
+<span class="ul__span">Another Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/pabloh/sequel-force-hooks">sequel-force-hooks </a>
+<span class="ul__span">Have after_commit/after_rollback hooks apply to current savepoint instead of transaction.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/earaujoassis/sequel-seed">sequel-seed </a>
+<span class="ul__span">A Sequel extension to make seeds/fixtures manageable like migrations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="http://github.com/jsvd/sequel_vectorized">sequel_vectorized </a>
+<span class="ul__span">Allows Sequel::Dataset to be exported as an Hash of Arrays and NArrays.</span>
+</li>
 </ul>
 
-<h3>External Adapters</h3>
+<a name="extensions-external-adapters"></a>
 
-<p>Adapters allow Sequel to communicate with databases.  Sequel ships with many adapters, but here are links to external adapters:</p>
+<h3 class="h3">External Adapters</h3>
+<p class="p">Adapters allow Sequel to communicate with databases. Sequel ships with many adapters, but here are links to external adapters:</p>
 
-<ul>
-<li><a href='https://github.com/djanowski/sequel-fusiontables'>fusiontables</a>: Fusion Tables adapter using <a href="https://github.com/djanowski/ft">ft</a> driver</li>
-<li><a href='https://github.com/hrp/sequel-hive-adapter'>hive</a>: Hadoop Hive adapter using <a href="https://github.com/forward3d/rbhive">rbhive</a> driver</li>
-<li><a href='https://github.com/outcomesinsights/sequel-impala'>impala</a>: Impala adapter, including jdbc/hive2 adapter</li>
-<li><a href='https://github.com/ahto/sequel-jdbc-crate'>jdbc-crate</a>: JDBC subadapter for Crate database</li>
-<li><a href='https://github.com/colincasey/sequel-jdbc-hxtt-adapter'>jdbc-hxtt</a>: JDBC subadapter for MS Access databases</li>
-<li><a href='https://github.com/gimoh/sequel-openedge-adapter'>openedge</a>: ODBC and JDBC subadapters for OpenEdge database</li>
-<li><a href='https://github.com/camilo/sequel-vertica'>vertica</a>: Vertica adapter using <a href="https://github.com/wvanbergen/vertica">vertica</a> driver</li>
+<ul class="ul ul--grid">
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/djanowski/sequel-fusiontables">fusiontables </a>
+<span class="ul__span">Fusion Tables adapter using <a class="a" href="https://github.com/djanowski/ft">ft</a> driver
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/hrp/sequel-hive-adapter">hive </a>
+<span class="ul__span">Hadoop Hive adapter using <a class="a" href="https://github.com/forward3d/rbhive">rbhive</a> driver
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/outcomesinsights/sequel-impala">impala </a>
+<span class="ul__span">Impala adapter, including jdbc/hive2 adapter
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/ahto/sequel-jdbc-crate">jdbc-crate </a>
+<span class="ul__span">JDBC subadapter for Crate database
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/colincasey/sequel-jdbc-hxtt-adapter">jdbc-hxtt </a>
+<span class="ul__span">JDBC subadapter for MS Access databases
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/gimoh/sequel-openedge-adapter">openedge </a>
+<span class="ul__span">ODBC and JDBC subadapters for OpenEdge database
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/camilo/sequel-vertica">vertica </a>
+<span class="ul__span">Vertica adapter using <a class="a" href="https://github.com/wvanbergen/vertica">vertica</a> driver
+</li>
 </ul>
+</div>
+</div>
 
-<h3>Submitting Your Plugin/Extension/Adapter</h3>
+<hr class="hr" />
 
-<p>If you have created a Sequel plugin/extension/adapter and would like to list it here, please submit a request to code AT jeremyevans DOT net, or send a pull request via github.</p>
+<div class="row">
+<div class="row__item">
+
+<a name="submit"></a>
+<h3 class="h3">Submitting Your Plugin/Extension/Adapter</h3>
+<p class="p">If you have created a Sequel plugin/extension/adapter and would like to list it here, please submit a request to code AT jeremyevans DOT net, or send a pull request via <a class="a" href="https://github.com/jeremyevans/sequel/pulls">GitHub</a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+</section>
