@@ -6,21 +6,16 @@
 	--red-primary: #B33D34;
 	--red-secondary: #771608;
 	--border: #e2e2e2;
-	--gap: 48px;
-}
-@media (max-width: 1280px) {
-	:root {
-		--gap: 32px;
-	}
+	--gap: 24px;
 }
 @media (max-width: 960px) {
 	:root {
-		--gap: 24px;
+		--gap: 20px;
 	}
 }
 @media (max-width: 640px) {
 	:root {
-		--gap: 20px;
+		--gap: 16px;
 	}
 }
 
@@ -42,7 +37,7 @@ body.body {
 header.header,
 main.main,
 footer.footer {
-	padding: 64px 128px 0 128px;
+	padding: 16px 16px 0 16px;
 }
 @media (max-width: 960px) {
 	header.header,
@@ -68,7 +63,7 @@ main.main {
 
 div.main__container,
 nav.nav {
-	max-width: 1280px;
+	max-width: 1200px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -77,9 +72,9 @@ nav.nav {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	gap: 64px;
+	gap: 16px;
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	nav.nav {
 		flex-direction: column;
 	}
@@ -180,7 +175,7 @@ input.nav__input {
 	border: 2px solid transparent;
 	min-width: 256px;
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	form.nav__form,
 	input.nav__input {
 		display: block;
@@ -188,7 +183,7 @@ input.nav__input {
 		min-width: 0px;
 	}
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	form.nav__form--header {
 		display: none;
 	}

@@ -66,6 +66,10 @@
 <span class="ul__span">Changes the *_to_many association method to return a proxy instead of an array of objects.</span>
 </li>
 <li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AutoRestrictEagerGraph.html">auto_restrict_eager_graph</a>
+<span class="ul__span">Automatically disallow the use of eager_graph for associations with blocks but without :graph_* conditions.</span>
+</li>
+<li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ConcurrentEagerLoading.html">concurrent_eager_loading </a>
 <span class="ul__span">Allows you to concurrently eagerly load multiple associations using the async_thread_pool Database extension.</span>
 </li>
@@ -88,6 +92,10 @@
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ForbidLazyLoad.html">forbid_lazy_load </a>
 <span class="ul__span">Forbids lazy loading of associations in cases where they could cause N+1 query issues.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/InstanceSpecificDefault.html">instance_specific_default</a>
+<span class="ul__span">Find associations that would benefit from having the :instance_specific option specified.</span>
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many </a>
@@ -386,6 +394,10 @@
 <span class="ul__span">Automatically add presence/not_null, max length, type, and unique validations based on the model's schema.</span>
 </li>
 <li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/AutoValidationsConstraintValidationsPresenceMessage.html">auto_validations_constraint<br>_validations_presence_message</a>
+<span class="ul__span">Use more specific constraint_validations error message instead of generic auto_validations in certain cases.</span>
+</li>
+<li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations </a>
 <span class="ul__span">Setup automatic validations for constraints added via the <a class="a" href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>. </span>
 </li>
@@ -579,9 +591,7 @@
 
 <hr class="hr" />
 
-<a name="extensions"></a>
-
-<h2 class="h2">Sequel Extensions <span class="h2__span">are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions). <span class="ul__span">
+<h2 class="h2" id="sequel-extensions">Sequel Extensions <span class="h2__span">are modifications or additions to Sequel that affect either Sequel::Database objects (database extensions), Sequel::Dataset objects (dataset extensions), or the general ruby environment (global extensions). <span class="ul__span">
 </h2>
 
 <div class="row">

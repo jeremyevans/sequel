@@ -16,7 +16,7 @@ div.plugins__sidebar {
 	margin-top: var(--gap);
 	border-top: 1px solid var(--border);
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	div.plugins__sidebar {
 		grid-template-columns: 1fr;
 	}
@@ -32,7 +32,7 @@ aside.plugins__sidebar-aside {
 	padding-left: var(--gap);
 	padding-right: var(--gap);
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	aside.plugins__sidebar-aside {
 		position: inherit;
 		border-right: none;

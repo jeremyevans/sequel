@@ -11,14 +11,8 @@ div.index__hero {
 	text-align: center;
 	justify-content: center;
 	row-gap: 8px;
-	height: clamp(480px, 75vh, 600px);
-}
-@media (max-width: 640px) {
-	div.index__hero {
-		height: max-content;
-		padding-top: 64px;
-		padding-bottom: 64px;
-	}
+	padding-top: 16px;
+	padding-bottom: 16px;
 }
 
 h1.index__h1 {
@@ -62,7 +56,7 @@ nav.index__nav {
 	display: flex;
 	align-items: center;
 	gap: calc(var(--gap) / 4);
-	margin-top: var(--gap);
+	margin-top: 16px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -107,14 +101,14 @@ ul.index__ul {
 	grid-template-columns: repeat(4, 1fr);
 	gap: var(--gap);
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	ul.index__ul {
 		grid-template-columns: 1fr;
 		grid-template-rows: auto;
 	}
 
 	ul.index__ul {
-		margin: 0 var(--gap);
+    margin: 0 32px;
 	}
 }
 
@@ -123,7 +117,7 @@ li.index__li {
 	line-height: 1.55em;
 	border-left: 1px solid rgba(255,255,255,.25);
 }
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
 	li.index__li {
 		padding-left: 0px;
 		padding-top: var(--gap);

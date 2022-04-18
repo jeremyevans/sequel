@@ -51,3 +51,10 @@ p.assets__description {
 	border-radius: 0 0 8px 8px;
 	color: #666;
 }
+
+a.parens:before {
+  content: "(";
+}
+a.parens:after {
+  content: ")";
+}
