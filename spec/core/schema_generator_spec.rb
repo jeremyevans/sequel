@@ -160,6 +160,8 @@ describe Sequel::Schema::AlterTableGenerator do
       drop_foreign_key(:node_id).must_be_nil
       drop_foreign_key([:node_id, :prop_id]).must_be_nil
       drop_foreign_key([:node_id, :prop_id], :name => :fkey).must_be_nil
+      add_column(:iii, :text, :index=>true).must_be_nil
+      add_column(:jjj, :text, :index=>{:name=>:jjj_index}).must_be_nil
     end
   end
   
@@ -189,6 +191,10 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :drop_column, :name => :node_id},
       {:op => :drop_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id]},
       {:op => :drop_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id], :name => :fkey},
+      {:op => :add_column, :name => :iii, :type => :text},
+      {:op => :add_index, :columns => [:iii]},
+      {:op => :add_column, :name => :jjj, :type => :text},
+      {:op => :add_index, :columns => [:jjj], :name => :jjj_index},
     ]
   end
 end

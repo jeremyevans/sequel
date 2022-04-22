@@ -387,8 +387,7 @@ module Sequel
       end
       
       # Add a column with the given name, type, and opts.
-      # See CreateTableGenerator#column for the available options (except for +:index+, use a
-      # separate +add_index+ call to add an index for the column).
+      # See CreateTableGenerator#column for the available options.
       #
       #   add_column(:name, String) # ADD COLUMN name varchar(255)
       #
@@ -401,7 +400,10 @@ module Sequel
       # :after :: The name of an existing column that the new column should be positioned after
       # :first :: Create this new column before all other existing columns
       def add_column(name, type, opts = OPTS)
-        @operations << {:op => :add_column, :name => name, :type => type}.merge!(opts)
+        op = {:op => :add_column, :name => name, :type => type}.merge!(opts)
+        index_opts = op.delete(:index)
+        @operations << op
+        add_index(name, index_opts.is_a?(Hash) ? index_opts : OPTS) if index_opts
         nil
       end
       
@@ -430,8 +432,7 @@ module Sequel
       end
 
       # Add a foreign key with the given name and referencing the given table.
-      # See CreateTableGenerator#column for the available options (except for +:index+, use a
-      # separate +add_index+ call to add an index for the column).
+      # See CreateTableGenerator#column for the available options.
       #
       # You can also pass an array of column names for creating composite foreign
       # keys. In this case, it will assume the columns exist and will only add

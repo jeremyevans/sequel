@@ -1,5 +1,7 @@
 === master
 
+* Make alter_table add_column/add_foreign_key methods support :index option to create an index on the column (jeremyevans)
+
 * Support creation of STRICT tables on SQLite 3.37.0+ via create_table :strict option (jeremyevans)
 
 * Add sqlite_json_ops extension for DSL support for JSON functions and operators added in SQLite 3.38.0 (jeremyevans)

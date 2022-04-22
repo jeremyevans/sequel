@@ -1145,6 +1145,13 @@ describe "DB#alter_table" do
     @db.sqls.must_equal ["ALTER TABLE cats ADD COLUMN node_id integer REFERENCES nodes"]
   end
 
+  it "should support add_foreign_key with :index option" do
+    @db.alter_table(:cats) do
+      add_foreign_key :node_id, :nodes, :index=>true
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats ADD COLUMN node_id integer REFERENCES nodes", "CREATE INDEX cats_node_id_index ON cats (node_id)"]
+  end
+
   it "should support add_foreign_key with composite foreign keys" do
     @db.alter_table(:cats) do
       add_foreign_key [:node_id, :prop_id], :nodes_props
@@ -1165,6 +1172,20 @@ describe "DB#alter_table" do
       add_foreign_key [:node_id, :prop_id], :nodes_props, :on_delete => :restrict, :on_update => :cascade
     end
     @db.sqls.must_equal ["ALTER TABLE cats ADD FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props ON DELETE RESTRICT ON UPDATE CASCADE"]
+  end
+
+  it "should support add_column with :index=>true option" do
+    @db.alter_table(:cats) do
+      add_column :name, Integer, :index=>true
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats ADD COLUMN name integer", "CREATE INDEX cats_name_index ON cats (name)"]
+  end
+
+  it "should support add_column with :index=>hash option" do
+    @db.alter_table(:cats) do
+      add_column :name, Integer, :index=>{:name=>:foo}
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats ADD COLUMN name integer", "CREATE INDEX foo ON cats (name)"]
   end
 
   it "should support add_index" do
