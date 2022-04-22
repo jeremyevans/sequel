@@ -9,12 +9,12 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.description = s.summary
   s.author = "Jeremy Evans"
   s.email = "code@jeremyevans.net"
-  s.homepage = "http://sequel.jeremyevans.net"
+  s.homepage = "https://sequel.jeremyevans.net"
   s.license = 'MIT'
   s.metadata = {
     'bug_tracker_uri'   => 'https://github.com/jeremyevans/sequel/issues',
-    'changelog_uri'     => 'http://sequel.jeremyevans.net/rdoc/files/CHANGELOG.html',
-    'documentation_uri' => 'http://sequel.jeremyevans.net/documentation.html',
+    'changelog_uri'     => 'https://sequel.jeremyevans.net/rdoc/files/CHANGELOG.html',
+    'documentation_uri' => 'https://sequel.jeremyevans.net/documentation.html',
     'mailing_list_uri'  => 'https://github.com/jeremyevans/sequel/discussions',
     'source_code_uri'   => 'https://github.com/jeremyevans/sequel',
   }
