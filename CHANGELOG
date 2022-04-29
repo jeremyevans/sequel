@@ -1,4 +1,4 @@
-=== master
+=== 5.56.0 (2022-05-01)
 
 * Make alter_table add_column/add_foreign_key methods support :index option to create an index on the column (jeremyevans)
 

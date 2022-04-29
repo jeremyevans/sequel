@@ -1,0 +1,51 @@
+= New Features
+
+* On SQLite, Database#create_table now supports a :strict option to
+  use the STRICT keyword when creating the table.  When this option
+  is used, SQLite will enforce the types for each column. When using
+  this option, you are limited to using the following column types:
+  int, integer, real, text, blob, and any (any allows for dynamic
+  types).
+
+* An sqlite_json_ops extension has been added, providing DSL support
+  for JSON functions and operators supported in SQLite 3.38.0. Usage
+  is similar to the pg_json_ops extension.  First, you create an
+  appropriate object:
+
+    j = Sequel.sqlite_json_op(:json_column)
+    # or:
+    j = Sequel[:json_column].sqlite_json_op
+
+  Then, you call methods on that object to create expressions for the
+  JSON functions and operators:
+
+    j[1]                 # (json_column ->> 1)
+    j.get_text(1)        # (json_column -> 1)
+    j.extract('$.a')     # json_extract(json_column, '$.a')
+ 
+    j.array_length       # json_array_length(json_column)
+    j.type               # json_type(json_column)
+    j.valid              # json_valid(json_column)
+    j.json               # json(json_column)
+ 
+    j.insert('$.a', 1)   # json_insert(json_column, '$.a', 1)
+    j.set('$.a', 1)      # json_set(json_column, '$.a', 1)
+    j.replace('$.a', 1)  # json_replace(json_column, '$.a', 1)
+    j.remove('$.a')      # json_remove(json_column, '$.a')
+    j.patch('{"a":2}')   # json_patch(json_column, '{"a":2}')
+ 
+    j.each               # json_each(json_column)
+    j.tree               # json_tree(json_column)
+
+= Other Improvements
+
+* The alter_table add_column and add_foreign_key methods now support
+  the :index option to create an index on the added column, for
+  compatibility with the :index option on the create_table column and
+  foreign_key methods.
+
+* The schema_dumper extension now treats the "INTEGER" type the same
+  as the "integer" type.  This fixes some behavior when using SQLite
+  3.37.0+.
+
+* Sequel's website has a much improved visual design.
