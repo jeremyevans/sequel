@@ -184,9 +184,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-2D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">369</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">-</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">370</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)
-<span class="line-num">371</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">370</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">-</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">371</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)
+<span class="line-num">372</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -205,22 +205,22 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">348</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">349</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">350</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">351</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">352</span>     <span class="ruby-keyword">case</span> <span class="ruby-ivar">@value</span>
-<span class="line-num">353</span>     <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>, <span class="ruby-constant">JSONBSubscriptOp</span>
-<span class="line-num">354</span>       <span class="ruby-comment"># Only use subscripts for identifiers.  In other cases, switching from</span>
-<span class="line-num">355</span>       <span class="ruby-comment"># the -&gt; operator to [] for subscripts causes SQL syntax issues.  You</span>
-<span class="line-num">356</span>       <span class="ruby-comment"># only need the [] for subscripting when doing assignment, and</span>
-<span class="line-num">357</span>       <span class="ruby-comment"># assignment is generally done on identifiers.</span>
-<span class="line-num">358</span>       <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">JSONBSubscriptOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">key</span>))
-<span class="line-num">359</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">360</span>       <span class="ruby-keyword">super</span>
-<span class="line-num">361</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">362</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">363</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">349</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">350</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">351</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">352</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">353</span>     <span class="ruby-keyword">case</span> <span class="ruby-ivar">@value</span>
+<span class="line-num">354</span>     <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>, <span class="ruby-constant">JSONBSubscriptOp</span>
+<span class="line-num">355</span>       <span class="ruby-comment"># Only use subscripts for identifiers.  In other cases, switching from</span>
+<span class="line-num">356</span>       <span class="ruby-comment"># the -&gt; operator to [] for subscripts causes SQL syntax issues.  You</span>
+<span class="line-num">357</span>       <span class="ruby-comment"># only need the [] for subscripting when doing assignment, and</span>
+<span class="line-num">358</span>       <span class="ruby-comment"># assignment is generally done on identifiers.</span>
+<span class="line-num">359</span>       <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">JSONBSubscriptOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">key</span>))
+<span class="line-num">360</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">361</span>       <span class="ruby-keyword">super</span>
+<span class="line-num">362</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">363</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">364</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-concat'>
@@ -242,9 +242,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-concat-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">377</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">concat</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">378</span>   <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">CONCAT</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))
-<span class="line-num">379</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">378</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">concat</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">379</span>   <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">CONCAT</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">380</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-contain_all'>
@@ -266,9 +266,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-contain_all-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">384</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contain_all</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">385</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))
-<span class="line-num">386</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">385</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contain_all</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">386</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">387</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-contain_any'>
@@ -290,9 +290,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-contain_any-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">391</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contain_any</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">392</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))
-<span class="line-num">393</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">392</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contain_any</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">393</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">394</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-contained_by'>
@@ -314,9 +314,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-contained_by-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">405</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contained_by</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">406</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))
-<span class="line-num">407</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">406</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contained_by</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">407</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">408</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-contains'>
@@ -338,9 +338,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-contains-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">398</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contains</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">399</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))
-<span class="line-num">400</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">399</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contains</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">400</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">401</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-delete_path'>
@@ -362,9 +362,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-delete_path-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">412</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete_path</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">413</span>   <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">DELETE_PATH</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))
-<span class="line-num">414</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">413</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete_path</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">414</span>   <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">DELETE_PATH</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))
+<span class="line-num">415</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-has_key-3F'>
@@ -386,9 +386,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-has_key-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">419</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_key?</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">420</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)
-<span class="line-num">421</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">420</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_key?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">421</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">422</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert'>
@@ -411,9 +411,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-insert-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">430</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">insert_after</span>=<span class="ruby-keyword">false</span>)
-<span class="line-num">431</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">insert_after</span>))
-<span class="line-num">432</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">431</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">insert_after</span>=<span class="ruby-keyword">false</span>)
+<span class="line-num">432</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">insert_after</span>))
+<span class="line-num">433</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_exists'>
@@ -435,9 +435,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_exists-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">437</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_exists</span>(<span class="ruby-identifier">path</span>)
-<span class="line-num">438</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">PATH_EXISTS</span>, <span class="ruby-identifier">path</span>)
-<span class="line-num">439</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">438</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_exists</span>(<span class="ruby-identifier">path</span>)
+<span class="line-num">439</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">PATH_EXISTS</span>, <span class="ruby-identifier">path</span>)
+<span class="line-num">440</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_exists-21'>
@@ -466,9 +466,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_exists-21-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">451</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_exists!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">452</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_exists</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">453</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">452</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_exists!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">453</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_exists</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">454</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_exists_tz-21'>
@@ -487,9 +487,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_exists_tz-21-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">456</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_exists_tz!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">457</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_exists_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">458</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">457</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_exists_tz!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">458</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_exists_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">459</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_match'>
@@ -511,9 +511,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_match-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">464</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_match</span>(<span class="ruby-identifier">path</span>)
-<span class="line-num">465</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">PATH_MATCH</span>, <span class="ruby-identifier">path</span>)
-<span class="line-num">466</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">465</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_match</span>(<span class="ruby-identifier">path</span>)
+<span class="line-num">466</span>   <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">PATH_MATCH</span>, <span class="ruby-identifier">path</span>)
+<span class="line-num">467</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_match-21'>
@@ -542,9 +542,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_match-21-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">479</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_match!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">480</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_match</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">481</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">480</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_match!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">481</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_match</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">482</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_match_tz-21'>
@@ -563,9 +563,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_match_tz-21-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">484</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_match_tz!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">485</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_match_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">486</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">485</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_match_tz!</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">486</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_match_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">487</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_query'>
@@ -594,9 +594,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_query-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">499</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">500</span>   <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>)
-<span class="line-num">501</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">500</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">501</span>   <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>)
+<span class="line-num">502</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_query_array'>
@@ -625,9 +625,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_query_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">519</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_array</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">520</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_array</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">521</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">520</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_array</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">521</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_array</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">522</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_query_array_tz'>
@@ -646,9 +646,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_query_array_tz-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">524</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_array_tz</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">525</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_array_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">526</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">525</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_array_tz</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">526</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_array_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">527</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_query_first'>
@@ -677,9 +677,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_query_first-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">539</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_first</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">540</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_first</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">541</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">540</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_first</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">541</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_first</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">542</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_query_first_tz'>
@@ -698,9 +698,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_query_first_tz-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">544</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_first_tz</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">545</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_first_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
-<span class="line-num">546</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">545</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_first_tz</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">546</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_first_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>))
+<span class="line-num">547</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-path_query_tz'>
@@ -719,9 +719,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-path_query_tz-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">504</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_tz</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">505</span>   <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>)
-<span class="line-num">506</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">505</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">path_query_tz</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">silent</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">506</span>   <span class="ruby-identifier">_path_function</span>(<span class="ruby-value">:jsonb_path_query_tz</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">vars</span>, <span class="ruby-identifier">silent</span>)
+<span class="line-num">507</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_jsonb'>
@@ -740,9 +740,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-pg_jsonb-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">549</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>
-<span class="line-num">550</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">551</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">550</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>
+<span class="line-num">551</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">552</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pretty'>
@@ -764,9 +764,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-pretty-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">556</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pretty</span>
-<span class="line-num">557</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:pretty</span>))
-<span class="line-num">558</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">557</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pretty</span>
+<span class="line-num">558</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:pretty</span>))
+<span class="line-num">559</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set'>
@@ -789,9 +789,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">566</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">create_missing</span>=<span class="ruby-keyword">true</span>)
-<span class="line-num">567</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:set</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">create_missing</span>))
-<span class="line-num">568</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">567</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">create_missing</span>=<span class="ruby-keyword">true</span>)
+<span class="line-num">568</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:set</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">create_missing</span>))
+<span class="line-num">569</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_lax'>
@@ -810,9 +810,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_lax-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">572</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_lax</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">create_missing</span>=<span class="ruby-keyword">true</span>, <span class="ruby-identifier">null_value_treatment</span>=<span class="ruby-string">&#39;use_json_null&#39;</span>)
-<span class="line-num">573</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:set_lax</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">create_missing</span>, <span class="ruby-identifier">null_value_treatment</span>))
-<span class="line-num">574</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">573</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_lax</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">create_missing</span>=<span class="ruby-keyword">true</span>, <span class="ruby-identifier">null_value_treatment</span>=<span class="ruby-string">&#39;use_json_null&#39;</span>)
+<span class="line-num">574</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:set_lax</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">create_missing</span>, <span class="ruby-identifier">null_value_treatment</span>))
+<span class="line-num">575</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

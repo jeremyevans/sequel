@@ -1,567 +1,674 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
+<html lang="en">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Sequel: The Database Toolkit for Ruby - Documentation</title>
-
-  <meta http-equiv="Content-Script-Type" content="text/javascript" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <title>Documentation - Sequel: The Database Toolkit for Ruby</title>
   <meta content="text/html; charset=utf-8" http-equiv="content-type" />
-  <meta content="en" name="content-language" />
-
-  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, activerecord, documentation, howto, news" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
   <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
 
+  <link rel="icon" type="image/icon" sizes="32x32" href="images/favicon.ico">
   <link href="css/application.css" media="screen" rel="stylesheet" type="text/css" />
-  <link href="css/ruby.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="css/documentation.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
-<body>
-  <div id="header">
-    <a href="index.html" id="logo"><img src="images/ruby-sequel.png" alt="Ruby Sequel Logo" /></a>
-    <h1>The Database Toolkit for Ruby</h1>
-    <div id="navigation">
-      <ul>
-        <li><a href="development.html">Development</a></li>
-        <li><a href="documentation.html">Documentation</a></li>
-        <li><a href="plugins.html">Plugins</a></li>
-        <li><a href="press.html">Press</a></li>
-        <li><a href="blog.html">Blog</a></li>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="index.html">
+        <img src="images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="http://www.google.com/search">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <section class="documentation">
+<h1 class="h1">Documentation for Sequel (v5.56.0)</h1>
+
+<hr class="hr" />
+
+<h2 class="h2">General Info, Guides, Examples, and Tutorials</h2>
+
+<div class="row row--grid">
+  <div class="row__item">
+    <a name="general-overview"></a>
+
+    <h3 class="h3">General Overviews</h3>
+
+    <ul class="ul">
+      <li class="ul__li"><a class="a" href="rdoc/files/README_rdoc.html">README</a> Introduction to Sequel, start here if new</li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/security_rdoc.html">Security</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/object_model_rdoc.html">Sequel Object Model</a></li>
+    </ul>
+  </div>
+  <div class="row__item">
+    <a name="databases"></a>
+
+    <h3 class="h3">Databases</h3>
+
+    <ul class="ul">
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/opening_databases_rdoc.html">Connecting to a Database</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/transactions_rdoc.html">Database Transactions</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/schema_modification_rdoc.html">Schema Modification</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/migration_rdoc.html">Migrations</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/sharding_rdoc.html">Primary/Replica Database Configurations and Sharding</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/postgresql_rdoc.html">PostgreSQL Specific Support</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/mssql_stored_procedures_rdoc.html">Microsoft SQL Server Stored Procedure Support</a></li>
+    </ul>
+  </div>
+  <div class="row__item">
+    <a name="datasets"></a>
+
+    <h3 class="h3">Datasets</h3>
+
+    <ul class="ul">
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/dataset_basics_rdoc.html">Dataset Basics</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/querying_rdoc.html">Querying in Sequel</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
+    </ul>
+  </div>
+  <div class="row__item">
+    <a name="models"></a>
+
+    <h3 class="h3">Models</h3>
+
+    <ul class="ul">
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/mass_assignment_rdoc.html">Model Mass Assignment</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/validations_rdoc.html">Model Validations</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/model_dataset_method_design_rdoc.html">Model Dataset Method Design</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics and Options</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/model_plugins_rdoc.html">Model Plugins</a></li>
+    </ul>
+  </div>
+  <div class="row__item">
+    <a name="misc"></a>
+
+    <h3 class="h3">Misc.</h3>
+
+    <ul class="ul">
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/code_order_rdoc.html">Code Order</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/thread_safety_rdoc.html">Thread Safety</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/fork_safety_rdoc.html">Fork Safety</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/extensions_rdoc.html">Sequel Extensions</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/core_extensions_rdoc.html">Core Extensions</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/files/doc/bin_sequel_rdoc.html">bin/sequel</a></li>
+    </ul>
+  </div>
+</div>
+
+<hr class="hr" />
+
+<a name="rdoc"></a>
+<h2 class="h2">RDoc</h2>
+
+<div class="row row--grid">
+  <div class="row__item">
+
+    <h3 class="h3"><a class="a" href="rdoc/index.html">Core / Model</a></h3>
+
+    <ul class="ul">
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel.html">Sequel</a> Main module</li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Database.html">Database</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Dataset.html">Dataset</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Model.html">Model</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Model/ClassMethods.html">Model Class Methods</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Model/InstanceMethods.html">Model Instance Methods</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Model/Associations/ClassMethods.html">Model Association Class Methods</a></li>
+      <li class="ul__li"><a class="a" href="rdoc/classes/Sequel/Model/Associations/DatasetMethods.html">Model Eager Loading Methods</a></li>
+    </ul>
+  </div>
+  <div class="row__item">
+    <h3 class="h3"><a class="a" href="rdoc-adapters/index.html">Adapters</a></h3>
+  </div>
+  <div class="row__item">
+    <h3 class="h3"><a class="a" href="rdoc-adapters/index.html">Extensions/Plugins</a></h3>
+  </div>
+</div>
+
+<hr class="hr" />
+
+<div class="row">
+  <a name="release-notes"></a>
+  <h3 class="h3"><a class="a" href="rdoc/files/CHANGELOG.html">Release Notes</a></h3>
+  <ul class="ul">
+    
+      <li><strong>Sequel 5</strong>
+        <ul class="release-notes">
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_56_0_txt.html">5.56</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_55_0_txt.html">5.55</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_54_0_txt.html">5.54</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_53_0_txt.html">5.53</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_52_0_txt.html">5.52</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_51_0_txt.html">5.51</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_50_0_txt.html">5.50</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_49_0_txt.html">5.49</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_48_0_txt.html">5.48</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_47_0_txt.html">5.47</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_46_0_txt.html">5.46</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_45_0_txt.html">5.45</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_44_0_txt.html">5.44</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_43_0_txt.html">5.43</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_42_0_txt.html">5.42</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_41_0_txt.html">5.41</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_40_0_txt.html">5.40</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_39_0_txt.html">5.39</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_38_0_txt.html">5.38</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_37_0_txt.html">5.37</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_36_0_txt.html">5.36</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_35_0_txt.html">5.35</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_34_0_txt.html">5.34</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_33_0_txt.html">5.33</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_32_0_txt.html">5.32</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_31_0_txt.html">5.31</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_30_0_txt.html">5.30</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_29_0_txt.html">5.29</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_28_0_txt.html">5.28</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_27_0_txt.html">5.27</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_26_0_txt.html">5.26</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_25_0_txt.html">5.25</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_24_0_txt.html">5.24</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_23_0_txt.html">5.23</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_22_0_txt.html">5.22</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_21_0_txt.html">5.21</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_20_0_txt.html">5.20</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_19_0_txt.html">5.19</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_18_0_txt.html">5.18</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_17_0_txt.html">5.17</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_16_0_txt.html">5.16</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_15_0_txt.html">5.15</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_14_0_txt.html">5.14</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_13_0_txt.html">5.13</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_12_0_txt.html">5.12</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_11_0_txt.html">5.11</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_10_0_txt.html">5.10</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_9_0_txt.html">5.9</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_8_0_txt.html">5.8</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_7_0_txt.html">5.7</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_6_0_txt.html">5.6</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_5_0_txt.html">5.5</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_4_0_txt.html">5.4</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_3_0_txt.html">5.3</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_2_0_txt.html">5.2</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_1_0_txt.html">5.1</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/5_0_0_txt.html">5.0</a> |
+              
+            </li>
+          
+        </ul>
+      </li>
+    
+      <li><strong>Sequel 4</strong>
+        <ul class="release-notes">
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_49_0_txt.html">4.49</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_48_0_txt.html">4.48</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_47_0_txt.html">4.47</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_46_0_txt.html">4.46</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_45_0_txt.html">4.45</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_44_0_txt.html">4.44</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_43_0_txt.html">4.43</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_42_0_txt.html">4.42</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_41_0_txt.html">4.41</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_40_0_txt.html">4.40</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_39_0_txt.html">4.39</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_38_0_txt.html">4.38</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_37_0_txt.html">4.37</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_36_0_txt.html">4.36</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_35_0_txt.html">4.35</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_34_0_txt.html">4.34</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_33_0_txt.html">4.33</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_32_0_txt.html">4.32</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_31_0_txt.html">4.31</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_30_0_txt.html">4.30</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_29_0_txt.html">4.29</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_28_0_txt.html">4.28</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_27_0_txt.html">4.27</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_26_0_txt.html">4.26</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_25_0_txt.html">4.25</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_24_0_txt.html">4.24</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_23_0_txt.html">4.23</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_22_0_txt.html">4.22</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_21_0_txt.html">4.21</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_20_0_txt.html">4.20</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_19_0_txt.html">4.19</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_18_0_txt.html">4.18</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_17_0_txt.html">4.17</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_16_0_txt.html">4.16</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_15_0_txt.html">4.15</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_14_0_txt.html">4.14</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_13_0_txt.html">4.13</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_12_0_txt.html">4.12</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_11_0_txt.html">4.11</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_10_0_txt.html">4.10</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_9_0_txt.html">4.9</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_8_0_txt.html">4.8</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_7_0_txt.html">4.7</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_6_0_txt.html">4.6</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_5_0_txt.html">4.5</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_4_0_txt.html">4.4</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_3_0_txt.html">4.3</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_2_0_txt.html">4.2</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_1_0_txt.html">4.1</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/4_0_0_txt.html">4.0</a> |
+              
+            </li>
+          
+        </ul>
+      </li>
+    
+      <li><strong>Sequel 3</strong>
+        <ul class="release-notes">
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_48_0_txt.html">3.48</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_47_0_txt.html">3.47</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_46_0_txt.html">3.46</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_45_0_txt.html">3.45</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_44_0_txt.html">3.44</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_43_0_txt.html">3.43</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_42_0_txt.html">3.42</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_41_0_txt.html">3.41</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_40_0_txt.html">3.40</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_39_0_txt.html">3.39</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_38_0_txt.html">3.38</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_37_0_txt.html">3.37</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_36_0_txt.html">3.36</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_35_0_txt.html">3.35</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_34_0_txt.html">3.34</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_33_0_txt.html">3.33</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_32_0_txt.html">3.32</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_31_0_txt.html">3.31</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_30_0_txt.html">3.30</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_29_0_txt.html">3.29</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_28_0_txt.html">3.28</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_27_0_txt.html">3.27</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_26_0_txt.html">3.26</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_25_0_txt.html">3.25</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_24_0_txt.html">3.24</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_23_0_txt.html">3.23</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_22_0_txt.html">3.22</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_21_0_txt.html">3.21</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_20_0_txt.html">3.20</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_19_0_txt.html">3.19</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_18_0_txt.html">3.18</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_17_0_txt.html">3.17</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_16_0_txt.html">3.16</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_15_0_txt.html">3.15</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_14_0_txt.html">3.14</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_13_0_txt.html">3.13</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_12_0_txt.html">3.12</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_11_0_txt.html">3.11</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_10_0_txt.html">3.10</a> |
+              
+            </li>
+          
+            <li>
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_9_0_txt.html">3.9</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_8_0_txt.html">3.8</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_7_0_txt.html">3.7</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_6_0_txt.html">3.6</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_5_0_txt.html">3.5</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_4_0_txt.html">3.4</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_3_0_txt.html">3.3</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_2_0_txt.html">3.2</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_1_0_txt.html">3.1</a> |
+              
+                <a class="a" href="rdoc/files/doc/release_notes/3_0_0_txt.html">3.0</a> |
+              
+            </li>
+          
+        </ul>
+      </li>
+    
+    
+      <li><strong>Sequel 2</strong>
+        <ul class="release-notes">
+          <li>
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_12_0_txt.html">2.12</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_11_0_txt.html">2.11</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_10_0_txt.html">2.10</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_9_0_txt.html">2.9</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_8_0_txt.html">2.8</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_7_0_txt.html">2.7</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_6_0_txt.html">2.6</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_5_0_txt.html">2.5</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_4_0_txt.html">2.4</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_3_0_txt.html">2.3</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_2_0_txt.html">2.2</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_1_0_txt.html">2.1</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/2_0_0_txt.html">2.0</a> |
+            
+          </li>
+        </ul>
+      </li>
+    
+      <li><strong>Sequel 1</strong>
+        <ul class="release-notes">
+          <li>
+            
+              <a class="a" href="rdoc/files/doc/release_notes/1_5_0_txt.html">1.5</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/1_4_0_txt.html">1.4</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/1_3_txt.html">1.3</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/1_1_txt.html">1.1</a> |
+            
+              <a class="a" href="rdoc/files/doc/release_notes/1_0_txt.html">1.0</a> |
+            
+          </li>
+        </ul>
+      </li>
+    
+  </ul>
+</div>
+
+<hr class="hr" />
+
+<div class="row row--grid">
+  <div class="row__item">
+    <h3 class="h3"><a class="a" href="rdoc/files/CHANGELOG.html">Change Log</a></h3>
+  </div>
+  <div class="row__item">
+    <h3 class="h3"><a class="a" href="rdoc/files/MIT-LICENSE.html">License</a></h3>
+  </div>
+</div>
+</section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="index.html">
+        <img src="images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="documentation.html" class="nav__a">Documentation</a>
+          <a href="documentation.html#general-overview" class="a">General Overview</a>
+          <a href="documentation.html#databases" class="a">Databases</a>
+          <a href="documentation.html#datasets" class="a">Datasets</a>
+          <a href="documentation.html#models" class="a">Models</a>
+          <a href="documentation.html#misc" class="a">Misc</a>
+          <a href="documentation.html#rdoc" class="a">RDoc</a>
+          <a href="documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="plugins.html" class="nav__a">Plugins</a>
+          <a href="plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="development.html" class="nav__a">Development</a>
+          <a href="development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="development.html#contribute" class="a">Contribute</a>
+          <a href="development.html#code" class="a">Source Code</a>
+          <a href="development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="links.html" class="nav__a">Links</a>
+          <a href="links.html#articles" class="a">Articles</a>
+          <a href="links.html#presentations" class="a">Presentations</a>
+          <a href="links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
       </ul>
       <form action="http://www.google.com/search">
         <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
-        <input id="searchbox" type="search" placeholder="Site Search" name="q" value="" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
       </form>
-    </div>
-    <br style="clear: both;" />
-  </div>
-
-  <hr />
-
-  <div id="content">
-    <br style="clear: both;" />
-    <h2>Documentation for Sequel (v5.55.0)</h2>
-
-<h3>General Info, Guides, Examples, and Tutorials</h3>
-
-<ul>
-  <li>General Overviews<ul>
-    <li><a href="rdoc/files/README_rdoc.html">README</a> (Introduction to Sequel, start here if new)</li>
-    <li><a href="rdoc/files/doc/security_rdoc.html">Security</a></li>
-    <li><a href="rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
-    <li><a href="rdoc/files/doc/sql_rdoc.html">Sequel for SQL Users</a></li>
-    <li><a href="rdoc/files/doc/object_model_rdoc.html">Sequel Object Model</a></li>
-  </ul></li>
-  <li>Databases<ul>
-    <li><a href="rdoc/files/doc/opening_databases_rdoc.html">Connecting to a Database</a></li>
-    <li><a href="rdoc/files/doc/transactions_rdoc.html">Database Transactions</a></li>
-    <li><a href="rdoc/files/doc/schema_modification_rdoc.html">Schema Modification</a></li>
-    <li><a href="rdoc/files/doc/migration_rdoc.html">Migrations</a></li>
-    <li><a href="rdoc/files/doc/sharding_rdoc.html">Primary/Replica Database Configurations and Sharding</a></li>
-    <li><a href="rdoc/files/doc/postgresql_rdoc.html">PostgreSQL Specific Support</a></li>
-    <li><a href="rdoc/files/doc/mssql_stored_procedures_rdoc.html">Microsoft SQL Server Stored Procedure Support</a></li>
-  </ul></li>
-  <li>Datasets<ul>
-    <li><a href="rdoc/files/doc/dataset_basics_rdoc.html">Dataset Basics</a></li>
-    <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
-    <li><a href="rdoc/files/doc/querying_rdoc.html">Querying in Sequel</a></li>
-    <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
-    <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
-  </ul></li>
-  <li>Models<ul>
-    <li><a href="rdoc/files/doc/mass_assignment_rdoc.html">Model Mass Assignment</a></li>
-    <li><a href="rdoc/files/doc/validations_rdoc.html">Model Validations</a></li>
-    <li><a href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
-    <li><a href="rdoc/files/doc/model_dataset_method_design_rdoc.html">Model Dataset Method Design</a></li>
-    <li><a href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics and Options</a></li>
-    <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
-    <li><a href="rdoc/files/doc/model_plugins_rdoc.html">Model Plugins</a></li>
-  </ul></li>
-  <li>Misc.<ul>
-    <li><a href="rdoc/files/doc/code_order_rdoc.html">Code Order</a></li>
-    <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
-    <li><a href="rdoc/files/doc/thread_safety_rdoc.html">Thread Safety</a></li>
-    <li><a href="rdoc/files/doc/fork_safety_rdoc.html">Fork Safety</a></li>
-    <li><a href="rdoc/files/doc/testing_rdoc.html">Testing With Sequel</a></li>
-    <li><a href="rdoc/files/doc/extensions_rdoc.html">Sequel Extensions</a></li>
-    <li><a href="rdoc/files/doc/core_extensions_rdoc.html">Core Extensions</a></li>
-    <li><a href="rdoc/files/doc/bin_sequel_rdoc.html">bin/sequel</a></li>
-  </ul></li>
-</ul>
-
-<h3>RDoc</h3>
-
-<ul>
-  <li><a href="rdoc/index.html">Core/Model</a>, main pages:<ul>
-    <li><a href="rdoc/classes/Sequel.html">Sequel</a> (main module)</li>
-    <li><a href="rdoc/classes/Sequel/Database.html">Database</a></li>
-    <li><a href="rdoc/classes/Sequel/Dataset.html">Dataset</a></li>
-    <li><a href="rdoc/classes/Sequel/Model.html">Model</a></li>
-    <li><a href="rdoc/classes/Sequel/Model/ClassMethods.html">Model Class Methods</a></li>
-    <li><a href="rdoc/classes/Sequel/Model/InstanceMethods.html">Model Instance Methods</a></li>
-    <li><a href="rdoc/classes/Sequel/Model/Associations/ClassMethods.html">Model Association Class Methods</a></li>
-    <li><a href="rdoc/classes/Sequel/Model/Associations/DatasetMethods.html">Model Eager Loading Methods</a></li>
-</ul></li>
-  <li><a href="rdoc-adapters/index.html">Adapters</a></li>
-  <li><a href="rdoc-plugins/index.html">Extensions/Plugins</a></li>
-</ul>
-
-<h3><a href="rdoc/files/CHANGELOG.html">Change Log</a></h3>
-
-<h3>Release Notes</h3>
-<ul>
-  
-    <li>Sequel 5:<ul>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/5_55_0_txt.html">5.55</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_54_0_txt.html">5.54</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_53_0_txt.html">5.53</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_52_0_txt.html">5.52</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_51_0_txt.html">5.51</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_50_0_txt.html">5.50</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/5_49_0_txt.html">5.49</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_48_0_txt.html">5.48</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_47_0_txt.html">5.47</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_46_0_txt.html">5.46</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_45_0_txt.html">5.45</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_44_0_txt.html">5.44</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_43_0_txt.html">5.43</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_42_0_txt.html">5.42</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_41_0_txt.html">5.41</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_40_0_txt.html">5.40</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/5_39_0_txt.html">5.39</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_38_0_txt.html">5.38</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_37_0_txt.html">5.37</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_36_0_txt.html">5.36</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_35_0_txt.html">5.35</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_34_0_txt.html">5.34</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_33_0_txt.html">5.33</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_32_0_txt.html">5.32</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_31_0_txt.html">5.31</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_30_0_txt.html">5.30</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/5_29_0_txt.html">5.29</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_28_0_txt.html">5.28</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_27_0_txt.html">5.27</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_26_0_txt.html">5.26</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_25_0_txt.html">5.25</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_24_0_txt.html">5.24</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_23_0_txt.html">5.23</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_22_0_txt.html">5.22</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_21_0_txt.html">5.21</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_20_0_txt.html">5.20</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/5_19_0_txt.html">5.19</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_18_0_txt.html">5.18</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_17_0_txt.html">5.17</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_16_0_txt.html">5.16</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_15_0_txt.html">5.15</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_14_0_txt.html">5.14</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_13_0_txt.html">5.13</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_12_0_txt.html">5.12</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_11_0_txt.html">5.11</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_10_0_txt.html">5.10</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/5_9_0_txt.html">5.9</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_8_0_txt.html">5.8</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_7_0_txt.html">5.7</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_6_0_txt.html">5.6</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_5_0_txt.html">5.5</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_4_0_txt.html">5.4</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_3_0_txt.html">5.3</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_2_0_txt.html">5.2</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_1_0_txt.html">5.1</a> |
-          
-            <a href="rdoc/files/doc/release_notes/5_0_0_txt.html">5.0</a> |
-          
-        </li>
-      
-    </ul></li>
-  
-    <li>Sequel 4:<ul>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/4_49_0_txt.html">4.49</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_48_0_txt.html">4.48</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_47_0_txt.html">4.47</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_46_0_txt.html">4.46</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_45_0_txt.html">4.45</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_44_0_txt.html">4.44</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_43_0_txt.html">4.43</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_42_0_txt.html">4.42</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_41_0_txt.html">4.41</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_40_0_txt.html">4.40</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/4_39_0_txt.html">4.39</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_38_0_txt.html">4.38</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_37_0_txt.html">4.37</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_36_0_txt.html">4.36</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_35_0_txt.html">4.35</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_34_0_txt.html">4.34</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_33_0_txt.html">4.33</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_32_0_txt.html">4.32</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_31_0_txt.html">4.31</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_30_0_txt.html">4.30</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/4_29_0_txt.html">4.29</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_28_0_txt.html">4.28</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_27_0_txt.html">4.27</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_26_0_txt.html">4.26</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_25_0_txt.html">4.25</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_24_0_txt.html">4.24</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_23_0_txt.html">4.23</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_22_0_txt.html">4.22</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_21_0_txt.html">4.21</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_20_0_txt.html">4.20</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/4_19_0_txt.html">4.19</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_18_0_txt.html">4.18</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_17_0_txt.html">4.17</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_16_0_txt.html">4.16</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_15_0_txt.html">4.15</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_14_0_txt.html">4.14</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_13_0_txt.html">4.13</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_12_0_txt.html">4.12</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_11_0_txt.html">4.11</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_10_0_txt.html">4.10</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/4_9_0_txt.html">4.9</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_8_0_txt.html">4.8</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_7_0_txt.html">4.7</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_6_0_txt.html">4.6</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_5_0_txt.html">4.5</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_4_0_txt.html">4.4</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_3_0_txt.html">4.3</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_2_0_txt.html">4.2</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_1_0_txt.html">4.1</a> |
-          
-            <a href="rdoc/files/doc/release_notes/4_0_0_txt.html">4.0</a> |
-          
-        </li>
-      
-    </ul></li>
-  
-    <li>Sequel 3:<ul>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/3_48_0_txt.html">3.48</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_47_0_txt.html">3.47</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_46_0_txt.html">3.46</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_45_0_txt.html">3.45</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_44_0_txt.html">3.44</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_43_0_txt.html">3.43</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_42_0_txt.html">3.42</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_41_0_txt.html">3.41</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_40_0_txt.html">3.40</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/3_39_0_txt.html">3.39</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_38_0_txt.html">3.38</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_37_0_txt.html">3.37</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_36_0_txt.html">3.36</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_35_0_txt.html">3.35</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_34_0_txt.html">3.34</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_33_0_txt.html">3.33</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_32_0_txt.html">3.32</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_31_0_txt.html">3.31</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_30_0_txt.html">3.30</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/3_29_0_txt.html">3.29</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_28_0_txt.html">3.28</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_27_0_txt.html">3.27</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_26_0_txt.html">3.26</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_25_0_txt.html">3.25</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_24_0_txt.html">3.24</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_23_0_txt.html">3.23</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_22_0_txt.html">3.22</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_21_0_txt.html">3.21</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_20_0_txt.html">3.20</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/3_19_0_txt.html">3.19</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_18_0_txt.html">3.18</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_17_0_txt.html">3.17</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_16_0_txt.html">3.16</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_15_0_txt.html">3.15</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_14_0_txt.html">3.14</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_13_0_txt.html">3.13</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_12_0_txt.html">3.12</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_11_0_txt.html">3.11</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_10_0_txt.html">3.10</a> |
-          
-        </li>
-      
-        <li>
-          
-            <a href="rdoc/files/doc/release_notes/3_9_0_txt.html">3.9</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_8_0_txt.html">3.8</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_7_0_txt.html">3.7</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_6_0_txt.html">3.6</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_5_0_txt.html">3.5</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_4_0_txt.html">3.4</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_3_0_txt.html">3.3</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_2_0_txt.html">3.2</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_1_0_txt.html">3.1</a> |
-          
-            <a href="rdoc/files/doc/release_notes/3_0_0_txt.html">3.0</a> |
-          
-        </li>
-      
-    </ul></li>
-  
-  
-    <li>Sequel 2: 
-      
-        <a href="rdoc/files/doc/release_notes/2_12_0_txt.html">2.12</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_11_0_txt.html">2.11</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_10_0_txt.html">2.10</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_9_0_txt.html">2.9</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_8_0_txt.html">2.8</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_7_0_txt.html">2.7</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_6_0_txt.html">2.6</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_5_0_txt.html">2.5</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_4_0_txt.html">2.4</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_3_0_txt.html">2.3</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_2_0_txt.html">2.2</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_1_0_txt.html">2.1</a> |
-      
-        <a href="rdoc/files/doc/release_notes/2_0_0_txt.html">2.0</a> |
-      
-    </li>
-  
-    <li>Sequel 1: 
-      
-        <a href="rdoc/files/doc/release_notes/1_5_0_txt.html">1.5</a> |
-      
-        <a href="rdoc/files/doc/release_notes/1_4_0_txt.html">1.4</a> |
-      
-        <a href="rdoc/files/doc/release_notes/1_3_txt.html">1.3</a> |
-      
-        <a href="rdoc/files/doc/release_notes/1_1_txt.html">1.1</a> |
-      
-        <a href="rdoc/files/doc/release_notes/1_0_txt.html">1.0</a> |
-      
-    </li>
-  
-</ul>
-
-<h3><a href="rdoc/files/MIT-LICENSE.html">License</a></h3>
-
-<h3>Presentations</h3>
-
-<ul>
-<li><a href="https://speakerdeck.com/janko_m/sequel-when-activerecord-is-not-enough">&quot;Sequel: When Active Record is not enough&quot; Presentation at RubyDay 2020</a></li>
-<li><a href="http://code.jeremyevans.net/presentations/rubyc2014-2/index.html">&quot;Give-and-Go with PostgreSQL and Sequel&quot; Presentation at RubyC 2014</a> (<a href="http://www.youtube.com/watch?v=toAcnwqlU1Q">Video</a>)</li>
-<li><a href="http://code.jeremyevans.net/presentations/rubyc2014-1/index.html">&quot;Deep Dive Into Eager Loading Limited Associations&quot; Presentation at RubyC 2014</a> (<a href="http://www.youtube.com/watch?v=KbF7RMk_2Qo">Video</a>)</li>
-<li><a href="http://code.jeremyevans.net/presentations/railsclub2013/index.html?trans=no">&quot;Give-and-Go with PostgreSQL and Sequel&quot; Presentation at RailsClub 2013</a> (<a href="http://code.jeremyevans.net/presentations/railsclub2013/index.html">In Russian</a>) (<a href="http://live.digicast.ru/ru/view/2116">Video</a>, starts about 6:30)</li>
-<li><a href="http://code.jeremyevans.net/presentations/heroku201205/index.html">&quot;The Development of Sequel&quot; Presentation in May 2012 at Heroku</a></li>
-<li><a href="http://code.jeremyevans.net/presentations/pgwest2011/index.html">&quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at PostgreSQL Conference West 2011</a></li>
-<li><a href="http://code.jeremyevans.net/presentations/lsrc2009_presentation/sequel-lsrc2009.html">&quot;Sequel: SQL in Ruby&quot; Presentation at Lone Star Ruby Conference 2009</a></li>
-<li><a href="http://code.jeremyevans.net/presentations/rk2009_presentation/sequel-rubykaigi2009.html">&quot;Sequel: SQL in Ruby&quot; Presentation at RubyKaigi 2009</a></li>
-<li><a href="http://code.jeremyevans.net/presentations/larc2009_presentation/sequel-larc2009-pres.html">&quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a> (<a href="http://confreaks.com/videos/246-larubyconf2009-sequel">Video</a>)</li>
-<li><a href="http://code.jeremyevans.net/presentations/mwrc2009_presentation.html">&quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at MountainWest RubyConf 2009</a> (<a href="http://confreaks.com/videos/51-mwrc2009-sequel">Video</a>) (<a href="http://code.jeremyevans.net/presentations/mwrc2009_presentation.txt">Transcript</a>)</li>
-</ul>
-
-    <br style="clear: both;" />
-  </div>
+    </nav>
+  </footer>
 </body>
 </html>

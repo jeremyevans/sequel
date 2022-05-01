@@ -30,12 +30,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-04-01 08:49:06 -0700</span>
+<span class='datetime'>2022-04-29 12:19:02 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.56.0+-282022-05-01-29"><a href="doc/release_notes/5_56_0_txt.html">5.56.0</a> (2022-05-01)<span><a href="#label-5.56.0+-282022-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make alter_table add_column/add_foreign_key methods support :index option to create an index on the column (jeremyevans)</p>
+</li><li>
+<p>Support creation of STRICT tables on SQLite <a href="doc/release_notes/3_37_0_txt.html">3.37.0</a>+ via create_table :strict option (jeremyevans)</p>
+</li><li>
+<p>Add sqlite_json_ops extension for DSL support for JSON functions and operators added in SQLite <a href="doc/release_notes/3_38_0_txt.html">3.38.0</a> (jeremyevans)</p>
+</li><li>
+<p>Recognize “INTEGER” type same as “integer” type in the schema dumper, helpful on SQLite <a href="doc/release_notes/3_37_0_txt.html">3.37.0</a>+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.55.0+-282022-04-01-29"><a href="doc/release_notes/5_55_0_txt.html">5.55.0</a> (2022-04-01)<span><a href="#label-5.55.0+-282022-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support :setup_regexp_function Database option in the sqlite adapter to allow the use of regexps when querying (jeremyevans)</p>

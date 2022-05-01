@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
 <head>
-<title>Sequel::Postgres::JSONHash</title>
+<title>Sequel::SQLite::JSONOpMethods</title>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -23,18 +23,14 @@
 <body class='page'>
 <div class='class' id='wrapper'>
 <div class='header'>
-<h1 class='name'><span class='type'>class</span>
-Sequel::Postgres::JSONHash
+<h1 class='name'><span class='type'>module</span>
+Sequel::SQLite::JSONOpMethods
 </h1>
 <ol class='paths'>
 <li>
-<a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+<a href="../../../files/lib/sequel/extensions/sqlite_json_ops_rb.html">lib/sequel/extensions/sqlite_json_ops.rb</a>
 </li>
 </ol>
-<div class='parent'>
-Superclass:
-<strong><a href="../../Object.html">Object</a></strong>
-</div>
 </div>
 <div id='content'>
 <div id='text'>
@@ -43,7 +39,7 @@ Superclass:
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
-<li><a href="#method-i-op">op</a></li>
+<li><a href="#method-i-sqlite_json_op">sqlite_json_op</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -51,25 +47,25 @@ Superclass:
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-op'>
-<a name='method-i-op'></a>
+<div class='method public-instance' id='method-method-i-sqlite_json_op'>
+<a name='method-i-sqlite_json_op'></a>
 <div class='synopsis'>
-<span class='name'>op</span><span class='arguments'>()</span>
+<span class='name'>sqlite_json_op</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
 
-<p>Wrap the <a href="JSONHash.html"><code>JSONHash</code></a> instance in an <a href="JSONOp.html"><code>JSONOp</code></a>, allowing you to easily use the PostgreSQL json functions and operators with literal jsons.</p>
+<p>Wrap the receiver in an <a href="JSONOp.html"><code>JSONOp</code></a> so you can easily use the <a href="../SQLite.html"><code>SQLite</code></a> json functions and operators with it.</p>
 
 </div>
 <div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-op-source&#39;); return false'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sqlite_json_op-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">684</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>
-<span class="line-num">685</span>   <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">686</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sqlite_json_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">214</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_json_op</span>
+<span class="line-num">215</span>   <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">216</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -1,0 +1,22 @@
+section.documentation {
+	background-color: #FFF;
+	border-radius: 12px;
+	box-shadow: 0 24px 64px rgba(0,0,0,.15);
+}
+
+ul.release-notes {
+	font-family: var(--font-monospace);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	font-size: 14px;
+	color: #ccc;
+	list-style: none;
+	margin-top: 8px;
+	margin-bottom: 16px;
+	padding: 0;
+}
+
+ul.release-notes__li {
+	list-style: none;
+}

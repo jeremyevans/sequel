@@ -1,87 +1,135 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
+<html lang="en">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Sequel: The Database Toolkit for Ruby</title>
-
-  <meta http-equiv="Content-Script-Type" content="text/javascript" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta content="text/html; charset=utf-8" http-equiv="content-type" />
-  <meta content="en" name="content-language" />
-
-  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, activerecord, documentation, howto, news" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="ruby, sequel, sql, toolkit, orm, plugins, documentation" />
   <meta name="description" content="Ruby Sequel is a lightweight database toolkit for Ruby." />
 
+  <link rel="icon" type="image/icon" sizes="32x32" href="images/favicon.ico">
   <link href="css/application.css" media="screen" rel="stylesheet" type="text/css" />
-  <link href="css/ruby.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="css/index.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
-<body>
-  <div id="header">
-    <a href="index.html" id="logo"><img src="images/ruby-sequel.png" alt="Ruby Sequel Logo" /></a>
-    <h1>The Database Toolkit for Ruby</h1>
-    <div id="navigation">
-      <ul>
-        <li><a href="development.html">Development</a></li>
-        <li><a href="documentation.html">Documentation</a></li>
-        <li><a href="plugins.html">Plugins</a></li>
-        <li><a href="press.html">Press</a></li>
-        <li><a href="blog.html">Blog</a></li>
+
+<body class="body">
+  <header class="header">
+    <nav class="nav nav--header">
+      <a href="index.html">
+        <img src="images/ruby-sequel.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--header" />
+      </a>
+      <ul class="nav__ul nav__ul--header">
+        <li class="nav__li">
+          <a href="documentation.html" class="nav__a">Documentation</a>
+        </li>
+        <li class="nav__li">
+          <a href="plugins.html" class="nav__a">Plugins</a>
+        </li>
+        <li class="nav__li">
+          <a href="development.html" class="nav__a">Development</a>
+        </li>
+        <li class="nav__li">
+          <a href="links.html" class="nav__a">Links</a>
+        </li>
+      </ul>
+      <form class="nav__form nav__form--header" action="http://www.google.com/search">
+        <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
+      </form>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="main__container">
+      <section class="index">
+<div class="index__hero">
+<h1 class="index__h1"><strong>Sequel:</strong> The Database Toolkit for Ruby</h1>
+</div>
+
+<ul class="index__ul">
+<li class="index__li">Thread safety, connection pooling and a concise DSL for constructing SQL queries and table schemas.</li>
+<li class="index__li">Comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
+<li class="index__li">Advanced database features such as prepared statements, bound variables, stored procedures, savepoints, two-phase commit, transaction isolation, primary/replica configurations, and database sharding.</li>
+<li class="index__li">With adapters for ADO, Amalgalite, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle, PostgreSQL, SQLAnywhere, SQLite3, and TinyTDS.</li>
+</ul>
+
+<a name="example"></a>
+<pre class="pre"><code class="ruby" lang="ruby"><span class="ident">require</span> <span class="punct">"</span><span class="string">sequel</span><span class="punct">"</span>
+
+<span class="comment"># connect to an in-memory database</span>
+<span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">sqlite</span>
+
+<span class="comment"># create an items table</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">create_table</span> <span class="symbol">:items</span> <span class="keyword">do</span>
+  <span class="ident">primary_key</span> <span class="symbol">:id</span>
+  <span class="ident">String</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">unique:</span> <span class="keyword">true</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
+  <span class="ident">Float</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="symbol">null:</span> <span class="keyword">false</span>
+<span class="keyword">end</span>
+
+<span class="comment"># create a dataset from the items table</span>
+<span class="ident">items</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:items</span><span class="punct">]</span>
+
+<span class="comment"># populate the table</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">'</span><span class="string">abc</span><span class="punct">',</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">'</span><span class="string">def</span><span class="punct">',</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+<span class="ident">items</span><span class="punct">.</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">name:</span> <span class="punct">'</span><span class="string">ghi</span><span class="punct">',</span> <span class="symbol">price:</span> <span class="ident">rand</span> <span class="punct">*</span> <span class="number">100</span><span class="punct">)</span>
+
+<span class="comment"># print out the number of records</span>
+<span class="ident">puts</span> <span class="punct">"</span><span class="string">Item count: <span class="expr">#{items.count}</span></span><span class="punct">"</span>
+
+<span class="comment"># print out the average price</span>
+<span class="ident">puts</span> <span class="punct">"</span><span class="string">The average price is: <span class="expr">#{items.avg(:price)}</span></span><span class="punct">"</span></code></pre>
+
+</section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="nav">
+      <a href="index.html">
+        <img src="images/ruby-sequel-monocrome.svg" alt="Ruby Sequel Logo" class="nav__img nav__img--footer" />
+      </a>
+      <ul class="nav__ul">
+        <li class="nav__li">
+          <a href="documentation.html" class="nav__a">Documentation</a>
+          <a href="documentation.html#general-overview" class="a">General Overview</a>
+          <a href="documentation.html#databases" class="a">Databases</a>
+          <a href="documentation.html#datasets" class="a">Datasets</a>
+          <a href="documentation.html#models" class="a">Models</a>
+          <a href="documentation.html#misc" class="a">Misc</a>
+          <a href="documentation.html#rdoc" class="a">RDoc</a>
+          <a href="documentation.html#release-notes" class="a">Release Notes</a>
+        </li>
+        <li class="nav__li">
+          <a href="plugins.html" class="nav__a">Plugins</a>
+          <a href="plugins.html#model-plugins" class="a">Model Plugins</a>
+          <a href="plugins.html#sequel-extensions" class="a">Sequel Extensions</a>
+        </li>
+        <li class="nav__li">
+          <a href="development.html" class="nav__a">Development</a>
+          <a href="development.html#bugs" class="a">Reporting Bugs</a>
+          <a href="development.html#contribute" class="a">Contribute</a>
+          <a href="development.html#code" class="a">Source Code</a>
+          <a href="development.html#license" class="a">License</a>
+        </li>
+        <li class="nav__li">
+          <a href="links.html" class="nav__a">Links</a>
+          <a href="links.html#articles" class="a">Articles</a>
+          <a href="links.html#presentations" class="a">Presentations</a>
+          <a href="links.html#logos" class="a">Logos &amp; Badges</a>
+          <a href="links.html#using-sequel" class="a">Using Sequel</a>
+          <a href="https://rubygems.org/gems/sequel/" class="a">RubyGems</a>
+          <a href="https://github.com/jeremyevans/sequel/" class="a">GitHub</a>
+        </li>
       </ul>
       <form action="http://www.google.com/search">
         <input type="hidden" name="sitesearch" value="sequel.jeremyevans.net" />
-        <input id="searchbox" type="search" placeholder="Site Search" name="q" value="" />
+        <input class="nav__input" type="search" placeholder="Search docs, plugins, etc..." name="q" value="" />
       </form>
-    </div>
-    <br style="clear: both;" />
-  </div>
-
-  <hr />
-
-  <div id="content">
-    <br style="clear: both;" />
-    <h2>Sequel: The Database Toolkit for Ruby (v5.55.0)</h2>
-
-<h3 id='features'>Features:</h3>
-
-<ul>
-<li>Sequel provides thread safety, connection pooling and a concise DSL for constructing SQL queries and table schemas.</li>
-<li>Sequel includes a comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
-<li>Sequel supports advanced database features such as prepared statements, bound variables, stored procedures, savepoints, two-phase commit, transaction isolation, primary/replica configurations, and database sharding.</li>
-<li>Sequel currently has adapters for ADO, Amalgalite, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle, PostgreSQL, SQLAnywhere, SQLite3, and TinyTDS.</li>
-</ul>
-
-<h3 id='a_short_example'>A short example:</h3>
-
-<pre><code class='ruby' lang='ruby'><span class='ident'>require</span> <span class='punct'>&quot;</span><span class='string'>sequel</span><span class='punct'>&quot;</span>
-
-<span class='comment'># connect to an in-memory database</span>
-<span class='constant'>DB</span> <span class='punct'>=</span> <span class='constant'>Sequel</span><span class='punct'>.</span><span class='ident'>sqlite</span>
-
-<span class='comment'># create an items table</span>
-<span class='constant'>DB</span><span class='punct'>.</span><span class='ident'>create_table</span> <span class='symbol'>:items</span> <span class='keyword'>do</span>
-  <span class='ident'>primary_key</span> <span class='symbol'>:id</span>
-  <span class='ident'>String</span> <span class='symbol'>:name</span><span class='punct'>,</span> <span class='symbol'>unique:</span> <span class='keyword'>true</span><span class='punct'>,</span> <span class='symbol'>null:</span> <span class='keyword'>false</span>
-  <span class='ident'>Float</span> <span class='symbol'>:price</span><span class='punct'>,</span> <span class='symbol'>null:</span> <span class='keyword'>false</span>
-<span class='keyword'>end</span>
-
-<span class='comment'># create a dataset from the items table</span>
-<span class='ident'>items</span> <span class='punct'>=</span> <span class='constant'>DB</span><span class='punct'>[</span><span class='symbol'>:items</span><span class='punct'>]</span>
-
-<span class='comment'># populate the table</span>
-<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>insert</span><span class='punct'>(</span><span class='symbol'>name:</span> <span class='punct'>&#39;</span><span class='string'>abc</span><span class='punct'>&#39;,</span> <span class='symbol'>price:</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>)</span>
-<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>insert</span><span class='punct'>(</span><span class='symbol'>name:</span> <span class='punct'>&#39;</span><span class='string'>def</span><span class='punct'>&#39;,</span> <span class='symbol'>price:</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>)</span>
-<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>insert</span><span class='punct'>(</span><span class='symbol'>name:</span> <span class='punct'>&#39;</span><span class='string'>ghi</span><span class='punct'>&#39;,</span> <span class='symbol'>price:</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>)</span>
-
-<span class='comment'># print out the number of records</span>
-<span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>Item count: <span class='expr'>#{items.count}</span></span><span class='punct'>&quot;</span>
-
-<span class='comment'># print out the average price</span>
-<span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>The average price is: <span class='expr'>#{items.avg(:price)}</span></span><span class='punct'>&quot;</span></code></pre>
-
-<h2><a href='documentation.html'>Learn more about Sequel&#8230;</a></h2>
-
-    <br style="clear: both;" />
-  </div>
+    </nav>
+  </footer>
 </body>
 </html>

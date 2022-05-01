@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.56.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.56.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.56.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-04-29 12:19:02 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>On SQLite, Database#create_table now supports a :strict option to use the STRICT keyword when creating the table.  When this option is used, SQLite will enforce the types for each column. When using this option, you are limited to using the following column types: int, integer, real, text, blob, and any (any allows for dynamic types).</p>
+</li><li>
+<p>An sqlite_json_ops extension has been added, providing DSL support for JSON functions and operators supported in SQLite 3.38.0. Usage is similar to the pg_json_ops extension.  First, you create an appropriate object:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_json_op</span>(<span class="ruby-value">:json_column</span>)
+<span class="ruby-comment"># or:</span>
+<span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:json_column</span>].<span class="ruby-identifier">sqlite_json_op</span>
+</pre>
+
+<p>Then, you call methods on that object to create expressions for the JSON functions and operators:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span>[<span class="ruby-value">1</span>]                 <span class="ruby-comment"># (json_column -&gt;&gt; 1)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>)        <span class="ruby-comment"># (json_column -&gt; 1)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;$.a&#39;</span>)     <span class="ruby-comment"># json_extract(json_column, &#39;$.a&#39;)</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_length</span>       <span class="ruby-comment"># json_array_length(json_column)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">type</span>               <span class="ruby-comment"># json_type(json_column)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">valid</span>              <span class="ruby-comment"># json_valid(json_column)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">json</span>               <span class="ruby-comment"># json(json_column)</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)   <span class="ruby-comment"># json_insert(json_column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">set</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)      <span class="ruby-comment"># json_set(json_column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)  <span class="ruby-comment"># json_replace(json_column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-string">&#39;$.a&#39;</span>)      <span class="ruby-comment"># json_remove(json_column, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">patch</span>(<span class="ruby-string">&#39;{&quot;a&quot;:2}&#39;</span>)   <span class="ruby-comment"># json_patch(json_column, &#39;{&quot;a&quot;:2}&#39;)</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">each</span>               <span class="ruby-comment"># json_each(json_column)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">tree</span>               <span class="ruby-comment"># json_tree(json_column)</span>
+</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The alter_table add_column and add_foreign_key methods now support the :index option to create an index on the added column, for compatibility with the :index option on the create_table column and foreign_key methods.</p>
+</li><li>
+<p>The schema_dumper extension now treats the “INTEGER” type the same as the “integer” type.  This fixes some behavior when using SQLite <a href="3_37_0_txt.html">3.37.0</a>+.</p>
+</li><li>
+<p>Sequel’s website has a much improved visual design.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

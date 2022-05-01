@@ -52,7 +52,7 @@ Sequel::Plugins::InstanceSpecificDefault
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p><code>first_track</code> is not instance specific, but <code>last_track</code> and <code>recent_tracks</code> are. <code>last_trac</code> is because the <code>num_tracks</code> call in the block is calling <code>Album#num_tracks</code>.  <code>recent_tracks</code> is because the value will change over time. This plugin allows you to find these cases, and set the :instance_specific option appropriately for them:</p>
+<p><code>first_track</code> is not instance specific, but <code>last_track</code> and <code>recent_tracks</code> are. <code>last_track</code> is because the <code>num_tracks</code> call in the block is calling <code>Album#num_tracks</code>.  <code>recent_tracks</code> is because the value will change over time. This plugin allows you to find these cases, and set the :instance_specific option appropriately for them:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_track</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">instance_specific:</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">number:</span> <span class="ruby-value">1</span>)

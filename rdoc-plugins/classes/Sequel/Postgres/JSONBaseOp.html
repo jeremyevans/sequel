@@ -141,13 +141,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">160</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">161</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
-<span class="line-num">162</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">163</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)
-<span class="line-num">164</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">160</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">161</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">162</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
+<span class="line-num">163</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">164</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">165</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_elements'>
@@ -169,9 +169,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-array_elements-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements</span>
-<span class="line-num">172</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements</span>)
-<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements</span>
+<span class="line-num">173</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements</span>)
+<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_elements_text'>
@@ -193,9 +193,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-array_elements_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements_text</span>
-<span class="line-num">179</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements_text</span>)
-<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements_text</span>
+<span class="line-num">180</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements_text</span>)
+<span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_length'>
@@ -217,9 +217,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-array_length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>
-<span class="line-num">186</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>))
-<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">186</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>
+<span class="line-num">187</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>))
+<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -241,9 +241,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
-<span class="line-num">194</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)
-<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">194</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
+<span class="line-num">195</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)
+<span class="line-num">196</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each_text'>
@@ -265,9 +265,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-each_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_text</span>
-<span class="line-num">202</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each_text</span>)
-<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">202</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_text</span>
+<span class="line-num">203</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each_text</span>)
+<span class="line-num">204</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extract'>
@@ -290,9 +290,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-extract-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">210</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
-<span class="line-num">211</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">210</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">211</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
+<span class="line-num">212</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extract_text'>
@@ -315,9 +315,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-extract_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">217</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract_text</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">218</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path_text</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
-<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">218</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract_text</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">219</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path_text</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
+<span class="line-num">220</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-get_text'>
@@ -341,13 +341,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-get_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">227</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_text</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">228</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">229</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
-<span class="line-num">230</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">231</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)
-<span class="line-num">232</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">228</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_text</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">229</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">230</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
+<span class="line-num">231</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">232</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">233</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">234</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-keys'>
@@ -369,9 +369,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-keys-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">238</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
-<span class="line-num">239</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:object_keys</span>)
-<span class="line-num">240</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">239</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
+<span class="line-num">240</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:object_keys</span>)
+<span class="line-num">241</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-populate'>
@@ -393,9 +393,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-populate-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">246</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_record</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
-<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">246</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">247</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_record</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">248</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-populate_set'>
@@ -417,9 +417,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-populate_set-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate_set</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">253</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_recordset</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
-<span class="line-num">254</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">253</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate_set</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">254</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_recordset</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">255</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-strip_nulls'>
@@ -441,9 +441,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-strip_nulls-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">strip_nulls</span>
-<span class="line-num">260</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:strip_nulls</span>))
-<span class="line-num">261</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">strip_nulls</span>
+<span class="line-num">261</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:strip_nulls</span>))
+<span class="line-num">262</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_record'>
@@ -465,9 +465,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_record-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">267</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_record</span>
-<span class="line-num">268</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_record</span>)
-<span class="line-num">269</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">268</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_record</span>
+<span class="line-num">269</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_record</span>)
+<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_recordset'>
@@ -489,9 +489,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_recordset-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">275</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_recordset</span>
-<span class="line-num">276</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_recordset</span>)
-<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">276</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_recordset</span>
+<span class="line-num">277</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_recordset</span>)
+<span class="line-num">278</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-typeof'>
@@ -513,9 +513,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-typeof-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typeof</span>
-<span class="line-num">283</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:typeof</span>)
-<span class="line-num">284</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">283</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typeof</span>
+<span class="line-num">284</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:typeof</span>)
+<span class="line-num">285</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
