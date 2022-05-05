@@ -66,6 +66,14 @@ module Sequel
             sql << " IS DISTINCT FROM "
             literal_append(sql, rhs)
             sql << ")"
+          elsif db.database_type == :derby && (lhs == nil || rhs == nil)
+            if lhs == nil && rhs == nil
+              sql << literal_false
+            elsif lhs == nil
+              literal_append(sql, ~Sequel.expr(rhs=>nil))
+            else
+              literal_append(sql, ~Sequel.expr(lhs=>nil))
+            end
           else
             literal_append(sql, Sequel.case({(Sequel.expr(lhs=>rhs) | [[lhs, nil], [rhs, nil]]) => 0}, 1) => 1)
           end
