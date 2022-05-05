@@ -666,6 +666,14 @@ describe "Postgres/SQLite extensions integration" do
   end
 end
 
+describe "is_distinct_from extension integration" do
+  it "Symbol#is_distinct_from should return an IsDistinctFrom" do
+    db = Sequel.connect("mock://postgres")
+    db.extension :is_distinct_from
+    db.literal(:a.is_distinct_from(:b)).must_equal '("a" IS DISTINCT FROM "b")'
+  end
+end
+
 describe "symbol_aref extensions" do
   before do
     @db = Sequel.mock

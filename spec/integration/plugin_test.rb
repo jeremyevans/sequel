@@ -2291,6 +2291,43 @@ describe "Sequel::Plugins::ConstraintValidations" do
   end
 end
 
+describe "is_distinct_from extension" do
+  before do
+    @db = DB
+    @db.create_table!(:is_distinct_from) do
+      Integer :a
+      Integer :b
+      Integer :c
+    end
+    @ds = @db[:is_distinct_from].extension(:is_distinct_from)
+    @ds.insert(1, nil, nil)
+    @ds.insert(2, nil, 1)
+    @ds.insert(3, 1, nil)
+    @ds.insert(4, 1, 1)
+    @ds.insert(5, 1, 2)
+  end
+  after do
+    @db.drop_table?(:is_distinct_from)
+  end
+
+  it "should support is_distinct_from" do
+    @ds.where(Sequel.is_distinct_from(:b, :c)).select_order_map(:a).must_equal [2, 3, 5]
+    @ds.exclude(Sequel.is_distinct_from(:b, :c)).select_order_map(:a).must_equal [1, 4]
+
+    @ds.where(Sequel.is_distinct_from(nil, nil)).count.must_equal 0
+    @ds.where(Sequel.is_distinct_from(1, nil)).count.must_equal 5
+    @ds.where(Sequel.is_distinct_from(nil, 2)).count.must_equal 5
+    @ds.where(Sequel.is_distinct_from(1, 1)).count.must_equal 0
+    @ds.where(Sequel.is_distinct_from(1, 2)).count.must_equal 5
+
+    @ds.exclude(Sequel.is_distinct_from(nil, nil)).count.must_equal 5
+    @ds.exclude(Sequel.is_distinct_from(1, nil)).count.must_equal 0
+    @ds.exclude(Sequel.is_distinct_from(nil, 2)).count.must_equal 0
+    @ds.exclude(Sequel.is_distinct_from(1, 1)).count.must_equal 5
+    @ds.exclude(Sequel.is_distinct_from(1, 2)).count.must_equal 0
+  end
+end
+
 describe "date_arithmetic extension" do
   asd = begin
     require 'active_support'

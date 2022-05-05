@@ -1,7 +1,7 @@
 require_relative "spec_helper"
 
 if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_ENGINE == 'jruby' && (JRUBY_VERSION >= '9.3' || (JRUBY_VERSION.match(/\A9\.2\.(\d+)/) && $1.to_i >= 7)))
-Sequel.extension :core_refinements, :pg_array, :pg_hstore, :pg_row, :pg_range, :pg_multirange, :pg_row_ops, :pg_range_ops, :pg_array_ops, :pg_hstore_ops, :pg_json, :pg_json_ops, :sqlite_json_ops
+Sequel.extension :core_refinements, :pg_array, :pg_hstore, :pg_row, :pg_range, :pg_multirange, :pg_row_ops, :pg_range_ops, :pg_array_ops, :pg_hstore_ops, :pg_json, :pg_json_ops, :sqlite_json_ops, :is_distinct_from
 using Sequel::CoreRefinements
 
 describe "Core refinements" do
@@ -457,6 +457,14 @@ describe "Symbol" do
 
   it "should support SQL EXTRACT function via #extract " do
     @ds.literal(:abc.extract(:year)).must_equal "extract(year FROM abc)"
+  end
+end
+
+describe "is_distinct_from extension integration" do
+  it "Symbol#is_distinct_from should return an IsDistinctFrom" do
+    db = Sequel.connect("mock://postgres")
+    db.extension :is_distinct_from
+    db.literal(:a.is_distinct_from(:b)).must_equal '("a" IS DISTINCT FROM "b")'
   end
 end
 
