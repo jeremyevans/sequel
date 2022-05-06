@@ -356,6 +356,12 @@ module Sequel
         end
       end
 
+      # Support :on_update_current_timestamp option.
+      def column_definition_default_sql(sql, column)
+        super
+        sql << " ON UPDATE CURRENT_TIMESTAMP" if column[:on_update_current_timestamp]
+      end
+
       # Add generation clause SQL fragment to column creation SQL.
       def column_definition_generated_sql(sql, column)
         if (generated_expression = column[:generated_always_as])

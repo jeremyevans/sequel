@@ -146,6 +146,9 @@ module Sequel
       #
       # :generated_type :: Set the type of column when using :generated_always_as,
       #                    should be :virtual or :stored to force a type.
+      # :on_update_current_timestamp :: Use ON UPDATE CURRENT TIMESTAMP when defining the column,
+      #                                 which will update the column value to CURRENT_TIMESTAMP
+      #                                 on every UPDATE.
       #
       # Microsoft SQL Server specific options:
       #

@@ -51,6 +51,20 @@ describe "MySQL", '#create_table' do
     @db.schema(:dolls).map{|k, v| v[:auto_increment]}.must_equal [true, nil, nil]
   end
 
+  it "should support :on_update_current_timestamp column option" do
+    @db.create_table(:dolls) do
+      Integer :id
+      timestamp :ts, :default=>0, :on_update_current_timestamp=>true
+      datetime :dt, :default=>nil, :on_update_current_timestamp=>true
+    end
+    @db[:dolls].insert(:id=>1)
+    ts1, dt1 = @db[:dolls].get([:ts, :dt])
+    @db[:dolls].update(:id=>2)
+    ts2, dt2 = @db[:dolls].get([:ts, :dt])
+    ts1.wont_equal ts2
+    dt1.wont_equal dt2
+  end
+
   it "should support collate with various other column options" do
     @db.create_table!(:dolls){ String :name, :size=>128, :collate=>:utf8_bin, :default=>'foo', :null=>false, :unique=>true}
     @db[:dolls].insert
