@@ -52,10 +52,11 @@ describe "MySQL", '#create_table' do
   end
 
   it "should support :on_update_current_timestamp column option" do
+    t = Time.now-60
     @db.create_table(:dolls) do
       Integer :id
-      timestamp :ts, :default=>0, :on_update_current_timestamp=>true
-      datetime :dt, :default=>nil, :on_update_current_timestamp=>true
+      timestamp :ts, :default=>t, :on_update_current_timestamp=>true
+      datetime :dt, :default=>t, :on_update_current_timestamp=>true
     end
     @db[:dolls].insert(:id=>1)
     ts1, dt1 = @db[:dolls].get([:ts, :dt])
