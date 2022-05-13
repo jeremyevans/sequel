@@ -1,5 +1,7 @@
 === master
 
+* Make Database#create_function on PostgreSQL accept :parallel option (bananarne) (#1870)
+
 * Add support for :on_update_current_timestamp column option on MySQL (jeremyevans)
 
 * Add is_distinct_from extension with support for the IS DISTINCT FROM operator (jeremyevans)
