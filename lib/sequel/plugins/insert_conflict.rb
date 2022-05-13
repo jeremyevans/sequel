@@ -22,6 +22,10 @@ module Sequel
     # for that album.  See the PostgreSQL and SQLite adapter documention for
     # the options you can pass to the insert_conflict method.
     #
+    # You should not attempt to use this plugin to ignore conflicts when
+    # inserting, you should only use it to turn insert conflicts into updates.
+    # Any usage to ignore conflicts is not recommended or supported.
+    #
     # Usage:
     #
     #   # Make all model subclasses support insert_conflict
