@@ -2048,7 +2048,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
   end
 
   it "#create_function and #drop_function should support options" do
-    args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'}}]
+    args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :parallel=>:unsafe, :set=>{:search_path => 'public'}}]
     @d.create_function(*args)
     # Make sure replace works
     @d.create_function(*args)

@@ -414,6 +414,7 @@ module Sequel
       #                  2 :: argument name
       #                  3 :: argument mode (e.g. in, out, inout)
       #         :behavior :: Should be IMMUTABLE, STABLE, or VOLATILE.  PostgreSQL assumes VOLATILE by default.
+      #         :parallel :: The thread safety attribute of the function. Should be SAFE, UNSAFE, RESTRICTED. PostgreSQL assumes UNSAFE by default.
       #         :cost :: The estimated cost of the function, used by the query planner.
       #         :language :: The language the function uses.  SQL is the default.
       #         :link_symbol :: For a dynamically loaded see function, the function's link symbol if different from the definition argument.
@@ -1117,6 +1118,7 @@ module Sequel
         #{opts[:behavior].to_s.upcase if opts[:behavior]}
         #{'STRICT' if opts[:strict]}
         #{'SECURITY DEFINER' if opts[:security_definer]}
+        #{"PARALLEL #{opts[:parallel].to_s.upcase}" if opts[:parallel]}
         #{"COST #{opts[:cost]}" if opts[:cost]}
         #{"ROWS #{opts[:rows]}" if opts[:rows]}
         #{opts[:set].map{|k,v| " SET #{k} = #{v}"}.join("\n") if opts[:set]}
