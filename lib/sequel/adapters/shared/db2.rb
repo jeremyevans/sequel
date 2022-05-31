@@ -338,6 +338,11 @@ module Sequel
         true
       end
       
+      # DB2 supports MERGE
+      def supports_merge?
+        true
+      end
+
       # DB2 does not support multiple columns in IN.
       def supports_multiple_column_in?
         false
@@ -359,6 +364,29 @@ module Sequel
       end
 
       private
+
+      # Normalize conditions for MERGE WHEN.
+      def _merge_when_conditions_sql(sql, data)
+        if data.has_key?(:conditions)
+          sql << " AND "
+          literal_append(sql, _normalize_merge_when_conditions(data[:conditions]))
+        end
+      end
+
+      # Handle nil, false, and true MERGE WHEN conditions to avoid non-boolean
+      # type error.
+      def _normalize_merge_when_conditions(conditions)
+        case conditions
+        when nil, false
+          {1=>0}
+        when true
+          {1=>1}
+        when Sequel::SQL::DelayedEvaluation
+          Sequel.delay{_normalize_merge_when_conditions(conditions.call(self))}
+        else
+          conditions
+        end
+      end
 
       def empty_from_sql
         ' FROM "SYSIBM"."SYSDUMMY1"'

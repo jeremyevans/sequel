@@ -2194,7 +2194,7 @@ describe "MERGE" do
     check(ds)
   end
 
-  it "should support WITH clauses" do
+  cspecify "should support WITH clauses", :db2 do
     ds = @m1.
       with(:m3, @db[:m2]).
       merge_using(:m3, :i1=>:i2).

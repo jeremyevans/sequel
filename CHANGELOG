@@ -1,6 +1,6 @@
 === master
 
-* Add Dataset#merge* methods to support MERGE statement on PostgreSQL 15+, MSSQL, H2, HSQLDB, and Derby (jeremyevans)
+* Add Dataset#merge* methods to support MERGE statement on PostgreSQL 15+, MSSQL, DB2, H2, HSQLDB, and Derby (jeremyevans)
 
 === 5.57.0 (2022-06-01)
 
