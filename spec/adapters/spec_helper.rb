@@ -32,7 +32,6 @@ unless defined?(DB)
   DB = Sequel.connect(ENV[env_var])
 end
 
-require_relative "../sequel_warning"
 require_relative "../visibility_checking" if ENV['CHECK_METHOD_VISIBILITY']
 
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)

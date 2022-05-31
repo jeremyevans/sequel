@@ -30,7 +30,6 @@ Sequel::Model.cache_anonymous_models = false
 require_relative '../guards_helper'
 
 DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL']) unless defined?(DB)
-require_relative "../sequel_warning"
 
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
