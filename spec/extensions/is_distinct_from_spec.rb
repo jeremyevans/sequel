@@ -42,6 +42,7 @@ describe "is_distinct_from extension" do
   it "should respect existing supports_is_distinct_from? dataset method" do
     db = Sequel.mock
     db.extend_datasets do
+      private
       def supports_is_distinct_from?; true; end
     end
     db.extension :is_distinct_from
