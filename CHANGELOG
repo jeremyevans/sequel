@@ -1,4 +1,4 @@
-=== master
+=== 5.57.0 (2022-06-01)
 
 * Make Database#create_function on PostgreSQL accept :parallel option (bananarne) (#1870)
 

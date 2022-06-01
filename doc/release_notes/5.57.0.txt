@@ -1,0 +1,23 @@
+= New Features
+
+* An is_distinct_from extension has been added with support for the
+  SQL IS DISTINCT FROM operator.  This operator is similar to the
+  not equals operator, except in terms of NULL handling.  It returns
+  true if only one side is NULL, and false if both sides are NULL.
+  You can call is_distinct_from on Sequel itself or on Sequel objects:
+
+    Sequel.is_distinct_from(:column_a, :column_b)
+    Sequel[:column_a].is_distinct_from(:column_b)
+    # (column_a IS DISTINCT FROM column_b)
+
+  On databases not supporting IS DISTINCT FROM, support is emulated
+  using a CASE statement.
+
+* Column definitions on MySQL can use the :on_update_current_timestamp
+  option for ON UPDATE CURRENT_TIMESTAMP, which creates a column that
+  will automatically have its value set to CURRENT_TIMESTAMP on every
+  update.
+
+* Database#create_function on PostgreSQL now supports a :parallel
+  option to set the thread safety of the funciton.  The value should
+  be :safe, :unsafe, or :restricted.
