@@ -51,6 +51,8 @@ Sequel::Plugins::InsertConflict
 
 <p>This example will try to insert the album, but if there is an existing album with the name ‘Foo’, this will update the copies_sold attribute for that album.  See the PostgreSQL and <a href="../SQLite.html"><code>SQLite</code></a> adapter documention for the options you can pass to the insert_conflict method.</p>
 
+<p>You should not attempt to use this plugin to ignore conflicts when inserting, you should only use it to turn insert conflicts into updates. Any usage to ignore conflicts is not recommended or supported.</p>
+
 <p>Usage:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Make all model subclasses support insert_conflict</span>
@@ -92,13 +94,13 @@ Sequel::Plugins::InsertConflict
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/insert_conflict.rb</span>
-<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
-<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">35</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:insert_conflict</span>)
-<span class="line-num">36</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;#{self}&#39;s dataset does not support insert_conflict&quot;</span>
-<span class="line-num">37</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">38</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">38</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">39</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:insert_conflict</span>)
+<span class="line-num">40</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;#{self}&#39;s dataset does not support insert_conflict&quot;</span>
+<span class="line-num">41</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">42</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

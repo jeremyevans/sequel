@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>is_distinct_from.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>is_distinct_from.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/is_distinct_from.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-05-05 13:03:39 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The is_distinct_from extension adds the ability to use the SQL standard IS DISTINCT FROM operator, which is similar to the not equals operator, except that NULL values are considered equal.  Only PostgreSQL and H2 currently support this operator.  On  other databases, support is emulated.</p>
+
+<p>First, you need to load the extension into the database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:is_distinct_from</span>
+</pre>
+
+<p>Then you can use the Sequel.is_distinct_from to create the expression objects:</p>
+
+<pre class="ruby"><span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">is_distinct_from</span>(<span class="ruby-value">:column_a</span>, <span class="ruby-value">:column_b</span>)
+<span class="ruby-comment"># (column_a IS DISTINCT FROM column_b)</span>
+</pre>
+
+<p>You can also use the <code>is_distinct_from</code> method on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
+
+<pre class="ruby"><span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column_a</span>].<span class="ruby-identifier">is_distinct_from</span>(<span class="ruby-value">:column_b</span>)
+<span class="ruby-comment"># (column_a IS DISTINCT FROM column_b)</span>
+</pre>
+
+<p>These expressions can be used in your datasets, or anywhere else that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions are allowed:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-identifier">expr</span>)
+</pre>
+
+<p>Related module: <a href="../../../../classes/Sequel/SQL/IsDistinctFrom.html"><code>Sequel::SQL::IsDistinctFrom</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

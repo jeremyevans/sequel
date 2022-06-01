@@ -1,4 +1,4 @@
-Sun, 01 May 2022 10:24:45 -0700
+Wed, 01 Jun 2022 08:02:40 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -35,6 +35,7 @@ lib/sequel/extensions/implicit_subquery.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/index_caching.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/extensions/inflector.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/extensions/integer64.rb	Thu, 16 Apr 2020 13:01:31 -0700
+lib/sequel/extensions/is_distinct_from.rb	Thu, 05 May 2022 13:03:39 -0700
 lib/sequel/extensions/looser_typecasting.rb	Thu, 24 May 2018 16:51:22 -0700
 lib/sequel/extensions/migration.rb	Fri, 29 Oct 2021 08:26:19 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
@@ -128,7 +129,7 @@ lib/sequel/plugins/forbid_lazy_load.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/plugins/force_encoding.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/hook_class_methods.rb	Tue, 23 Apr 2019 16:34:31 -0700
 lib/sequel/plugins/input_transformer.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/insert_conflict.rb	Wed, 31 Jul 2019 10:49:27 -0700
+lib/sequel/plugins/insert_conflict.rb	Fri, 13 May 2022 08:52:32 -0700
 lib/sequel/plugins/insert_returning_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_filters.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_hooks.rb	Tue, 01 Aug 2017 08:12:01 -0700

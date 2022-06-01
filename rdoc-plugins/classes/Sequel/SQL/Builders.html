@@ -31,6 +31,9 @@ Sequel::SQL::Builders
 <a href="../../../files/lib/sequel/extensions/date_arithmetic_rb.html">lib/sequel/extensions/date_arithmetic.rb</a>
 </li>
 <li class='other'>
+<a href="../../../files/lib/sequel/extensions/is_distinct_from_rb.html">lib/sequel/extensions/is_distinct_from.rb</a>
+</li>
+<li class='other'>
 <a href="../../../files/lib/sequel/extensions/pg_array_rb.html">lib/sequel/extensions/pg_array.rb</a>
 </li>
 <li class='other'>
@@ -88,6 +91,7 @@ Sequel::SQL::Builders
 <li><a href="#method-i-date_sub">date_sub</a></li>
 <li><a href="#method-i-hstore">hstore</a></li>
 <li><a href="#method-i-hstore_op">hstore_op</a></li>
+<li><a href="#method-i-is_distinct_from">is_distinct_from</a></li>
 <li><a href="#method-i-pg_array">pg_array</a></li>
 <li><a href="#method-i-pg_array_op">pg_array_op</a></li>
 <li><a href="#method-i-pg_inet_op">pg_inet_op</a></li>
@@ -217,6 +221,27 @@ Sequel::SQL::Builders
 <span class="line-num">385</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
 <span class="line-num">386</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">387</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-is_distinct_from'>
+<a name='method-i-is_distinct_from'></a>
+<div class='synopsis'>
+<span class='name'>is_distinct_from</span><span class='arguments'>(lhs, rhs)</span>
+
+</div>
+<div class='description'>
+
+<p>Return a <a href="IsDistinctFrom.html"><code>IsDistinctFrom</code></a> expression object, using the IS DISTINCT FROM operator with the given left hand side and right hand side.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-is_distinct_from-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-is_distinct_from-source'>   <span class="ruby-comment"># File lib/sequel/extensions/is_distinct_from.rb</span>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_distinct_from</span>(<span class="ruby-identifier">lhs</span>, <span class="ruby-identifier">rhs</span>)
+<span class="line-num">38</span>   <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-constant">IsDistinctFrom</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">lhs</span>, <span class="ruby-identifier">rhs</span>))
+<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_array'>

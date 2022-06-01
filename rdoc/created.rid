@@ -1,6 +1,6 @@
-Sun, 01 May 2022 10:23:51 -0700
+Wed, 01 Jun 2022 08:01:46 -0700
 README.rdoc	Sat, 18 Dec 2021 10:36:54 -0800
-CHANGELOG	Fri, 29 Apr 2022 12:19:02 -0700
+CHANGELOG	Wed, 01 Jun 2022 07:58:52 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 05 Jan 2022 16:44:47 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Fri, 29 Apr 2022 12:19:02 -0700
+lib/sequel/version.rb	Wed, 01 Jun 2022 07:58:52 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 17 Dec 2021 16:59:47 -0800
@@ -26,7 +26,7 @@ lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
 lib/sequel/database/misc.rb	Mon, 18 Oct 2021 13:42:00 -0700
 lib/sequel/database/query.rb	Wed, 15 Dec 2021 16:07:57 -0800
-lib/sequel/database/schema_generator.rb	Fri, 22 Apr 2022 15:55:11 -0700
+lib/sequel/database/schema_generator.rb	Fri, 06 May 2022 11:12:21 -0700
 lib/sequel/database/schema_methods.rb	Fri, 15 Apr 2022 15:27:11 -0700
 lib/sequel/database/transactions.rb	Fri, 20 Nov 2020 10:49:30 -0800
 lib/sequel/dataset/actions.rb	Tue, 08 Mar 2022 11:16:59 -0800
@@ -39,7 +39,7 @@ lib/sequel/dataset/prepared_statements.rb	Wed, 02 Dec 2020 15:37:08 -0800
 lib/sequel/dataset/query.rb	Wed, 03 Nov 2021 13:00:48 -0700
 lib/sequel/dataset/sql.rb	Tue, 08 Mar 2022 11:16:59 -0800
 lib/sequel/model/associations.rb	Fri, 19 Nov 2021 23:47:18 -0800
-lib/sequel/model/base.rb	Fri, 17 Dec 2021 16:59:47 -0800
+lib/sequel/model/base.rb	Tue, 17 May 2022 08:53:02 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Mon, 09 Aug 2021 13:30:01 -0700
@@ -247,6 +247,7 @@ doc/release_notes/5.53.0.txt	Tue, 01 Feb 2022 08:07:06 -0800
 doc/release_notes/5.54.0.txt	Tue, 01 Mar 2022 08:11:18 -0800
 doc/release_notes/5.55.0.txt	Fri, 01 Apr 2022 08:49:06 -0700
 doc/release_notes/5.56.0.txt	Fri, 29 Apr 2022 12:19:02 -0700
+doc/release_notes/5.57.0.txt	Wed, 01 Jun 2022 07:58:52 -0700
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700

@@ -63,11 +63,11 @@ Sequel::Plugins::InsertConflict::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-insert_conflict-source'>   <span class="ruby-comment"># File lib/sequel/plugins/insert_conflict.rb</span>
-<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">44</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Model#insert_conflict is only supported on new model instances&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span>
-<span class="line-num">45</span>   <span class="ruby-ivar">@insert_conflict_opts</span> = <span class="ruby-identifier">opts</span>
-<span class="line-num">46</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">48</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Model#insert_conflict is only supported on new model instances&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span>
+<span class="line-num">49</span>   <span class="ruby-ivar">@insert_conflict_opts</span> = <span class="ruby-identifier">opts</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
