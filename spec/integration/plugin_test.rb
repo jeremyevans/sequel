@@ -763,7 +763,9 @@ describe "Composition plugin" do
 end
 
 describe "RcteTree Plugin" do
-  RcteTreePluginSpecs = shared_description do
+  rcte_tree_plugin_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should load all standard (not-CTE) methods correctly" do
       @a.children.must_equal [@aa, @ab]
       @b.children.must_equal [@ba, @bb]
@@ -981,7 +983,7 @@ describe "RcteTree Plugin" do
       @db.drop_table? :nodes
     end
     
-    include RcteTreePluginSpecs
+    include rcte_tree_plugin_specs
 
     it "should work correctly if not all columns are selected" do
       c = Class.new(Sequel::Model(@db[:nodes]))
@@ -1029,7 +1031,7 @@ describe "RcteTree Plugin" do
       @db.drop_table? :nodes
     end
     
-    include RcteTreePluginSpecs
+    include rcte_tree_plugin_specs
   end
 end if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
 
@@ -1706,7 +1708,9 @@ describe "List plugin with a scope" do
 end
 
 describe "Sequel::Plugins::Tree" do
-  TreePluginSpecs = shared_description do
+  tree_plugin_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should instantiate" do
       @Node.all.size.must_equal 12
     end
@@ -1780,7 +1784,7 @@ describe "Sequel::Plugins::Tree" do
       @db.drop_table?(:nodes)
     end
 
-    include TreePluginSpecs
+    include tree_plugin_specs
   end
 
   describe "with composite key" do
@@ -1817,7 +1821,7 @@ describe "Sequel::Plugins::Tree" do
       @db.drop_table?(:nodes)
     end
 
-    include TreePluginSpecs
+    include tree_plugin_specs
   end
 end
 
@@ -1983,7 +1987,9 @@ describe "Caching plugins" do
     @db.drop_table?(:albums, :artists)
   end
 
-  CachingPluginSpecs = shared_description do
+  caching_plugin_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should work with looking up using Model.[]" do 
       @Artist[1].must_be_same_as(@Artist[1])
       @Artist[:id=>1].must_equal @Artist[1]
@@ -2010,7 +2016,7 @@ describe "Caching plugins" do
       @Album.many_to_one :artist, :class=>@Artist
     end
 
-    include CachingPluginSpecs
+    include caching_plugin_specs
   end
 
   describe "static_cache plugin" do
@@ -2020,7 +2026,7 @@ describe "Caching plugins" do
       @Album.many_to_one :artist, :class=>@Artist
     end
 
-    include CachingPluginSpecs
+    include caching_plugin_specs
 
     it "should have first retrieve correct values" do 
       @Artist.first.must_equal @Artist.load(:id=>1)
@@ -2082,7 +2088,9 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @db.drop_constraint_validations_table
   end
 
-  ConstraintValidationsSpecs = shared_description do
+  constraint_validations_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     cspecify "should set up constraints that work even outside the model", [proc{|db| !db.mariadb? || db.server_version <= 100200}, :mysql] do 
       @ds.insert(@valid_row)
 
@@ -2231,13 +2239,13 @@ describe "Sequel::Plugins::ConstraintValidations" do
         @validation_opts = {:allow_nil=>true}
         @table_block.call
       end
-      include ConstraintValidationsSpecs
+      include constraint_validations_specs
     end
     describe "with :allow_nil=>false" do
       before(:all) do
         @table_block.call
       end
-      include ConstraintValidationsSpecs
+      include constraint_validations_specs
     end
   end
 
@@ -2280,13 +2288,13 @@ describe "Sequel::Plugins::ConstraintValidations" do
         @validation_opts = {:allow_nil=>true}
         @table_block.call
       end
-      include ConstraintValidationsSpecs
+      include constraint_validations_specs
     end
     describe "with :allow_nil=>false" do
       before(:all) do
         @table_block.call
       end
-      include ConstraintValidationsSpecs
+      include constraint_validations_specs
     end
   end
 end

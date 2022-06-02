@@ -21,7 +21,9 @@ describe "Shared caching behavior" do
     Object.send(:remove_const, :LookupModel)
   end
 
-  many_to_one_cpk_specs = shared_description do
+  many_to_one_cpk_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should use a simple primary key lookup when retrieving many_to_one associated records with a composite key" do
       @db.sqls.must_equal []
       @c.load(:id=>3, :caching_model_id=>1, :caching_model_id2=>2).caching_model2.must_be_same_as(@cm12)
@@ -32,7 +34,9 @@ describe "Shared caching behavior" do
     end
   end
 
-  many_to_one_pk_specs = shared_description do
+  many_to_one_pk_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should use a simple primary key lookup when retrieving many_to_one associated records" do
       @cc.set_primary_key([:id, :id2])
       @db.sqls.must_equal []

@@ -8,7 +8,9 @@ describe "Sequel::Plugins::Dirty" do
     @c.columns :initial, :initial_changed, :missing, :missing_changed
   end
 
-  dirty_plugin_specs = shared_description do
+  dirty_plugin_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "initial_value should be the current value if value has not changed" do
       @o.initial_value(:initial).must_equal 'i'
       @o.initial_value(:missing).must_be_nil

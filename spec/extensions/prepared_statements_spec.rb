@@ -48,7 +48,9 @@ describe "prepared_statements plugin" do
     @p.send(:use_prepared_statements_for?, :insert_select).must_equal false
   end
 
-  prepared_statements_spec = shared_description do
+  prepared_statements_spec = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should correctly update instance" do
       @p.update(:name=>'bar').must_equal @c.load(:id=>1, :name=>'bar', :i => 2)
       @db.sqls.must_equal ["UPDATE people SET name = 'bar' WHERE (id = 1)"]

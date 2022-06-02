@@ -15,7 +15,9 @@ describe "Sequel::Plugins::StaticCache" do
     @c.map{|o| o.valid?}.must_equal [true, true]
   end
 
-  static_cache_specs = shared_description do
+  static_cache_specs = Module.new do
+    extend Minitest::Spec::DSL
+
     it "should use a ruby hash as a cache of all model instances" do
       @c.cache.must_equal(1=>@c.load(:id=>1), 2=>@c.load(:id=>2))
       @c.cache[1].must_be_same_as(@c1)

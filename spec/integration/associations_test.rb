@@ -1,6 +1,8 @@
 require_relative "spec_helper"
 
-OneToOneEagerLimitStrategies = shared_description do
+one_to_one_eager_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "eager loading one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els) if @els
     Artist.one_to_one  :last_album, {:clone=>:last_album}.merge(@els) if @els
@@ -31,7 +33,9 @@ OneToOneEagerLimitStrategies = shared_description do
   end
 end
 
-OneToOneEagerGraphLimitStrategies = shared_description do
+one_to_one_eager_graph_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "eager graphing one_to_one associations should work correctly" do
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
@@ -69,7 +73,9 @@ OneToOneEagerGraphLimitStrategies = shared_description do
   end
 end
 
-OneToManyEagerLimitStrategies = shared_description do
+one_to_many_eager_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle limits and offsets when eager loading one_to_many associations" do
     Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els) if @els
     Artist.one_to_many :second_two_albums, {:clone=>:second_two_albums}.merge(@els) if @els
@@ -99,7 +105,9 @@ OneToManyEagerLimitStrategies = shared_description do
   end
 end
 
-OneToManyEagerGraphLimitStrategies = shared_description do
+one_to_many_eager_graph_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle limits and offsets when eager graphing one_to_many associations" do
     @album.update(:artist => @artist)
     middle_album = @middle_album.call
@@ -136,7 +144,9 @@ OneToManyEagerGraphLimitStrategies = shared_description do
   end
 end
 
-OneThroughOneEagerLimitStrategies = shared_description do
+one_through_one_eager_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle offsets when eager loading one_through_one associations" do
     Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els) if @els
     Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els && @els[:eager_limit_strategy] != :distinct_on
@@ -160,7 +170,9 @@ OneThroughOneEagerLimitStrategies = shared_description do
   end
 end
 
-OneThroughOneEagerGraphLimitStrategies = shared_description do
+one_through_one_eager_graph_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle offsets when eager graphing one_through_one associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -187,7 +199,9 @@ OneThroughOneEagerGraphLimitStrategies = shared_description do
   end
 end
 
-ManyToManyEagerLimitStrategies = shared_description do
+many_to_many_eager_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle limits and offsets when eager loading many_to_many associations" do
     Album.send @many_to_many_method||:many_to_many, :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
     Album.send @many_to_many_method||:many_to_many, :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
@@ -215,7 +229,9 @@ ManyToManyEagerLimitStrategies = shared_description do
   end
 end
 
-ManyToManyEagerGraphLimitStrategies = shared_description do
+many_to_many_eager_graph_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle limits and offsets when eager loading many_to_many associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -249,7 +265,9 @@ ManyToManyEagerGraphLimitStrategies = shared_description do
   end
 end
 
-ManyThroughManyEagerLimitStrategies = shared_description do
+many_through_many_eager_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle limits and offsets when eager loading many_through_many associations" do
     Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els) if @els
     Artist.many_through_many :second_two_tags, {:clone=>:second_two_tags}.merge(@els) if @els
@@ -280,7 +298,9 @@ ManyThroughManyEagerLimitStrategies = shared_description do
   end
 end
 
-ManyThroughManyEagerGraphLimitStrategies = shared_description do
+many_through_many_eager_graph_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle limits and offsets when eager loading many_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -316,7 +336,9 @@ ManyThroughManyEagerGraphLimitStrategies = shared_description do
   end
 end
 
-OneThroughManyEagerLimitStrategies = shared_description do
+one_through_many_eager_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle offsets when eager loading one_through_many associations" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els) if @els
     Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els && @els[:eager_limit_strategy] != :distinct_on
@@ -343,7 +365,9 @@ OneThroughManyEagerLimitStrategies = shared_description do
   end
 end
 
-OneThroughManyEagerGraphLimitStrategies = shared_description do
+one_through_many_eager_graph_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should correctly handle offsets when eager graphing one_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -373,25 +397,27 @@ OneThroughManyEagerGraphLimitStrategies = shared_description do
   end
 end
 
-EagerLimitStrategies = shared_description do
-  include OneToOneEagerLimitStrategies
-  include OneToManyEagerLimitStrategies
-  include ManyToManyEagerLimitStrategies
-  include OneThroughOneEagerLimitStrategies
-  include ManyThroughManyEagerLimitStrategies
-  include OneThroughManyEagerLimitStrategies
+eager_limit_strategies = Module.new do
+  include one_to_one_eager_limit_strategies
+  include one_to_many_eager_limit_strategies
+  include many_to_many_eager_limit_strategies
+  include one_through_one_eager_limit_strategies
+  include many_through_many_eager_limit_strategies
+  include one_through_many_eager_limit_strategies
 end
 
-EagerGraphLimitStrategies = shared_description do
-  include OneToOneEagerGraphLimitStrategies
-  include OneToManyEagerGraphLimitStrategies
-  include ManyToManyEagerGraphLimitStrategies
-  include OneThroughOneEagerGraphLimitStrategies
-  include ManyThroughManyEagerGraphLimitStrategies
-  include OneThroughManyEagerGraphLimitStrategies
+eager_graph_limit_strategies = Module.new do
+  include one_to_one_eager_graph_limit_strategies
+  include one_to_many_eager_graph_limit_strategies
+  include many_to_many_eager_graph_limit_strategies
+  include one_through_one_eager_graph_limit_strategies
+  include many_through_many_eager_graph_limit_strategies
+  include one_through_many_eager_graph_limit_strategies
 end
 
-FilterByAssociations = shared_description do
+filter_by_associations = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should handle association inner joins" do
     @Artist.association_join(:albums).select(Sequel.qualify(@Artist.first_source, @Artist.columns.first)).all.must_equal []
     @Artist.association_join(:first_album).select(Sequel.qualify(@Artist.first_source, @Artist.columns.first)).all.must_equal []
@@ -1033,7 +1059,9 @@ FilterByAssociations = shared_description do
   end
 end
 
-FilterByAssociationsOneToOneLimitStrategies = shared_description do
+filter_by_associations_one_to_one_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+  
   it "filter by associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
     Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
@@ -1067,8 +1095,9 @@ FilterByAssociationsOneToOneLimitStrategies = shared_description do
   end
 end
 
-FilterByAssociationsSingularLimitStrategies = shared_description do
-  include FilterByAssociationsOneToOneLimitStrategies
+filter_by_associations_singular_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+  include filter_by_associations_one_to_one_limit_strategies
 
   it "dataset associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
@@ -1241,7 +1270,9 @@ FilterByAssociationsSingularLimitStrategies = shared_description do
   end
 end
 
-FilterByAssociationsOneToManyLimitStrategies = shared_description do
+filter_by_associations_one_to_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
   it "filter by associations with limited one_to_many associations should work correctly" do
     Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els)
     Artist.one_to_many :second_two_albums, {:clone=>:second_two_albums}.merge(@els)
@@ -1282,9 +1313,10 @@ FilterByAssociationsOneToManyLimitStrategies = shared_description do
   end
 end
 
-FilterByAssociationsLimitStrategies = shared_description do
-  include FilterByAssociationsSingularLimitStrategies
-  include FilterByAssociationsOneToManyLimitStrategies
+filter_by_associations_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+  include filter_by_associations_singular_limit_strategies
+  include filter_by_associations_one_to_many_limit_strategies
 
   it "dataset associations with limited one_to_many associations should work correctly" do
     Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els)
@@ -1483,7 +1515,7 @@ FilterByAssociationsLimitStrategies = shared_description do
   end
 end
 
-BasicRegularAndCompositeKeyAssociations = shared_description do
+basic_regular_and_composite_key_associations = lambda do
   describe "when filtering/excluding by associations" do
     before do
       @Artist = Artist.dataset
@@ -1491,7 +1523,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
       @Tag = Tag.dataset
     end
 
-    include FilterByAssociations
+    include filter_by_associations
   end
 
   it "should return no objects if none are associated" do
@@ -1724,7 +1756,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
   end
 end
 
-RegularAndCompositeKeyAssociations = shared_description do
+regular_and_composite_key_associations = lambda do
   describe "when filtering/excluding by associations when joining" do
     def self_join(c)
       c.join(Sequel.as(c.table_name, :b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
@@ -1736,22 +1768,22 @@ RegularAndCompositeKeyAssociations = shared_description do
       @Tag = self_join(Tag)
     end
 
-    include FilterByAssociations
+    include filter_by_associations
   end
 
   describe "with default/union :eager_limit_strategy" do
     before do
       @els = {}
     end
-    include EagerLimitStrategies
+    include eager_limit_strategies
   end
 
   describe "with :eager_limit_strategy=>:ruby" do
     before do
       @els = {:eager_limit_strategy=>:ruby}
     end
-    include EagerLimitStrategies
-    include EagerGraphLimitStrategies
+    include eager_limit_strategies
+    include eager_graph_limit_strategies
   end
 
   describe "with :eager_limit_strategy=>:distinct_on" do
@@ -1759,22 +1791,23 @@ RegularAndCompositeKeyAssociations = shared_description do
       @els = {:eager_limit_strategy=>:distinct_on}
     end
 
-    include OneToOneEagerLimitStrategies
-    include OneThroughOneEagerLimitStrategies
-    include OneThroughManyEagerLimitStrategies
-    include OneToOneEagerGraphLimitStrategies
-    include OneThroughOneEagerGraphLimitStrategies
-    include OneThroughManyEagerGraphLimitStrategies
-    include FilterByAssociationsSingularLimitStrategies
+    include one_to_one_eager_limit_strategies
+    include one_through_one_eager_limit_strategies
+    include one_through_many_eager_limit_strategies
+    include one_to_one_eager_graph_limit_strategies
+    include one_through_one_eager_graph_limit_strategies
+    include one_through_many_eager_graph_limit_strategies
+    include filter_by_associations_singular_limit_strategies
   end if DB.dataset.supports_ordered_distinct_on?
 
   describe "with :eager_limit_strategy=>:window_function" do
-    before do
+    def setup
+      super
       @els = {:eager_limit_strategy=>:window_function}
     end
-    include EagerLimitStrategies
-    include EagerGraphLimitStrategies
-    include FilterByAssociationsLimitStrategies
+    include eager_limit_strategies
+    include eager_graph_limit_strategies
+    include filter_by_associations_limit_strategies
   end if DB.dataset.supports_window_functions?
 
   it "should work with a many_through_many association" do
@@ -1878,9 +1911,9 @@ describe "Sequel::Model Simple Associations" do
       foreign_key :tag_id, :tags
     end
   end
-  before do
+  define_method(:setup) do
     [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
-    class ::Artist < Sequel::Model(@db)
+    (::Artist = Class.new(Sequel::Model(@db[:artists]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       one_to_many :albums, :order=>:name
@@ -1905,7 +1938,7 @@ describe "Sequel::Model Simple Associations" do
       one_through_many :last_tag, :clone=>:first_tag, :order=>Sequel.desc(Sequel[:tags][:name]), :graph_order=>Sequel.desc(:name)
       one_through_many :t_tag, :clone=>:first_tag, :conditions=>{Sequel[:tags][:name]=>'T'}
     end
-    class ::Album < Sequel::Model(@db)
+    (::Album = Class.new(Sequel::Model(@db[:albums]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       many_to_one :artist, :reciprocal=>nil
@@ -1926,7 +1959,7 @@ describe "Sequel::Model Simple Associations" do
       one_through_one :t_tag, :clone=>:t_tags
       one_through_one :alias_t_tag, :clone=>:alias_t_tags
     end
-    class ::Tag < Sequel::Model(@db)
+    (::Tag = Class.new(Sequel::Model(@db[:tags]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       many_to_many :albums
@@ -1942,6 +1975,7 @@ describe "Sequel::Model Simple Associations" do
     @other_tags = lambda{t = [Tag.create(:name=>'U'), Tag.create(:name=>'V')]; @db[:albums_tags].insert([:album_id, :tag_id], Tag.select(@album.id, :id)); t}
     @pr = lambda{[Album.create(:name=>'Al2'),Artist.create(:name=>'Ar2'),Tag.create(:name=>'T2')]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id=>@tag.id)}
+    super()
   end
   after do
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
@@ -1950,18 +1984,18 @@ describe "Sequel::Model Simple Associations" do
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
   
-  include BasicRegularAndCompositeKeyAssociations
-  include RegularAndCompositeKeyAssociations
+  instance_exec(&basic_regular_and_composite_key_associations)
+  instance_exec(&regular_and_composite_key_associations)
 
   describe "with :correlated_subquery limit strategy" do
     before do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
 
-    include OneToOneEagerGraphLimitStrategies
-    include OneToManyEagerGraphLimitStrategies
-    include FilterByAssociationsOneToOneLimitStrategies
-    include FilterByAssociationsOneToManyLimitStrategies
+    include one_to_one_eager_graph_limit_strategies
+    include one_to_many_eager_graph_limit_strategies
+    include filter_by_associations_one_to_one_limit_strategies
+    include filter_by_associations_one_to_many_limit_strategies
   end if DB.dataset.supports_limits_in_correlated_subqueries?
 
   it "should handle eager loading limited associations for many objects" do
@@ -2202,9 +2236,9 @@ describe "Sequel::Model Composite Key Associations" do
       foreign_key [:tag_id1, :tag_id2], :tags
     end
   end
-  before do
+  define_method(:setup) do
     [:albums_tags, :tags, :albums, :artists].each{|t| @db[t].delete}
-    class ::Artist < Sequel::Model(@db)
+    (::Artist = Class.new(Sequel::Model(@db[:artists]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       set_primary_key [:id1, :id2]
@@ -2231,7 +2265,7 @@ describe "Sequel::Model Composite Key Associations" do
       one_through_many :last_tag, :clone=>:first_tag, :order=>Sequel.desc(Sequel[:tags][:name]), :graph_order=>Sequel.desc(:name)
       one_through_many :t_tag, :clone=>:first_tag do |ds| ds.where(Sequel[:tags][:name]=>'T') end
     end
-    class ::Album < Sequel::Model(@db)
+    (::Album = Class.new(Sequel::Model(@db[:albums]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       set_primary_key [:id1, :id2]
@@ -2254,7 +2288,7 @@ describe "Sequel::Model Composite Key Associations" do
       one_through_one :t_tag, :clone=>:t_tags
       one_through_one :alias_t_tag, :clone=>:alias_t_tags
     end
-    class ::Tag < Sequel::Model(@db)
+    (::Tag = Class.new(Sequel::Model(@db[:tags]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       set_primary_key [:id1, :id2]
@@ -2272,6 +2306,7 @@ describe "Sequel::Model Composite Key Associations" do
     @other_tags = lambda{t = [Tag.create(:name=>'U', :id1=>17, :id2=>18), Tag.create(:name=>'V', :id1=>19, :id2=>20)]; @db[:albums_tags].insert([:album_id1, :album_id2, :tag_id1, :tag_id2], Tag.select(1, 2, :id1, :id2)); t}
     @pr = lambda{[Album.create(:name=>'Al2', :id1=>11, :id2=>12),Artist.create(:name=>'Ar2', :id1=>13, :id2=>14),Tag.create(:name=>'T2', :id1=>15, :id2=>16)]}
     @ins = lambda{@db[:albums_tags].insert(:tag_id1=>@tag.id1, :tag_id2=>@tag.id2)}
+    super()
   end
   after do
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
@@ -2280,18 +2315,18 @@ describe "Sequel::Model Composite Key Associations" do
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
 
-  include BasicRegularAndCompositeKeyAssociations
-  include RegularAndCompositeKeyAssociations
+  instance_exec(&basic_regular_and_composite_key_associations)
+  instance_exec(&regular_and_composite_key_associations)
 
   describe "with :correlated_subquery limit strategy" do
     before do
       @els = {:eager_limit_strategy=>:correlated_subquery}
     end
 
-    include OneToOneEagerGraphLimitStrategies
-    include OneToManyEagerGraphLimitStrategies
-    include FilterByAssociationsOneToOneLimitStrategies
-    include FilterByAssociationsOneToManyLimitStrategies
+    include one_to_one_eager_graph_limit_strategies
+    include one_to_many_eager_graph_limit_strategies
+    include filter_by_associations_one_to_one_limit_strategies
+    include filter_by_associations_one_to_many_limit_strategies
   end if DB.dataset.supports_limits_in_correlated_subqueries? && DB.dataset.supports_multiple_column_in?
 
   it "should have add method accept hashes and create new records" do
@@ -2364,7 +2399,7 @@ describe "Sequel::Model pg_array_to_many" do
   end
   before do
     [:tags, :albums, :artists].each{|t| @db[t].delete}
-    class ::Artist < Sequel::Model(@db)
+    (::Artist = Class.new(Sequel::Model(@db[:artists]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       one_to_many :albums, :order=>:name
@@ -2372,7 +2407,7 @@ describe "Sequel::Model pg_array_to_many" do
       one_to_many :a_albums, :clone=>:albums do |ds| ds.where(:name=>'Al') end
       one_to_one :first_a_album, :clone=>:a_albums
     end
-    class ::Album < Sequel::Model(@db)
+    (::Album = Class.new(Sequel::Model(@db[:albums]))).class_eval do
       plugin :dataset_associations
       plugin :pg_array_associations
       plugin :eager_graph_eager
@@ -2387,7 +2422,7 @@ describe "Sequel::Model pg_array_to_many" do
       pg_array_to_many :t_tags, :clone=>:tags do |ds| ds.where(Sequel[:tags][:name]=>'T') end
       pg_array_to_many :alias_t_tags, :clone=>:t_tags
     end
-    class ::Tag < Sequel::Model(@db)
+    (::Tag = Class.new(Sequel::Model(@db[:tags]))).class_eval do
       plugin :dataset_associations
       plugin :pg_array_associations
       plugin :eager_graph_eager
@@ -2412,9 +2447,9 @@ describe "Sequel::Model pg_array_to_many" do
     @db.drop_table?(:tags, :albums, :artists)
   end
 
-  include BasicRegularAndCompositeKeyAssociations
-  include ManyToManyEagerLimitStrategies
-  include ManyToManyEagerGraphLimitStrategies
+  instance_exec(&basic_regular_and_composite_key_associations)
+  include many_to_many_eager_limit_strategies
+  include many_to_many_eager_graph_limit_strategies
 
   it "should handle adding and removing entries in array" do
     a = Album.create
@@ -2448,7 +2483,7 @@ describe "Sequel::Model many_to_pg_array" do
   end
   before do
     [:tags, :albums, :artists].each{|t| @db[t].delete}
-    class ::Artist < Sequel::Model(@db)
+    (::Artist = Class.new(Sequel::Model(@db[:artists]))).class_eval do
       plugin :dataset_associations
       plugin :eager_graph_eager
       one_to_many :albums, :order=>:name
@@ -2456,7 +2491,7 @@ describe "Sequel::Model many_to_pg_array" do
       one_to_many :a_albums, :clone=>:albums do |ds| ds.where(:name=>'Al') end
       one_to_one :first_a_album, :clone=>:a_albums
     end
-    class ::Album < Sequel::Model(@db)
+    (::Album = Class.new(Sequel::Model(@db[:albums]))).class_eval do
       plugin :dataset_associations
       plugin :pg_array_associations
       plugin :eager_graph_eager
@@ -2471,7 +2506,7 @@ describe "Sequel::Model many_to_pg_array" do
       many_to_pg_array :t_tags, :clone=>:tags do |ds| ds.where(Sequel[:tags][:name]=>'T') end
       many_to_pg_array :alias_t_tags, :clone=>:t_tags
     end
-    class ::Tag < Sequel::Model(@db)
+    (::Tag = Class.new(Sequel::Model(@db[:tags]))).class_eval do
       plugin :dataset_associations
       plugin :pg_array_associations
       plugin :eager_graph_eager
@@ -2496,9 +2531,9 @@ describe "Sequel::Model many_to_pg_array" do
     @db.drop_table?(:tags, :albums, :artists)
   end
   
-  include BasicRegularAndCompositeKeyAssociations
-  include ManyToManyEagerLimitStrategies
-  include ManyToManyEagerGraphLimitStrategies
+  instance_exec(&basic_regular_and_composite_key_associations)
+  include many_to_many_eager_limit_strategies
+  include many_to_many_eager_graph_limit_strategies
 
   it "should handle adding and removing entries in array" do
     a = Album.create

@@ -113,7 +113,7 @@ The order in which you delete/truncate the tables is important if you are using 
 
 = Testing Sequel Itself
 
-Sequel has multiple separate test suites.  All test suites use minitest/spec, with the minitest-hooks, minitest-global_expectations, and minitest-shared_description extensions.  To install the dependencies necessary to test Sequel, run <tt>gem install --development sequel</tt>.
+Sequel has multiple separate test suites.  All test suites use minitest/spec, with the minitest-hooks and minitest-global_expectations extensions.  To install the dependencies necessary to test Sequel, run <tt>gem install --development sequel</tt>.
 
 == rake
 

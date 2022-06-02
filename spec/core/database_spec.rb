@@ -778,7 +778,9 @@ describe "Database#table_exists?" do
   end
 end
 
-DatabaseTransactionSpecs = shared_description do
+database_transaction_specs = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should wrap the supplied block with BEGIN + COMMIT statements" do
     @db.transaction{@db.execute 'DROP TABLE test;'}
     @db.sqls.must_equal ['BEGIN', 'DROP TABLE test;', 'COMMIT']
@@ -1199,7 +1201,7 @@ describe "Database#transaction with savepoint support" do
     @db = Sequel.mock(:servers=>{:test=>{}})
   end
 
-  include DatabaseTransactionSpecs
+  include database_transaction_specs
 
   it "should support :retry_on option for automatically retrying transactions when using :savepoint option" do
     a = []
@@ -1457,7 +1459,7 @@ describe "Database#transaction without savepoint support" do
     @db.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
   
-  include DatabaseTransactionSpecs
+  include database_transaction_specs
 end
   
 describe "Sequel.transaction" do

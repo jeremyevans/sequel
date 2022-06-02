@@ -1,6 +1,8 @@
 require_relative "spec_helper"
 
-mod = shared_description do
+duplicate_columns_handler_specs = Module.new do
+  extend Minitest::Spec::DSL
+
   it "should take action depending on :on_duplicate_columns if 2 or more columns have the same name" do
     check(nil, @cols)
     @warned.must_be_nil
@@ -60,7 +62,7 @@ describe "Sequel::DuplicateColumnsHandler Database configuration" do
     @ds.send(:columns=, cols)
   end
 
-  include mod
+  include duplicate_columns_handler_specs
 end
 
 describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
@@ -76,7 +78,7 @@ describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
     @ds.on_duplicate_columns(handler).send(:columns=, cols)
   end
 
-  include mod
+  include duplicate_columns_handler_specs
 
   it "should use handlers passed as blocks to on_duplicate_columns" do
     proc{@ds.on_duplicate_columns{:raise}.send(:columns=, @cols)}.must_raise(Sequel::DuplicateColumnError)

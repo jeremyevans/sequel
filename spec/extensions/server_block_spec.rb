@@ -1,6 +1,8 @@
 require_relative "spec_helper"
 
-with_server_specs = shared_description do
+with_server_specs = Module.new do
+    extend Minitest::Spec::DSL
+
   it "should set the default server to use in the block" do
     @db.with_server(:a){@db[:t].all}
     @db.sqls.must_equal ["SELECT * FROM t -- a"]
