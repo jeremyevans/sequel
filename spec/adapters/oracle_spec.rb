@@ -373,3 +373,104 @@ SQL
     res.must_equal 'Hello World CLOB OUT parameter'
   end
 end if DB.adapter_scheme == :oracle
+
+describe "Oracle non-standard MERGE" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:m1){Integer :i1; Integer :a}
+    @db.create_table!(:m2){Integer :i2; Integer :b}
+    @m1 = @db[:m1]
+    @m2 = @db[:m2]
+  end
+  after do
+    @m1.delete
+    @m2.delete
+  end
+  after(:all) do
+    @db.drop_table?(:m1, :m2)
+  end
+
+  it "should allow inserts, updates, and deletes based on conditions in a single MERGE statement" do
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_insert(:i1=>Sequel[:i2], :a=>Sequel[:b]+11){b <= 50}.
+      merge_delete{{:a => 40..70}}.
+      merge_update(:a=>Sequel[:a]+:b+20){a <= 50}
+
+    @m2.insert(1, 2)
+    @m1.all.must_equal []
+
+    # INSERT
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    # UPDATE
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>35}]
+
+    # DELETE MATCHING current row, INSERT NOT MATCHED new row
+    @m1.update(:i1=>12, :a=>45)
+    @m2.insert(12, 3)
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    # MATCHED DO NOTHING
+    @m2.where(:i2=>12).delete
+    @m1.update(:a=>51)
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>51}]
+
+    # NOT MATCHED DO NOTHING
+    @m1.delete
+    @m2.update(:b=>51)
+    ds.merge
+    @m1.all.must_equal []
+  end
+
+  it "should calls inserts, updates, and deletes without conditions" do
+    @m2.insert(1, 2)
+    ds = @m1.merge_using(:m2, :i1=>:i2)
+    
+    ds.merge_insert(:i2, :b).merge
+    @m1.all.must_equal [{:i1=>1, :a=>2}]
+
+    ds.merge_update(:a=>Sequel[:a]+1).merge
+    @m1.all.must_equal [{:i1=>1, :a=>3}]
+
+    ds.merge_update(:a=>Sequel[:a]+1).merge_delete{true}.merge
+    @m1.all.must_equal []
+  end
+
+  it "should raise if a merge is attempted without WHEN clauses" do
+    proc{@m1.merge_using(:m2, :i1=>:i2).merge}.must_raise Sequel::Error
+  end
+
+  it "should raise if a merge is attempted without a merge source" do
+    proc{@m1.merge_insert(:a=>1).merge}.must_raise Sequel::Error
+  end
+
+  it "should raise if multiple merge operations of the same type are used" do
+    ds = @m1.merge_using(:m2, :i1=>:i2).merge_insert(:a=>1){true}.merge_insert(:a=>1){true}
+    proc{ds.merge}.must_raise Sequel::Error
+  end
+
+  it "should raise if a delete is attempted without an update" do
+    proc{@m1.merge_using(:m2, :i1=>:i2).merge_delete.merge}.must_raise Sequel::Error
+  end
+
+  it "should handle uncachable SQL" do
+    v = true
+    @m2.insert(1, 2)
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_insert(Sequel[:i2], Sequel[:b]+11){Sequel.delay{v}}
+
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    @m1.delete
+    v = false
+    ds.merge
+    @m1.all.must_equal []
+  end
+end

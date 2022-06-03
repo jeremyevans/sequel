@@ -478,6 +478,11 @@ module Sequel
         false
       end
     
+      # Oracle supports MERGE
+      def supports_merge?
+        true
+      end
+
       # Oracle supports NOWAIT.
       def supports_nowait?
         true
@@ -524,6 +529,70 @@ module Sequel
       end
 
       private
+
+      # Handle nil, false, and true MERGE WHEN conditions to avoid non-boolean
+      # type error.
+      def _normalize_merge_when_conditions(conditions)
+        case conditions
+        when nil, false
+          {1=>0}
+        when true
+          {1=>1}
+        when Sequel::SQL::DelayedEvaluation
+          Sequel.delay{_normalize_merge_when_conditions(conditions.call(self))}
+        else
+          conditions
+        end
+      end
+
+      # Handle Oracle's non standard MERGE syntax
+      def _merge_when_sql(sql)
+        raise Error, "no WHEN [NOT] MATCHED clauses provided for MERGE" unless merge_when = @opts[:merge_when]
+        insert = update = delete = nil
+        types = merge_when.map{|d| d[:type]}
+        raise Error, "Oracle does not support multiple INSERT, UPDATE, or DELETE clauses in MERGE" if types != types.uniq
+
+        merge_when.each do |data|
+          case data[:type]
+          when :insert
+            insert = data
+          when :update
+            update = data
+          else # when :delete
+            delete = data
+          end
+        end
+
+        if delete
+          raise Error, "Oracle does not support DELETE without UPDATE clause in MERGE" unless update
+          raise Error, "Oracle does not support DELETE without conditions clause in MERGE" unless delete.has_key?(:conditions)
+        end
+
+        if update
+          sql << " WHEN MATCHED"
+          _merge_update_sql(sql, update)
+          _merge_when_conditions_sql(sql, update)
+
+          if delete
+            sql << " DELETE"
+            _merge_when_conditions_sql(sql, delete)
+          end
+        end
+
+        if insert
+          sql << " WHEN NOT MATCHED"
+          _merge_insert_sql(sql, insert)
+          _merge_when_conditions_sql(sql, insert)
+        end
+      end
+
+      # Handle Oracle's non-standard MERGE WHEN condition syntax.
+      def _merge_when_conditions_sql(sql, data)
+        if data.has_key?(:conditions)
+          sql << " WHERE "
+          literal_append(sql, _normalize_merge_when_conditions(data[:conditions]))
+        end
+      end
 
       # Allow preparing prepared statements, since determining the prepared sql to use for
       # a prepared statement requires calling prepare on that statement.

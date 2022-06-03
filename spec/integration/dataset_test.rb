@@ -2250,4 +2250,4 @@ describe "MERGE" do
     ds.merge
     @m1.all.must_equal []
   end
-end if DB.dataset.supports_merge?
+end if DB.dataset.supports_merge? && DB.database_type != :oracle

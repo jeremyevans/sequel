@@ -891,7 +891,6 @@ module Sequel
     end
 
     # Append MERGE WHEN conditions, if there are conditions provided.
-    # nil is treated as no conditions.
     def _merge_when_conditions_sql(sql, data)
       if data.has_key?(:conditions)
         sql << " AND "
