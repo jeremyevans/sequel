@@ -92,6 +92,7 @@ module Sequel
     
     # The SQL to use for the MERGE statement.
     def merge_sql
+      raise Error, "This database doesn't support MERGE" unless supports_merge?
       if sql = opts[:sql]
         return static_sql(sql)
       end
@@ -854,7 +855,7 @@ module Sequel
 
     # Append the INSERT sql used in a MERGE
     def _merge_insert_sql(sql, data)
-      sql << " THEN INSERT "
+      sql << " THEN INSERT"
       columns, values = _parse_insert_sql_args(data[:values])
       _insert_columns_sql(sql, columns)
       _insert_values_sql(sql, values)

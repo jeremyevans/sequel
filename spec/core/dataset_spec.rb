@@ -3874,6 +3874,102 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
   end
 end
 
+describe "Dataset#merge*" do
+  before do
+    @db = Sequel.mock
+    @db.extend_datasets{def supports_merge?; true end}
+    @ds = @db[:t1].merge_using(:t2, :c1=>:c2)
+  end
+
+  it "#merge_delete should set a DELETE clause for the merge" do
+    @ds.merge_delete.merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED THEN DELETE"
+  end
+
+  it "#merge_delete should accept a virtual row block for conditions" do
+    @ds.merge_delete{a > 30}.merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED AND (a > 30) THEN DELETE"
+  end
+
+  it "#merge_insert should set an INSERT clause for the merge" do
+    @ds.merge_insert(:a=>1).merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED THEN INSERT (a) VALUES (1)"
+  end
+
+  it "#merge_insert should accept a virtual row block for condition" do
+    @ds.merge_insert(:a=>1){b > 30}.merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED AND (b > 30) THEN INSERT (a) VALUES (1)"
+  end
+
+  it "#merge_insert should accept other arguments acceptable by insert" do
+    @ds.merge_insert.merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED THEN INSERT DEFAULT VALUES"
+    @ds.merge_insert(1).merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED THEN INSERT VALUES (1)"
+    @ds.merge_insert([1]).merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED THEN INSERT VALUES (1)"
+    @ds.merge_insert(1, 2).merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED THEN INSERT VALUES (1, 2)"
+    @ds.merge_insert([:a], [1]).merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN NOT MATCHED THEN INSERT (a) VALUES (1)"
+  end
+
+  it "#merge_update should set an UPDATE clause for the merge" do
+    @ds.merge_update(:a=>1).merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED THEN UPDATE SET a = 1"
+  end
+
+  it "#merge_update should accept a virtual row block for condition" do
+    @ds.merge_update(:a=>1){b > 30}.merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED AND (b > 30) THEN UPDATE SET a = 1"
+  end
+
+  it "#merge_{insert,update,delete} methods should add SQL clauses in the order they are called" do
+    @ds.
+      merge_delete{a > 30}.
+      merge_insert(:a=>1).
+      merge_update(:a=>1).
+      merge_sql.
+      must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED AND (a > 30) THEN DELETE WHEN NOT MATCHED THEN INSERT (a) VALUES (1) WHEN MATCHED THEN UPDATE SET a = 1"
+
+    @ds.
+      merge_update(:a=>1){b > 30}.
+      merge_insert(:a=>1).
+      merge_delete.
+      merge_sql.
+      must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED AND (b > 30) THEN UPDATE SET a = 1 WHEN NOT MATCHED THEN INSERT (a) VALUES (1) WHEN MATCHED THEN DELETE"
+  end
+
+  it "#merge should execute the MERGE statement" do
+    @ds.merge_delete.merge.must_be_nil
+    @db.sqls.must_equal ["MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED THEN DELETE"]
+  end
+
+  it "#merge_sql should support static SQL" do
+    @ds.with_sql('M').merge_sql.must_equal 'M'
+  end
+
+  it "#merge_sql should cache SQL by default" do
+    ds = @ds.merge_delete
+    ds.merge_sql.must_be_same_as ds.merge_sql
+  end
+
+  it "#merge_sql should not cache SQL if it shouldn't be cached" do
+    v = true
+    ds = @ds.merge_delete{Sequel.delay{v}}
+    sql = ds.merge_sql
+    sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED AND 't' THEN DELETE"
+    ds.merge_sql.wont_be_same_as sql
+    v = false
+    ds.merge_sql.must_equal "MERGE INTO t1 USING t2 ON (c1 = c2) WHEN MATCHED AND 'f' THEN DELETE"
+  end
+
+  it "#merge_sql should raise for MERGE without source" do
+    proc{@db[:a].merge_delete.merge_sql}.must_raise Sequel::Error
+  end
+
+  it "#merge_sql should raise for MERGE without WHEN clauses" do
+    proc{@ds.merge_sql}.must_raise Sequel::Error
+  end
+
+  it "#merge_sql should raise if MERGE is not supported" do
+    proc{@ds.merge_delete.with_extend{def supports_merge?; false end}.merge_sql}.must_raise Sequel::Error
+  end
+
+  it "does not support MERGE by default" do
+    Sequel.mock.dataset.supports_merge?.must_equal false
+  end
+end
+
 describe "Dataset#with_sql_*" do
   before do
     @db = Sequel.mock(:servers=>{:read_only=>{}}, :autoid=>1, :fetch=>{:id=>1})

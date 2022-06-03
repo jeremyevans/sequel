@@ -1791,7 +1791,7 @@ module Sequel
         h = {:type=>:insert, :values=>values}
         if override = @opts[:override]
           h[:override] = insert_override_sql(String.new)
-       end
+        end
         _merge_when(h, &block)
       end
     
