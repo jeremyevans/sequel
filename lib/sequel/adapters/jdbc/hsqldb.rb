@@ -179,6 +179,12 @@ module Sequel
           true
         end
 
+        # HSQLDB 2.3.4+ supports MERGE.  Older versions also support MERGE, but not all
+        # features that are in Sequel's tests.
+        def supports_merge?
+          db.db_version >= 20304
+        end
+
         private
 
         def empty_from_sql

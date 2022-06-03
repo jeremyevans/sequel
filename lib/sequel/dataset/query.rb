@@ -678,6 +678,56 @@ module Sequel
       clone(:lock => style)
     end
     
+    # Return a dataset with a WHEN MATCHED THEN DELETE clause added to the
+    # MERGE statement.  If a block is passed, treat it as a virtual row and
+    # use it as additional conditions for the match.
+    #
+    #   merge_delete
+    #   # WHEN MATCHED THEN DELETE
+    #
+    #   merge_delete{a > 30}
+    #   # WHEN MATCHED AND (a > 30) THEN DELETE
+    def merge_delete(&block)
+      _merge_when(:type=>:delete, &block)
+    end
+
+    # Return a dataset with a WHEN NOT MATCHED THEN INSERT clause added to the
+    # MERGE statement.  If a block is passed, treat it as a virtual row and
+    # use it as additional conditions for the match.
+    #
+    # The arguments provided can be any arguments that would be accepted by
+    # #insert.
+    #
+    #   merge_insert(i1: :i2, a: Sequel[:b]+11)
+    #   # WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))
+    #
+    #   merge_insert(:i2, Sequel[:b]+11){a > 30}
+    #   # WHEN NOT MATCHED AND (a > 30) THEN INSERT VALUES (i2, (b + 11))
+    def merge_insert(*values, &block)
+      _merge_when(:type=>:insert, :values=>values, &block)
+    end
+    
+    # Return a dataset with a WHEN MATCHED THEN UPDATE clause added to the
+    # MERGE statement.  If a block is passed, treat it as a virtual row and
+    # use it as additional conditions for the match.
+    #
+    #   merge_update(i1: Sequel[:i1]+:i2+10, a: Sequel[:a]+:b+20)
+    #   # WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+    #
+    #   merge_update(i1: :i2){a > 30}
+    #   # WHEN MATCHED AND (a > 30) THEN UPDATE SET i1 = i2
+    def merge_update(values, &block)
+      _merge_when(:type=>:update, :values=>values, &block)
+    end
+
+    # Return a dataset with the source and join condition to use for the MERGE statement.
+    #
+    #   merge_using(:m2, i1: :i2)
+    #   # USING m2 ON (i1 = i2)
+    def merge_using(source, join_condition)
+      clone(:merge_using => [source, join_condition].freeze)
+    end
+
     # Returns a cloned dataset without a row_proc.
     #
     #   ds = DB[:items].with_row_proc(:invert.to_proc)
@@ -1284,6 +1334,18 @@ module Sequel
         SQL::BooleanExpression.invert(cond)
       else
         cond
+      end
+    end
+
+    # Append to the current MERGE WHEN clauses.
+    # Mutates the hash to add the conditions, if a virtual row block is passed.
+    def _merge_when(hash, &block)
+      hash[:conditions] = Sequel.virtual_row(&block) if block
+
+      if merge_when = @opts[:merge_when]
+        clone(:merge_when => (merge_when.dup << hash.freeze).freeze)
+      else
+        clone(:merge_when => [hash.freeze].freeze)
       end
     end
 

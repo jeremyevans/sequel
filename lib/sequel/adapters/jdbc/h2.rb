@@ -229,6 +229,11 @@ module Sequel
           false
         end
         
+        # H2 supports MERGE
+        def supports_merge?
+          true
+        end
+
         # H2 doesn't support multiple columns in IN/NOT IN
         def supports_multiple_column_in?
           false

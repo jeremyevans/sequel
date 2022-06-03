@@ -24,29 +24,7 @@ module Sequel
 
       check_insert_allowed!
 
-      columns = []
-
-      case values.size
-      when 0
-        return insert_sql(OPTS)
-      when 1
-        case vals = values[0]
-        when Hash
-          values = []
-          vals.each do |k,v| 
-            columns << k
-            values << v
-          end
-        when Dataset, Array, LiteralString
-          values = vals
-        end
-      when 2
-        if (v0 = values[0]).is_a?(Array) && ((v1 = values[1]).is_a?(Array) || v1.is_a?(Dataset) || v1.is_a?(LiteralString))
-          columns, values = v0, v1
-          raise(Error, "Different number of values and columns given to insert_sql") if values.is_a?(Array) and columns.length != values.length
-        end
-      end
-
+      columns, values = _parse_insert_sql_args(values)
       if values.is_a?(Array) && values.empty? && !insert_supports_empty_values? 
         columns, values = insert_empty_columns_values
       elsif values.is_a?(Dataset) && hoist_cte?(values) && supports_cte?(:insert)
@@ -112,6 +90,30 @@ module Sequel
       end
     end
     
+    # The SQL to use for the MERGE statement.
+    def merge_sql
+      if sql = opts[:sql]
+        return static_sql(sql)
+      end
+      if sql = cache_get(:_merge_sql)
+        return sql
+      end
+      source, join_condition = @opts[:merge_using]
+      raise Error, "No USING clause for MERGE" unless source
+      sql = @opts[:append_sql] || sql_string_origin
+
+      select_with_sql(sql)
+      sql << "MERGE INTO "
+      source_list_append(sql, @opts[:from])
+      sql << " USING "
+      identifier_append(sql, source)
+      sql << " ON "
+      literal_append(sql, join_condition)
+      _merge_when_sql(sql)
+      cache_set(:_merge_sql, sql) if cache_sql?
+      sql
+    end
+
     # Returns an array of insert statements for inserting multiple records.
     # This method is used by +multi_insert+ to format insert statements and
     # expects a keys array and and an array of value arrays.
@@ -850,6 +852,84 @@ module Sequel
     
     private
 
+    # Append the INSERT sql used in a MERGE
+    def _merge_insert_sql(sql, data)
+      sql << " THEN INSERT "
+      columns, values = _parse_insert_sql_args(data[:values])
+      _insert_columns_sql(sql, columns)
+      _insert_values_sql(sql, values)
+    end
+
+    def _merge_update_sql(sql, data)
+      sql << " THEN UPDATE SET "
+      update_sql_values_hash(sql, data[:values])
+    end
+
+    def _merge_delete_sql(sql, data)
+      sql << " THEN DELETE"
+    end
+
+    # Mapping of merge types to related SQL
+    MERGE_TYPE_SQL = {
+      :insert => ' WHEN NOT MATCHED',
+      :delete => ' WHEN MATCHED',
+      :update => ' WHEN MATCHED',
+      :matched => ' WHEN MATCHED',
+      :not_matched => ' WHEN NOT MATCHED',
+    }.freeze
+    private_constant :MERGE_TYPE_SQL
+
+    # Add the WHEN clauses to the MERGE SQL
+    def _merge_when_sql(sql)
+      raise Error, "no WHEN [NOT] MATCHED clauses provided for MERGE" unless merge_when = @opts[:merge_when]
+      merge_when.each do |data|
+        type = data[:type]
+        sql << MERGE_TYPE_SQL[type]
+        _merge_when_conditions_sql(sql, data)
+        send(:"_merge_#{type}_sql", sql, data)
+      end
+    end
+
+    # Append MERGE WHEN conditions, if there are conditions provided.
+    # nil is treated as no conditions.
+    def _merge_when_conditions_sql(sql, data)
+      if data.has_key?(:conditions)
+        sql << " AND "
+        literal_append(sql, data[:conditions])
+      end
+    end
+
+    # Parse the values passed to insert_sql, returning columns and values
+    # to use for the INSERT.  Returned columns is always an array, but can be empty
+    # for an INSERT without explicit column references. Returned values can be an
+    # array, dataset, or literal string.
+    def _parse_insert_sql_args(values)
+      columns = []
+
+      case values.size
+      when 0
+        values = []
+      when 1
+        case vals = values[0]
+        when Hash
+          values = []
+          vals.each do |k,v| 
+            columns << k
+            values << v
+          end
+        when Dataset, Array, LiteralString
+          values = vals
+        end
+      when 2
+        if (v0 = values[0]).is_a?(Array) && ((v1 = values[1]).is_a?(Array) || v1.is_a?(Dataset) || v1.is_a?(LiteralString))
+          columns, values = v0, v1
+          raise(Error, "Different number of values and columns given to insert_sql") if values.is_a?(Array) and columns.length != values.length
+        end
+      end
+
+      [columns, values]
+    end
+
     # Formats the truncate statement.  Assumes the table given has already been
     # literalized.
     def _truncate_sql(table)
@@ -1165,7 +1245,10 @@ module Sequel
     end
 
     def insert_columns_sql(sql)
-      columns = opts[:columns]
+      _insert_columns_sql(sql, opts[:columns])
+    end
+
+    def _insert_columns_sql(sql, columns)
       if columns && !columns.empty?
         sql << ' ('
         identifier_list_append(sql, columns)
@@ -1184,7 +1267,11 @@ module Sequel
     end
 
     def insert_values_sql(sql)
-      case values = opts[:values]
+      _insert_values_sql(sql, opts[:values])
+    end
+    
+    def _insert_values_sql(sql, values)
+      case values
       when Array
         if values.empty?
           sql << " DEFAULT VALUES"

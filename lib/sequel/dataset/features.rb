@@ -125,6 +125,11 @@ module Sequel
       false
     end
 
+    # Whether the MERGE statement is supported, false by default.
+    def supports_merge?
+      false
+    end
+
     # Whether modifying joined datasets is supported, false by default.
     def supports_modifying_joins?
       false

@@ -734,6 +734,11 @@ module Sequel
         false
       end
 
+      # MSSQL 2008+ supports MERGE
+      def supports_merge?
+        is_2008_or_later?
+      end
+
       # MSSQL 2005+ supports modifying joined datasets
       def supports_modifying_joins?
         is_2005_or_later?
@@ -823,6 +828,35 @@ module Sequel
       end
 
       private
+
+      # Normalize conditions for MERGE WHEN.
+      def _merge_when_conditions_sql(sql, data)
+        if data.has_key?(:conditions)
+          sql << " AND "
+          literal_append(sql, _normalize_merge_when_conditions(data[:conditions]))
+        end
+      end
+
+      # Handle nil, false, and true MERGE WHEN conditions to avoid non-boolean
+      # type error.
+      def _normalize_merge_when_conditions(conditions)
+        case conditions
+        when nil, false
+          {1=>0}
+        when true
+          {1=>1}
+        when Sequel::SQL::DelayedEvaluation
+          Sequel.delay{_normalize_merge_when_conditions(conditions.call(self))}
+        else
+          conditions
+        end
+      end
+
+      # MSSQL requires a semicolon at the end of MERGE.
+      def _merge_when_sql(sql)
+        super
+        sql << ';'
+      end
 
       # MSSQL does not allow ordering in sub-clauses unless TOP (limit) is specified
       def aggregate_dataset

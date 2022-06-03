@@ -457,6 +457,48 @@ module Sequel
       _aggregate(:max, arg)
     end
 
+    # Execute a MERGE statement, which allows for INSERT, UPDATE, and DELETE
+    # behavior in a single query, based on whether rows from a source table
+    # match rows in the current table, based on the join conditions.
+    #
+    # Unless the dataset uses static SQL, to use #merge, you must first have
+    # called #merge_using to specify the merge source and join conditions.
+    # You will then likely to call one or more of the following methods
+    # to specify MERGE behavior by adding WHEN [NOT] MATCHED clauses:
+    #
+    # * #merge_insert
+    # * #merge_update
+    # * #merge_delete
+    # * #merge_do_nothing_when_matched
+    # * #merge_do_nothing_when_not_matched
+    # 
+    # The WHEN [NOT] MATCHED clauses are added to the SQL in the order these
+    # methods were called on the dataset.  If none of these methods are
+    # called, an error is raised.
+    #
+    # Example:
+    #
+    #   DB[:m1]
+    #     merge_using(:m2, i1: :i2).
+    #     merge_do_nothing_when_not_matched{b > 50}.
+    #     merge_insert(i1: :i2, a: Sequel[:b]+11).
+    #     merge_do_nothing_when_matched{a > 50}.
+    #     merge_delete{a > 30}.
+    #     merge_update(i1: Sequel[:i1]+:i2+10, a: Sequel[:a]+:b+20).
+    #     merge
+    #
+    # SQL:
+    #
+    #   MERGE INTO m1 USING m2 ON (i1 = i2)
+    #   WHEN NOT MATCHED AND (b > 50) THEN DO NOTHING
+    #   WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))
+    #   WHEN MATCHED AND (a > 50) THEN DO NOTHING
+    #   WHEN MATCHED AND (a > 30) THEN DELETE
+    #   WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+    def merge
+      execute_ddl(merge_sql)
+    end
+
     # Returns the minimum value for the given column/expression.
     # Uses a virtual row block if no argument is given.
     #

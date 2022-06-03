@@ -235,6 +235,11 @@ module Sequel
           false
         end
 
+        # Derby 10.11+ supports MERGE.
+        def supports_merge?
+          db.svn_version >= 1616546
+        end
+
         # Derby does not support IN/NOT IN with multiple columns
         def supports_multiple_column_in?
           false

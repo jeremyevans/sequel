@@ -311,6 +311,21 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 3, 4]
   end if DB.server_version >= 100002
 
+  it "should handle generated column overrides using override value at time of merge_insert call" do
+    @db.create_table(:tmp_dolls){primary_key :id, :identity=>:always}
+    @db.create_table(:unlogged_dolls){Integer :i}
+    @db[:unlogged_dolls].insert(10)
+    @db[:unlogged_dolls].insert(20)
+    @db[:tmp_dolls].
+      merge_using(:unlogged_dolls, :id=>:i).
+      overriding_system_value.
+      merge_insert(:i){i > 15}.
+      overriding_user_value.
+      merge_insert(:i).
+      merge
+    @db[:tmp_dolls].select_order_map(:id).must_equal [1, 20]
+  end if DB.server_version >= 150000
+
   it "should support converting serial columns to identity columns" do
     @db.create_table(:tmp_dolls){primary_key :id, :identity=>false, :serial=>true}
     sch = @db.schema(:tmp_dolls)[0][1]
@@ -5204,3 +5219,108 @@ describe "Common Table Expression CYCLE" do
       ]
   end
 end if DB.server_version >= 140000
+
+describe "MERGE DO NOTHING" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:m1){Integer :i1; Integer :a}
+    @db.create_table!(:m2){Integer :i2; Integer :b}
+    @m1 = @db[:m1]
+    @m2 = @db[:m2]
+  end
+  after do
+    @m1.delete
+    @m2.delete
+  end
+  after(:all) do
+    @db.drop_table?(:m1, :m2)
+  end
+
+  it "should allow inserts, updates, do nothings, and deletes based on conditions in a single MERGE statement" do
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_do_nothing_when_not_matched{b > 50}.
+      merge_insert(:i1=>Sequel[:i2], :a=>Sequel[:b]+11).
+      merge_do_nothing_when_matched{a > 50}.
+      merge_delete{a > 30}.
+      merge_update(:i1=>Sequel[:i1]+:i2+10, :a=>Sequel[:a]+:b+20)
+
+    @m2.insert(1, 2)
+    @m1.all.must_equal []
+
+    # INSERT
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    # UPDATE
+    ds.merge
+    @m1.all.must_equal [{:i1=>12, :a=>35}]
+
+    # DELETE MATCHING current row, INSERT NOT MATCHED new row
+    @m2.insert(12, 3)
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    # MATCHED DO NOTHING
+    @m2.where(:i2=>12).delete
+    @m1.update(:a=>51)
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>51}]
+
+    # NOT MATCHED DO NOTHING
+    @m1.delete
+    @m2.update(:b=>51)
+    ds.merge
+    @m1.all.must_equal []
+
+    @m2.insert(1, 2)
+    @m2.insert(11, 22)
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_insert(:i2, :b){b <= 10}.
+      merge_update(:a=>Sequel[:a]+1){false}.
+      merge_delete{false}
+
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>2}]
+
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>2}]
+  end
+
+  it "should consider condition blocks that return nil as NULL" do
+    @m2.insert(1, 2)
+    @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_insert(Sequel[:i2], Sequel[:b]+11){nil}.
+      merge
+    @m1.all.must_equal []
+  end
+
+  it "supports static SQL" do
+    @m2.insert(1, 2)
+    @m1.with_sql(<<SQL).merge
+MERGE INTO m1 USING m2 ON (i1 = i2)
+WHEN NOT MATCHED AND (b > 50) THEN DO NOTHING
+WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))
+WHEN MATCHED AND (a > 50) THEN DO NOTHING
+WHEN MATCHED AND (a > 30) THEN DELETE
+WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+SQL
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+  end
+
+  it "should support merge_do_nothing_* without blocks" do
+    @m2.insert(1, 2)
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_do_nothing_when_matched.
+      merge_do_nothing_when_not_matched
+    ds.merge
+    @m1.all.must_equal []
+
+    @m1.insert(1, 3)
+    ds.merge
+    @m1.all.must_equal [{:i1=>1, :a=>3}]
+  end
+end if DB.server_version >= 150000

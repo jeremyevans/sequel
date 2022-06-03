@@ -1527,7 +1527,7 @@ module Sequel
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze).freeze
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
-      Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
+      Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns override values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'values order limit'], ['elsif server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if server_version >= 90100', %w'with update table set from where returning'], ['else', %w'update table set from where returning']])
 
@@ -1760,6 +1760,41 @@ module Sequel
         nil
       end
 
+      # Return a dataset with a WHEN MATCHED THEN DO NOTHING clause added to the
+      # MERGE statement.  If a block is passed, treat it as a virtual row and
+      # use it as additional conditions for the match.
+      #
+      #   merge_do_nothing_when_matched
+      #   # WHEN MATCHED THEN DO NOTHING
+      #
+      #   merge_do_nothing_when_matched{a > 30}
+      #   # WHEN MATCHED AND (a > 30) THEN DO NOTHING
+      def merge_do_nothing_when_matched(&block)
+        _merge_when(:type=>:matched, &block)
+      end
+
+      # Return a dataset with a WHEN NOT MATCHED THEN DO NOTHING clause added to the
+      # MERGE statement.  If a block is passed, treat it as a virtual row and
+      # use it as additional conditions for the match.
+      #
+      #   merge_do_nothing_when_not_matched
+      #   # WHEN NOT MATCHED THEN DO NOTHING
+      #
+      #   merge_do_nothing_when_not_matched{a > 30}
+      #   # WHEN NOT MATCHED AND (a > 30) THEN DO NOTHING
+      def merge_do_nothing_when_not_matched(&block)
+        _merge_when(:type=>:not_matched, &block)
+      end
+
+      # Support OVERRIDING USER|SYSTEM VALUE for MERGE INSERT.
+      def merge_insert(*values, &block)
+        h = {:type=>:insert, :values=>values}
+        if override = @opts[:override]
+          h[:override] = insert_override_sql(String.new)
+       end
+        _merge_when(h, &block)
+      end
+    
       # Use OVERRIDING USER VALUE for INSERT statements, so that identity columns
       # always use the user supplied value, and an error is not raised for identity
       # columns that are GENERATED ALWAYS.
@@ -1825,6 +1860,11 @@ module Sequel
       # PostgreSQL supports modifying joined datasets
       def supports_modifying_joins?
         true
+      end
+
+      # PostgreSQL 15+ supports MERGE.
+      def supports_merge?
+        server_version >= 150000
       end
 
       # PostgreSQL supports NOWAIT.
@@ -1937,6 +1977,22 @@ module Sequel
 
       private
 
+      # Append the INSERT sql used in a MERGE
+      def _merge_insert_sql(sql, data)
+        sql << " THEN INSERT "
+        columns, values = _parse_insert_sql_args(data[:values])
+        _insert_columns_sql(sql, columns)
+        if override = data[:override]
+          sql << override
+        end
+        _insert_values_sql(sql, values)
+      end
+
+      def _merge_matched_sql(sql, data)
+        sql << " THEN DO NOTHING"
+      end
+      alias _merge_not_matched_sql _merge_matched_sql
+
       # Format TRUNCATE statement with PostgreSQL specific options.
       def _truncate_sql(table)
         to = @opts[:truncate_opts] || OPTS
@@ -2013,14 +2069,13 @@ module Sequel
       end
 
       # Support OVERRIDING SYSTEM|USER VALUE in insert statements
-      def insert_values_sql(sql)
+      def insert_override_sql(sql)
         case opts[:override]
         when :system
           sql << " OVERRIDING SYSTEM VALUE"
         when :user
           sql << " OVERRIDING USER VALUE"
         end
-        super
       end
 
       # For multiple table support, PostgreSQL requires at least
