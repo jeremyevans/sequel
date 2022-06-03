@@ -57,6 +57,14 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.where{price < 100}.update(:active => true)
   dataset.where(:active).update(:price => Sequel[:price] * 0.90)
 
+= Merge rows
+
+  dataset.
+    merge_using(:table, col1: :col2).
+    merge_insert(col3: :col4).
+    merge_delete{col5 > 30}.
+    merge_update(col3: Sequel[:col3] + :col4)
+
 == Datasets are Enumerable
 
   dataset.map{|r| r[:name]}

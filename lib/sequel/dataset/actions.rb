@@ -469,8 +469,6 @@ module Sequel
     # * #merge_insert
     # * #merge_update
     # * #merge_delete
-    # * #merge_do_nothing_when_matched
-    # * #merge_do_nothing_when_not_matched
     # 
     # The WHEN [NOT] MATCHED clauses are added to the SQL in the order these
     # methods were called on the dataset.  If none of these methods are
@@ -480,9 +478,7 @@ module Sequel
     #
     #   DB[:m1]
     #     merge_using(:m2, i1: :i2).
-    #     merge_do_nothing_when_not_matched{b > 50}.
     #     merge_insert(i1: :i2, a: Sequel[:b]+11).
-    #     merge_do_nothing_when_matched{a > 50}.
     #     merge_delete{a > 30}.
     #     merge_update(i1: Sequel[:i1]+:i2+10, a: Sequel[:a]+:b+20).
     #     merge
@@ -490,11 +486,22 @@ module Sequel
     # SQL:
     #
     #   MERGE INTO m1 USING m2 ON (i1 = i2)
-    #   WHEN NOT MATCHED AND (b > 50) THEN DO NOTHING
     #   WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))
-    #   WHEN MATCHED AND (a > 50) THEN DO NOTHING
     #   WHEN MATCHED AND (a > 30) THEN DELETE
     #   WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+    #
+    # On PostgreSQL, two additional merge methods are supported, for the
+    # PostgreSQL-specific DO NOTHING syntax.
+    #
+    # * #merge_do_nothing_when_matched
+    # * #merge_do_nothing_when_not_matched
+    #
+    # This method is supported on Oracle, but Oracle's MERGE support is
+    # non-standard, and has the following issues:
+    #
+    # * DELETE clause requires UPDATE clause
+    # * DELETE clause requires a condition
+    # * DELETE clause only affects rows updated by UPDATE clause
     def merge
       execute_ddl(merge_sql)
     end

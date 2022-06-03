@@ -414,6 +414,31 @@ As with +delete+, +update+ affects all rows in the dataset, so +where+ first,
   # NOT THIS:
   posts.update(:state => 'archived').where(Sequel[:stamp] < Date.today - 7)
 
+=== Merging records
+
+Merging records using the SQL MERGE statment is done using <tt>merge*</tt> methods.
+You use +merge_using+ to specify the merge source and join conditions.
+You can use +merge_insert+, +merge_delete+, and/or +merge_update+ to set the
+INSERT, DELETE, and UPDATE clauses for the merge. +merge_insert+ takes the same
+arguments as +insert+, and +merge_update+ takes the same arguments as +update+.
++merge_insert+, +merge_delete+, and +merge_update+ can all be called with blocks,
+to set the conditions for the related INSERT, DELETE, or UPDATE.
+
+Finally, after calling all of the other <tt>merge_*</tt> methods, you call +merge+
+to run the MERGE statement on the database.
+
+  ds = DB[:m1]
+    merge_using(:m2, i1: :i2).
+    merge_insert(i1: :i2, a: Sequel[:b]+11).
+    merge_delete{a > 30}.
+    merge_update(i1: Sequel[:i1]+:i2+10, a: Sequel[:a]+:b+20)
+
+  ds.merge
+  # MERGE INTO m1 USING m2 ON (i1 = i2)
+  # WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))
+  # WHEN MATCHED AND (a > 30) THEN DELETE
+  # WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+
 === Transactions
 
 You can wrap a block of code in a database transaction using the <tt>Database#transaction</tt> method:
