@@ -333,6 +333,12 @@ module Sequel
           sqls <<  "SET sql_mode = '#{sql_mode}'"
         end
 
+        # Disable the use of split_materialized in the optimizer. This is
+        # needed to pass association tests on MariaDB 10.5+.
+        if opts[:disable_split_materialized] && typecast_value_boolean(opts[:disable_split_materialized])
+          sqls <<  "SET SESSION optimizer_switch='split_materialized=off'"
+        end
+
         sqls
       end
       

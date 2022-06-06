@@ -1,5 +1,7 @@
 === master
 
+* Support :disable_split_materialized Database option on MySQL to work around optimizer bug in MariaDB 10.5+ affecting association tests (jeremyevans)
+
 * Add Dataset#merge* methods to support MERGE statement on PostgreSQL 15+, MSSQL, Oracle, DB2, H2, HSQLDB, and Derby (jeremyevans)
 
 === 5.57.0 (2022-06-01)

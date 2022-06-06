@@ -258,6 +258,8 @@ The following additional options are supported:
 :compress :: Whether to compress data sent/received via the socket connection.
 :config_default_group :: The default group to read from the in the MySQL config file, defaults to "client")
 :config_local_infile :: If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with the given value.
+:disable_split_materialized :: Set split_materialized=off in the optimizer settings.  Necessary to pass the associations
+                               integration tests in MariaDB 10.5+, due to a unfixed bug in the optimizer.
 :encoding :: Specify the encoding/character set to use for the connection.
 :fractional_seconds :: On MySQL 5.6.5+, this option is recognized and will include fractional seconds in
                        time/timestamp values, as well as have the schema method create columns that can contain
@@ -278,7 +280,9 @@ if either the :sslca or :sslkey option is given.
 
 This is a newer MySQL adapter that does typecasting in C, so it is often faster than the
 mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation
-for details on what options are supported.
+for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized
+options supported by the mysql adapter are also supported for mysql2 adapter (and any other adapters connecting to
+mysql, such as the jdbc/mysql adapter).
 
 === odbc 
 
