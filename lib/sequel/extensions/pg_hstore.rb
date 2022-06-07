@@ -76,7 +76,7 @@
 #
 # This extension integrates with the pg_array extension.  If you plan
 # to use arrays of hstore types, load the pg_array extension before the
-# pg_interval extension:
+# pg_hstore extension:
 #
 #   DB.extension :pg_array, :pg_hstore
 #
