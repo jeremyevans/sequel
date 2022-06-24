@@ -102,6 +102,7 @@ The following options can be specified and are passed to the database's internal
 :after_connect :: A callable object called after each new connection is made, with the
                   connection object (and server argument if the callable accepts 2 arguments),
                   useful for customizations that you want to apply to all connections (nil by default).
+:connect_sqls :: An array of sql strings to execute on each new connection, after :after_connect runs.
 :max_connections :: The maximum size of the connection pool (4 connections by default on most databases)
 :pool_timeout :: The number of seconds to wait if a connection cannot be acquired before raising an error (5 seconds by default)
 :single_threaded :: Whether to use a single-threaded (non-thread safe) connection pool
