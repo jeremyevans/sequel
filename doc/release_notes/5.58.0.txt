@@ -1,0 +1,31 @@
+= New Features
+
+* Dataset#merge and related #merge_* methods have been added for the
+  MERGE statement.  MERGE is supported on PostgreSQL 15+, Oracle,
+  Microsoft SQL Server, DB2, H2, HSQLDB, and Derby. You can use MERGE
+  to insert, update, and/or delete in a single query.  You call
+  the #merge_* methods to setup the MERGE statement, and #merge to
+  execute it on the database:
+
+    ds = DB[:m1]
+      merge_using(:m2, i1: :i2).
+      merge_insert(i1: :i2, a: Sequel[:b]+11).
+      merge_delete{a > 30}.
+      merge_update(i1: Sequel[:i1]+:i2+10, a: Sequel[:a]+:b+20)
+
+    ds.merge
+    # MERGE INTO m1 USING m2 ON (i1 = i2)
+    # WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))
+    # WHEN MATCHED AND (a > 30) THEN DELETE
+    # WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+
+  On PostgreSQL, the following additional MERGE related methods are
+  available:
+
+  * #merge_do_nothing_when_matched
+  * #merge_do_nothing_when_not_matched
+
+* A :disable_split_materialized Database option is now supported on
+  MySQL. This disables split_materialized support in the optimizer,
+  working around a bug in MariaDB 10.5+ that causes failures in
+  Sequel's association tests.

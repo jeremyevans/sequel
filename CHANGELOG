@@ -1,4 +1,4 @@
-=== master
+=== 5.58.0 (2022-07-01)
 
 * Support :disable_split_materialized Database option on MySQL to work around optimizer bug in MariaDB 10.5+ affecting association tests (jeremyevans)
 
