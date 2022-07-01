@@ -145,6 +145,7 @@ WHERE (b = b) # NULL
 #  Non-empty array: where(:b=&gt;[1, 2])
 WHERE (b IN (1, 2)) # NULL
 WHERE (b NOT IN (1, 2)) # NULL
+
 # Static boolean handling
 #  Empty array: where(:b=&gt;[])
 WHERE (1 = 0) # false

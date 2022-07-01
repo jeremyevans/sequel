@@ -30,7 +30,7 @@ doc/cheat_sheet.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-11-30 09:54:54 -0800</span>
+<span class='datetime'>2022-06-03 15:14:21 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -102,6 +102,15 @@ Last Update:
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">delete</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">update</span>(<span class="ruby-value">:active</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>)
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:price</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:price</span>] <span class="ruby-operator">*</span> <span class="ruby-value">0.90</span>)
+</pre>
+
+<h1 id="label-Merge+rows">Merge rows<span><a href="#label-Merge+rows">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.
+  <span class="ruby-identifier">merge_using</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">col1:</span> <span class="ruby-value">:col2</span>).
+  <span class="ruby-identifier">merge_insert</span>(<span class="ruby-value">col3:</span> <span class="ruby-value">:col4</span>).
+  <span class="ruby-identifier">merge_delete</span>{<span class="ruby-identifier">col5</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">30</span>}.
+  <span class="ruby-identifier">merge_update</span>(<span class="ruby-value">col3:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:col3</span>] <span class="ruby-operator">+</span> <span class="ruby-value">:col4</span>)
 </pre>
 
 <h2 id="label-Datasets+are+Enumerable">Datasets are Enumerable<span><a href="#label-Datasets+are+Enumerable">&para;</a> <a href="#top">&uarr;</a></span></h2>

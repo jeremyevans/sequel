@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-03-08 13:17:00 -0800</span>
+<span class='datetime'>2022-06-24 07:37:05 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -140,6 +140,8 @@ Last Update:
 <p>The following options can be specified and are passed to the database’s internal connection pool.</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:after_connect </td><td>
 <p>A callable object called after each new connection is made, with the connection object (and server argument if the callable accepts 2 arguments), useful for customizations that you want to apply to all connections (nil by default).</p>
+</td></tr><tr><td class='label'>:connect_sqls </td><td>
+<p>An array of sql strings to execute on each new connection, after :after_connect runs.</p>
 </td></tr><tr><td class='label'>:max_connections </td><td>
 <p>The maximum size of the connection pool (4 connections by default on most databases)</p>
 </td></tr><tr><td class='label'>:pool_timeout </td><td>
@@ -271,6 +273,8 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>The default group to read from the in the MySQL config file, defaults to “client”)</p>
 </td></tr><tr><td class='label'>:config_local_infile </td><td>
 <p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with the given value.</p>
+</td></tr><tr><td class='label'>:disable_split_materialized </td><td>
+<p>Set split_materialized=off in the optimizer settings.  Necessary to pass the associations integration tests in MariaDB 10.5+, due to a unfixed bug in the optimizer.</p>
 </td></tr><tr><td class='label'>:encoding </td><td>
 <p>Specify the encoding/character set to use for the connection.</p>
 </td></tr><tr><td class='label'>:fractional_seconds </td><td>
@@ -291,7 +295,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>This is a newer MySQL adapter that does typecasting in C, so it is often faster than the mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation for details on what options are supported.</p>
+<p>This is a newer MySQL adapter that does typecasting in C, so it is often faster than the mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized options supported by the mysql adapter are also supported for mysql2 adapter (and any other adapters connecting to mysql, such as the jdbc/mysql adapter).</p>
 
 <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -334,7 +338,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:convert_infinite_timestamps </td><td>
 <p>Whether infinite timestamps/dates should be converted on retrieval.  By default, no conversion is done, so an error is raised if you attempt to retrieve an infinite timestamp/date.  You can set this to :nil to convert to nil, :string to leave as a string, or :float to convert to an infinite float.</p>
 </td></tr><tr><td class='label'>:conn_str </td><td>
-<p>Use connection string (in form of ‘host=x port=y …`). Ignores all other options, only supported with pg library. See <a href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING</a> and  <a href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS</a> for format and list of supported options.</p>
+<p>Use connection string (in form of ‘host=x port=y …`). Ignores all other options, only supported with pg library. See <a target="_top" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING</a> and  <a target="_top" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS</a> for format and list of supported options.</p>
 </td></tr><tr><td class='label'>:connect_timeout </td><td>
 <p>Set the number of seconds to wait for a connection (default 20, only respected if using the pg library).</p>
 </td></tr><tr><td class='label'>:driver_options </td><td>

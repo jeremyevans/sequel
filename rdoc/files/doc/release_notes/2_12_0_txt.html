@@ -301,6 +301,7 @@ Last Update:
 <pre># Old
 validates_presence_of :name, :if=&gt;:new?
 validates_presence_of :pass, :if=&gt;{flag &gt; 3}
+
 # New
 def validate
   validates_presence(:name) if new?

@@ -1,6 +1,6 @@
-Wed, 01 Jun 2022 08:01:46 -0700
-README.rdoc	Sat, 18 Dec 2021 10:36:54 -0800
-CHANGELOG	Wed, 01 Jun 2022 07:58:52 -0700
+Fri, 01 Jul 2022 07:43:18 -0700
+README.rdoc	Fri, 03 Jun 2022 15:14:21 -0700
+CHANGELOG	Fri, 01 Jul 2022 07:40:12 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 05 Jan 2022 16:44:47 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Wed, 01 Jun 2022 07:58:52 -0700
+lib/sequel/version.rb	Fri, 01 Jul 2022 07:40:12 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 17 Dec 2021 16:59:47 -0800
@@ -29,15 +29,15 @@ lib/sequel/database/query.rb	Wed, 15 Dec 2021 16:07:57 -0800
 lib/sequel/database/schema_generator.rb	Fri, 06 May 2022 11:12:21 -0700
 lib/sequel/database/schema_methods.rb	Fri, 15 Apr 2022 15:27:11 -0700
 lib/sequel/database/transactions.rb	Fri, 20 Nov 2020 10:49:30 -0800
-lib/sequel/dataset/actions.rb	Tue, 08 Mar 2022 11:16:59 -0800
+lib/sequel/dataset/actions.rb	Fri, 03 Jun 2022 15:14:21 -0700
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
-lib/sequel/dataset/features.rb	Wed, 30 Dec 2020 11:27:05 -0800
+lib/sequel/dataset/features.rb	Fri, 03 Jun 2022 15:14:21 -0700
 lib/sequel/dataset/graph.rb	Tue, 19 Mar 2019 16:51:03 -0700
 lib/sequel/dataset/misc.rb	Wed, 08 Jan 2020 19:48:38 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/dataset/prepared_statements.rb	Wed, 02 Dec 2020 15:37:08 -0800
-lib/sequel/dataset/query.rb	Wed, 03 Nov 2021 13:00:48 -0700
-lib/sequel/dataset/sql.rb	Tue, 08 Mar 2022 11:16:59 -0800
+lib/sequel/dataset/query.rb	Fri, 03 Jun 2022 15:14:21 -0700
+lib/sequel/dataset/sql.rb	Fri, 03 Jun 2022 15:14:21 -0700
 lib/sequel/model/associations.rb	Fri, 19 Nov 2021 23:47:18 -0800
 lib/sequel/model/base.rb	Tue, 17 May 2022 08:53:02 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
@@ -49,7 +49,7 @@ lib/sequel/model/plugins.rb	Fri, 04 Dec 2020 13:44:07 -0800
 doc/advanced_associations.rdoc	Wed, 01 Apr 2020 09:49:55 -0700
 doc/association_basics.rdoc	Wed, 28 Jul 2021 07:37:57 -0700
 doc/bin_sequel.rdoc	Thu, 10 Aug 2017 09:06:47 -0700
-doc/cheat_sheet.rdoc	Mon, 30 Nov 2020 09:54:54 -0800
+doc/cheat_sheet.rdoc	Fri, 03 Jun 2022 15:14:21 -0700
 doc/code_order.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
 doc/core_extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/dataset_basics.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -63,7 +63,7 @@ doc/model_hooks.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/opening_databases.rdoc	Tue, 08 Mar 2022 13:17:00 -0800
+doc/opening_databases.rdoc	Fri, 24 Jun 2022 07:37:05 -0700
 doc/postgresql.rdoc	Tue, 14 Sep 2021 13:38:58 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Tue, 08 Mar 2022 13:17:00 -0800
@@ -72,7 +72,7 @@ doc/schema_modification.rdoc	Mon, 30 Oct 2017 13:46:56 -0700
 doc/security.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
 doc/sharding.rdoc	Mon, 13 May 2019 11:09:07 -0700
 doc/sql.rdoc	Tue, 08 Mar 2022 13:17:00 -0800
-doc/testing.rdoc	Sat, 18 Dec 2021 10:42:18 -0800
+doc/testing.rdoc	Thu, 02 Jun 2022 13:05:13 -0700
 doc/thread_safety.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/transactions.rdoc	Sun, 27 Sep 2020 19:15:06 -0700
 doc/validations.rdoc	Tue, 04 Aug 2020 18:11:34 -0700
@@ -248,6 +248,7 @@ doc/release_notes/5.54.0.txt	Tue, 01 Mar 2022 08:11:18 -0800
 doc/release_notes/5.55.0.txt	Fri, 01 Apr 2022 08:49:06 -0700
 doc/release_notes/5.56.0.txt	Fri, 29 Apr 2022 12:19:02 -0700
 doc/release_notes/5.57.0.txt	Wed, 01 Jun 2022 07:58:52 -0700
+doc/release_notes/5.58.0.txt	Fri, 01 Jul 2022 07:40:12 -0700
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700

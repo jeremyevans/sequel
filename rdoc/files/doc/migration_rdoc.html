@@ -317,6 +317,7 @@ Last Update:
 
 <pre># Date
 20100510_create_artists.rb
+
 # Date and Time
 20100510120000_create_artists.rb
 
@@ -426,6 +427,7 @@ sequel -m /absolute/path/to/migrations postgres://host/database</pre>
 
 <pre># Migrate all the way down
 sequel -m db/migrations -M 0 postgres://host/database
+
 # Migrate to version 10 (IntegerMigrator style migrations)
 sequel -m db/migrations -M 10 postgres://host/database
 

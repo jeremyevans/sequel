@@ -76,6 +76,7 @@ Last Update:
     foreign_key :parent_id, :nodes
   end
   create_table
+
   many_to_one :parent
   one_to_many :children, :key=&gt;:parent_id
 
@@ -164,6 +165,7 @@ end
     end
   end)
 end
+
 nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
 
 <p>New Adapter Features</p>

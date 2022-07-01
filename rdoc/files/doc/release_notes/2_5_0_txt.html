@@ -62,6 +62,7 @@ Last Update:
   foreign_key [:id, :name], :other_table, \
     :key=&gt;[:item_id, :item_name]
 end
+
 DB.alter_table(:items) do
   add_primary_key [:id, :name]
   add_foreign_key [:id, :name], :other_table, \

@@ -30,7 +30,7 @@ README.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-12-18 10:36:54 -0800</span>
+<span class='datetime'>2022-06-03 15:14:21 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -51,15 +51,15 @@ Last Update:
 
 <h2 id="label-Resources">Resources<span><a href="#label-Resources">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>Website </td><td>
-<p><a href="https://sequel.jeremyevans.net">sequel.jeremyevans.net</a></p>
+<p><a target="_top" href="https://sequel.jeremyevans.net">sequel.jeremyevans.net</a></p>
 </td></tr><tr><td class='label'>RDoc Documentation </td><td>
-<p><a href="https://sequel.jeremyevans.net/rdoc">sequel.jeremyevans.net/rdoc</a></p>
+<p><a target="_top" href="https://sequel.jeremyevans.net/rdoc">sequel.jeremyevans.net/rdoc</a></p>
 </td></tr><tr><td class='label'>Source Code </td><td>
-<p><a href="https://github.com/jeremyevans/sequel">github.com/jeremyevans/sequel</a></p>
+<p><a target="_top" href="https://github.com/jeremyevans/sequel">github.com/jeremyevans/sequel</a></p>
 </td></tr><tr><td class='label'>Bug tracking (GitHub Issues) </td><td>
-<p><a href="https://github.com/jeremyevans/sequel/issues">github.com/jeremyevans/sequel/issues</a></p>
+<p><a target="_top" href="https://github.com/jeremyevans/sequel/issues">github.com/jeremyevans/sequel/issues</a></p>
 </td></tr><tr><td class='label'>Discussion Forum (GitHub Discussions) </td><td>
-<p><a href="https://github.com/jeremyevans/sequel/discussions">github.com/jeremyevans/sequel/discussions</a></p>
+<p><a target="_top" href="https://github.com/jeremyevans/sequel/discussions">github.com/jeremyevans/sequel/discussions</a></p>
 </td></tr><tr><td class='label'>Alternate Discussion Forum (sequel-talk Google Group) </td><td>
 <p><a target="_top" href="http://groups.google.com/group/sequel-talk">groups.google.com/group/sequel-talk</a></p>
 </td></tr></tbody></table>
@@ -495,6 +495,25 @@ Last Update:
 <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;archived&#39;</span>)
 <span class="ruby-comment"># NOT THIS:</span>
 <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;archived&#39;</span>).<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>)
+</pre>
+
+<h3 id="label-Merging+records">Merging records<span><a href="#label-Merging+records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Merging records using the SQL MERGE statment is done using <code>merge*</code> methods. You use <code>merge_using</code> to specify the merge source and join conditions. You can use <code>merge_insert</code>, <code>merge_delete</code>, and/or <code>merge_update</code> to set the INSERT, DELETE, and UPDATE clauses for the merge. <code>merge_insert</code> takes the same arguments as <code>insert</code>, and <code>merge_update</code> takes the same arguments as <code>update</code>. <code>merge_insert</code>, <code>merge_delete</code>, and <code>merge_update</code> can all be called with blocks, to set the conditions for the related INSERT, DELETE, or UPDATE.</p>
+
+<p>Finally, after calling all of the other <code>merge_*</code> methods, you call <code>merge</code> to run the MERGE statement on the database.</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:m1</span>]
+  <span class="ruby-identifier">merge_using</span>(<span class="ruby-value">:m2</span>, <span class="ruby-value">i1:</span> <span class="ruby-value">:i2</span>).
+  <span class="ruby-identifier">merge_insert</span>(<span class="ruby-value">i1:</span> <span class="ruby-value">:i2</span>, <span class="ruby-value">a:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>]<span class="ruby-value">+11</span>).
+  <span class="ruby-identifier">merge_delete</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">30</span>}.
+  <span class="ruby-identifier">merge_update</span>(<span class="ruby-value">i1:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:i1</span>]<span class="ruby-operator">+</span><span class="ruby-value">:i2</span><span class="ruby-value">+10</span>, <span class="ruby-value">a:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-operator">+</span><span class="ruby-value">:b</span><span class="ruby-value">+20</span>)
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">merge</span>
+<span class="ruby-comment"># MERGE INTO m1 USING m2 ON (i1 = i2)</span>
+<span class="ruby-comment"># WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))</span>
+<span class="ruby-comment"># WHEN MATCHED AND (a &gt; 30) THEN DELETE</span>
+<span class="ruby-comment"># WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</span>
 </pre>
 
 <h3 id="label-Transactions">Transactions<span><a href="#label-Transactions">&para;</a> <a href="#top">&uarr;</a></span></h3>

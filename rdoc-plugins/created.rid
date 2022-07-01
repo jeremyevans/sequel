@@ -1,4 +1,4 @@
-Wed, 01 Jun 2022 08:02:40 -0700
+Fri, 01 Jul 2022 07:44:12 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -47,7 +47,7 @@ lib/sequel/extensions/pg_array.rb	Fri, 04 Dec 2020 13:44:07 -0800
 lib/sequel/extensions/pg_array_ops.rb	Tue, 25 Jan 2022 08:40:33 -0800
 lib/sequel/extensions/pg_enum.rb	Fri, 09 Apr 2021 07:38:35 -0700
 lib/sequel/extensions/pg_extended_date_support.rb	Wed, 22 Sep 2021 11:50:26 -0700
-lib/sequel/extensions/pg_hstore.rb	Mon, 16 Mar 2020 11:01:23 -0700
+lib/sequel/extensions/pg_hstore.rb	Tue, 07 Jun 2022 07:35:10 -0700
 lib/sequel/extensions/pg_hstore_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
 lib/sequel/extensions/pg_inet.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/extensions/pg_inet_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800

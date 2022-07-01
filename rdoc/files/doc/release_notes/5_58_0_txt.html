@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.58.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.58.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.58.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-07-01 07:40:12 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#merge and related merge_* methods have been added for the MERGE statement.  MERGE is supported on PostgreSQL 15+, Oracle, Microsoft SQL Server, DB2, H2, HSQLDB, and Derby. You can use MERGE to insert, update, and/or delete in a single query.  You call the merge_* methods to setup the MERGE statement, and merge to execute it on the database:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:m1</span>]
+  <span class="ruby-identifier">merge_using</span>(<span class="ruby-value">:m2</span>, <span class="ruby-value">i1:</span> <span class="ruby-value">:i2</span>).
+  <span class="ruby-identifier">merge_insert</span>(<span class="ruby-value">i1:</span> <span class="ruby-value">:i2</span>, <span class="ruby-value">a:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>]<span class="ruby-value">+11</span>).
+  <span class="ruby-identifier">merge_delete</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">30</span>}.
+  <span class="ruby-identifier">merge_update</span>(<span class="ruby-value">i1:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:i1</span>]<span class="ruby-operator">+</span><span class="ruby-value">:i2</span><span class="ruby-value">+10</span>, <span class="ruby-value">a:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-operator">+</span><span class="ruby-value">:b</span><span class="ruby-value">+20</span>)
+
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">merge</span>
+<span class="ruby-comment"># MERGE INTO m1 USING m2 ON (i1 = i2)</span>
+<span class="ruby-comment"># WHEN NOT MATCHED THEN INSERT (i1, a) VALUES (i2, (b + 11))</span>
+<span class="ruby-comment"># WHEN MATCHED AND (a &gt; 30) THEN DELETE</span>
+<span class="ruby-comment"># WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</span>
+</pre>
+
+<p>On PostgreSQL, the following additional MERGE related methods are available:</p>
+<ul><li>
+<p>merge_do_nothing_when_matched</p>
+</li><li>
+<p>merge_do_nothing_when_not_matched</p>
+</li></ul>
+</li><li>
+<p>A :disable_split_materialized Database option is now supported on MySQL. This disables split_materialized support in the optimizer, working around a bug in MariaDB 10.5+ that causes failures in Sequel’s association tests.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
