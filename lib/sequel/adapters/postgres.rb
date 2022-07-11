@@ -23,16 +23,20 @@ begin
   end
 rescue LoadError => e 
   begin
-    require 'postgres-pr/postgres-compat'
-    Sequel::Postgres::USES_PG = false
+    require 'sequel/postgres-pr'
   rescue LoadError 
-    raise e 
+    begin
+      require 'postgres-pr/postgres-compat'
+    rescue LoadError 
+      raise e 
+    end 
   end 
+  Sequel::Postgres::USES_PG = false
 end
 
 module Sequel
   module Postgres
-    if Sequel::Postgres::USES_PG
+    if USES_PG
       # Whether the given sequel_pg version integer is supported.
       def self.sequel_pg_version_supported?(version)
         version >= 10617
@@ -74,8 +78,10 @@ module Sequel
         unless public_method_defined?(:async_exec_params)
           alias async_exec_params async_exec
         end
-      else
-        # Make postgres-pr look like pg
+      elsif !const_defined?(:CONNECTION_OK)
+        # Handle old postgres-pr
+        # sequel-postgres-pr already implements this API
+
         CONNECTION_OK = -1
 
         # Escape bytea values.  Uses historical format instead of hex
