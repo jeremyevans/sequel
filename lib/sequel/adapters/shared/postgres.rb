@@ -1247,6 +1247,10 @@ module Sequel
       def create_view_prefix_sql(name, options)
         sql = create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}#{'RECURSIVE ' if options[:recursive]}#{'MATERIALIZED ' if options[:materialized]}VIEW #{quote_schema_table(name)}", options[:columns] || options[:recursive])
 
+        if options[:security_invoker]
+          sql += " WITH (security_invoker)"
+        end
+
         if tablespace = options[:tablespace]
           sql += " TABLESPACE #{quote_identifier(tablespace)}"
         end

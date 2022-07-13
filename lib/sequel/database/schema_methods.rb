@@ -295,6 +295,9 @@ module Sequel
     #               in a subquery, if you are providing a Dataset as the source
     #               argument, if should probably call the union method with the
     #               all: true and from_self: false options.
+    # :security_invoker :: Set the security_invoker property on the view, making
+    #                      the access to the view use the current user's permissions,
+    #                      instead of the view owner's permissions.
     # :tablespace :: The tablespace to use for materialized views.
     def create_view(name, source, options = OPTS)
       execute_ddl(create_view_sql(name, source, options))

@@ -484,6 +484,13 @@ describe "PostgreSQL temporary table/view support" do
     @db.create_or_replace_view(:tmp_dolls_view, @db[:tmp_dolls].where(:number=>20),  :temp=>true)
     @db[:tmp_dolls_view].map(:number).must_equal [20]
   end
+
+  it "should support security_invoker view option" do
+    @db.create_table(:tmp_dolls, :temp => true){Integer :number}
+    @db[:tmp_dolls].insert(10)
+    @db.create_view(:tmp_dolls_view, @db[:tmp_dolls].where(:number=>10), :temp=>true, :security_invoker=>true)
+    @db[:tmp_dolls_view].count.must_equal 1
+  end if DB.server_version >= 150000
 end
 
 describe "PostgreSQL views" do
