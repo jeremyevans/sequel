@@ -1,5 +1,7 @@
 === master
 
+* Add is_json and is_not_json methods to the pg_json_ops extension, for the PostgreSQL 15+ IS [NOT] JSON operator (jeremyevans)
+
 * Support :security_invoker view option on PostgreSQL 15+, for views where access uses permissions of user instead of owner (jeremyevans)
 
 * Support :nulls_distinct index option on PostgreSQL 15+, for NULLS [NOT] DISTINCT (jeremyevans)

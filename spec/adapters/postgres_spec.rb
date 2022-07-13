@@ -3770,6 +3770,45 @@ describe 'PostgreSQL json type' do
         end
       end
 
+      if DB.server_version >= 150000
+        meth = Sequel.method(:"pg_#{json_type}_op")
+        @db.get(meth.call('{}').is_json).must_equal true
+        @db.get(meth.call('null').is_json).must_equal true
+        @db.get(meth.call('1').is_json).must_equal true
+        @db.get(meth.call('"a"').is_json).must_equal true
+        @db.get(meth.call('[]').is_json).must_equal true
+        @db.get(meth.call('').is_json).must_equal false
+
+        @db.get(meth.call('1').is_json(:type=>:scalar)).must_equal true
+        @db.get(meth.call('null').is_json(:type=>:value)).must_equal true
+        @db.get(meth.call('{}').is_json(:type=>:object)).must_equal true
+        @db.get(meth.call('{}').is_json(:type=>:array)).must_equal false
+        @db.get(meth.call('{"a": 1, "a": 2}').is_json(:type=>:object, :unique=>true)).must_equal false
+        @db.get(meth.call('{"a": 1, "b": 2}').is_json(:type=>:object, :unique=>true)).must_equal true
+        @db.get(meth.call('[]').is_json(:type=>:object, :unique=>true)).must_equal false
+        @db.get(meth.call('{"a": 1, "a": 2}').is_json(:unique=>true)).must_equal false
+        @db.get(meth.call('{"a": 1, "b": 2}').is_json(:unique=>true)).must_equal true
+        @db.get(meth.call('[]').is_json(:unique=>true)).must_equal true
+
+        @db.get(meth.call('{}').is_not_json).must_equal false
+        @db.get(meth.call('null').is_not_json).must_equal false
+        @db.get(meth.call('1').is_not_json).must_equal false
+        @db.get(meth.call('"a"').is_not_json).must_equal false
+        @db.get(meth.call('[]').is_not_json).must_equal false
+        @db.get(meth.call('').is_not_json).must_equal true
+
+        @db.get(meth.call('1').is_not_json(:type=>:scalar)).must_equal false
+        @db.get(meth.call('null').is_not_json(:type=>:value)).must_equal false
+        @db.get(meth.call('{}').is_not_json(:type=>:object)).must_equal false
+        @db.get(meth.call('{}').is_not_json(:type=>:array)).must_equal true
+        @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal true
+        @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal false
+        @db.get(meth.call('[]').is_not_json(:type=>:object, :unique=>true)).must_equal true
+        @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:unique=>true)).must_equal true
+        @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:unique=>true)).must_equal false
+        @db.get(meth.call('[]').is_not_json(:unique=>true)).must_equal false
+      end
+
       Sequel.extension :pg_row_ops
       @db.create_table!(:items) do
         Integer :a
