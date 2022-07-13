@@ -1304,16 +1304,20 @@ module Sequel
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
+
         expr = if o = index[:opclass]
           "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
         else
           literal(Array(cols))
         end
+
         if_not_exists = " IF NOT EXISTS" if index[:if_not_exists]
         unique = "UNIQUE " if index[:unique]
         index_type = index[:type]
         filter = index[:where] || index[:filter]
         filter = " WHERE #{filter_expr(filter)}" if filter
+        nulls_distinct = " NULLS#{' NOT' if index[:nulls_distinct] == false} DISTINCT" unless index[:nulls_distinct].nil?
+
         case index_type
         when :full_text
           expr = "(to_tsvector(#{literal(index[:language] || 'simple')}::regconfig, #{literal(dataset.send(:full_text_string_join, cols))}))"
@@ -1321,7 +1325,8 @@ module Sequel
         when :spatial
           index_type = :gist
         end
-        "CREATE #{unique}INDEX#{' CONCURRENTLY' if index[:concurrently]}#{if_not_exists} #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{" INCLUDE #{literal(Array(index[:include]))}" if index[:include]}#{" TABLESPACE #{quote_identifier(index[:tablespace])}" if index[:tablespace]}#{filter}"
+
+        "CREATE #{unique}INDEX#{' CONCURRENTLY' if index[:concurrently]}#{if_not_exists} #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{" INCLUDE #{literal(Array(index[:include]))}" if index[:include]}#{nulls_distinct}#{" TABLESPACE #{quote_identifier(index[:tablespace])}" if index[:tablespace]}#{filter}"
       end
 
       # Setup datastructures shared by all postgres adapters.

@@ -1,5 +1,7 @@
 === master
 
+* Support :nulls_distinct index option on PostgreSQL 15+, for NULLS [NOT] DISTINCT (jeremyevans)
+
 * Support sequel-postgres-pr driver in the postgres adapter (jeremyevans)
 
 === 5.58.0 (2022-07-01)

@@ -1014,6 +1014,19 @@ describe "A PostgreSQL dataset" do
     @db.add_index :test, [:name, :value], :if_not_exists=>true, :name=>'tnv3'
   end if DB.server_version >= 90500
 
+  it "should support specifying whether NULLS are distinct in unique indexes" do
+    @db.create_table(:atest){Integer :a}
+    @db.add_index :atest, :a, :nulls_distinct=>true, :unique=>true
+    @db[:atest].insert
+    @db[:atest].insert
+    @db[:atest].count.must_equal 2
+
+    @db.create_table!(:atest){Integer :a}
+    @db.add_index :atest, :a, :nulls_distinct=>false, :unique=>true
+    @db[:atest].insert
+    proc{@db[:atest].insert}.must_raise Sequel::DatabaseError
+  end if DB.server_version >= 150000
+
   it "should support including columns in indexes" do
     @db.create_table(:atest){Integer :a; Integer :b; Integer :c}
     @db.add_index :atest, :a, :include=>[:b, :c]

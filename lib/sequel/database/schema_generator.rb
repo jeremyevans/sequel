@@ -262,6 +262,7 @@ module Sequel
       #                  operations on the table while the index is being
       #                  built.
       # :if_not_exists :: Only create the index if an index of the same name doesn't already exist.
+      # :nulls_distinct :: Set whether separate NULLs should be considered distinct values in unique indexes.
       # :opclass :: Set an opclass to use for all columns (per-column opclasses require
       #             custom SQL).
       # :tablespace :: Specify tablespace for index.
