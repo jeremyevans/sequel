@@ -109,6 +109,13 @@ module Sequel
     # to eagerly set the associated objects, and having separate threads
     # modify the same model instance is not thread-safe.
     #
+    # Because this plugin will automatically use eager loading for
+    # performance, it can break code that defines associations that
+    # do not support eager loading, without marking that they do not
+    # support eager loading via the <tt>allow_eager: false</tt> option.
+    # Make sure to set <tt>allow_eager: false</tt> on any association
+    # used with this plugin if the association doesn't support eager loading.
+    #
     # Usage:
     #
     #   # Make all model subclass instances use tactical eager loading (called before loading subclasses)
