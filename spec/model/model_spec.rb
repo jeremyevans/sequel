@@ -334,7 +334,12 @@ describe Sequel::Model do
 
   it "should raise an error on set_dataset if there is an error connecting to the database" do
     def @model.columns() raise Sequel::DatabaseConnectionError end
-    proc{@model.set_dataset(Sequel::Database.new[:foo].join(:blah).from_self)}.must_raise Sequel::DatabaseConnectionError
+    proc{@model.set_dataset(Sequel.mock[:foo].join(:blah).from_self)}.must_raise Sequel::DatabaseConnectionError
+  end
+
+  it "should raise an error on set_dataset if there is a disconnect error" do
+    def @model.columns() raise Sequel::DatabaseDisconnectError end
+    proc{@model.set_dataset(Sequel.mock[:foo].join(:blah).from_self)}.must_raise Sequel::DatabaseDisconnectError
   end
 
   it "should not raise an error if there is a problem getting the columns for a dataset" do

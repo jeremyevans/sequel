@@ -1,5 +1,7 @@
 === master
 
+* Model code that does not swallow connection errors will now also not swallow disconnect errors (jeremyevans) (#1892)
+
 * Add is_json and is_not_json methods to the pg_json_ops extension, for the PostgreSQL 15+ IS [NOT] JSON operator (jeremyevans)
 
 * Support :security_invoker view option on PostgreSQL 15+, for views where access uses permissions of user instead of owner (jeremyevans)

@@ -680,10 +680,11 @@ module Sequel
   
       private
       
-      # Yield to the passed block and if do_raise is false, swallow all errors other than DatabaseConnectionErrors.
+      # Yield to the passed block and if do_raise is false, swallow Sequel::Errors other than DatabaseConnectionError
+      # and DatabaseDisconnectError.
       def check_non_connection_error(do_raise=require_valid_table)
         db.transaction(:savepoint=>:only){yield}
-      rescue Sequel::DatabaseConnectionError
+      rescue Sequel::DatabaseConnectionError, Sequel::DatabaseDisconnectError
         raise
       rescue Sequel::Error
         raise if do_raise
