@@ -747,6 +747,16 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_table.must_equal '"b"."a"'
   end
 
+  it "should have simple table = nil if passed an aliased expression to set_dataset" do
+    @c.set_dataset Sequel.as(:a, :b)
+    @c.simple_table.must_be_nil
+  end
+
+  it "should have simple table = nil if passed a literal string" do
+    @c.set_dataset Sequel.lit('a')
+    @c.simple_table.must_be_nil
+  end
+
   it "should have simple_table = nil if passed a non-simple select all dataset to set_dataset" do
     @c.set_dataset @c.db[:a].filter(:active)
     @c.simple_table.must_be_nil

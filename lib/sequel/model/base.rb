@@ -694,8 +694,11 @@ module Sequel
       # this model's dataset.
       def convert_input_dataset(ds)
         case ds
-        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
+        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier
           self.simple_table = db.literal(ds).freeze
+          ds = db.from(ds)
+        when SQL::AliasedExpression, LiteralString
+          self.simple_table = nil
           ds = db.from(ds)
         when Dataset
           ds = ds.from_self(:alias=>ds.first_source) if ds.joined_dataset?
