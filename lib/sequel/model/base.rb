@@ -788,7 +788,7 @@ module Sequel
         schema_hash = {}
         ds_opts = dataset.opts
         get_columns = proc{check_non_connection_error{columns} || []}
-        schema_array = check_non_connection_error(false){db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
+        schema_array = get_db_schema_array(reload) if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
 
@@ -823,6 +823,12 @@ module Sequel
           get_columns.call.each{|c| schema_hash[c] = {}}
         end
         schema_hash
+      end
+
+      # Get the array of schema information for the dataset.  Returns nil if
+      # the schema information cannot be determined.
+      def get_db_schema_array(reload)
+        check_non_connection_error(false){db.schema(dataset, :reload=>reload)}
       end
 
       # Uncached version of setter_methods, to be overridden by plugins
