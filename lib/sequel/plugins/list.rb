@@ -33,7 +33,9 @@ module Sequel
     # You can provide a <tt>:scope</tt> option to scope the list.  This option
     # can be a symbol or array of symbols specifying column name(s), or a proc
     # that accepts a model instance and returns a dataset representing the list
-    # the object is in.
+    # the object is in.  You will need to provide a <tt>:scope</tt> option if
+    # the model's dataset uses a subquery (such as when using the class_table_inheritance
+    # plugin).
     # 
     # For example, if each item has a +user_id+ field, and you want every user
     # to have their own list:
