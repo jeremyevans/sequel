@@ -1717,6 +1717,8 @@ module Sequel
         # :graph_select :: A column or array of columns to select from the associated table
         #                  when eagerly loading the association via +eager_graph+. Defaults to all
         #                  columns in the associated table.
+        # :instance_specific :: Marks the association as instance specific. Should be used if the association block
+        #                       uses instance specific state, or transient state (accessing current date/time, etc.).
         # :limit :: Limit the number of records to the provided value.  Use
         #           an array with two elements for the value to specify a
         #           limit (first element) and an offset (second element).
@@ -1855,6 +1857,16 @@ module Sequel
             # values other than the foreign key value.  This needs to be checked for
             # in certain places to disable optimizations.
             opts[:instance_specific] = _association_instance_specific_default(name)
+          end
+          if (orig_opts[:instance_specific] || orig_opts[:dataset]) && !opts.has_key?(:allow_eager) && !opts[:eager_loader]
+            # For associations explicitly marked as instance specific, or that use the
+            # :dataset option, where :allow_eager is not set, and no :eager_loader is
+            # provided, disallow eager loading.  In these cases, eager loading is
+            # unlikely to work.  This is not done for implicit setting of :instance_specific,
+            # because implicit use is done by default for all associations with blocks,
+            # and the vast majority of associations with blocks use the block for filtering
+            # in a manner compatible with eager loading.
+            opts[:allow_eager] = false
           end
           opts = assoc_class.new.merge!(opts)
 

@@ -219,6 +219,20 @@ describe Sequel::Model, "associate" do
     c.association_reflection(:c)[:instance_specific].must_equal false
   end
 
+  it "should set :allow_eager false by default if :instance_specific option is set and eager loading not otherwise allowed" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_one :c, :instance_specific=>true
+    c.association_reflection(:c)[:allow_eager].must_equal false
+    c.many_to_one :c, :instance_specific=>true, :allow_eager=>true
+    c.association_reflection(:c)[:allow_eager].must_equal true
+    c.many_to_one :c, :instance_specific=>true, :eager_loader=>proc{}
+    c.association_reflection(:c)[:allow_eager].must_be_nil
+    c.many_to_one :c do |_| end
+    c.association_reflection(:c)[:allow_eager].must_be_nil
+    c.many_to_one :c, :dataset=>proc{|_|}
+    c.association_reflection(:c)[:allow_eager].must_equal false
+  end
+
   it "should allow cloning of one_to_many to one_to_one associations and vice-versa" do
     c = Class.new(Sequel::Model(:c))
     c.one_to_one :c

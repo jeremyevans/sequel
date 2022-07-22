@@ -1,5 +1,7 @@
 === master
 
+* Set :allow_eager association option to false for instance specific associations without eager loaders (jeremyevans)
+
 * Add require_valid_schema plugin for checking that model classes have schema parsed as expected (jeremyevans)
 
 * Model classes created from aliased expressions and literal strings no longer use the simple table optimization (jeremyevans)
