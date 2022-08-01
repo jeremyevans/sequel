@@ -120,6 +120,8 @@ Sequel::Plugins::TacticalEagerLoading
 
 <p>When using this plugin, calling association methods on separate instances of the same result set is not thread-safe, because this plugin attempts to modify all instances of the same result set to eagerly set the associated objects, and having separate threads modify the same model instance is not thread-safe.</p>
 
+<p>Because this plugin will automatically use eager loading for performance, it can break code that defines associations that do not support eager loading, without marking that they do not support eager loading via the <code>allow_eager: false</code> option. Make sure to set <code>allow_eager: false</code> on any association used with this plugin if the association doesn’t support eager loading.</p>
+
 <p>Usage:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances use tactical eager loading (called before loading subclasses)</span>

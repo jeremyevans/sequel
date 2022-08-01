@@ -1122,6 +1122,8 @@ Superclass:
 <p>Creates a materialized view, similar to a regular view, but backed by a physical table.</p>
 </td></tr><tr><td class='label'>:recursive </td><td>
 <p>Creates a recursive view.  As columns must be specified for recursive views, you can also set them as the value of this option.  Since a recursive view requires a union that isn’t in a subquery, if you are providing a <a href="Dataset.html"><code>Dataset</code></a> as the source argument, if should probably call the union method with the all: true and from_self: false options.</p>
+</td></tr><tr><td class='label'>:security_invoker </td><td>
+<p>Set the security_invoker property on the view, making the access to the view use the current user’s permissions, instead of the view owner’s permissions.</p>
 </td></tr><tr><td class='label'>:tablespace </td><td>
 <p>The tablespace to use for materialized views.</p>
 </td></tr></tbody></table>
@@ -1132,11 +1134,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-create_view-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">299</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">300</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">create_view_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>))
-<span class="line-num">301</span>   <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">302</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">303</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">302</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">303</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">create_view_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>))
+<span class="line-num">304</span>   <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">305</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">306</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_column'>
@@ -1160,9 +1162,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-drop_column-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">310</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_column</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">311</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">drop_column</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
-<span class="line-num">312</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">313</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_column</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">314</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">drop_column</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">315</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_index'>
@@ -1187,9 +1189,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-drop_index-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">320</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_index</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">321</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>){<span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>)}
-<span class="line-num">322</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">323</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_index</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">324</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>){<span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>)}
+<span class="line-num">325</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_join_table'>
@@ -1212,9 +1214,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-drop_join_table-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">329</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_join_table</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">330</span>   <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">join_table_name</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>), <span class="ruby-identifier">options</span>)
-<span class="line-num">331</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">332</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_join_table</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">333</span>   <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">join_table_name</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>), <span class="ruby-identifier">options</span>)
+<span class="line-num">334</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_table'>
@@ -1238,14 +1240,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-drop_table-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">338</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_table</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>)
-<span class="line-num">339</span>   <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span> 
-<span class="line-num">340</span>   <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>
-<span class="line-num">341</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_table_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))
-<span class="line-num">342</span>     <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)
-<span class="line-num">343</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">344</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">345</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">341</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_table</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>)
+<span class="line-num">342</span>   <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span> 
+<span class="line-num">343</span>   <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>
+<span class="line-num">344</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_table_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))
+<span class="line-num">345</span>     <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)
+<span class="line-num">346</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">347</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">348</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_table-3F'>
@@ -1269,20 +1271,20 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-drop_table-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">353</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_table?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>)
-<span class="line-num">354</span>   <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>
-<span class="line-num">355</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">supports_drop_table_if_exists?</span>
-<span class="line-num">356</span>     <span class="ruby-identifier">options</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:if_exists</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">357</span>     <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
-<span class="line-num">358</span>       <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>)
-<span class="line-num">359</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">360</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">361</span>     <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
-<span class="line-num">362</span>       <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">table_exists?</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">363</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">364</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">365</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">366</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">356</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_table?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>)
+<span class="line-num">357</span>   <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>
+<span class="line-num">358</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">supports_drop_table_if_exists?</span>
+<span class="line-num">359</span>     <span class="ruby-identifier">options</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:if_exists</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">360</span>     <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+<span class="line-num">361</span>       <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>)
+<span class="line-num">362</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">363</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">364</span>     <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+<span class="line-num">365</span>       <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">table_exists?</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">366</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">367</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">368</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">369</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_view'>
@@ -1319,14 +1321,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-drop_view-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">381</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_view</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>)
-<span class="line-num">382</span>   <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>
-<span class="line-num">383</span>   <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>
-<span class="line-num">384</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_view_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))
-<span class="line-num">385</span>     <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)
-<span class="line-num">386</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">387</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">388</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">384</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_view</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">names</span>)
+<span class="line-num">385</span>   <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>
+<span class="line-num">386</span>   <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>
+<span class="line-num">387</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_view_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))
+<span class="line-num">388</span>     <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)
+<span class="line-num">389</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">390</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">391</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rename_column'>
@@ -1350,9 +1352,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-rename_column-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">407</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_column</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">408</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">rename_column</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
-<span class="line-num">409</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">410</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_column</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">411</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">rename_column</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">412</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rename_table'>
@@ -1376,11 +1378,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-rename_table-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">395</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
-<span class="line-num">396</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">rename_table_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>))
-<span class="line-num">397</span>   <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">398</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">399</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">398</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
+<span class="line-num">399</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">rename_table_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>))
+<span class="line-num">400</span>   <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">401</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">402</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_column_default'>
@@ -1404,9 +1406,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_column_default-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">416</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_default</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">417</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_default</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
-<span class="line-num">418</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">419</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_default</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">420</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_default</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">421</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_column_type'>
@@ -1430,9 +1432,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_column_type-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_methods.rb</span>
-<span class="line-num">425</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_type</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">426</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_type</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
-<span class="line-num">427</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">428</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_type</span>(<span class="ruby-identifier">table</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">429</span>   <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_type</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">430</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

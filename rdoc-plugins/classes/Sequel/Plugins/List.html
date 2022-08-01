@@ -61,7 +61,7 @@ Sequel::Plugins::List
 <span class="ruby-identifier">item</span>.<span class="ruby-identifier">move_down</span>
 </pre>
 
-<p>You can provide a <code>:scope</code> option to scope the list.  This option can be a symbol or array of symbols specifying column name(s), or a proc that accepts a model instance and returns a dataset representing the list the object is in.</p>
+<p>You can provide a <code>:scope</code> option to scope the list.  This option can be a symbol or array of symbols specifying column name(s), or a proc that accepts a model instance and returns a dataset representing the list the object is in.  You will need to provide a <code>:scope</code> option if the model’s dataset uses a subquery (such as when using the class_table_inheritance plugin).</p>
 
 <p>For example, if each item has a <code>user_id</code> field, and you want every user to have their own list:</p>
 
@@ -114,24 +114,24 @@ Sequel::Plugins::List
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>
-<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">63</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">position_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:position</span>
-<span class="line-num">64</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">position_field</span>)
-<span class="line-num">65</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">66</span>     <span class="ruby-ivar">@top_of_list</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:top</span>] <span class="ruby-operator">||</span> <span class="ruby-value">1</span>
-<span class="line-num">67</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">68</span>   
-<span class="line-num">69</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:scope</span>]
-<span class="line-num">70</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
-<span class="line-num">71</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-identifier">scope</span>)
-<span class="line-num">72</span>     <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">scope</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">scope</span>))}
-<span class="line-num">73</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">74</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">scope</span>)
-<span class="line-num">75</span>     <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">scope</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">s</span>, <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">s</span>)]})}
-<span class="line-num">76</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">77</span>     <span class="ruby-identifier">scope</span>
-<span class="line-num">78</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">79</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">65</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">position_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:position</span>
+<span class="line-num">66</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">position_field</span>)
+<span class="line-num">67</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">68</span>     <span class="ruby-ivar">@top_of_list</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:top</span>] <span class="ruby-operator">||</span> <span class="ruby-value">1</span>
+<span class="line-num">69</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">70</span>   
+<span class="line-num">71</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:scope</span>]
+<span class="line-num">72</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
+<span class="line-num">73</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-identifier">scope</span>)
+<span class="line-num">74</span>     <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">scope</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">scope</span>))}
+<span class="line-num">75</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">76</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order_prepend</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">scope</span>)
+<span class="line-num">77</span>     <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">scope</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">s</span>, <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">s</span>)]})}
+<span class="line-num">78</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">79</span>     <span class="ruby-identifier">scope</span>
+<span class="line-num">80</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -30,7 +30,7 @@ lib/sequel/extensions/pg_json_ops.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-04-15 14:39:58 -0700</span>
+<span class='datetime'>2022-07-13 14:55:58 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -150,6 +150,16 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:c</span>)
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">update</span>(<span class="ruby-identifier">c</span>[<span class="ruby-string">&#39;key1&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>.<span class="ruby-identifier">to_json</span>, <span class="ruby-identifier">c</span>[<span class="ruby-string">&#39;key2&#39;</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">to_json</span>)
+</pre>
+
+<p>On PostgreSQL 15+, the <code>IS [NOT] JSON</code> operator is supported:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>                              <span class="ruby-comment"># j IS JSON</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:object</span>)               <span class="ruby-comment"># j IS JSON OBJECT</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:object</span>, <span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># j IS JSON OBJECT WITH UNIQUE</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_not_json</span>                          <span class="ruby-comment"># j IS NOT JSON</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:array</span>)                <span class="ruby-comment"># j IS NOT JSON ARRAY</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>(<span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>)                <span class="ruby-comment"># j IS NOT JSON WITH UNIQUE</span>
 </pre>
 
 <p>If you are also using the pg_json extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>

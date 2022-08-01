@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.59.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.59.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.59.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-08-01 07:42:42 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A require_valid_schema plugin has been added, for checking that model classes have schema parsed as expected.  By default, model classes are not required to have valid schema, because it is allowed to have model classes based on arbitrary datasets (such as those using joins or set-returning functions), and it is not possible to determine the schema for arbitary datasets.</p>
+
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> swallows non-connection errors when trying to parse schema for a model’s dataset, but if schema parsing fails when you would expect it to succeed, it results in a model where typecasting does not work as expected.</p>
+
+<p>The require_valid_schema plugin will raise an error when setting the dataset for a model if schema parsing fails and the dataset uses a simple table where you would expect schema parsing to succeed.  You can also provide an argument of :warn when loading the plugin, to warn instead of raising an error.</p>
+
+<p>This plugin may not work correctly in all cases for all adapters, especially external adapters. Adapters are not required to support schema parsing.  Even if supported, adapters may not support parsing schema for qualified tables, or parsing schema for views. You should consider this plugin as a possible safety net.  Users are encouraged to try using it and report any unexpected breakage, as that may help improve schema parsing in adapters that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> ships.</p>
+</li><li>
+<p>is_json and is_not_json methods have been added to the pg_json_ops extension, for the IS [NOT] JSON operator supported in PostgreSQL 15+.</p>
+</li><li>
+<p>Index creation methods on PostgreSQL 15+ now support a :nulls_distinct option, for NULLS [NOT] DISTINCT.  This allows you to create unique indexes where NULL values are not considered distinct.</p>
+</li><li>
+<p>View creation methods on PostgreSQL 15+ now support a :security_invoker option to create a view where access is determined by the permissions of the role that is accessing the view, instead of the role that created the view.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The :allow_eager association option is now set to false by default for associations explicitly marked as :instance_specific, if the :eager_loader association is not given.</p>
+</li><li>
+<p>The postgres adapter now supports the sequel-postgres-pr driver. The sequel-postgres-pr driver is a slimmed down fork of the postgres-pr driver designed specifically for use by <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
+</li><li>
+<p>Model code that explicitly does not swallow connection errors will also now not swallow disconnect errors. This can fix issues where model classes are being loaded at runtime, and the query to get the columns/schema for the model uses a connection that has been disconnected.</p>
+</li><li>
+<p>Model classes created from aliased expressions and literal strings no longer use the simple_table optimization, as there are cases where doing so is not safe.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The change to not swallow disconnect errors when not swallowing connection errors can result in exceptions being raised which weren’t raised previously.  In most cases, this will alert you to issues in your application that should be fixed, but it potentially it can result in regressions if you were OK with the errors being swallowed.  If this does result in regressions in your application, please file an issue and we can probably add a setting controlling this feature.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

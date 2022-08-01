@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::RequireValidSchema</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::RequireValidSchema
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/require_valid_schema_rb.html">lib/sequel/plugins/require_valid_schema.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The require_valid_schema plugin makes <a href="../../Sequel.html"><code>Sequel</code></a> raise or warn if attempting to set the dataset of a model class to a simple table, where the database supports schema parsing, but schema parsing does not work for the model’s table.</p>
+
+<p>The plugin’s default behavior requires that all models that select from a single identifier have a valid table schema, if the database supports schema parsing. If the schema cannot be determined for such a model, an error is raised:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:require_valid_schema</span>
+</pre>
+
+<p>If you load the plugin with an argument of :warn, <a href="../../Sequel.html"><code>Sequel</code></a> will warn instead of raising for such tables:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:require_valid_schema</span>, <span class="ruby-value">:warn</span>
+</pre>
+
+<p>This can catch bugs where you expect models to have valid schema, but they do not. This setting only affects future attempts to set datasets in the current class and subclasses created in the future.</p>
+
+<p>If you load the plugin with an argument of false, it will not require valid schema. This can be used in subclasses where you do not want to require valid schema, but the plugin must be loaded before a dataset with invalid schema is set:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:require_valid_schema</span>
+<span class="ruby-constant">InvalidSchemaAllowed</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)
+<span class="ruby-constant">InvalidSchemaAllowed</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:require_valid_schema</span>, <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">class</span> <span class="ruby-constant">MyModel</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">InvalidSchemaAllowed</span>
+<span class="ruby-keyword">end</span>
+</pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="RequireValidSchema/ClassMethods.html">Sequel::Plugins::RequireValidSchema::ClassMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model, setting=true)</span>
+
+</div>
+<div class='description'>
+
+<p>Modify the current model’s dataset selection, if the model has a dataset.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/require_valid_schema.rb</span>
+<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">setting</span>=<span class="ruby-keyword">true</span>)
+<span class="line-num">39</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@require_valid_schema</span>, <span class="ruby-identifier">setting</span>)
+<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

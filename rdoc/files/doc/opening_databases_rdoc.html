@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-06-24 07:37:05 -0700</span>
+<span class='datetime'>2022-07-13 14:55:58 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -328,9 +328,9 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>Requires: pg (or postgres-pr/postgres-compat if pg is not available)</p>
+<p>Requires: pg (or sequel/postgres-pr or postgres-pr/postgres-compat if pg is not available)</p>
 
-<p>The <a href="../../classes/Sequel.html"><code>Sequel</code></a> postgres adapter works with the pg and postgres-pr ruby libraries. The pg library is the best supported, as it supports real bound variables and prepared statements. If the pg library is being used, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will also attempt to load the sequel_pg library, which is a C extension that optimizes performance when <a href="../../classes/Sequel.html"><code>Sequel</code></a> is used with pg.  All users of <a href="../../classes/Sequel.html"><code>Sequel</code></a> who use pg are encouraged to install sequel_pg.  For users who want to use postgres-pr to avoid issues with C extensions, it is recommended to use jeremyevans-postgres-pr, which fixes many issues in the upstream postgres-pr gem, and is regularly tested with <a href="../../classes/Sequel.html"><code>Sequel</code></a>.</p>
+<p>The <a href="../../classes/Sequel.html"><code>Sequel</code></a> postgres adapter works with the pg, sequel-postgres-pr, jeremyevans-postgres-pr, and postgres-pr ruby libraries. The pg library is the best supported, as it supports real bound variables and prepared statements. If the pg library is being used, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will also attempt to load the sequel_pg library, which is a C extension that optimizes performance when <a href="../../classes/Sequel.html"><code>Sequel</code></a> is used with pg.  All users of <a href="../../classes/Sequel.html"><code>Sequel</code></a> who use pg are encouraged to install sequel_pg.  For users who want to use one of the postgres-pr libraries to avoid issues with C extensions, it is recommended to use sequel-postgres-pr.</p>
 
 <p>The following additional options are supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:charset </td><td>
