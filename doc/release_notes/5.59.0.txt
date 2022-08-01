@@ -1,0 +1,73 @@
+= New Features
+
+* A require_valid_schema plugin has been added, for checking that
+  model classes have schema parsed as expected.  By default, model
+  classes are not required to have valid schema, because it is
+  allowed to have model classes based on arbitrary datasets (such
+  as those using joins or set-returning functions), and it is not
+  possible to determine the schema for arbitary datasets.
+
+  Sequel swallows non-connection errors when trying to parse schema
+  for a model's dataset, but if schema parsing fails when you would
+  expect it to succeed, it results in a model where typecasting does
+  not work as expected.
+
+  The require_valid_schema plugin will raise an error when setting
+  the dataset for a model if schema parsing fails and the dataset
+  uses a simple table where you would expect schema parsing to
+  succeed.  You can also provide an argument of :warn when loading
+  the plugin, to warn instead of raising an error.
+
+  This plugin may not work correctly in all cases for all adapters,
+  especially external adapters. Adapters are not required to support
+  schema parsing.  Even if supported, adapters may not support
+  parsing schema for qualified tables, or parsing schema for views.
+  You should consider this plugin as a possible safety net.  Users
+  are encouraged to try using it and report any unexpected breakage,
+  as that may help improve schema parsing in adapters that Sequel
+  ships.
+
+* is_json and is_not_json methods have been added to the pg_json_ops
+  extension, for the IS [NOT] JSON operator supported in PostgreSQL
+  15+.
+
+* Index creation methods on PostgreSQL 15+ now support a
+  :nulls_distinct option, for NULLS [NOT] DISTINCT.  This allows you
+  to create unique indexes where NULL values are not considered
+  distinct.
+
+* View creation methods on PostgreSQL 15+ now support a
+  :security_invoker option to create a view where access is
+  determined by the permissions of the role that is accessing the
+  view, instead of the role that created the view.
+
+= Other Improvements
+
+* The :allow_eager association option is now set to false by default
+  for associations explicitly marked as :instance_specific, if the
+  :eager_loader association is not given.
+  
+* The postgres adapter now supports the sequel-postgres-pr driver.
+  The sequel-postgres-pr driver is a slimmed down fork of the
+  postgres-pr driver designed specifically for use by Sequel.
+
+* Model code that explicitly does not swallow connection errors
+  will also now not swallow disconnect errors. This can fix issues
+  where model classes are being loaded at runtime, and the query to
+  get the columns/schema for the model uses a connection that has
+  been disconnected.
+
+* Model classes created from aliased expressions and literal
+  strings no longer use the simple_table optimization, as there
+  are cases where doing so is not safe.
+
+= Backwards Compatibility
+
+* The change to not swallow disconnect errors when not swallowing
+  connection errors can result in exceptions being raised which
+  weren't raised previously.  In most cases, this will alert you
+  to issues in your application that should be fixed, but it
+  potentially it can result in regressions if you were OK with
+  the errors being swallowed.  If this does result in regressions
+  in your application, please file an issue and we can probably
+  add a setting controlling this feature.

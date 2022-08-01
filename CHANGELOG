@@ -1,4 +1,4 @@
-=== master
+=== 5.59.0 (2022-08-01)
 
 * Set :allow_eager association option to false for instance specific associations without eager loaders (jeremyevans)
 
