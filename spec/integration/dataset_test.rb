@@ -1376,7 +1376,7 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.must_equal [{:b=>20, :c=>40}]
   end
   
-  cspecify "#having should work without a previous group", :sqlite do
+  cspecify "#having should work without a previous group", [proc{|db| db.sqlite_version < 33900}, :sqlite] do
     @ds = @ds.unordered
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.must_equal []
     wait{@ds.insert(20, 30)}

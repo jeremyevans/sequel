@@ -1,5 +1,7 @@
 === master
 
+* Support HAVING without GROUP BY on SQLite 3.39+ (jeremyevans)
+
 * Convert most respond_to? calls to equivalent defined? for better performance (jeremyevans)
 
 === 5.59.0 (2022-08-01)

@@ -663,7 +663,7 @@ module Sequel
       
       # HAVING requires GROUP BY on SQLite
       def having(*cond)
-        raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
+        raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") if !@opts[:group] && db.sqlite_version < 33900
         super
       end
       
