@@ -63,7 +63,7 @@ module Sequel
           end
         end
         # :nocov:
-        ruby2_keywords(meth) if respond_to?(:ruby2_keywords, false)
+        mod.send(:ruby2_keywords, meth) if mod.respond_to?(:ruby2_keywords, true)
         # :nocov:
       end
 
@@ -97,7 +97,7 @@ module Sequel
             end
           end
           # :nocov:
-          ruby2_keywords(meth) if respond_to?(:ruby2_keywords, false)
+          ruby2_keywords(meth) if respond_to?(:ruby2_keywords, true)
           # :nocov:
         end
 
@@ -129,7 +129,7 @@ module Sequel
             end
           end
           # :nocov:
-          ruby2_keywords(meth) if respond_to?(:ruby2_keywords, false)
+          ruby2_keywords(meth) if respond_to?(:ruby2_keywords, true)
           # :nocov:
         end
 
@@ -159,7 +159,7 @@ module Sequel
             end
           end
           # :nocov:
-          ruby2_keywords(meth) if respond_to?(:ruby2_keywords, false)
+          ruby2_keywords(meth) if respond_to?(:ruby2_keywords, true)
           # :nocov:
         end
 
