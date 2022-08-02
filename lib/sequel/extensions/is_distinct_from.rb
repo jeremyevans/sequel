@@ -3,7 +3,7 @@
 # The is_distinct_from extension adds the ability to use the
 # SQL standard IS DISTINCT FROM operator, which is similar to the
 # not equals operator, except that NULL values are considered
-# equal.  Only PostgreSQL and H2 currently support this operator.  On 
+# equal.  PostgreSQL, SQLite 3.39+, and H2 currently support this operator.  On 
 # other databases, support is emulated.
 #
 # First, you need to load the extension into the database:
@@ -90,6 +90,8 @@ module Sequel
           case db.database_type
           when :postgres, :h2
             true
+          when :sqlite
+            db.sqlite_version >= 33900
           else
             false
           end

@@ -1,5 +1,7 @@
 === master
 
+* Support native IS DISTINCT FROM on SQLite 3.39+ instead of emulating support in the is_distinct_from extension (jeremyevans)
+
 * Support HAVING without GROUP BY on SQLite 3.39+ (jeremyevans)
 
 * Convert most respond_to? calls to equivalent defined? for better performance (jeremyevans)

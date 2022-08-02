@@ -26,6 +26,16 @@ describe "is_distinct_from extension" do
     db.literal(Sequel.is_distinct_from(:a, :b)).must_equal '(a IS DISTINCT FROM b)'
   end
 
+  it "should use IS DISTINCT FROM syntax on SQLite 3.39+" do
+    db = dbf[:sqlite]
+    def db.sqlite_version; 33900; end
+    db.literal(Sequel.is_distinct_from(:a, :b)).must_equal '(`a` IS DISTINCT FROM `b`)'
+
+    db = dbf[:sqlite]
+    def db.sqlite_version; 33800; end
+    db.literal(Sequel.is_distinct_from(:a, :b)).must_equal "((CASE WHEN ((`a` = `b`) OR ((`a` IS NULL) AND (`b` IS NULL))) THEN 0 ELSE 1 END) = 1)"
+  end
+
   it "should handle given nil values on derby" do
     db = dbf[:derby]
     def db.database_type; :derby; end
