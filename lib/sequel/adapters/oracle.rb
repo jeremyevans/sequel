@@ -149,7 +149,7 @@ module Sequel
       end
 
       def database_specific_error_class(exception, opts)
-        return super unless exception.respond_to?(:code)
+        return super unless defined?(exception.code)
         case exception.code
         when 1400, 1407
           NotNullConstraintViolation

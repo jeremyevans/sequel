@@ -144,7 +144,7 @@ module Sequel
         db.instance_exec do
           extend_datasets(IntervalDatasetMethods)
           add_conversion_proc(1186, Postgres::IntervalDatabaseMethods::PARSER)
-          if respond_to?(:register_array_type)
+          if defined?(register_array_type)
             register_array_type('interval', :oid=>1187, :scalar_oid=>1186)
           end
           @schema_type_classes[:interval] = ActiveSupport::Duration

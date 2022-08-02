@@ -301,7 +301,7 @@ module Sequel
         end
       end
 
-      unless Sequel::Postgres.respond_to?(:parse_pg_array)
+      unless defined?(Sequel::Postgres.parse_pg_array)
         require 'strscan'
 
         # PostgreSQL array parser that handles PostgreSQL array output format.
@@ -412,7 +412,7 @@ module Sequel
           @converter = converter
         end
 
-        if Sequel::Postgres.respond_to?(:parse_pg_array)
+        if defined?(Sequel::Postgres.parse_pg_array)
         # :nocov:
           # Use sequel_pg's C-based parser if it has already been defined.
           def call(string)

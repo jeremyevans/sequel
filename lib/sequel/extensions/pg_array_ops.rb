@@ -158,7 +158,7 @@ module Sequel
           Sequel.function(:hstore, self, wrap_array(arg))
         end
         # :nocov:
-        if Sequel.respond_to?(:hstore_op)
+        if defined?(Sequel.hstore_op)
         # :nocov:
           v = Sequel.hstore_op(v)
         end

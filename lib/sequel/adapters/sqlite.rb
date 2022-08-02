@@ -305,7 +305,7 @@ module Sequel
       if USE_EXTENDED_RESULT_CODES
         # Support SQLite exception codes if ruby-sqlite3 supports them.
         def sqlite_error_code(exception)
-          exception.code if exception.respond_to?(:code)
+          exception.code if defined?(exception.code)
         end
       end
     end

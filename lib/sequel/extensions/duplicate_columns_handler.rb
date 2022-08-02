@@ -77,7 +77,7 @@ module Sequel
     def duplicate_columns_handler_type(cols)
       handler = opts.fetch(:on_duplicate_columns){db.opts.fetch(:on_duplicate_columns, :warn)}
 
-      if handler.respond_to?(:call)
+      if defined?(handler.call)
         handler.call(cols)
       else
         handler

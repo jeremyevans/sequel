@@ -3016,7 +3016,7 @@ module Sequel
         def complex_expression_sql_append(sql, op, args)
           r = args[1]
           if (((op == :'=' || op == :'!=') && r.is_a?(Sequel::Model)) ||
-              (multiple = ((op == :IN || op == :'NOT IN') && ((is_ds = r.is_a?(Sequel::Dataset)) || (r.respond_to?(:all?) && r.all?{|x| x.is_a?(Sequel::Model)})))))
+              (multiple = ((op == :IN || op == :'NOT IN') && ((is_ds = r.is_a?(Sequel::Dataset)) || (defined?(r.all?) && r.all?{|x| x.is_a?(Sequel::Model)})))))
             l = args[0]
             if ar = model.association_reflections[l]
               raise Error, "filtering by associations is not allowed for #{ar.inspect}" if ar[:allow_filtering_by] == false
@@ -3024,7 +3024,7 @@ module Sequel
               if multiple
                 klass = ar.associated_class
                 if is_ds
-                  if r.respond_to?(:model)
+                  if defined?(r.model)
                     unless r.model <= klass
                       # A dataset for a different model class, could be a valid regular query
                       return super
@@ -3356,10 +3356,10 @@ module Sequel
           assoc_table_alias = ds.unused_table_alias(alias_base)
           loader = r[:eager_grapher]
           if !associations.empty?
-            if associations.first.respond_to?(:call)
+            if defined?(associations.first.call)
               callback = associations.first
               associations = {}
-            elsif associations.length == 1 && (assocs = associations.first).is_a?(Hash) && assocs.length == 1 && (pr_assoc = assocs.to_a.first) && pr_assoc.first.respond_to?(:call)
+            elsif associations.length == 1 && (assocs = associations.first).is_a?(Hash) && assocs.length == 1 && (pr_assoc = assocs.to_a.first) && defined?(pr_assoc.first.call)
               callback, assoc = pr_assoc
               associations = assoc.is_a?(Array) ? assoc : [assoc]
             end
@@ -3601,10 +3601,10 @@ module Sequel
             end
           
             associations = eager_assoc[r[:name]]
-            if associations.respond_to?(:call)
+            if defined?(associations.call)
               eager_block = associations
               associations = OPTS
-            elsif associations.is_a?(Hash) && associations.length == 1 && (pr_assoc = associations.to_a.first) && pr_assoc.first.respond_to?(:call)
+            elsif associations.is_a?(Hash) && associations.length == 1 && (pr_assoc = associations.to_a.first) && defined?(pr_assoc.first.call)
               eager_block, associations = pr_assoc
             end
 

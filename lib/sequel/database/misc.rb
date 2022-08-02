@@ -350,7 +350,7 @@ module Sequel
     # strings with all whitespace, and ones that respond
     # true to empty?
     def blank_object?(obj)
-      return obj.blank? if obj.respond_to?(:blank?)
+      return obj.blank? if defined?(obj.blank?)
       case obj
       when NilClass, FalseClass
         true
@@ -359,7 +359,7 @@ module Sequel
       when String
         obj.strip.empty?
       else
-        obj.respond_to?(:empty?) ? obj.empty? : false
+        defined?(obj.empty?) ? obj.empty? : false
       end
     end
 

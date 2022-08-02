@@ -36,7 +36,7 @@ module Sequel
     module InsertConflict
       def self.configure(model)
         model.instance_exec do
-          if @dataset && !@dataset.respond_to?(:insert_conflict)
+          if @dataset && !defined?(@dataset.insert_conflict)
             raise Error, "#{self}'s dataset does not support insert_conflict"
           end
         end

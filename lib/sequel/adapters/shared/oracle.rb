@@ -121,7 +121,7 @@ module Sequel
       def server_version(server=nil)
         return @server_version if @server_version
         @server_version = synchronize(server) do |conn|
-          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
+          (conn.server_version rescue nil) if defined?(conn.server_version)
         end
         unless @server_version
           @server_version = if m = /(\d+)\.(\d+)\.?(\d+)?\.?(\d+)?/.match(fetch("select version from PRODUCT_COMPONENT_VERSION where lower(product) like 'oracle%'").single_value)

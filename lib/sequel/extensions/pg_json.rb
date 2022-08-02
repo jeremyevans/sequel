@@ -227,7 +227,7 @@ module Sequel
         db.instance_exec do
           add_conversion_proc(114, method(:_db_parse_json))
           add_conversion_proc(3802, method(:_db_parse_jsonb))
-          if respond_to?(:register_array_type)
+          if defined?(register_array_type)
             register_array_type('json', :oid=>199, :scalar_oid=>114)
             register_array_type('jsonb', :oid=>3807, :scalar_oid=>3802)
           end

@@ -152,7 +152,7 @@ module Sequel
         if obj.is_a?(Array)
           obj.map{|x| object_to_json_data(x, *args, &block)}
         else
-          if obj.respond_to?(:to_json_data)
+          if defined?(obj.to_json_data)
             obj.to_json_data(*args, &block)
           else
             begin

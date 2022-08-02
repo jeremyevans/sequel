@@ -257,7 +257,7 @@ module Sequel
             @shared_adapter = true
             extend(mod::DatabaseMethods)
             extend_datasets(mod::DatasetMethods)
-            if mod.respond_to?(:mock_adapter_setup)
+            if defined?(mod.mock_adapter_setup)
               mod.mock_adapter_setup(self)
             end
           end

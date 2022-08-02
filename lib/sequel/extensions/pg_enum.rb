@@ -144,7 +144,7 @@ module Sequel
           select_hash_groups(Sequel.cast(:enumtypid, Integer).as(:v), :enumlabel).freeze
         enum_labels.each_value(&:freeze)
 
-        if respond_to?(:register_array_type)
+        if defined?(register_array_type)
           array_types = metadata_dataset.
             from(:pg_type).
             where(:oid=>enum_labels.keys).

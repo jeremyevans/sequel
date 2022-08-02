@@ -115,13 +115,13 @@ SQL
       # :before_thread_exit :: An object that responds to +call+ that is called before the 
       #                        the created thread exits.
       def listen_for_static_cache_updates(models, opts=OPTS)
-        raise Error, "this database object does not respond to listen, use the postgres adapter with the pg driver" unless respond_to?(:listen)
+        raise Error, "this database object does not respond to listen, use the postgres adapter with the pg driver" unless defined?(listen)
         models = [models] unless models.is_a?(Array)
         raise Error, "array of models to listen for changes cannot be empty" if models.empty?
 
         oid_map = {}
         models.each do |model|
-          raise Error, "#{model.inspect} does not use the static_cache plugin" unless model.respond_to?(:load_cache)
+          raise Error, "#{model.inspect} does not use the static_cache plugin" unless defined?(model.load_cache)
           oid_map[get(regclass_oid(model.dataset.first_source_table))] = model
         end
 

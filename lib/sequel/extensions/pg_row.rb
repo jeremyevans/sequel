@@ -375,7 +375,7 @@ module Sequel
             @row_schema_types = {}
             extend(@row_type_method_module = Module.new)
             add_conversion_proc(2249, PGRow::Parser.new(:converter=>PGRow::ArrayRow))
-            if respond_to?(:register_array_type)
+            if defined?(register_array_type)
               register_array_type('record', :oid=>2287, :scalar_oid=>2249)
             end
           end
@@ -464,7 +464,7 @@ module Sequel
           parser = Parser.new(parser_opts)
           add_conversion_proc(parser.oid, parser)
 
-          if respond_to?(:register_array_type) && array_oid && array_oid > 0
+          if defined?(register_array_type) && array_oid && array_oid > 0
             array_type_name = if type_schema
               "#{type_schema}.#{type_name}"
             else

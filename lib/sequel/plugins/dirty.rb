@@ -203,7 +203,7 @@ module Sequel
             get_column_value(column)
           end
 
-          initial_values[column] = if value && value != true && value.respond_to?(:clone)
+          initial_values[column] = if value && value != true && defined?(value.clone)
             begin
               value.clone
             rescue TypeError

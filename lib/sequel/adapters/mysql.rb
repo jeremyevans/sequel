@@ -72,7 +72,7 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
 
-        if Mysql.respond_to?(:init)
+        if defined?(Mysql.init)
           conn = Mysql.init
           conn.options(Mysql::READ_DEFAULT_GROUP, opts[:config_default_group] || "client")
           conn.options(Mysql::OPT_LOCAL_INFILE, opts[:config_local_infile]) if opts.has_key?(:config_local_infile)
@@ -186,7 +186,7 @@ module Sequel
         elsif defined?(yield)
           yield conn
         end
-        if conn.respond_to?(:more_results?)
+        if defined?(conn.more_results?)
           while conn.more_results? do
             if r
               r.free
@@ -207,7 +207,7 @@ module Sequel
       ensure
         r.free if r
         # Use up all results to avoid a commands out of sync message.
-        if conn.respond_to?(:more_results?)
+        if defined?(conn.more_results?)
           while conn.more_results? do
             begin
               conn.next_result

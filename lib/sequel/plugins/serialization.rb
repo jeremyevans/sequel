@@ -162,7 +162,7 @@ module Sequel
                 if !cc.include?(column) && (new? || get_column_value(column) != v)
                   cc << column
 
-                  will_change_column(column) if respond_to?(:will_change_column)
+                  will_change_column(column) if defined?(will_change_column)
                 end
 
                 deserialized_values[column] = v
