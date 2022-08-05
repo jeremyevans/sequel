@@ -416,7 +416,7 @@ As with +delete+, +update+ affects all rows in the dataset, so +where+ first,
 
 === Merging records
 
-Merging records using the SQL MERGE statment is done using <tt>merge*</tt> methods.
+Merging records using the SQL MERGE statement is done using <tt>merge*</tt> methods.
 You use +merge_using+ to specify the merge source and join conditions.
 You can use +merge_insert+, +merge_delete+, and/or +merge_update+ to set the
 INSERT, DELETE, and UPDATE clauses for the merge. +merge_insert+ takes the same
