@@ -1,6 +1,11 @@
 require 'rbconfig'
 require 'yaml'
 
+if ENV['COVERAGE']
+  require_relative "sequel_coverage"
+  SimpleCov.sequel_coverage(:subprocesses=>true)
+end
+
 RUBY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_INSTALL_NAME'])
 OUTPUT = "spec/bin-sequel-spec-output-#{$$}.log"
 TMP_FILE = "spec/bin-sequel-tmp-#{$$}.rb"
@@ -29,7 +34,7 @@ require 'minitest/global_expectations/autorun'
 
 describe "bin/sequel" do
   def bin(opts={})
-    cmd = "#{opts[:pre]}\"#{RUBY}\" -I lib bin/sequel #{opts[:args]} #{"#{CONN_PREFIX}#{BIN_SPEC_DB}" unless opts[:no_conn]} #{opts[:post]}> #{OUTPUT}#{" 2>&1" if opts[:stderr]}"
+    cmd = "#{opts[:pre]}\"#{RUBY}\" -I lib spec/bin_shim #{opts[:args]} #{"#{CONN_PREFIX}#{BIN_SPEC_DB}" unless opts[:no_conn]} #{opts[:post]}> #{OUTPUT}#{" 2>&1" if opts[:stderr]}"
     system(cmd)
     File.read(OUTPUT)
   end
@@ -99,6 +104,55 @@ END
     DB2.indexes(:b).must_equal(:b_a_index=>{:unique=>false, :columns=>[:a]})
     DB2.foreign_key_list(:a).must_equal []
     DB2.foreign_key_list(:b).must_equal [{:columns=>[:a], :table=>:a, :key=>nil, :on_update=>:no_action, :on_delete=>:no_action}]
+  end
+
+  it "-C should copy databases showing status while iterating over tables" do
+    DB.create_table(:a) do
+      primary_key :a
+      String :name
+    end
+    DB.create_table(:b) do
+      foreign_key :a, :a
+      index :a
+    end
+    DB[:a].insert(1, 'foo')
+
+    begin
+      ENV['SEQUEL_BIN_STATUS_ALL_LINES'] = '1'
+      bin(:args=>'-C', :post=>"#{CONN_PREFIX}#{BIN_SPEC_DB2}").must_match Regexp.new(<<END)
+Databases connections successful
+Migrations dumped successfully
+Tables created
+Begin copying data
+Begin copying records for table: a
+Status: 1 records copied
+Finished copying 1 records for table: a
+Begin copying records for table: b
+Finished copying 0 records for table: b
+Finished copying data
+Begin creating indexes
+Finished creating indexes
+Begin adding foreign key constraints
+Finished adding foreign key constraints
+Database copy finished in \\d+\\.\\d+ seconds
+END
+    ensure
+      ENV.delete('SEQUEL_BIN_STATUS_ALL_LINES')
+    end
+
+    DB2.tables.sort_by{|t| t.to_s}.must_equal [:a, :b]
+    DB[:a].all.must_equal [{:a=>1, :name=>'foo'}]
+    DB[:b].all.must_equal []
+    DB2.schema(:a).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, false, nil, true, int_type, :integer, nil], [:name, true, nil, false, "varchar(255)", :string, nil]]
+    DB2.schema(:b).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, true, nil, false, int_type, :integer, nil]]
+    DB2.indexes(:a).must_equal({})
+    DB2.indexes(:b).must_equal(:b_a_index=>{:unique=>false, :columns=>[:a]})
+    DB2.foreign_key_list(:a).must_equal []
+    DB2.foreign_key_list(:b).must_equal [{:columns=>[:a], :table=>:a, :key=>nil, :on_update=>:no_action, :on_delete=>:no_action}]
+  end
+
+  it "-C should display error if not given second database" do
+    bin(:args=>'-C', :stderr=>true).must_include 'Error: Must specify database connection string or path to yaml file as second argument for database you want to copy to'
   end
 
   it "-C should convert integer to bigint when copying from SQLite to other databases" do

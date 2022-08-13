@@ -194,7 +194,11 @@ begin
     TO_DB = connect_proc[db2]
     same_db = DB.database_type==TO_DB.database_type
     index_opts = {:same_db=>same_db}
+
+    # :nocov:
     index_opts[:index_names] = :namespace if !DB.global_index_namespace? && TO_DB.global_index_namespace?
+    # :nocov:
+
     if DB.database_type == :sqlite && !same_db
       # SQLite integer types allows 64-bit integers
       TO_DB.extension :integer64
@@ -212,18 +216,20 @@ begin
     puts "Begin copying data"
     DB.transaction do
       TO_DB.transaction do
+        all_status_lines = ENV['SEQUEL_BIN_STATUS_ALL_LINES']
+
         DB.tables.each do |table|
           puts "Begin copying records for table: #{table}"
           time = Time.now
           to_ds = TO_DB.from(table)
           j = 0
           DB.from(table).each do |record|
-            if Time.now - time > 5
+            to_ds.insert(record)
+            j += 1
+            if Time.now - time > 5 || all_status_lines
               puts "Status: #{j} records copied" 
               time = Time.now
             end
-            to_ds.insert(record)
-            j += 1
           end
           puts "Finished copying #{j} records for table: #{table}"
         end
@@ -260,8 +266,10 @@ if !ARGV.empty?
   ARGV.each{|v| load(v)}
 elsif !$stdin.isatty
   eval($stdin.read)
+# :nocov:
 else
   require 'irb'
   puts "Your database is stored in DB..."
   IRB.start
 end
+# :nocov:

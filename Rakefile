@@ -112,15 +112,15 @@ spec_task.call("Run core and model specs together", :spec_core_model, 'spec/core
 spec_task.call("Run core specs", :spec_core, 'spec/core_spec.rb', false, false)
 spec_task.call("Run model specs", :spec_model, 'spec/model_spec.rb', false, false)
 spec_task.call("Run plugin/extension specs", :spec_plugin, 'spec/plugin_spec.rb', "plugin-extension", true)
-spec_task.call("Run bin/sequel specs", :spec_bin, 'spec/bin_spec.rb', false, false)
-spec_task.call("Run core extensions specs", :spec_core_ext, 'spec/core_extensions_spec.rb', true, true)
-spec_task.call("Run integration tests", :spec_integration, 'spec/adapter_spec.rb none', true, true)
+spec_task.call("Run bin/sequel specs", :spec_bin, 'spec/bin_spec.rb', 'bin', false)
+spec_task.call("Run core extensions specs", :spec_core_ext, 'spec/core_extensions_spec.rb', 'core-ext', true)
+spec_task.call("Run integration tests", :spec_integration, 'spec/adapter_spec.rb none', '1', true)
 
 %w'postgres sqlite mysql oracle mssql db2 sqlanywhere'.each do |adapter|
-  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "spec/adapter_spec.rb #{adapter}", true, true)
+  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "spec/adapter_spec.rb #{adapter}", adapter, true)
 end
 
-spec_task.call("Run model specs without the associations code", :_spec_model_no_assoc, 'spec/model_no_assoc_spec.rb', false)
+spec_task.call("Run model specs without the associations code", :_spec_model_no_assoc, 'spec/model_no_assoc_spec.rb', false, false)
 desc "Run model specs without the associations code"
 task :spec_model_no_assoc do
   ENV['SEQUEL_NO_ASSOCIATIONS'] = '1'
@@ -132,6 +132,8 @@ task :spec_cov do
   ENV['SEQUEL_MERGE_COVERAGE'] = '1'
   Rake::Task['spec_core_model_cov'].invoke
   Rake::Task['spec_plugin_cov'].invoke
+  Rake::Task['spec_core_ext_cov'].invoke
+  Rake::Task['spec_bin_cov'].invoke
 end
 
 task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
