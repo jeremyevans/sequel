@@ -5,6 +5,7 @@ require_relative 'shared/postgres'
 begin 
   require 'pg' 
 
+  # :nocov:
   Sequel::Postgres::PGError = PG::Error if defined?(PG::Error)
   Sequel::Postgres::PGconn = PG::Connection if defined?(PG::Connection)
   Sequel::Postgres::PGresult = PG::Result if defined?(PG::Result)
@@ -14,14 +15,17 @@ begin
     raise LoadError unless defined?(PGconn::CONNECTION_OK)
   end
 
-  Sequel::Postgres::USES_PG = true
   if defined?(PG::TypeMapByClass)
+  # :nocov:
     type_map = Sequel::Postgres::PG_QUERY_TYPE_MAP = PG::TypeMapByClass.new
     type_map[Integer] = PG::TextEncoder::Integer.new
     type_map[FalseClass] = type_map[TrueClass] = PG::TextEncoder::Boolean.new
     type_map[Float] = PG::TextEncoder::Float.new
   end
+
+  Sequel::Postgres::USES_PG = true
 rescue LoadError => e 
+  # :nocov:
   begin
     require 'sequel/postgres-pr'
   rescue LoadError 
@@ -32,16 +36,19 @@ rescue LoadError => e
     end 
   end 
   Sequel::Postgres::USES_PG = false
+  # :nocov:
 end
 
 module Sequel
   module Postgres
+    # :nocov:
     if USES_PG
       # Whether the given sequel_pg version integer is supported.
       def self.sequel_pg_version_supported?(version)
         version >= 10617
       end
     end
+    # :nocov:
 
     # PGconn subclass for connection specific methods used with the
     # pg or postgres-pr driver.
@@ -49,7 +56,9 @@ module Sequel
       # The underlying exception classes to reraise as disconnect errors
       # instead of regular database errors.
       DISCONNECT_ERROR_CLASSES = [IOError, Errno::EPIPE, Errno::ECONNRESET]
+      # :nocov:
       if defined?(::PG::ConnectionBad)
+      # :nocov:
         DISCONNECT_ERROR_CLASSES << ::PG::ConnectionBad
       end
       DISCONNECT_ERROR_CLASSES.freeze
@@ -75,6 +84,7 @@ module Sequel
         # are SQL strings.
         attr_reader :prepared_statements
 
+      # :nocov:
         unless public_method_defined?(:async_exec_params)
           alias async_exec_params async_exec
         end
@@ -117,6 +127,7 @@ module Sequel
           alias cmd_tuples cmdtuples
         end 
       end
+      # :nocov:
       
       # Raise a Sequel::DatabaseDisconnectError if a one of the disconnect
       # error classes is raised, or a PGError is raised and the connection
@@ -210,7 +221,9 @@ module Sequel
             :sslmode => opts[:sslmode],
             :sslrootcert => opts[:sslrootcert]
           }.delete_if { |key, value| blank_object?(value) }
+          # :nocov:
           connection_params.merge!(opts[:driver_options]) if opts[:driver_options]
+          # :nocov:
           conn = Adapter.connect(opts[:conn_str] || connection_params)
 
           conn.instance_variable_set(:@prepared_statements, {})
@@ -218,6 +231,13 @@ module Sequel
           if receiver = opts[:notice_receiver]
             conn.set_notice_receiver(&receiver)
           end
+
+          # :nocov:
+          if conn.respond_to?(:type_map_for_queries=) && defined?(PG_QUERY_TYPE_MAP)
+          # :nocov:
+            conn.type_map_for_queries = PG_QUERY_TYPE_MAP
+          end
+        # :nocov:
         else
           unless typecast_value_boolean(@opts.fetch(:force_standard_strings, true))
             raise Error, "Cannot create connection using postgres-pr unless force_standard_strings is set"
@@ -232,12 +252,11 @@ module Sequel
             opts[:password]
           )
         end
+        # :nocov:
 
         conn.instance_variable_set(:@db, self)
-        if USES_PG && conn.respond_to?(:type_map_for_queries=) && defined?(PG_QUERY_TYPE_MAP)
-          conn.type_map_for_queries = PG_QUERY_TYPE_MAP
-        end
 
+        # :nocov:
         if encoding = opts[:encoding] || opts[:charset]
           if defined?(conn.set_client_encoding)
             conn.set_client_encoding(encoding)
@@ -245,6 +264,7 @@ module Sequel
             conn.async_exec("set client_encoding to '#{encoding}'")
           end
         end
+        # :nocov:
 
         connection_configuration_sqls(opts).each{|sql| conn.execute(sql)}
         conn
@@ -271,7 +291,9 @@ module Sequel
         nil
       end
 
+      # :nocov:
       if USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
+      # :nocov:
         # Return a hash of information about the related PGError (or Sequel::DatabaseError that
         # wraps a PGError), with the following entries (any of which may be +nil+):
         #
@@ -322,7 +344,9 @@ module Sequel
         synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
       end
 
+      # :nocov:
       if USES_PG
+      # :nocov:
         # +copy_table+ uses PostgreSQL's +COPY TO STDOUT+ SQL statement to return formatted
         # results directly to the caller.  This method is only supported if pg is the
         # underlying ruby driver.  This method should only be called if you want
@@ -515,8 +539,10 @@ module Sequel
       def adapter_initialize
         @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, true))
         initialize_postgres_adapter
+        # :nocov:
         add_conversion_proc(17, method(:unescape_bytea)) if USES_PG
         add_conversion_proc(1082, TYPE_TRANSLATOR_DATE) if @use_iso_date_format
+        # :nocov:
         self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
 
@@ -526,19 +552,22 @@ module Sequel
       rescue => e
         raise_error(e, :classes=>database_error_classes)
       end
-
       # Set the DateStyle to ISO if configured, for faster date parsing.
       def connection_configuration_sqls(opts=@opts)
         sqls = super
+        # :nocov:
         sqls << "SET DateStyle = 'ISO'" if @use_iso_date_format
+        # :nocov:
         sqls
       end
 
+      # :nocov:
       if USES_PG
         def unescape_bytea(s)
           ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s))
         end
       end
+      # :nocov:
 
       DATABASE_ERROR_CLASSES = [PGError].freeze
       def database_error_classes
@@ -552,7 +581,9 @@ module Sequel
       end
 
       def database_exception_sqlstate(exception, opts)
+        # :nocov:
         if defined?(exception.result) && (result = exception.result)
+        # :nocov:
           result.error_field(PGresult::PG_DIAG_SQLSTATE)
         end
       end
@@ -662,7 +693,9 @@ module Sequel
         clone(:where=>Sequel.lit(['CURRENT OF '], Sequel.identifier(cursor_name)))
       end
 
+      # :nocov:
       if USES_PG
+      # :nocov:
         PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
         
         # PostgreSQL specific argument mapper used for mapping the named
@@ -809,6 +842,7 @@ module Sequel
   end
 end
 
+# :nocov:
 if Sequel::Postgres::USES_PG && !ENV['NO_SEQUEL_PG']
   begin
     require 'sequel_pg'
@@ -820,3 +854,4 @@ if Sequel::Postgres::USES_PG && !ENV['NO_SEQUEL_PG']
   rescue LoadError
   end
 end
+# :nocov:

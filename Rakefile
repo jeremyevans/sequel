@@ -129,11 +129,14 @@ end
 
 desc "Run core/model/extension/plugin specs with coverage"
 task :spec_cov do
+  Rake::Cleaner.cleanup_files(::Rake::FileList["coverage"])
   ENV['SEQUEL_MERGE_COVERAGE'] = '1'
+  Rake::Task['spec_bin_cov'].invoke
   Rake::Task['spec_core_model_cov'].invoke
   Rake::Task['spec_plugin_cov'].invoke
   Rake::Task['spec_core_ext_cov'].invoke
-  Rake::Task['spec_bin_cov'].invoke
+  ENV['NO_SEQUEL_PG'] = '1'
+  Rake::Task['spec_postgres_cov'].invoke
 end
 
 task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do

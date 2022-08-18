@@ -230,7 +230,6 @@ module Sequel
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
 
-      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'=>:no_action, 'r'=>:restrict, 'c'=>:cascade, 'n'=>:set_null, 'd'=>:set_default}.freeze
       ON_COMMIT = {:drop => 'DROP', :delete_rows => 'DELETE ROWS', :preserve_rows => 'PRESERVE ROWS'}.freeze
       ON_COMMIT.each_value(&:freeze)
@@ -365,9 +364,10 @@ module Sequel
 
         table_oid = regclass_oid(table)
         im = input_identifier_meth
-        unless column = im.call(opts[:column] || ((sch = schema(table).find{|_, sc| sc[:primary_key] && sc[:auto_increment]}) && sch[0]))
+        unless column = (opts[:column] || ((sch = schema(table).find{|_, sc| sc[:primary_key] && sc[:auto_increment]}) && sch[0]))
           raise Error, "could not determine column to convert from serial to identity automatically"
         end
+        column = im.call(column)
 
         column_num = ds.from(:pg_attribute).
           where(:attrelid=>table_oid, :attname=>column).
@@ -569,10 +569,12 @@ module Sequel
         if server_version >= 90500
           cpos = Sequel.expr{array_position(co[:conkey], ctable[:attnum])}
           rpos = Sequel.expr{array_position(co[:confkey], rtable[:attnum])}
+        # :nocov:
         else
           range = 0...32
           cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, ctable[:attnum])}
           rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, rtable[:attnum])}
+        # :nocov:
         end
 
         ds = metadata_dataset.
@@ -653,9 +655,11 @@ module Sequel
 
         if server_version >= 90500
           order = [Sequel[:indc][:relname], Sequel.function(:array_position, Sequel[:ind][:indkey], Sequel[:att][:attnum])]
+        # :nocov:
         else
           range = 0...32
           order = [Sequel[:indc][:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(Sequel[:ind][:indkey], [x]), x]}, 32, Sequel[:att][:attnum])]
+        # :nocov:
         end
 
         attnums = SQL::Function.new(:ANY, Sequel[:ind][:indkey])
@@ -676,8 +680,10 @@ module Sequel
           select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
         ds = ds.where(:indpred=>nil) unless opts[:include_partial]
+        # :nocov:
         ds = ds.where(:indisready=>true) if server_version >= 80300
         ds = ds.where(:indislive=>true) if server_version >= 90300
+        # :nocov:
 
         indexes = {}
         ds.each do |r|
@@ -758,10 +764,12 @@ module Sequel
           seq_ds = metadata_dataset.from(:pg_sequence).where(:seqrelid=>regclass_oid(LiteralString.new(seq)))
           increment_by = :seqincrement
           min_value = :seqmin
+        # :nocov:
         else
           seq_ds = metadata_dataset.from(LiteralString.new(seq))
           increment_by = :increment_by
           min_value = :min_value
+        # :nocov:
         end
 
         get{setval(seq, db[table].select(coalesce(max(pk)+seq_ds.select(increment_by), seq_ds.select(min_value))), false)}
@@ -774,7 +782,9 @@ module Sequel
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
+        # :nocov:
         auto_increment_key = server_version >= 100002 ? :identity : :serial
+        # :nocov:
         {:primary_key => true, auto_increment_key => true, :type=>Integer}
       end
 
@@ -1152,7 +1162,7 @@ module Sequel
         when :hash
           mod, remainder = generator.hash_values
           sql << " FOR VALUES WITH (MODULUS #{literal(mod)}, REMAINDER #{literal(remainder)})"
-        when :default
+        else # when :default
           sql << " DEFAULT"
         end
 
@@ -1356,11 +1366,6 @@ module Sequel
         end
       end
 
-      # Use a dollar sign instead of question mark for the argument placeholder.
-      def prepared_arg_placeholder
-        PREPARED_ARG_PLACEHOLDER
-      end
-
       # Return an expression the oid for the table expr.  Used by the metadata parsing
       # code to disambiguate unqualified tables.
       def regclass_oid(expr, opts=OPTS)
@@ -1434,10 +1439,14 @@ module Sequel
           where{{pg_class[:oid]=>oid}}.
           order{pg_attribute[:attnum]}
 
+        # :nocov:
         if server_version > 100000
+        # :nocov:
           ds = ds.select_append{pg_attribute[:attidentity]}
 
+          # :nocov:
           if server_version > 120000
+          # :nocov:
             ds = ds.select_append{Sequel.~(pg_attribute[:attgenerated]=>'').as(:generated)}
           end
         end
@@ -1525,7 +1534,9 @@ module Sequel
 
       # PostgreSQL 9.4+ supports views with check option.
       def view_with_check_option_support
+        # :nocov:
         :local if server_version >= 90400
+        # :nocov:
       end
     end
 
@@ -1921,6 +1932,8 @@ module Sequel
           server_version >= 90000
         when :groups, :exclude
           server_version >= 110000
+        else
+          false
         end
       end
     
@@ -2067,12 +2080,11 @@ module Sequel
 
       # Return the primary key to use for RETURNING in an INSERT statement
       def insert_pk
-        if (f = opts[:from]) && !f.empty?
-          case t = f.first
-          when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
-            if pk = db.primary_key(t)
-              Sequel::SQL::Identifier.new(pk)
-            end
+        (f = opts[:from]) && !f.empty? && (t = f.first)
+        case t
+        when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
+          if pk = db.primary_key(t)
+            Sequel::SQL::Identifier.new(pk)
           end
         end
       end

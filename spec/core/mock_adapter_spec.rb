@@ -621,6 +621,17 @@ describe "PostgreSQL support" do
     @db.drop_table(:t, :foreign=>true)
     @db.sqls.must_equal ['CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')',
       'DROP FOREIGN TABLE "t"']
+
+    @db.create_table(:t, :foreign=>:f){Integer :a}
+    @db.sqls.must_equal ['CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f"']
+  end
+
+  it "should not support creating temporary foreign tables" do
+    proc{@db.create_table(:t, :foreign=>:f, :temp=>true){Integer :a}}.must_raise Sequel::Error
+  end
+
+  it "should not support creating unlogged foreign tables" do
+    proc{@db.create_table(:t, :foreign=>:f, :unlogged=>true){Integer :a}}.must_raise Sequel::Error
   end
 
   it "#create_function and #drop_function should create and drop functions" do
@@ -635,6 +646,12 @@ describe "PostgreSQL support" do
     @db.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>[[:integer, :a], :integer])
     @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ["CREATE OR REPLACE FUNCTION tf(a integer, integer) RETURNS integer LANGUAGE SQL IMMUTABLE STRICT SECURITY DEFINER COST 2 SET search_path = public AS 'SELECT $1 + $2'",
       'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE']
+
+    @db.create_function('tf', 'myfunc.so', :language=>'SQL', :rows=>20, :link_symbol=>:ls)
+    @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ["CREATE FUNCTION tf() RETURNS void LANGUAGE SQL ROWS 20 AS 'myfunc.so', 'ls'"]
+
+    @db.create_function('tf', 'SELECT $1 + $2', :args=>[[:integer, :a, 'OUT']], :language=>'SQL')
+    @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ["CREATE FUNCTION tf(OUT a integer) LANGUAGE SQL AS 'SELECT $1 + $2'"]
   end
 
   it "#create_language and #drop_language should create and drop languages" do
@@ -670,6 +687,183 @@ describe "PostgreSQL support" do
       %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()},
       'DROP TRIGGER identity ON "test"',
       'DROP TRIGGER IF EXISTS identity ON "test" CASCADE']
+  end
+
+  it "#create_trigger should raise exception if using trigger conditions on an unsupported version" do
+    def @db.server_version; 80400 end
+    proc{@db.create_trigger(:test, :identity, :tf, :when=>true)}.must_raise Sequel::Error 
+  end
+
+  it "should attempt to remove aliases when inserting on PostgreSQL <9.5" do
+    def @db.server_version(*); 90400 end
+    @db.from{a.as(:b)}.returning.insert
+    @db.sqls.must_equal ["INSERT INTO \"a\" DEFAULT VALUES RETURNING *"]
+  end
+
+  it "should support adding columns with COLLATE" do
+    @db.alter_table(:t){add_column :x, String, :collate=>'s'}
+    @db.sqls.must_equal ["ALTER TABLE \"t\" ADD COLUMN \"x\" text COLLATE s"]
+    @db.alter_table(:t){add_column :x, String, :collate=>:s}
+    @db.sqls.must_equal ["ALTER TABLE \"t\" ADD COLUMN \"x\" text COLLATE \"s\""]
+  end
+
+  it "should support dropping columns with CASCADE and IF EXISTS" do
+    @db.alter_table(:t){drop_column :x, :cascade=>true, :if_exists=>true}
+    @db.sqls.must_equal ["ALTER TABLE \"t\" DROP COLUMN IF EXISTS \"x\" CASCADE"]
+  end
+
+  it "should support transaction isolation levels" do
+    @db.supports_transaction_isolation_levels?.must_equal true
+  end
+
+  it "should not support arbitrary window function frame options" do
+    @db.dataset.supports_window_function_frame_option?(:bad).must_equal false
+  end
+
+  it "should support getting server version from specific server" do
+    begin
+      version = @db.server_version
+      @db.instance_variable_set(:@server_version, nil)
+      @db.fetch = {:v=>version}
+      @db.server_version(:default)
+      @db.sqls.must_equal ["SELECT CAST(current_setting('server_version_num') AS integer) AS v"]
+    ensure
+      @db.instance_variable_set(:@server_version, version)
+    end
+  end
+
+  it "should support bytea unescaping" do
+    bytea = @db.conversion_procs[17]
+    bytea.call('\\x70').ord.must_equal 112
+    bytea.call('\\070').ord.must_equal 56
+    bytea.call('\\\\').ord.must_equal 92
+  end
+
+  it "should support converting serial columns to identity" do
+    @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], [{:objid=>2345, :v=>false}]]
+    def @db.regclass_oid(x) 1234 end
+    def @db.schema(x) [[:id, {:primary_key=>true, :auto_increment=>true}]] end
+    @db.convert_serial_to_identity(:table).must_be_nil
+    @db.sqls.must_equal [
+      "SELECT current_setting('is_superuser') LIMIT 1",
+      "SELECT \"attnum\" FROM \"pg_attribute\" WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id')) LIMIT 1",
+      "SELECT \"objid\", (\"deptype\" = 'i') AS \"v\" FROM \"pg_depend\" WHERE ((\"refclassid\" = CAST('pg_class' AS regclass)) AND (\"refobjid\" = 1234) AND (\"refobjsubid\" = 1) AND (\"classid\" = CAST('pg_class' AS regclass)) AND (\"objsubid\" = 0) AND (\"deptype\" IN ('a', 'i')))",
+       "BEGIN",
+       "ALTER TABLE \"table\" ALTER COLUMN \"id\" DROP DEFAULT",
+       "UPDATE \"pg_depend\" SET \"deptype\" = 'i' WHERE ((\"classid\" = CAST('pg_class' AS regclass)) AND (\"objid\" = 2345) AND (\"objsubid\" = 0) AND (\"deptype\" = 'a'))",
+       "UPDATE \"pg_attribute\" SET \"attidentity\" = 'd' WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id'))",
+       "COMMIT"
+    ]
+  end
+
+  it "should support :column option when converting serial columns to identity" do
+    @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], [{:objid=>2345, :v=>false}]]
+    def @db.regclass_oid(x) 1234 end
+    @db.convert_serial_to_identity(:table, :column=>'id').must_be_nil
+    @db.sqls.must_equal [
+      "SELECT current_setting('is_superuser') LIMIT 1",
+      "SELECT \"attnum\" FROM \"pg_attribute\" WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id')) LIMIT 1",
+      "SELECT \"objid\", (\"deptype\" = 'i') AS \"v\" FROM \"pg_depend\" WHERE ((\"refclassid\" = CAST('pg_class' AS regclass)) AND (\"refobjid\" = 1234) AND (\"refobjsubid\" = 1) AND (\"classid\" = CAST('pg_class' AS regclass)) AND (\"objsubid\" = 0) AND (\"deptype\" IN ('a', 'i')))",
+       "BEGIN",
+       "ALTER TABLE \"table\" ALTER COLUMN \"id\" DROP DEFAULT",
+       "UPDATE \"pg_depend\" SET \"deptype\" = 'i' WHERE ((\"classid\" = CAST('pg_class' AS regclass)) AND (\"objid\" = 2345) AND (\"objsubid\" = 0) AND (\"deptype\" = 'a'))",
+       "UPDATE \"pg_attribute\" SET \"attidentity\" = 'd' WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id'))",
+       "COMMIT"
+    ]
+  end
+
+  it "should support :server option converting serial columns to identity" do
+    @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], [{:objid=>2345, :v=>false}]]
+    def @db.regclass_oid(x) 1234 end
+    @db.convert_serial_to_identity(:table, :column=>'id', :server=>:default).must_be_nil
+    @db.sqls.must_equal [
+      "SELECT current_setting('is_superuser') LIMIT 1",
+      "SELECT \"attnum\" FROM \"pg_attribute\" WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id')) LIMIT 1",
+      "SELECT \"objid\", (\"deptype\" = 'i') AS \"v\" FROM \"pg_depend\" WHERE ((\"refclassid\" = CAST('pg_class' AS regclass)) AND (\"refobjid\" = 1234) AND (\"refobjsubid\" = 1) AND (\"classid\" = CAST('pg_class' AS regclass)) AND (\"objsubid\" = 0) AND (\"deptype\" IN ('a', 'i')))",
+       "BEGIN",
+       "ALTER TABLE \"table\" ALTER COLUMN \"id\" DROP DEFAULT",
+       "UPDATE \"pg_depend\" SET \"deptype\" = 'i' WHERE ((\"classid\" = CAST('pg_class' AS regclass)) AND (\"objid\" = 2345) AND (\"objsubid\" = 0) AND (\"deptype\" = 'a'))",
+       "UPDATE \"pg_attribute\" SET \"attidentity\" = 'd' WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id'))",
+       "COMMIT"
+    ]
+  end
+
+  it "should handle case where column is already identity when converting serial columns to identity" do
+    @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], [{:objid=>2345, :v=>true}]]
+    def @db.regclass_oid(x) 1234 end
+    @db.convert_serial_to_identity(:table, :column=>'id').must_be_nil
+    @db.sqls.must_equal [
+      "SELECT current_setting('is_superuser') LIMIT 1",
+      "SELECT \"attnum\" FROM \"pg_attribute\" WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id')) LIMIT 1",
+      "SELECT \"objid\", (\"deptype\" = 'i') AS \"v\" FROM \"pg_depend\" WHERE ((\"refclassid\" = CAST('pg_class' AS regclass)) AND (\"refobjid\" = 1234) AND (\"refobjsubid\" = 1) AND (\"classid\" = CAST('pg_class' AS regclass)) AND (\"objsubid\" = 0) AND (\"deptype\" IN ('a', 'i')))",
+    ]
+  end
+
+  it "should handle case where multiple serial columns exist when converting serial columns to identity" do
+    @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], [{:objid=>2345, :v=>false}, {:objid=>3456, :v=>false}]]
+    def @db.regclass_oid(x) 1234 end
+    proc{@db.convert_serial_to_identity(:table, :column=>'id')}.must_raise Sequel::Error
+    @db.sqls.must_equal [
+      "SELECT current_setting('is_superuser') LIMIT 1",
+      "SELECT \"attnum\" FROM \"pg_attribute\" WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id')) LIMIT 1",
+      "SELECT \"objid\", (\"deptype\" = 'i') AS \"v\" FROM \"pg_depend\" WHERE ((\"refclassid\" = CAST('pg_class' AS regclass)) AND (\"refobjid\" = 1234) AND (\"refobjsubid\" = 1) AND (\"classid\" = CAST('pg_class' AS regclass)) AND (\"objsubid\" = 0) AND (\"deptype\" IN ('a', 'i')))",
+    ]
+  end
+
+  it "should handle case where no serial columns exist when converting serial columns to identity" do
+    @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], []]
+    def @db.regclass_oid(x) 1234 end
+    proc{@db.convert_serial_to_identity(:table, :column=>'id')}.must_raise Sequel::Error
+    @db.sqls.must_equal [
+      "SELECT current_setting('is_superuser') LIMIT 1",
+      "SELECT \"attnum\" FROM \"pg_attribute\" WHERE ((\"attrelid\" = 1234) AND (\"attname\" = 'id')) LIMIT 1",
+      "SELECT \"objid\", (\"deptype\" = 'i') AS \"v\" FROM \"pg_depend\" WHERE ((\"refclassid\" = CAST('pg_class' AS regclass)) AND (\"refobjid\" = 1234) AND (\"refobjsubid\" = 1) AND (\"classid\" = CAST('pg_class' AS regclass)) AND (\"objsubid\" = 0) AND (\"deptype\" IN ('a', 'i')))",
+    ]
+  end
+
+  it "should not support converting serial columns to identity on PostgreSQL <10.2" do
+    def @db.server_version; 100000; end
+    proc{@db.convert_serial_to_identity(:table)}.must_raise Sequel::Error
+  end
+
+  it "should not support converting serial columns to identity if not a superuser" do
+    @db.fetch = {:v=>'off'}
+    proc{@db.convert_serial_to_identity(:table)}.must_raise Sequel::Error
+  end
+
+  it "should not support converting serial columns to identity if column cannot be determined" do
+    @db.fetch = {:v=>'on'}
+    def @db.schema(x) [[:id, {:primary_key=>false, :auto_increment=>false}]] end
+    proc{@db.convert_serial_to_identity(:table)}.must_raise Sequel::Error
+  end
+
+  it "should have connection_configuration_sqls return SQLs to use for new connections" do
+    @db.send(:connection_configuration_sqls).must_equal [
+      "SET standard_conforming_strings = ON",
+      "SET client_min_messages = 'WARNING'"
+    ]
+
+    h = {:force_standard_strings=>false, :client_min_messages=>:notice}
+    @db.send(:connection_configuration_sqls, h).must_equal ["SET client_min_messages = 'NOTICE'"]
+
+    h[:client_min_messages] = :notice2
+    proc{@db.send(:connection_configuration_sqls, h)}.must_raise Sequel::Error
+
+    h[:client_min_messages] = nil
+    @db.send(:connection_configuration_sqls, h).must_equal []
+
+    h[:search_path] = Object.new
+    proc{@db.send(:connection_configuration_sqls, h)}.must_raise Sequel::Error
+
+    h[:search_path] = 'public,foo'
+    @db.send(:connection_configuration_sqls, h).must_equal ["SET search_path = \"public\",\"foo\""]
+
+    h[:search_path] = %w'public foo2'
+    @db.send(:connection_configuration_sqls, h).must_equal ["SET search_path = \"public\",\"foo2\""]
+  end
+
+  it "should recognize 40P01 SQL state as a serialization failure" do
+    @db.send(:database_specific_error_class_from_sqlstate, '40P01').must_equal Sequel::SerializationFailure
   end
 end
 

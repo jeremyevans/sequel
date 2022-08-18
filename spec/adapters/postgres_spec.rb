@@ -13,17 +13,69 @@ end
 DB.extension :pg_hstore if DB.type_supported?('hstore')
 DB.extension :pg_multirange if DB.server_version >= 140000
 
+describe 'PostgreSQL adapter' do
+  before do
+    @db = DB
+    @db.disconnect
+  end
+  after do
+    @db.disconnect
+  end
+
+  it "should handle case where status raises PGError" do
+    proc do
+      @db.synchronize do |c|
+        def c.status; raise Sequel::Postgres::PGError end
+        def c.execute_query(*); raise Sequel::Postgres::PGError end
+        c.execute('SELECT 1')
+      end
+    end.must_raise Sequel::DatabaseDisconnectError
+  end
+
+  it "should handle case where execute_query returns nil" do
+    @db.synchronize do |c|
+      def c.execute_query(*); super; nil end
+      c.execute('SELECT 1 AS v'){|v| v.must_be_nil}
+    end
+  end
+
+  it "should handle prepared statement case where exec_prepared returns nil" do
+    @db.synchronize do |c|
+      def c.exec_prepared(*); super; nil end
+      @db['SELECT 1 AS v'].prepare(:all, :test_prepared)
+      @db.execute(:test_prepared){|v| v.must_be_nil}
+    end
+  end
+
+  it "should handle prepared statement case where same variable is used more than once" do
+    @db['SELECT (?::integer + ?::integer) AS v', :$v, :$v].prepare(:single_value, :test_prepared).call(:v=>2).must_equal 4
+  end
+end if uses_pg
+
 describe 'A PostgreSQL database' do
   before do
     @db = DB
   end
   after do
-    @db.drop_table(:test)
+    @db.drop_table?(:test)
   end
 
   it "should provide a list of existing ordinary tables" do
     @db.create_table(:test){Integer :id}
     @db.tables.must_include :test
+  end
+
+  it "should handle providing a block to tables" do
+    @db.create_table(:test){Integer :id}
+    @db.tables{|ds| ds.where(:relkind=>'r').map{|r| r[:relname]}}.must_include 'test'
+    @db.tables{|ds| ds.where(:relkind=>'p').map{|r| r[:relname]}}.wont_include 'test'
+  end
+
+  it "should handle blobs" do
+    @db.create_table(:test){File :blob}
+    blob = Sequel.blob("\0\1\254\255").force_encoding('BINARY')
+    @db[:test].insert(blob)
+    @db[:test].get(:blob).force_encoding('BINARY').must_equal blob
   end
 
   it "should provide a list of existing partitioned tables" do
@@ -203,6 +255,14 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls_3].order(:id).select_order_map(:id).must_equal [5]
   end if DB.server_version >= 100000 
 
+  it "should raise for unsupported partition types" do
+    @db.create_table(:tmp_dolls, :partition_by => [:id, :id2], :partition_type=>:range){Integer :id; Integer :id2}
+    proc{@db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){from 1, 1; to 3, 3; modulus 10}}.must_raise Sequel::Error
+    proc{@db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){from 1, 1}}.must_raise Sequel::Error
+    proc{@db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){modulus 10}}.must_raise Sequel::Error
+    proc{@db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){}}.must_raise Sequel::Error
+  end if DB.server_version >= 100000 
+
   it "should not use a size for text columns" do
     @db.create_table(:tmp_dolls){String :description, text: true, size: :long}
     @db.tables.must_include :tmp_dolls
@@ -283,6 +343,18 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].insert
     @db[:tmp_dolls].get(:id).must_equal 1
   end if DB.server_version >= 100002
+
+  it "should support primary_key with :Bignum type and serial=>true" do
+    @db.create_table!(:tmp_dolls){primary_key :id, :type=>:Bignum, :serial=>true}
+    @db[:tmp_dolls].insert(2**48)
+    @db[:tmp_dolls].get(:id).must_equal(2**48)
+  end
+
+  it "should support Bignum column with serial=>true" do
+    @db.create_table!(:tmp_dolls){Bignum :id, :serial=>true, :primary_key=>true}
+    @db[:tmp_dolls].insert(2**48)
+    @db[:tmp_dolls].get(:id).must_equal(2**48)
+  end
 
   it "should support creating identity columns on non-primary key tables" do
     @db.create_table(:tmp_dolls){Integer :a, :identity=>true}
@@ -558,6 +630,10 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @db.drop_table?(:ic_test)
   end
 
+  it "Dataset#supports_insert_conflict? should be true" do
+    @ds.supports_insert_conflict?.must_equal true
+  end
+
   it "Dataset#insert_ignore and insert_conflict should ignore uniqueness violations" do
     @ds.insert(1, 2, 3)
     @ds.insert(10, 11, 3, true)
@@ -641,6 +717,10 @@ describe "A PostgreSQL database" do
 
   it "should support subqueries with #values" do
     @db.values([[1, 2]]).from_self.cross_join(@db.values([[3, 4]]).as(:x, [:c1, :c2])).map([:column1, :column2, :c1, :c2]).must_equal [[1, 2, 3, 4]]
+  end
+
+  it "should support JOIN USING" do
+    @db.from(@db.values([[1, 2]]).as(:x, [:c1, :c2])).join(@db.values([[1, 2]]).as(:y, [:c1, :c2]), [:c1, :c2]).all.must_equal [{:c1=>1, :c2=>2}]
   end
 
   it "should support column aliases for JOIN USING" do
@@ -819,6 +899,8 @@ describe "A PostgreSQL dataset" do
     @d.order(:value).select(:value).limit(1).with_ties.select_order_map(:value).must_equal [1, 1]
     @d.order(:value).select(:value).limit(2, 1).select_order_map(:value).must_equal [1, 2]
     @d.order(:value).select(:value).limit(2, 1).with_ties.select_order_map(:value).must_equal [1, 2, 2]
+    @d.order(:value).select(:value).offset(1).select_order_map(:value).must_equal [1, 2, 2]
+    @d.order(:value).select(:value).offset(1).with_ties.select_order_map(:value).must_equal [1, 2, 2]
   end if DB.server_version >= 130000
 
   it "should support regexps" do
@@ -851,6 +933,10 @@ describe "A PostgreSQL dataset" do
 
   it "#lock should lock tables and yield if a block is given" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
+  end
+
+  it "#lock should raise Error for unsupported lock mode" do
+    proc{@d.lock('BAD'){}}.must_raise Sequel::Error
   end
 
   it "should support exclusion constraints when creating or altering tables" do
@@ -1080,6 +1166,16 @@ describe "A PostgreSQL dataset" do
     @d.from(:test, :test).truncate
     tables.each{|t| @d.from(t).count.must_equal 0}
   end
+
+  it "should not allow truncate for grouped or joined datasets" do
+    proc{@d.from(:test).cross_join(:test).truncate}.must_raise Sequel::InvalidOperation
+    proc{@d.from(:test).group(:test).truncate}.must_raise Sequel::InvalidOperation
+  end
+
+  it "should raise when attempting to insert with 0 or multiple tables" do
+    proc{@d.from(:test, :test).insert}.must_raise Sequel::InvalidOperation
+    proc{@d.from.insert}.must_raise Sequel::Error
+  end
 end
 
 describe "Dataset#distinct" do
@@ -1171,7 +1267,10 @@ describe "A PostgreSQL dataset with a timestamp field" do
       DateTime :time
     end
     @d = @db[:test3]
-    @db.extension :pg_extended_date_support
+    @db.convert_infinite_timestamps.must_equal false
+    @db.convert_infinite_timestamps = false
+    @db.convert_infinite_timestamps = true
+    @db.convert_infinite_timestamps = false
   end
   before do
     @d.delete
@@ -1804,7 +1903,7 @@ describe "Postgres::Database schema qualified tables" do
 
   it "should be able to get serial sequences for tables in a given schema" do
     @db.create_table(Sequel[:schema_test][:schema_test]){primary_key :i}
-    @db.primary_key_sequence(Sequel[:schema_test][:schema_test]).must_equal '"schema_test"."schema_test_i_seq"'
+    2.times{@db.primary_key_sequence(Sequel[:schema_test][:schema_test]).must_equal '"schema_test"."schema_test_i_seq"'}
   end
 
   it "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
@@ -1844,6 +1943,15 @@ describe "Postgres::Database schema qualified tables" do
     ensure
       @db.drop_table?(Sequel[:public][:schema_test])
     end
+  end
+
+  it "should support resetting the primary key sequence" do
+    name = Sequel[:schema_test][:schema_test]
+    @db.create_table(name){primary_key :id}
+    @db[name].insert(:id=>10).must_equal 10
+    @db.reset_primary_key_sequence(name).must_equal 11
+    @db[name].insert.must_equal 11
+    @db[name].select_order_map(:id).must_equal [10, 11]
   end
 end
 
@@ -2172,6 +2280,20 @@ if DB.adapter_scheme == :postgres
       end.must_raise(ArgumentError)
     end
 
+    it "should handle errors raised while closing cursor after successful cursor fetch" do
+      proc do
+        closed = false
+        @db.synchronize do |c|
+          @ds.use_cursor(:rows_per_fetch=>2000).each do |r|
+            if closed == false
+              @db.run "CLOSE sequel_cursor"
+              closed = true
+            end
+          end
+        end
+      end.must_raise(Sequel::DatabaseError)
+    end
+
     it "should respect the :rows_per_fetch option" do
       i = 0
       @ds = @ds.with_extend{define_method(:execute){|*a, &block| i+=1; super(*a, &block);}}
@@ -2181,6 +2303,14 @@ if DB.adapter_scheme == :postgres
       i = 0
       @ds.use_cursor(:rows_per_fetch=>100).all
       i.must_equal 11
+
+      i = 0
+      @ds.use_cursor(:rows_per_fetch=>0).all
+      i.must_equal 2
+
+      i = 0
+      @ds.use_cursor(:rows_per_fetch=>2000).all
+      i.must_equal 1
     end
 
     it "should respect the :hold=>true option for creating the cursor WITH HOLD and not using a transaction" do
@@ -2253,10 +2383,14 @@ if DB.adapter_scheme == :postgres
     it "should work with for enums" do
       @db.drop_enum(:foo_enum) rescue nil
       @db.create_enum(:foo_enum, %w(foo bar))
-      @db.add_named_conversion_proc(:foo_enum){|string| string.reverse}
+      @db.add_named_conversion_proc(:foo_enum, &:reverse)
       @db.create_table!(:foo){foo_enum :bar}
       @db[:foo].insert(:bar => 'foo')
       @db[:foo].get(:bar).must_equal 'foo'.reverse
+    end
+
+    it "should raise error for unsupported type" do
+      proc{@db.add_named_conversion_proc(:nonexistant_type, &:reverse)}.must_raise Sequel::Error
     end
   end
 end
@@ -2451,6 +2585,15 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
       proc{@db.copy_table(@db[:test_copy].select(Sequel[1]/(Sequel[:x] - 3)))}.must_raise Sequel::DatabaseError
       @db.get(1).must_equal 1
     end
+
+    it "should disconnect if the result status after the copy is not expected" do
+      proc do
+        @db.synchronize do |c|
+          def c.get_last_result; end
+          @db.copy_table(:test_copy)
+        end
+      end.must_raise Sequel::DatabaseDisconnectError
+    end
   end
 end
 
@@ -2526,6 +2669,8 @@ if uses_pg && DB.server_version >= 90000
       called.must_equal true
       called2.must_equal true
       i.must_equal 1
+
+      proc{@db.listen('foo', :loop=>true)}.must_raise Sequel::Error
     end
 
     it "should accept a :timeout option in listen" do
@@ -2543,9 +2688,14 @@ if uses_pg && DB.server_version >= 90000
       called.must_equal false
       i.must_equal 1
 
-	  i = 0
+      i = 0
       t = 0
       @db.listen('foo2', :timeout=>proc{t+=1; 0.001}, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_be_nil
+      called.must_equal false
+      t.must_equal 4
+
+      t = 0
+      @db.listen('foo2', :timeout=>proc{t+=1; throw :stop if t == 4; 0.001}, :loop=>true){|ev, pid, payload| called = true}.must_be_nil
       called.must_equal false
       t.must_equal 4
 

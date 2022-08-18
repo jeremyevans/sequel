@@ -4,14 +4,10 @@ def SimpleCov.sequel_coverage(opts = {})
   start do
     enable_coverage :branch
     command_name SEQUEL_COVERAGE unless SEQUEL_COVERAGE == "1"
-
     add_filter "/spec/"
-    add_group('Missing-Revelent'){|src| src.filename =~ opts[:group] && src.covered_percent < 100} if opts[:group]
-    add_group('Missing'){|src| src.covered_percent < 100}
-    add_group('Covered'){|src| src.covered_percent == 100}
 
     if ENV['SEQUEL_MERGE_COVERAGE']
-      filter = %r{bin/sequel\z|lib/sequel/(\w+\.rb|(dataset|database|model|connection_pool|extensions|plugins)/\w+\.rb|adapters/mock\.rb)\z}
+      filter = %r{bin/sequel\z|lib/sequel/(\w+\.rb|(dataset|database|model|connection_pool|extensions|plugins)/\w+\.rb|adapters/(mock|(shared/)?postgres)\.rb)\z}
       add_filter{|src| src.filename !~ filter}
     elsif opts[:filter]
       add_filter{|src| src.filename !~ opts[:filter]}
