@@ -1267,10 +1267,14 @@ describe "A PostgreSQL dataset with a timestamp field" do
       DateTime :time
     end
     @d = @db[:test3]
-    @db.convert_infinite_timestamps.must_equal false
-    @db.convert_infinite_timestamps = false
-    @db.convert_infinite_timestamps = true
-    @db.convert_infinite_timestamps = false
+    if @db.adapter_scheme == :postgres
+      @db.convert_infinite_timestamps.must_equal false
+      @db.convert_infinite_timestamps = false
+      @db.convert_infinite_timestamps = true
+      @db.convert_infinite_timestamps = false
+    else
+      @db.extension :pg_extended_date_support
+    end
   end
   before do
     @d.delete
@@ -2593,7 +2597,7 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
           @db.copy_table(:test_copy)
         end
       end.must_raise Sequel::DatabaseDisconnectError
-    end
+    end if uses_pg
   end
 end
 
