@@ -14,6 +14,14 @@ module Sequel
     def exists
       SQL::PlaceholderLiteralString.new(EXISTS, [self], true)
     end
+
+    # Returns a NOT EXISTS clause for the dataset as an SQL::PlaceholderLiteralString.
+    #
+    #   DB.select(1).where(DB[:items].not_exists)
+    #   # SELECT 1 WHERE (NOT EXISTS (SELECT * FROM items))
+    def not_exists
+      SQL::PlaceholderLiteralString.new(NOT_EXISTS, [self], true)
+    end
     
     # Returns an INSERT SQL query string.  See +insert+.
     #
@@ -248,6 +256,7 @@ module Sequel
     DEFAULT = LiteralString.new('DEFAULT').freeze
 
     EXISTS = ['EXISTS '.freeze].freeze
+    NOT_EXISTS = ['NOT EXISTS '.freeze].freeze
     BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :offset, :compounds].freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze

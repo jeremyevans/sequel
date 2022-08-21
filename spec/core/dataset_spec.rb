@@ -357,6 +357,26 @@ describe "Dataset#exists" do
   end
 end
 
+describe "Dataset#not_exists" do
+  before do
+    @ds1 = Sequel.mock[:test]
+    @ds2 = @ds1.filter(Sequel.expr(:price) < 100)
+    @ds3 = @ds1.filter(Sequel.expr(:price) > 50)
+  end
+
+  it "should work in filters" do
+    @ds1.filter(@ds2.not_exists).sql.
+      must_equal 'SELECT * FROM test WHERE (NOT EXISTS (SELECT * FROM test WHERE (price < 100)))'
+    @ds1.filter(@ds2.not_exists & @ds3.not_exists).sql.
+      must_equal 'SELECT * FROM test WHERE ((NOT EXISTS (SELECT * FROM test WHERE (price < 100))) AND (NOT EXISTS (SELECT * FROM test WHERE (price > 50))))'
+  end
+
+  it "should work in select" do
+    @ds1.select(@ds2.not_exists.as(:a), @ds3.not_exists.as(:b)).sql.
+      must_equal 'SELECT (NOT EXISTS (SELECT * FROM test WHERE (price < 100))) AS a, (NOT EXISTS (SELECT * FROM test WHERE (price > 50))) AS b FROM test'
+  end
+end
+
 describe "Dataset#where" do
   before do
     @dataset = Sequel.mock[:test]
@@ -584,6 +604,11 @@ describe "Dataset#where" do
     @dataset.filter(a.exists).sql.must_equal 'SELECT * FROM test WHERE (EXISTS (SELECT * FROM test WHERE (price < 100)))'
   end
   
+  it "should accept a subquery for a NOT EXISTS clause" do
+    a = @dataset.filter(Sequel.expr(:price) < 100)
+    @dataset.filter(a.not_exists).sql.must_equal 'SELECT * FROM test WHERE (NOT EXISTS (SELECT * FROM test WHERE (price < 100)))'
+  end
+
   it "should accept proc expressions" do
     d = @d1.select(Sequel.function(:avg, :gdp))
     @dataset.filter{gdp > d}.sql.must_equal "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
