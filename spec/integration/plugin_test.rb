@@ -2426,6 +2426,30 @@ describe "date_arithmetic extension" do
     @check.call(:date_sub, @dt, @h1, @s1)
     @check.call(:date_sub, @dt, @h2, @s2)
   end
+
+  it "be able to use expressions as interval values" do
+    zero = Sequel[1] - 1
+    one = Sequel[0] + 1
+    h0 = {:days=>zero}
+    h1 = {:days=>one, :years=>nil, :hours=>zero}
+    h2 = {:years=>one, :months=>one, :days=>one, :hours=>one, :minutes=>one, :seconds=>one}
+
+    @check.call(:date_add, @date, h0, @dt)
+    @check.call(:date_add, @date, h1, @a1)
+    @check.call(:date_add, @date, h2, @a2)
+
+    @check.call(:date_add, @dt, h0, @dt)
+    @check.call(:date_add, @dt, h1, @a1)
+    @check.call(:date_add, @dt, h2, @a2)
+
+    @check.call(:date_sub, @date, h0, @dt)
+    @check.call(:date_sub, @date, h1, @s1)
+    @check.call(:date_sub, @date, h2, @s2)
+
+    @check.call(:date_sub, @dt, h0, @dt)
+    @check.call(:date_sub, @dt, h1, @s1)
+    @check.call(:date_sub, @dt, h2, @s2)
+  end if DB.database_type == :postgres && DB.server_version >= 90400
 end
 
 describe "string_agg extension" do

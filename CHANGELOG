@@ -1,5 +1,7 @@
 === master
 
+* Support arbitrary expressions for date_arithmetic interval values on PostgreSQL 9.4+ (jeremyevans)
+
 * Support native IS DISTINCT FROM on SQLite 3.39+ instead of emulating support in the is_distinct_from extension (jeremyevans)
 
 * Support HAVING without GROUP BY on SQLite 3.39+ (jeremyevans)

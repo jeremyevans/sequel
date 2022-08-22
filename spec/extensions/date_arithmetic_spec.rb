@@ -92,11 +92,27 @@ describe "date_arithmetic extension" do
   it "should correctly literalize on Postgres" do
     db = dbf.call(:postgres).dataset.with_quote_identifiers(false)
     db.literal(Sequel.date_add(:a, @h0)).must_equal "CAST(a AS timestamp)"
+    db.literal(Sequel.date_add(:a, @h1)).must_equal "(CAST(a AS timestamp) + make_interval(days := 1))"
+    db.literal(Sequel.date_add(:a, @h2)).must_equal "(CAST(a AS timestamp) + make_interval(years := 1, months := 1, days := 8, hours := 1, mins := 1, secs := 1))"
+
+    db.literal(Sequel.date_sub(:a, @h0)).must_equal "CAST(a AS timestamp)"
+    db.literal(Sequel.date_sub(:a, @h1)).must_equal "(CAST(a AS timestamp) + make_interval(days := -1))"
+    db.literal(Sequel.date_sub(:a, @h2)).must_equal "(CAST(a AS timestamp) + make_interval(years := -1, months := -1, days := -8, hours := -1, mins := -1, secs := -1))"
+
+    db.literal(Sequel.date_add(:a, @h0, :cast=>:timestamptz)).must_equal "CAST(a AS timestamptz)"
+    db.literal(Sequel.date_add(:a, @h1, :cast=>:timestamptz)).must_equal "(CAST(a AS timestamptz) + make_interval(days := 1))"
+    db.literal(Sequel.date_add(:a, @h2, :cast=>:timestamptz)).must_equal "(CAST(a AS timestamptz) + make_interval(years := 1, months := 1, days := 8, hours := 1, mins := 1, secs := 1))"
+
+    db.literal(Sequel.date_add(:a, :days=>Sequel[:a]+1, :weeks=>Sequel[:b])).must_equal "(CAST(a AS timestamp) + make_interval(days := (0 + a + 1 + (b * 7))))"
+    db.literal(Sequel.date_sub(:a, :days=>Sequel[:a]+1, :weeks=>Sequel[:b])).must_equal "(CAST(a AS timestamp) + make_interval(days := (0 + ((a + 1) * -1) + (b * -1 * 7))))"
+
+    def (db.db).server_version(*); 90300 end
+    db.literal(Sequel.date_add(:a, @h0)).must_equal "CAST(a AS timestamp)"
     db.literal(Sequel.date_add(:a, @h1)).must_equal "(CAST(a AS timestamp) + CAST('1 days ' AS interval))"
     db.literal(Sequel.date_add(:a, @h2)).must_equal "(CAST(a AS timestamp) + CAST('1 years 1 months 8 days 1 hours 1 minutes 1 seconds ' AS interval))"
 
     db.literal(Sequel.date_add(:a, @h0, :cast=>:timestamptz)).must_equal "CAST(a AS timestamptz)"
-    db.literal(Sequel.date_sub(:a, @h0, :cast=>:timestamptz)).must_equal "CAST(a AS timestamptz)"
+    db.literal(Sequel.date_add(:a, @h1, :cast=>:timestamptz)).must_equal "(CAST(a AS timestamptz) + CAST('1 days ' AS interval))"
     db.literal(Sequel.date_add(:a, @h2, :cast=>:timestamptz)).must_equal "(CAST(a AS timestamptz) + CAST('1 years 1 months 8 days 1 hours 1 minutes 1 seconds ' AS interval))"
   end
 

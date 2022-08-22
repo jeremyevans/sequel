@@ -32,6 +32,10 @@
 #
 #   DB[:table].select(add.as(:d)).where(sub > Sequel::CURRENT_TIMESTAMP)
 #
+# On most databases, the values you provide for years/months/days/etc. must
+# be numeric values and not arbitrary SQL expressions.  However, on PostgreSQL
+# 9.4+, use of arbitrary SQL expressions is supported.
+#
 # Related module: Sequel::SQL::DateAdd
 
 #
@@ -54,7 +58,16 @@ module Sequel
           interval = interval.parts
         end
         parts = {}
-        interval.each{|k,v| parts[k] = -v unless v.nil?}
+        interval.each do |k,v|
+          case v
+          when nil
+            # ignore
+          when Numeric
+            parts[k] = -v
+          else
+            parts[k] = Sequel::SQL::NumericExpression.new(:*, v, -1)
+          end
+        end
         DateAdd.new(expr, parts, opts)
       end
     end
@@ -68,6 +81,7 @@ module Sequel
       module DatasetMethods
         DURATION_UNITS = [:years, :months, :days, :hours, :minutes, :seconds].freeze
         DEF_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s.freeze}).freeze
+        POSTGRES_DURATION_UNITS = DURATION_UNITS.zip([:years, :months, :days, :hours, :mins, :secs].map{|s| s.to_s.freeze}).freeze
         MYSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.upcase[0...-1]).freeze}).freeze
         MSSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s[0...-1]).freeze}).freeze
         H2_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s[0...-1].freeze}).freeze
@@ -87,14 +101,28 @@ module Sequel
 
           cast = case db_type = db.database_type
           when :postgres
-            interval = String.new
-            each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
-              interval << "#{value} #{sql_unit} "
-            end
-            if interval.empty?
-              return literal_append(sql, Sequel.cast(expr, cast_type))
+            casted = Sequel.cast(expr, cast_type)
+
+            if db.server_version >= 90400
+              placeholder = []
+              vals = []
+              each_valid_interval_unit(h, POSTGRES_DURATION_UNITS) do |value, sql_unit|
+                placeholder << "#{', ' unless placeholder.empty?}#{sql_unit} := "
+                vals << value
+              end
+              interval = Sequel.function(:make_interval, Sequel.lit(placeholder, *vals)) unless vals.empty?
             else
-              return complex_expression_sql_append(sql, :+, [Sequel.cast(expr, cast_type), Sequel.cast(interval, :interval)])
+              parts = String.new
+              each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
+                parts << "#{value} #{sql_unit} "
+              end
+              interval = Sequel.cast(parts, :interval) unless parts.empty?
+            end
+
+            if interval
+              return complex_expression_sql_append(sql, :+, [casted, interval])
+            else
+              return literal_append(sql, casted)
             end
           when :sqlite
             args = [expr]
