@@ -30,13 +30,13 @@ lib/sequel/extensions/is_distinct_from.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-05-05 13:03:39 -0700</span>
+<span class='datetime'>2022-08-02 16:36:07 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The is_distinct_from extension adds the ability to use the SQL standard IS DISTINCT FROM operator, which is similar to the not equals operator, except that NULL values are considered equal.  Only PostgreSQL and H2 currently support this operator.  On  other databases, support is emulated.</p>
+<p>The is_distinct_from extension adds the ability to use the SQL standard IS DISTINCT FROM operator, which is similar to the not equals operator, except that NULL values are considered equal.  PostgreSQL, SQLite 3.39+, and H2 currently support this operator.  On  other databases, support is emulated.</p>
 
 <p>First, you need to load the extension into the database:</p>
 

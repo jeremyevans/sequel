@@ -81,13 +81,13 @@ Sequel::Postgres::InetDatabaseMethods
 <span class="line-num">49</span>       <span class="ruby-identifier">meth</span> = <span class="ruby-constant">IPAddr</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:new</span>)
 <span class="line-num">50</span>       <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">869</span>, <span class="ruby-identifier">meth</span>)
 <span class="line-num">51</span>       <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">650</span>, <span class="ruby-identifier">meth</span>)
-<span class="line-num">52</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)
+<span class="line-num">52</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">register_array_type</span>)
 <span class="line-num">53</span>         <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;inet&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1041</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">869</span>)
 <span class="line-num">54</span>         <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;cidr&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">651</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">650</span>)
 <span class="line-num">55</span>       <span class="ruby-keyword">end</span>
 <span class="line-num">56</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">57</span> 
-<span class="line-num">58</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)
+<span class="line-num">58</span>     <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">register_array_type</span>)
 <span class="line-num">59</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;macaddr&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1040</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">829</span>)
 <span class="line-num">60</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">61</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:ipaddr</span>] = <span class="ruby-constant">IPAddr</span>

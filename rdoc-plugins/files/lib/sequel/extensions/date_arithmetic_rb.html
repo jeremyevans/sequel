@@ -30,7 +30,7 @@ lib/sequel/extensions/date_arithmetic.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-04-19 08:53:26 -0700</span>
+<span class='datetime'>2022-08-22 13:26:24 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -65,6 +65,8 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">add</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:d</span>)).<span class="ruby-identifier">where</span>(<span class="ruby-identifier">sub</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>)
 </pre>
+
+<p>On most databases, the values you provide for years/months/days/etc. must be numeric values and not arbitrary SQL expressions.  However, on PostgreSQL 9.4+, use of arbitrary SQL expressions is supported.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/SQL/DateAdd.html"><code>Sequel::SQL::DateAdd</code></a></p>
 </div>

@@ -30,7 +30,7 @@ README.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-06-03 15:14:21 -0700</span>
+<span class='datetime'>2022-08-05 07:47:24 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -499,7 +499,7 @@ Last Update:
 
 <h3 id="label-Merging+records">Merging records<span><a href="#label-Merging+records">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>Merging records using the SQL MERGE statment is done using <code>merge*</code> methods. You use <code>merge_using</code> to specify the merge source and join conditions. You can use <code>merge_insert</code>, <code>merge_delete</code>, and/or <code>merge_update</code> to set the INSERT, DELETE, and UPDATE clauses for the merge. <code>merge_insert</code> takes the same arguments as <code>insert</code>, and <code>merge_update</code> takes the same arguments as <code>update</code>. <code>merge_insert</code>, <code>merge_delete</code>, and <code>merge_update</code> can all be called with blocks, to set the conditions for the related INSERT, DELETE, or UPDATE.</p>
+<p>Merging records using the SQL MERGE statement is done using <code>merge*</code> methods. You use <code>merge_using</code> to specify the merge source and join conditions. You can use <code>merge_insert</code>, <code>merge_delete</code>, and/or <code>merge_update</code> to set the INSERT, DELETE, and UPDATE clauses for the merge. <code>merge_insert</code> takes the same arguments as <code>insert</code>, and <code>merge_update</code> takes the same arguments as <code>update</code>. <code>merge_insert</code>, <code>merge_delete</code>, and <code>merge_update</code> can all be called with blocks, to set the conditions for the related INSERT, DELETE, or UPDATE.</p>
 
 <p>Finally, after calling all of the other <code>merge_*</code> methods, you call <code>merge</code> to run the MERGE statement on the database.</p>
 

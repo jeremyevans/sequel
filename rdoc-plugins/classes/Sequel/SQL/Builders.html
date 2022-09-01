@@ -134,9 +134,9 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-date_add-source'>   <span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb</span>
-<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date_add</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">45</span>   <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date_add</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">49</span>   <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-date_sub'>
@@ -158,14 +158,23 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-date_sub-source'>   <span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb</span>
-<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date_sub</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">53</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>)
-<span class="line-num">54</span>     <span class="ruby-identifier">interval</span> = <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">parts</span>
-<span class="line-num">55</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">56</span>   <span class="ruby-identifier">parts</span> = {}
-<span class="line-num">57</span>   <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">parts</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-operator">-</span><span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}
-<span class="line-num">58</span>   <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">parts</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">59</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">56</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date_sub</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">57</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>)
+<span class="line-num">58</span>     <span class="ruby-identifier">interval</span> = <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">parts</span>
+<span class="line-num">59</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">60</span>   <span class="ruby-identifier">parts</span> = {}
+<span class="line-num">61</span>   <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">62</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">63</span>     <span class="ruby-keyword">when</span> <span class="ruby-keyword">nil</span>
+<span class="line-num">64</span>       <span class="ruby-comment"># ignore</span>
+<span class="line-num">65</span>     <span class="ruby-keyword">when</span> <span class="ruby-constant">Numeric</span>
+<span class="line-num">66</span>       <span class="ruby-identifier">parts</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-operator">-</span><span class="ruby-identifier">v</span>
+<span class="line-num">67</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">68</span>       <span class="ruby-identifier">parts</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:*</span>, <span class="ruby-identifier">v</span>, <span class="ruby-value">-1</span>)
+<span class="line-num">69</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">70</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">71</span>   <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">parts</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hstore'>

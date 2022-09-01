@@ -114,7 +114,7 @@ Superclass:
 </a>
 <pre id='method-i-call-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
 <span class="line-num">1349</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">1350</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">1350</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
 <span class="line-num">1351</span>     <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)
 <span class="line-num">1352</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">1353</span>     <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>

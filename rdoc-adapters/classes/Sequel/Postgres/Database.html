@@ -74,7 +74,9 @@ Superclass:
 <td>=</td>
 <td class='context-item-value'>[PGError].freeze</td>
 <td>&nbsp;</td>
-<td class='context-item-desc'></td>
+<td class='context-item-desc'>
+<p>:nocov:</p>
+</td>
 </tr>
 </table>
 </div>
@@ -97,16 +99,16 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-bound_variable_arg-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)
-<span class="line-num">174</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>
-<span class="line-num">175</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>
-<span class="line-num">176</span>     {<span class="ruby-value">:value</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">arg</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">17</span>, <span class="ruby-value">:format</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}
-<span class="line-num">177</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">DateTime</span>, <span class="ruby-constant">Time</span>
-<span class="line-num">178</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">179</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">180</span>     <span class="ruby-identifier">arg</span>
-<span class="line-num">181</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">184</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)
+<span class="line-num">185</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>
+<span class="line-num">186</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>
+<span class="line-num">187</span>     {<span class="ruby-value">:value</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">arg</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">17</span>, <span class="ruby-value">:format</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}
+<span class="line-num">188</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">DateTime</span>, <span class="ruby-constant">Time</span>
+<span class="line-num">189</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">190</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">191</span>     <span class="ruby-identifier">arg</span>
+<span class="line-num">192</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-call_procedure'>
@@ -129,9 +131,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-call_procedure-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_procedure</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">190</span>   <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:call_procedure</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_procedure</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">201</span>   <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:call_procedure</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">202</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-connect'>
@@ -150,58 +152,67 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-connect-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)
-<span class="line-num">201</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
-<span class="line-num">202</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">USES_PG</span>
-<span class="line-num">203</span>     <span class="ruby-identifier">connection_params</span> = {
-<span class="line-num">204</span>       <span class="ruby-value">:host</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>],
-<span class="line-num">205</span>       <span class="ruby-value">:port</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>],
-<span class="line-num">206</span>       <span class="ruby-value">:dbname</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>],
-<span class="line-num">207</span>       <span class="ruby-value">:user</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>],
-<span class="line-num">208</span>       <span class="ruby-value">:password</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>],
-<span class="line-num">209</span>       <span class="ruby-value">:connect_timeout</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">20</span>,
-<span class="line-num">210</span>       <span class="ruby-value">:sslmode</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslmode</span>],
-<span class="line-num">211</span>       <span class="ruby-value">:sslrootcert</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslrootcert</span>]
-<span class="line-num">212</span>     }.<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">value</span>) }
-<span class="line-num">213</span>     <span class="ruby-identifier">connection_params</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:driver_options</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:driver_options</span>]
-<span class="line-num">214</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:conn_str</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">connection_params</span>)
-<span class="line-num">215</span> 
-<span class="line-num">216</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {})
-<span class="line-num">217</span> 
-<span class="line-num">218</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">receiver</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:notice_receiver</span>]
-<span class="line-num">219</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_notice_receiver</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">receiver</span>)
-<span class="line-num">220</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">221</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">222</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:force_standard_strings</span>, <span class="ruby-keyword">true</span>))
-<span class="line-num">223</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot create connection using postgres-pr unless force_standard_strings is set&quot;</span>
-<span class="line-num">224</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">225</span> 
-<span class="line-num">226</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">connect</span>(
-<span class="line-num">227</span>       (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>])),
-<span class="line-num">228</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5432</span>,
-<span class="line-num">229</span>       <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;&#39;</span>,
-<span class="line-num">230</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>],
-<span class="line-num">231</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>],
-<span class="line-num">232</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]
-<span class="line-num">233</span>     )
-<span class="line-num">234</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">235</span> 
-<span class="line-num">236</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@db</span>, <span class="ruby-keyword">self</span>)
-<span class="line-num">237</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">USES_PG</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:type_map_for_queries=</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_QUERY_TYPE_MAP</span>)
-<span class="line-num">238</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">type_map_for_queries</span> = <span class="ruby-constant">PG_QUERY_TYPE_MAP</span>
-<span class="line-num">239</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">240</span> 
-<span class="line-num">241</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]
-<span class="line-num">242</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:set_client_encoding</span>)
-<span class="line-num">243</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_client_encoding</span>(<span class="ruby-identifier">encoding</span>)
-<span class="line-num">244</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">245</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">async_exec</span>(<span class="ruby-node">&quot;set client_encoding to &#39;#{encoding}&#39;&quot;</span>)
-<span class="line-num">246</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">247</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">248</span> 
-<span class="line-num">249</span>   <span class="ruby-identifier">connection_configuration_sqls</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)}
-<span class="line-num">250</span>   <span class="ruby-identifier">conn</span>
-<span class="line-num">251</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">211</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">212</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">213</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">USES_PG</span>
+<span class="line-num">214</span>     <span class="ruby-identifier">connection_params</span> = {
+<span class="line-num">215</span>       <span class="ruby-value">:host</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>],
+<span class="line-num">216</span>       <span class="ruby-value">:port</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>],
+<span class="line-num">217</span>       <span class="ruby-value">:dbname</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>],
+<span class="line-num">218</span>       <span class="ruby-value">:user</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>],
+<span class="line-num">219</span>       <span class="ruby-value">:password</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>],
+<span class="line-num">220</span>       <span class="ruby-value">:connect_timeout</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">20</span>,
+<span class="line-num">221</span>       <span class="ruby-value">:sslmode</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslmode</span>],
+<span class="line-num">222</span>       <span class="ruby-value">:sslrootcert</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslrootcert</span>]
+<span class="line-num">223</span>     }.<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">value</span>) }
+<span class="line-num">224</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">225</span>     <span class="ruby-identifier">connection_params</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:driver_options</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:driver_options</span>]
+<span class="line-num">226</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">227</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:conn_str</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">connection_params</span>)
+<span class="line-num">228</span> 
+<span class="line-num">229</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {})
+<span class="line-num">230</span> 
+<span class="line-num">231</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">receiver</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:notice_receiver</span>]
+<span class="line-num">232</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_notice_receiver</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">receiver</span>)
+<span class="line-num">233</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">234</span> 
+<span class="line-num">235</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">236</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:type_map_for_queries=</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">PG_QUERY_TYPE_MAP</span>)
+<span class="line-num">237</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">238</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">type_map_for_queries</span> = <span class="ruby-constant">PG_QUERY_TYPE_MAP</span>
+<span class="line-num">239</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">240</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">241</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">242</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:force_standard_strings</span>, <span class="ruby-keyword">true</span>))
+<span class="line-num">243</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot create connection using postgres-pr unless force_standard_strings is set&quot;</span>
+<span class="line-num">244</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">245</span> 
+<span class="line-num">246</span>     <span class="ruby-identifier">conn</span> = <span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">connect</span>(
+<span class="line-num">247</span>       (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>])),
+<span class="line-num">248</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5432</span>,
+<span class="line-num">249</span>       <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;&#39;</span>,
+<span class="line-num">250</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>],
+<span class="line-num">251</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>],
+<span class="line-num">252</span>       <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]
+<span class="line-num">253</span>     )
+<span class="line-num">254</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">255</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">256</span> 
+<span class="line-num">257</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@db</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">258</span> 
+<span class="line-num">259</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">260</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]
+<span class="line-num">261</span>     <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_client_encoding</span>)
+<span class="line-num">262</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">set_client_encoding</span>(<span class="ruby-identifier">encoding</span>)
+<span class="line-num">263</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">264</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">async_exec</span>(<span class="ruby-node">&quot;set client_encoding to &#39;#{encoding}&#39;&quot;</span>)
+<span class="line-num">265</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">266</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">267</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">268</span> 
+<span class="line-num">269</span>   <span class="ruby-identifier">connection_configuration_sqls</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)}
+<span class="line-num">270</span>   <span class="ruby-identifier">conn</span>
+<span class="line-num">271</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-convert_infinite_timestamps'>
@@ -220,9 +231,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-convert_infinite_timestamps-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">255</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_infinite_timestamps</span>
-<span class="line-num">256</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">257</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">275</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_infinite_timestamps</span>
+<span class="line-num">276</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-convert_infinite_timestamps-3D'>
@@ -241,13 +252,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-convert_infinite_timestamps-3D-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_infinite_timestamps=</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">261</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">262</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>, <span class="ruby-keyword">true</span>
-<span class="line-num">263</span>     <span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_extended_date_support</span>)
-<span class="line-num">264</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">265</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">266</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">280</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_infinite_timestamps=</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">281</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">282</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>, <span class="ruby-keyword">true</span>
+<span class="line-num">283</span>     <span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_extended_date_support</span>)
+<span class="line-num">284</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">285</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">286</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-copy_into'>
@@ -281,37 +292,37 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-copy_into-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">403</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">copy_into</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">404</span>   <span class="ruby-identifier">data</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:data</span>]
-<span class="line-num">405</span>   <span class="ruby-identifier">data</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">data</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
-<span class="line-num">406</span> 
-<span class="line-num">407</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">data</span>
-<span class="line-num">408</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both a :data option and a block to copy_into&quot;</span>
-<span class="line-num">409</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">data</span>
-<span class="line-num">410</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide either a :data option or a block to copy_into&quot;</span>
-<span class="line-num">411</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">412</span> 
-<span class="line-num">413</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
-<span class="line-num">414</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">copy_into_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
-<span class="line-num">415</span>     <span class="ruby-keyword">begin</span>
-<span class="line-num">416</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
-<span class="line-num">417</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-keyword">yield</span>
-<span class="line-num">418</span>           <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_data</span>(<span class="ruby-identifier">buf</span>)
-<span class="line-num">419</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">420</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">421</span>         <span class="ruby-identifier">data</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">buff</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_data</span>(<span class="ruby-identifier">buff</span>)}
-<span class="line-num">422</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">423</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Exception</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">424</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_end</span>(<span class="ruby-string">&quot;ruby exception occurred while copying data into PostgreSQL&quot;</span>)
-<span class="line-num">425</span>     <span class="ruby-keyword">ensure</span>
-<span class="line-num">426</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_end</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">e</span>
-<span class="line-num">427</span>       <span class="ruby-keyword">while</span> <span class="ruby-identifier">res</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_result</span>
-<span class="line-num">428</span>         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">e</span>
-<span class="line-num">429</span>         <span class="ruby-identifier">check_database_errors</span>{<span class="ruby-identifier">res</span>.<span class="ruby-identifier">check</span>}
-<span class="line-num">430</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">431</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">432</span>   <span class="ruby-keyword">end</span> 
-<span class="line-num">433</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">427</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">copy_into</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">428</span>   <span class="ruby-identifier">data</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:data</span>]
+<span class="line-num">429</span>   <span class="ruby-identifier">data</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">data</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
+<span class="line-num">430</span> 
+<span class="line-num">431</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">data</span>
+<span class="line-num">432</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both a :data option and a block to copy_into&quot;</span>
+<span class="line-num">433</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">data</span>
+<span class="line-num">434</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide either a :data option or a block to copy_into&quot;</span>
+<span class="line-num">435</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">436</span> 
+<span class="line-num">437</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">438</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">copy_into_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
+<span class="line-num">439</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">440</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">441</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-keyword">yield</span>
+<span class="line-num">442</span>           <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_data</span>(<span class="ruby-identifier">buf</span>)
+<span class="line-num">443</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">444</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">445</span>         <span class="ruby-identifier">data</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">buff</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_data</span>(<span class="ruby-identifier">buff</span>)}
+<span class="line-num">446</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">447</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Exception</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">448</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_end</span>(<span class="ruby-string">&quot;ruby exception occurred while copying data into PostgreSQL&quot;</span>)
+<span class="line-num">449</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">450</span>       <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">put_copy_end</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">e</span>
+<span class="line-num">451</span>       <span class="ruby-keyword">while</span> <span class="ruby-identifier">res</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_result</span>
+<span class="line-num">452</span>         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">e</span>
+<span class="line-num">453</span>         <span class="ruby-identifier">check_database_errors</span>{<span class="ruby-identifier">res</span>.<span class="ruby-identifier">check</span>}
+<span class="line-num">454</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">455</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">456</span>   <span class="ruby-keyword">end</span> 
+<span class="line-num">457</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-copy_table'>
@@ -322,7 +333,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p><code>copy_table</code> uses PostgreSQL’s +COPY TO STDOUT+ SQL statement to return formatted results directly to the caller.  This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want results returned to the client.  If you are using +COPY TO+ with a filename, you should just use <code>run</code> instead of this method.</p>
+<p>:nocov:  <code>copy_table</code> uses PostgreSQL’s +COPY TO STDOUT+ SQL statement to return formatted results directly to the caller.  This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want results returned to the client.  If you are using +COPY TO+ with a filename, you should just use <code>run</code> instead of this method.</p>
 
 <p>The table argument supports the following types:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>String </td><td>
@@ -350,35 +361,35 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-copy_table-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">353</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">copy_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">354</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
-<span class="line-num">355</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">copy_table_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
-<span class="line-num">356</span>     <span class="ruby-keyword">begin</span>
-<span class="line-num">357</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
-<span class="line-num">358</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_copy_data</span>
-<span class="line-num">359</span>           <span class="ruby-keyword">yield</span> <span class="ruby-identifier">buf</span>
-<span class="line-num">360</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">361</span>         <span class="ruby-identifier">b</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">362</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">363</span>         <span class="ruby-identifier">b</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">364</span>         <span class="ruby-identifier">b</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">buf</span> <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_copy_data</span>
-<span class="line-num">365</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">366</span> 
-<span class="line-num">367</span>       <span class="ruby-identifier">res</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_last_result</span>
-<span class="line-num">368</span>       <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">res</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">res</span>.<span class="ruby-identifier">result_status</span> <span class="ruby-operator">!=</span> <span class="ruby-value">1</span>
-<span class="line-num">369</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">NotAllCopyDataRetrieved</span>, <span class="ruby-string">&quot;Not all COPY data retrieved&quot;</span>
-<span class="line-num">370</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">371</span> 
-<span class="line-num">372</span>       <span class="ruby-identifier">b</span>
-<span class="line-num">373</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">374</span>       <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>, <span class="ruby-value">:disconnect</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">375</span>     <span class="ruby-keyword">ensure</span>
-<span class="line-num">376</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">buf</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">e</span>
-<span class="line-num">377</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-string">&quot;disconnecting as a partial COPY may leave the connection in an unusable state&quot;</span>
-<span class="line-num">378</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">379</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">380</span>   <span class="ruby-keyword">end</span> 
-<span class="line-num">381</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">377</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">copy_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">378</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">379</span>     <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">copy_table_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
+<span class="line-num">380</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">381</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">382</span>         <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_copy_data</span>
+<span class="line-num">383</span>           <span class="ruby-keyword">yield</span> <span class="ruby-identifier">buf</span>
+<span class="line-num">384</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">385</span>         <span class="ruby-identifier">b</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">386</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">387</span>         <span class="ruby-identifier">b</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">388</span>         <span class="ruby-identifier">b</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">buf</span> <span class="ruby-keyword">while</span> <span class="ruby-identifier">buf</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_copy_data</span>
+<span class="line-num">389</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">390</span> 
+<span class="line-num">391</span>       <span class="ruby-identifier">res</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">get_last_result</span>
+<span class="line-num">392</span>       <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">res</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">res</span>.<span class="ruby-identifier">result_status</span> <span class="ruby-operator">!=</span> <span class="ruby-value">1</span>
+<span class="line-num">393</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">NotAllCopyDataRetrieved</span>, <span class="ruby-string">&quot;Not all COPY data retrieved&quot;</span>
+<span class="line-num">394</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">395</span> 
+<span class="line-num">396</span>       <span class="ruby-identifier">b</span>
+<span class="line-num">397</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">398</span>       <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>, <span class="ruby-value">:disconnect</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">399</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">400</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">buf</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">e</span>
+<span class="line-num">401</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-string">&quot;disconnecting as a partial COPY may leave the connection in an unusable state&quot;</span>
+<span class="line-num">402</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">403</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">404</span>   <span class="ruby-keyword">end</span> 
+<span class="line-num">405</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disconnect_connection'>
@@ -395,11 +406,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-disconnect_connection-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">268</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect_connection</span>(<span class="ruby-identifier">conn</span>)
-<span class="line-num">269</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">finish</span>
-<span class="line-num">270</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span>, <span class="ruby-constant">IOError</span>
-<span class="line-num">271</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">272</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">288</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect_connection</span>(<span class="ruby-identifier">conn</span>)
+<span class="line-num">289</span>   <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">finish</span>
+<span class="line-num">290</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span>, <span class="ruby-constant">IOError</span>
+<span class="line-num">291</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">292</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-error_info'>
@@ -410,7 +421,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Return a hash of information about the related PGError (or Sequel::DatabaseError that wraps a PGError), with the following entries (any of which may be <code>nil</code>):</p>
+<p>:nocov:  Return a hash of information about the related PGError (or Sequel::DatabaseError that wraps a PGError), with the following entries (any of which may be <code>nil</code>):</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:schema </td><td>
 <p>The schema name related to the error</p>
 </td></tr><tr><td class='label'>:table </td><td>
@@ -453,28 +464,28 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-error_info-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">297</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">error_info</span>(<span class="ruby-identifier">e</span>)
-<span class="line-num">298</span>   <span class="ruby-identifier">e</span> = <span class="ruby-identifier">e</span>.<span class="ruby-identifier">wrapped_exception</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DatabaseError</span>)
-<span class="line-num">299</span>   <span class="ruby-identifier">r</span> = <span class="ruby-identifier">e</span>.<span class="ruby-identifier">result</span>
-<span class="line-num">300</span>   {
-<span class="line-num">301</span>     <span class="ruby-value">:schema</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SCHEMA_NAME</span>),
-<span class="line-num">302</span>     <span class="ruby-value">:table</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_TABLE_NAME</span>),
-<span class="line-num">303</span>     <span class="ruby-value">:column</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_COLUMN_NAME</span>),
-<span class="line-num">304</span>     <span class="ruby-value">:constraint</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_CONSTRAINT_NAME</span>),
-<span class="line-num">305</span>     <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_DATATYPE_NAME</span>),
-<span class="line-num">306</span>     <span class="ruby-value">:severity</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SEVERITY</span>),
-<span class="line-num">307</span>     <span class="ruby-value">:sql_state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SQLSTATE</span>),
-<span class="line-num">308</span>     <span class="ruby-value">:message_primary</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_MESSAGE_PRIMARY</span>),
-<span class="line-num">309</span>     <span class="ruby-value">:message_detail</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_MESSAGE_DETAIL</span>),
-<span class="line-num">310</span>     <span class="ruby-value">:message_hint</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_MESSAGE_HINT</span>),
-<span class="line-num">311</span>     <span class="ruby-value">:statement_position</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_STATEMENT_POSITION</span>),
-<span class="line-num">312</span>     <span class="ruby-value">:internal_position</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_INTERNAL_POSITION</span>),
-<span class="line-num">313</span>     <span class="ruby-value">:internal_query</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_INTERNAL_QUERY</span>),
-<span class="line-num">314</span>     <span class="ruby-value">:source_file</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SOURCE_FILE</span>),
-<span class="line-num">315</span>     <span class="ruby-value">:source_line</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SOURCE_LINE</span>),
-<span class="line-num">316</span>     <span class="ruby-value">:source_function</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SOURCE_FUNCTION</span>)
-<span class="line-num">317</span>   }
-<span class="line-num">318</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">319</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">error_info</span>(<span class="ruby-identifier">e</span>)
+<span class="line-num">320</span>   <span class="ruby-identifier">e</span> = <span class="ruby-identifier">e</span>.<span class="ruby-identifier">wrapped_exception</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DatabaseError</span>)
+<span class="line-num">321</span>   <span class="ruby-identifier">r</span> = <span class="ruby-identifier">e</span>.<span class="ruby-identifier">result</span>
+<span class="line-num">322</span>   {
+<span class="line-num">323</span>     <span class="ruby-value">:schema</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SCHEMA_NAME</span>),
+<span class="line-num">324</span>     <span class="ruby-value">:table</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_TABLE_NAME</span>),
+<span class="line-num">325</span>     <span class="ruby-value">:column</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_COLUMN_NAME</span>),
+<span class="line-num">326</span>     <span class="ruby-value">:constraint</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_CONSTRAINT_NAME</span>),
+<span class="line-num">327</span>     <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_DATATYPE_NAME</span>),
+<span class="line-num">328</span>     <span class="ruby-value">:severity</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SEVERITY</span>),
+<span class="line-num">329</span>     <span class="ruby-value">:sql_state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SQLSTATE</span>),
+<span class="line-num">330</span>     <span class="ruby-value">:message_primary</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_MESSAGE_PRIMARY</span>),
+<span class="line-num">331</span>     <span class="ruby-value">:message_detail</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_MESSAGE_DETAIL</span>),
+<span class="line-num">332</span>     <span class="ruby-value">:message_hint</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_MESSAGE_HINT</span>),
+<span class="line-num">333</span>     <span class="ruby-value">:statement_position</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_STATEMENT_POSITION</span>),
+<span class="line-num">334</span>     <span class="ruby-value">:internal_position</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_INTERNAL_POSITION</span>),
+<span class="line-num">335</span>     <span class="ruby-value">:internal_query</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_INTERNAL_QUERY</span>),
+<span class="line-num">336</span>     <span class="ruby-value">:source_file</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SOURCE_FILE</span>),
+<span class="line-num">337</span>     <span class="ruby-value">:source_line</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SOURCE_LINE</span>),
+<span class="line-num">338</span>     <span class="ruby-value">:source_function</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">error_field</span>(<span class="ruby-operator">::</span><span class="ruby-constant">PG</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_DIAG_SOURCE_FUNCTION</span>)
+<span class="line-num">339</span>   }
+<span class="line-num">340</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute'>
@@ -491,9 +502,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">321</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">322</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">check_database_errors</span>{<span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}}
-<span class="line-num">323</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">343</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">344</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">check_database_errors</span>{<span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}}
+<span class="line-num">345</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-listen'>
@@ -530,43 +541,43 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-listen-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">458</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">listen</span>(<span class="ruby-identifier">channels</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">459</span>   <span class="ruby-identifier">check_database_errors</span> <span class="ruby-keyword">do</span>
-<span class="line-num">460</span>     <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
-<span class="line-num">461</span>       <span class="ruby-keyword">begin</span>
-<span class="line-num">462</span>         <span class="ruby-identifier">channels</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">channels</span>)
-<span class="line-num">463</span>         <span class="ruby-identifier">channels</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">channel</span><span class="ruby-operator">|</span>
-<span class="line-num">464</span>           <span class="ruby-identifier">sql</span> = <span class="ruby-string">&quot;LISTEN &quot;</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">465</span>           <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:identifier_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">channel</span>)
-<span class="line-num">466</span>           <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">467</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">468</span>         <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_listen</span>].<span class="ruby-identifier">call</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_listen</span>]
-<span class="line-num">469</span>         <span class="ruby-identifier">timeout</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:timeout</span>]
-<span class="line-num">470</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">timeout</span>
-<span class="line-num">471</span>           <span class="ruby-identifier">timeout_block</span> = <span class="ruby-identifier">timeout</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:call</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">timeout</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">timeout</span>}
-<span class="line-num">472</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">473</span> 
-<span class="line-num">474</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">l</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:loop</span>]
-<span class="line-num">475</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;calling #listen with :loop requires a block&#39;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block</span>
-<span class="line-num">476</span>           <span class="ruby-identifier">loop_call</span> = <span class="ruby-identifier">l</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:call</span>)
-<span class="line-num">477</span>           <span class="ruby-identifier">catch</span>(<span class="ruby-value">:stop</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">478</span>             <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
-<span class="line-num">479</span>               <span class="ruby-identifier">t</span> = <span class="ruby-identifier">timeout_block</span> <span class="ruby-operator">?</span> [<span class="ruby-identifier">timeout_block</span>.<span class="ruby-identifier">call</span>] <span class="ruby-operator">:</span> []
-<span class="line-num">480</span>               <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">wait_for_notify</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">t</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">481</span>               <span class="ruby-identifier">l</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">loop_call</span>
-<span class="line-num">482</span>             <span class="ruby-keyword">end</span>
-<span class="line-num">483</span>           <span class="ruby-keyword">end</span>
-<span class="line-num">484</span>           <span class="ruby-keyword">nil</span>
-<span class="line-num">485</span>         <span class="ruby-keyword">else</span>
-<span class="line-num">486</span>           <span class="ruby-identifier">t</span> = <span class="ruby-identifier">timeout_block</span> <span class="ruby-operator">?</span> [<span class="ruby-identifier">timeout_block</span>.<span class="ruby-identifier">call</span>] <span class="ruby-operator">:</span> []
-<span class="line-num">487</span>           <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">wait_for_notify</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">t</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">488</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">489</span>       <span class="ruby-keyword">ensure</span>
-<span class="line-num">490</span>         <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&quot;UNLISTEN *&quot;</span>)
-<span class="line-num">491</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">492</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">493</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">494</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">482</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">listen</span>(<span class="ruby-identifier">channels</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">483</span>   <span class="ruby-identifier">check_database_errors</span> <span class="ruby-keyword">do</span>
+<span class="line-num">484</span>     <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">485</span>       <span class="ruby-keyword">begin</span>
+<span class="line-num">486</span>         <span class="ruby-identifier">channels</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">channels</span>)
+<span class="line-num">487</span>         <span class="ruby-identifier">channels</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">channel</span><span class="ruby-operator">|</span>
+<span class="line-num">488</span>           <span class="ruby-identifier">sql</span> = <span class="ruby-string">&quot;LISTEN &quot;</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">489</span>           <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:identifier_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">channel</span>)
+<span class="line-num">490</span>           <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">491</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">492</span>         <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_listen</span>].<span class="ruby-identifier">call</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_listen</span>]
+<span class="line-num">493</span>         <span class="ruby-identifier">timeout</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:timeout</span>]
+<span class="line-num">494</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">timeout</span>
+<span class="line-num">495</span>           <span class="ruby-identifier">timeout_block</span> = <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">timeout</span>.<span class="ruby-identifier">call</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">timeout</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">timeout</span>}
+<span class="line-num">496</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">497</span> 
+<span class="line-num">498</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">l</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:loop</span>]
+<span class="line-num">499</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;calling #listen with :loop requires a block&#39;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block</span>
+<span class="line-num">500</span>           <span class="ruby-identifier">loop_call</span> = <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">l</span>.<span class="ruby-identifier">call</span>)
+<span class="line-num">501</span>           <span class="ruby-identifier">catch</span>(<span class="ruby-value">:stop</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">502</span>             <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
+<span class="line-num">503</span>               <span class="ruby-identifier">t</span> = <span class="ruby-identifier">timeout_block</span> <span class="ruby-operator">?</span> [<span class="ruby-identifier">timeout_block</span>.<span class="ruby-identifier">call</span>] <span class="ruby-operator">:</span> []
+<span class="line-num">504</span>               <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">wait_for_notify</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">t</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">505</span>               <span class="ruby-identifier">l</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">loop_call</span>
+<span class="line-num">506</span>             <span class="ruby-keyword">end</span>
+<span class="line-num">507</span>           <span class="ruby-keyword">end</span>
+<span class="line-num">508</span>           <span class="ruby-keyword">nil</span>
+<span class="line-num">509</span>         <span class="ruby-keyword">else</span>
+<span class="line-num">510</span>           <span class="ruby-identifier">t</span> = <span class="ruby-identifier">timeout_block</span> <span class="ruby-operator">?</span> [<span class="ruby-identifier">timeout_block</span>.<span class="ruby-identifier">call</span>] <span class="ruby-operator">:</span> []
+<span class="line-num">511</span>           <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">wait_for_notify</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">t</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">512</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">513</span>       <span class="ruby-keyword">ensure</span>
+<span class="line-num">514</span>         <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&quot;UNLISTEN *&quot;</span>)
+<span class="line-num">515</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">516</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">517</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">518</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

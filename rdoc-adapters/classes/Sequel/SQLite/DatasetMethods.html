@@ -288,7 +288,7 @@ Sequel::SQLite::DatasetMethods
 </a>
 <pre id='method-i-having-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
 <span class="line-num">665</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">having</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>)
-<span class="line-num">666</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">InvalidOperation</span>, <span class="ruby-string">&quot;Can only specify a HAVING clause on a grouped dataset&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:group</span>]
+<span class="line-num">666</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">InvalidOperation</span>, <span class="ruby-string">&quot;Can only specify a HAVING clause on a grouped dataset&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:group</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">33900</span>
 <span class="line-num">667</span>   <span class="ruby-keyword">super</span>
 <span class="line-num">668</span> <span class="ruby-keyword">end</span></pre>
 </div>
