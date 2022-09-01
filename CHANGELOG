@@ -1,4 +1,4 @@
-=== master
+=== 5.60.0 (2022-09-01)
 
 * Support arbitrary expressions for date_arithmetic interval values on PostgreSQL 9.4+ (jeremyevans)
 

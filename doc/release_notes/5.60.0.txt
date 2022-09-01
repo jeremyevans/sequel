@@ -1,0 +1,22 @@
+= New Features
+
+* The date_arithmetic extension now supports arbitrary expressions
+  as interval values on PostgreSQL 9.4+.  Previously, only integers
+  were supported for the interval values.
+
+= Other Improvements
+
+* Most Kernel#respond_to? calls have been converted to equivalent
+  defined? calls for better performance.  defined? is a keyword
+  and is about 50% faster for the same behavior.
+
+* The is_distinct_from extension now supports the IS DISTINCT FROM
+  syntax natively on SQLite 3.39+, instead of emulating it.
+
+* HAVING without GROUP BY is now supported on SQLite 3.39+.
+
+* Coverage testing has been significantly expanded.  Previously,
+  the core, model, plugin, and extension code had 100% line/branch
+  coverage.  100% line/branch coverage has been added for the
+  core extensions, bin/sequel, and the postgres adapter with the
+  pg driver.
