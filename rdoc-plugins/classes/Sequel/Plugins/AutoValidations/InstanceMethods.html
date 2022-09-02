@@ -121,7 +121,7 @@ Sequel::Plugins::AutoValidations::InstanceMethods
 <span class="line-num">252</span> 
 <span class="line-num">253</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">skip</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:unique</span>)
 <span class="line-num">254</span>     <span class="ruby-identifier">unique_opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>[<span class="ruby-value">:unique</span>]]
-<span class="line-num">255</span>     <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_dataset</span>)
+<span class="line-num">255</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:sti_dataset</span>)
 <span class="line-num">256</span>       <span class="ruby-identifier">unique_opts</span>[<span class="ruby-value">:dataset</span>] = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_dataset</span>
 <span class="line-num">257</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">258</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">auto_validate_unique_columns</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">cols</span><span class="ruby-operator">|</span> <span class="ruby-identifier">validates_unique</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">unique_opts</span>)}

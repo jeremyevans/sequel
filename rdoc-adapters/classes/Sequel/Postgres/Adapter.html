@@ -249,7 +249,7 @@ Superclass:
 <span class="line-num">160</span>   <span class="ruby-keyword">begin</span>
 <span class="line-num">161</span>     <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">q</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">cmd_tuples</span>
 <span class="line-num">162</span>   <span class="ruby-keyword">ensure</span>
-<span class="line-num">163</span>     <span class="ruby-identifier">q</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">q</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">q</span>.<span class="ruby-identifier">clear</span>)
+<span class="line-num">163</span>     <span class="ruby-identifier">q</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">q</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:clear</span>)
 <span class="line-num">164</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
 </div>

@@ -93,7 +93,7 @@ Sequel::Postgres::PGRow::DatabaseMethods
 <span class="line-num">375</span>     <span class="ruby-ivar">@row_schema_types</span> = {}
 <span class="line-num">376</span>     <span class="ruby-identifier">extend</span>(<span class="ruby-ivar">@row_type_method_module</span> = <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>)
 <span class="line-num">377</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">2249</span>, <span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:converter</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>))
-<span class="line-num">378</span>     <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">register_array_type</span>)
+<span class="line-num">378</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)
 <span class="line-num">379</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;record&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2287</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2249</span>)
 <span class="line-num">380</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">381</span>   <span class="ruby-keyword">end</span>
@@ -230,7 +230,7 @@ Sequel::Postgres::PGRow::DatabaseMethods
 <span class="line-num">464</span>   <span class="ruby-identifier">parser</span> = <span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">parser_opts</span>)
 <span class="line-num">465</span>   <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">parser</span>.<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">parser</span>)
 <span class="line-num">466</span> 
-<span class="line-num">467</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-identifier">register_array_type</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">array_oid</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">array_oid</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+<span class="line-num">467</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">array_oid</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">array_oid</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
 <span class="line-num">468</span>     <span class="ruby-identifier">array_type_name</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_schema</span>
 <span class="line-num">469</span>       <span class="ruby-node">&quot;#{type_schema}.#{type_name}&quot;</span>
 <span class="line-num">470</span>     <span class="ruby-keyword">else</span>

@@ -96,7 +96,7 @@ Sequel::Plugins::InsertConflict
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/insert_conflict.rb</span>
 <span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
 <span class="line-num">38</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">39</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">insert_conflict</span>)
+<span class="line-num">39</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:insert_conflict</span>)
 <span class="line-num">40</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;#{self}&#39;s dataset does not support insert_conflict&quot;</span>
 <span class="line-num">41</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">42</span>   <span class="ruby-keyword">end</span>
