@@ -3443,7 +3443,7 @@ describe 'PostgreSQL hstore handling' do
   end
 end if DB.type_supported?(:hstore)
 
-describe 'PostgreSQL json type' do
+describe 'PostgreSQL' do
   before(:all) do
     @db = DB
     @ds = @db[:items]
@@ -3466,8 +3466,11 @@ describe 'PostgreSQL json type' do
     array_class = json_type == :jsonb ? Sequel::Postgres::JSONBArray : Sequel::Postgres::JSONArray
     str_class = json_type == :jsonb ? Sequel::Postgres::JSONBString : Sequel::Postgres::JSONString
     object_class = json_type == :jsonb ? Sequel::Postgres::JSONBObject : Sequel::Postgres::JSONObject
+    Sequel.extension :pg_json_ops
+    jo = pg_json.call('a'=>1, 'b'=>{'c'=>2, 'd'=>{'e'=>3}}).op
+    ja = pg_json.call([2, 3, %w'a b']).op
 
-    it 'insert and retrieve json values' do
+    it "insert and retrieve #{json_type} values" do
       @db.create_table!(:items){column :j, json_type}
       @ds.insert(pg_json.call(@h))
       @ds.count.must_equal 1
@@ -3495,7 +3498,7 @@ describe 'PostgreSQL json type' do
       @ds.all.must_equal rs
     end
 
-    it 'insert and retrieve json primitive values' do
+    it "insert and retrieve #{json_type} primitive values" do
       @db.create_table!(:items){column :j, json_type}
       ['str', 1, 2.5, nil, true, false].each do |rv|
         @ds.delete
@@ -3533,7 +3536,7 @@ describe 'PostgreSQL json type' do
       end
     end
 
-    it 'insert and retrieve json[] values' do
+    it "insert and retrieve #{json_type}[] values" do
       @db.create_table!(:items){column :j, json_array_type}
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])])
       @ds.insert(j)
@@ -3549,7 +3552,7 @@ describe 'PostgreSQL json type' do
       @ds.all.must_equal rs
     end
 
-    it 'insert and retrieve json[] values with json primitives' do
+    it "insert and retrieve #{json_type}[] values with json primitives" do
       @db.create_table!(:items){column :j, json_array_type}
       raw = ['str', 1, 2.5, nil, true, false]
       j = Sequel.pg_array(raw.map(&pg_json_wrap), json_type)
@@ -3597,7 +3600,7 @@ describe 'PostgreSQL json type' do
       end
     end
 
-    it 'with models' do
+    it "models with #{json_type} columns" do
       @db.create_table!(:items) do
         primary_key :id
         column :h, json_type
@@ -3609,7 +3612,7 @@ describe 'PostgreSQL json type' do
       c.create(:h=>pg_json.call(@a)).h.must_equal @a
     end
 
-    it 'with models with json primitives' do
+    it "models with #{json_type} primitives" do
       @db.create_table!(:items) do
         primary_key :id
         column :h, json_type
@@ -3665,7 +3668,7 @@ describe 'PostgreSQL json type' do
       c.new(:h=>nil).h.must_be_nil
     end
 
-    it 'with empty json default values and defaults_setter plugin' do
+    it "with empty #{json_type} default values and defaults_setter plugin" do
       @db.create_table!(:items) do
         column :h, json_type, :default=>hash_class.new({})
         column :a, json_type, :default=>array_class.new([])
@@ -3684,7 +3687,7 @@ describe 'PostgreSQL json type' do
       o.a.must_equal([1])
     end
 
-    it 'use json in bound variables' do
+    it "use #{json_type} in bound variables" do
       @db.create_table!(:items){column :i, json_type}
       @ds.call(:insert, {:i=>pg_json.call(@h)}, {:i=>:$i})
       @ds.get(:i).must_equal @h
@@ -3699,7 +3702,7 @@ describe 'PostgreSQL json type' do
       @ds.get(:i).must_equal j
     end if uses_pg_or_jdbc
 
-    it 'use json primitives in bound variables' do
+    it "use #{json_type} primitives in bound variables" do
       @db.create_table!(:items){column :i, json_type}
       @db.wrap_json_primitives = true
       raw = ['str', 1, 2.5, nil, true, false]
@@ -3729,11 +3732,7 @@ describe 'PostgreSQL json type' do
       end
     end if uses_pg_or_jdbc
 
-    it 'operations/functions with pg_json_ops' do
-      Sequel.extension :pg_json_ops
-      jo = pg_json.call('a'=>1, 'b'=>{'c'=>2, 'd'=>{'e'=>3}}).op
-      ja = pg_json.call([2, 3, %w'a b']).op
-
+    it "9.3 #{json_type} operations/functions with pg_json_ops" do
       @db.get(jo['a']).must_equal 1
       @db.get(jo['b']['c']).must_equal 2
       @db.get(jo[%w'b c']).must_equal 2
@@ -3752,216 +3751,11 @@ describe 'PostgreSQL json type' do
       @db.get(ja.array_length).must_equal 3
       @db.from(ja.array_elements.as(:v)).select_map(:v).must_equal [2, 3, %w'a b']
 
-      if DB.server_version >= 90400 
-        @db.get(jo.typeof).must_equal 'object'
-        @db.get(ja.typeof).must_equal 'array'
-        @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.must_equal ['2', '3', '["a","b"]']
-        @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).must_equal [1]
-        @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).must_equal [1]
-
-        if json_type == :jsonb
-          @db.get(jo.has_key?('a')).must_equal true
-          @db.get(jo.has_key?('c')).must_equal false
-          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('2')).must_equal true
-          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('4')).must_equal false
-
-          @db.get(jo.contain_all(['a', 'b'])).must_equal true
-          @db.get(jo.contain_all(['a', 'c'])).must_equal false
-          @db.get(jo.contain_all(['d', 'c'])).must_equal false
-          @db.get(jo.contain_any(['a', 'b'])).must_equal true
-          @db.get(jo.contain_any(['a', 'c'])).must_equal true
-          @db.get(jo.contain_any(['d', 'c'])).must_equal false
-
-          @db.get(jo.contains(jo)).must_equal true
-          @db.get(jo.contained_by(jo)).must_equal true
-          @db.get(jo.contains('a'=>1)).must_equal true
-          @db.get(jo.contained_by('a'=>1)).must_equal false
-          @db.get(pg_json.call('a'=>1).op.contains(jo)).must_equal false
-          @db.get(pg_json.call('a'=>1).op.contained_by(jo)).must_equal true
-
-          @db.get(ja.contains(ja)).must_equal true
-          @db.get(ja.contained_by(ja)).must_equal true
-          @db.get(ja.contains([2,3])).must_equal true
-          @db.get(ja.contained_by([2,3])).must_equal false
-          @db.get(pg_json.call([2,3]).op.contains(ja)).must_equal false
-          @db.get(pg_json.call([2,3]).op.contained_by(ja)).must_equal true
-        end
-      end
-
-      if DB.server_version >= 90500 && json_type == :jsonb
-        @db.get(pg_json.call([nil, 2]).op.strip_nulls[1]).must_equal 2
-        @db.get(pg_json.call([nil, 2]).op.pretty).must_equal "[\n    null,\n    2\n]"
-        @db.from((jo - 'b').keys.as(:k)).select_order_map(:k).must_equal %w'a'
-        @db.from(jo.delete_path(['b','c'])['b'].keys.as(:k)).select_order_map(:k).must_equal %w'd'
-        @db.from(jo.concat('c'=>'d').keys.as(:k)).select_order_map(:k).must_equal %w'a b c'
-        @db.get(jo.set(%w'a', 'f'=>'g')['a']['f']).must_equal 'g'
-
-        if DB.server_version >= 130000
-          @db.get(jo.set_lax(%w'a', 'f'=>'g')['a']['f']).must_equal 'g'
-        end
-      end
-
-      if DB.server_version >= 90600  && json_type == :jsonb
-        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2})[0]['a']).must_equal 2
-        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, false)[0]['a']).must_equal 2
-        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, true)[0]).must_equal 3
-        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, true)[1]['a']).must_equal 2
-      end
-
       @db.from(jo.keys.as(:k)).select_order_map(:k).must_equal %w'a b'
       @db.from(jo.each).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each).order(:key).select_map(:value).must_equal [1, {'c'=>2, 'd'=>{'e'=>3}}]
       @db.from(jo.each_text).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').must_match(/\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/)
-
-      if DB.server_version >= 120000  && json_type == :jsonb
-        @db.get(jo.path_exists('$.b.d.e')).must_equal true
-        @db.get(jo.path_exists('$.b.d.f')).must_equal false
-
-        @db.get(jo.path_exists!('$.b.d.e')).must_equal true
-        @db.get(jo.path_exists!('$.b.d.f')).must_equal false
-        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal true
-        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal false
-        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', x: 2)).must_equal true
-        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', x: 4)).must_equal false
-        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal true
-        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal false
-
-        @db.get(jo.path_match('$.b.d.e')).must_be_nil
-        @db.get(jo.path_match('$.b.d.f')).must_be_nil
-        @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match('$.b.d.e')).must_equal true
-        @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match('$.b.d.e')).must_equal false
-
-        proc{@db.get(jo.path_match!('$.b.d.e'))}.must_raise(Sequel::DatabaseError)
-        proc{@db.get(jo.path_match!('$.b.d.f'))}.must_raise(Sequel::DatabaseError)
-        @db.get(jo.path_match!('$.b.d.e', {}, true)).must_be_nil
-        @db.get(jo.path_match!('$.b.d.f', {}, true)).must_be_nil
-        @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match!('$.b.d.e')).must_equal true
-        @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match!('$.b.d.e')).must_equal false
-        @db.get(jo.path_match!('$.b.d.e > $x', '{"x":2}')).must_equal true
-        @db.get(jo.path_match!('$.b.d.e > $x', '{"x":4}')).must_equal false
-        @db.get(jo.path_match!('$.b.d.e > $x', x: 2)).must_equal true
-        @db.get(jo.path_match!('$.b.d.e > $x', x: 4)).must_equal false
-        @db.get(jo.path_match!('$.b.d.e > $x', {x: 2}, false)).must_equal true
-        @db.get(jo.path_match!('$.b.d.e > $x', {x: 4}, true)).must_equal false
-
-        @db.get(jo.path_query_first('$.b.d.e')).must_equal 3
-        @db.get(jo.path_query_first('$.b.d.f')).must_be_nil
-        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal 3
-        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', '{"x":4}')).must_be_nil
-        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', x: 2)).must_equal 3
-        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', x: 4)).must_be_nil
-        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal 3
-        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_be_nil
-
-        @db.get(jo.path_query_array('$.b.d.e')).must_equal [3]
-        @db.get(jo.path_query_array('$.b.d.f')).must_equal []
-        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal [3]
-        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal []
-        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', x: 2)).must_equal [3]
-        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', x: 4)).must_equal []
-        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal [3]
-        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal []
-
-        @db.from(jo.path_query('$.b.d.e').as(:a, [:b])).get(:b).must_equal 3
-        @db.from(jo.path_query('$.b.d.f').as(:a, [:b])).get(:b).must_be_nil
-        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', '{"x":2}').as(:a, [:b])).get(:b).must_equal 3
-        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', '{"x":4}').as(:a, [:b])).get(:b).must_be_nil
-        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', x: 2).as(:a, [:b])).get(:b).must_equal 3
-        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', x: 4).as(:a, [:b])).get(:b).must_be_nil
-        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', {x: 2}, true).as(:a, [:b])).get(:b).must_equal 3
-        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', {x: 4}, false).as(:a, [:b])).get(:b).must_be_nil
-
-        if DB.server_version >= 130000
-          @db.get(jo.path_exists_tz!('$.b.d.e')).must_equal true
-          @db.get(jo.path_exists_tz!('$.b.d.f')).must_equal false
-          @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal true
-          @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal false
-          @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', x: 2)).must_equal true
-          @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', x: 4)).must_equal false
-          @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal true
-          @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal false
-
-          proc{@db.get(jo.path_match_tz!('$.b.d.e'))}.must_raise(Sequel::DatabaseError)
-          proc{@db.get(jo.path_match_tz!('$.b.d.f'))}.must_raise(Sequel::DatabaseError)
-          @db.get(jo.path_match_tz!('$.b.d.e', {}, true)).must_be_nil
-          @db.get(jo.path_match_tz!('$.b.d.f', {}, true)).must_be_nil
-          @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match_tz!('$.b.d.e')).must_equal true
-          @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match_tz!('$.b.d.e')).must_equal false
-          @db.get(jo.path_match_tz!('$.b.d.e > $x', '{"x":2}')).must_equal true
-          @db.get(jo.path_match_tz!('$.b.d.e > $x', '{"x":4}')).must_equal false
-          @db.get(jo.path_match_tz!('$.b.d.e > $x', x: 2)).must_equal true
-          @db.get(jo.path_match_tz!('$.b.d.e > $x', x: 4)).must_equal false
-          @db.get(jo.path_match_tz!('$.b.d.e > $x', {x: 2}, false)).must_equal true
-          @db.get(jo.path_match_tz!('$.b.d.e > $x', {x: 4}, true)).must_equal false
-
-          @db.get(jo.path_query_first_tz('$.b.d.e')).must_equal 3
-          @db.get(jo.path_query_first_tz('$.b.d.f')).must_be_nil
-          @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal 3
-          @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', '{"x":4}')).must_be_nil
-          @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', x: 2)).must_equal 3
-          @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', x: 4)).must_be_nil
-          @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal 3
-          @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_be_nil
-
-          @db.get(jo.path_query_array_tz('$.b.d.e')).must_equal [3]
-          @db.get(jo.path_query_array_tz('$.b.d.f')).must_equal []
-          @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal [3]
-          @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal []
-          @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', x: 2)).must_equal [3]
-          @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', x: 4)).must_equal []
-          @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal [3]
-          @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal []
-
-          @db.from(jo.path_query_tz('$.b.d.e').as(:a, [:b])).get(:b).must_equal 3
-          @db.from(jo.path_query_tz('$.b.d.f').as(:a, [:b])).get(:b).must_be_nil
-          @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', '{"x":2}').as(:a, [:b])).get(:b).must_equal 3
-          @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', '{"x":4}').as(:a, [:b])).get(:b).must_be_nil
-          @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', x: 2).as(:a, [:b])).get(:b).must_equal 3
-          @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', x: 4).as(:a, [:b])).get(:b).must_be_nil
-          @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', {x: 2}, true).as(:a, [:b])).get(:b).must_equal 3
-          @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', {x: 4}, false).as(:a, [:b])).get(:b).must_be_nil
-        end
-      end
-
-      if DB.server_version >= 150000
-        meth = Sequel.method(:"pg_#{json_type}_op")
-        @db.get(meth.call('{}').is_json).must_equal true
-        @db.get(meth.call('null').is_json).must_equal true
-        @db.get(meth.call('1').is_json).must_equal true
-        @db.get(meth.call('"a"').is_json).must_equal true
-        @db.get(meth.call('[]').is_json).must_equal true
-        @db.get(meth.call('').is_json).must_equal false
-
-        @db.get(meth.call('1').is_json(:type=>:scalar)).must_equal true
-        @db.get(meth.call('null').is_json(:type=>:value)).must_equal true
-        @db.get(meth.call('{}').is_json(:type=>:object)).must_equal true
-        @db.get(meth.call('{}').is_json(:type=>:array)).must_equal false
-        @db.get(meth.call('{"a": 1, "a": 2}').is_json(:type=>:object, :unique=>true)).must_equal false
-        @db.get(meth.call('{"a": 1, "b": 2}').is_json(:type=>:object, :unique=>true)).must_equal true
-        @db.get(meth.call('[]').is_json(:type=>:object, :unique=>true)).must_equal false
-        @db.get(meth.call('{"a": 1, "a": 2}').is_json(:unique=>true)).must_equal false
-        @db.get(meth.call('{"a": 1, "b": 2}').is_json(:unique=>true)).must_equal true
-        @db.get(meth.call('[]').is_json(:unique=>true)).must_equal true
-
-        @db.get(meth.call('{}').is_not_json).must_equal false
-        @db.get(meth.call('null').is_not_json).must_equal false
-        @db.get(meth.call('1').is_not_json).must_equal false
-        @db.get(meth.call('"a"').is_not_json).must_equal false
-        @db.get(meth.call('[]').is_not_json).must_equal false
-        @db.get(meth.call('').is_not_json).must_equal true
-
-        @db.get(meth.call('1').is_not_json(:type=>:scalar)).must_equal false
-        @db.get(meth.call('null').is_not_json(:type=>:value)).must_equal false
-        @db.get(meth.call('{}').is_not_json(:type=>:object)).must_equal false
-        @db.get(meth.call('{}').is_not_json(:type=>:array)).must_equal true
-        @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal true
-        @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal false
-        @db.get(meth.call('[]').is_not_json(:type=>:object, :unique=>true)).must_equal true
-        @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:unique=>true)).must_equal true
-        @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:unique=>true)).must_equal false
-        @db.get(meth.call('[]').is_not_json(:unique=>true)).must_equal false
-      end
 
       Sequel.extension :pg_row_ops
       @db.create_table!(:items) do
@@ -3974,17 +3768,220 @@ describe 'PostgreSQL json type' do
       j = Sequel.pg_json([{'a'=>1, 'b'=>'c'}, {'a'=>2, 'b'=>'d'}]).op
       @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).must_equal [1, 2]
       @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).must_equal %w'c d'
-
-      if DB.server_version >= 140000 && json_type == :jsonb
-        @db.create_table!(:items){column :i, json_type}
-        @db[:items].delete
-        @db[:items].insert(:i=>Sequel.pg_jsonb('a'=>{'b'=>1}))
-        @db[:items].update(Sequel.pg_jsonb_op(:i)['a']['b'] => '2',
-          Sequel.pg_jsonb_op(:i)['a']['c'] => '3',
-          Sequel.pg_jsonb_op(Sequel[:i])['d'] => Sequel.pg_jsonb('e'=>4))
-        @db[:items].all.must_equal [{:i=>{'a'=>{'b'=>2, 'c'=>3}, 'd'=>{'e'=>4}}}]
-      end
     end if DB.server_version >= 90300
+
+    it "9.4 #{json_type} operations/functions with pg_json_ops" do
+      @db.get(jo.typeof).must_equal 'object'
+      @db.get(ja.typeof).must_equal 'array'
+      @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.must_equal ['2', '3', '["a","b"]']
+      @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).must_equal [1]
+      @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).must_equal [1]
+
+      if json_type == :jsonb
+        @db.get(jo.has_key?('a')).must_equal true
+        @db.get(jo.has_key?('c')).must_equal false
+        @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('2')).must_equal true
+        @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('4')).must_equal false
+
+        @db.get(jo.contain_all(['a', 'b'])).must_equal true
+        @db.get(jo.contain_all(['a', 'c'])).must_equal false
+        @db.get(jo.contain_all(['d', 'c'])).must_equal false
+        @db.get(jo.contain_any(['a', 'b'])).must_equal true
+        @db.get(jo.contain_any(['a', 'c'])).must_equal true
+        @db.get(jo.contain_any(['d', 'c'])).must_equal false
+
+        @db.get(jo.contains(jo)).must_equal true
+        @db.get(jo.contained_by(jo)).must_equal true
+        @db.get(jo.contains('a'=>1)).must_equal true
+        @db.get(jo.contained_by('a'=>1)).must_equal false
+        @db.get(pg_json.call('a'=>1).op.contains(jo)).must_equal false
+        @db.get(pg_json.call('a'=>1).op.contained_by(jo)).must_equal true
+
+        @db.get(ja.contains(ja)).must_equal true
+        @db.get(ja.contained_by(ja)).must_equal true
+        @db.get(ja.contains([2,3])).must_equal true
+        @db.get(ja.contained_by([2,3])).must_equal false
+        @db.get(pg_json.call([2,3]).op.contains(ja)).must_equal false
+        @db.get(pg_json.call([2,3]).op.contained_by(ja)).must_equal true
+      end
+    end if DB.server_version >= 90400 
+
+    it '9.5 jsonb operations/functions with pg_json_ops' do
+      @db.get(pg_json.call([nil, 2]).op.strip_nulls[1]).must_equal 2
+      @db.get(pg_json.call([nil, 2]).op.pretty).must_equal "[\n    null,\n    2\n]"
+      @db.from((jo - 'b').keys.as(:k)).select_order_map(:k).must_equal %w'a'
+      @db.from(jo.delete_path(['b','c'])['b'].keys.as(:k)).select_order_map(:k).must_equal %w'd'
+      @db.from(jo.concat('c'=>'d').keys.as(:k)).select_order_map(:k).must_equal %w'a b c'
+      @db.get(jo.set(%w'a', 'f'=>'g')['a']['f']).must_equal 'g'
+    end if DB.server_version >= 90500 && json_type == :jsonb
+
+    it '9.6 jsonb operations/functions with pg_json_ops' do
+      @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2})[0]['a']).must_equal 2
+      @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, false)[0]['a']).must_equal 2
+      @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, true)[0]).must_equal 3
+      @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, true)[1]['a']).must_equal 2
+    end if DB.server_version >= 90600  && json_type == :jsonb
+
+    it '12 jsonb operations/functions with pg_json_ops' do
+      @db.get(jo.path_exists('$.b.d.e')).must_equal true
+      @db.get(jo.path_exists('$.b.d.f')).must_equal false
+
+      @db.get(jo.path_exists!('$.b.d.e')).must_equal true
+      @db.get(jo.path_exists!('$.b.d.f')).must_equal false
+      @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal true
+      @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal false
+      @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', x: 2)).must_equal true
+      @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', x: 4)).must_equal false
+      @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal true
+      @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal false
+
+      @db.get(jo.path_match('$.b.d.e')).must_be_nil
+      @db.get(jo.path_match('$.b.d.f')).must_be_nil
+      @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match('$.b.d.e')).must_equal true
+      @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match('$.b.d.e')).must_equal false
+
+      proc{@db.get(jo.path_match!('$.b.d.e'))}.must_raise(Sequel::DatabaseError)
+      proc{@db.get(jo.path_match!('$.b.d.f'))}.must_raise(Sequel::DatabaseError)
+      @db.get(jo.path_match!('$.b.d.e', {}, true)).must_be_nil
+      @db.get(jo.path_match!('$.b.d.f', {}, true)).must_be_nil
+      @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match!('$.b.d.e')).must_equal true
+      @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match!('$.b.d.e')).must_equal false
+      @db.get(jo.path_match!('$.b.d.e > $x', '{"x":2}')).must_equal true
+      @db.get(jo.path_match!('$.b.d.e > $x', '{"x":4}')).must_equal false
+      @db.get(jo.path_match!('$.b.d.e > $x', x: 2)).must_equal true
+      @db.get(jo.path_match!('$.b.d.e > $x', x: 4)).must_equal false
+      @db.get(jo.path_match!('$.b.d.e > $x', {x: 2}, false)).must_equal true
+      @db.get(jo.path_match!('$.b.d.e > $x', {x: 4}, true)).must_equal false
+
+      @db.get(jo.path_query_first('$.b.d.e')).must_equal 3
+      @db.get(jo.path_query_first('$.b.d.f')).must_be_nil
+      @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal 3
+      @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', '{"x":4}')).must_be_nil
+      @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', x: 2)).must_equal 3
+      @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', x: 4)).must_be_nil
+      @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal 3
+      @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_be_nil
+
+      @db.get(jo.path_query_array('$.b.d.e')).must_equal [3]
+      @db.get(jo.path_query_array('$.b.d.f')).must_equal []
+      @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal [3]
+      @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal []
+      @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', x: 2)).must_equal [3]
+      @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', x: 4)).must_equal []
+      @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal [3]
+      @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal []
+
+      @db.from(jo.path_query('$.b.d.e').as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query('$.b.d.f').as(:a, [:b])).get(:b).must_be_nil
+      @db.from(jo.path_query('$.b.d.e ? (@ > $x)', '{"x":2}').as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query('$.b.d.e ? (@ > $x)', '{"x":4}').as(:a, [:b])).get(:b).must_be_nil
+      @db.from(jo.path_query('$.b.d.e ? (@ > $x)', x: 2).as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query('$.b.d.e ? (@ > $x)', x: 4).as(:a, [:b])).get(:b).must_be_nil
+      @db.from(jo.path_query('$.b.d.e ? (@ > $x)', {x: 2}, true).as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query('$.b.d.e ? (@ > $x)', {x: 4}, false).as(:a, [:b])).get(:b).must_be_nil
+    end if DB.server_version >= 120000  && json_type == :jsonb
+
+    it '13 jsonb operations/functions with pg_json_ops' do
+      @db.get(jo.set_lax(%w'a', 'f'=>'g')['a']['f']).must_equal 'g'
+
+      @db.get(jo.path_exists_tz!('$.b.d.e')).must_equal true
+      @db.get(jo.path_exists_tz!('$.b.d.f')).must_equal false
+      @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal true
+      @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal false
+      @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', x: 2)).must_equal true
+      @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', x: 4)).must_equal false
+      @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal true
+      @db.get(jo.path_exists_tz!('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal false
+
+      proc{@db.get(jo.path_match_tz!('$.b.d.e'))}.must_raise(Sequel::DatabaseError)
+      proc{@db.get(jo.path_match_tz!('$.b.d.f'))}.must_raise(Sequel::DatabaseError)
+      @db.get(jo.path_match_tz!('$.b.d.e', {}, true)).must_be_nil
+      @db.get(jo.path_match_tz!('$.b.d.f', {}, true)).must_be_nil
+      @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match_tz!('$.b.d.e')).must_equal true
+      @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match_tz!('$.b.d.e')).must_equal false
+      @db.get(jo.path_match_tz!('$.b.d.e > $x', '{"x":2}')).must_equal true
+      @db.get(jo.path_match_tz!('$.b.d.e > $x', '{"x":4}')).must_equal false
+      @db.get(jo.path_match_tz!('$.b.d.e > $x', x: 2)).must_equal true
+      @db.get(jo.path_match_tz!('$.b.d.e > $x', x: 4)).must_equal false
+      @db.get(jo.path_match_tz!('$.b.d.e > $x', {x: 2}, false)).must_equal true
+      @db.get(jo.path_match_tz!('$.b.d.e > $x', {x: 4}, true)).must_equal false
+
+      @db.get(jo.path_query_first_tz('$.b.d.e')).must_equal 3
+      @db.get(jo.path_query_first_tz('$.b.d.f')).must_be_nil
+      @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal 3
+      @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', '{"x":4}')).must_be_nil
+      @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', x: 2)).must_equal 3
+      @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', x: 4)).must_be_nil
+      @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal 3
+      @db.get(jo.path_query_first_tz('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_be_nil
+
+      @db.get(jo.path_query_array_tz('$.b.d.e')).must_equal [3]
+      @db.get(jo.path_query_array_tz('$.b.d.f')).must_equal []
+      @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal [3]
+      @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal []
+      @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', x: 2)).must_equal [3]
+      @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', x: 4)).must_equal []
+      @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal [3]
+      @db.get(jo.path_query_array_tz('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal []
+
+      @db.from(jo.path_query_tz('$.b.d.e').as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query_tz('$.b.d.f').as(:a, [:b])).get(:b).must_be_nil
+      @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', '{"x":2}').as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', '{"x":4}').as(:a, [:b])).get(:b).must_be_nil
+      @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', x: 2).as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', x: 4).as(:a, [:b])).get(:b).must_be_nil
+      @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', {x: 2}, true).as(:a, [:b])).get(:b).must_equal 3
+      @db.from(jo.path_query_tz('$.b.d.e ? (@ > $x)', {x: 4}, false).as(:a, [:b])).get(:b).must_be_nil
+    end if DB.server_version >= 130000  && json_type == :jsonb
+
+    it '14 jsonb operations/functions with pg_json_ops' do
+      @db.create_table!(:items){column :i, json_type}
+      @db[:items].delete
+      @db[:items].insert(:i=>Sequel.pg_jsonb('a'=>{'b'=>1}))
+      @db[:items].update(Sequel.pg_jsonb_op(:i)['a']['b'] => '2',
+        Sequel.pg_jsonb_op(:i)['a']['c'] => '3',
+        Sequel.pg_jsonb_op(Sequel[:i])['d'] => Sequel.pg_jsonb('e'=>4))
+      @db[:items].all.must_equal [{:i=>{'a'=>{'b'=>2, 'c'=>3}, 'd'=>{'e'=>4}}}]
+    end if DB.server_version >= 140000 && json_type == :jsonb
+
+    it "15 #{json_type} operations/functions with pg_json_ops" do
+      meth = Sequel.method(:"pg_#{json_type}_op")
+      @db.get(meth.call('{}').is_json).must_equal true
+      @db.get(meth.call('null').is_json).must_equal true
+      @db.get(meth.call('1').is_json).must_equal true
+      @db.get(meth.call('"a"').is_json).must_equal true
+      @db.get(meth.call('[]').is_json).must_equal true
+      @db.get(meth.call('').is_json).must_equal false
+
+      @db.get(meth.call('1').is_json(:type=>:scalar)).must_equal true
+      @db.get(meth.call('null').is_json(:type=>:value)).must_equal true
+      @db.get(meth.call('{}').is_json(:type=>:object)).must_equal true
+      @db.get(meth.call('{}').is_json(:type=>:array)).must_equal false
+      @db.get(meth.call('{"a": 1, "a": 2}').is_json(:type=>:object, :unique=>true)).must_equal false
+      @db.get(meth.call('{"a": 1, "b": 2}').is_json(:type=>:object, :unique=>true)).must_equal true
+      @db.get(meth.call('[]').is_json(:type=>:object, :unique=>true)).must_equal false
+      @db.get(meth.call('{"a": 1, "a": 2}').is_json(:unique=>true)).must_equal false
+      @db.get(meth.call('{"a": 1, "b": 2}').is_json(:unique=>true)).must_equal true
+      @db.get(meth.call('[]').is_json(:unique=>true)).must_equal true
+
+      @db.get(meth.call('{}').is_not_json).must_equal false
+      @db.get(meth.call('null').is_not_json).must_equal false
+      @db.get(meth.call('1').is_not_json).must_equal false
+      @db.get(meth.call('"a"').is_not_json).must_equal false
+      @db.get(meth.call('[]').is_not_json).must_equal false
+      @db.get(meth.call('').is_not_json).must_equal true
+
+      @db.get(meth.call('1').is_not_json(:type=>:scalar)).must_equal false
+      @db.get(meth.call('null').is_not_json(:type=>:value)).must_equal false
+      @db.get(meth.call('{}').is_not_json(:type=>:object)).must_equal false
+      @db.get(meth.call('{}').is_not_json(:type=>:array)).must_equal true
+      @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal true
+      @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal false
+      @db.get(meth.call('[]').is_not_json(:type=>:object, :unique=>true)).must_equal true
+      @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:unique=>true)).must_equal true
+      @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:unique=>true)).must_equal false
+      @db.get(meth.call('[]').is_not_json(:unique=>true)).must_equal false
+    end if DB.server_version >= 150000
   end
 end if DB.server_version >= 90200
 
