@@ -1,4 +1,4 @@
-=== master
+=== 5.60.1 (2022-09-02)
 
 * Revert conversion of respond_to? to defined?, as it breaks with unused refinements on Ruby 2 (jeremyevans) (#1919)
 
