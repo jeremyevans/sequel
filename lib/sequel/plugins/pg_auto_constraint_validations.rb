@@ -159,7 +159,7 @@ module Sequel
 
           case @dataset.first_source_table
           when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
-           convert_errors = defined?(db.error_info)
+           convert_errors = db.respond_to?(:error_info)
           end
 
           unless convert_errors

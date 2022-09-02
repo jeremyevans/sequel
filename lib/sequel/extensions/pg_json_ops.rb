@@ -358,7 +358,7 @@ module Sequel
       # Automatically wrap argument in a PGArray if it is a plain Array.
       # Requires that the pg_array extension has been loaded to work.
       def wrap_array(arg)
-        if arg.instance_of?(Array) && defined?(Sequel.pg_array)
+        if arg.instance_of?(Array) && Sequel.respond_to?(:pg_array)
           Sequel.pg_array(arg)
         else
           arg
@@ -652,7 +652,7 @@ module Sequel
 
       # Wrap argument in a PGArray if it is an array
       def wrap_input_array(obj)
-        if obj.is_a?(Array) && defined?(Sequel.pg_array) 
+        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array) 
           Sequel.pg_array(obj)
         else
           obj
@@ -661,7 +661,7 @@ module Sequel
 
       # Wrap argument in a JSONBArray or JSONBHash if it is an array or hash.
       def wrap_input_jsonb(obj)
-        if defined?(Sequel.pg_jsonb) && (obj.is_a?(Array) || obj.is_a?(Hash))
+        if Sequel.respond_to?(:pg_jsonb) && (obj.is_a?(Array) || obj.is_a?(Hash))
           Sequel.pg_jsonb(obj)
         else
           obj

@@ -492,13 +492,13 @@ module Sequel
       def plugin(plugin, *args, &block)
         m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
 
-        if !defined?(m.apply) && !defined?(m.configure) && (!args.empty? || block)
+        if !m.respond_to?(:apply) && !m.respond_to?(:configure) && (!args.empty? || block)
           Deprecation.deprecate("Plugin #{plugin} accepts no arguments or block, and passing arguments/block to it", "Remove arguments and block when loading the plugin")
         end
 
         unless @plugins.include?(m)
           @plugins << m
-          m.apply(self, *args, &block) if defined?(m.apply)
+          m.apply(self, *args, &block) if m.respond_to?(:apply)
           extend(m::ClassMethods) if m.const_defined?(:ClassMethods, false)
           include(m::InstanceMethods) if m.const_defined?(:InstanceMethods, false)
           if m.const_defined?(:DatasetMethods, false)
@@ -506,7 +506,7 @@ module Sequel
           end
         end
 
-        m.configure(self, *args, &block) if defined?(m.configure)
+        m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
       # :nocov:
       ruby2_keywords(:plugin) if respond_to?(:ruby2_keywords, true)

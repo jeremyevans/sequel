@@ -91,7 +91,7 @@ module Sequel
         # +many_to_many+ association, make sure the associated object is created on the
         # current object's shard, unless the passed object already has an assigned shard.
         def ensure_associated_primary_key(opts, o, *args)
-          o.set_server?(@server) if defined?(o.set_server?)
+          o.set_server?(@server) if o.respond_to?(:set_server?)
           super
         end
 

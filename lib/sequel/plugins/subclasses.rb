@@ -35,7 +35,7 @@ module Sequel
     #   class B < Sequel::Model; end
     #   a # => [A, B]
     module Subclasses
-      NEED_SUBCLASSES = !defined?(Object.subclasses) || Object.method(:subclasses).source_location
+      NEED_SUBCLASSES = !Object.respond_to?(:subclasses) || Object.method(:subclasses).source_location
       private_constant :NEED_SUBCLASSES
 
       # Initialize the subclasses instance variable for the model.

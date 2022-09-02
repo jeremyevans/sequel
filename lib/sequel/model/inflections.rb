@@ -99,7 +99,7 @@ module Sequel
     # Convert the given string to CamelCase.  Will also convert '/' to '::' which is useful for converting paths to namespaces.
     def camelize(s)
       s = s.to_s
-      return s.camelize if defined?(s.camelize)
+      return s.camelize if s.respond_to?(:camelize)
       s = s.gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
       s
     end
@@ -109,7 +109,7 @@ module Sequel
     # or is not initialized.
     def constantize(s)
       s = s.to_s
-      return s.constantize if defined?(s.constantize)
+      return s.constantize if s.respond_to?(:constantize)
       raise(NameError, "#{s.inspect} is not a valid constant name!") unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(s)
       Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
     end
@@ -117,14 +117,14 @@ module Sequel
     # Removes the module part from the expression in the string
     def demodulize(s)
       s = s.to_s
-      return s.demodulize if defined?(s.demodulize)
+      return s.demodulize if s.respond_to?(:demodulize)
       s.gsub(/^.*::/, '')
     end
   
     # Returns the plural form of the word in the string.
     def pluralize(s)
       s = s.to_s
-      return s.pluralize if defined?(s.pluralize)
+      return s.pluralize if s.respond_to?(:pluralize)
       result = s.dup
       Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
@@ -133,7 +133,7 @@ module Sequel
     # The reverse of pluralize, returns the singular form of a word in a string.
     def singularize(s)
       s = s.to_s
-      return s.singularize if defined?(s.singularize)
+      return s.singularize if s.respond_to?(:singularize)
       result = s.dup
       Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
@@ -143,7 +143,7 @@ module Sequel
     # Also changes '::' to '/' to convert namespaces to paths.
     def underscore(s)
       s = s.to_s
-      return s.underscore if defined?(s.underscore)
+      return s.underscore if s.respond_to?(:underscore)
       s.gsub('::', '/').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').
         gsub(/([a-z\d])([A-Z])/, '\1_\2').tr('-', '_').downcase
     end

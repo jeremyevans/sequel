@@ -296,7 +296,7 @@ module Sequel
 
       # Wrap argument in a PGArray if it is an array
       def wrap_input_array(obj)
-        if obj.is_a?(Array) && defined?(Sequel.pg_array) 
+        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array) 
           Sequel.pg_array(obj)
         else
           obj
@@ -305,7 +305,7 @@ module Sequel
 
       # Wrap argument in an Hstore if it is a hash
       def wrap_input_hash(obj)
-        if obj.is_a?(Hash) && defined?(Sequel.hstore) 
+        if obj.is_a?(Hash) && Sequel.respond_to?(:hstore) 
           Sequel.hstore(obj)
         else
           obj
@@ -314,7 +314,7 @@ module Sequel
 
       # Wrap argument in a PGArrayOp if supported
       def wrap_output_array(obj)
-        if defined?(Sequel.pg_array_op) 
+        if Sequel.respond_to?(:pg_array_op) 
           Sequel.pg_array_op(obj)
         else
           obj

@@ -282,7 +282,7 @@ module Sequel
               o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && v.size == i
             end
             if w = opts[:within]
-              o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && w.public_send(defined?(w.cover?) ? :cover? : :include?, v.size)
+              o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && w.public_send(w.respond_to?(:cover?) ? :cover? : :include?, v.size)
             end
           end
         end
@@ -337,14 +337,14 @@ module Sequel
         def validates_inclusion_of(*atts)
           opts = extract_options!(atts)
           n = opts[:in]
-          unless n && (defined?(n.cover?) || defined?(n.include?))
+          unless n && (n.respond_to?(:cover?) || n.respond_to?(:include?))
             raise ArgumentError, "The :in parameter is required, and must respond to cover? or include?"
           end
           opts[:message] ||= "is not in range or set: #{n.inspect}"
           reflect_validation(:inclusion, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors.add(a, opts[:message]) unless n.public_send(defined?(n.cover?) ? :cover? : :include?, v)
+            o.errors.add(a, opts[:message]) unless n.public_send(n.respond_to?(:cover?) ? :cover? : :include?, v)
           end
         end
     

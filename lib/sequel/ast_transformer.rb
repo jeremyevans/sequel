@@ -81,7 +81,7 @@ module Sequel
       when SQL::Wrapper
         SQL::Wrapper.new(v(o.value))
       when SQL::Expression
-        if defined?(o.sequel_ast_transform)
+        if o.respond_to?(:sequel_ast_transform)
           o.sequel_ast_transform(method(:v))
         else
           o

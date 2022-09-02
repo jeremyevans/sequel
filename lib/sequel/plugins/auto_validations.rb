@@ -252,7 +252,7 @@ module Sequel
 
           unless skip.include?(:unique)
             unique_opts = Hash[opts[:unique]]
-            if defined?(model.sti_dataset)
+            if model.respond_to?(:sti_dataset)
               unique_opts[:dataset] = model.sti_dataset
             end
             model.auto_validate_unique_columns.each{|cols| validates_unique(cols, unique_opts)}

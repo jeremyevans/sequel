@@ -139,7 +139,7 @@ module Sequel
             register_range_type('tstzrange', :oid=>3910, :subtype_oid=>1184)
             register_range_type('daterange', :oid=>3912, :subtype_oid=>1082)
             register_range_type('int8range', :oid=>3926, :subtype_oid=>20)
-            if defined?(register_array_type)
+            if respond_to?(:register_array_type)
               register_array_type('int4range', :oid=>3905, :scalar_oid=>3904, :scalar_typecast=>:int4range)
               register_array_type('numrange', :oid=>3907, :scalar_oid=>3906, :scalar_typecast=>:numrange)
               register_array_type('tsrange', :oid=>3909, :scalar_oid=>3908, :scalar_typecast=>:tsrange)
@@ -154,7 +154,7 @@ module Sequel
             procs = conversion_procs
             add_conversion_proc(3908, Parser.new("tsrange", procs[1114]))
             add_conversion_proc(3910, Parser.new("tstzrange", procs[1184]))
-            if defined?(register_array_type) && defined?(PGArray::Creator)
+            if respond_to?(:register_array_type) && defined?(PGArray::Creator)
               add_conversion_proc(3909, PGArray::Creator.new("tsrange", procs[3908]))
               add_conversion_proc(3911, PGArray::Creator.new("tstzrange", procs[3910]))
             end

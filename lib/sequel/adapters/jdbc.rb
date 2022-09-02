@@ -38,7 +38,7 @@ module Sequel
     else
       if defined?(::Jdbc) && ( ::Jdbc.const_defined?(name) rescue nil )
         jdbc_module = ::Jdbc.const_get(name) # e.g. Jdbc::SQLite3
-        jdbc_module.load_driver if defined?(jdbc_module.load_driver)
+        jdbc_module.load_driver if jdbc_module.respond_to?(:load_driver)
       end
     end
 
@@ -396,9 +396,9 @@ module Sequel
 
       def database_exception_sqlstate(exception, opts)
         if database_exception_use_sqlstates?
-          while defined?(exception.cause)
+          while exception.respond_to?(:cause)
             exception = exception.cause
-            return exception.getSQLState if defined?(exception.getSQLState)
+            return exception.getSQLState if exception.respond_to?(:getSQLState)
           end
         end
         nil
@@ -415,8 +415,8 @@ module Sequel
 
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
-        cause = defined?(exception.cause) ? exception.cause : exception
-        super || (defined?(cause.getSQLState) && cause.getSQLState =~ /^08/)
+        cause = exception.respond_to?(:cause) ? exception.cause : exception
+        super || (cause.respond_to?(:getSQLState) && cause.getSQLState =~ /^08/)
       end
 
       # Execute the prepared statement.  If the provided name is a

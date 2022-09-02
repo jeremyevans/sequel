@@ -44,7 +44,7 @@ module Sequel
         errors = @model.errors
       end
 
-      if defined?(errors.full_messages)
+      if errors.respond_to?(:full_messages)
         @errors = errors
         super(errors.full_messages.join(', '))
       else

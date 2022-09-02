@@ -205,7 +205,7 @@ module Sequel
           return @server_version = Integer(@opts[:server_version])
         end
         @server_version = synchronize(server) do |conn|
-          (conn.server_version rescue nil) if defined?(conn.server_version)
+          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
           m = /^(\d+)\.(\d+)\.(\d+)/.match(fetch("SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)").single_value.to_s)

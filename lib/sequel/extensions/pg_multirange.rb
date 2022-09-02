@@ -124,7 +124,7 @@ module Sequel
             register_multirange_type('datemultirange', :range_oid=>3912, :oid=>4535)
             register_multirange_type('int8multirange', :range_oid=>3926, :oid=>4536)
 
-            if defined?(register_array_type)
+            if respond_to?(:register_array_type)
               register_array_type('int4multirange', :oid=>6150, :scalar_oid=>4451, :scalar_typecast=>:int4multirange)
               register_array_type('nummultirange', :oid=>6151, :scalar_oid=>4532, :scalar_typecast=>:nummultirange)
               register_array_type('tsmultirange', :oid=>6152, :scalar_oid=>4533, :scalar_typecast=>:tsmultirange)
@@ -141,7 +141,7 @@ module Sequel
             add_conversion_proc(4533, PGMultiRange::Creator.new("tsmultirange", procs[3908]))
             add_conversion_proc(4534, PGMultiRange::Creator.new("tstzmultirange", procs[3910]))
 
-            if defined?(register_array_type) && defined?(PGArray::Creator)
+            if respond_to?(:register_array_type) && defined?(PGArray::Creator)
               add_conversion_proc(6152, PGArray::Creator.new("tsmultirange", procs[4533]))
               add_conversion_proc(6153, PGArray::Creator.new("tstzmultirange", procs[4534]))
             end

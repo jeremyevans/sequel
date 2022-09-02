@@ -1398,9 +1398,9 @@ module Sequel
       # don't cache SQL for a dataset that uses this.
       disable_sql_caching!
 
-      if defined?(v.sql_literal_append)
+      if v.respond_to?(:sql_literal_append)
         v.sql_literal_append(self, sql)
-      elsif defined?(v.sql_literal)
+      elsif v.respond_to?(:sql_literal)
         sql << v.sql_literal(self)
       else
         raise Error, "can't express #{v.inspect} as a SQL literal"

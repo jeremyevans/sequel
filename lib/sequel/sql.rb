@@ -1347,7 +1347,7 @@ module Sequel
       # underlying callable only accepts a single argument, call it
       # with the given dataset.
       def call(ds)
-        if defined?(@callable.arity) && @callable.arity == 1
+        if @callable.respond_to?(:arity) && @callable.arity == 1
           @callable.call(ds)
         else
           @callable.call

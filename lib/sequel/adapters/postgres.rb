@@ -160,7 +160,7 @@ module Sequel
         begin
           defined?(yield) ? yield(q) : q.cmd_tuples
         ensure
-          q.clear if q && defined?(q.clear)
+          q.clear if q && q.respond_to?(:clear)
         end
       end
 
@@ -258,7 +258,7 @@ module Sequel
 
         # :nocov:
         if encoding = opts[:encoding] || opts[:charset]
-          if defined?(conn.set_client_encoding)
+          if conn.respond_to?(:set_client_encoding)
             conn.set_client_encoding(encoding)
           else
             conn.async_exec("set client_encoding to '#{encoding}'")
@@ -492,12 +492,12 @@ module Sequel
                 opts[:after_listen].call(conn) if opts[:after_listen]
                 timeout = opts[:timeout]
                 if timeout
-                  timeout_block = defined?(timeout.call) ? timeout : proc{timeout}
+                  timeout_block = timeout.respond_to?(:call) ? timeout : proc{timeout}
                 end
 
                 if l = opts[:loop]
                   raise Error, 'calling #listen with :loop requires a block' unless block
-                  loop_call = defined?(l.call)
+                  loop_call = l.respond_to?(:call)
                   catch(:stop) do
                     while true
                       t = timeout_block ? [timeout_block.call] : []
@@ -582,7 +582,7 @@ module Sequel
 
       def database_exception_sqlstate(exception, opts)
         # :nocov:
-        if defined?(exception.result) && (result = exception.result)
+        if exception.respond_to?(:result) && (result = exception.result)
         # :nocov:
           result.error_field(PGresult::PG_DIAG_SQLSTATE)
         end
@@ -625,7 +625,7 @@ module Sequel
         begin
           defined?(yield) ? yield(q) : q.cmd_tuples
         ensure
-          q.clear if q && defined?(q.clear)
+          q.clear if q && q.respond_to?(:clear)
         end
       end
 

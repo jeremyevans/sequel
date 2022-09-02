@@ -107,7 +107,7 @@ module Sequel
     
         # Check attribute value(s) is included in the given set.
         def validates_includes(set, atts, opts=OPTS)
-          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.public_send(defined?(set.cover?) ? :cover? : :include?, v)}
+          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.public_send(set.respond_to?(:cover?) ? :cover? : :include?, v)}
         end
     
         # Check attribute value(s) string representation is a valid integer.
