@@ -95,7 +95,7 @@ describe "pg_extended_date_support extension" do
   end
 
   it "should handle parsing AD timestamps with offset seconds" do
-    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20).to_time
+    @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal Time.utc(1200, 2, 15, 14, 13, 20)
     Sequel.datetime_class = DateTime
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20)
   end
@@ -109,17 +109,17 @@ describe "pg_extended_date_support extension" do
     proc{@db.literal(Object.new)}.must_raise Sequel::Error
   end
 
-  it "should format BC dates" do
+  it "should format BC and AD dates" do
     @db.literal(Date.new(-1091, 10, 20)).must_equal "'1092-10-20 BC'"
     @db.literal(Date.new(1092, 10, 20)).must_equal "'1092-10-20'"
   end
 
-  it "should format BC datetimes" do
+  it "should format BC and AD datetimes" do
     @db.literal(DateTime.new(-1199, 2, 15, 14, 13, 20)).must_equal "'1200-02-15 14:13:20.000000000+0000 BC'"
     @db.literal(DateTime.new(1200, 2, 15, 14, 13, 20)).must_equal "'1200-02-15 14:13:20.000000+0000'"
   end
 
-  it "should format BC times" do
+  it "should format BC and AD times" do
     @db.literal(Time.at(-100000000000).utc).must_equal "'1200-02-15 14:13:20.000000000+0000 BC'"
     @db.literal(Time.at(100000000000).utc).must_equal "'5138-11-16 09:46:40.000000+0000'"
   end

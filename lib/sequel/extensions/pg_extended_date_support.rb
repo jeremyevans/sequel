@@ -29,6 +29,8 @@ module Sequel
       INFINITE_DATETIME_VALUES = ([PLUS_INFINITY, MINUS_INFINITY] + INFINITE_TIMESTAMP_STRINGS).freeze
       PLUS_DATE_INFINITY = Date::Infinity.new
       MINUS_DATE_INFINITY = -PLUS_DATE_INFINITY
+      RATIONAL_60 = Rational(60)
+      TIME_CAN_PARSE_BC = RUBY_VERSION >= '2.5'
 
       # Add dataset methods and update the conversion proces for dates and timestamps.
       def self.extended(db)
@@ -86,27 +88,16 @@ module Sequel
         if value.is_a?(String) && (m = /((?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/.match(value)) && (m[2] || m[3])
           if m[3]
             value = value.sub(' BC', '').sub(' ', ' BC ')
-            conv = defined?(JRUBY_VERSION) && JRUBY_VERSION == '9.2.0.0'
           end
-          if m[2] || conv
-            dt = DateTime.parse(value)
-            if conv
-              # :nocov:
-              if Sequel.datetime_class == DateTime
-                dt >>= 12
-              else
-                dt >>= 24
-              end
-              # :nocov:
+          if m[2]
+            dt = if Sequel.datetime_class == DateTime
+              DateTime.parse(value)
+            elsif TIME_CAN_PARSE_BC
+              Time.parse(value)
+            else
+              DateTime.parse(value).to_time
             end
-            unless Sequel.datetime_class == DateTime
-              dt = dt.to_time
-              if conv && (timezone == nil || timezone == :local) && !m[1]
-                # :nocov:
-                dt = Sequel.send(:convert_input_timestamp, dt.strftime("%F %T.%6N"), :local)
-                # :nocov:
-              end
-            end
+
             Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
           else
             super(value)
@@ -223,10 +214,7 @@ module Sequel
           # Work around JRuby bug #4822 in Time#to_datetime for times before date of calendar reform
           def literal_time(time)
             if time < TIME_YEAR_1
-              dt = DateTime.parse(super)
-              # Work around JRuby bug #5191
-              dt >>= 12 if JRUBY_VERSION == '9.2.0.0'
-              literal_datetime(dt)
+              literal_datetime(DateTime.parse(super))
             else
               super
             end
@@ -236,7 +224,8 @@ module Sequel
           # Handle BC Time objects.
           def literal_time(time)
             if time < TIME_YEAR_1
-              literal_datetime(time.to_datetime)
+              time = db.from_application_timestamp(time)
+              time.strftime("'#{sprintf('%04i', time.year.abs+1)}-%m-%d %H:%M:%S.%N#{format_timestamp_offset(*(time.utc_offset/RATIONAL_60).divmod(60))} BC'")
             else
               super
             end
