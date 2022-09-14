@@ -16,6 +16,10 @@ else
   gem 'nokogiri'
 end
 
+if RUBY_VERSION < '2.3'
+  gem 'i18n', '<1.12'
+end
+
 if RUBY_VERSION < '2.2.0'
   gem 'activemodel', '<5.0.0'
 elsif RUBY_VERSION < '2.4.0'
