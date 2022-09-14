@@ -3943,45 +3943,6 @@ describe 'PostgreSQL' do
         Sequel.pg_jsonb_op(Sequel[:i])['d'] => Sequel.pg_jsonb('e'=>4))
       @db[:items].all.must_equal [{:i=>{'a'=>{'b'=>2, 'c'=>3}, 'd'=>{'e'=>4}}}]
     end if DB.server_version >= 140000 && json_type == :jsonb
-
-    it "15 #{json_type} operations/functions with pg_json_ops" do
-      meth = Sequel.method(:"pg_#{json_type}_op")
-      @db.get(meth.call('{}').is_json).must_equal true
-      @db.get(meth.call('null').is_json).must_equal true
-      @db.get(meth.call('1').is_json).must_equal true
-      @db.get(meth.call('"a"').is_json).must_equal true
-      @db.get(meth.call('[]').is_json).must_equal true
-      @db.get(meth.call('').is_json).must_equal false
-
-      @db.get(meth.call('1').is_json(:type=>:scalar)).must_equal true
-      @db.get(meth.call('null').is_json(:type=>:value)).must_equal true
-      @db.get(meth.call('{}').is_json(:type=>:object)).must_equal true
-      @db.get(meth.call('{}').is_json(:type=>:array)).must_equal false
-      @db.get(meth.call('{"a": 1, "a": 2}').is_json(:type=>:object, :unique=>true)).must_equal false
-      @db.get(meth.call('{"a": 1, "b": 2}').is_json(:type=>:object, :unique=>true)).must_equal true
-      @db.get(meth.call('[]').is_json(:type=>:object, :unique=>true)).must_equal false
-      @db.get(meth.call('{"a": 1, "a": 2}').is_json(:unique=>true)).must_equal false
-      @db.get(meth.call('{"a": 1, "b": 2}').is_json(:unique=>true)).must_equal true
-      @db.get(meth.call('[]').is_json(:unique=>true)).must_equal true
-
-      @db.get(meth.call('{}').is_not_json).must_equal false
-      @db.get(meth.call('null').is_not_json).must_equal false
-      @db.get(meth.call('1').is_not_json).must_equal false
-      @db.get(meth.call('"a"').is_not_json).must_equal false
-      @db.get(meth.call('[]').is_not_json).must_equal false
-      @db.get(meth.call('').is_not_json).must_equal true
-
-      @db.get(meth.call('1').is_not_json(:type=>:scalar)).must_equal false
-      @db.get(meth.call('null').is_not_json(:type=>:value)).must_equal false
-      @db.get(meth.call('{}').is_not_json(:type=>:object)).must_equal false
-      @db.get(meth.call('{}').is_not_json(:type=>:array)).must_equal true
-      @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal true
-      @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:type=>:object, :unique=>true)).must_equal false
-      @db.get(meth.call('[]').is_not_json(:type=>:object, :unique=>true)).must_equal true
-      @db.get(meth.call('{"a": 1, "a": 2}').is_not_json(:unique=>true)).must_equal true
-      @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:unique=>true)).must_equal false
-      @db.get(meth.call('[]').is_not_json(:unique=>true)).must_equal false
-    end if DB.server_version >= 150000
   end
 end if DB.server_version >= 90200
 

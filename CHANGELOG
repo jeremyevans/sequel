@@ -1,5 +1,7 @@
 === master
 
+* Remove is_json and is_not_json methods from the pg_json_ops extension, as the support was removed in PostgreSQL 15 beta 4 (jeremyevans)
+
 * Fix handling of timestamps before the date of calendar reform when using pg_extended_date_support extension on Ruby 3.2 (jeremyevans)
 
 === 5.60.1 (2022-09-02)
