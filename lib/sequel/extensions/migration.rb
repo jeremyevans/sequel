@@ -129,7 +129,11 @@ module Sequel
     end
 
     # Defines the migration's down action.
-    def down(&block)
+    def down(raw_sql = nil, &block)
+      if raw_sql
+        Kernel.raise(ArgumentError, "down cannot be given both raw sql and a block") if block
+        block = Proc.new { execute raw_sql }
+      end
       migration.down = block
     end
 
@@ -144,7 +148,11 @@ module Sequel
     end
 
     # Defines the migration's up action.
-    def up(&block)
+    def up(raw_sql = nil, &block)
+      if raw_sql
+        Kernel.raise(ArgumentError, "up cannot be given both raw sql and a block") if block
+        block = Proc.new { execute raw_sql }
+      end
       migration.up = block
     end
 

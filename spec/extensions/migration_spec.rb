@@ -63,7 +63,23 @@ describe "Migration.apply" do
     m.respond_to?(:foo).must_equal false
     m.respond_to?(:execute).must_equal true
   end
-  
+
+  it "should allow raw sql to the up and down methods in place of a block" do
+    m = Sequel.migration do
+      up "select 'up'"
+      down "select 'down'"
+    end
+    db = Sequel.mock
+    m.apply(db, :up)
+    m.apply(db, :down)
+    db.sqls.must_equal ["select 'up'", "select 'down'"]
+  end
+
+  it "should not allow both raw sql and a block to up and down" do
+    proc {Sequel.migration{ up("select 'up'") { 5 } }}.must_raise(ArgumentError)
+    proc {Sequel.migration{ down("select 'down'") { 6 } }}.must_raise(ArgumentError)
+  end
+
   if RUBY_VERSION >= '2.7'
     it "should handle keywords when delegating" do
       eval 'def @db.foo(name: (raise)) name end'
