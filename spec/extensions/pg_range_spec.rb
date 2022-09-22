@@ -199,6 +199,12 @@ describe "pg_range extension" do
       @db.typecast_value(:int4range, '[1,2]').must_equal @o
     end
 
+    it "should raise errors for too long string input if configured" do
+      proc{@db.typecast_value(:int4range, '[1,'+'1'*100+']')}.must_raise(Sequel::InvalidValue)
+      @db.check_string_typecast_bytesize = false
+      @db.typecast_value(:int4range, '[1,'+'1'*100+']').must_equal @R.new(1, Integer('1'*100), :db_type=>'int4range')
+    end
+
     it "should raise errors for unparsable formats" do
       proc{@db.typecast_value(:int8range, 'foo')}.must_raise(Sequel::InvalidValue)
     end

@@ -111,7 +111,7 @@ module Sequel
         when IPAddr
           value
         when String
-          IPAddr.new(value)
+          IPAddr.new(typecast_check_string_length(value, 100))
         else
           raise Sequel::InvalidValue, "invalid value for inet/cidr: #{value.inspect}"
         end

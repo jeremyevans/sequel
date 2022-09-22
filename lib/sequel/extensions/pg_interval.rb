@@ -197,7 +197,7 @@ module Sequel
         when Numeric
           ActiveSupport::Duration.new(value, [[:seconds, value]])
         when String
-          PARSER.call(value)
+          PARSER.call(typecast_check_string_length(value, 1000))
         else
           raise Sequel::InvalidValue, "invalid value for interval type: #{value.inspect}"
         end

@@ -8,6 +8,9 @@
 # :decimal :: use 0.0 for unsupported strings
 # :string :: silently allow hash and array conversion to string
 #
+# This also removes bytesize checks for string inputs for float, integer
+# and decimal conversions.
+#
 # To load the extension into the database:
 #
 #   DB.extension :looser_typecasting

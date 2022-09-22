@@ -63,6 +63,12 @@ describe "pg_inet extension" do
     @db.typecast_value(:ipaddr, ip.to_s).must_equal ip
     proc{@db.typecast_value(:ipaddr, '')}.must_raise(Sequel::InvalidValue)
     proc{@db.typecast_value(:ipaddr, 1)}.must_raise(Sequel::InvalidValue)
+
+    proc{@db.typecast_value(:ipaddr, '::ffff%'+'a'*100)}.must_raise(Sequel::InvalidValue)
+    @db.check_string_typecast_bytesize = false
+    if RUBY_VERSION >= '3.1'
+      @db.typecast_value(:ipaddr, '::ffff%'+'a'*100).must_equal IPAddr.new('::ffff%'+'a'*100)
+    end
   end
 
   it "should return correct results for Database#schema_type_class" do

@@ -91,6 +91,11 @@ module Sequel
     # The specific default size of string columns for this Sequel::Database, usually 255 by default.
     attr_accessor :default_string_column_size
 
+    # Whether to check the bytesize of strings before typecasting (to avoid typecasting strings that
+    # would be too long for the given type), true by default. Strings that are too long will raise
+    # a typecasting error.
+    attr_accessor :check_string_typecast_bytesize
+
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
@@ -98,6 +103,7 @@ module Sequel
     # :before_preconnect :: Callable that runs after extensions from :preconnect_extensions are loaded,
     #                       but before any connections are created.
     # :cache_schema :: Whether schema should be cached for this Database instance
+    # :check_string_typecast_bytesize :: Whether to check the bytesize of strings before typecasting.
     # :default_string_column_size :: The default size of string columns, 255 by default.
     # :extensions :: Extensions to load into this Database instance.  Can be a symbol, array of symbols,
     #                or string with extensions separated by columns.  These extensions are loaded after
@@ -107,7 +113,7 @@ module Sequel
     # :loggers :: An array of loggers to use.
     # :log_connection_info :: Whether connection information should be logged when logging queries.
     # :log_warn_duration :: The number of elapsed seconds after which queries should be logged at warn level.
-    # :name :: A name to use for the Database object, displayed in PoolTimeout .
+    # :name :: A name to use for the Database object, displayed in PoolTimeout.
     # :preconnect :: Automatically create the maximum number of connections, so that they don't
     #                need to be created as needed.  This is useful when connecting takes a long time
     #                and you want to avoid possible latency during runtime.
@@ -116,7 +122,7 @@ module Sequel
     # :preconnect_extensions :: Similar to the :extensions option, but loads the extensions before the
     #                           connections are made by the :preconnect option.
     # :quote_identifiers :: Whether to quote identifiers.
-    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .
+    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol.
     # :single_threaded :: Whether to use a single-threaded connection pool.
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
@@ -132,6 +138,7 @@ module Sequel
       @opts[:adapter_class] = self.class
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Sequel.single_threaded))
       @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
+      @check_string_typecast_bytesize = typecast_value_boolean(@opts.fetch(:check_string_typecast_bytesize, true))
 
       @schemas = {}
       @prepared_statements = {}
@@ -465,6 +472,21 @@ module Sequel
     #   Don't rescue other exceptions, they will be raised normally.
     end
 
+    # Check the bytesize of a string before conversion. There is no point
+    # trying to typecast strings that would be way too long.
+    def typecast_check_string_length(string, max_size)
+      if @check_string_typecast_bytesize && string.bytesize > max_size
+        raise InvalidValue, "string too long to typecast (bytesize: #{string.bytesize}, max: #{max_size})"
+      end
+      string
+    end
+
+    # Check the bytesize of the string value, if value is a string.
+    def typecast_check_length(value, max_size)
+      typecast_check_string_length(value, max_size) if String === value
+      value
+    end
+
     # Typecast the value to an SQL::Blob
     def typecast_value_blob(value)
       value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
@@ -488,9 +510,9 @@ module Sequel
       when Date
         value
       when String
-        Sequel.string_to_date(value)
+        Sequel.string_to_date(typecast_check_string_length(value, 100))
       when Hash
-        Date.new(*[:year, :month, :day].map{|x| (value[x] || value[x.to_s]).to_i})
+        Date.new(*[:year, :month, :day].map{|x| typecast_check_length(value[x] || value[x.to_s], 100).to_i})
       else
         raise InvalidValue, "invalid value for Date: #{value.inspect}"
       end
@@ -498,7 +520,17 @@ module Sequel
 
     # Typecast the value to a DateTime or Time depending on Sequel.datetime_class
     def typecast_value_datetime(value)
-      Sequel.typecast_to_application_timestamp(value)
+      case value
+      when String
+        Sequel.typecast_to_application_timestamp(typecast_check_string_length(value, 100))
+      when Hash
+        [:year, :month, :day, :hour, :minute, :second, :nanos, :offset].each do |x|
+          typecast_check_length(value[x] || value[x.to_s], 100)
+        end
+        Sequel.typecast_to_application_timestamp(value)
+      else
+        Sequel.typecast_to_application_timestamp(value)
+      end
     end
     
     if RUBY_VERSION >= '2.4'
@@ -531,18 +563,30 @@ module Sequel
       when Numeric
         BigDecimal(value.to_s)
       when String
-        _typecast_value_string_to_decimal(value)
+        _typecast_value_string_to_decimal(typecast_check_string_length(value, 1000))
       else
         raise InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
       end
     end
 
     # Typecast the value to a Float
-    alias typecast_value_float Float
+    def typecast_value_float(value)
+      Float(typecast_check_length(value, 1000))
+    end
 
     # Typecast the value to an Integer
     def typecast_value_integer(value)
-      (value.is_a?(String) && value =~ /\A0+(\d)/) ? Integer(value, 10) : Integer(value)
+      case value
+      when String
+        typecast_check_string_length(value, 100)
+        if value =~ /\A-?0+(\d)/
+          Integer(value, 10)
+        else
+          Integer(value)
+        end
+      else
+        Integer(value)
+      end
     end
 
     # Typecast the value to a String
@@ -565,9 +609,9 @@ module Sequel
           SQLTime.create(value.hour, value.min, value.sec, value.nsec/1000.0)
         end
       when String
-        Sequel.string_to_time(value)
+        Sequel.string_to_time(typecast_check_string_length(value, 100))
       when Hash
-        SQLTime.create(*[:hour, :minute, :second].map{|x| (value[x] || value[x.to_s]).to_i})
+        SQLTime.create(*[:hour, :minute, :second].map{|x| typecast_check_length(value[x] || value[x.to_s], 100).to_i})
       else
         raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
       end

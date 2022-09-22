@@ -282,7 +282,7 @@ module Sequel
           when Range
             PGRange.from_range(value, parser.db_type)
           when String
-            parser.call(value)
+            parser.call(typecast_check_string_length(value, 100))
           else
             raise Sequel::InvalidValue, "invalid value for range type: #{value.inspect}"
           end

@@ -45,6 +45,14 @@ describe "A new Database" do
     db.default_string_column_size.must_equal 2
   end
   
+  it "should handle checking string bytesize before typecasting" do
+    @db.check_string_typecast_bytesize.must_equal true
+    db = Sequel::Database.new(:check_string_typecast_bytesize=>'f')
+    db.check_string_typecast_bytesize.must_equal false
+    db.check_string_typecast_bytesize = true
+    db.check_string_typecast_bytesize.must_equal true
+  end
+  
   it "should set the sql_log_level from opts[:sql_log_level]" do
     Sequel::Database.new(1 => 2, :sql_log_level=>:debug).sql_log_level.must_equal :debug
     Sequel::Database.new(1 => 2, :sql_log_level=>'debug').sql_log_level.must_equal :debug
@@ -2215,6 +2223,8 @@ describe "Database#typecast_value" do
   it "should handle integers with leading 0x as base 16" do
     @db.typecast_value(:integer, "0x013").must_equal 19
     @db.typecast_value(:integer, "0x80").must_equal 128
+    @db.typecast_value(:integer, "-0x013").must_equal -19
+    @db.typecast_value(:integer, "-0x80").must_equal -128
   end
 
   it "should typecast blobs as as Sequel::SQL::Blob" do
@@ -2532,6 +2542,61 @@ describe "Database#typecast_value" do
     st = Sequel::SQLTime.local(t.year, t.month, t.day, 1, 2, 3, 500000)
     t = Time.local(t.year, t.month, t.day, 1, 2, 3, 500000)
     @db.typecast_value(:time, t).must_equal st
+  end
+
+  it "should enforce bytesize limits when typecasting strings" do
+    s = ' '*100
+
+    proc{@db.typecast_value(:date, '2010-10-30'+s)}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:date, 'year'=>'2010'+s, 'month'=>'10', 'day'=>'30')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:date, 'year'=>'2010', 'month'=>'10'+s, 'day'=>'30')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:date, 'year'=>'2010', 'month'=>'10', 'day'=>'30'+s)}.must_raise Sequel::InvalidValue
+
+    proc{@db.typecast_value(:datetime, '2010-10-30 10:20:30'+s)}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010'+s, 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10'+s, 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30'+s, 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1'+s, 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2'+s, 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3'+s, 'nanos'=>'123456789'+s, 'offset'=>'+0000')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000'+s)}.must_raise Sequel::InvalidValue
+
+    proc{@db.typecast_value(:decimal, '1'*1001)}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:float, '1.'+'0'*1000)}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:integer, '1'*101)}.must_raise Sequel::InvalidValue
+
+    proc{@db.typecast_value(:time, '10:20:30'+s)}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:time, 'hour'=>'10'+s, 'minute'=>'20', 'second'=>'30')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:time, 'hour'=>'10', 'minute'=>'20'+s, 'second'=>'30')}.must_raise Sequel::InvalidValue
+    proc{@db.typecast_value(:time, 'hour'=>'10', 'minute'=>'20', 'second'=>'30'+s)}.must_raise Sequel::InvalidValue
+  end
+
+  it "should not enforce bytesize limits when typecasting strings if check_string_typecast_bytesize = false" do
+    @db.check_string_typecast_bytesize = false
+    s = ' '*100
+
+    @db.typecast_value(:date, '2010-10-30'+s).must_equal Date.new(2010, 10, 30)
+    @db.typecast_value(:date, 'year'=>'2010'+s, 'month'=>'10', 'day'=>'30').must_equal Date.new(2010, 10, 30)
+    @db.typecast_value(:date, 'year'=>'2010', 'month'=>'10'+s, 'day'=>'30').must_equal Date.new(2010, 10, 30)
+    @db.typecast_value(:date, 'year'=>'2010', 'month'=>'10', 'day'=>'30'+s).must_equal Date.new(2010, 10, 30)
+
+    @db.typecast_value(:datetime, '2010-10-30 10:20:30'+s).must_equal Time.local(2010, 10, 30, 10, 20, 30)
+    @db.typecast_value(:datetime, 'year'=>'2010'+s, 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000').must_be_kind_of Time
+    @db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10'+s, 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000').must_be_kind_of Time
+    @db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30'+s, 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000').must_be_kind_of Time
+    @db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1'+s, 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000').must_be_kind_of Time
+    @db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2'+s, 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000').must_be_kind_of Time
+    @db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3'+s, 'nanos'=>'123456789'+s, 'offset'=>'+0000').must_be_kind_of Time
+    @db.typecast_value(:datetime, 'year'=>'2010', 'month'=>'10', 'day'=>'30', 'hour'=>'1', 'minute'=>'2', 'second'=>'3', 'nanos'=>'123456789', 'offset'=>'+0000'+s).must_be_kind_of Time
+
+    @db.typecast_value(:decimal, '1'*1001).must_equal BigDecimal('1'*1001)
+    @db.typecast_value(:float, '1.'+'0'*1000).must_equal 1.0
+    @db.typecast_value(:integer, '1'*101).must_equal Integer('1'*101)
+
+    @db.typecast_value(:time, '10:20:30'+s).must_equal Sequel::SQLTime.create(10, 20, 30)
+    @db.typecast_value(:time, 'hour'=>'10'+s, 'minute'=>'20', 'second'=>'30').must_equal Sequel::SQLTime.create(10, 20, 30)
+    @db.typecast_value(:time, 'hour'=>'10', 'minute'=>'20'+s, 'second'=>'30').must_equal Sequel::SQLTime.create(10, 20, 30)
+    @db.typecast_value(:time, 'hour'=>'10', 'minute'=>'20', 'second'=>'30'+s).must_equal Sequel::SQLTime.create(10, 20, 30)
   end
 
   it "should have an underlying exception class available at wrapped_exception" do

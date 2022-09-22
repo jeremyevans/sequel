@@ -1,5 +1,9 @@
 === master
 
+* Add Database#check_string_typecast_bytesize for checking bytesize of strings before typecasting (jeremyevans)
+
+* Treat negative hexidecimal strings similar to positive hexidecimal strings when typecasting to integer (jeremyevans)
+
 * Remove is_json and is_not_json methods from the pg_json_ops extension, as the support was removed in PostgreSQL 15 beta 4 (jeremyevans)
 
 * Fix handling of timestamps before the date of calendar reform when using pg_extended_date_support extension on Ruby 3.2 (jeremyevans)

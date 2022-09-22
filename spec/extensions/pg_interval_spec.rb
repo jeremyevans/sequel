@@ -119,6 +119,10 @@ describe "pg_interval extension" do
 
     proc{@db.typecast_value(:interval, 'foo')}.must_raise(Sequel::InvalidValue)
     proc{@db.typecast_value(:interval, Object.new)}.must_raise(Sequel::InvalidValue)
+
+    proc{@db.typecast_value(:interval, '1'*1000+' secs')}.must_raise(Sequel::InvalidValue)
+    @db.check_string_typecast_bytesize = false
+    @db.typecast_value(:interval, '1'*1000+' secs').must_be_kind_of ActiveSupport::Duration
   end
 
   it "should return correct results for Database#schema_type_class" do
