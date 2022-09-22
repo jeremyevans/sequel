@@ -17,7 +17,7 @@ else
 end
 
 if RUBY_VERSION < '2.3'
-  gem 'i18n', '<1.12'
+  gem 'i18n', '<1.5'
 end
 
 if RUBY_VERSION < '2.2.0'
