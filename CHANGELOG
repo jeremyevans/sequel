@@ -1,5 +1,7 @@
 === master
 
+* Make Database#foreign_key_list on PostgreSQL return results for partitioned tables (jeremyevans)
+
 * Add Database#check_string_typecast_bytesize for checking bytesize of strings before typecasting (jeremyevans)
 
 * Treat negative hexidecimal strings similar to positive hexidecimal strings when typecasting to integer (jeremyevans)

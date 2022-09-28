@@ -586,7 +586,7 @@ module Sequel
           join(Sequel[:pg_namespace].as(:nsp), :oid=>Sequel[:cl2][:relnamespace]).
           order{[co[:conname], cpos]}.
           where{{
-            cl[:relkind]=>'r',
+            cl[:relkind]=>%w'r p',
             co[:contype]=>'f',
             cl[:oid]=>oid,
             cpos=>rpos

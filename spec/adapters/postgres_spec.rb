@@ -91,6 +91,20 @@ describe 'A PostgreSQL database' do
     @db.tables.must_include :test_1
     @db.tables.must_include :test_2
   end if DB.server_version >= 100000
+
+  it "should provide a list of foreign keys on partitioned tables" do
+    begin
+      @db.create_table(:test){primary_key :i}
+      @db.create_table(:test2, :partition_by => :id, :partition_type => :range){foreign_key :id, :test}
+      fks = @db.foreign_key_list(:test2)
+      fks.length.must_equal 1
+      fks[0][:table].must_equal :test
+      fks[0][:columns].must_equal [:id]
+      fks[0][:key].must_equal [:i]
+    ensure
+      @db.drop_table?(:test2)
+    end
+  end if DB.server_version >= 100000
 end
 
 describe "PostgreSQL", '#create_table' do
