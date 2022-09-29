@@ -320,6 +320,11 @@ module Sequel
         end
       end
     
+      # SQLite does not restrict the integer type to a specific range.
+      def column_schema_integer_min_max_values(db_type)
+        nil
+      end
+
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
       # new connections.
       def connection_pragmas

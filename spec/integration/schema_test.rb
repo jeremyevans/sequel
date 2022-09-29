@@ -175,6 +175,55 @@ describe "Database schema parser" do
     DB.schema(:items).first.last[:db_type].must_equal db_type
   end
 
+  int_types = [Integer, :Bignum]
+
+  case DB.database_type
+  when :postgres
+    int_types.concat([:smallint, :int2, :int4, :int8])
+  when :mysql
+    if DB.send(:supports_check_constraints?)
+      int_types.concat([:tinyint, :smallint, :mediumint, 'int(9)', 'tinyint(2)', "integer unsigned", "bigint unsigned", "tinyint unsigned", "smallint unsigned", "mediumint unsigned", 'int(9) unsigned', 'tinyint(2) unsigned'])
+    else
+      int_types.clear 
+    end
+  when :mssql, :h2, :hsqldb
+    int_types.concat([:smallint, :tinyint])
+  when :derby, :access
+    int_types.concat([:smallint])
+  when :sqlanywhere
+    int_types.concat([:tinyint])
+  when :sqlite, :oracle
+    # SQLite doesn't enforce integer type values, even on strict tables.
+    # Oracle only has a number type with variable precision, not a standard integer type.
+    int_types.clear
+  end
+
+  if int_types.empty?
+    it "should not parse maximum and minimum values for integer columns" do
+      DB.create_table!(:items){Integer :a}
+      sch = DB.schema(:items).first.last
+      sch.keys.wont_include :max_value
+      sch.keys.wont_include :min_value
+    end
+  end
+
+  int_types.each do |type|
+    it "should correctly parse maximum and minimum values for #{type} columns" do
+      DB.create_table!(:items){column :a, type}
+      sch = DB.schema(:items).first.last
+      max = sch[:max_value]
+      min = sch[:min_value]
+      max.must_be_kind_of Integer
+      min.must_be_kind_of Integer
+      ds = DB[:items]
+      proc{ds.insert(max+1)}.must_raise Sequel::DatabaseError
+      proc{ds.insert(min-1)}.must_raise Sequel::DatabaseError
+      ds.insert(max)
+      ds.insert(min)
+      ds.select_order_map(:a).must_equal [min, max]
+    end
+  end
+
   it "should parse maximum length for string columns" do
     DB.create_table!(:items){String :a, :size=>4}
     DB.schema(:items).first.last[:max_length].must_equal 4

@@ -57,6 +57,14 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
+      # Access's Byte type will accept much larger values,
+      # even though it only stores 0-255.  Do not set min/max
+      # values for the Byte type.
+      def column_schema_integer_min_max_values(db_type)
+        return if /byte/i =~ db_type
+        super
+      end
+
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end

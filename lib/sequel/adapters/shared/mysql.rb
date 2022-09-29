@@ -550,6 +550,13 @@ module Sequel
         end
       end
 
+      # Return nil if CHECK constraints are not supported, because
+      # versions that don't support check constraints don't raise
+      # errors for values outside of range.
+      def column_schema_integer_min_max_values(db_type)
+        super if supports_check_constraints?
+      end
+
       # Split DROP INDEX ops on MySQL 5.6+, as dropping them in the same
       # statement as dropping a related foreign key causes an error.
       def split_alter_table_op?(op)

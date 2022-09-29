@@ -325,6 +325,11 @@ module Sequel
         false
       end
 
+      # MSSQL tinyint types are unsigned.
+      def column_schema_tinyint_type_is_unsigned?
+        true
+      end
+
       # Handle MSSQL specific default format.
       def column_schema_normalize_default(default, type)
         if m = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/.match(default)

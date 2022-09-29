@@ -2856,6 +2856,46 @@ describe "Database#supports_transaction_isolation_levels?" do
   end
 end
 
+describe "Database#schema min/max integer values" do
+  def min_max(type)
+    @db = Sequel::Database.new
+    @db.define_singleton_method(:schema_parse_table){|*| [[:a, {:db_type=>type, :type=>type == 'varchar' ? :string : :integer}]]}
+    yield @db if block_given?
+    sch = @db.schema(:t)[0][1]
+    [sch.fetch(:min_value, :none), sch.fetch(:max_value, :none)]
+  end
+
+  it "should parse minimum and maximum values for regular integer types" do
+    min_max('integer').must_equal [-2147483648, 2147483647]
+    min_max('int4').must_equal [-2147483648, 2147483647]
+    min_max('bigint').must_equal [-9223372036854775808, 9223372036854775807]
+    min_max('int8').must_equal [-9223372036854775808, 9223372036854775807]
+    min_max('smallint').must_equal [-32768, 32767]
+    min_max('int2').must_equal [-32768, 32767]
+    min_max('tinyint').must_equal [-128, 127]
+    min_max('mediumint').must_equal [-8388608, 8388607]
+  end
+
+  it "should parse minimum and maximum values for unsigned integer types" do
+    min_max('integer unsigned').must_equal [0, 4294967295]
+    min_max('unsigned int4').must_equal [0, 4294967295]
+    min_max('bigint unsigned').must_equal [0, 18446744073709551615]
+    min_max('int8 unsigned').must_equal [0, 18446744073709551615]
+    min_max('smallint unsigned').must_equal [0, 65535]
+    min_max('int2 unsigned').must_equal [0, 65535]
+    min_max('tinyint unsigned').must_equal [0, 255]
+    min_max('mediumint unsigned').must_equal [0, 16777215]
+  end
+
+  it "should parse minimum and maximum values for tinyint types where database tinyint type is unsigned by default" do
+    min_max('tinyint'){|db| def db.column_schema_tinyint_type_is_unsigned?; true end}.must_equal [0, 255]
+  end
+
+  it "should not parse minimum and maximum values for non-integer types" do
+    min_max('varchar').must_equal [:none, :none]
+  end
+end
+
 describe "Database#column_schema_to_ruby_default" do
   it "should handle converting many default formats" do
     db = Sequel::Database.new

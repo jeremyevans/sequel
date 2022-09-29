@@ -175,6 +175,9 @@ module Sequel
         if !c[:max_length] && c[:type] == :string && (max_length = column_schema_max_length(c[:db_type]))
           c[:max_length] = max_length
         end
+        if !c[:max_value] && !c[:min_value] && c[:type] == :integer && (min_max = column_schema_integer_min_max_values(c[:db_type]))
+          c[:min_value], c[:max_value] = min_max
+        end
       end
       schema_post_process(cols)
 
@@ -270,6 +273,40 @@ module Sequel
       end
       default = column_schema_normalize_default(default, type)
       column_schema_default_to_ruby_value(default, type) rescue nil
+    end
+
+    INTEGER1_MIN_MAX = [-128, 127].freeze
+    INTEGER2_MIN_MAX = [-32768, 32767].freeze
+    INTEGER3_MIN_MAX = [-8388608, 8388607].freeze
+    INTEGER4_MIN_MAX = [-2147483648, 2147483647].freeze
+    INTEGER8_MIN_MAX = [-9223372036854775808, 9223372036854775807].freeze
+    UNSIGNED_INTEGER1_MIN_MAX = [0, 255].freeze
+    UNSIGNED_INTEGER2_MIN_MAX = [0, 65535].freeze
+    UNSIGNED_INTEGER3_MIN_MAX = [0, 16777215].freeze
+    UNSIGNED_INTEGER4_MIN_MAX = [0, 4294967295].freeze
+    UNSIGNED_INTEGER8_MIN_MAX = [0, 18446744073709551615].freeze
+
+    # Look at the db_type and guess the minimum and maximum integer values for
+    # the column.
+    def column_schema_integer_min_max_values(db_type)
+      unsigned = /unsigned/i =~ db_type
+      case db_type
+      when /big|int8/i
+        unsigned ? UNSIGNED_INTEGER8_MIN_MAX : INTEGER8_MIN_MAX
+      when /medium/i
+        unsigned ? UNSIGNED_INTEGER3_MIN_MAX : INTEGER3_MIN_MAX
+      when /small|int2/i
+        unsigned ? UNSIGNED_INTEGER2_MIN_MAX : INTEGER2_MIN_MAX
+      when /tiny/i
+        (unsigned || column_schema_tinyint_type_is_unsigned?) ? UNSIGNED_INTEGER1_MIN_MAX : INTEGER1_MIN_MAX
+      else
+        unsigned ? UNSIGNED_INTEGER4_MIN_MAX : INTEGER4_MIN_MAX
+      end
+    end
+
+    # Whether the tinyint type (if supported by the database) is unsigned by default.
+    def column_schema_tinyint_type_is_unsigned?
+      false
     end
 
     # Look at the db_type and guess the maximum length of the column.

@@ -195,6 +195,11 @@ module Sequel
         end
       end
 
+      # SQLAnywhere tinyint types are unsigned.
+      def column_schema_tinyint_type_is_unsigned?
+        true
+      end
+
       # SqlAnywhere doesn't support CREATE TABLE AS, it only supports SELECT INTO.
       # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
       # is given as the argument, it can't work with a string, so raise an
@@ -213,6 +218,8 @@ module Sequel
       def schema_column_type(db_type)
         if convert_smallint_to_bool && db_type =~ /smallint/i
           :boolean
+        elsif db_type =~ /unsigned (big)?int/i
+          :integer
         else
           super
         end

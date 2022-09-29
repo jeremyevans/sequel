@@ -178,6 +178,13 @@ module Sequel
         ''
       end
 
+      # Do not support min/max integer values on Oracle, since
+      # Oracle uses a number type, and integer just adds a
+      # constaint on the number type.
+      def column_schema_integer_min_max_values(db_type)
+        nil
+      end
+
       def create_sequence_sql(name, opts=OPTS)
         "CREATE SEQUENCE #{quote_identifier(name)} start with #{opts [:start_with]||1} increment by #{opts[:increment_by]||1} nomaxvalue"
       end
