@@ -250,8 +250,12 @@ END
     h.keys.must_equal ['`a`']
     column, schema = h.values.first.first
     column.must_equal :a
-    schema.delete(:generated) # May be present on SQLite 3.31+
-    schema.must_equal(:type=>:integer, :db_type=>int_type, :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false)
+    schema[:type].must_equal :integer
+    schema[:db_type].must_equal int_type
+    schema.fetch(:ruby_default).must_be_nil
+    schema.fetch(:default).must_be_nil
+    schema[:allow_null].must_equal true
+    schema[:primary_key].must_equal false
   end
 
   it "-X should dump the index cache" do
