@@ -2037,6 +2037,80 @@ describe "Caching plugins" do
   end
 end
 
+describe "Sequel::Plugins::AutoValidations" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:auto_validations_test) do
+      primary_key :id
+      String :s, :size=>50
+      String :n, :null=>false
+      Integer :u, :null=>false
+      index :u, :unique=>true
+    end
+  end
+  before do
+    @c = Sequel::Model(:auto_validations_test)
+    @c.plugin :auto_validations, :skip_invalid=>true
+    @c.dataset.delete
+    @o = @c.new(:s=>'s', :n=>'n', :u=>1)
+  end
+  after(:all) do
+    @db.drop_table?(:auto_validations_test)
+  end
+
+  it "should setup type validations automatically" do
+    @o.s = ''
+    @o.u = 'a'
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:u=>["is not a valid integer"])
+  end
+
+  it "should setup not_null validations automatically" do
+    @o.u = nil
+    @o.n = ''
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:u=>["is not present"])
+  end
+
+  it "should setup presence validations if configured" do
+    @c.plugin :auto_validations, not_null: :presence
+    @o.n = ''
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:n=>["is not present"])
+  end
+
+  it "should setup unique validations automatically" do
+    @o.save
+    o = @c.new(:s=>'s', :n=>'n', :u=>1)
+    o.valid?.must_equal false
+    o.errors.must_equal(:u=>["is already taken"])
+  end if DB.supports_index_parsing?
+
+  it "should setup no null byte validations automatically" do
+    @o.s = "a\0b"
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:s=>["contains a null byte"])
+  end
+
+  it "should setup max length validations automatically" do
+    @o.s = "a" * 51
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:s=>["is longer than 50 characters"])
+  end
+
+  cspecify "should setup max value validations for integers automatically", :sqlite, :oracle, [proc{|db| !db.send(:supports_check_constraints?)}, :mysql] do
+    @o.u = 2147483648
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:u=>["is greater than maximum allowed value"])
+  end
+
+  cspecify "should setup min value validations for integers automatically", :sqlite, :oracle, [proc{|db| !db.send(:supports_check_constraints?)}, :mysql] do
+    @o.u = -2147483649
+    @o.valid?.must_equal false
+    @o.errors.must_equal(:u=>["is less than minimum allowed value"])
+  end
+end
+
 describe "Sequel::Plugins::ConstraintValidations" do
   before(:all) do
     @db = DB

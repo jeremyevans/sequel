@@ -9,14 +9,16 @@ module Sequel
     # 2. not_null validations on NOT NULL columns (optionally, presence validations)
     # 3. unique validations on columns or sets of columns with unique indexes
     # 4. max length validations on string columns
+    # 5. no null byte validations on string columns
+    # 6. minimum and maximum values on columns
     #
-    # To determine the columns to use for the type/not_null/max_length validations,
+    # To determine the columns to use for the type/not_null/max_length/no_null_byte/max_value/min_value validations,
     # the plugin looks at the database schema for the model's table.  To determine
     # the unique validations, Sequel looks at the indexes on the table.  In order
     # for this plugin to be fully functional, the underlying database adapter needs
     # to support both schema and index parsing.  Additionally, unique validations are
     # only added for models that select from a simple table, they are not added for models
-    # that select from a subquery or joined dataset.
+    # that select from a subquery.
     #
     # This plugin uses the validation_helpers plugin underneath to implement the
     # validations.  It does not allow for any per-column validation message
@@ -50,7 +52,7 @@ module Sequel
     #
     #   Model.plugin :auto_validations, unique_opts: {only_if_modified: true}
     #
-    # This works for unique_opts, max_length_opts, schema_types_opts,
+    # This works for unique_opts, max_length_opts, schema_types_opts, max_value_opts, min_value_opts, no_null_byte_opts,
     # explicit_not_null_opts, and not_null_opts.
     #
     # If you only want auto_validations to add validations to columns that do not already
@@ -72,6 +74,19 @@ module Sequel
       SCHEMA_TYPES_OPTIONS = NOT_NULL_OPTIONS
       UNIQUE_OPTIONS = NOT_NULL_OPTIONS
       NO_NULL_BYTE_OPTIONS = MAX_LENGTH_OPTIONS
+      MAX_VALUE_OPTIONS = {:from=>:values, :allow_nil=>true, :skip_invalid=>true}.freeze
+      MIN_VALUE_OPTIONS = MAX_VALUE_OPTIONS
+      AUTO_VALIDATE_OPTIONS = {
+        :no_null_byte=>NO_NULL_BYTE_OPTIONS,
+        :not_null=>NOT_NULL_OPTIONS,
+        :explicit_not_null=>EXPLICIT_NOT_NULL_OPTIONS,
+        :max_length=>MAX_LENGTH_OPTIONS,
+        :max_value=>MAX_VALUE_OPTIONS,
+        :min_value=>MIN_VALUE_OPTIONS,
+        :schema_types=>SCHEMA_TYPES_OPTIONS,
+        :unique=>UNIQUE_OPTIONS
+      }.freeze
+
       EMPTY_ARRAY = [].freeze
 
       def self.apply(model, opts=OPTS)
@@ -82,17 +97,11 @@ module Sequel
           @auto_validate_not_null_columns = []
           @auto_validate_explicit_not_null_columns = []
           @auto_validate_max_length_columns = []
+          @auto_validate_max_value_columns = []
+          @auto_validate_min_value_columns = []
           @auto_validate_unique_columns = []
           @auto_validate_types = true
-
-          @auto_validate_options = {
-              :no_null_byte=>NO_NULL_BYTE_OPTIONS,
-              :not_null=>NOT_NULL_OPTIONS,
-              :explicit_not_null=>EXPLICIT_NOT_NULL_OPTIONS,
-              :max_length=>MAX_LENGTH_OPTIONS,
-              :schema_types=>SCHEMA_TYPES_OPTIONS,
-              :unique=>UNIQUE_OPTIONS
-          }.freeze
+          @auto_validate_options = AUTO_VALIDATE_OPTIONS
         end
       end
 
@@ -105,7 +114,7 @@ module Sequel
           end
 
           h = @auto_validate_options.dup
-          [:not_null, :explicit_not_null, :max_length, :no_null_byte, :schema_types, :unique].each do |type|
+          [:not_null, :explicit_not_null, :max_length, :max_value, :min_value, :no_null_byte, :schema_types, :unique].each do |type|
             if type_opts = opts[:"#{type}_opts"]
               h[type] = h[type].merge(type_opts).freeze
             end
@@ -135,6 +144,14 @@ module Sequel
         # pairs, with the first entry being the column name and second entry being the maximum length.
         attr_reader :auto_validate_max_length_columns
 
+        # The columns with automatch max value validations, as an array of
+        # pairs, with the first entry being the column name and second entry being the maximum value.
+        attr_reader :auto_validate_max_value_columns
+
+        # The columns with automatch min value validations, as an array of
+        # pairs, with the first entry being the column name and second entry being the minimum value.
+        attr_reader :auto_validate_min_value_columns
+
         # The columns or sets of columns with automatic unique validations
         attr_reader :auto_validate_unique_columns
 
@@ -148,6 +165,8 @@ module Sequel
           :@auto_validate_not_null_columns=>:dup,
           :@auto_validate_explicit_not_null_columns=>:dup,
           :@auto_validate_max_length_columns=>:dup,
+          :@auto_validate_max_value_columns=>:dup,
+          :@auto_validate_min_value_columns=>:dup,
           :@auto_validate_unique_columns=>:dup,
           :@auto_validate_options => :dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
@@ -168,18 +187,23 @@ module Sequel
           @auto_validate_not_null_columns.freeze
           @auto_validate_explicit_not_null_columns.freeze
           @auto_validate_max_length_columns.freeze
+          @auto_validate_max_value_columns.freeze
+          @auto_validate_min_value_columns.freeze
           @auto_validate_unique_columns.freeze
 
           super
         end
 
         # Skip automatic validations for the given validation type
-        # (:not_null, :types, :unique, :max_length, :no_null_byte).
+        # (:not_null, :no_null_byte, :types, :unique, :max_length, :max_value, :min_value).
         # If :all is given as the type, skip all auto validations.
+        #
+        # Skipping types validation automatically skips max_value and min_value validations,
+        # since those validations require valid types.
         def skip_auto_validations(type)
           case type
           when :all
-            [:not_null, :no_null_byte, :types, :unique, :max_length].each{|v| skip_auto_validations(v)}
+            [:not_null, :no_null_byte, :types, :unique, :max_length, :max_value, :min_value].each{|v| skip_auto_validations(v)}
           when :not_null
             auto_validate_not_null_columns.clear
             auto_validate_explicit_not_null_columns.clear
@@ -199,6 +223,8 @@ module Sequel
           explicit_not_null_cols += Array(primary_key)
           @auto_validate_explicit_not_null_columns = explicit_not_null_cols.uniq
           @auto_validate_max_length_columns = db_schema.select{|col, sch| sch[:type] == :string && sch[:max_length].is_a?(Integer)}.map{|col, sch| [col, sch[:max_length]]}
+          @auto_validate_max_value_columns = db_schema.select{|col, sch| sch[:max_value]}.map{|col, sch| [col, sch[:max_value]]}
+          @auto_validate_min_value_columns = db_schema.select{|col, sch| sch[:min_value]}.map{|col, sch| [col, sch[:min_value]]}
           @auto_validate_no_null_byte_columns = db_schema.select{|_, sch| sch[:type] == :string}.map{|col, _| col}
           table = dataset.first_source_table
           @auto_validate_unique_columns = if db.supports_index_parsing? && [Symbol, SQL::QualifiedIdentifier, SQL::Identifier, String].any?{|c| table.is_a?(c)}
@@ -248,6 +274,18 @@ module Sequel
 
           unless skip.include?(:types) || !model.auto_validate_types?
             validates_schema_types(keys, opts[:schema_types])
+
+            unless skip.include?(:max_value) || ((max_value_columns = model.auto_validate_max_value_columns).empty?)
+              max_value_columns.each do |col, max|
+                validates_max_value(max, col, opts[:max_value])
+              end
+            end
+
+            unless skip.include?(:min_value) || ((min_value_columns = model.auto_validate_min_value_columns).empty?)
+              min_value_columns.each do |col, min|
+                validates_min_value(min, col, opts[:min_value])
+              end
+            end
           end
 
           unless skip.include?(:unique)

@@ -1,5 +1,7 @@
 === master
 
+* Setup validation of minimum and maximum values for integer columns in auto_validations (jeremyevans)
+
 * Add validates_max_value and validates_min_value to validation_helpers (jeremyevans)
 
 * Include :min_value and :max_value schema entries for integer columns on most databases (jeremyevans)

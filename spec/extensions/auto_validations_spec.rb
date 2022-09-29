@@ -2,14 +2,14 @@ require_relative "spec_helper"
 
 describe "Sequel::Plugins::AutoValidations" do
   before do
-    db = Sequel.mock(:fetch=>proc{|sql| sql =~ /a{51}/ ? {:v=>0} : {:v=>1}})
+    db = Sequel.mock(:fetch=>proc{|sql| sql =~ /'a{51}'|'uniq'/ ? {:v=>0} : {:v=>1}})
     def db.schema_parse_table(*) true; end
     def db.schema(t, *)
       t = t.first_source if t.is_a?(Sequel::Dataset)
       return [] if t != :test
       [[:id, {:primary_key=>true, :type=>:integer, :allow_null=>false}],
        [:name, {:primary_key=>false, :type=>:string, :allow_null=>false, :max_length=>50}],
-       [:num, {:primary_key=>false, :type=>:integer, :allow_null=>true}],
+       [:num, {:primary_key=>false, :type=>:integer, :allow_null=>true, :min_value=>-100000, :max_value=>100000}],
        [:d, {:primary_key=>false, :type=>:date, :allow_null=>false}],
        [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :default=>'nnd'}]]
     end
@@ -30,12 +30,13 @@ describe "Sequel::Plugins::AutoValidations" do
   end
 
   it "should have automatically created validations" do
+    @m.num = 100001
     @m.valid?.must_equal false
-    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"])
+    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"], :num=>["is greater than maximum allowed value"])
 
-    @m.name = ''
+    @m.set(:num=>-100001, :name=>"")
     @m.valid?.must_equal false
-    @m.errors.must_equal(:d=>["is not present"])
+    @m.errors.must_equal(:d=>["is not present"], :num=>["is less than minimum allowed value"])
 
     @m.set(:d=>'/', :num=>'a', :name=>"a\0b")
     @m.valid?.must_equal false
@@ -181,6 +182,20 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal true
   end
 
+  it "should skip min/max value validations when skipping type validations" do
+    @m.set(:d=>Date.today, :num=>100001, :name=>'uniq')
+    @m.valid?.must_equal false
+    @m.skip_auto_validations(:types) do
+      @m.valid?.must_equal true
+    end
+
+    @m.num = -100001
+    @m.valid?.must_equal false
+    @m.skip_auto_validations(:types) do
+      @m.valid?.must_equal true
+    end
+  end
+
   it "should default to skipping all auto validations if no arguments given to instance method" do
     @c = Class.new(@c)
     @m = @c.new
@@ -196,14 +211,19 @@ describe "Sequel::Plugins::AutoValidations" do
   it "should work correctly in subclasses" do
     @c = Class.new(@c)
     @m = @c.new
+    @m.num = 100001
     @m.valid?.must_equal false
-    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"])
+    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"], :num=>["is greater than maximum allowed value"])
 
-    @m.set(:d=>'/', :num=>'a', :name=>'1')
+    @m.set(:num=>-100001, :name=>"")
     @m.valid?.must_equal false
-    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
+    @m.errors.must_equal(:d=>["is not present"], :num=>["is less than minimum allowed value"])
 
-    @m.set(:d=>Date.today, :num=>1)
+    @m.set(:d=>'/', :num=>'a', :name=>"a\0b")
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"], :name=>["contains a null byte"])
+
+    @m.set(:d=>Date.today, :num=>1, :name=>'')
     @m.valid?.must_equal false
     @m.errors.must_equal([:name, :num]=>["is already taken"])
 
@@ -241,7 +261,14 @@ describe "Sequel::Plugins::AutoValidations" do
 
   it "should support setting validator options" do
     sc = Class.new(@c)
-    sc.plugin :auto_validations, :max_length_opts=> {:message=> 'ml_message'}, :schema_types_opts=> {:message=> 'st_message'}, :explicit_not_null_opts=> {:message=> 'enn_message'}, :unique_opts=> {:message=> 'u_message'}
+    sc.plugin :auto_validations,
+      :max_length_opts=> {:message=> 'ml_message'},
+      :max_value_opts=> {:message=> 'mv_message'},
+      :min_value_opts=> {:message=> 'min_message'},
+      :no_null_byte_opts=> {:message=> 'nnb_message'},
+      :schema_types_opts=> {:message=> 'st_message'},
+      :explicit_not_null_opts=> {:message=> 'enn_message'},
+      :unique_opts=> {:message=> 'u_message'}
 
     @m = sc.new
     @m.set(:name=>'a'*51, :d => '/', :nnd => nil, :num=>1)
@@ -252,6 +279,51 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.set(:name=>1, :num=>1, :d=>Date.today)
     @m.valid?.must_equal false
     @m.errors.must_equal([:name, :num]=>["u_message"])
+
+    @m.set(:num=>100001, :name=>"a\0b")
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["nnb_message"], :num=>["mv_message"])
+
+    @m.num = -100001
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["nnb_message"], :num=>["min_message"])
+  end
+
+  it "should store modifying auto validation information in mutable auto_validate_* attributes" do
+    @c.auto_validate_not_null_columns.frozen?.must_equal false
+    @c.auto_validate_explicit_not_null_columns.frozen?.must_equal false
+    @c.auto_validate_max_length_columns.frozen?.must_equal false
+    @c.auto_validate_unique_columns.frozen?.must_equal false
+    @c.auto_validate_no_null_byte_columns.frozen?.must_equal false
+    @c.auto_validate_max_value_columns.frozen?.must_equal false
+    @c.auto_validate_min_value_columns.frozen?.must_equal false
+    @c.auto_validate_not_null_columns.frozen?.must_equal false
+
+    @c.auto_validate_explicit_not_null_columns.sort.must_equal [:id, :nnd]
+    @c.auto_validate_max_length_columns.sort.must_equal [[:name, 50]]
+    @c.auto_validate_unique_columns.sort.must_equal [[:name, :num]]
+    @c.auto_validate_no_null_byte_columns.sort.must_equal [:name, :nnd]
+    @c.auto_validate_max_value_columns.sort.must_equal [[:num, 100000]]
+    @c.auto_validate_min_value_columns.sort.must_equal [[:num, -100000]]
+  end
+
+  it "should copy auto validation information when subclassing" do
+    sc = Class.new(@c)
+    @c.auto_validate_not_null_columns.clear
+    @c.auto_validate_explicit_not_null_columns.clear
+    @c.auto_validate_max_length_columns.clear
+    @c.auto_validate_unique_columns.clear
+    @c.auto_validate_no_null_byte_columns.clear
+    @c.auto_validate_max_value_columns.clear
+    @c.auto_validate_min_value_columns.clear
+    @c.auto_validate_not_null_columns.clear
+
+    sc.auto_validate_explicit_not_null_columns.sort.must_equal [:id, :nnd]
+    sc.auto_validate_max_length_columns.sort.must_equal [[:name, 50]]
+    sc.auto_validate_unique_columns.sort.must_equal [[:name, :num]]
+    sc.auto_validate_no_null_byte_columns.sort.must_equal [:name, :nnd]
+    sc.auto_validate_max_value_columns.sort.must_equal [[:num, 100000]]
+    sc.auto_validate_min_value_columns.sort.must_equal [[:num, -100000]]
   end
 
   it "should not allow modifying auto validation information for frozen model classes" do
@@ -260,5 +332,8 @@ describe "Sequel::Plugins::AutoValidations" do
     @c.auto_validate_explicit_not_null_columns.frozen?.must_equal true
     @c.auto_validate_max_length_columns.frozen?.must_equal true
     @c.auto_validate_unique_columns.frozen?.must_equal true
+    @c.auto_validate_no_null_byte_columns.frozen?.must_equal true
+    @c.auto_validate_max_value_columns.frozen?.must_equal true
+    @c.auto_validate_min_value_columns.frozen?.must_equal true
   end
 end
