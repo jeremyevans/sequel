@@ -227,6 +227,30 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.wont_be :valid?
   end
 
+  it "should support validates_max_value" do
+    @c.set_validations{validates_max_value(5, :value)}
+    @m.must_be :valid?
+
+    @m.value = 6
+    @m.wont_be :valid?
+    @m.errors[:value].must_equal ['is greater than maximum allowed value']
+
+    @m.value = 5
+    @m.must_be :valid?
+  end
+
+  it "should support validates_min_value" do
+    @c.set_validations{validates_min_value(7, :value)}
+    @m.must_be :valid?
+
+    @m.value = 6
+    @m.wont_be :valid?
+    @m.errors[:value].must_equal ['is less than minimum allowed value']
+
+    @m.value = 7
+    @m.must_be :valid?
+  end
+
   it "should support validates_schema_types" do
     @c.set_validations{validates_schema_types}
     @m.value = 123

@@ -83,7 +83,9 @@ module Sequel
         :integer=>{:message=>lambda{"is not a number"}},
         :length_range=>{:message=>lambda{|range| "is too short or too long"}},
         :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
+        :max_value=>{:message=>lambda{|max| "is greater than maximum allowed value"}},
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
+        :min_value=>{:message=>lambda{|min| "is less than minimum allowed value"}},
         :not_null=>{:message=>lambda{"is not present"}},
         :no_null_byte=>{:message=>lambda{"contains a null byte"}},
         :numeric=>{:message=>lambda{"is not a number"}},
@@ -141,9 +143,27 @@ module Sequel
           end
         end
 
+        # Check that the attribute values are not greater that the given maximum value.
+        # Does not perform validation if attribute value is nil.
+        # You should only call this if you have checked the attribute value has the expected type.
+        def validates_max_value(max, atts, opts=OPTS)
+          validatable_attributes_for_type(:max_value, atts, opts) do |a,v,m|
+            validation_error_message(m, max) if !v.nil? && v > max
+          end
+        end
+
         # Check that the attribute values are not shorter than the given min length.
         def validates_min_length(min, atts, opts=OPTS)
           validatable_attributes_for_type(:min_length, atts, opts){|a,v,m| validation_error_message(m, min) if v.nil? || v.length < min}
+        end
+
+        # Check that the attribute values are not less that the given minimum value.
+        # Does not perform validation if attribute value is nil.
+        # You should only call this if you have checked the attribute value has the expected type.
+        def validates_min_value(min, atts, opts=OPTS)
+          validatable_attributes_for_type(:min_value, atts, opts) do |a,v,m|
+            validation_error_message(m, min) if !v.nil? && v < min
+          end
         end
 
         # Check attribute value(s) are not NULL/nil.

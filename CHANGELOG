@@ -1,5 +1,7 @@
 === master
 
+* Add validates_max_value and validates_min_value to validation_helpers (jeremyevans)
+
 * Include :min_value and :max_value schema entries for integer columns on most databases (jeremyevans)
 
 * Don't wrap multi-inserts in a transaction when it's not required (shannoncole, jeremyevans) (#1945)
