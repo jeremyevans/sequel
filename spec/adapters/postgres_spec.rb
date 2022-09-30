@@ -104,7 +104,7 @@ describe 'A PostgreSQL database' do
     ensure
       @db.drop_table?(:test2)
     end
-  end if DB.server_version >= 100000
+  end if DB.server_version >= 110000
 end
 
 describe "PostgreSQL", '#create_table' do
