@@ -2223,8 +2223,8 @@ describe "Database#typecast_value" do
   it "should handle integers with leading 0x as base 16" do
     @db.typecast_value(:integer, "0x013").must_equal 19
     @db.typecast_value(:integer, "0x80").must_equal 128
-    @db.typecast_value(:integer, "-0x013").must_equal -19
-    @db.typecast_value(:integer, "-0x80").must_equal -128
+    @db.typecast_value(:integer, "-0x013").must_equal(-19)
+    @db.typecast_value(:integer, "-0x80").must_equal(-128)
   end
 
   it "should typecast blobs as as Sequel::SQL::Blob" do
