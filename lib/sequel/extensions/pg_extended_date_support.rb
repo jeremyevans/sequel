@@ -94,8 +94,10 @@ module Sequel
               DateTime.parse(value)
             elsif TIME_CAN_PARSE_BC
               Time.parse(value)
+            # :nocov:
             else
               DateTime.parse(value).to_time
+            # :nocov:
             end
 
             Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
