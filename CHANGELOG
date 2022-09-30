@@ -1,4 +1,4 @@
-=== master
+=== 5.61.0 (2022-10-01)
 
 * Make Database#foreign_key_list on PostgreSQL return results for partitioned tables (jeremyevans)
 

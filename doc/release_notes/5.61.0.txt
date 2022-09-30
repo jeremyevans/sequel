@@ -1,0 +1,43 @@
+= Improvements
+
+* When typecasting strings to other types, Sequel::Database will now
+  by default not typecast strings that are much longer than expected
+  for the underlying type. Depending on the underlying type, there
+  is a limit of either 100 or 1000 bytes on the input string.  This
+  avoids potential performance issues when trying to convert
+  arbitrary sized user input to specific types.
+
+* The respond_to? to defined? change made in 5.60.0 was reverted in
+  5.60.1 as it broke cases on Ruby < 3 where the object had an unused
+  refinement that added the method.
+
+* When typecasting strings to integer, strings such as -0xa are now
+  treated as negative hexidecimal strings, similar to how 0xa is
+  treated as a positive hexidecimal string.
+
+* Database#foreign_key_list now returns results for partitioned
+  tables on PostgreSQL 11+.
+
+* Timestamps before the date of calendar reform are now handled
+  correctly by the pg_extended_date_support extension when using
+  Ruby 3.2 preview 2+.
+
+= Backwards Compatibility
+
+* The change to not typecast strings that are too long can break
+  backwards compatibility for applications that expect typecasting
+  for input beyond Sequel's limits.  You can disable the string
+  bytesize checking by setting:
+
+    DB.check_string_typecast_bytesize = false
+
+  or by passing the check_string_typecast_bytesize: false option when
+  creating the Database instance.
+
+* Code to workaround a bug in JRuby 9.2.0.0 has been removed from the
+  pg_extended_date_support extension.  Users of the extension should
+  upgrade to a newer JRuby version.
+
+* The is_json and is_not_json methods have been removed from the
+  pg_json_ops extension, as the underlying support was removed in
+  PostgreSQL 15 beta 4.
