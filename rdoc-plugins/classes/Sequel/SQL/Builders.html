@@ -387,14 +387,14 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-pg_json_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">761</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json_op</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">762</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">763</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>
-<span class="line-num">764</span>     <span class="ruby-identifier">v</span>
-<span class="line-num">765</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">766</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">767</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">768</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">709</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">710</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">711</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>
+<span class="line-num">712</span>     <span class="ruby-identifier">v</span>
+<span class="line-num">713</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">714</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">715</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">716</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_json_wrap'>
@@ -472,14 +472,14 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-pg_jsonb_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">771</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb_op</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">772</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">773</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>
-<span class="line-num">774</span>     <span class="ruby-identifier">v</span>
-<span class="line-num">775</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">776</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">777</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">778</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">719</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">720</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">721</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>
+<span class="line-num">722</span>     <span class="ruby-identifier">v</span>
+<span class="line-num">723</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">724</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">725</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">726</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_jsonb_wrap'>

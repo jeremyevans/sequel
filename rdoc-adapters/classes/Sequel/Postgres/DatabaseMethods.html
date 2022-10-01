@@ -867,7 +867,7 @@ end_sql
 <span class="line-num">586</span>     <span class="ruby-identifier">join</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:pg_namespace</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:nsp</span>), <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:cl2</span>][<span class="ruby-value">:relnamespace</span>]).
 <span class="line-num">587</span>     <span class="ruby-identifier">order</span>{[<span class="ruby-identifier">co</span>[<span class="ruby-value">:conname</span>], <span class="ruby-identifier">cpos</span>]}.
 <span class="line-num">588</span>     <span class="ruby-identifier">where</span>{{
-<span class="line-num">589</span>       <span class="ruby-identifier">cl</span>[<span class="ruby-value">:relkind</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;r&#39;</span>,
+<span class="line-num">589</span>       <span class="ruby-identifier">cl</span>[<span class="ruby-value">:relkind</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-node">%w&#39;r p&#39;</span>,
 <span class="line-num">590</span>       <span class="ruby-identifier">co</span>[<span class="ruby-value">:contype</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;f&#39;</span>,
 <span class="line-num">591</span>       <span class="ruby-identifier">cl</span>[<span class="ruby-value">:oid</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">oid</span>,
 <span class="line-num">592</span>       <span class="ruby-identifier">cpos</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">rpos</span>

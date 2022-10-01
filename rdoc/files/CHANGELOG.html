@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-09-02 09:11:30 -0700</span>
+<span class='datetime'>2022-09-30 13:30:09 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.61.0+-282022-10-01-29"><a href="doc/release_notes/5_61_0_txt.html">5.61.0</a> (2022-10-01)<span><a href="#label-5.61.0+-282022-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make Database#foreign_key_list on PostgreSQL return results for partitioned tables (jeremyevans)</p>
+</li><li>
+<p>Add Database#check_string_typecast_bytesize for checking bytesize of strings before typecasting (jeremyevans)</p>
+</li><li>
+<p>Treat negative hexidecimal strings similar to positive hexidecimal strings when typecasting to integer (jeremyevans)</p>
+</li><li>
+<p>Remove is_json and is_not_json methods from the pg_json_ops extension, as the support was removed in PostgreSQL 15 beta 4 (jeremyevans)</p>
+</li><li>
+<p>Fix handling of timestamps before the date of calendar reform when using pg_extended_date_support extension on Ruby 3.2 (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.60.1+-282022-09-02-29">5.60.1 (2022-09-02)<span><a href="#label-5.60.1+-282022-09-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Revert conversion of respond_to? to defined?, as it breaks with unused refinements on Ruby 2 (jeremyevans) (#1919)</p>

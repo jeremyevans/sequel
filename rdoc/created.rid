@@ -1,6 +1,6 @@
-Fri, 02 Sep 2022 09:26:26 -0700
+Sat, 01 Oct 2022 09:14:02 -0700
 README.rdoc	Fri, 05 Aug 2022 07:47:24 -0700
-CHANGELOG	Fri, 02 Sep 2022 09:11:30 -0700
+CHANGELOG	Fri, 30 Sep 2022 13:30:09 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Wed, 05 Jan 2022 16:44:47 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Fri, 02 Sep 2022 09:11:30 -0700
+lib/sequel/version.rb	Fri, 30 Sep 2022 13:30:09 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/connection_pool/single.rb	Fri, 17 Dec 2021 16:59:47 -0800
@@ -24,7 +24,7 @@ lib/sequel/database/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
-lib/sequel/database/misc.rb	Fri, 02 Sep 2022 09:11:30 -0700
+lib/sequel/database/misc.rb	Thu, 22 Sep 2022 15:08:16 -0700
 lib/sequel/database/query.rb	Wed, 15 Dec 2021 16:07:57 -0800
 lib/sequel/database/schema_generator.rb	Wed, 13 Jul 2022 14:55:58 -0700
 lib/sequel/database/schema_methods.rb	Wed, 13 Jul 2022 14:55:58 -0700
@@ -252,6 +252,7 @@ doc/release_notes/5.58.0.txt	Fri, 01 Jul 2022 07:40:12 -0700
 doc/release_notes/5.59.0.txt	Mon, 01 Aug 2022 07:42:42 -0700
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.60.0.txt	Thu, 01 Sep 2022 07:52:17 -0700
+doc/release_notes/5.61.0.txt	Fri, 30 Sep 2022 13:30:09 -0700
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
