@@ -241,6 +241,30 @@ module Sequel
       pool.servers
     end
 
+    # Connect to the given server/shard. Handles database-generic post-connection
+    # setup not handled by #connect, using the :after_connect and :connect_sqls
+    # options.
+    def new_connection(server)
+      conn = connect(server)
+      opts = server_opts(server)
+
+      if ac = opts[:after_connect]
+        if ac.arity == 2
+          ac.call(conn, server)
+        else
+          ac.call(conn)
+        end
+      end
+
+      if cs = opts[:connect_sqls]
+        cs.each do |sql|
+          log_connection_execute(conn, sql)
+        end
+      end
+
+      conn
+    end
+
     # Returns true if the database is using a single-threaded connection pool.
     def single_threaded?
       @single_threaded

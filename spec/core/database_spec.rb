@@ -170,6 +170,45 @@ describe "A new Database" do
   end
 end
 
+describe "Database :after_connect option" do
+  it "should be called for each new connection" do
+    db = Sequel.mock(:after_connect=>proc{|c| c.execute('SELECT 1'); c.execute('SELECT 2');})
+    db.sqls.must_equal ['SELECT 1', 'SELECT 2']
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 3']
+    db.disconnect
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 1', 'SELECT 2', 'SELECT 3']
+  end
+
+  it "should pass shard as second argument if supported" do
+    db = Sequel.mock(:servers=>{:a=>{}}, :after_connect=>proc{|c, s| c.execute("SELECT #{s}")})
+    db.sqls.must_equal ['SELECT default']
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 3']
+    db.disconnect
+    db['SELECT 3'].server(:a).get
+    db.sqls.must_equal ['SELECT a -- a', 'SELECT 3 -- a']
+  end
+
+  it "should allow for server/shard specific :after_connect" do
+    db = Sequel.mock(
+      :after_connect=>proc{|c, s| c.execute("SELECT #{s}")},
+      :servers=>{
+        :a=>{:after_connect=>proc{|c, s| c.execute("SELECT A #{s}")}},
+        :b=>{:after_connect=>proc{|c, s| c.execute("SELECT B #{s}")}}
+      })
+    db.sqls.must_equal ['SELECT default']
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 3']
+    db.disconnect
+    db['SELECT 3'].server(:a).get
+    db.sqls.must_equal ['SELECT A a -- a', 'SELECT 3 -- a']
+    db['SELECT 3'].server(:b).get
+    db.sqls.must_equal ['SELECT B b -- b', 'SELECT 3 -- b']
+  end
+end
+
 describe "Database :connect_sqls option" do
   it "should issue the each sql query for each new connection" do
     db = Sequel.mock(:connect_sqls=>['SELECT 1', 'SELECT 2'])
@@ -179,6 +218,18 @@ describe "Database :connect_sqls option" do
     db.disconnect
     db['SELECT 3'].get
     db.sqls.must_equal ['SELECT 1', 'SELECT 2', 'SELECT 3']
+  end
+
+  it "should allow for server/shard specific :connect_sqls" do
+    db = Sequel.mock(:connect_sqls=>['SELECT 1'], :servers=>{:a=>{:connect_sqls=>['SELECT A']}, :b=>{:connect_sqls=>['SELECT B']}})
+    db.sqls.must_equal ['SELECT 1']
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 3']
+    db.disconnect
+    db['SELECT 3'].server(:a).get
+    db.sqls.must_equal ['SELECT A -- a', 'SELECT 3 -- a']
+    db['SELECT 3'].server(:b).get
+    db.sqls.must_equal ['SELECT B -- b', 'SELECT 3 -- b']
   end
 end
 

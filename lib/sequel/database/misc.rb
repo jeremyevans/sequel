@@ -100,10 +100,14 @@ module Sequel
     # options hash.
     #
     # Accepts the following options:
+    # :after_connect :: A callable object called after each new connection is made, with the
+    #                   connection object (and server argument if the callable accepts 2 arguments),
+    #                   useful for customizations that you want to apply to all connections.
     # :before_preconnect :: Callable that runs after extensions from :preconnect_extensions are loaded,
     #                       but before any connections are created.
     # :cache_schema :: Whether schema should be cached for this Database instance
     # :check_string_typecast_bytesize :: Whether to check the bytesize of strings before typecasting.
+    # :connect_sqls :: An array of sql strings to execute on each new connection, after :after_connect runs.
     # :default_string_column_size :: The default size of string columns, 255 by default.
     # :extensions :: Extensions to load into this Database instance.  Can be a symbol, array of symbols,
     #                or string with extensions separated by columns.  These extensions are loaded after
@@ -126,9 +130,11 @@ module Sequel
     # :single_threaded :: Whether to use a single-threaded connection pool.
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
+    # For sharded connection pools, :after_connect and :connect_sqls can be specified per-shard.
+    #
     # All options given are also passed to the connection pool.  Additional options respected by
-    # the connection pool are :after_connect, :connect_sqls, :max_connections, :pool_timeout,
-    # :servers, and :servers_hash.  See the connection pool documentation for details.
+    # the connection pool are :max_connections, :pool_timeout, :servers, and :servers_hash.  See the
+    # connection pool documentation for details.
     def initialize(opts = OPTS)
       @opts ||= opts
       @opts = connection_pool_default_options.merge(@opts)

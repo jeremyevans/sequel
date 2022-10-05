@@ -4,10 +4,10 @@ require_relative '../../lib/sequel/connection_pool/sharded_threaded'
 connection_pool_defaults = {:pool_timeout=>5, :max_connections=>4}
 st_connection_pool_defaults = connection_pool_defaults.merge(:single_threaded=>true)
 
-mock_db = lambda do |*a, &b|
-  db = Sequel.mock
+mock_db = lambda do |a=nil, opts={}, &b|
+  db = Sequel.mock(opts)
   db.define_singleton_method(:connect){|c| b.arity == 1 ? b.call(c) : b.call} if b
-  if b2 = a.shift
+  if b2 = a
     db.define_singleton_method(:disconnect_connection){|c| b2.arity == 1 ? b2.call(c) : b2.call}
   end
   # Work around JRuby Issue #3854
@@ -1218,6 +1218,21 @@ end
         a.must_equal []
         p.hold{}
         a.must_equal [123]
+
+        p.after_connect = proc{|c, s| a = [c, s]}
+        p.disconnect
+        p.hold{}
+        a.must_equal [123, :default]
+      end
+
+      it "should be able to modify connect_sqls after the pool is created" do
+        db = mock_db.call
+        p = @class.new(db, {})
+        p.connect_sqls = ['SELECT 1']
+        p.connect_sqls.must_equal ['SELECT 1']
+        db.disconnect
+        p.hold{}
+        db.sqls.must_equal ['SELECT 1']
       end
 
       it "should not raise an error when disconnecting twice" do
@@ -1240,13 +1255,23 @@ end
       
       it "should have respect an :after_connect proc that is called with each newly created connection" do
         x = nil
-        @class.new(mock_db.call{123}, :after_connect=>proc{|c| x = [c, c]}).hold{}
+        db = mock_db.call(nil, :after_connect=>proc{|c| x = [c, c]}){123}
+        @class.new(db, db.opts).hold{}
         x.must_equal [123, 123]
-        @class.new(mock_db.call{123}, :after_connect=>lambda{|c| x = [c, c]}).hold{}
+
+        x = nil
+        db = mock_db.call(nil, :after_connect=>lambda{|c| x = [c, c]}){123}
+        @class.new(db, db.opts).hold{}
         x.must_equal [123, 123]
-        @class.new(mock_db.call{123}, :after_connect=>proc{|c, s| x = [c, s]}).hold{}
+
+        x = nil
+        db = mock_db.call(nil, :after_connect=>proc{|c, s| x = [c, s]}){123}
+        @class.new(db, db.opts).hold{}
         x.must_equal [123, :default]
-        @class.new(mock_db.call{123}, :after_connect=>lambda{|c, s| x = [c, s]}).hold{}
+
+        x = nil
+        db = mock_db.call(nil, :after_connect=>lambda{|c, s| x = [c, s]}){123}
+        @class.new(db, db.opts).hold{}
         x.must_equal [123, :default]
       end
       

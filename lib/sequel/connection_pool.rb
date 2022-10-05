@@ -74,26 +74,35 @@ class Sequel::ConnectionPool
 
   # The after_connect proc used for this pool.  This is called with each new
   # connection made, and is usually used to set custom per-connection settings.
-  attr_accessor :after_connect
+  # Deprecated.
+  attr_reader :after_connect # SEQUEL6: Remove
 
-  # An array of sql strings to execute on each new connection.
-  attr_accessor :connect_sqls
+  # Override the after_connect proc for the connection pool. Deprecated.
+  # Disables support for shard-specific :after_connect and :connect_sqls if used.
+  def after_connect=(v) # SEQUEL6: Remove
+    @use_old_connect_api = true
+    @after_connect = v
+  end
+
+  # An array of sql strings to execute on each new connection. Deprecated.
+  attr_reader :connect_sqls # SEQUEL6: Remove
+
+  # Override the connect_sqls for the connection pool. Deprecated.
+  # Disables support for shard-specific :after_connect and :connect_sqls if used.
+  def connect_sqls=(v) # SEQUEL6: Remove
+    @use_old_connect_api = true
+    @connect_sqls = v
+  end
 
   # The Sequel::Database object tied to this connection pool.
   attr_accessor :db
 
-  # Instantiates a connection pool with the given options.  The block is called
-  # with a single symbol (specifying the server/shard to use) every time a new
-  # connection is needed.  The following options are respected for all connection
-  # pools:
-  # :after_connect :: A callable object called after each new connection is made, with the
-  #                   connection object (and server argument if the callable accepts 2 arguments),
-  #                   useful for customizations that you want to apply to all connections.
-  # :connect_sqls :: An array of sql strings to execute on each new connection, after :after_connect runs.
-  def initialize(db, opts=OPTS)
+  # Instantiates a connection pool with the given Database and options.
+  def initialize(db, opts=OPTS) # SEQUEL6: Remove second argument, always use db.opts
     @db = db
-    @after_connect = opts[:after_connect]
-    @connect_sqls = opts[:connect_sqls]
+    @use_old_connect_api = false # SEQUEL6: Remove
+    @after_connect = opts[:after_connect] # SEQUEL6: Remove
+    @connect_sqls = opts[:connect_sqls] # SEQUEL6: Remove
     @error_classes = db.send(:database_error_classes).dup.freeze
   end
   
@@ -119,25 +128,30 @@ class Sequel::ConnectionPool
   # and checking for connection errors.
   def make_new(server)
     begin
-      conn = @db.connect(server)
+      if @use_old_connect_api
+        # SEQUEL6: Remove block
+        conn = @db.connect(server)
 
-      if ac = @after_connect
-        if ac.arity == 2
-          ac.call(conn, server)
-        else
-          ac.call(conn)
+        if ac = @after_connect
+          if ac.arity == 2
+            ac.call(conn, server)
+          else
+            ac.call(conn)
+          end
         end
-      end
+  
+        if cs = @connect_sqls
+          cs.each do |sql|
+            db.send(:log_connection_execute, conn, sql)
+          end
+        end
 
-      if cs = @connect_sqls
-        cs.each do |sql|
-          db.send(:log_connection_execute, conn, sql)
-        end
+        conn
+      else
+        @db.new_connection(server)
       end
     rescue Exception=>exception
       raise Sequel.convert_exception_class(exception, Sequel::DatabaseConnectionError)
-    end
-    raise(Sequel::DatabaseConnectionError, "Connection parameters not valid") unless conn
-    conn
+    end || raise(Sequel::DatabaseConnectionError, "Connection parameters not valid")
   end
 end
