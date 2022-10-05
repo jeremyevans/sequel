@@ -1,5 +1,7 @@
 === master
 
+* Add pg_extended_integer_support extension for customizing behavior when literalizing a Ruby integer outside PostgreSQL bigint range (jeremyevans)
+
 * Raise Postgres::IntegerOutsideBigintRange if attempting to literalize a Ruby integer outside PostgreSQL bigint range (jeremyevans)
 
 * Add primary_key_lookup_check_values plugin for typecasting and checking primary key values during lookup (jeremyevans)
