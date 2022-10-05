@@ -739,6 +739,10 @@ describe "PostgreSQL support" do
     bytea.call('\\\\').ord.must_equal 92
   end
 
+  it "should raise for integers outside of PostgreSQL bigint range" do
+    proc{@db.literal(2**63)}.must_raise Sequel::InvalidValue
+  end
+
   it "should support converting serial columns to identity" do
     @db.fetch= [[{:v=>'on'}], [{:attnum=>1}], [{:objid=>2345, :v=>false}]]
     def @db.regclass_oid(x) 1234 end

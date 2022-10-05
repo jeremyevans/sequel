@@ -1,5 +1,7 @@
 === master
 
+* Raise Postgres::IntegerOutsideBigintRange if attempting to literalize a Ruby integer outside PostgreSQL bigint range (jeremyevans)
+
 * Add primary_key_lookup_check_values plugin for typecasting and checking primary key values during lookup (jeremyevans)
 
 * Setup validation of minimum and maximum values for integer columns in auto_validations (jeremyevans)

@@ -19,6 +19,9 @@ module Sequel
   module Postgres
     Sequel::Database.set_shared_adapter_scheme(:postgres, self)
 
+    # Exception class ranged when literalizing integers outside the bigint/int8 range.
+    class IntegerOutsideBigintRange < InvalidValue; end
+
     NAN             = 0.0/0.0
     PLUS_INFINITY   = 1.0/0.0
     MINUS_INFINITY  = -1.0/0.0
@@ -2243,6 +2246,22 @@ module Sequel
           "'-Infinity'"
         end
       end 
+
+      # Handle Ruby integers outside PostgreSQL bigint range specially.
+      def literal_integer(v)
+        if v > 9223372036854775807 || v < -9223372036854775808
+          literal_integer_outside_bigint_range(v)
+        else
+          v.to_s
+        end
+      end
+
+      # Raise IntegerOutsideBigintRange when attempting to literalize Ruby integer
+      # outside PostgreSQL bigint range, so PostgreSQL doesn't treat
+      # the value as numeric.
+      def literal_integer_outside_bigint_range(v)
+        raise IntegerOutsideBigintRange, "attempt to literalize Ruby integer outside PostgreSQL bigint range: #{v}"
+      end
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string_append(sql, v)

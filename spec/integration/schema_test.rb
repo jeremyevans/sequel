@@ -216,8 +216,8 @@ describe "Database schema parser" do
       max.must_be_kind_of Integer
       min.must_be_kind_of Integer
       ds = DB[:items]
-      proc{ds.insert(max+1)}.must_raise Sequel::DatabaseError
-      proc{ds.insert(min-1)}.must_raise Sequel::DatabaseError
+      proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
+      proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
       ds.insert(max)
       ds.insert(min)
       ds.select_order_map(:a).must_equal [min, max]
