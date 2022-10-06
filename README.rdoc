@@ -24,8 +24,9 @@ Bug tracking (GitHub Issues) :: https://github.com/jeremyevans/sequel/issues
 Discussion Forum (GitHub Discussions) :: https://github.com/jeremyevans/sequel/discussions
 Alternate Discussion Forum (sequel-talk Google Group) :: http://groups.google.com/group/sequel-talk
 
-If you have questions about how to use Sequel, please ask on the
-sequel-talk Google Group or Github Discussion Forum (links are above).  Only use the the bug tracker to report
+If you have questions about how to use Sequel, please ask on
+GitHub Discussions or the sequel-talk Google Group.
+Only use the the bug tracker to report
 bugs in Sequel, not to ask for help on using Sequel.
 
 To check out the source code:
