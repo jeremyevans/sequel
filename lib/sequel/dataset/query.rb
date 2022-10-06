@@ -116,7 +116,7 @@ module Sequel
     #  DB[:items].order(:id).distinct(:id) # SQL: SELECT DISTINCT ON (id) * FROM items ORDER BY id
     #  DB[:items].order(:id).distinct{func(:id)} # SQL: SELECT DISTINCT ON (func(id)) * FROM items ORDER BY id
     #
-    # There is support for emualting the DISTINCT ON support in MySQL, but it
+    # There is support for emulating the DISTINCT ON support in MySQL, but it
     # does not support the ORDER of the dataset, and also doesn't work in many
     # cases if the ONLY_FULL_GROUP_BY sql_mode is used, which is the default on
     # MySQL 5.7.5+.
