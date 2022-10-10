@@ -197,6 +197,15 @@ module Sequel
     module IntervalDatasetMethods
       private
 
+      # Allow auto parameterization of ActiveSupport::Duration instances.
+      def auto_param_type_fallback(v)
+        if defined?(super) && (type = super)
+          type
+        elsif ActiveSupport::Duration === v
+          "::interval"
+        end
+      end
+
       # Handle literalization of ActiveSupport::Duration objects, treating them as
       # PostgreSQL intervals.
       def literal_other_append(sql, v)

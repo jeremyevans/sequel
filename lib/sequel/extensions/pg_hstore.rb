@@ -280,6 +280,11 @@ module Sequel
         str
       end
 
+      # Allow automatic parameterization.
+      def sequel_auto_param_type(ds)
+        "::hstore"
+      end
+
       private
 
       # Return a new hash based on the input hash with string

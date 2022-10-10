@@ -142,6 +142,11 @@ module Sequel
           ds.literal_append(sql, Sequel.object_to_json(self))
           sql << '::json'
         end
+
+        # Allow automatic parameterization.
+        def sequel_auto_param_type(ds)
+          "::json"
+        end
       end
 
       jsonb_class = Class.new(base_class) do
@@ -150,6 +155,11 @@ module Sequel
         def sql_literal_append(ds, sql)
           ds.literal_append(sql, Sequel.object_to_json(self))
           sql << '::jsonb'
+        end
+
+        # Allow automatic parameterization.
+        def sequel_auto_param_type(ds)
+          "::jsonb"
         end
       end
 

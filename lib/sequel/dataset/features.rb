@@ -152,6 +152,11 @@ module Sequel
       supports_distinct_on?
     end
     
+    # Whether placeholder literalizers are supported, true by default.
+    def supports_placeholder_literalizer?
+      true
+    end
+
     # Whether the dataset supports pattern matching by regular expressions, false by default.
     def supports_regexp?
       false

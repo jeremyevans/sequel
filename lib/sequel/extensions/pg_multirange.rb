@@ -336,6 +336,11 @@ module Sequel
          
         val << "}"
       end
+
+      # Allow automatic parameterization.
+      def sequel_auto_param_type(ds)
+        "::#{db_type}"
+      end
     end
   end
 

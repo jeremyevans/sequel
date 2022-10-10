@@ -955,11 +955,12 @@ describe Sequel::Model, "#eager" do
   end
 
   it "should respect the :limit option on a one_to_many association with an association block" do
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id=>2, :album_id=>1}, {:id=>3, :album_id=>1}, {:id=>4, :album_id=>1}])
     EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2 do |ds| ds.where(:a=>1) end
     a = EagerAlbum.eager(:tracks).all
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
-    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE ((a = 1) AND (1 = tracks.album_id)) ORDER BY name LIMIT 2) AS t1']
-    a.first.tracks.must_equal [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE ((a = 1) AND (tracks.album_id IN (1))) ORDER BY name']
+    a.first.tracks.must_equal [EagerTrack.load(:id => 2, :album_id=>1), EagerTrack.load(:id => 3, :album_id=>1)]
     DB.sqls.must_equal []
   end
   

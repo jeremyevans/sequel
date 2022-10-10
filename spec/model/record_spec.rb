@@ -1397,6 +1397,13 @@ describe Sequel::Model, "#destroy" do
     @instance.destroy
     DB.sqls.must_equal ["before blah", "DELETE FROM items WHERE id = 1234", "after blah"]
   end
+
+  it "should run within a transaction if use_transactions is true" do
+    @model.dataset = @model.dataset.with_extend{def supports_placeholder_literalizer?; false end}
+    @instance.destroy
+    DB.sqls.must_equal ["DELETE FROM items WHERE (id = 1234)"]
+  end
+
 end
 
 describe Sequel::Model, "#exists?" do

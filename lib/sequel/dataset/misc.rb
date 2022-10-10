@@ -302,7 +302,7 @@ module Sequel
           cache_set(key, loader + 1)
           loader = nil
         end
-      elsif cache_sql?
+      elsif cache_sql? && supports_placeholder_literalizer?
         cache_set(key, 1)
       end
 

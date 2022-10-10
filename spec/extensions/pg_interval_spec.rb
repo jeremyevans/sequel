@@ -85,6 +85,24 @@ describe "pg_interval extension" do
     s[1][1][:ruby_default].must_equal ActiveSupport::Duration.new(3*86400, :days=>3)
   end
 
+  it "should automatically parameterize pg_interval values" do
+    @db.extension :pg_auto_parameterize
+    v = ActiveSupport::Duration.new(3*86400, :days=>3)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO table VALUES ($1::interval)'
+    sql.args.length.must_equal 1
+    sql.args[0].must_equal v
+  end
+
+  it "should automatically parameterize pg_interval values when loading pg_inet after" do
+    @db.extension :pg_auto_parameterize, :pg_inet
+    v = ActiveSupport::Duration.new(3*86400, :days=>3)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO table VALUES ($1::interval)'
+    sql.args.length.must_equal 1
+    sql.args[0].must_equal v
+  end
+
   it "should support typecasting for the interval type" do
     m = Sequel::Postgres::IntervalDatabaseMethods::Parser
     seconds = m::SECONDS_PER_YEAR + 2*m::SECONDS_PER_MONTH + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7

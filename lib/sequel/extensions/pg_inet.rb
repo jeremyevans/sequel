@@ -111,6 +111,15 @@ module Sequel
     module InetDatasetMethods
       private
 
+      # Allow auto parameterization of IPAddr instances.
+      def auto_param_type_fallback(v)
+        if defined?(super) && (type = super)
+          type
+        elsif IPAddr === v
+          "::inet"
+        end
+      end
+
       # Convert IPAddr value to a string and append a literal version
       # of the string to the sql.
       def literal_other_append(sql, value)

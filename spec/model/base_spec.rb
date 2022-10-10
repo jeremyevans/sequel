@@ -774,6 +774,12 @@ describe Sequel::Model, ".[] optimization" do
     @db.sqls.must_equal ['SELECT * FROM a WHERE id = 1']
   end
 
+  it "should use Dataset#with_sql if simple_table and simple_pk are true" do
+    @c.set_dataset @db[:a].with_fetch(:id=>1).with_extend{def supports_placeholder_literalizer?; false end}
+    @c[1].must_equal @c.load(:id=>1)
+    @db.sqls.must_equal ['SELECT * FROM a WHERE (id = 1) LIMIT 1']
+  end
+
   it "should not use Dataset#with_sql if either simple_table or simple_pk is nil" do
     @c.set_dataset @db[:a].where(:active).with_fetch(:id=>1)
     @c[1].must_equal @c.load(:id=>1)

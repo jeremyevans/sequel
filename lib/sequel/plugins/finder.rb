@@ -97,7 +97,9 @@ module Sequel
         #   Artist.first_by_name(nil)
         #   # WHERE (name IS NULL)
         #
-        # See Dataset::PlaceholderLiteralizer for additional caveats.
+        # See Dataset::PlaceholderLiteralizer for additional caveats. Note that if the model's
+        # dataset does not support placeholder literalizers, you will not be able to use this
+        # method.
         def finder(meth=OPTS, opts=OPTS, &block)
           if block
             raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)

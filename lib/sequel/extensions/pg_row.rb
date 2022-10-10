@@ -136,6 +136,15 @@ module Sequel
             ds.quote_schema_table_append(sql, db_type)
           end
         end
+
+        # Allow automatic parameterization if all values support it.
+        def sequel_auto_param_type(ds)
+          if db_type && all?{|v| nil == v || ds.send(:auto_param_type, v)}
+            s = String.new << "::"
+            ds.quote_schema_table_append(s, db_type)
+            s
+          end
+        end
       end
 
       # Class for row-valued/composite types that are treated as hashes.
@@ -206,6 +215,15 @@ module Sequel
           if db_type
             sql << '::'
             ds.quote_schema_table_append(sql, db_type)
+          end
+        end
+
+        # Allow automatic parameterization if all values support it.
+        def sequel_auto_param_type(ds)
+          if db_type && all?{|_,v| nil == v || ds.send(:auto_param_type, v)}
+            s = String.new << "::"
+            ds.quote_schema_table_append(s, db_type)
+            s
           end
         end
       end

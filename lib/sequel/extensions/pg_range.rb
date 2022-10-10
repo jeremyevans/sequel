@@ -481,6 +481,11 @@ module Sequel
         end
       end
 
+      # Allow automatic parameterization for ranges with types.
+      def sequel_auto_param_type(ds)
+        "::#{db_type}" if db_type
+      end
+
       private
 
       # Escape common range types.  Instead of quoting, just backslash escape all

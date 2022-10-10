@@ -12,6 +12,7 @@ rescue LoadError
 end
 DB.extension :pg_hstore if DB.type_supported?('hstore')
 DB.extension :pg_multirange if DB.server_version >= 140000
+DB.extension :pg_auto_parameterize if uses_pg && ENV['SEQUEL_PG_AUTO_PARAMETERIZE']
 
 describe 'PostgreSQL adapter' do
   before do
@@ -840,8 +841,8 @@ describe "A PostgreSQL database " do
   end
 
   it "should handle non-ASCII column aliases" do
-    s = String.new("\u00E4").force_encoding(DB.get('a').encoding)
-    k, v = DB.select(Sequel.as(s, s)).first.shift
+    s = String.new("\u00E4").force_encoding(DB.get(Sequel.cast('a', :text)).encoding)
+    k, v = DB.select(Sequel.as(Sequel.cast(s, :text), s)).first.shift
     k.to_s.must_equal v
   end
 

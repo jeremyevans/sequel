@@ -1725,7 +1725,7 @@ module Sequel
     # Append literalization of the subselect to SQL string.
     def subselect_sql_append(sql, ds)
       sds = subselect_sql_dataset(sql, ds)
-      sds.sql
+      subselect_sql_append_sql(sql, sds)
       unless sds.send(:cache_sql?)
         # If subquery dataset does not allow caching SQL,
         # then this dataset should not allow caching SQL.
@@ -1735,6 +1735,10 @@ module Sequel
 
     def subselect_sql_dataset(sql, ds)
       ds.clone(:append_sql=>sql)
+    end
+
+    def subselect_sql_append_sql(sql, ds)
+      ds.sql
     end
 
     # The number of decimal digits of precision to use in timestamps.

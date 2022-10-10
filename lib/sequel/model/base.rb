@@ -606,6 +606,7 @@ module Sequel
           @db_schema = get_db_schema
         end
 
+        @fast_pk_lookup_sql = @fast_instance_delete_sql = nil unless @dataset.supports_placeholder_literalizer?
         reset_instance_dataset
         self
       end

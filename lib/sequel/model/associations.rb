@@ -276,7 +276,7 @@ module Sequel
 
           if eo[:no_results]
             no_results = true
-          elsif eo[:eager_block] || eo[:loader] == false
+          elsif eo[:eager_block] || eo[:loader] == false || !use_placeholder_loader?
             ds = eager_loading_dataset(eo)
 
             strategy = ds.opts[:eager_limit_strategy] || strategy
@@ -822,7 +822,7 @@ module Sequel
 
         # Whether the placeholder loader can be used to load the association.
         def use_placeholder_loader?
-          self[:use_placeholder_loader]
+          self[:use_placeholder_loader] && _associated_dataset.supports_placeholder_literalizer?
         end
       end
     

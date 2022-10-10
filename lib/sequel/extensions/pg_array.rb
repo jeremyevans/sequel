@@ -468,6 +468,14 @@ module Sequel
         end
       end
 
+      # Allow automatic parameterization of the receiver if all elements can be
+      # can be automatically parameterized.
+      def sequel_auto_param_type(ds)
+        if array_type && all?{|x| nil == x || ds.send(:auto_param_type, x)}
+          "::#{array_type}[]"
+        end
+      end
+
       private
 
       # Recursive method that handles multi-dimensional
