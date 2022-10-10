@@ -2243,7 +2243,10 @@ module Sequel
       # Support PostgreSQL 14+ CTE SEARCH/CYCLE clauses
       def select_with_sql_cte(sql, cte)
         super
+        select_with_sql_cte_search_cycle(sql, cte)
+      end
 
+      def select_with_sql_cte_search_cycle(sql, cte)
         if search_opts = cte[:search]
           sql << if search_opts[:type] == :breadth
             " SEARCH BREADTH FIRST BY "
