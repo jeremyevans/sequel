@@ -299,6 +299,11 @@ module Sequel
             strategy = :ruby if strategy == :correlated_subquery
             strategy = nil if strategy == :ruby && assign_singular?
             objects = apply_eager_limit_strategy(ds, strategy, eager_limit).all
+
+            if strategy == :window_function
+              delete_rn = ds.row_number_column 
+              objects.each{|obj| obj.values.delete(delete_rn)}
+            end
           elsif strategy == :union
             objects = []
             ds = associated_dataset

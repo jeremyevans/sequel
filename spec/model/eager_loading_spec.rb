@@ -266,6 +266,16 @@ describe Sequel::Model, "#eager" do
     end
   end
   
+  it "should eagerly load a single one_to_one association with an offset and an eager callback" do
+    EagerTrack.dataset = EagerTrack.dataset.with_extend{def supports_window_functions?; true end}.with_fetch([{:id => 3, :album_id=>1, :x_sequel_row_number_x=>2}])
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[nil, 1]
+    a = EagerAlbum.eager(:track=>proc{|ds| ds}).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x = 2)']
+    a.first.track.must_equal EagerTrack.load(:id => 3, :album_id=>1)
+    DB.sqls.must_equal []
+  end
+  
   it "should automatically use an eager limit stategy if the association has an offset" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1]
     EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 4, :album_id=>1}])

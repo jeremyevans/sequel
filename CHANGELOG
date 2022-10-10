@@ -1,5 +1,7 @@
 === master
 
+* Fix corner case in eager loading where window function eager limit strategy is used, but row number entry is not removed (jeremyevans)
+
 * Support server/shard specific :after_connect and :connect_sqls Database options (jeremyevans) (#1935)
 
 === 5.61.0 (2022-10-01)
