@@ -3014,21 +3014,21 @@ describe 'PostgreSQL array handling' do
     @db.create_table!(:items) do
       column :i, 'int4[]'
     end
-    @ds.call(:insert, {:i=>[1,2]}, {:i=>:$i})
+    @ds.call(:insert, {:i=>[1,2]}, :i=>:$i)
     @ds.get(:i).must_equal [1, 2]
     @ds.filter(:i=>:$i).call(:first, :i=>[1,2]).must_equal(:i=>[1,2])
     @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).must_be_nil
 
     # NULL values
     @ds.delete
-    @ds.call(:insert, {:i=>[nil,nil]}, {:i=>:$i})
+    @ds.call(:insert, {:i=>[nil,nil]}, :i=>:$i)
     @ds.first.must_equal(:i=>[nil, nil])
 
     @db.create_table!(:items) do
       column :i, 'text[]'
     end
     a = ["\"\\\\\"{}\n\t\r \v\b123afP", 'NULL', nil, '']
-    @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a))
+    @ds.call(:insert, {:i=>Sequel.pg_array(a)}, :i=>:$i)
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
     @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).must_be_nil
@@ -3037,7 +3037,7 @@ describe 'PostgreSQL array handling' do
       column :i, 'date[]'
     end
     a = [Date.today]
-    @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'date'))
+    @ds.call(:insert, {:i=>Sequel.pg_array(a, 'date')}, :i=>:$i)
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Date.today-1], 'date')).must_be_nil
@@ -3046,7 +3046,7 @@ describe 'PostgreSQL array handling' do
       column :i, 'timestamp[]'
     end
     a = [Time.local(2011, 1, 2, 3, 4, 5)]
-    @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'timestamp'))
+    @ds.call(:insert, {:i=>Sequel.pg_array(a, 'timestamp')}, :i=>:$i)
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([a.first-1], 'timestamp')).must_be_nil
@@ -3055,7 +3055,7 @@ describe 'PostgreSQL array handling' do
       column :i, 'boolean[]'
     end
     a = [true, false]
-    @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'boolean'))
+    @ds.call(:insert, {:i=>Sequel.pg_array(a, 'boolean')}, :i=>:$i)
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([false, true], 'boolean')).must_be_nil
@@ -3064,7 +3064,7 @@ describe 'PostgreSQL array handling' do
       column :i, 'bytea[]'
     end
     a = [Sequel.blob("a\0'\"")]
-    @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'bytea'))
+    @ds.call(:insert, {:i=>Sequel.pg_array(a, 'bytea')}, :i=>:$i)
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).must_be_nil
