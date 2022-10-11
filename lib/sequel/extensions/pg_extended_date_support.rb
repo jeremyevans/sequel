@@ -40,6 +40,18 @@ module Sequel
         procs[1184] = procs[1114] = db.method(:to_application_timestamp)
       end
 
+      # Handle BC dates and times in bound variables. This is necessary for Date values
+      # when using both the postgres and jdbc adapters, but also necessary for Time values
+      # on jdbc.
+      def bound_variable_arg(arg, conn)
+        case arg
+        when Date, Time
+          literal(arg)
+        else
+          super
+        end
+      end
+
       # Whether infinite timestamps/dates should be converted on retrieval.  By default, no
       # conversion is done, so an error is raised if you attempt to retrieve an infinite
       # timestamp/date.  You can set this to :nil to convert to nil, :string to leave

@@ -1297,7 +1297,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.convert_infinite_timestamps = false
     Sequel.datetime_class = Time
     Sequel::SQLTime.date = nil
-    Sequel.application_timezone = nil
+    Sequel.default_timezone = nil
   end
   after(:all) do
     @db.drop_table?(:test3)
@@ -1359,8 +1359,10 @@ describe "A PostgreSQL dataset with a timestamp field" do
   it "should handle parsing dates and timestamps in the distant future" do
     d = Date.new(5874896, 2, 3)
     @db.get(Sequel.cast(d, Date)).must_equal d
+
     d = Time.local(294275, 2, 3, 10, 11, 12)
     @db.get(Sequel.cast(d, Time)).must_equal d
+
     Sequel.datetime_class = DateTime
     d = DateTime.new(294275, 2, 3, 10, 11, 12)
     @db.get(Sequel.cast(d, Time)).must_equal d
@@ -1369,17 +1371,32 @@ describe "A PostgreSQL dataset with a timestamp field" do
   it "should handle BC times and dates" do
     d = Date.new(-1234, 2, 3)
     @db.get(Sequel.cast(d, Date)).must_equal d
+
     Sequel.default_timezone = :utc
     t = Time.at(-100000000000).utc + 0.5
     @db.get(Sequel.cast(t, Time)).must_equal t
     @db.get(Sequel.cast(t, :timestamptz)).must_equal t
+
     Sequel.datetime_class = DateTime
     dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
     @db.get(Sequel.cast(dt, DateTime)).must_equal dt
     @db.get(Sequel.cast(dt, :timestamptz)).must_equal dt
-    Sequel.datetime_class = Time
-    Sequel.default_timezone = nil
   end
+
+  it "should handle BC times and dates in bound variables" do
+    d = Date.new(-1234, 2, 3)
+    @db.select(Sequel.cast(:$d, Date)).call(:single_value, :d=>d).must_equal d
+
+    Sequel.default_timezone = :utc
+    t = Time.at(-100000000000).utc + 0.5
+    @db.select(Sequel.cast(:$t, Time)).call(:single_value, :t=>t).must_equal t
+    @db.select(Sequel.cast(:$t, :timestamptz)).call(:single_value, :t=>t).must_equal t
+
+    Sequel.datetime_class = DateTime
+    dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+    @db.select(Sequel.cast(:$dt, DateTime)).call(:single_value, :dt=>dt).must_equal dt
+    @db.select(Sequel.cast(:$dt, :timestamptz)).call(:single_value, :dt=>dt).must_equal dt
+  end if uses_pg_or_jdbc 
 
   it "should handle infinite timestamps if convert_infinite_timestamps is set" do
     @d.insert(:time=>Sequel.cast('infinity', DateTime))

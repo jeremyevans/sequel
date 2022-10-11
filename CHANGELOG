@@ -1,5 +1,7 @@
 === master
 
+* Handle BC dates and timestamps in bound variables when using the pg_extended_date_support extension (jeremyevans)
+
 * Correctly format hstore[] types in bound variables on PostgreSQL (jeremyevans)
 
 * Fix corner case in eager loading where window function eager limit strategy is used, but row number entry is not removed (jeremyevans)
