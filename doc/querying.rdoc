@@ -715,6 +715,20 @@ aggregation:
 
   Album.select_group(:artist_id).select_append{sum(num_tracks).as(tracks)}
   # SELECT artist_id, sum(num_tracks) AS tracks FROM albums GROUP BY artist_id
+  
+You can combine select_group, select_append while we are using a join and a where statement:
+
+  Album.  
+  left_join(DB[:artists].
+      select_group(:id).
+      select_append{max(:sales)},
+    :album_id=>:id).
+  where{{albums[:song] => "Bohemian Rhapsody"}}.sql
+  # SELECT * FROM albums 
+  #    LEFT JOIN (SELECT id, max(sales) 
+  #               FROM artists GROUP BY id) AS t1 
+  #    ON (t1.album_id = albums.id)
+  # WHERE (albums.song = 'Bohemian Rhapsody')
 
 == Having
 
