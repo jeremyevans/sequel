@@ -163,16 +163,6 @@ module Sequel
 
       private
 
-      # Handle arrays of interval types in bound variables.
-      def bound_variable_array(a)
-        case a
-        when ActiveSupport::Duration
-          "\"#{IntervalDatabaseMethods.literal_duration(a)}\""
-        else
-          super
-        end
-      end
-
       # Set the :ruby_default value if the default value is recognized as an interval.
       def schema_post_process(_)
         super.each do |a|

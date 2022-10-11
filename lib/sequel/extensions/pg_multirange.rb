@@ -220,16 +220,6 @@ module Sequel
 
         private
 
-        # Handle arrays of multirange types in bound variables.
-        def bound_variable_array(a)
-          case a
-          when PGMultiRange
-            "\"#{bound_variable_arg(a, nil)}\""
-          else
-            super
-          end
-        end
-
         # Recognize the registered database multirange types.
         def schema_column_type(db_type)
           @pg_multirange_schema_types[db_type] || super

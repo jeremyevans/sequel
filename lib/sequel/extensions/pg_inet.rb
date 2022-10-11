@@ -75,16 +75,6 @@ module Sequel
 
       private
 
-      # Handle inet[]/cidr[] types in bound variables.
-      def bound_variable_array(a)
-        case a
-        when IPAddr
-          "\"#{a.to_s}/#{a.instance_variable_get(:@mask_addr).to_s(2).count('1')}\""
-        else
-          super
-        end
-      end
-
       # Make the column type detection recognize the inet and cidr types.
       def schema_column_type(db_type)
         case db_type

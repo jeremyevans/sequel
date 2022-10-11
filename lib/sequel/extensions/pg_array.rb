@@ -228,14 +228,25 @@ module Sequel
           when Array
             "{#{a.map{|i| bound_variable_array(i)}.join(',')}}"
           when Sequel::SQL::Blob
-            "\"#{literal(a)[BLOB_RANGE].gsub("''", "'").gsub(/("|\\)/, '\\\\\1')}\""
+            bound_variable_array_string(literal(a)[BLOB_RANGE].gsub("''", "'"))
           when Sequel::LiteralString
             a
           when String
-            "\"#{a.gsub(/("|\\)/, '\\\\\1')}\""
+            bound_variable_array_string(a)
           else
-            literal(a)
+            if (s = bound_variable_arg(a, nil)).is_a?(String)
+              bound_variable_array_string(s)
+            else
+              literal(a)
+            end
           end
+        end
+
+        # Escape strings used as array members in bound variables. Most complex
+        # will create a regular string with bound_variable_arg, and then use this
+        # escaping to format it as an array member.
+        def bound_variable_array_string(s)
+          "\"#{s.gsub(/("|\\)/, '\\\\\1')}\""
         end
 
         # Look into both the current database's array schema types and the global

@@ -1,5 +1,7 @@
 === master
 
+* Correctly format hstore[] types in bound variables on PostgreSQL (jeremyevans)
+
 * Fix corner case in eager loading where window function eager limit strategy is used, but row number entry is not removed (jeremyevans)
 
 * Support server/shard specific :after_connect and :connect_sqls Database options (jeremyevans) (#1935)

@@ -233,16 +233,6 @@ module Sequel
 
         private
 
-        # Handle arrays of range types in bound variables.
-        def bound_variable_array(a)
-          case a
-          when PGRange, Range
-            "\"#{bound_variable_arg(a, nil)}\""
-          else
-            super
-          end
-        end
-
         # Recognize the registered database range types.
         def schema_column_type(db_type)
           @pg_range_schema_types[db_type] || super

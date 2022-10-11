@@ -23,18 +23,6 @@ module Sequel
             super
           end
         end
-
-        private
-
-        # Handle Sequel::Model instances in bound variable arrays.
-        def bound_variable_array(arg)
-          case arg
-          when Sequel::Model
-            "\"(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(',').gsub(/("|\\)/, '\\\\\1')})\""
-          else
-            super
-          end
-        end
       end
     end
   end

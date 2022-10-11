@@ -3262,6 +3262,18 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(:i).must_equal @h
     @ds.filter(:i=>:$i).call(:first, :i=>@h).must_equal(:i=>@h)
     @ds.filter(:i=>:$i).call(:first, :i=>{}).must_be_nil
+
+    @db.create_table!(:items) do
+      column :i, 'hstore[]'
+    end
+    @ds.call(:insert, {:i=>Sequel.pg_array([Sequel.hstore(@h)], :hstore)}, {:i=>:$i})
+    @ds.get(:i).must_equal [@h]
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.hstore(@h)], :hstore)).must_equal(:i=>[@h])
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.hstore({})], :hstore)).must_be_nil
+
+    @ds.delete
+    @ds.call(:insert, {:i=>Sequel.pg_array([Sequel.hstore('a'=>nil)], :hstore)}, {:i=>:$i})
+    @ds.get(:i).must_equal [Sequel.hstore('a'=>nil)]
   end if uses_pg_or_jdbc
 
   it 'with models and associations' do
@@ -4431,7 +4443,7 @@ describe 'PostgreSQL multirange types' do
     @ds.delete
   end
 
-  it 'use range types in bound variables' do
+  it 'use multirange types in bound variables' do
     @db.create_table!(:items){int4multirange :i4; int8multirange :i8; nummultirange :n; datemultirange :d; tsmultirange :t; tstzmultirange :tz}
     h = {}
     @r.keys.each{|k| h[k] = :"$#{k}"}

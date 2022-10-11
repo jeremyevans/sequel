@@ -424,16 +424,6 @@ module Sequel
         end
       end
 
-      # Handle json[] and jsonb[] types in bound variables.
-      def bound_variable_array(a)
-        case a
-        when JSONObject, JSONBObject
-          "\"#{Sequel.object_to_json(a).gsub('"', '\\"')}\""
-        else
-          super
-        end
-      end
-
       # Make the column type detection recognize the json types.
       def schema_column_type(db_type)
         case db_type
