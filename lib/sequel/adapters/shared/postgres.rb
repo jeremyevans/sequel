@@ -83,6 +83,15 @@ module Sequel
       def primary_key(table)
         :id
       end
+
+      # Handle NoMethodErrors when parsing schema due to output_identifier
+      # being called with nil when the Database fetch results are not set
+      # to what schema parsing expects.
+      def schema_parse_table(table, opts=OPTS)
+        super
+      rescue NoMethodError
+        []
+      end
     end
 
     def self.mock_adapter_setup(db)
@@ -253,7 +262,7 @@ module Sequel
         WHERE cons.contype = 'p'
           AND pg_get_expr(def.adbin, attr.attrelid) ~* 'nextval'
       end_sql
-      ).strip.gsub(/\s+/, ' ').freeze
+      ).strip.gsub(/\s+/, ' ').freeze # SEQUEL6: Remove
 
       # SQL fragment for determining primary key column for the given table.  Only
       # returns the first primary key if the table has a composite primary key.
@@ -266,7 +275,7 @@ module Sequel
           AND pg_index.indkey[0] = pg_attribute.attnum
           AND pg_index.indisprimary = 't'
       end_sql
-      ).strip.gsub(/\s+/, ' ').freeze
+      ).strip.gsub(/\s+/, ' ').freeze # SEQUEL6: Remove
 
       # SQL fragment for getting sequence associated with table's
       # primary key, assuming it was a serial primary key column.
@@ -284,7 +293,7 @@ module Sequel
           AND attr.attrelid = t.oid
           AND cons.contype = 'p'
       end_sql
-      ).strip.gsub(/\s+/, ' ').freeze
+      ).strip.gsub(/\s+/, ' ').freeze # SEQUEL6: Remove
 
       # A hash of conversion procs, keyed by type integer (oid) and
       # having callable values for the conversion proc for that type.
@@ -318,14 +327,8 @@ module Sequel
       def check_constraints(table)
         m = output_identifier_meth
 
-        rows = metadata_dataset.
-          from{pg_constraint.as(:co)}.
-          left_join(Sequel[:pg_attribute].as(:att), :attrelid=>:conrelid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
-          where(:conrelid=>regclass_oid(table), :contype=>'c').
-          select{[co[:conname].as(:constraint), att[:attname].as(:column), pg_get_constraintdef(co[:oid]).as(:definition)]}
-
         hash = {}
-        rows.each do |row|
+        _check_constraints_ds.where_each(:conrelid=>regclass_oid(table)) do |row|
           constraint = m.call(row[:constraint])
           entry = hash[constraint] ||= {:definition=>row[:definition], :columns=>[]}
           entry[:columns] << m.call(row[:column]) if row[:column]
@@ -551,65 +554,12 @@ module Sequel
       def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth
         schema, _ = opts.fetch(:schema, schema_and_table(table))
-        oid = regclass_oid(table)
-        reverse = opts[:reverse]
-
-        if reverse
-          ctable = Sequel[:att2]
-          cclass = Sequel[:cl2]
-          rtable = Sequel[:att]
-          rclass = Sequel[:cl]
-        else
-          ctable = Sequel[:att]
-          cclass = Sequel[:cl]
-          rtable = Sequel[:att2]
-          rclass = Sequel[:cl2]
-        end
-
-        if server_version >= 90500
-          cpos = Sequel.expr{array_position(co[:conkey], ctable[:attnum])}
-          rpos = Sequel.expr{array_position(co[:confkey], rtable[:attnum])}
-        # :nocov:
-        else
-          range = 0...32
-          cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, ctable[:attnum])}
-          rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, rtable[:attnum])}
-        # :nocov:
-        end
-
-        ds = metadata_dataset.
-          from{pg_constraint.as(:co)}.
-          join(Sequel[:pg_class].as(cclass), :oid=>:conrelid).
-          join(Sequel[:pg_attribute].as(ctable), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
-          join(Sequel[:pg_class].as(rclass), :oid=>Sequel[:co][:confrelid]).
-          join(Sequel[:pg_attribute].as(rtable), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
-          join(Sequel[:pg_namespace].as(:nsp), :oid=>Sequel[:cl2][:relnamespace]).
-          order{[co[:conname], cpos]}.
-          where{{
-            cl[:relkind]=>%w'r p',
-            co[:contype]=>'f',
-            cl[:oid]=>oid,
-            cpos=>rpos
-          }}.
-          select{[
-            co[:conname].as(:name),
-            ctable[:attname].as(:column),
-            co[:confupdtype].as(:on_update),
-            co[:confdeltype].as(:on_delete),
-            cl2[:relname].as(:table),
-            rtable[:attname].as(:refcolumn),
-            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable),
-            nsp[:nspname].as(:schema)
-          ]}
-
-        if reverse
-          ds = ds.order_append(Sequel[:nsp][:nspname], Sequel[:cl2][:relname])
-        end
 
         h = {}
         fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
+        reverse = opts[:reverse]
 
-        ds.each do |row|
+        (reverse ? _reverse_foreign_key_list_ds : _foreign_key_list_ds).where_each(Sequel[:cl][:oid]=>regclass_oid(table)) do |row|
           if reverse
             key = [row[:schema], row[:table], row[:name]]
           else
@@ -644,6 +594,14 @@ module Sequel
       def freeze
         server_version
         supports_prepared_transactions?
+        _schema_ds
+        _select_serial_sequence_ds
+        _select_custom_sequence_ds
+        _select_pk_ds
+        _indexes_ds
+        _check_constraints_ds
+        _foreign_key_list_ds
+        _reverse_foreign_key_list_ds
         @conversion_procs.freeze
         super
       end
@@ -651,42 +609,11 @@ module Sequel
       # Use the pg_* system tables to determine indexes on a table
       def indexes(table, opts=OPTS)
         m = output_identifier_meth
-        oid = regclass_oid(table, opts)
-
-        if server_version >= 90500
-          order = [Sequel[:indc][:relname], Sequel.function(:array_position, Sequel[:ind][:indkey], Sequel[:att][:attnum])]
-        # :nocov:
-        else
-          range = 0...32
-          order = [Sequel[:indc][:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(Sequel[:ind][:indkey], [x]), x]}, 32, Sequel[:att][:attnum])]
-        # :nocov:
-        end
-
-        attnums = SQL::Function.new(:ANY, Sequel[:ind][:indkey])
-
-        ds = metadata_dataset.
-          from{pg_class.as(:tab)}.
-          join(Sequel[:pg_index].as(:ind), :indrelid=>:oid).
-          join(Sequel[:pg_class].as(:indc), :oid=>:indexrelid).
-          join(Sequel[:pg_attribute].as(:att), :attrelid=>Sequel[:tab][:oid], :attnum=>attnums).
-          left_join(Sequel[:pg_constraint].as(:con), :conname=>Sequel[:indc][:relname]).
-          where{{
-            indc[:relkind]=>'i',
-            ind[:indisprimary]=>false,
-            :indexprs=>nil,
-            :indisvalid=>true,
-            tab[:oid]=>oid}}.
-          order(*order).
-          select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
-
-        ds = ds.where(:indpred=>nil) unless opts[:include_partial]
-        # :nocov:
-        ds = ds.where(:indisready=>true) if server_version >= 80300
-        ds = ds.where(:indislive=>true) if server_version >= 90300
-        # :nocov:
+        cond = {Sequel[:tab][:oid]=>regclass_oid(table, opts)}
+        cond[:indpred] = nil unless opts[:include_partial]
 
         indexes = {}
-        ds.each do |r|
+        _indexes_ds.where_each(cond) do |r|
           i = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>r[:unique], :deferrable=>r[:deferrable]}
           i[:columns] << m.call(r[:column])
         end
@@ -719,8 +646,7 @@ module Sequel
       def primary_key(table, opts=OPTS)
         quoted_table = quote_schema_table(table)
         Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
-        sql = "#{SELECT_PK_SQL} AND pg_class.oid = #{literal(regclass_oid(table, opts))}"
-        value = fetch(sql).single_value
+        value = _select_pk_ds.where_single_value(Sequel[:pg_class][:oid] => regclass_oid(table, opts))
         Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
 
@@ -728,17 +654,14 @@ module Sequel
       def primary_key_sequence(table, opts=OPTS)
         quoted_table = quote_schema_table(table)
         Sequel.synchronize{return @primary_key_sequences[quoted_table] if @primary_key_sequences.has_key?(quoted_table)}
-        sql = "#{SELECT_SERIAL_SEQUENCE_SQL} AND t.oid = #{literal(regclass_oid(table, opts))}"
-        if pks = fetch(sql).single_record
-          value = literal(SQL::QualifiedIdentifier.new(pks[:schema], pks[:sequence]))
-          Sequel.synchronize{@primary_key_sequences[quoted_table] = value}
-        else
-          sql = "#{SELECT_CUSTOM_SEQUENCE_SQL} AND t.oid = #{literal(regclass_oid(table, opts))}"
-          if pks = fetch(sql).single_record
-            value = literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
-            Sequel.synchronize{@primary_key_sequences[quoted_table] = value}
-          end
+        cond = {Sequel[:t][:oid] => regclass_oid(table, opts)}
+        value = if pks = _select_serial_sequence_ds.first(cond)
+          literal(SQL::QualifiedIdentifier.new(pks[:schema], pks[:sequence]))
+        elsif pks = _select_custom_sequence_ds.first(cond)
+          literal(SQL::QualifiedIdentifier.new(pks[:schema], LiteralString.new(pks[:sequence])))
         end
+
+        Sequel.synchronize{@primary_key_sequences[quoted_table] = value} if value
       end
 
       # Refresh the materialized view with the given name.
@@ -894,6 +817,216 @@ module Sequel
       end
 
       private
+
+      # Dataset used to retrieve CHECK constraint information
+      def _check_constraints_ds
+        @_check_constraints_ds ||= metadata_dataset.
+          from{pg_constraint.as(:co)}.
+          left_join(Sequel[:pg_attribute].as(:att), :attrelid=>:conrelid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+          where(:contype=>'c').
+          select{[co[:conname].as(:constraint), att[:attname].as(:column), pg_get_constraintdef(co[:oid]).as(:definition)]}
+      end
+
+      # Dataset used to retrieve foreign keys referenced by a table
+      def _foreign_key_list_ds
+        @_foreign_key_list_ds ||= __foreign_key_list_ds(false)
+      end
+
+      # Dataset used to retrieve foreign keys referencing a table
+      def _reverse_foreign_key_list_ds
+        @_reverse_foreign_key_list_ds ||= __foreign_key_list_ds(true)
+      end
+
+      # Build dataset used for foreign key list methods.
+      def __foreign_key_list_ds(reverse)
+        if reverse
+          ctable = Sequel[:att2]
+          cclass = Sequel[:cl2]
+          rtable = Sequel[:att]
+          rclass = Sequel[:cl]
+        else
+          ctable = Sequel[:att]
+          cclass = Sequel[:cl]
+          rtable = Sequel[:att2]
+          rclass = Sequel[:cl2]
+        end
+
+        if server_version >= 90500
+          cpos = Sequel.expr{array_position(co[:conkey], ctable[:attnum])}
+          rpos = Sequel.expr{array_position(co[:confkey], rtable[:attnum])}
+        # :nocov:
+        else
+          range = 0...32
+          cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, ctable[:attnum])}
+          rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, rtable[:attnum])}
+        # :nocov:
+        end
+
+        ds = metadata_dataset.
+          from{pg_constraint.as(:co)}.
+          join(Sequel[:pg_class].as(cclass), :oid=>:conrelid).
+          join(Sequel[:pg_attribute].as(ctable), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+          join(Sequel[:pg_class].as(rclass), :oid=>Sequel[:co][:confrelid]).
+          join(Sequel[:pg_attribute].as(rtable), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
+          join(Sequel[:pg_namespace].as(:nsp), :oid=>Sequel[:cl2][:relnamespace]).
+          order{[co[:conname], cpos]}.
+          where{{
+            cl[:relkind]=>%w'r p',
+            co[:contype]=>'f',
+            cpos=>rpos
+          }}.
+          select{[
+            co[:conname].as(:name),
+            ctable[:attname].as(:column),
+            co[:confupdtype].as(:on_update),
+            co[:confdeltype].as(:on_delete),
+            cl2[:relname].as(:table),
+            rtable[:attname].as(:refcolumn),
+            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable),
+            nsp[:nspname].as(:schema)
+          ]}
+
+        if reverse
+          ds = ds.order_append(Sequel[:nsp][:nspname], Sequel[:cl2][:relname])
+        end
+
+        ds
+      end
+
+      # Dataset used to retrieve index information
+      def _indexes_ds
+        @_indexes_ds ||= begin
+          if server_version >= 90500
+            order = [Sequel[:indc][:relname], Sequel.function(:array_position, Sequel[:ind][:indkey], Sequel[:att][:attnum])]
+          # :nocov:
+          else
+            range = 0...32
+            order = [Sequel[:indc][:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(Sequel[:ind][:indkey], [x]), x]}, 32, Sequel[:att][:attnum])]
+          # :nocov:
+          end
+
+          attnums = SQL::Function.new(:ANY, Sequel[:ind][:indkey])
+
+          ds = metadata_dataset.
+            from{pg_class.as(:tab)}.
+            join(Sequel[:pg_index].as(:ind), :indrelid=>:oid).
+            join(Sequel[:pg_class].as(:indc), :oid=>:indexrelid).
+            join(Sequel[:pg_attribute].as(:att), :attrelid=>Sequel[:tab][:oid], :attnum=>attnums).
+            left_join(Sequel[:pg_constraint].as(:con), :conname=>Sequel[:indc][:relname]).
+            where{{
+              indc[:relkind]=>'i',
+              ind[:indisprimary]=>false,
+              :indexprs=>nil,
+              :indisvalid=>true}}.
+            order(*order).
+            select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
+
+          # :nocov:
+          ds = ds.where(:indisready=>true) if server_version >= 80300
+          ds = ds.where(:indislive=>true) if server_version >= 90300
+          # :nocov:
+
+          ds
+        end
+      end
+
+      # Dataset used to determine custom serial sequences for tables
+      def _select_custom_sequence_ds
+        @_select_custom_sequence_ds ||= metadata_dataset.
+          from{pg_class.as(:t)}.
+          join(:pg_namespace, {:oid => :relnamespace}, :table_alias=>:name).
+          join(:pg_attribute, {:attrelid => Sequel[:t][:oid]}, :table_alias=>:attr).
+          join(:pg_attrdef, {:adrelid => :attrelid, :adnum => :attnum}, :table_alias=>:def).
+          join(:pg_constraint, {:conrelid => :adrelid, Sequel[:cons][:conkey].sql_subscript(1) => :adnum}, :table_alias=>:cons).
+          where{{cons[:contype] => 'p', pg_get_expr(self.def[:adbin], attr[:attrelid]) => /nextval/i}}.
+          select{
+            expr = split_part(pg_get_expr(self.def[:adbin], attr[:attrelid]), "'", 2)
+            [
+              name[:nspname].as(:schema),
+              Sequel.case({{expr => /./} => substr(expr, strpos(expr, '.')+1)}, expr).as(:sequence)
+            ]
+          }
+      end
+
+      # Dataset used to determine normal serial sequences for tables
+      def _select_serial_sequence_ds
+        @_serial_sequence_ds ||= metadata_dataset.
+          from{[
+            pg_class.as(:seq),
+            pg_attribute.as(:attr),
+            pg_depend.as(:dep),
+            pg_namespace.as(:name),
+            pg_constraint.as(:cons),
+            pg_class.as(:t)
+          ]}.
+          where{[
+            [seq[:oid], dep[:objid]],
+            [seq[:relnamespace], name[:oid]],
+            [seq[:relkind], 'S'],
+            [attr[:attrelid], dep[:refobjid]],
+            [attr[:attnum], dep[:refobjsubid]],
+            [attr[:attrelid], cons[:conrelid]],
+            [attr[:attnum], cons[:conkey].sql_subscript(1)],
+            [attr[:attrelid], t[:oid]],
+            [cons[:contype], 'p']
+          ]}.
+          select{[
+            name[:nspname].as(:schema),
+            seq[:relname].as(:sequence)
+          ]}
+      end
+
+      # Dataset used to determine primary keys for tables
+      def _select_pk_ds
+        @_select_pk_ds ||= metadata_dataset.
+          from(:pg_class, :pg_attribute, :pg_index, :pg_namespace).
+          where{[
+            [pg_class[:oid], pg_attribute[:attrelid]],
+            [pg_class[:relnamespace], pg_namespace[:oid]],
+            [pg_class[:oid], pg_index[:indrelid]],
+            [pg_index[:indkey].sql_subscript(0), pg_attribute[:attnum]],
+            [pg_index[:indisprimary], 't']
+          ]}.
+          select{pg_attribute[:attname].as(:pk)}
+      end
+
+      # Dataset used to get schema for tables
+      def _schema_ds
+        @_schema_ds ||= begin
+          ds = metadata_dataset.select{[
+              pg_attribute[:attname].as(:name),
+              SQL::Cast.new(pg_attribute[:atttypid], :integer).as(:oid),
+              SQL::Cast.new(basetype[:oid], :integer).as(:base_oid),
+              SQL::Function.new(:format_type, basetype[:oid], pg_type[:typtypmod]).as(:db_base_type),
+              SQL::Function.new(:format_type, pg_type[:oid], pg_attribute[:atttypmod]).as(:db_type),
+              SQL::Function.new(:pg_get_expr, pg_attrdef[:adbin], pg_class[:oid]).as(:default),
+              SQL::BooleanExpression.new(:NOT, pg_attribute[:attnotnull]).as(:allow_null),
+              SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(pg_attribute[:attnum] => SQL::Function.new(:ANY, pg_index[:indkey])), false).as(:primary_key)]}.
+            from(:pg_class).
+            join(:pg_attribute, :attrelid=>:oid).
+            join(:pg_type, :oid=>:atttypid).
+            left_outer_join(Sequel[:pg_type].as(:basetype), :oid=>:typbasetype).
+            left_outer_join(:pg_attrdef, :adrelid=>Sequel[:pg_class][:oid], :adnum=>Sequel[:pg_attribute][:attnum]).
+            left_outer_join(:pg_index, :indrelid=>Sequel[:pg_class][:oid], :indisprimary=>true).
+            where{{pg_attribute[:attisdropped]=>false}}.
+            where{pg_attribute[:attnum] > 0}.
+            order{pg_attribute[:attnum]}
+
+          # :nocov:
+          if server_version > 100000
+          # :nocov:
+            ds = ds.select_append{pg_attribute[:attidentity]}
+
+            # :nocov:
+            if server_version > 120000
+            # :nocov:
+              ds = ds.select_append{Sequel.~(pg_attribute[:attgenerated]=>'').as(:generated)}
+            end
+          end
+
+          ds
+        end
+      end
 
       def alter_table_add_column_sql(table, op)
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
@@ -1418,40 +1551,8 @@ module Sequel
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])
-        oid = regclass_oid(table_name, opts)
-        ds = metadata_dataset.select{[
-            pg_attribute[:attname].as(:name),
-            SQL::Cast.new(pg_attribute[:atttypid], :integer).as(:oid),
-            SQL::Cast.new(basetype[:oid], :integer).as(:base_oid),
-            SQL::Function.new(:format_type, basetype[:oid], pg_type[:typtypmod]).as(:db_base_type),
-            SQL::Function.new(:format_type, pg_type[:oid], pg_attribute[:atttypmod]).as(:db_type),
-            SQL::Function.new(:pg_get_expr, pg_attrdef[:adbin], pg_class[:oid]).as(:default),
-            SQL::BooleanExpression.new(:NOT, pg_attribute[:attnotnull]).as(:allow_null),
-            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(pg_attribute[:attnum] => SQL::Function.new(:ANY, pg_index[:indkey])), false).as(:primary_key)]}.
-          from(:pg_class).
-          join(:pg_attribute, :attrelid=>:oid).
-          join(:pg_type, :oid=>:atttypid).
-          left_outer_join(Sequel[:pg_type].as(:basetype), :oid=>:typbasetype).
-          left_outer_join(:pg_attrdef, :adrelid=>Sequel[:pg_class][:oid], :adnum=>Sequel[:pg_attribute][:attnum]).
-          left_outer_join(:pg_index, :indrelid=>Sequel[:pg_class][:oid], :indisprimary=>true).
-          where{{pg_attribute[:attisdropped]=>false}}.
-          where{pg_attribute[:attnum] > 0}.
-          where{{pg_class[:oid]=>oid}}.
-          order{pg_attribute[:attnum]}
 
-        # :nocov:
-        if server_version > 100000
-        # :nocov:
-          ds = ds.select_append{pg_attribute[:attidentity]}
-
-          # :nocov:
-          if server_version > 120000
-          # :nocov:
-            ds = ds.select_append{Sequel.~(pg_attribute[:attgenerated]=>'').as(:generated)}
-          end
-        end
-
-        ds.map do |row|
+        _schema_ds.where_all(Sequel[:pg_class][:oid]=>regclass_oid(table_name, opts)).map do |row|
           row[:default] = nil if blank_object?(row[:default])
           if row[:base_oid]
             row[:domain_oid] = row[:oid]
