@@ -22,8 +22,11 @@ end
 
 if RUBY_VERSION < '2.2.0'
   gem 'activemodel', '<5.0.0'
+  gem 'concurrent-ruby', '<1.1.10'
 elsif RUBY_VERSION < '2.4.0'
   gem 'activemodel', '<6.0.0'
+elsif RUBY_VERSION < '2.7.0'
+  gem 'activemodel', '<7.0.0'
 else
   gem 'activemodel'
 end
@@ -32,6 +35,8 @@ if RUBY_VERSION < '3.1.0' && RUBY_VERSION >= '3.0.0'
   gem 'json', '2.5.1'
 elsif RUBY_VERSION < '2.0.0'
   gem 'json', '<1.8.5'
+elsif RUBY_VERSION < '2.3.0'
+  gem 'json', '<2.6'
 else
   gem 'json'
 end
