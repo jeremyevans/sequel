@@ -52,6 +52,15 @@ describe "Sequel named_timezones extension with DateTime class" do
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
   end
   
+  it "should convert datetimes going into the database to named database_timezone" do
+    ds = @db[:a].with_extend do
+      def supports_timestamp_timezones?; true; end
+    end
+    @dt += Rational(555555, 1000000*86400)
+    ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30.555555,-7/24.0), DateTime.civil(2009,6,1,6,20,30.555555,-1/6.0)])
+    @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400')"]
+  end
+  
   it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
     dt.must_be_instance_of DateTime
@@ -145,7 +154,7 @@ describe "Sequel named_timezones extension with Time class" do
     Sequel.database_timezone.must_equal @tz_out
   end
     
-  it "should convert datetimes going into the database to named database_timezone" do
+  it "should convert times going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
       def supports_timestamp_timezones?; true; end
       def supports_timestamp_usecs?; false; end
@@ -154,7 +163,15 @@ describe "Sequel named_timezones extension with Time class" do
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
   end
   
-  it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
+  it "should convert times with fractional seconds going into the database to named database_timezone" do
+    ds = @db[:a].with_extend do
+      def supports_timestamp_timezones?; true; end
+    end
+    ds.insert([Time.new(2009,6,1,3,20,30.5555554, RUBY_VERSION >= '2.6' ? @tz_in : -25200), Time.new(2009,6,1,3,20,30.5555554,-25200), Time.new(2009,6,1,6,20,30.5555554,-14400)])
+    @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400')"]
+  end
+  
+  it "should convert times coming out of the database from database_timezone to application_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
     dt.must_be_instance_of Time
     dt.must_equal Time.new(2009,6,1,3,20,30,-25200)
@@ -163,6 +180,20 @@ describe "Sequel named_timezones extension with Time class" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30+0000')
     dt.must_be_instance_of Time
     dt.must_equal Time.new(2009,6,1,3,20,30,-25200)
+    dt.utc_offset.must_equal(-25200)
+  end
+    
+  it "should convert times with fractional seconds coming out of the database from database_timezone to application_timezone" do
+    dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30.555555-0400')
+    dt.must_be_instance_of Time
+    dt.to_i.must_equal Time.new(2009,6,1,3,20,30,-25200).to_i
+    dt.nsec.must_equal 555555000
+    dt.utc_offset.must_equal(-25200)
+    
+    dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30.555555+0000')
+    dt.must_be_instance_of Time
+    dt.to_i.must_equal Time.new(2009,6,1,3,20,30,-25200).to_i
+    dt.nsec.must_equal 555555000
     dt.utc_offset.must_equal(-25200)
   end
     
@@ -175,6 +206,17 @@ describe "Sequel named_timezones extension with Time class" do
     Sequel.database_to_application_timestamp('2004-10-31T01:30:00').must_equal Time.new(2004, 10, 30, 22, 30, 0, -25200)
     dt = Sequel.database_to_application_timestamp('2004-10-31T01:30:00')
     dt.must_equal Time.new(2004, 10, 30, 22, 30, 0, -25200)
+    dt.utc_offset.must_equal(-25200)
+  end
+
+  it "should support tzinfo_disambiguator= to handle ambiguous timezones automatically when using fractional seconds" do
+    Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
+    dt = Sequel.database_to_application_timestamp('2004-10-31T01:30:00.555555')
+    dt.to_i.must_equal Time.new(2004, 10, 30, 22, 30, 0, -25200).to_i
+    dt.nsec.must_equal 555555000
+    dt = Sequel.database_to_application_timestamp('2004-10-31T01:30:00.555555')
+    dt.to_i.must_equal Time.new(2004, 10, 30, 22, 30, 0, -25200).to_i
+    dt.nsec.must_equal 555555000
     dt.utc_offset.must_equal(-25200)
   end
 

@@ -1,5 +1,7 @@
 === master
 
+* Support fractional seconds in the named_timezones extension (jeremyevans) (#1943)
+
 * Cache reflection datasets in the postgres adapter to improve performance (jeremyevans)
 
 * Handle BC dates and timestamps in bound variables when using the pg_extended_date_support extension (jeremyevans)

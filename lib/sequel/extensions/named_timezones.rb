@@ -76,33 +76,41 @@ module Sequel
         raise unless disamb = tzinfo_disambiguator_for(v)
         period = input_timezone.period_for_local(v, &disamb)
         offset = period.utc_total_offset
-        Time.at(v.to_i - offset, :in => input_timezone)
+        if defined?(JRUBY_VERSION)
+          Time.at(v.to_i - offset, :in => input_timezone) + v.nsec/1000000000.0
+        else
+          Time.at(v.to_i - offset, v.nsec, :nsec, :in => input_timezone)
+        end
       end
 
       # Convert the given input Time to the given output timezone,
       # which should be a TZInfo::Timezone instance.
       def convert_output_time_other(v, output_timezone)
-        Time.at(v.to_i, :in => output_timezone)
+        if defined?(JRUBY_VERSION)
+          Time.at(v.to_i, :in => output_timezone) + v.nsec/1000000000.0
+        else
+          Time.at(v.to_i, v.nsec, :nsec, :in => output_timezone)
+        end
       end
       # :nodoc:
       # :nocov:
     else
       def convert_input_time_other(v, input_timezone)
         local_offset = input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset
-        Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i
+        Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i + v.nsec/1000000000.0 
       end
 
       if defined?(TZInfo::VERSION) && TZInfo::VERSION > '2'
         def convert_output_time_other(v, output_timezone)
           v = output_timezone.utc_to_local(v.getutc)
           local_offset = output_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset
-          Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i + local_offset
+          Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i + v.nsec/1000000000.0 + local_offset
         end
       else
         def convert_output_time_other(v, output_timezone)
           v = output_timezone.utc_to_local(v.getutc)
           local_offset = output_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset
-          Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i
+          Time.new(1970, 1, 1, 0, 0, 0, local_offset) + v.to_i + v.nsec/1000000000.0
         end
       end
       # :nodoc:
