@@ -59,7 +59,7 @@ describe "Sequel named_timezones extension with DateTime class" do
     @dt += Rational(555555, 1000000*86400)
     ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30.555555,-7/24.0), DateTime.civil(2009,6,1,6,20,30.555555,-1/6.0)])
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400')"]
-  end
+  end unless defined?(JRUBY_VERSION) && JRUBY_VERSION < "9.2"
   
   it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
