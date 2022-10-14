@@ -1,5 +1,7 @@
 === master
 
+* Update mock PostgreSQL adapter to default to PostgreSQL 15 instead of PostgreSQL 14 (jeremyevans)
+
 * Support fractional seconds in the named_timezones extension (jeremyevans) (#1943)
 
 * Cache reflection datasets in the postgres adapter to improve performance (jeremyevans)
