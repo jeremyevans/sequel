@@ -8,10 +8,16 @@ gem 'minitest-global_expectations'
 # Plugin/Extension Dependencies
 gem 'tzinfo'
 
-if RUBY_VERSION < '2.1.0'
-  gem 'nokogiri', '<1.7.0'
-elsif RUBY_VERSION < '2.3.0'
-  gem 'nokogiri', '<1.10.0'
+if RUBY_VERSION < '2.1'
+  gem 'nokogiri', '<1.7'
+elsif RUBY_VERSION < '2.2'
+  gem 'nokogiri', '<1.10'
+elsif RUBY_VERSION < '2.4'
+  gem 'nokogiri', '<1.11'
+elsif RUBY_VERSION < '2.5'
+  gem 'nokogiri', '<1.12'
+elsif RUBY_VERSION < '2.6'
+  gem 'nokogiri', '<1.13'
 else
   gem 'nokogiri'
 end
@@ -77,7 +83,7 @@ end
 
 # JRuby Adapter Dependencies
 platforms :jruby do
-  if JRUBY_VERSION < '9.2'
+  if RUBY_VERSION < '2.4'
     gem 'racc', '<1.6'
   end
 
