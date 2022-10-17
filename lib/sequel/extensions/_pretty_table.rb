@@ -39,7 +39,7 @@ module Sequel
 
     # Hash of the maximum size of the value for each column 
     def self.column_sizes(records, columns) # :nodoc:
-      sizes = Hash.new {0}
+      sizes = Hash.new(0)
       columns.each do |c|
         sizes[c] = c.to_s.size
       end
