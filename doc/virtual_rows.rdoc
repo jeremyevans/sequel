@@ -166,7 +166,7 @@ distinct method on the returned Function:
   ds.select{|o| o.count(o.col1, o.col2).distinct}
   ds.select{count(col1, col2).distinct}
   # SELECT count(DISTINCT col1, col2)
-  
+
 == SQL::Functions with windows - SQL window function calls
 
 To create a window function call, just call the over method on the Function
@@ -197,6 +197,11 @@ DatasetFiltering[http://sequel.jeremyevans.net/rdoc/files/doc/dataset_filtering_
   ds.where{|o| (o.price < 200) & (o.tax * 100 >= 23)}
   ds.where{(price < 200) & (tax * 100 >= 0.23)}
   # WHERE ((price < 200) AND ((tax * 100) >= 0.23))
+
+You can using other methods too, besides `where` or `select` - many of the Dataset methods are available to you.
+
+  DB[:artists].order{[name, id.desc]}.sql  
+  # SELECT * FROM artists ORDER BY name, id DESC
 
 However, VirtualRows have special handling of some operator methods to make
 certain things easier.  The operators all use a prefix form.
