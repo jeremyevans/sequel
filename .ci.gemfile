@@ -77,6 +77,10 @@ end
 
 # JRuby Adapter Dependencies
 platforms :jruby do
+  if JRUBY_VERSION < '9.2'
+    gem 'racc', '<1.6'
+  end
+
   gem 'jdbc-sqlite3'
   gem 'jdbc-mysql'
   gem 'jdbc-postgres'
