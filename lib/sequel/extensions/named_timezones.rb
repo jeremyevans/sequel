@@ -76,8 +76,10 @@ module Sequel
         raise unless disamb = tzinfo_disambiguator_for(v)
         period = input_timezone.period_for_local(v, &disamb)
         offset = period.utc_total_offset
+        # :nocov:
         if defined?(JRUBY_VERSION)
           Time.at(v.to_i - offset, :in => input_timezone) + v.nsec/1000000000.0
+        # :nocov:
         else
           Time.at(v.to_i - offset, v.nsec, :nsec, :in => input_timezone)
         end
@@ -86,8 +88,10 @@ module Sequel
       # Convert the given input Time to the given output timezone,
       # which should be a TZInfo::Timezone instance.
       def convert_output_time_other(v, output_timezone)
+        # :nocov:
         if defined?(JRUBY_VERSION)
           Time.at(v.to_i, :in => output_timezone) + v.nsec/1000000000.0
+        # :nocov:
         else
           Time.at(v.to_i, v.nsec, :nsec, :in => output_timezone)
         end
