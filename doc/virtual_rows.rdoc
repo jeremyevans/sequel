@@ -23,7 +23,7 @@ With virtual rows, you can use the less verbose:
 Virtual row blocks behave differently depending on whether the block accepts
 an argument.  If the block accepts an argument, it is called with an instance
 of Sequel::SQL::VirtualRow.  If it does not accept an argument, it is
-evaluated in the context of an instance of Sequel::SQL::VirtualRow.
+evaluated in the <em> context of an instance </em> of Sequel::SQL::VirtualRow.
 
   ds = DB[:items]
   # Regular block
