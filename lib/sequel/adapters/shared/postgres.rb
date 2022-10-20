@@ -668,7 +668,7 @@ module Sequel
       # 
       #   DB.refresh_view(:items_view)
       #   # REFRESH MATERIALIZED VIEW items_view
-      #   DB.refresh_view(:items_view, :concurrently=>true)
+      #   DB.refresh_view(:items_view, concurrently: true)
       #   # REFRESH MATERIALIZED VIEW CONCURRENTLY items_view
       def refresh_view(name, opts=OPTS)
         run "REFRESH MATERIALIZED VIEW#{' CONCURRENTLY' if opts[:concurrently]} #{quote_schema_table(name)}"

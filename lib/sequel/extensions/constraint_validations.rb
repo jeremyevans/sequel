@@ -126,7 +126,7 @@
 #   be emulated by dropping the table and recreating it with the constraints.
 #   If you want to use this plugin on SQLite with an alter_table block,
 #   you should drop all constraint validation metadata using
-#   <tt>drop_constraint_validations_for(:table=>'table')</tt>, and then
+#   <tt>drop_constraint_validations_for(table: 'table')</tt>, and then
 #   readd all constraints you want to use inside the alter table block,
 #   making no other changes inside the alter_table block.
 #

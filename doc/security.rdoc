@@ -127,8 +127,8 @@ a ruby string as raw SQL.  For example:
   DB.literal(Date.today) # "'2013-03-22'"
   DB.literal('a') # "'a'"
   DB.literal(Sequel.lit('a')) # "a"
-  DB.literal(:a => 'a') # "(\"a\" = 'a')"
-  DB.literal(:a => Sequel.lit('a')) # "(\"a\" = a)"
+  DB.literal(a: 'a') # "(\"a\" = 'a')"
+  DB.literal(a: Sequel.lit('a')) # "(\"a\" = a)"
 
 ==== SQL Filter Fragments
 
@@ -178,7 +178,7 @@ user input for function names.
 For backwards compatibility, Sequel supports regular strings in the
 window function :frame option, which will be treated as a literal string:
 
-  DB[:table].select{fun(arg).over(:frame=>'SQL Here')}
+  DB[:table].select{fun(arg).over(frame: 'SQL Here')}
 
 You should make sure the frame argument is not derived from user input,
 or switch to using a hash as the :frame option value.
@@ -237,7 +237,7 @@ or:
 
 Instead, you should do:
 
-  DB[:table].update(:column => params[:value].to_s) # Safe
+  DB[:table].update(column: params[:value].to_s) # Safe
 
 Because using the auto_literal_strings extension makes SQL injection
 so much eaiser, it is recommended to not use it, and instead
@@ -402,29 +402,29 @@ This issue isn't necessarily specific to Sequel, but it is a good general practi
 If you are using values derived from user input, it is best to be explicit about
 their type.  For example:
 
-  Album.where(:id=>params[:id])
+  Album.where(id: params[:id])
 
 is probably a bad idea.  Assuming you are using a web framework, <tt>params[:id]</tt> could
 be a string, an array, a hash, nil, or potentially something else.
 
 Assuming that +id+ is an integer field, you probably want to do:
 
-  Album.where(:id=>params[:id].to_i)
+  Album.where(id: params[:id].to_i)
 
 If you are looking something up by name, you should try to enforce the value to be
 a string:
 
-  Album.where(:name=>params[:name].to_s)
+  Album.where(name: params[:name].to_s)
 
 If you are trying to use an IN clause with a list of id values based on input provided
 on a web form:
 
-  Album.where(:id=>params[:ids].to_a.map(&:to_i))
+  Album.where(id: params[:ids].to_a.map(&:to_i))
 
 Basically, be as explicit as possible. While there aren't any known security issues
 in Sequel when you do:
 
-  Album.where(:id=>params[:id])
+  Album.where(id: params[:id])
 
 It allows the attacker to choose to do any of the following queries:
 

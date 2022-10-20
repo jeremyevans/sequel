@@ -377,7 +377,7 @@ Sequel will not add a column, but will add a composite primary key constraint:
 It is possible to specify a name for the primary key constraint: via the :name option:
 
   alter_table(:albums_artists) do
-    add_primary_key [:album_id, :artist_id], :name=>:albums_artists_pkey
+    add_primary_key [:album_id, :artist_id], name: :albums_artists_pkey
   end
 
 If you just want to take an existing single column and make it a primary key, call

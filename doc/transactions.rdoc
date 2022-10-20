@@ -127,28 +127,28 @@ Other exceptions, unless rescued inside the outer transaction block, will rollba
   end # ROLLBACK
   # ArgumentError raised
 
-If you want the current savepoint to be rolled back when the savepoint block exits instead of being committed (even if an exception is not raised), use <tt>Database#rollback_on_exit(:savepoint=>true)</tt>
+If you want the current savepoint to be rolled back when the savepoint block exits instead of being committed (even if an exception is not raised), use <tt>Database#rollback_on_exit(savepoint: true)</tt>
 
   DB.transaction do # BEGIN
     DB.transaction(savepoint: true) do # SAVEPOINT
-      DB.rollback_on_exit(:savepoint=>true)
+      DB.rollback_on_exit(savepoint: true)
     end # ROLLBACK TO SAVEPOINT
   end # COMMIT
 
   DB.transaction do # BEGIN
     DB.transaction(savepoint: true) do # SAVEPOINT
       DB.transaction(savepoint: true) do # SAVEPOINT
-        DB.rollback_on_exit(:savepoint=>true)
+        DB.rollback_on_exit(savepoint: true)
       end # ROLLBACK TO SAVEPOINT
     end # RELEASE SAVEPOINT
   end # COMMIT
 
-If you want the current savepoint and potentially enclosing savepoints to be rolled back when the savepoint blocks exit  (even if an exception is not raised), use <tt>Database#rollback_on_exit(:savepoint=>integer)</tt>
+If you want the current savepoint and potentially enclosing savepoints to be rolled back when the savepoint blocks exit  (even if an exception is not raised), use <tt>Database#rollback_on_exit(savepoint: integer)</tt>
 
   DB.transaction do # BEGIN
     DB.transaction(savepoint: true) do # SAVEPOINT
       DB.transaction(savepoint: true) do # SAVEPOINT
-        DB.rollback_on_exit(:savepoint=>2)
+        DB.rollback_on_exit(savepoint: 2)
       end # ROLLBACK TO SAVEPOINT
     end # ROLLBACK TO SAVEPOINT
   end # COMMIT
@@ -156,7 +156,7 @@ If you want the current savepoint and potentially enclosing savepoints to be rol
   DB.transaction do # BEGIN
     DB.transaction(savepoint: true) do # SAVEPOINT
       DB.transaction(savepoint: true) do # SAVEPOINT
-        DB.rollback_on_exit(:savepoint=>3)
+        DB.rollback_on_exit(savepoint: 3)
       end # ROLLBACK TO SAVEPOINT
     end # ROLLBACK TO SAVEPOINT
   end # ROLLBACK

@@ -22,7 +22,7 @@
 #
 # Named placeholders can also be used with a hash:
 #
-#   ds.where("name > :a", :a=>"A")
+#   ds.where("name > :a", a: "A")
 #   # SELECT * FROM table WHERE (name > 'A')
 #
 # This extension also allows the use of a plain string passed to Dataset#update:

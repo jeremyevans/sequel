@@ -12,7 +12,7 @@ module Sequel
     #   # SELECT * FROM albums WHERE (id = 1) LIMIT 1
     #   # -- model:Album,method_type:class,method:[]
     #
-    #   album.update(:name=>'A')
+    #   album.update(name: 'A')
     #   # UPDATE albums SET name = 'baz' WHERE (id = 1)
     #   # -- model:Album,method_type:instance,method:update
     #

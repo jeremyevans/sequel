@@ -54,8 +54,8 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Update/Delete rows
 
   dataset.exclude(:active).delete
-  dataset.where{price < 100}.update(:active => true)
-  dataset.where(:active).update(:price => Sequel[:price] * 0.90)
+  dataset.where{price < 100}.update(active: true)
+  dataset.where(:active).update(price: Sequel[:price] * 0.90)
 
 = Merge rows
 
@@ -174,7 +174,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
     String :name, unique: true, null: false
     TrueClass :active, default: true
     foreign_key :category_id, :categories
-    DateTime :created_at, default: Sequel::CURRENT_TIMESTAMP, :index=>true
+    DateTime :created_at, default: Sequel::CURRENT_TIMESTAMP, index: true
     
     index [:category_id, :active]
   end

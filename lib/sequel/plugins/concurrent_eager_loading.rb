@@ -50,10 +50,10 @@ module Sequel
     # support concurrent eager loading.  Taking this example from the
     # {Advanced Associations guide}[rdoc-ref:doc/advanced_associations.rdoc]
     #
-    #   Album.many_to_one :artist, :eager_loader=>(proc do |eo_opts|
+    #   Album.many_to_one :artist, eager_loader: (proc do |eo_opts|
     #     eo_opts[:rows].each{|album| album.associations[:artist] = nil}
     #     id_map = eo_opts[:id_map]
-    #     Artist.where(:id=>id_map.keys).all do |artist|
+    #     Artist.where(id: id_map.keys).all do |artist|
     #       if albums = id_map[artist.id]
     #         albums.each do |album|
     #           album.associations[:artist] = artist
@@ -74,12 +74,12 @@ module Sequel
     # the code that loads the objects, since that will prevent concurrent loading.
     # So after the changes, the custom eager loader would look like this:
     #
-    #   Album.many_to_one :artist, :eager_loader=>(proc do |eo_opts|
+    #   Album.many_to_one :artist, eager_loader: (proc do |eo_opts|
     #     Sequel.synchronize_with(eo[:mutex]) do
     #       eo_opts[:rows].each{|album| album.associations[:artist] = nil}
     #     end
     #     id_map = eo_opts[:id_map]
-    #     rows = Artist.where(:id=>id_map.keys).all
+    #     rows = Artist.where(id: id_map.keys).all
     #     Sequel.synchronize_with(eo[:mutex]) do
     #       rows.each do |artist|
     #         if albums = id_map[artist.id]

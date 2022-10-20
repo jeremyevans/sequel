@@ -115,7 +115,7 @@ These two approaches can also be nested, with +eager+ -> +eager_graph+ -> +eager
 
 Or with 2 separate +eager_graph+ queries:
 
-  Artist.eager_graph(:albums).eager_graph_eager([:albums], :tracks=>proc{|ds| ds.eager_graph(:lyric)})
+  Artist.eager_graph(:albums).eager_graph_eager([:albums], tracks: proc{|ds| ds.eager_graph(:lyric)})
   # 2 Queries:
   # SELECT artists.id, artists.name, ...
   #        albums.id AS albums_id, albums.name AS albums_name, ...
@@ -238,9 +238,9 @@ have the following associations
     
 and the following three albums in the database:
 
-  album1 = Album.create(:artist_id=>3) # id: 1
-  album2 = Album.create(:artist_id=>3) # id: 2
-  album3 = Album.create(:artist_id=>2) # id: 3
+  album1 = Album.create(artist_id: 3) # id: 1
+  album2 = Album.create(artist_id: 3) # id: 2
+  album3 = Album.create(artist_id: 2) # id: 3
 
 If you try to eager load this dataset:
 
@@ -256,7 +256,7 @@ the are both in the array related to that key.  album3 has a different
 artist_id, so it is in a different array. Eager loading of artists is
 done by looking for any artist having one of the keys in the hash:
 
-  artists = Artist.where(:id=>id_map.keys).all
+  artists = Artist.where(id: id_map.keys).all
 
 When the artists are retrieved, you can iterate over them, find entries
 with matching keys, and manually associate them to the albums:
@@ -281,7 +281,7 @@ case each array only has a single object, because id is the primary key).  So wh
 looking for tracks to eagerly load, you only need to look for ones that have an
 album_id with one of the keys in the hash:
 
-  tracks = Track.where(:album_id=>id_map.keys).all
+  tracks = Track.where(album_id: id_map.keys).all
 
 When the tracks are retrieved, you can iterate over them, find entries with matching
 keys, and manually associate them to the albums:
@@ -314,10 +314,10 @@ artist or tracks method on the album will not do another database lookup.
 
 So putting everything together, the artist eager loader looks like:
 
-  Album.many_to_one :artist, :eager_loader=>(proc do |eo_opts|
+  Album.many_to_one :artist, eager_loader: (proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:artist] = nil}
     id_map = eo_opts[:id_map]
-    Artist.where(:id=>id_map.keys).all do |artist|
+    Artist.where(id: id_map.keys).all do |artist|
       if albums = id_map[artist.id]
         albums.each do |album|
           album.associations[:artist] = artist
@@ -328,10 +328,10 @@ So putting everything together, the artist eager loader looks like:
 
 and the tracks eager loader looks like:
 
-  Album.one_to_many :tracks, :eager_loader=>(proc do |eo_opts|
+  Album.one_to_many :tracks, eager_loader: (proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:tracks] = []}
     id_map = eo_opts[:id_map]
-    Track.where(:album_id=>id_map.keys).all do |track|
+    Track.where(album_id: id_map.keys).all do |track|
       if albums = id_map[track.album_id]
         albums.each do |album|
           album.associations[:tracks] << track
@@ -405,7 +405,7 @@ the window function strategy:
 
   Artist.one_to_many :first_10_albums, class: :Album, order: :release_date, limit: 10,
     eager_limit_strategy: :window_function
-  Artist.where(:id=>[1,2]).eager(:first_10_albums).all
+  Artist.where(id: [1,2]).eager(:first_10_albums).all
   # SELECT * FROM (
   #   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x
   #   FROM albums
@@ -483,7 +483,7 @@ function:
 The :correlated_subquery approach JOINs to a nested subquery using a correlated
 subquery:
 
-  Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>:correlated_subquery).all
+  Artist.eager_graph_with_options(:first_10_albums, limit_strategy: :correlated_subquery).all
   # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
   #        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,
   #        first_10_albums.release_date
@@ -853,7 +853,7 @@ associated tickets.
   class Project < Sequel::Model
     one_to_many :tickets
     many_to_one :ticket_hours, read_only: true, key: :id,
-     dataset: proc{Ticket.where(:project_id=>id).select{sum(hours).as(hours)}},
+     dataset: proc{Ticket.where(project_id: id).select{sum(hours).as(hours)}},
      eager_loader: (lambda do |eo|
       eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
       Ticket.where(project_id: eo[:id_map].keys).

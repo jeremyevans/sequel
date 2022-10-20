@@ -295,16 +295,16 @@ option to +foreign_key_list+:
     primary_key :id
     Integer :i
     Integer :j
-    foreign_key :a_id, :a, :foreign_key_constraint_name=>:a_a
+    foreign_key :a_id, :a, foreign_key_constraint_name: :a_a
     unique [:i, :j]
   end
   DB.create_table!(:b) do
-    foreign_key :a_id, :a, :foreign_key_constraint_name=>:a_a
+    foreign_key :a_id, :a, foreign_key_constraint_name: :a_a
     Integer :c
     Integer :d
-    foreign_key [:c, :d], :a, :key=>[:j, :i], :name=>:a_c_d
+    foreign_key [:c, :d], :a, key: [:j, :i], name: :a_c_d
   end
-  DB.foreign_key_list(:a, :reverse=>true)
+  DB.foreign_key_list(:a, reverse: true)
   # => [
   #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :schema=>:public},
   #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public},
@@ -413,12 +413,12 @@ syntax:
 
   DB.create_table(:table){primary_key :id}
   # Ignore the given value for id, using the identity's sequence value.
-  DB[:table].overriding_user_value.insert(:id=>1)
+  DB[:table].overriding_user_value.insert(id: 1)
 
-  DB.create_table(:table){primary_key :id, :identity=>:always}
+  DB.create_table(:table){primary_key :id, identity: :always}
   # Force the use of the given value for id, because otherwise the insert will
   # raise an error, since GENERATED ALWAYS was used when creating the column.
-  DB[:table].overriding_system_value.insert(:id=>1)
+  DB[:table].overriding_system_value.insert(id: 1)
 
 === Distinct On Specific Columns
 
@@ -561,7 +561,7 @@ such as the related table and column or constraint.
 
   DB.create_table(:test1){primary_key :id}
   DB.create_table(:test2){primary_key :id; foreign_key :test1_id, :test1}
-  DB[:test2].insert(:test1_id=>1) rescue DB.error_info($!)
+  DB[:test2].insert(test1_id: 1) rescue DB.error_info($!)
   # => {
   #  :schema=>"public",
   #  :table=>"test2",

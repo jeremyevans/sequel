@@ -37,7 +37,7 @@ module Sequel
     #
     # It also saves the previously changed values after an update:
     #
-    #   artist.update(:name=>'Bar')
+    #   artist.update(name: 'Bar')
     #   artist.column_changes        # => {}
     #   artist.previous_changes      # => {:name=>['Foo', 'Bar']}
     #

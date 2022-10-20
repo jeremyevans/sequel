@@ -15,7 +15,7 @@ These run each test in its own transaction, the recommended way to test.
   
   class Minitest::HooksSpec
     def around
-      DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
+      DB.transaction(rollback: :always, auto_savepoint: true){super}
     end
   end
 
@@ -24,7 +24,7 @@ These run each test in its own transaction, the recommended way to test.
   
   class Minitest::Spec
     def run(*args, &block)
-      DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
+      DB.transaction(rollback: :always, auto_savepoint: true){super}
     end
   end
 
@@ -34,7 +34,7 @@ These run each test in its own transaction, the recommended way to test.
   # Use this class as the base class for your tests
   class SequelTestCase < Minitest::Test
     def run(*args, &block)
-      DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
+      DB.transaction(rollback: :always, auto_savepoint: true){super}
     end
   end
 
@@ -43,7 +43,7 @@ These run each test in its own transaction, the recommended way to test.
   
   RSpec.configure do |c|
     c.around(:each) do |example|
-      DB.transaction(:rollback=>:always, :auto_savepoint=>true){example.run}
+      DB.transaction(rollback: :always, auto_savepoint: true){example.run}
     end
   end
 
@@ -51,11 +51,11 @@ These run each test in its own transaction, the recommended way to test.
 
 You can use the Sequel.transaction method to run a transaction on multiple databases, rolling all of them back.  Instead of:
 
-  DB.transaction(:rollback=>:always)
+  DB.transaction(rollback: :always)
 
 Use Sequel.transaction with an array of databases:
 
-  Sequel.transaction([DB1, DB2, DB3], :rollback=>:always)
+  Sequel.transaction([DB1, DB2, DB3], rollback: :always)
 
 == Transactional testing with savepoints
 
@@ -71,11 +71,11 @@ Example:
   require 'minitest/hooks/default'
   class Minitest::HooksSpec
     def around
-      DB.transaction(:rollback=>:always, :savepoint=>true, :auto_savepoint=>true){super}
+      DB.transaction(rollback: :always, savepoint: true, auto_savepoint: true){super}
     end
 
     def around_all
-      DB.transaction(:rollback=>:always){super}
+      DB.transaction(rollback: :always){super}
     end
   end
 

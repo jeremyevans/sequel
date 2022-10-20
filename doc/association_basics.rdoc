@@ -320,11 +320,11 @@ Associations are cached after being retrieved:
   @album.artists # Cached - No Database Query
   
 You can choose to ignore the cached versions and do a database query to
-retrieve results by passing a :reload=>true option to the association method:
+retrieve results by passing a <tt>reload: true</tt> option to the association method:
 
   @album.artists # Not cached - Database Query
   @album.artists # Cached - No Database Query
-  @album.artists(:reload=>true) # Ignore cache - Database Query
+  @album.artists(reload: true) # Ignore cache - Database Query
 
 If you reload/refresh the object, it will automatically clear the
 associations cache for the object:
@@ -532,14 +532,14 @@ Which could be created using the following Sequel code:
   DB.create_table(:artists) do
     # Primary key must be set explicitly
     primary_key :id
-    String :name, :null=>false, :unique=>true
+    String :name, null: false, unique: true
   end
   DB.create_table(:albums) do
     primary_key :id
     # Table that foreign key references needs to be set explicitly
     # for a database foreign key reference to be created.
-    foreign_key :artist_id, :artists, :null=>false
-    String :name, :null=>false, :unique=>true
+    foreign_key :artist_id, :artists, null: false
+    String :name, null: false, unique: true
   end
 
 If you already had a schema such as:
@@ -552,7 +552,7 @@ If you already had a schema such as:
 Then you just need to add the column:
 
   DB.alter_table(:albums) do
-    add_foreign_key :artist_id, :artists, :null=>false
+    add_foreign_key :artist_id, :artists, null: false
   end
 
 === many_to_many
@@ -588,11 +588,11 @@ wanted to add an albums_artists join table to create the following schema:
 
 You could use the following Sequel code:
 
-  DB.create_join_table(:album_id=>:albums, :artist_id=>:artists)
+  DB.create_join_table(album_id: :albums, artist_id: :artists)
   # or
   DB.create_table(:albums_artists) do
-    foreign_key :album_id, :albums, :null=>false
-    foreign_key :artist_id, :artists, :null=>false
+    foreign_key :album_id, :albums, null: false
+    foreign_key :artist_id, :artists, null: false
     primary_key [:album_id, :artist_id]
     index [:artist_id, :album_id]
   end
@@ -713,7 +713,7 @@ saving the passed in (or newly created) object.  However, to avoid
 silent failures of these methods, they explicitly raise exceptions
 even when raise_on_save_failure is false for the associated model.
 You can disable this behavior (i.e. return nil instead of raising
-exceptions on a save failure) by setting the <tt>:raise_on_save_failure=>false</tt>
+exceptions on a save failure) by setting the <tt>raise_on_save_failure: false</tt>
 option for the association.
 
 === remove_<i>association</i>(object_to_disassociate) (e.g. remove_album) [+one_to_many+ and +many_to_many+]
@@ -981,7 +981,7 @@ If you do not use a hash or array of two element arrays, you should use the
 :graph_conditions, :graph_only_conditions, or :graph_block option or you will not
 be able to use eager_graph or association_join with the association.
 
-  Artist.one_to_many :good_albums, class: :Album, conditions: {:good=>true}
+  Artist.one_to_many :good_albums, class: :Album, conditions: {good: true}
   @artist.good_albums
   # SELECT * FROM albums WHERE ((artist_id = 1) AND (good IS TRUE))
 
@@ -1162,7 +1162,7 @@ join of the join table and the associated table, whereas this option just
 applies to the join table.  It can be used to make sure that filters are used
 when deleting.
 
-  Artist.many_to_many :lead_guitar_albums, class: :Album, :join_table_block=>(lambda do |ds|
+  Artist.many_to_many :lead_guitar_albums, class: :Album, join_table_block: (lambda do |ds|
     ds.where(instrument_id: 5)
   end)
 
@@ -1177,7 +1177,7 @@ access to the join table.
 For example, if the Album class uses a different Sequel::Database than the Artist
 class, and the join table is in the database that the Artist class uses:
 
-  Artist.many_to_many :lead_guitar_albums, class: :Album, :join_table_db=>Artist.db
+  Artist.many_to_many :lead_guitar_albums, class: :Album, join_table_db: Artist.db
 
 This option also affects the add/remove/remove_all methods, by changing
 which database is used for inserts/deletes from the join table (add/remove/remove_all
@@ -1470,7 +1470,7 @@ at least the following keys:
 Example:
 
   Artist.one_to_many :self_title_albums, class: :Album,
-   :eager_grapher=>(lambda do |eo|
+   eager_grapher: (lambda do |eo|
     eo[:self].graph(:albums, {artist_id: :id, name: :name},
       table_alias: eo[:table_alias], implicit_qualifier: eo[:implicit_qualifier])
   end)
@@ -1727,7 +1727,7 @@ support joins.
 If set to false, you cannot use the association when filtering.
 
   Artist.one_to_many :albums, allow_filtering_by: false
-  Artist.where(:albums=>Album.where(:name=>'A')).all # Raises Sequel::Error
+  Artist.where(albums: Album.where(name: 'A')).all # Raises Sequel::Error
 
 This is useful if such filtering cannot work, such as when a subquery cannot
 be used because the necessary tables are not in the same database.

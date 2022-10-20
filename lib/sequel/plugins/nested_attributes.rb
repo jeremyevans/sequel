@@ -33,7 +33,7 @@ module Sequel
     # objects.  You just need to make sure that the primary key field is filled in for the
     # associated object:
     #
-    #   a.update(:albums_attributes => [{id: 1, name: 'T'}])
+    #   a.update(albums_attributes: [{id: 1, name: 'T'}])
     #
     # Since the primary key field is filled in, the plugin will update the album with id 1 instead
     # of creating a new album.
@@ -42,14 +42,14 @@ module Sequel
     # entry to the hash, and also pass the :destroy option when calling +nested_attributes+:
     #
     #   Artist.nested_attributes :albums, destroy: true
-    #   a.update(:albums_attributes => [{id: 1, _delete: true}])
+    #   a.update(albums_attributes: [{id: 1, _delete: true}])
     #
     # This will delete the related associated object from the database.  If you want to leave the
     # associated object in the database, but just remove it from the association, add a _remove
     # entry in the hash, and also pass the :remove option when calling +nested_attributes+:
     #
     #   Artist.nested_attributes :albums, remove: true
-    #   a.update(:albums_attributes => [{id: 1, _remove: true}])
+    #   a.update(albums_attributes: [{id: 1, _remove: true}])
     #
     # The above example was for a one_to_many association, but the plugin also works similarly
     # for other association types.  For one_to_one and many_to_one associations, you need to
@@ -84,7 +84,7 @@ module Sequel
     # nested attributes options for that association.  This is useful for per-call filtering
     # of the allowed fields:
     #
-    #   a.set_nested_attributes(:albums, params['artist'], :fields=>%w'name')
+    #   a.set_nested_attributes(:albums, params['artist'], fields: %w'name')
     module NestedAttributes
       # Depend on the validate_associated plugin.
       def self.apply(model)

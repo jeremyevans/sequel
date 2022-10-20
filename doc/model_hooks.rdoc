@@ -199,7 +199,7 @@ While it's not enforced anywhere, it's a good idea to make +super+ the last expr
 
     def after_save
       super
-      AuditLog.create(:log=>"Album #{name} created")
+      AuditLog.create(log: "Album #{name} created")
     end
   end
 

@@ -32,7 +32,7 @@ module Sequel
     #
     # Example:
     #
-    #   album = Album.new(:artist_id=>1) # Assume no such artist exists
+    #   album = Album.new(artist_id: 1) # Assume no such artist exists
     #   begin
     #     album.save
     #   rescue Sequel::ValidationFailed

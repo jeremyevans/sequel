@@ -104,7 +104,7 @@ module Sequel
     # should reference the subquery alias (and qualified identifiers should not be needed
     # unless joining to another table):
     #
-    #   a = Executive.where(:id=>1).first # works
+    #   a = Executive.where(id: 1).first # works
     #   a = Executive.where{{employees[:id]=>1}}.first # works
     #   a = Executive.where{{executives[:id]=>1}}.first # doesn't work
     #
@@ -115,7 +115,7 @@ module Sequel
     #
     #   pks = Executive.where{num_staff < 10}.select_map(:id)
     #   Executive.cti_tables.reverse_each do |table|
-    #     DB.from(table).where(:id=>pks).delete
+    #     DB.from(table).where(id: pks).delete
     #   end
     #
     # = Usage

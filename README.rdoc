@@ -56,9 +56,9 @@ If you have any comments or suggestions please post to the Google group.
   items = DB[:items] # Create a dataset
   
   # Populate the table
-  items.insert(:name => 'abc', :price => rand * 100)
-  items.insert(:name => 'def', :price => rand * 100)
-  items.insert(:name => 'ghi', :price => rand * 100)
+  items.insert(name: 'abc', price: rand * 100)
+  items.insert(name: 'def', price: rand * 100)
+  items.insert(name: 'ghi', price: rand * 100)
   
   # Print out the number of records
   puts "Item count: #{items.count}"
@@ -84,7 +84,7 @@ Sequel uses the concept of datasets to retrieve data. A Dataset object encapsula
 
 For example, the following one-liner returns the average GDP for countries in the middle east region:
 
-  DB[:countries].where(:region => 'Middle East').avg(:GDP)
+  DB[:countries].where(region: 'Middle East').avg(:GDP)
   
 Which is equivalent to:
 
@@ -92,7 +92,7 @@ Which is equivalent to:
 
 Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes, and are accessed using an +Enumerable+ interface:
 
-  middle_east = DB[:countries].where(:region => 'Middle East')
+  middle_east = DB[:countries].where(region: 'Middle East')
   middle_east.order(:name).each{|r| puts r[:name]}
   
 Sequel also offers convenience methods for extracting data from Datasets, such as an extended +map+ method:
@@ -210,12 +210,12 @@ If the dataset is ordered, you can also ask for the last record:
   
 You can also provide a filter when asking for a single record:
 
-  posts.first(:id => 1)
+  posts.first(id: 1)
   # SELECT * FROM posts WHERE id = 1 LIMIT 1
   
 Or retrieve a single value for a specific record:
 
-  posts.where(:id => 1).get(:name)
+  posts.where(id: 1).get(:name)
   # SELECT name FROM posts WHERE id = 1 LIMIT 1
   
 === Filtering Records
@@ -411,9 +411,9 @@ As with +delete+, +update+ affects all rows in the dataset, so +where+ first,
 +update+ second:
 
   # DO THIS:
-  posts.where(Sequel[:stamp] < Date.today - 7).update(:state => 'archived')
+  posts.where(Sequel[:stamp] < Date.today - 7).update(state: 'archived')
   # NOT THIS:
-  posts.update(:state => 'archived').where(Sequel[:stamp] < Date.today - 7)
+  posts.update(state: 'archived').where(Sequel[:stamp] < Date.today - 7)
 
 === Merging records
 
@@ -448,7 +448,7 @@ You can wrap a block of code in a database transaction using the <tt>Database#tr
     # BEGIN
     posts.insert(category: 'ruby', author: 'david')
     # INSERT
-    posts.where(Sequel[:stamp] < Date.today - 7).update(:state => 'archived')
+    posts.where(Sequel[:stamp] < Date.today - 7).update(state: 'archived')
     # UPDATE 
   end
   # COMMIT
@@ -461,9 +461,9 @@ and not raise an exception outside the block, you can raise the
 
   DB.transaction do
     # BEGIN
-    posts.insert(:category => 'ruby', :author => 'david')
+    posts.insert(category: 'ruby', author: 'david')
     # INSERT
-    if posts.where('stamp < ?', Date.today - 7).update(:state => 'archived') == 0
+    if posts.where('stamp < ?', Date.today - 7).update(state: 'archived') == 0
     # UPDATE 
       raise Sequel::Rollback
     end
@@ -706,8 +706,8 @@ You can delete individual records by calling +delete+ or +destroy+. The only dif
 
 Records can also be deleted en-masse by calling <tt>delete</tt> and <tt>destroy</tt> on the model's dataset. As stated above, you can specify filters for the deleted records:
 
-  Post.where(:category => 32).delete # => bypasses hooks
-  Post.where(:category => 32).destroy # => runs hooks
+  Post.where(category: 32).delete # => bypasses hooks
+  Post.where(category: 32).destroy # => runs hooks
 
 Please note that if <tt>destroy</tt> is called, each record is deleted 
 separately, but <tt>delete</tt> deletes all matching records with a single 
@@ -720,9 +720,9 @@ Associations are used in order to specify relationships between model classes th
   class Post < Sequel::Model
     many_to_one :author
     one_to_many :comments
-    one_to_one :first_comment, :class=>:Comment, :order=>:id
+    one_to_one :first_comment, class: :Comment, order: :id
     many_to_many :tags
-    one_through_one :first_tag, :class=>:Tag, :order=>:name, :right_key=>:tag_id
+    one_through_one :first_tag, class: :Tag, order: :name, right_key: :tag_id
   end
 
 +many_to_one+ and +one_to_one+ create a getter and setter for each model object:
@@ -761,7 +761,7 @@ All associations add a dataset method that can be used to further filter or reor
 Associations can be eagerly loaded via +eager+ and the <tt>:eager</tt> association option. Eager loading is used when loading a group of objects. It loads all associated objects for all of the current objects in one query, instead of using a separate query to get the associated objects for each current object. Eager loading requires that you retrieve all model objects at once via +all+ (instead of individually by +each+). Eager loading can be cascaded, loading association's associated objects.
 
   class Person < Sequel::Model
-    one_to_many :posts, :eager=>[:tags]
+    one_to_many :posts, eager: [:tags]
   end
 
   class Post < Sequel::Model

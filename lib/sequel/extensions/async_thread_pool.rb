@@ -5,9 +5,9 @@
 # code
 #
 #   DB.extension :async_thread_pool
-#   foos = DB[:foos].async.where{:name=>'A'..'M'}.all
+#   foos = DB[:foos].async.where{name: 'A'..'M'}.all
 #   bar_names = DB[:bar].async.select_order_map(:name)
-#   baz_1 = DB[:bazes].async.first(:id=>1)
+#   baz_1 = DB[:bazes].async.first(id: 1)
 #
 # All 3 queries will be run in separate threads.  +foos+, +bar_names+
 # and +baz_1+ will be proxy objects.  Calling a method on the proxy
@@ -15,9 +15,9 @@
 # of calling that method on the result of the query method. For example,
 # if you run:
 #
-#   foos = DB[:foos].async.where{:name=>'A'..'M'}.all
+#   foos = DB[:foos].async.where{name: 'A'..'M'}.all
 #   bar_names = DB[:bars].async.select_order_map(:name)
-#   baz_1 = DB[:bazes].async.first(:id=>1)
+#   baz_1 = DB[:bazes].async.first(id: 1)
 #   sleep(1)
 #   foos.size
 #   bar_names.first
@@ -26,9 +26,9 @@
 # These three queries will generally be run concurrently in separate
 # threads.  If you instead run:
 #   
-#   DB[:foos].async.where{:name=>'A'..'M'}.all.size
+#   DB[:foos].async.where{name: 'A'..'M'}.all.size
 #   DB[:bars].async.select_order_map(:name).first
-#   DB[:bazes].async.first(:id=>1).name
+#   DB[:bazes].async.first(id: 1).name
 #
 # Then will run each query sequentially, since you need the result of
 # one query before running the next query.  The queries will still be
@@ -37,11 +37,11 @@
 # What is run in the separate thread is the entire method call that
 # returns results.  So with the original example:
 #
-#   foos = DB[:foos].async.where{:name=>'A'..'M'}.all
+#   foos = DB[:foos].async.where{name: 'A'..'M'}.all
 #   bar_names = DB[:bars].async.select_order_map(:name)
-#   baz_1 = DB[:bazes].async.first(:id=>1)
+#   baz_1 = DB[:bazes].async.first(id: 1)
 #
-# The +all+, <tt>select_order_map(:name)</tt>, and <tt>first(:id=>1)</tt>
+# The +all+, <tt>select_order_map(:name)</tt>, and <tt>first(id: 1)</tt>
 # calls are run in separate threads.  If a block is passed to a method
 # such as +all+ or +each+, the block is also run in that thread.  If you
 # have code such as:
@@ -156,10 +156,10 @@
 # so that the query will run in the current thread instead of waiting
 # for an async thread to become available.  With the following code:
 #
-#   foos = DB[:foos].async.where{:name=>'A'..'M'}.all
+#   foos = DB[:foos].async.where{name: 'A'..'M'}.all
 #   bar_names = DB[:bar].async.select_order_map(:name)
 #   if foos.length > 4
-#     baz_1 = DB[:bazes].async.first(:id=>1)
+#     baz_1 = DB[:bazes].async.first(id: 1)
 #   end
 # 
 # Whether you need the +baz_1+ variable depends on the value of foos.

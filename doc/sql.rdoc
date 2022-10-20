@@ -223,22 +223,22 @@ If the database supports window functions, Sequel can handle them by calling the
   DB[:albums].select{count.function.*.over}
   # SELECT count(*) OVER () FROM albums
 
-  DB[:albums].select{function(:col1).over(:partition=>col2, :order=>col3)}
+  DB[:albums].select{function(:col1).over(partition: col2, order: col3)}
   # SELECT function(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM albums
 
-  DB[:albums].select{function(c1, c2).over(:partition=>[c3, c4], :order=>[c5, c6.desc])}
+  DB[:albums].select{function(c1, c2).over(partition: [c3, c4], order: [c5, c6.desc])}
   # SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6 DESC) FROM albums
 
-  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>:rows)}
+  DB[:albums].select{function(c1).over(partition: c2, order: :c3, frame: :rows)}
   # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM albums
 
-  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>{:type=>:range, :start=>1, :end=>1})}
+  DB[:albums].select{function(c1).over(partition: c2, order: :c3, frame: {type: :range, start: 1, end: 1})}
   # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM albums
 
-  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>{:type=>:groups, :start=>[2, :preceding], :end=>[1, :preceding]})}
+  DB[:albums].select{function(c1).over(partition: c2, order: :c3, frame: {type: :groups, start: [2, :preceding], end: [1, :preceding]})}
   # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 GROUPS BETWEEN 2 PRECEDING AND 1 PRECEDING) FROM albums
 
-  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>{:type=>:range, :start=>:preceding, :exclude=>:current})}
+  DB[:albums].select{function(c1).over(partition: c2, order: :c3, frame: {type: :range, start: :preceding, exclude: :current})}
   # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 RANGE UNBOUNDED PRECEDING EXCLUDE CURRENT ROW) FROM albums
 
 === Schema Qualified Functions
@@ -551,8 +551,8 @@ You can also use the <tt>Sequel.asc</tt> and <tt>Sequel.desc</tt> methods:
 
 On some databases, you can specify null ordering:
 
-  Sequel.asc(:column, :nulls=>:first) # "column" ASC NULLS FIRST
-  Sequel.desc(Sequel[:table][:column], :nulls=>:last) # "table"."column" DESC NULLS LAST
+  Sequel.asc(:column, nulls: :first) # "column" ASC NULLS FIRST
+  Sequel.desc(Sequel[:table][:column], nulls: :last) # "table"."column" DESC NULLS LAST
 
 === All Columns (.*)
 
@@ -629,16 +629,16 @@ Also note that while the SELECT clause is displayed when you look at a dataset, 
 
   ds = DB[:albums]
   ds.all # SELECT * FROM albums
-  ds.insert(:name=>'RF') # INSERT INTO albums (name) VALUES ('RF')
-  ds.update(:name=>'RF') # UPDATE albums SET name = 'RF'
+  ds.insert(name: 'RF') # INSERT INTO albums (name) VALUES ('RF')
+  ds.update(name: 'RF') # UPDATE albums SET name = 'RF'
   ds.delete # DELETE FROM albums
 
 In general, the +insert+, +update+, and +delete+ methods use the appropriate clauses you defined on the dataset:
 
-  ds = DB[:albums].where(:id=>1)
+  ds = DB[:albums].where(id: 1)
   ds.all # SELECT * FROM albums WHERE (id = 1)
-  ds.insert(:name=>'RF') # INSERT INTO albums (name) VALUES ('RF')
-  ds.update(:name=>'RF') # UPDATE albums SET name = 'RF' WHERE (id = 1)
+  ds.insert(name: 'RF') # INSERT INTO albums (name) VALUES ('RF')
+  ds.update(name: 'RF') # UPDATE albums SET name = 'RF' WHERE (id = 1)
   ds.delete # DELETE FROM albums WHERE (id = 1)
 
 Note how +update+ and +delete+ used the +where+ argument, but +insert+ did not, because INSERT doesn't use a WHERE clause.

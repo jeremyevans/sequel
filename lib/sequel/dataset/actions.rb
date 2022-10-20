@@ -576,7 +576,7 @@ module Sequel
     #   # SELECT * FROM table ORDER BY id LIMIT 1000 OFFSET 1000
     #   # ...
     #
-    #   DB[:table].order(:id).paged_each(:rows_per_fetch=>100){|row| }
+    #   DB[:table].order(:id).paged_each(rows_per_fetch: 100){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 100
     #   # SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100
     #   # ...

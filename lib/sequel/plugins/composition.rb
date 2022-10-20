@@ -39,8 +39,8 @@ module Sequel
     # also be implemented as:
     #
     #   Album.composition :date,
-    #     :composer=>proc{Date.new(year, month, day) if year || month || day},
-    #     :decomposer=>(proc do
+    #     composer: proc{Date.new(year, month, day) if year || month || day},
+    #     decomposer: (proc do
     #       if d = compositions[:date]
     #         self.year = d.year
     #         self.month = d.month

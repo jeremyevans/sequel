@@ -1141,7 +1141,7 @@ module Sequel
       #
       #   Artist[1] === Artist[1] # => true
       #   Artist.new === Artist.new # => false
-      #   Artist[1].set(:name=>'Bob') === Artist[1] # => true
+      #   Artist[1].set(name: 'Bob') === Artist[1] # => true
       def ===(obj)
         case pkv = pk
         when nil
@@ -1160,7 +1160,7 @@ module Sequel
       #
       #   Artist[1].pk_equal?(Artist[1]) # => true
       #   Artist.new.pk_equal?(Artist.new) # => false
-      #   Artist[1].set(:name=>'Bob').pk_equal?(Artist[1]) # => true
+      #   Artist[1].set(name: 'Bob').pk_equal?(Artist[1]) # => true
       alias pk_equal? ===
 
       # class is defined in Object, but it is also a keyword,
@@ -1232,7 +1232,7 @@ module Sequel
       #
       #   Artist[1] == Artist[1] # => true
       #   Artist.new == Artist.new # => true
-      #   Artist[1].set(:name=>'Bob') == Artist[1] # => false
+      #   Artist[1].set(name: 'Bob') == Artist[1] # => false
       def eql?(obj)
         (obj.class == model) && (obj.values == @values)
       end
@@ -1334,13 +1334,13 @@ module Sequel
       #   a = Artist[1]
       #   Artist.db.transaction do
       #     a.lock!
-      #     a.update(:name=>'A')
+      #     a.update(name: 'A')
       #   end
       #
       #   a = Artist[2]
       #   Artist.db.transaction do
       #     a.lock!('FOR NO KEY UPDATE')
-      #     a.update(:name=>'B')
+      #     a.update(name: 'B')
       #   end
       def lock!(style=:update)
         _refresh(this.lock_style(style)) unless new?

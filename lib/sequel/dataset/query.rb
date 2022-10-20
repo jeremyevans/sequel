@@ -65,7 +65,7 @@ module Sequel
       Sequel.synchronize{EXTENSIONS[ext] = block}
     end
 
-    # On Ruby 2.4+, use clone(:freeze=>false) to create clones, because
+    # On Ruby 2.4+, use clone(freeze: false) to create clones, because
     # we use true freezing in that case, and we need to modify the opts
     # in the frozen copy.
     #
@@ -787,7 +787,7 @@ module Sequel
     #   DB[:items].order(Sequel.lit('a + b')) # SELECT * FROM items ORDER BY a + b
     #   DB[:items].order(Sequel[:a] + :b) # SELECT * FROM items ORDER BY (a + b)
     #   DB[:items].order(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name DESC
-    #   DB[:items].order(Sequel.asc(:name, :nulls=>:last)) # SELECT * FROM items ORDER BY name ASC NULLS LAST
+    #   DB[:items].order(Sequel.asc(:name, nulls: :last)) # SELECT * FROM items ORDER BY name ASC NULLS LAST
     #   DB[:items].order{sum(name).desc} # SELECT * FROM items ORDER BY sum(name) DESC
     #   DB[:items].order(nil) # SELECT * FROM items
     def order(*columns, &block)
@@ -857,13 +857,13 @@ module Sequel
     #   DB[:items].returning(nil) # RETURNING NULL
     #   DB[:items].returning(:id, :name) # RETURNING id, name
     #
-    #   DB[:items].returning.insert(:a=>1) do |hash|
+    #   DB[:items].returning.insert(a: 1) do |hash|
     #     # hash for each row inserted, with values for all columns
     #   end
-    #   DB[:items].returning.update(:a=>1) do |hash|
+    #   DB[:items].returning.update(a: 1) do |hash|
     #     # hash for each row updated, with values for all columns
     #   end
-    #   DB[:items].returning.delete(:a=>1) do |hash|
+    #   DB[:items].returning.delete(a: 1) do |hash|
     #     # hash for each row deleted, with values for all columns
     #   end
     def returning(*values)
@@ -1102,7 +1102,7 @@ module Sequel
     # referenced in window functions. See Sequel::SQL::Window for a list of
     # options that can be passed in. Example:
     #
-    #   DB[:items].window(:w, :partition=>:c1, :order=>:c2)
+    #   DB[:items].window(:w, partition: :c1, order: :c2)
     #   # SELECT * FROM items WINDOW w AS (PARTITION BY c1 ORDER BY c2)
     def window(name, opts)
       clone(:window=>((@opts[:window]||EMPTY_ARRAY) + [[name, SQL::Window.new(opts)].freeze]).freeze)
@@ -1163,7 +1163,7 @@ module Sequel
     #   DB[:t].with_recursive(:t,
     #     DB[:i1].select(:id, :parent_id).where(parent_id: nil),
     #     DB[:i1].join(:t, id: :parent_id).select(Sequel[:i1][:id], Sequel[:i1][:parent_id]),
-    #     :args=>[:id, :parent_id])
+    #     args: [:id, :parent_id])
     #   
     #   # WITH RECURSIVE t(id, parent_id) AS (
     #   #   SELECT id, parent_id FROM i1 WHERE (parent_id IS NULL)
@@ -1241,7 +1241,7 @@ module Sequel
     #
     # You can also provide a method name and arguments to call to get the SQL:
     #
-    #   DB[:items].with_sql(:insert_sql, :b=>1) # INSERT INTO items (b) VALUES (1)
+    #   DB[:items].with_sql(:insert_sql, b: 1) # INSERT INTO items (b) VALUES (1)
     #
     # Note that datasets that specify custom SQL using this method will generally
     # ignore future dataset methods that modify the SQL used, as specifying custom SQL

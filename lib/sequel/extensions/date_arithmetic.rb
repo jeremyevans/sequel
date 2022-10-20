@@ -25,7 +25,7 @@
 # By default, values are casted to the generic timestamp type for the
 # database.  You can override the cast type using the :cast option:
 #
-#   add = Sequel.date_add(:date_column, {years: 1, months: 2, days: 3}, :cast=>:timestamptz)
+#   add = Sequel.date_add(:date_column, {years: 1, months: 2, days: 3}, cast: :timestamptz)
 #
 # These expressions can be used in your datasets, or anywhere else that
 # Sequel expressions are allowed:

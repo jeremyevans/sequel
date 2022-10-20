@@ -17,7 +17,7 @@ module Sequel
 
       # Doesn't work, due to security restrictions on MSysObjects
       #def tables
-      #  from(:MSysObjects).where(:Type=>1, :Flags=>0).select_map(:Name).map(&:to_sym)
+      #  from(:MSysObjects).where(Type: 1, Flags: 0).select_map(:Name).map(&:to_sym)
       #end
       
       # Access doesn't support renaming tables from an SQL query,

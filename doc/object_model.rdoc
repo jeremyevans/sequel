@@ -36,7 +36,7 @@ schema modification,
 and transactions:
 
   DB.transaction do
-    DB[:table].insert(:column=>value)
+    DB[:table].insert(column: value)
   end
 
 Sequel::Database#literal can be used to take any object that Sequel handles
@@ -468,7 +468,7 @@ objects:
   Sequel.lit(['', ' = '], :a, 1)
 
   '? = ?'.lit(:a, 1) # core_extensions extension
-  ':b = :v'.lit(:b=>:a, :v=>1) # core_extensions extension
+  ':b = :v'.lit(b: :a, v: 1) # core_extensions extension
 
 === Sequel::SQL::OrderedExpression
 
@@ -482,20 +482,20 @@ it ascending or descending:
 Additionally, they take an options hash, which can be used to specify how nulls
 can be sorted:
 
-  Sequel::SQL::OrderedExpression.new(:a, true, :nulls=>:first) # "a" DESC NULLS FIRST
-  Sequel::SQL::OrderedExpression.new(:a, false, :nulls=>:last) # "a" ASC NULLS LAST
+  Sequel::SQL::OrderedExpression.new(:a, true, nulls: :first) # "a" DESC NULLS FIRST
+  Sequel::SQL::OrderedExpression.new(:a, false, nulls: :last) # "a" ASC NULLS LAST
 
 The following shortcuts exist for creating Sequel::SQL::OrderedExpression objects:
 
   Sequel.asc(:a)
   Sequel.desc(:a)
-  Sequel.asc(:a, :nulls=>:first)
-  Sequel.desc(:a, :nulls=>:last)
+  Sequel.asc(:a, nulls: :first)
+  Sequel.desc(:a, nulls: :last)
 
   :a.asc # core_extensions extension
   :a.desc # core_extensions extension
-  :a.asc(:nulls=>:first) # core_extensions extension
-  :a.desc(:nulls=>:last) # core_extensions extension
+  :a.asc(nulls: :first) # core_extensions extension
+  :a.desc(nulls: :last) # core_extensions extension
 
 === Sequel::SQL::Subscript
 
