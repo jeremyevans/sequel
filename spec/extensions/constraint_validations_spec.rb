@@ -3,6 +3,7 @@ require_relative "spec_helper"
 describe "constraint_validations extension" do
   def parse_insert(s)
     m = /\AINSERT INTO "?sequel_constraint_validations"? \("?(.*)"?\) VALUES \((.*)\)\z/.match(s)
+    raise "Couldn't extract insertion from statement <#{s}>" unless m
     Hash[*m[1].split(/"?, "?/).map{|v| v.to_sym}.zip(m[2].split(/"?, "?/).map{|v| parse_insert_value(v)}).reject{|k, v| v.nil?}.flatten]
   end
 
@@ -93,8 +94,8 @@ describe "constraint_validations extension" do
   it "should allow adding constraint validations via create_table validate" do
     @db.create_table(:foo){String :name; validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
   it "should allow adding constraint validations using generator directly" do
@@ -103,16 +104,16 @@ describe "constraint_validations extension" do
     gen.validate{presence :name}
     @db.create_table(:foo, :generator=>gen)
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
   it "should allow adding constraint validations via alter_table validate" do
     @db.schema = [[:name, {:type=>:string}]]
     @db.alter_table(:foo){validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(2)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
-    sqls.must_equal ["parse schema for foo", "BEGIN", "COMMIT", "ALTER TABLE foo ADD CHECK ((name IS NOT NULL) AND (trim(name) != ''))"]
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    sqls.must_equal ["parse schema for foo", "ALTER TABLE foo ADD CHECK ((name IS NOT NULL) AND (trim(name) != ''))"]
   end
 
   it "should allow altering the table without validation" do
@@ -124,22 +125,22 @@ describe "constraint_validations extension" do
   it "should handle :message option when adding validations" do
     @db.create_table(:foo){String :name; validate{presence :name, :message=>'not there'}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :message=>'not there')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :message=>'not there')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
   it "should handle :allow_nil option when adding validations" do
     @db.create_table(:foo){String :name; validate{presence :name, :allow_nil=>true}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NULL) OR (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NULL) OR (trim(name) != '')))"]
   end
 
   it "should handle :name option when adding validations" do
     @db.create_table(:foo){String :name; validate{presence :name, :name=>'cons'}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :constraint_name=>'cons')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CONSTRAINT cons CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :constraint_name=>'cons')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CONSTRAINT cons CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
   it "should handle multiple string columns when adding presence validations" do
@@ -179,14 +180,14 @@ describe "constraint_validations extension" do
   it "should handle presence validation on non-String columns" do
     @db.create_table(:foo){Integer :name; validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer, CHECK (name IS NOT NULL))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    sqls.must_equal ["CREATE TABLE foo (name integer, CHECK (name IS NOT NULL))"]
 
     @db.schema = [[:name, {:type=>:integer}]]
     @db.alter_table(:foo){validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(2)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
-    sqls.must_equal ["parse schema for foo", "BEGIN", "COMMIT", "ALTER TABLE foo ADD CHECK (name IS NOT NULL)"]
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    sqls.must_equal ["parse schema for foo", "ALTER TABLE foo ADD CHECK (name IS NOT NULL)"]
   end
 
   it "should handle presence validation on Oracle with IS NOT NULL instead of != ''" do
@@ -199,63 +200,63 @@ describe "constraint_validations extension" do
     @db.extension(:constraint_validations)
     @db.create_table(:foo){String :name; validate{presence :name}}
     sqls = @db.sqls
-    s = sqls.slice!(1).upcase
+    s = sqls.slice!(0).upcase
     m = /\AINSERT INTO sequel_constraint_validations \((.*)\) SELECT (.*) FROM DUAL\z/i.match(s)
     Hash[*m[1].split(', ').map{|v| v.downcase.to_sym}.zip(m[2].split(', ').map{|v| parse_insert_value(v.downcase.gsub('null', 'NULL'))}).reject{|k, v| v.nil?}.flatten].must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", 'CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) IS NOT NULL)))']
+    sqls.must_equal ['CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) IS NOT NULL)))']
   end
 
   it "should assume column is not a String if it can't determine the type" do
     @db.create_table(:foo){Integer :name; validate{presence :bar}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer, CHECK (bar IS NOT NULL))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo")
+    sqls.must_equal ["CREATE TABLE foo (name integer, CHECK (bar IS NOT NULL))"]
 
     @db.schema = [[:name, {:type=>:integer}]]
     @db.alter_table(:foo){validate{presence :bar}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(2)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo")
-    sqls.must_equal ["parse schema for foo", "BEGIN", "COMMIT", "ALTER TABLE foo ADD CHECK (bar IS NOT NULL)"]
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo")
+    sqls.must_equal ["parse schema for foo", "ALTER TABLE foo ADD CHECK (bar IS NOT NULL)"]
   end
 
   it "should handle presence validation on non-String columns with :allow_nil option" do
     @db.create_table(:foo){Integer :name; validate{presence :name, :allow_nil=>true}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer)"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t')
+    sqls.must_equal ["CREATE TABLE foo (name integer)"]
   end
 
   it "should support :exact_length constraint validation" do
     @db.create_table(:foo){String :name; validate{exact_length 5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"exact_length", :column=>"name", :table=>"foo", :argument=>'5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) = 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"exact_length", :column=>"name", :table=>"foo", :argument=>'5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) = 5)))"]
   end
 
   it "should support :min_length constraint validation" do
     @db.create_table(:foo){String :name; validate{min_length 5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"min_length", :column=>"name", :table=>"foo", :argument=>'5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) >= 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"min_length", :column=>"name", :table=>"foo", :argument=>'5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) >= 5)))"]
   end
 
   it "should support :max_length constraint validation" do
     @db.create_table(:foo){String :name; validate{max_length 5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"max_length", :column=>"name", :table=>"foo", :argument=>'5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) <= 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"max_length", :column=>"name", :table=>"foo", :argument=>'5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) <= 5)))"]
   end
 
   it "should support :length_range constraint validation" do
     @db.create_table(:foo){String :name; validate{length_range 3..5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"length_range", :column=>"name", :table=>"foo", :argument=>'3..5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) >= 3) AND (char_length(name) <= 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"length_range", :column=>"name", :table=>"foo", :argument=>'3..5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) >= 3) AND (char_length(name) <= 5)))"]
 
     @db.create_table(:foo){String :name; validate{length_range 3...5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"length_range", :column=>"name", :table=>"foo", :argument=>'3...5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) >= 3) AND (char_length(name) < 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"length_range", :column=>"name", :table=>"foo", :argument=>'3...5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (char_length(name) >= 3) AND (char_length(name) < 5)))"]
   end
 
   it "should support :format constraint validation" do
@@ -264,8 +265,8 @@ describe "constraint_validations extension" do
     @db.extension(:constraint_validations)
     @db.create_table(:foo){String :name; validate{format(/^foo.*/, :name)}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"format", :column=>"name", :table=>"foo", :argument=>'^foo.*')
-    sqls.must_equal ["BEGIN", "COMMIT", %[CREATE TABLE foo (name text, CHECK ((name IS NOT NULL) AND (name ~ '^foo.*')))]]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"format", :column=>"name", :table=>"foo", :argument=>'^foo.*')
+    sqls.must_equal [%[CREATE TABLE foo (name text, CHECK ((name IS NOT NULL) AND (name ~ '^foo.*')))]]
   end
 
   it "should support :format constraint validation with case insensitive format" do
@@ -274,127 +275,127 @@ describe "constraint_validations extension" do
     @db.extension(:constraint_validations)
     @db.create_table(:foo){String :name; validate{format(/^foo.*/i, :name)}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"iformat", :column=>"name", :table=>"foo", :argument=>'^foo.*')
-    sqls.must_equal ["BEGIN", "COMMIT", %[CREATE TABLE foo (name text, CHECK ((name IS NOT NULL) AND (name ~* '^foo.*')))]]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"iformat", :column=>"name", :table=>"foo", :argument=>'^foo.*')
+    sqls.must_equal [%[CREATE TABLE foo (name text, CHECK ((name IS NOT NULL) AND (name ~* '^foo.*')))]]
   end
 
   it "should support :includes constraint validation with an array of strings" do
     @db.create_table(:foo){String :name; validate{includes %w'a b c', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"includes_str_array", :column=>"name", :table=>"foo", :argument=>'a,b,c')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN ('a', 'b', 'c'))))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"includes_str_array", :column=>"name", :table=>"foo", :argument=>'a,b,c')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN ('a', 'b', 'c'))))"]
   end
 
   it "should support :includes constraint validation with an array of integers" do
     @db.create_table(:foo){String :name; validate{includes [1, 2, 3], :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"includes_int_array", :column=>"name", :table=>"foo", :argument=>'1,2,3')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN (1, 2, 3))))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"includes_int_array", :column=>"name", :table=>"foo", :argument=>'1,2,3')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN (1, 2, 3))))"]
   end
 
   it "should support :includes constraint validation with a inclusive range of integers" do
     @db.create_table(:foo){String :name; validate{includes 3..5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"includes_int_range", :column=>"name", :table=>"foo", :argument=>'3..5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name >= 3) AND (name <= 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"includes_int_range", :column=>"name", :table=>"foo", :argument=>'3..5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name >= 3) AND (name <= 5)))"]
   end
 
   it "should support :includes constraint validation with a exclusive range of integers" do
     @db.create_table(:foo){String :name; validate{includes 3...5, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"includes_int_range", :column=>"name", :table=>"foo", :argument=>'3...5')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name >= 3) AND (name < 5)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"includes_int_range", :column=>"name", :table=>"foo", :argument=>'3...5')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name >= 3) AND (name < 5)))"]
   end
 
   it "should support :like constraint validation" do
     @db.create_table(:foo){String :name; validate{like 'foo%', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"like", :column=>"name", :table=>"foo", :argument=>'foo%')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name LIKE 'foo%' ESCAPE '\\')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"like", :column=>"name", :table=>"foo", :argument=>'foo%')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name LIKE 'foo%' ESCAPE '\\')))"]
   end
 
   it "should support :ilike constraint validation" do
     @db.create_table(:foo){String :name; validate{ilike 'foo%', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"ilike", :column=>"name", :table=>"foo", :argument=>'foo%')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (UPPER(name) LIKE UPPER('foo%') ESCAPE '\\')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"ilike", :column=>"name", :table=>"foo", :argument=>'foo%')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (UPPER(name) LIKE UPPER('foo%') ESCAPE '\\')))"]
   end
 
   it "should support :operator :< constraint validation with string" do
     @db.create_table(:foo){String :name; validate{operator :<, 'a', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"str_lt", :column=>"name", :table=>"foo", :argument=>'a')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name < 'a')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"str_lt", :column=>"name", :table=>"foo", :argument=>'a')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name < 'a')))"]
   end
 
   it "should support :operator :<= constraint validation with string" do
     @db.create_table(:foo){String :name; validate{operator :<=, 'a', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"str_lte", :column=>"name", :table=>"foo", :argument=>'a')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name <= 'a')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"str_lte", :column=>"name", :table=>"foo", :argument=>'a')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name <= 'a')))"]
   end
 
   it "should support :operator :> constraint validation with string" do
     @db.create_table(:foo){String :name; validate{operator :>, 'a', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"str_gt", :column=>"name", :table=>"foo", :argument=>'a')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name > 'a')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"str_gt", :column=>"name", :table=>"foo", :argument=>'a')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name > 'a')))"]
   end
 
   it "should support :operator :>= constraint validation with string" do
     @db.create_table(:foo){String :name; validate{operator :>=, 'a', :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"str_gte", :column=>"name", :table=>"foo", :argument=>'a')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name >= 'a')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"str_gte", :column=>"name", :table=>"foo", :argument=>'a')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name >= 'a')))"]
   end
 
   it "should support :operator :< constraint validation with integer" do
     @db.create_table(:foo){Integer :name; validate{operator :<, 2, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"int_lt", :column=>"name", :table=>"foo", :argument=>'2')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name < 2)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"int_lt", :column=>"name", :table=>"foo", :argument=>'2')
+    sqls.must_equal ["CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name < 2)))"]
   end
 
   it "should support :operator :<= constraint validation with integer" do
     @db.create_table(:foo){Integer :name; validate{operator :<=, 2, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"int_lte", :column=>"name", :table=>"foo", :argument=>'2')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name <= 2)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"int_lte", :column=>"name", :table=>"foo", :argument=>'2')
+    sqls.must_equal ["CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name <= 2)))"]
   end
 
   it "should support :operator :> constraint validation with integer" do
     @db.create_table(:foo){Integer :name; validate{operator :>, 2, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"int_gt", :column=>"name", :table=>"foo", :argument=>'2')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name > 2)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"int_gt", :column=>"name", :table=>"foo", :argument=>'2')
+    sqls.must_equal ["CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name > 2)))"]
   end
 
   it "should support :operator :>= constraint validation with integer" do
     @db.create_table(:foo){Integer :name; validate{operator :>=, 2, :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"int_gte", :column=>"name", :table=>"foo", :argument=>'2')
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name >= 2)))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"int_gte", :column=>"name", :table=>"foo", :argument=>'2')
+    sqls.must_equal ["CREATE TABLE foo (name integer, CHECK ((name IS NOT NULL) AND (name >= 2)))"]
   end
 
   it "should support :unique constraint validation" do
     @db.create_table(:foo){String :name; validate{unique :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"unique", :column=>"name", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), UNIQUE (name))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"unique", :column=>"name", :table=>"foo")
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), UNIQUE (name))"]
   end
 
   it "should support :unique constraint validation with multiple columns" do
     @db.create_table(:foo){String :name; Integer :id; validate{unique [:name, :id]}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"unique", :column=>"name,id", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), id integer, UNIQUE (name, id))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"unique", :column=>"name,id", :table=>"foo")
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), id integer, UNIQUE (name, id))"]
   end
 
   it "should support :unique constraint validation in alter_table" do
     @db.alter_table(:foo){validate{unique :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"unique", :column=>"name", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "ALTER TABLE foo ADD UNIQUE (name)"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"unique", :column=>"name", :table=>"foo")
+    sqls.must_equal ["ALTER TABLE foo ADD UNIQUE (name)"]
   end
 
   it "should drop constraints and validations when dropping a constraint validation" do
@@ -405,8 +406,8 @@ describe "constraint_validations extension" do
   it "should drop constraints and validations before adding new ones" do
     @db.alter_table(:foo){String :name; validate{unique :name; drop :bar}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(2)).must_equal(:validation_type=>"unique", :column=>"name", :table=>"foo")
-    sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE ((table, constraint_name) IN (('foo', 'bar')))", "BEGIN", "COMMIT", "ALTER TABLE foo ADD UNIQUE (name)", "ALTER TABLE foo DROP CONSTRAINT bar"]
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"unique", :column=>"name", :table=>"foo")
+    sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE ((table, constraint_name) IN (('foo', 'bar')))", "ALTER TABLE foo ADD UNIQUE (name)", "ALTER TABLE foo DROP CONSTRAINT bar"]
   end
 
   it "should raise an error if attempting to validate inclusion with a range of non-integers" do
@@ -444,14 +445,14 @@ describe "constraint_validations extension" do
   it "should allow adding constraint validations for tables specified as a SQL::Identifier" do
     @db.create_table(Sequel.identifier(:sch__foo)){String :name; validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"sch__foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE sch__foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"sch__foo")
+    sqls.must_equal ["CREATE TABLE sch__foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
   it "should allow adding constraint validations for tables specified as a SQL::QualifiedIdentifier" do
     @db.create_table(Sequel.qualify(:sch, :foo)){String :name; validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"sch.foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE sch.foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"sch.foo")
+    sqls.must_equal ["CREATE TABLE sch.foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 end

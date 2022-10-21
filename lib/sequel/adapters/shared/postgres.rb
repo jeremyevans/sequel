@@ -2078,11 +2078,9 @@ module Sequel
       def _import(columns, values, opts=OPTS)
         if @opts[:returning]
           statements = multi_insert_sql(columns, values)
-          trans_opts = Hash[opts]
-          trans_opts[:server] = @opts[:server]
-          @db.transaction(trans_opts) do
-            statements.map{|st| returning_fetch_rows(st)}
-          end.first.map{|v| v.length == 1 ? v.values.first : v}
+          # no transaction: our multi_insert_sql_strategy should guarantee
+          # that there's only ever a single statement.
+          statements.map{|st| returning_fetch_rows(st)}.first.map{|v| v.length == 1 ? v.values.first : v}
         elsif opts[:return] == :primary_key
           returning(insert_pk)._import(columns, values, opts)
         else

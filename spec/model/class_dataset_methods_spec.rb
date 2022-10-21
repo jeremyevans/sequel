@@ -48,7 +48,7 @@ describe Sequel::Model, "class dataset methods"  do
     @c.group_by(:a).sql.must_equal "SELECT * FROM items GROUP BY a"
     @c.having(:a).sql.must_equal "SELECT * FROM items HAVING a"
     @c.import([:id], [[1]])
-    @db.sqls.must_equal ["BEGIN", "INSERT INTO items (id) VALUES (1)", "COMMIT"]
+    @db.sqls.must_equal ["INSERT INTO items (id) VALUES (1)"]
     @c.inner_join(@c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
     @c.insert.must_equal 1
     @db.sqls.must_equal ["INSERT INTO items DEFAULT VALUES"]
@@ -68,7 +68,7 @@ describe Sequel::Model, "class dataset methods"  do
     @c.min(:id).must_equal 1
     @db.sqls.must_equal ["SELECT min(id) AS min FROM items LIMIT 1"]
     @c.multi_insert([{:id=>1}])
-    @db.sqls.must_equal ["BEGIN", "INSERT INTO items (id) VALUES (1)", "COMMIT"]
+    @db.sqls.must_equal ["INSERT INTO items (id) VALUES (1)"]
     @c.naked.row_proc.must_be_nil
     @c.natural_full_join(@c.table_name).sql.must_equal "SELECT * FROM items NATURAL FULL JOIN items"
     @c.natural_join(@c.table_name).sql.must_equal "SELECT * FROM items NATURAL JOIN items"

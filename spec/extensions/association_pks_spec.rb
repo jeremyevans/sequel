@@ -165,9 +165,7 @@ describe "Sequel::Plugins::AssociationPks" do
     @Album.load(:id=>2).tag_pks = [1, 3]
     @db.sqls.must_equal ["DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))",
       'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
-      'BEGIN',
-      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)',
-      'COMMIT']
+      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)']
   end
 
   it "should return correct right-side associated cpks for one_to_many associations" do
@@ -196,9 +194,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first, last) NOT IN (('F1', 'L1'), ('F2', 'L2'))))"
     sqls[1].must_equal 'SELECT first, last FROM albums_vocalists WHERE (album_id = 2)'
-    match = sqls[3].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    match = sqls[2].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'F1'", "last"=>"'L1'", "album_id"=>"2")
-    sqls.length.must_equal 5
+    sqls.length.must_equal 3
   end
 
   it "should return correct associated pks for left-side cpks for one_to_many associations" do
@@ -227,9 +225,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM vocalists_instruments WHERE ((first = 'F2') AND (last = 'L2') AND (instrument_id NOT IN (1, 2)))"
     sqls[1].must_equal "SELECT instrument_id FROM vocalists_instruments WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[3].match(/INSERT INTO vocalists_instruments \((.*)\) VALUES \((.*)\)/)
+    match = sqls[2].match(/INSERT INTO vocalists_instruments \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'F2'", "last"=>"'L2'", "instrument_id"=>"1")
-    sqls.length.must_equal 5
+    sqls.length.must_equal 3
   end
 
   it "should return correct right-side associated cpks for left-side cpks for one_to_many associations" do
@@ -273,9 +271,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
     sqls[1].must_equal "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[3].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'F2'", "last"=>"'L2'", "year"=>"1997", "week"=>"1")
-    sqls.length.must_equal 5
+    sqls.length.must_equal 3
   end
 
   it "should use transactions if the object is configured to use transactions" do
@@ -316,9 +314,7 @@ describe "Sequel::Plugins::AssociationPks" do
     @Album.load(:id=>2).tag_pks = %w'1 3'
     @db.sqls.must_equal ["DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))",
       'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
-      'BEGIN',
-      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)',
-      'COMMIT']
+      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)']
   end
 
   it "should not automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
@@ -341,9 +337,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
     sqls[1].must_equal "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[3].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'F2'", "last"=>"'L2'", "year"=>"1997", "week"=>"1")
-    sqls.length.must_equal 5
+    sqls.length.must_equal 3
 
     @Vocalist.db_schema[:first][:type] = :integer
     @Vocalist.db_schema[:last][:type] = :integer
@@ -372,9 +368,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN (('1997', '1'), (1997, 2))))"
     sqls[1].must_equal "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[3].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"'F2'", "last"=>"'L2'", "year"=>"'1997'", "week"=>"'1'")
-    sqls.length.must_equal 5
+    sqls.length.must_equal 3
 
     @Vocalist.db_schema[:first][:type] = :integer
     @Vocalist.db_schema[:last][:type] = :string
@@ -430,9 +426,7 @@ describe "Sequel::Plugins::AssociationPks" do
       "SELECT * FROM albums WHERE (id = 2) LIMIT 1",
       "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 2)))",
       "SELECT tag_id FROM albums_tags WHERE (album_id = 2)",
-      "BEGIN",
-      "INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)",
-      "COMMIT"
+      "INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)"
     ]
     ar = @Artist.load(:id=>1)
     ar.album_pks.must_equal [1,2,3]
@@ -466,9 +460,7 @@ describe "Sequel::Plugins::AssociationPks" do
     @db.sqls.must_equal [
       "DELETE FROM albums_tags WHERE ((album_id = 1) AND (tag_id NOT IN (2, 3)))",
       "SELECT tag_id FROM albums_tags WHERE (album_id = 1)",
-      "BEGIN",
-      "INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3)",
-      "COMMIT",
+      "INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3)"
     ]
 
     al.tag_pks = []

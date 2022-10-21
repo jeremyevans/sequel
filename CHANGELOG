@@ -1,5 +1,7 @@
 === master
 
+* Don't wrap multi-inserts in a transaction when it's not required.
+
 * Update mock PostgreSQL adapter to default to PostgreSQL 15 instead of PostgreSQL 14 (jeremyevans)
 
 * Support fractional seconds in the named_timezones extension (jeremyevans) (#1943)

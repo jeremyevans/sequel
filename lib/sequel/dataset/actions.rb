@@ -313,14 +313,18 @@ module Sequel
     
     # Inserts multiple records into the associated table. This method can be
     # used to efficiently insert a large number of records into a table in a
-    # single query if the database supports it. Inserts
-    # are automatically wrapped in a transaction.
+    # single query if the database supports it. Inserts are automatically
+    # wrapped in a transaction if necessary.
     # 
     # This method is called with a columns array and an array of value arrays:
     #
     #   DB[:table].import([:x, :y], [[1, 2], [3, 4]])
     #   # INSERT INTO table (x, y) VALUES (1, 2) 
-    #   # INSERT INTO table (x, y) VALUES (3, 4) 
+    #   # INSERT INTO table (x, y) VALUES (3, 4)
+    #
+    # or, if the database supports it:
+    #
+    #   # INSERT INTO table (x, y) VALUES (1, 2), (3, 4)
     #
     # This method also accepts a dataset instead of an array of value arrays:
     #
@@ -328,9 +332,13 @@ module Sequel
     #   # INSERT INTO table (x, y) SELECT a, b FROM table2 
     #
     # Options:
-    # :commit_every :: Open a new transaction for every given number of records.
-    #                  For example, if you provide a value of 50, will commit
-    #                  after every 50 records.
+    # :commit_every :: Open a new transaction for every given number of
+    #                  records. For example, if you provide a value of 50,
+    #                  will commit after every 50 records. When a
+    #                  transaction is not required, this option controls
+    #                  the maximum number of values to insert with a single
+    #                  statement; it does not force the use of a
+    #                  transaction.
     # :return :: When this is set to :primary_key, returns an array of
     #            autoincremented primary key values for the rows inserted.
     #            This does not have an effect if +values+ is a Dataset.
@@ -1023,7 +1031,8 @@ module Sequel
 
     # Internals of #import.  If primary key values are requested, use
     # separate insert commands for each row.  Otherwise, call #multi_insert_sql
-    # and execute each statement it gives separately.
+    # and execute each statement it gives separately. A transaction is only used
+    # if there are multiple statements to execute.
     def _import(columns, values, opts)
       trans_opts = Hash[opts]
       trans_opts[:server] = @opts[:server]
@@ -1031,7 +1040,11 @@ module Sequel
         @db.transaction(trans_opts){values.map{|v| insert(columns, v)}}
       else
         stmts = multi_insert_sql(columns, values)
-        @db.transaction(trans_opts){stmts.each{|st| execute_dui(st)}}
+        if stmts.length == 1
+          execute_dui(stmts[0]) # only one statement: no need for a transaction
+        else
+          @db.transaction(trans_opts){stmts.each{|st| execute_dui(st)}}
+        end
       end
     end
   

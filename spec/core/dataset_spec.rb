@@ -3382,9 +3382,7 @@ describe "Dataset#import" do
       "INSERT INTO items (x, y) VALUES (1, 2)",
       "INSERT INTO items (x, y) VALUES (3, 4)",
       'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT']
+      "INSERT INTO items (x, y) VALUES (5, 6)"]
 
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>nil)
     @db.sqls.must_equal ['BEGIN',
@@ -3400,9 +3398,7 @@ describe "Dataset#import" do
       "INSERT INTO items (x, y) VALUES (1, 2)",
       "INSERT INTO items (x, y) VALUES (3, 4)",
       'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT']
+      "INSERT INTO items (x, y) VALUES (5, 6)"]
   end
 
   it "should accept a columns array and a values array with :slice option" do
@@ -3411,41 +3407,27 @@ describe "Dataset#import" do
       "INSERT INTO items (x, y) VALUES (1, 2)",
       "INSERT INTO items (x, y) VALUES (3, 4)",
       'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT']
+      "INSERT INTO items (x, y) VALUES (5, 6)"]
   end
 
   it "should use correct sql for :values strategy" do
     @ds = @ds.with_extend{def multi_insert_sql_strategy; :values end}
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2), (3, 4), (5, 6)",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) VALUES (1, 2), (3, 4), (5, 6)"]
 
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>2)
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2), (3, 4)",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) VALUES (1, 2), (3, 4)",
+      "INSERT INTO items (x, y) VALUES (5, 6)"]
   end
 
   it "should use correct sql for :union strategy" do
     @ds = @ds.with_extend{def multi_insert_sql_strategy; :union end}
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6"]
 
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>2)
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) SELECT 5, 6",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4",
+      "INSERT INTO items (x, y) SELECT 5, 6"]
   end
 
   it "should use correct sql for :union strategy when FROM is required" do
@@ -3454,17 +3436,11 @@ describe "Dataset#import" do
       def multi_insert_sql_strategy; :union end
     end
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo UNION ALL SELECT 5, 6 FROM foo",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo UNION ALL SELECT 5, 6 FROM foo"]
 
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>2)
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) SELECT 5, 6 FROM foo",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo",
+      "INSERT INTO items (x, y) SELECT 5, 6 FROM foo"]
   end
 
   it "should raise an error if columns are empty and values are not empty" do
@@ -3563,15 +3539,9 @@ describe "Dataset#multi_insert" do
   
   it "should accept the :commit_every option for committing every x records" do
     @ds.multi_insert(@list, :commit_every => 1)
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (name) VALUES ('abc')",
-      'COMMIT',
-      'BEGIN',
+    @db.sqls.must_equal ["INSERT INTO items (name) VALUES ('abc')",
       "INSERT INTO items (name) VALUES ('def')",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (name) VALUES ('ghi')",
-      'COMMIT']
+      "INSERT INTO items (name) VALUES ('ghi')"]
   end
 
   it "should accept the :slice option for committing every x records" do
@@ -3580,9 +3550,7 @@ describe "Dataset#multi_insert" do
       "INSERT INTO items (name) VALUES ('abc')",
       "INSERT INTO items (name) VALUES ('def')",
       'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (name) VALUES ('ghi')",
-      'COMMIT']
+      "INSERT INTO items (name) VALUES ('ghi')"]
   end
   
   it "should accept string keys as column names" do
