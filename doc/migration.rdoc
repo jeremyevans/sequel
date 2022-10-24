@@ -643,3 +643,11 @@ If you need to use database extensions in migrations (e.g. +:pg_enum+), you shou
       # migration here
     end
   end
+
+== Code Reloading
+
+When using code reloading in development, you need to make sure that Sequel models are reloaded when new migrations are applied, so that they pick up schema changes such as newly added or removed columns. One way you could do that is ensure schema is dumped when running the migrations, and trigger a reload when the schema file has changed.
+
+You'll also want to configure Sequel models to reload the schema cache when they're re-defined, to ensure current schema is picked up:
+
+  Sequel::Model.cache_associations = false if ENV["RACK_ENV"] == "development"
