@@ -377,7 +377,7 @@ module Sequel
     # Raise a NotCurrentError unless the migrator is current, takes the same
     # arguments as #run.
     def self.check_current(*args)
-      raise(NotCurrentError, 'migrator is not current') unless is_current?(*args)
+      raise(NotCurrentError, 'current migration version does not match latest available version') unless is_current?(*args)
     end
 
     # Return whether the migrator is current (i.e. it does not need to make
