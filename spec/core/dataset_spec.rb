@@ -3507,6 +3507,12 @@ describe "Dataset#multi_insert" do
       'COMMIT']
   end
   
+  it "should not use transaction when using :return=>:primary_key option with single row" do
+    @db.autoid = 1
+    @ds.multi_insert(@list[0,1], :return=>:primary_key).must_equal [1]
+    @db.sqls.must_equal ["INSERT INTO items (name) VALUES ('abc')"]
+  end
+  
   with_symbol_splitting "should handle splittable symbols for tables" do
     @ds = @ds.from(:sch__tab)
     @ds.multi_insert(@list)

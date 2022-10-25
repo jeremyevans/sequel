@@ -800,11 +800,10 @@ module Sequel
         if opts[:return] == :primary_key && !@opts[:output]
           output(nil, [SQL::QualifiedIdentifier.new(:inserted, first_primary_key)])._import(columns, values, opts)
         elsif @opts[:output]
-          statements = multi_insert_sql(columns, values)
-          ds = naked
           # no transaction: our multi_insert_sql_strategy should guarantee
           # that there's only ever a single statement.
-          statements.map{|st| ds.with_sql(st)}.first.map{|v| v.length == 1 ? v.values.first : v}
+          sql = multi_insert_sql(columns, values)[0]
+          naked.with_sql(sql).map{|v| v.length == 1 ? v.values.first : v}
         else
           super
         end

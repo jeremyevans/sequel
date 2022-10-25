@@ -1,6 +1,6 @@
 === master
 
-* Don't wrap multi-inserts in a transaction when it's not required.
+* Don't wrap multi-inserts in a transaction when it's not required (shannoncole, jeremyevans) (#1945)
 
 * Update mock PostgreSQL adapter to default to PostgreSQL 15 instead of PostgreSQL 14 (jeremyevans)
 

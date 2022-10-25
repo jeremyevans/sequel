@@ -1037,17 +1037,13 @@ module Sequel
       trans_opts = Hash[opts]
       trans_opts[:server] = @opts[:server]
       if opts[:return] == :primary_key
-        @db.transaction(trans_opts){values.map{|v| insert(columns, v)}}
+        _import_transaction(values, trans_opts){values.map{|v| insert(columns, v)}}
       else
         stmts = multi_insert_sql(columns, values)
-        if stmts.length == 1
-          execute_dui(stmts[0]) # only one statement: no need for a transaction
-        else
-          @db.transaction(trans_opts){stmts.each{|st| execute_dui(st)}}
-        end
+        _import_transaction(stmts, trans_opts){stmts.each{|st| execute_dui(st)}}
       end
     end
-  
+
     # Return an array of arrays of values given by the symbols in ret_cols.
     def _select_map_multiple(ret_cols)
       map{|r| r.values_at(*ret_cols)}
@@ -1086,6 +1082,17 @@ module Sequel
       end
     end
     
+    # Use a transaction when yielding to the block if multiple values/statements
+    # are provided. When only a single value or statement is provided, then yield
+    # without using a transaction.
+    def _import_transaction(values, trans_opts, &block)
+      if values.length > 1
+        @db.transaction(trans_opts, &block)
+      else
+        yield
+      end
+    end
+  
     # Internals of +select_hash+ and +select_hash_groups+
     def _select_hash(meth, key_column, value_column, opts=OPTS)
       select(*(key_column.is_a?(Array) ? key_column : [key_column]) + (value_column.is_a?(Array) ? value_column : [value_column])).
