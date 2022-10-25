@@ -342,6 +342,12 @@ instance method:
   @album.artists # [<Artist ...>, ...]
   @album.associations[:artists] # [<Artist ...>, ...]
 
+=== Code Reloading
+
+When declaring associations, Sequel caches association metadata in the association reflection. If you're doing any code reloading that doesn't involve restarting the related process, you should disable caching of the association reflection, to avoid stale model classes still being referenced after reloading:
+
+  Sequel::Model.cache_associations = false
+
 == Dataset Method
 
 In addition to the above methods, associations also add an instance method
