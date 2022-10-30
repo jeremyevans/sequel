@@ -332,6 +332,19 @@ describe Sequel::Model, "#eager" do
     a.first.track.must_equal EagerTrack.load(:id => 4, :album_id=>1)
     DB.sqls.must_equal []
   end
+
+  it "should handle eager loading with UNION when using an eager block" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :subqueries_per_union=>2, :instance_specific=>false do |ds|
+      ds.where(:x=>4)
+    end
+    EagerAlbum.dataset = EagerAlbum.dataset.with_fetch([{:id => 1, :band_id => 2}, {:id => 2, :band_id => 3}, {:id => 3, :band_id => 4}])
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([[{:id => 4, :album_id=>1}, {:id=>5, :album_id=>2}], [{:id=>6, :album_id=>3}]])
+    a = EagerAlbum.eager(:track).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2), EagerAlbum.load(:id => 2, :band_id => 3), EagerAlbum.load(:id => 3, :band_id => 4)]
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE ((x = 4) AND (1 = tracks.album_id)) LIMIT 1 OFFSET 1) AS t1 UNION ALL SELECT * FROM (SELECT * FROM tracks WHERE ((x = 4) AND (2 = tracks.album_id)) LIMIT 1 OFFSET 1) AS t1', 'SELECT * FROM (SELECT * FROM tracks WHERE ((x = 4) AND (3 = tracks.album_id)) LIMIT 1 OFFSET 1) AS t1']
+    a.first.track.must_equal EagerTrack.load(:id => 4, :album_id=>1)
+    DB.sqls.must_equal []
+  end
   
   it "should eagerly load a single one_to_many association" do
     a = EagerAlbum.eager(:tracks).all
