@@ -185,8 +185,12 @@ module Sequel
         case arg
         when Sequel::SQL::Blob
           {:value=>arg, :type=>17, :format=>1}
+        # :nocov:
+        # Not covered by tests as tests use pg_extended_date_support
+        # extension, which has basically the same code.
         when DateTime, Time
           literal(arg)
+        # :nocov:
         else
           arg
         end
