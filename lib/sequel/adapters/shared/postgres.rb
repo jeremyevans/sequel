@@ -87,6 +87,8 @@ module Sequel
         :id
       end
 
+      private
+
       # Handle NoMethodErrors when parsing schema due to output_identifier
       # being called with nil when the Database fetch results are not set
       # to what schema parsing expects.
