@@ -1,0 +1,132 @@
+= New Features
+
+* The pg_auto_parameterize extension for automatically using bound
+  variables when using postgres adapter with the pg driver has been
+  added back to Sequel.  This extension was originally added in Sequel
+  3.34.0, but was removed in 4.0.0 due to the many corner cases it
+  had.  Almost all of the corner cases have now been fixed, and
+  the extension is now recommended for production use.  Compared
+  to the original version in Sequel 3, the reintroduced version
+  of the extension includes the following changes:
+
+  * Handles integers used in LIMIT/ORDER
+  * Respects explicit CASTs
+  * Tries to convert column IN (int, ...) into column = ANY($) with an
+    array parameter
+  * Uses the same parameter for the same object used more than once in
+    a query
+  * Uses parameters when inserting multiple rows via Dataset#import
+  * Supports automatically parameterizing all of the
+    PostgreSQL-specific types that Sequel ships support for in pg_*
+    extensions (though some values of those types may not support
+    automatic parameterization).
+  * Supports skipping auto parameterization for specific values.
+
+  Automatic parameterization is generally slower than Sequel's default
+  behavior, since some optimizations Sequel uses by default do not
+  currently support automatic parameterization.
+
+  Applications may need changes to work correctly with the
+  pg_auto_parameterize extension, such as the addition of explicit
+  casts.  Please read the extension documentation for more details.
+
+* Integer column schema entries now include :min_value and :max_value
+  entries on most databases, indicating the minimum and maximum values
+  supported for the column.
+
+  The validation_helpers plugin now has validates_max_value and
+  validates_min_value for testing the column value is not greater
+  than the given maximum value and not less than the given minimum
+  value, respectively.
+
+  The auto_validations plugin now automatically uses the :min_value
+  and :max_value column schema entries with the new validation_helpers
+  methods to validate that the column values for integer columns are
+  in the allowed range.
+
+* A primary_key_lookup_check_values plugin has been added for
+  automatically typecasting and checking the primary key values are
+  in the allowed range (given by :min_value and :max_value column
+  schema entries) during lookup. If typecasting fails or the value
+  is outside the allowed range, the primary key lookup will return
+  nil without issuing a query (or will raise a NoMatchingRow error
+  if using with_pk!).
+
+  Note that this can change behavior in some cases if you are
+  passing filter conditions during lookup instead of passing primary
+  key values. The plugin tries to support most common filter
+  conditions, but there are still cases that will break.
+
+* Sequel now supports shard-specific :after_connect and :connect_sqls
+  Database options, allowing you to customize behavior for specific
+  shards:
+
+    DB = Sequel.connect('url', servers: {
+        :shard1 => {host: '...', after_connect: proc{|conn|}},
+        :shard2 => {host: '...', connect_sqls: ['...']},
+      })
+
+  Note that these shard-specific options will not be respected if you
+  are calling after_connect= or connect_sqls= on the Database's
+  connection pool.
+
+= Other Improvements
+
+* A Sequel::Postgres::IntegerOutsideBigintRange exception will now be
+  raised if trying to literalize an integer outside PostgreSQL bigint
+  range, to avoid PostgreSQL treating the integer as a numeric type
+  and not respecting indexes on the related column.
+
+  A pg_extended_integer_support extension has been added for
+  customizing the behavior when literalizing an integer outside
+  PostgreSQL bigint range, either quoting it or getting the
+  historical behavior of using it directly in the query.
+
+* Dataset#import and #multi_insert no longer use transactions when
+  they only run a single query.
+
+* Fractional seconds in timestamps are now respected in the
+  named_timezones extension.
+
+* Using hstore[] types as bound variables now works on PostgreSQL.
+
+* Using BC dates and timestamps in bound variables now works on
+  PostgreSQL.
+
+* A corner case has been fixed in eager loading where the window
+  function eager limit strategy would be used without removing the
+  row_number entries from the result.
+
+* The shared postgres adapter now caches reflection datasets, speeding
+  up Database#indexes and similar methods.
+
+* The mock postgres adapter now assumes PostgreSQL 15 instead of
+  PostgreSQL 14 by default.
+
+= Backwards Compatibility
+
+* If you are using Ruby integers outside PostgreSQL bigint range when
+  dealing with PostgreSQL numeric column values, this version may
+  not be compatible.  It is recommended you explicitly convert the
+  Ruby integers to BigDecimal objects if you are using them for
+  numeric column values.  You can also use the
+  pg_extended_integer_support extension introduced in this version.
+
+= Workaround for Older Versions
+
+* If you cannot upgrade to Sequel 5.62.0, but still want to avoid the
+  problems that come from using literal large integers on PostgreSQL,
+  you can use the following code, where DB is your Sequel::Database
+  object:
+
+    DB.extend_datasets do
+      def literal_integer(v)
+        if v > 9223372036854775807 || v < -9223372036854775808
+          raise Sequel::InvalidValue, "PostgreSQL int too large: #{v}"
+        end
+        super
+      end
+    end
+
+  This workaround should work all the way back to Sequel 3.29.0,
+  released in November 2011.

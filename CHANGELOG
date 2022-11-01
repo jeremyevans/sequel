@@ -1,4 +1,4 @@
-=== master
+=== 5.62.0 (2022-11-01)
 
 * Add back the pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with pg driver (jeremyevans)
 
