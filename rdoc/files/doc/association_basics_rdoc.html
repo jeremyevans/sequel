@@ -30,7 +30,7 @@ doc/association_basics.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-07-28 07:37:57 -0700</span>
+<span class='datetime'>2022-10-25 10:16:08 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -347,11 +347,11 @@ Last Update:
 <span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span>
 </pre>
 
-<p>You can choose to ignore the cached versions and do a database query to retrieve results by passing a :reload=&gt;true option to the association method:</p>
+<p>You can choose to ignore the cached versions and do a database query to retrieve results by passing a <code>reload: true</code> option to the association method:</p>
 
 <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>
 <span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span>
-<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">:reload</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># Ignore cache - Database Query</span>
+<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">reload:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># Ignore cache - Database Query</span>
 </pre>
 
 <p>If you reload/refresh the object, it will automatically clear the associations cache for the object:</p>
@@ -368,6 +368,13 @@ Last Update:
 <span class="ruby-ivar">@album</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:artists</span>] <span class="ruby-comment"># nil</span>
 <span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># [&lt;Artist ...&gt;, ...]</span>
 <span class="ruby-ivar">@album</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:artists</span>] <span class="ruby-comment"># [&lt;Artist ...&gt;, ...]</span>
+</pre>
+
+<h3 id="label-Code+Reloading">Code Reloading<span><a href="#label-Code+Reloading">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>When declaring associations, <a href="../../classes/Sequel.html"><code>Sequel</code></a> caches association metadata in the association reflection. If you’re doing any code reloading that doesn’t involve restarting the related process, you should disable caching of the association reflection, to avoid stale model classes still being referenced after reloading:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">cache_associations</span> = <span class="ruby-keyword">false</span>
 </pre>
 
 <h2 id="label-Dataset+Method">Dataset Method<span><a href="#label-Dataset+Method">&para;</a> <a href="#top">&uarr;</a></span></h2>
@@ -548,14 +555,14 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:artists</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-comment"># Primary key must be set explicitly</span>
   <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
-  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>, <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>, <span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>
 <span class="ruby-keyword">end</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:albums</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
   <span class="ruby-comment"># Table that foreign key references needs to be set explicitly</span>
   <span class="ruby-comment"># for a database foreign key reference to be created.</span>
-  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>
-  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>, <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>
+  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>, <span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>
 <span class="ruby-keyword">end</span>
 </pre>
 
@@ -570,7 +577,7 @@ Last Update:
 <p>Then you just need to add the column:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:albums</span>) <span class="ruby-keyword">do</span>
-  <span class="ruby-identifier">add_foreign_key</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>
+  <span class="ruby-identifier">add_foreign_key</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>
 <span class="ruby-keyword">end</span>
 </pre>
 
@@ -606,11 +613,11 @@ Last Update:
 
 <p>You could use the following <a href="../../classes/Sequel.html"><code>Sequel</code></a> code:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_join_table</span>(<span class="ruby-value">:album_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artists</span>)
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_join_table</span>(<span class="ruby-value">album_id:</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">artist_id:</span> <span class="ruby-value">:artists</span>)
 <span class="ruby-comment"># or</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:albums_artists</span>) <span class="ruby-keyword">do</span>
-  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:album_id</span>, <span class="ruby-value">:albums</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>
-  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>
+  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:album_id</span>, <span class="ruby-value">:albums</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artists</span>, <span class="ruby-value">null:</span> <span class="ruby-keyword">false</span>
   <span class="ruby-identifier">primary_key</span> [<span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>]
   <span class="ruby-identifier">index</span> [<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>]
 <span class="ruby-keyword">end</span>
@@ -714,7 +721,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-ivar">@album</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>)
 </pre>
 
-<p>Note that the add_* methods for <code>one_to_many</code> persist the changes by saving the passed in (or newly created) object.  However, to avoid silent failures of these methods, they explicitly raise exceptions even when raise_on_save_failure is false for the associated model. You can disable this behavior (i.e. return nil instead of raising exceptions on a save failure) by setting the <code>:raise_on_save_failure=&gt;false</code> option for the association.</p>
+<p>Note that the add_* methods for <code>one_to_many</code> persist the changes by saving the passed in (or newly created) object.  However, to avoid silent failures of these methods, they explicitly raise exceptions even when raise_on_save_failure is false for the associated model. You can disable this behavior (i.e. return nil instead of raising exceptions on a save failure) by setting the <code>raise_on_save_failure: false</code> option for the association.</p>
 
 <h3 id="label-remove_association-28object_to_disassociate-29+-28e.g.+remove_album-29+-5Bone_to_many+and+many_to_many-5D">remove_<em>association</em>(object_to_disassociate) (e.g. remove_album) [<code>one_to_many</code> and <code>many_to_many</code>]<span><a href="#label-remove_association-28object_to_disassociate-29+-28e.g.+remove_album-29+-5Bone_to_many+and+many_to_many-5D">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -928,7 +935,7 @@ Last Update:
 
 <p>If you do not use a hash or array of two element arrays, you should use the :graph_conditions, :graph_only_conditions, or :graph_block option or you will not be able to use eager_graph or association_join with the association.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:good_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">conditions:</span> {<span class="ruby-value">:good</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:good_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">conditions:</span> {<span class="ruby-value">good:</span> <span class="ruby-keyword">true</span>}
 <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">good_albums</span>
 <span class="ruby-comment"># SELECT * FROM albums WHERE ((artist_id = 1) AND (good IS TRUE))</span>
 </pre>
@@ -1068,7 +1075,7 @@ Last Update:
 
 <p>A proc that can be used to modify the dataset used in the add/remove/remove_all methods.  It’s separate from the association block, as that is called on a join of the join table and the associated table, whereas this option just applies to the join table.  It can be used to make sure that filters are used when deleting.</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:lead_guitar_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">:join_table_block</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:lead_guitar_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">join_table_block:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">instrument_id:</span> <span class="ruby-value">5</span>)
 <span class="ruby-keyword">end</span>)
 </pre>
@@ -1079,7 +1086,7 @@ Last Update:
 
 <p>For example, if the Album class uses a different <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> than the Artist class, and the join table is in the database that the Artist class uses:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:lead_guitar_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">:join_table_db</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:lead_guitar_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">join_table_db:</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>
 </pre>
 
 <p>This option also affects the add/remove/remove_all methods, by changing which database is used for inserts/deletes from the join table (add/remove/remove_all defaults to use the current model’s database instead of the associated model’s database).</p>
@@ -1334,7 +1341,7 @@ Last Update:
 <p>Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:self_title_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>,
- <span class="ruby-value">:eager_grapher</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo</span><span class="ruby-operator">|</span>
+ <span class="ruby-value">eager_grapher:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">eo</span>[<span class="ruby-value">:self</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:albums</span>, {<span class="ruby-value">artist_id:</span> <span class="ruby-value">:id</span>, <span class="ruby-value">name:</span> <span class="ruby-value">:name</span>},
     <span class="ruby-value">table_alias:</span> <span class="ruby-identifier">eo</span>[<span class="ruby-value">:table_alias</span>], <span class="ruby-value">implicit_qualifier:</span> <span class="ruby-identifier">eo</span>[<span class="ruby-value">:implicit_qualifier</span>])
 <span class="ruby-keyword">end</span>)
@@ -1520,7 +1527,7 @@ Last Update:
 <p>If set to false, you cannot use the association when filtering.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">allow_filtering_by:</span> <span class="ruby-keyword">false</span>
-<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>)).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Raises Sequel::Error</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">albums:</span> <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;A&#39;</span>)).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Raises Sequel::Error</span>
 </pre>
 
 <p>This is useful if such filtering cannot work, such as when a subquery cannot be used because the necessary tables are not in the same database.</p>

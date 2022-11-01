@@ -147,6 +147,7 @@ Superclass:
 <li><a href="#attribute-i-log_warn_duration">log_warn_duration</a></li>
 <li><a href="#method-i-logger-3D">logger=</a></li>
 <li><a href="#attribute-i-loggers">loggers</a></li>
+<li><a href="#method-i-new_connection">new_connection</a></li>
 <li><a href="#attribute-i-opts">opts</a></li>
 <li><a href="#attribute-i-pool">pool</a></li>
 <li><a href="#method-i-prepared_statement">prepared_statement</a></li>
@@ -251,6 +252,76 @@ Superclass:
 <td class='context-item-name'>COLUMN_SCHEMA_STRING_TYPES</td>
 <td>=</td>
 <td class='context-item-value'>[:string, :blob, :date, :datetime, :time, :enum, :set, :interval].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>INTEGER1_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[-128, 127].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>INTEGER2_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[-32768, 32767].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>INTEGER3_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[-8388608, 8388607].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>INTEGER4_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[-2147483648, 2147483647].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>INTEGER8_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[-9223372036854775808, 9223372036854775807].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>UNSIGNED_INTEGER1_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[0, 255].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>UNSIGNED_INTEGER2_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[0, 65535].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>UNSIGNED_INTEGER3_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[0, 16777215].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>UNSIGNED_INTEGER4_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[0, 4294967295].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>UNSIGNED_INTEGER8_MIN_MAX</td>
+<td>=</td>
+<td class='context-item-value'>[0, 18446744073709551615].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
@@ -564,12 +635,15 @@ Superclass:
 <span class="line-num">175</span>     <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">c</span>[<span class="ruby-value">:max_length</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:string</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">max_length</span> = <span class="ruby-identifier">column_schema_max_length</span>(<span class="ruby-identifier">c</span>[<span class="ruby-value">:db_type</span>]))
 <span class="line-num">176</span>       <span class="ruby-identifier">c</span>[<span class="ruby-value">:max_length</span>] = <span class="ruby-identifier">max_length</span>
 <span class="line-num">177</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">178</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">179</span>   <span class="ruby-identifier">schema_post_process</span>(<span class="ruby-identifier">cols</span>)
-<span class="line-num">180</span> 
-<span class="line-num">181</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@schemas</span>[<span class="ruby-identifier">quoted_name</span>] = <span class="ruby-identifier">cols</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache_schema</span>
-<span class="line-num">182</span>   <span class="ruby-identifier">cols</span>
-<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">178</span>     <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">c</span>[<span class="ruby-value">:max_value</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">c</span>[<span class="ruby-value">:min_value</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:integer</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">min_max</span> = <span class="ruby-identifier">column_schema_integer_min_max_values</span>(<span class="ruby-identifier">c</span>[<span class="ruby-value">:db_type</span>]))
+<span class="line-num">179</span>       <span class="ruby-identifier">c</span>[<span class="ruby-value">:min_value</span>], <span class="ruby-identifier">c</span>[<span class="ruby-value">:max_value</span>] = <span class="ruby-identifier">min_max</span>
+<span class="line-num">180</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">181</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">182</span>   <span class="ruby-identifier">schema_post_process</span>(<span class="ruby-identifier">cols</span>)
+<span class="line-num">183</span> 
+<span class="line-num">184</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@schemas</span>[<span class="ruby-identifier">quoted_name</span>] = <span class="ruby-identifier">cols</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache_schema</span>
+<span class="line-num">185</span>   <span class="ruby-identifier">cols</span>
+<span class="line-num">186</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-table_exists-3F'>
@@ -594,15 +668,15 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-table_exists-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/query.rb</span>
-<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_exists?</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">194</span>   <span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">195</span>   <span class="ruby-identifier">name</span> = <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">sch</span>
-<span class="line-num">196</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">from</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">197</span>   <span class="ruby-identifier">transaction</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:only</span>){<span class="ruby-identifier">_table_exists?</span>(<span class="ruby-identifier">ds</span>)}
-<span class="line-num">198</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">199</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">DatabaseError</span>
-<span class="line-num">200</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">201</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_exists?</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">197</span>   <span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">198</span>   <span class="ruby-identifier">name</span> = <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">sch</span>
+<span class="line-num">199</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">from</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">200</span>   <span class="ruby-identifier">transaction</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:only</span>){<span class="ruby-identifier">_table_exists?</span>(<span class="ruby-identifier">ds</span>)}
+<span class="line-num">201</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">202</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">DatabaseError</span>
+<span class="line-num">203</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">204</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -1968,6 +2042,44 @@ Superclass:
 <span class="line-num">215</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-new_connection'>
+<a name='method-i-new_connection'></a>
+<div class='synopsis'>
+<span class='name'>new_connection</span><span class='arguments'>(server)</span>
+
+</div>
+<div class='description'>
+
+<p>Connect to the given server/shard. Handles database-generic post-connection setup not handled by connect, using the :after_connect and :connect_sqls options.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-new_connection-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-new_connection-source'>    <span class="ruby-comment"># File lib/sequel/database/connecting.rb</span>
+<span class="line-num">247</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new_connection</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">248</span>   <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">249</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">250</span> 
+<span class="line-num">251</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ac</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]
+<span class="line-num">252</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">ac</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>
+<span class="line-num">253</span>       <span class="ruby-identifier">ac</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">server</span>)
+<span class="line-num">254</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">255</span>       <span class="ruby-identifier">ac</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">conn</span>)
+<span class="line-num">256</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">257</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">258</span> 
+<span class="line-num">259</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>]
+<span class="line-num">260</span>     <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span>
+<span class="line-num">261</span>       <span class="ruby-identifier">log_connection_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">262</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">263</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">264</span> 
+<span class="line-num">265</span>   <span class="ruby-identifier">conn</span>
+<span class="line-num">266</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-remove_servers'>
 <a name='method-i-remove_servers'></a>
 <div class='synopsis'>
@@ -2041,9 +2153,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-single_threaded-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/connecting.rb</span>
-<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_threaded?</span>
-<span class="line-num">246</span>   <span class="ruby-ivar">@single_threaded</span>
-<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">269</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_threaded?</span>
+<span class="line-num">270</span>   <span class="ruby-ivar">@single_threaded</span>
+<span class="line-num">271</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-synchronize'>
@@ -2062,9 +2174,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-synchronize-source'>    <span class="ruby-comment"># File lib/sequel/database/connecting.rb</span>
-<span class="line-num">251</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">synchronize</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">252</span>   <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">hold</span>(<span class="ruby-identifier">server</span> <span class="ruby-operator">||</span> <span class="ruby-value">:default</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}
-<span class="line-num">253</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">275</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">synchronize</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">276</span>   <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">hold</span>(<span class="ruby-identifier">server</span> <span class="ruby-operator">||</span> <span class="ruby-value">:default</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}
+<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-test_connection'>
@@ -2083,10 +2195,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-test_connection-source'>    <span class="ruby-comment"># File lib/sequel/database/connecting.rb</span>
-<span class="line-num">277</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">test_connection</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">278</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>}
-<span class="line-num">279</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">280</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">301</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">test_connection</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">302</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>}
+<span class="line-num">303</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">304</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-valid_connection-3F'>
@@ -2105,16 +2217,16 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-valid_connection-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/connecting.rb</span>
-<span class="line-num">286</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid_connection?</span>(<span class="ruby-identifier">conn</span>)
-<span class="line-num">287</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">valid_connection_sql</span>
-<span class="line-num">288</span>   <span class="ruby-keyword">begin</span>
-<span class="line-num">289</span>     <span class="ruby-identifier">log_connection_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">290</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">database_error_classes</span>
-<span class="line-num">291</span>     <span class="ruby-keyword">false</span>
-<span class="line-num">292</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">293</span>     <span class="ruby-keyword">true</span>
-<span class="line-num">294</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">295</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">310</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid_connection?</span>(<span class="ruby-identifier">conn</span>)
+<span class="line-num">311</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">valid_connection_sql</span>
+<span class="line-num">312</span>   <span class="ruby-keyword">begin</span>
+<span class="line-num">313</span>     <span class="ruby-identifier">log_connection_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">314</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">database_error_classes</span>
+<span class="line-num">315</span>     <span class="ruby-keyword">false</span>
+<span class="line-num">316</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">317</span>     <span class="ruby-keyword">true</span>
+<span class="line-num">318</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">319</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -2563,12 +2675,16 @@ Superclass:
 <p>Constructs a new instance of a database connection with the specified options hash.</p>
 
 <p>Accepts the following options:</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:before_preconnect </td><td>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:after_connect </td><td>
+<p>A callable object called after each new connection is made, with the connection object (and server argument if the callable accepts 2 arguments), useful for customizations that you want to apply to all connections.</p>
+</td></tr><tr><td class='label'>:before_preconnect </td><td>
 <p>Callable that runs after extensions from :preconnect_extensions are loaded, but before any connections are created.</p>
 </td></tr><tr><td class='label'>:cache_schema </td><td>
 <p>Whether schema should be cached for this <a href="Database.html"><code>Database</code></a> instance</p>
 </td></tr><tr><td class='label'>:check_string_typecast_bytesize </td><td>
 <p>Whether to check the bytesize of strings before typecasting.</p>
+</td></tr><tr><td class='label'>:connect_sqls </td><td>
+<p>An array of sql strings to execute on each new connection, after :after_connect runs.</p>
 </td></tr><tr><td class='label'>:default_string_column_size </td><td>
 <p>The default size of string columns, 255 by default.</p>
 </td></tr><tr><td class='label'>:extensions </td><td>
@@ -2599,7 +2715,9 @@ Superclass:
 <p>Method to use to log <a href="SQL.html"><code>SQL</code></a> to a logger, :info by default.</p>
 </td></tr></tbody></table>
 
-<p>All options given are also passed to the connection pool.  Additional options respected by the connection pool are :after_connect, :connect_sqls, :max_connections, :pool_timeout, :servers, and :servers_hash.  See the connection pool documentation for details.</p>
+<p>For sharded connection pools, :after_connect and :connect_sqls can be specified per-shard.</p>
+
+<p>All options given are also passed to the connection pool.  Additional options respected by the connection pool are :max_connections, :pool_timeout, :servers, and :servers_hash.  See the connection pool documentation for details.</p>
 
 </div>
 <div class='source'>
@@ -2607,62 +2725,62 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">133</span>   <span class="ruby-ivar">@opts</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>
-<span class="line-num">134</span>   <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">connection_pool_default_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-ivar">@opts</span>)
-<span class="line-num">135</span>   <span class="ruby-ivar">@loggers</span> = <span class="ruby-constant">Array</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:logger</span>]) <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:loggers</span>])
-<span class="line-num">136</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:servers</span>] = {} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:servers</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
-<span class="line-num">137</span>   <span class="ruby-ivar">@sharded</span> = <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:servers</span>]
-<span class="line-num">138</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:adapter_class</span>] = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>
-<span class="line-num">139</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:single_threaded</span>] = <span class="ruby-ivar">@single_threaded</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:single_threaded</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span>))
-<span class="line-num">140</span>   <span class="ruby-ivar">@default_string_column_size</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:default_string_column_size</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_STRING_COLUMN_SIZE</span>
-<span class="line-num">141</span>   <span class="ruby-ivar">@check_string_typecast_bytesize</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:check_string_typecast_bytesize</span>, <span class="ruby-keyword">true</span>))
-<span class="line-num">142</span> 
-<span class="line-num">143</span>   <span class="ruby-ivar">@schemas</span> = {}
-<span class="line-num">144</span>   <span class="ruby-ivar">@prepared_statements</span> = {}
-<span class="line-num">145</span>   <span class="ruby-ivar">@transactions</span> = {}
-<span class="line-num">146</span>   <span class="ruby-ivar">@symbol_literal_cache</span> = {}
-<span class="line-num">147</span> 
-<span class="line-num">148</span>   <span class="ruby-ivar">@timezone</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">149</span> 
-<span class="line-num">150</span>   <span class="ruby-ivar">@dataset_class</span> = <span class="ruby-identifier">dataset_class_default</span>
-<span class="line-num">151</span>   <span class="ruby-ivar">@cache_schema</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:cache_schema</span>, <span class="ruby-keyword">true</span>))
-<span class="line-num">152</span>   <span class="ruby-ivar">@dataset_modules</span> = []
-<span class="line-num">153</span>   <span class="ruby-ivar">@loaded_extensions</span> = []
-<span class="line-num">154</span>   <span class="ruby-ivar">@schema_type_classes</span> = <span class="ruby-constant">SCHEMA_TYPE_CLASSES</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">139</span>   <span class="ruby-ivar">@opts</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>
+<span class="line-num">140</span>   <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">connection_pool_default_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-ivar">@opts</span>)
+<span class="line-num">141</span>   <span class="ruby-ivar">@loggers</span> = <span class="ruby-constant">Array</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:logger</span>]) <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:loggers</span>])
+<span class="line-num">142</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:servers</span>] = {} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:servers</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
+<span class="line-num">143</span>   <span class="ruby-ivar">@sharded</span> = <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:servers</span>]
+<span class="line-num">144</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:adapter_class</span>] = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>
+<span class="line-num">145</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:single_threaded</span>] = <span class="ruby-ivar">@single_threaded</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:single_threaded</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span>))
+<span class="line-num">146</span>   <span class="ruby-ivar">@default_string_column_size</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:default_string_column_size</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_STRING_COLUMN_SIZE</span>
+<span class="line-num">147</span>   <span class="ruby-ivar">@check_string_typecast_bytesize</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:check_string_typecast_bytesize</span>, <span class="ruby-keyword">true</span>))
+<span class="line-num">148</span> 
+<span class="line-num">149</span>   <span class="ruby-ivar">@schemas</span> = {}
+<span class="line-num">150</span>   <span class="ruby-ivar">@prepared_statements</span> = {}
+<span class="line-num">151</span>   <span class="ruby-ivar">@transactions</span> = {}
+<span class="line-num">152</span>   <span class="ruby-ivar">@symbol_literal_cache</span> = {}
+<span class="line-num">153</span> 
+<span class="line-num">154</span>   <span class="ruby-ivar">@timezone</span> = <span class="ruby-keyword">nil</span>
 <span class="line-num">155</span> 
-<span class="line-num">156</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sql_log_level</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql_log_level</span>] <span class="ruby-operator">?</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql_log_level</span>].<span class="ruby-identifier">to_sym</span> <span class="ruby-operator">:</span> <span class="ruby-value">:info</span>
-<span class="line-num">157</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">log_warn_duration</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:log_warn_duration</span>]
-<span class="line-num">158</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">log_connection_info</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:log_connection_info</span>])
-<span class="line-num">159</span> 
-<span class="line-num">160</span>   <span class="ruby-ivar">@pool</span> = <span class="ruby-constant">ConnectionPool</span>.<span class="ruby-identifier">get_pool</span>(<span class="ruby-keyword">self</span>, <span class="ruby-ivar">@opts</span>)
+<span class="line-num">156</span>   <span class="ruby-ivar">@dataset_class</span> = <span class="ruby-identifier">dataset_class_default</span>
+<span class="line-num">157</span>   <span class="ruby-ivar">@cache_schema</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:cache_schema</span>, <span class="ruby-keyword">true</span>))
+<span class="line-num">158</span>   <span class="ruby-ivar">@dataset_modules</span> = []
+<span class="line-num">159</span>   <span class="ruby-ivar">@loaded_extensions</span> = []
+<span class="line-num">160</span>   <span class="ruby-ivar">@schema_type_classes</span> = <span class="ruby-constant">SCHEMA_TYPE_CLASSES</span>.<span class="ruby-identifier">dup</span>
 <span class="line-num">161</span> 
-<span class="line-num">162</span>   <span class="ruby-identifier">reset_default_dataset</span>
-<span class="line-num">163</span>   <span class="ruby-identifier">adapter_initialize</span>
-<span class="line-num">164</span> 
-<span class="line-num">165</span>   <span class="ruby-identifier">keep_reference</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:keep_reference</span>]) <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>
-<span class="line-num">166</span>   <span class="ruby-keyword">begin</span>
-<span class="line-num">167</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">push</span>(<span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">keep_reference</span>
-<span class="line-num">168</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">run_after_initialize</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">169</span> 
-<span class="line-num">170</span>     <span class="ruby-identifier">initialize_load_extensions</span>(<span class="ruby-value">:preconnect_extensions</span>)
-<span class="line-num">171</span> 
-<span class="line-num">172</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">before_preconnect</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:before_preconnect</span>]
-<span class="line-num">173</span>       <span class="ruby-identifier">before_preconnect</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">174</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">162</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sql_log_level</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql_log_level</span>] <span class="ruby-operator">?</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql_log_level</span>].<span class="ruby-identifier">to_sym</span> <span class="ruby-operator">:</span> <span class="ruby-value">:info</span>
+<span class="line-num">163</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">log_warn_duration</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:log_warn_duration</span>]
+<span class="line-num">164</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">log_connection_info</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:log_connection_info</span>])
+<span class="line-num">165</span> 
+<span class="line-num">166</span>   <span class="ruby-ivar">@pool</span> = <span class="ruby-constant">ConnectionPool</span>.<span class="ruby-identifier">get_pool</span>(<span class="ruby-keyword">self</span>, <span class="ruby-ivar">@opts</span>)
+<span class="line-num">167</span> 
+<span class="line-num">168</span>   <span class="ruby-identifier">reset_default_dataset</span>
+<span class="line-num">169</span>   <span class="ruby-identifier">adapter_initialize</span>
+<span class="line-num">170</span> 
+<span class="line-num">171</span>   <span class="ruby-identifier">keep_reference</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:keep_reference</span>]) <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>
+<span class="line-num">172</span>   <span class="ruby-keyword">begin</span>
+<span class="line-num">173</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">push</span>(<span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">keep_reference</span>
+<span class="line-num">174</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">run_after_initialize</span>(<span class="ruby-keyword">self</span>)
 <span class="line-num">175</span> 
-<span class="line-num">176</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:preconnect</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:preconnect</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">177</span>       <span class="ruby-identifier">concurrent</span> = <span class="ruby-identifier">typecast_value_string</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:preconnect</span>]) <span class="ruby-operator">==</span> <span class="ruby-string">&quot;concurrently&quot;</span>
-<span class="line-num">178</span>       <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:preconnect</span>, <span class="ruby-identifier">concurrent</span>)
-<span class="line-num">179</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">180</span> 
-<span class="line-num">181</span>     <span class="ruby-identifier">initialize_load_extensions</span>(<span class="ruby-value">:extensions</span>)
-<span class="line-num">182</span>     <span class="ruby-identifier">test_connection</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:test</span>, <span class="ruby-keyword">true</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:connect</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">183</span>   <span class="ruby-keyword">rescue</span>
-<span class="line-num">184</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">keep_reference</span>
-<span class="line-num">185</span>     <span class="ruby-identifier">raise</span>
-<span class="line-num">186</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">176</span>     <span class="ruby-identifier">initialize_load_extensions</span>(<span class="ruby-value">:preconnect_extensions</span>)
+<span class="line-num">177</span> 
+<span class="line-num">178</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">before_preconnect</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:before_preconnect</span>]
+<span class="line-num">179</span>       <span class="ruby-identifier">before_preconnect</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">180</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">181</span> 
+<span class="line-num">182</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:preconnect</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:preconnect</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">183</span>       <span class="ruby-identifier">concurrent</span> = <span class="ruby-identifier">typecast_value_string</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:preconnect</span>]) <span class="ruby-operator">==</span> <span class="ruby-string">&quot;concurrently&quot;</span>
+<span class="line-num">184</span>       <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:preconnect</span>, <span class="ruby-identifier">concurrent</span>)
+<span class="line-num">185</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">186</span> 
+<span class="line-num">187</span>     <span class="ruby-identifier">initialize_load_extensions</span>(<span class="ruby-value">:extensions</span>)
+<span class="line-num">188</span>     <span class="ruby-identifier">test_connection</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:test</span>, <span class="ruby-keyword">true</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:connect</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">189</span>   <span class="ruby-keyword">rescue</span>
+<span class="line-num">190</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">keep_reference</span>
+<span class="line-num">191</span>     <span class="ruby-identifier">raise</span>
+<span class="line-num">192</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-register_extension'>
@@ -2736,9 +2854,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-cast_type_literal-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">216</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_type_literal</span>(<span class="ruby-identifier">type</span>)
-<span class="line-num">217</span>   <span class="ruby-identifier">type_literal</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>)
-<span class="line-num">218</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">222</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_type_literal</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">223</span>   <span class="ruby-identifier">type_literal</span>(<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>)
+<span class="line-num">224</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extension'>
@@ -2757,19 +2875,19 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-extension-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">225</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">exts</span>)
-<span class="line-num">226</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">exts</span>)
-<span class="line-num">227</span>   <span class="ruby-identifier">exts</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ext</span><span class="ruby-operator">|</span>
-<span class="line-num">228</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">pr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">EXTENSIONS</span>[<span class="ruby-identifier">ext</span>]}
-<span class="line-num">229</span>       <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@loaded_extensions</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">ext</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@loaded_extensions</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">ext</span>)}
-<span class="line-num">230</span>         <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">231</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">232</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">233</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Extension #{ext} does not have specific support handling individual databases (try: Sequel.extension #{ext.inspect})&quot;</span>)
-<span class="line-num">234</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">235</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">236</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">237</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">exts</span>)
+<span class="line-num">232</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">exts</span>)
+<span class="line-num">233</span>   <span class="ruby-identifier">exts</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ext</span><span class="ruby-operator">|</span>
+<span class="line-num">234</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">pr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">EXTENSIONS</span>[<span class="ruby-identifier">ext</span>]}
+<span class="line-num">235</span>       <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@loaded_extensions</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">ext</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@loaded_extensions</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">ext</span>)}
+<span class="line-num">236</span>         <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">237</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">238</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">239</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Extension #{ext} does not have specific support handling individual databases (try: Sequel.extension #{ext.inspect})&quot;</span>)
+<span class="line-num">240</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">241</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">242</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">243</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -2788,19 +2906,19 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">190</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">191</span>   <span class="ruby-identifier">valid_connection_sql</span>
-<span class="line-num">192</span>   <span class="ruby-identifier">metadata_dataset</span>
-<span class="line-num">193</span>   <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">194</span>   <span class="ruby-ivar">@loggers</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">195</span>   <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">196</span>   <span class="ruby-ivar">@dataset_class</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">197</span>   <span class="ruby-ivar">@dataset_modules</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">198</span>   <span class="ruby-ivar">@schema_type_classes</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">199</span>   <span class="ruby-ivar">@loaded_extensions</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">200</span>   <span class="ruby-identifier">metadata_dataset</span>
-<span class="line-num">201</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">202</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">197</span>   <span class="ruby-identifier">valid_connection_sql</span>
+<span class="line-num">198</span>   <span class="ruby-identifier">metadata_dataset</span>
+<span class="line-num">199</span>   <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">200</span>   <span class="ruby-ivar">@loggers</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">201</span>   <span class="ruby-ivar">@pool</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">202</span>   <span class="ruby-ivar">@dataset_class</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">203</span>   <span class="ruby-ivar">@dataset_modules</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">204</span>   <span class="ruby-ivar">@schema_type_classes</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">205</span>   <span class="ruby-ivar">@loaded_extensions</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">206</span>   <span class="ruby-identifier">metadata_dataset</span>
+<span class="line-num">207</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">208</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-from_application_timestamp'>
@@ -2819,9 +2937,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-from_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">242</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from_application_timestamp</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">243</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">timezone</span>)
-<span class="line-num">244</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">248</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from_application_timestamp</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">249</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">timezone</span>)
+<span class="line-num">250</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inspect'>
@@ -2840,14 +2958,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-inspect-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">248</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
-<span class="line-num">249</span>   <span class="ruby-identifier">a</span> = []
-<span class="line-num">250</span>   <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">inspect</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">uri</span>
-<span class="line-num">251</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">oo</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">oo</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">252</span>     <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">oo</span>.<span class="ruby-identifier">inspect</span>
-<span class="line-num">253</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">254</span>   <span class="ruby-node">&quot;#&lt;#{self.class}: #{a.join(&#39; &#39;)}&gt;&quot;</span>
-<span class="line-num">255</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">254</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">255</span>   <span class="ruby-identifier">a</span> = []
+<span class="line-num">256</span>   <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">inspect</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">uri</span>
+<span class="line-num">257</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">oo</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">oo</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">258</span>     <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">oo</span>.<span class="ruby-identifier">inspect</span>
+<span class="line-num">259</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">260</span>   <span class="ruby-node">&quot;#&lt;#{self.class}: #{a.join(&#39; &#39;)}&gt;&quot;</span>
+<span class="line-num">261</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-literal'>
@@ -2871,9 +2989,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-literal-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">262</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">263</span>   <span class="ruby-identifier">schema_utility_dataset</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">264</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">268</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">269</span>   <span class="ruby-identifier">schema_utility_dataset</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-literal_symbol'>
@@ -2892,9 +3010,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-literal_symbol-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">268</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_symbol</span>(<span class="ruby-identifier">sym</span>)
-<span class="line-num">269</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@symbol_literal_cache</span>[<span class="ruby-identifier">sym</span>]}
-<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">274</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_symbol</span>(<span class="ruby-identifier">sym</span>)
+<span class="line-num">275</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@symbol_literal_cache</span>[<span class="ruby-identifier">sym</span>]}
+<span class="line-num">276</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-literal_symbol_set'>
@@ -2913,9 +3031,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-literal_symbol_set-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">273</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_symbol_set</span>(<span class="ruby-identifier">sym</span>, <span class="ruby-identifier">lit</span>)
-<span class="line-num">274</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@symbol_literal_cache</span>[<span class="ruby-identifier">sym</span>] = <span class="ruby-identifier">lit</span>}
-<span class="line-num">275</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">279</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_symbol_set</span>(<span class="ruby-identifier">sym</span>, <span class="ruby-identifier">lit</span>)
+<span class="line-num">280</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@symbol_literal_cache</span>[<span class="ruby-identifier">sym</span>] = <span class="ruby-identifier">lit</span>}
+<span class="line-num">281</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_statement'>
@@ -2934,9 +3052,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-prepared_statement-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">278</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">279</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">prepared_statements</span>[<span class="ruby-identifier">name</span>]}
-<span class="line-num">280</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">284</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">285</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">prepared_statements</span>[<span class="ruby-identifier">name</span>]}
+<span class="line-num">286</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quote_identifier'>
@@ -2955,9 +3073,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-quote_identifier-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">285</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_identifier</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">286</span>   <span class="ruby-identifier">schema_utility_dataset</span>.<span class="ruby-identifier">quote_identifier</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">287</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_identifier</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">292</span>   <span class="ruby-identifier">schema_utility_dataset</span>.<span class="ruby-identifier">quote_identifier</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-schema_type_class'>
@@ -2976,9 +3094,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-schema_type_class-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">290</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_type_class</span>(<span class="ruby-identifier">type</span>)
-<span class="line-num">291</span>   <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-identifier">type</span>]
-<span class="line-num">292</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">296</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_type_class</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">297</span>   <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-identifier">type</span>]
+<span class="line-num">298</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -2997,9 +3115,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-serial_primary_key_options-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">295</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>
-<span class="line-num">296</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Integer</span>, <span class="ruby-value">:auto_increment</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>}
-<span class="line-num">297</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">301</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>
+<span class="line-num">302</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Integer</span>, <span class="ruby-value">:auto_increment</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>}
+<span class="line-num">303</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_prepared_statement'>
@@ -3018,9 +3136,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_prepared_statement-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">300</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)
-<span class="line-num">301</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">prepared_statements</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">ps</span>}
-<span class="line-num">302</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">306</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)
+<span class="line-num">307</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">prepared_statements</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">ps</span>}
+<span class="line-num">308</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sharded-3F'>
@@ -3039,9 +3157,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sharded-3F-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">306</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sharded?</span>
-<span class="line-num">307</span>   <span class="ruby-ivar">@sharded</span>
-<span class="line-num">308</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">312</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sharded?</span>
+<span class="line-num">313</span>   <span class="ruby-ivar">@sharded</span>
+<span class="line-num">314</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-timezone'>
@@ -3060,9 +3178,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-timezone-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">311</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">timezone</span>
-<span class="line-num">312</span>   <span class="ruby-ivar">@timezone</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>
-<span class="line-num">313</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">317</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">timezone</span>
+<span class="line-num">318</span>   <span class="ruby-ivar">@timezone</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>
+<span class="line-num">319</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_application_timestamp'>
@@ -3081,9 +3199,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">318</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_application_timestamp</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">319</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">timezone</span>)
-<span class="line-num">320</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">324</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_application_timestamp</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">325</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">timezone</span>)
+<span class="line-num">326</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-typecast_value'>
@@ -3102,16 +3220,16 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-typecast_value-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">327</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast_value</span>(<span class="ruby-identifier">column_type</span>, <span class="ruby-identifier">value</span>)
-<span class="line-num">328</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nil?</span>
-<span class="line-num">329</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-node">&quot;typecast_value_#{column_type}&quot;</span>
-<span class="line-num">330</span>   <span class="ruby-keyword">begin</span>
-<span class="line-num">331</span>     <span class="ruby-comment"># Allow calling private methods as per-type typecasting methods are private</span>
-<span class="line-num">332</span>     <span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-keyword">true</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">value</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">value</span>
-<span class="line-num">333</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-constant">TypeError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">334</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)
-<span class="line-num">335</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">336</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">333</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast_value</span>(<span class="ruby-identifier">column_type</span>, <span class="ruby-identifier">value</span>)
+<span class="line-num">334</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nil?</span>
+<span class="line-num">335</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-node">&quot;typecast_value_#{column_type}&quot;</span>
+<span class="line-num">336</span>   <span class="ruby-keyword">begin</span>
+<span class="line-num">337</span>     <span class="ruby-comment"># Allow calling private methods as per-type typecasting methods are private</span>
+<span class="line-num">338</span>     <span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-keyword">true</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">value</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">value</span>
+<span class="line-num">339</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-constant">TypeError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">340</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)
+<span class="line-num">341</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">342</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-uri'>
@@ -3130,9 +3248,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-uri-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">340</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">uri</span>
-<span class="line-num">341</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:uri</span>]
-<span class="line-num">342</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">346</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">uri</span>
+<span class="line-num">347</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:uri</span>]
+<span class="line-num">348</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-url'>
@@ -3151,9 +3269,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-url-source'>    <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">345</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">url</span>
-<span class="line-num">346</span>   <span class="ruby-identifier">uri</span>
-<span class="line-num">347</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">351</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">url</span>
+<span class="line-num">352</span>   <span class="ruby-identifier">uri</span>
+<span class="line-num">353</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

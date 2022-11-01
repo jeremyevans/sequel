@@ -103,13 +103,13 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-db_parse_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">304</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">db_parse_json</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">305</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">306</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">307</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>
-<span class="line-num">308</span>   <span class="ruby-identifier">raise</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
-<span class="line-num">309</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-node">&quot;[#{s}]&quot;</span>).<span class="ruby-identifier">first</span>
-<span class="line-num">310</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">314</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">db_parse_json</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">315</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">316</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">317</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>
+<span class="line-num">318</span>   <span class="ruby-identifier">raise</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
+<span class="line-num">319</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-node">&quot;[#{s}]&quot;</span>).<span class="ruby-identifier">first</span>
+<span class="line-num">320</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-db_parse_jsonb'>
@@ -128,13 +128,13 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-db_parse_jsonb-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">313</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">db_parse_jsonb</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">314</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">315</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-identifier">s</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">316</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>
-<span class="line-num">317</span>   <span class="ruby-identifier">raise</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
-<span class="line-num">318</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-node">&quot;[#{s}]&quot;</span>).<span class="ruby-identifier">first</span>
-<span class="line-num">319</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">323</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">db_parse_jsonb</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">324</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">325</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-identifier">s</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">326</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>
+<span class="line-num">327</span>   <span class="ruby-identifier">raise</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
+<span class="line-num">328</span>   <span class="ruby-identifier">parse_json</span>(<span class="ruby-node">&quot;[#{s}]&quot;</span>).<span class="ruby-identifier">first</span>
+<span class="line-num">329</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-extended'>
@@ -151,18 +151,18 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
-<span class="line-num">227</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">228</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">114</span>, <span class="ruby-identifier">method</span>(<span class="ruby-value">:_db_parse_json</span>))
-<span class="line-num">229</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">3802</span>, <span class="ruby-identifier">method</span>(<span class="ruby-value">:_db_parse_jsonb</span>))
-<span class="line-num">230</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)
-<span class="line-num">231</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;json&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">199</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">114</span>)
-<span class="line-num">232</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;jsonb&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3807</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3802</span>)
-<span class="line-num">233</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">234</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:json</span>] = [<span class="ruby-constant">JSONObject</span>]
-<span class="line-num">235</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:jsonb</span>] = [<span class="ruby-constant">JSONBObject</span>]
-<span class="line-num">236</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">237</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">236</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">237</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">238</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">114</span>, <span class="ruby-identifier">method</span>(<span class="ruby-value">:_db_parse_json</span>))
+<span class="line-num">239</span>     <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-value">3802</span>, <span class="ruby-identifier">method</span>(<span class="ruby-value">:_db_parse_jsonb</span>))
+<span class="line-num">240</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:register_array_type</span>)
+<span class="line-num">241</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;json&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">199</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">114</span>)
+<span class="line-num">242</span>       <span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;jsonb&#39;</span>, <span class="ruby-value">:oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3807</span>, <span class="ruby-value">:scalar_oid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3802</span>)
+<span class="line-num">243</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">244</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:json</span>] = [<span class="ruby-constant">JSONObject</span>]
+<span class="line-num">245</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:jsonb</span>] = [<span class="ruby-constant">JSONBObject</span>]
+<span class="line-num">246</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-json_primitive_wrapper'>
@@ -181,26 +181,26 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-json_primitive_wrapper-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">json_primitive_wrapper</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">261</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
-<span class="line-num">262</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
-<span class="line-num">263</span>     <span class="ruby-constant">JSONHash</span>
-<span class="line-num">264</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
-<span class="line-num">265</span>     <span class="ruby-constant">JSONArray</span>
-<span class="line-num">266</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">String</span>
-<span class="line-num">267</span>     <span class="ruby-constant">JSONString</span>
-<span class="line-num">268</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Integer</span>
-<span class="line-num">269</span>     <span class="ruby-constant">JSONInteger</span>
-<span class="line-num">270</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Float</span>
-<span class="line-num">271</span>     <span class="ruby-constant">JSONFloat</span>
-<span class="line-num">272</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">NilClass</span>
-<span class="line-num">273</span>     <span class="ruby-constant">JSONNull</span>
-<span class="line-num">274</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">TrueClass</span>
-<span class="line-num">275</span>     <span class="ruby-constant">JSONTrue</span>
-<span class="line-num">276</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">FalseClass</span>
-<span class="line-num">277</span>     <span class="ruby-constant">JSONFalse</span>
-<span class="line-num">278</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">279</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">270</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">json_primitive_wrapper</span>(<span class="ruby-identifier">value</span>)
+<span class="line-num">271</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
+<span class="line-num">272</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
+<span class="line-num">273</span>     <span class="ruby-constant">JSONHash</span>
+<span class="line-num">274</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
+<span class="line-num">275</span>     <span class="ruby-constant">JSONArray</span>
+<span class="line-num">276</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">String</span>
+<span class="line-num">277</span>     <span class="ruby-constant">JSONString</span>
+<span class="line-num">278</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Integer</span>
+<span class="line-num">279</span>     <span class="ruby-constant">JSONInteger</span>
+<span class="line-num">280</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Float</span>
+<span class="line-num">281</span>     <span class="ruby-constant">JSONFloat</span>
+<span class="line-num">282</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">NilClass</span>
+<span class="line-num">283</span>     <span class="ruby-constant">JSONNull</span>
+<span class="line-num">284</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">TrueClass</span>
+<span class="line-num">285</span>     <span class="ruby-constant">JSONTrue</span>
+<span class="line-num">286</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">FalseClass</span>
+<span class="line-num">287</span>     <span class="ruby-constant">JSONFalse</span>
+<span class="line-num">288</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">289</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-json_wrapper'>
@@ -219,14 +219,14 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-json_wrapper-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">240</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">json_wrapper</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">241</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
-<span class="line-num">242</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
-<span class="line-num">243</span>     <span class="ruby-constant">JSONHash</span>
-<span class="line-num">244</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
-<span class="line-num">245</span>     <span class="ruby-constant">JSONArray</span>
-<span class="line-num">246</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">250</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">json_wrapper</span>(<span class="ruby-identifier">value</span>)
+<span class="line-num">251</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
+<span class="line-num">252</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
+<span class="line-num">253</span>     <span class="ruby-constant">JSONHash</span>
+<span class="line-num">254</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
+<span class="line-num">255</span>     <span class="ruby-constant">JSONArray</span>
+<span class="line-num">256</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">257</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-jsonb_primitive_wrapper'>
@@ -245,26 +245,26 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-jsonb_primitive_wrapper-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">jsonb_primitive_wrapper</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">283</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
-<span class="line-num">284</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
-<span class="line-num">285</span>     <span class="ruby-constant">JSONBHash</span>
-<span class="line-num">286</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
-<span class="line-num">287</span>     <span class="ruby-constant">JSONBArray</span>
-<span class="line-num">288</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">String</span>
-<span class="line-num">289</span>     <span class="ruby-constant">JSONBString</span>
-<span class="line-num">290</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Integer</span>
-<span class="line-num">291</span>     <span class="ruby-constant">JSONBInteger</span>
-<span class="line-num">292</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Float</span>
-<span class="line-num">293</span>     <span class="ruby-constant">JSONBFloat</span>
-<span class="line-num">294</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">NilClass</span>
-<span class="line-num">295</span>     <span class="ruby-constant">JSONBNull</span>
-<span class="line-num">296</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">TrueClass</span>
-<span class="line-num">297</span>     <span class="ruby-constant">JSONBTrue</span>
-<span class="line-num">298</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">FalseClass</span>
-<span class="line-num">299</span>     <span class="ruby-constant">JSONBFalse</span>
-<span class="line-num">300</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">301</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">292</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">jsonb_primitive_wrapper</span>(<span class="ruby-identifier">value</span>)
+<span class="line-num">293</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
+<span class="line-num">294</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
+<span class="line-num">295</span>     <span class="ruby-constant">JSONBHash</span>
+<span class="line-num">296</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
+<span class="line-num">297</span>     <span class="ruby-constant">JSONBArray</span>
+<span class="line-num">298</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">String</span>
+<span class="line-num">299</span>     <span class="ruby-constant">JSONBString</span>
+<span class="line-num">300</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Integer</span>
+<span class="line-num">301</span>     <span class="ruby-constant">JSONBInteger</span>
+<span class="line-num">302</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Float</span>
+<span class="line-num">303</span>     <span class="ruby-constant">JSONBFloat</span>
+<span class="line-num">304</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">NilClass</span>
+<span class="line-num">305</span>     <span class="ruby-constant">JSONBNull</span>
+<span class="line-num">306</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">TrueClass</span>
+<span class="line-num">307</span>     <span class="ruby-constant">JSONBTrue</span>
+<span class="line-num">308</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">FalseClass</span>
+<span class="line-num">309</span>     <span class="ruby-constant">JSONBFalse</span>
+<span class="line-num">310</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">311</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-jsonb_wrapper'>
@@ -283,14 +283,14 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-jsonb_wrapper-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">250</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">jsonb_wrapper</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">251</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
-<span class="line-num">252</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
-<span class="line-num">253</span>     <span class="ruby-constant">JSONBHash</span>
-<span class="line-num">254</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
-<span class="line-num">255</span>     <span class="ruby-constant">JSONBArray</span>
-<span class="line-num">256</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">257</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">jsonb_wrapper</span>(<span class="ruby-identifier">value</span>)
+<span class="line-num">261</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
+<span class="line-num">262</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Hash</span>
+<span class="line-num">263</span>     <span class="ruby-constant">JSONBHash</span>
+<span class="line-num">264</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Array</span>
+<span class="line-num">265</span>     <span class="ruby-constant">JSONBArray</span>
+<span class="line-num">266</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">267</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-parse_json'>
@@ -309,26 +309,26 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-c-parse_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">322</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">parse_json</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">jsonb</span>=<span class="ruby-keyword">false</span>)
-<span class="line-num">323</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">324</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres::JSONDatabaseMethods.{parse_json,db_parse_json,db_parse_jsonb} are deprecated and will be removed in Sequel 6.&quot;</span>)
-<span class="line-num">325</span>   <span class="ruby-keyword">begin</span>
-<span class="line-num">326</span>     <span class="ruby-identifier">value</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">327</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">json_parser_error_class</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">328</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
-<span class="line-num">329</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">330</span> 
-<span class="line-num">331</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
-<span class="line-num">332</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">333</span>     (<span class="ruby-identifier">jsonb</span> <span class="ruby-operator">?</span> <span class="ruby-constant">JSONBArray</span> <span class="ruby-operator">:</span> <span class="ruby-constant">JSONArray</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">334</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span> 
-<span class="line-num">335</span>     (<span class="ruby-identifier">jsonb</span> <span class="ruby-operator">?</span> <span class="ruby-constant">JSONBHash</span> <span class="ruby-operator">:</span> <span class="ruby-constant">JSONHash</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>)
-<span class="line-num">336</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>, <span class="ruby-constant">Numeric</span>, <span class="ruby-keyword">true</span>, <span class="ruby-keyword">false</span>, <span class="ruby-keyword">nil</span>
-<span class="line-num">337</span>     <span class="ruby-identifier">value</span>
-<span class="line-num">338</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">339</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;unhandled json value: #{value.inspect} (from #{s.inspect})&quot;</span>
-<span class="line-num">340</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">341</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">332</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">parse_json</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">jsonb</span>=<span class="ruby-keyword">false</span>)
+<span class="line-num">333</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">334</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres::JSONDatabaseMethods.{parse_json,db_parse_json,db_parse_jsonb} are deprecated and will be removed in Sequel 6.&quot;</span>)
+<span class="line-num">335</span>   <span class="ruby-keyword">begin</span>
+<span class="line-num">336</span>     <span class="ruby-identifier">value</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">parse_json</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">337</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">json_parser_error_class</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">338</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>)
+<span class="line-num">339</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">340</span> 
+<span class="line-num">341</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">value</span>
+<span class="line-num">342</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">343</span>     (<span class="ruby-identifier">jsonb</span> <span class="ruby-operator">?</span> <span class="ruby-constant">JSONBArray</span> <span class="ruby-operator">:</span> <span class="ruby-constant">JSONArray</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>)
+<span class="line-num">344</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span> 
+<span class="line-num">345</span>     (<span class="ruby-identifier">jsonb</span> <span class="ruby-operator">?</span> <span class="ruby-constant">JSONBHash</span> <span class="ruby-operator">:</span> <span class="ruby-constant">JSONHash</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>)
+<span class="line-num">346</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>, <span class="ruby-constant">Numeric</span>, <span class="ruby-keyword">true</span>, <span class="ruby-keyword">false</span>, <span class="ruby-keyword">nil</span>
+<span class="line-num">347</span>     <span class="ruby-identifier">value</span>
+<span class="line-num">348</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">349</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;unhandled json value: #{value.inspect} (from #{s.inspect})&quot;</span>
+<span class="line-num">350</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">351</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -348,14 +348,14 @@ Sequel::Postgres::JSONDatabaseMethods
 [show source]
 </a>
 <pre id='method-i-bound_variable_arg-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
-<span class="line-num">356</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)
-<span class="line-num">357</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>
-<span class="line-num">358</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">JSONObject</span>, <span class="ruby-constant">JSONBObject</span>
-<span class="line-num">359</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">360</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">361</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">362</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">363</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">366</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)
+<span class="line-num">367</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>
+<span class="line-num">368</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">JSONObject</span>, <span class="ruby-constant">JSONBObject</span>
+<span class="line-num">369</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">370</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">371</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">372</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">373</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

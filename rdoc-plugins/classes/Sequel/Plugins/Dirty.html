@@ -68,7 +68,7 @@ Sequel::Plugins::Dirty
 
 <p>It also saves the previously changed values after an update:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bar&#39;</span>)
 <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>        <span class="ruby-comment"># =&gt; {}</span>
 <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">previous_changes</span>      <span class="ruby-comment"># =&gt; {:name=&gt;[&#39;Foo&#39;, &#39;Bar&#39;]}</span>
 

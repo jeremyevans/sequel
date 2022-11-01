@@ -30,7 +30,7 @@ doc/security.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-07-09 14:34:36 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -177,8 +177,8 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>) <span class="ruby-comment"># &quot;&#39;2013-03-22&#39;&quot;</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># &quot;&#39;a&#39;&quot;</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)) <span class="ruby-comment"># &quot;a&quot;</span>
-<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># &quot;(\&quot;a\&quot; = &#39;a&#39;)&quot;</span>
-<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-value">:a</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)) <span class="ruby-comment"># &quot;(\&quot;a\&quot; = a)&quot;</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-value">a:</span> <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># &quot;(\&quot;a\&quot; = &#39;a&#39;)&quot;</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-value">a:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)) <span class="ruby-comment"># &quot;(\&quot;a\&quot; = a)&quot;</span>
 </pre>
 
 <h4 id="label-SQL+Filter+Fragments">SQL Filter Fragments<span><a href="#label-SQL+Filter+Fragments">&para;</a> <a href="#top">&uarr;</a></span></h4>
@@ -223,7 +223,7 @@ Last Update:
 
 <p>For backwards compatibility, <a href="../../classes/Sequel.html"><code>Sequel</code></a> supports regular strings in the window function :frame option, which will be treated as a literal string:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">fun</span>(<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:frame</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;SQL Here&#39;</span>)}
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">fun</span>(<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">frame:</span> <span class="ruby-string">&#39;SQL Here&#39;</span>)}
 </pre>
 
 <p>You should make sure the frame argument is not derived from user input, or switch to using a hash as the :frame option value.</p>
@@ -288,7 +288,7 @@ Last Update:
 
 <p>Instead, you should do:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:value</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">column:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:value</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span>
 </pre>
 
 <p>Because using the auto_literal_strings extension makes SQL injection so much eaiser, it is recommended to not use it, and instead use Sequel.lit with placeholders.</p>
@@ -399,29 +399,29 @@ Last Update:
 
 <p>This issue isn’t necessarily specific to <a href="../../classes/Sequel.html"><code>Sequel</code></a>, but it is a good general practice. If you are using values derived from user input, it is best to be explicit about their type.  For example:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>])
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>])
 </pre>
 
 <p>is probably a bad idea.  Assuming you are using a web framework, <code>params[:id]</code> could be a string, an array, a hash, nil, or potentially something else.</p>
 
 <p>Assuming that <code>id</code> is an integer field, you probably want to do:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>].<span class="ruby-identifier">to_i</span>)
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>].<span class="ruby-identifier">to_i</span>)
 </pre>
 
 <p>If you are looking something up by name, you should try to enforce the value to be a string:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:name</span>].<span class="ruby-identifier">to_s</span>)
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:name</span>].<span class="ruby-identifier">to_s</span>)
 </pre>
 
 <p>If you are trying to use an IN clause with a list of id values based on input provided on a web form:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:ids</span>].<span class="ruby-identifier">to_a</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:to_i</span>))
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:ids</span>].<span class="ruby-identifier">to_a</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:to_i</span>))
 </pre>
 
 <p>Basically, be as explicit as possible. While there aren’t any known security issues in <a href="../../classes/Sequel.html"><code>Sequel</code></a> when you do:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>])
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>])
 </pre>
 
 <p>It allows the attacker to choose to do any of the following queries:</p>

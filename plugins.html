@@ -45,7 +45,7 @@
     <div class="main__container">
       <section class="plugins">
 
-<h1 class="h1">Sequel::Model Plugins for v5.61.0</h1>
+<h1 class="h1">Sequel::Model Plugins for v5.62.0</h1>
 
 <div class="plugins__sidebar">
 <aside class="plugins__sidebar-aside">
@@ -500,6 +500,10 @@
 <span class="ul__span">Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</span>
 </li>
 <li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/RequireValidSchema.html">primary_key_lookup_check_values </a>
+<span class="ul__span">Typecasts and checks values in allowed range during lookups by primary key.</span>
+</li>
+<li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/RequireValidSchema.html">require_valid_schema </a>
 <span class="ul__span">Requires that model classes selecting from simple tables have valid schema.</span>
 </li>
@@ -708,12 +712,20 @@
 <span class="ul__span">Adds support for PostgreSQL arrays.</span>
 </li>
 <li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_auto_parameterize_rb.html">pg_auto_parameterize </a>
+<span class="ul__span">Automatically parameterizes queries when using the postgres adapter with the pg driver.</span>
+</li>
+<li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_enum_rb.html">pg_enum </a>
 <span class="ul__span">Adds support for PostgreSQL enums.</span>
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_extended_date_support_rb.html">pg_extended_date_support </a>
 <span class="ul__span">Adds support for PostgreSQL infinite and BC date/timestamp support.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_extended_integer_support_rb.html">pg_extended_integer_support </a>
+<span class="ul__span">Adds support for handling Ruby integers outside PostgreSQL bigint range.</span>
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore </a>
@@ -1093,6 +1105,10 @@
 <li class="ul__li ul__li--grid">
 <a class="a" href="https://github.com/earaujoassis/sequel-seed">sequel-seed </a>
 <span class="ul__span">A Sequel extension to make seeds/fixtures manageable like migrations.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/rosenfeld/sequel_tools">sequel_tools </a>
+<span class="ul__span">Tools to help with managing database operations with Sequel through Rake tasks.</span>
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="http://github.com/jsvd/sequel_vectorized">sequel_vectorized </a>

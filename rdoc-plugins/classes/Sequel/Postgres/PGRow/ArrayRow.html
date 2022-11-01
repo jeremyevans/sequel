@@ -61,6 +61,7 @@ Superclass:
 <li><a href="#method-i-db_type">db_type</a></li>
 <li><a href="#attribute-i-db_type">db_type</a></li>
 <li><a href="#method-i-op">op</a></li>
+<li><a href="#method-i-sequel_auto_param_type">sequel_auto_param_type</a></li>
 <li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
 </ol>
 </div>
@@ -164,6 +165,31 @@ Superclass:
 <span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>
 <span class="line-num">169</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-keyword">self</span>)
 <span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sequel_auto_param_type'>
+<a name='method-i-sequel_auto_param_type'></a>
+<div class='synopsis'>
+<span class='name'>sequel_auto_param_type</span><span class='arguments'>(ds)</span>
+
+</div>
+<div class='description'>
+
+<p>Allow automatic parameterization if all values support it.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sequel_auto_param_type-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
+<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">142</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">v</span>)}
+<span class="line-num">143</span>     <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;::&quot;</span>
+<span class="line-num">144</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">145</span>     <span class="ruby-identifier">s</span>
+<span class="line-num">146</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>

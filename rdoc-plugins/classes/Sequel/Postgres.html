@@ -34,10 +34,16 @@ Sequel::Postgres
 <a href="../../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
 </li>
 <li class='other'>
+<a href="../../files/lib/sequel/extensions/pg_auto_parameterize_rb.html">lib/sequel/extensions/pg_auto_parameterize.rb</a>
+</li>
+<li class='other'>
 <a href="../../files/lib/sequel/extensions/pg_enum_rb.html">lib/sequel/extensions/pg_enum.rb</a>
 </li>
 <li class='other'>
 <a href="../../files/lib/sequel/extensions/pg_extended_date_support_rb.html">lib/sequel/extensions/pg_extended_date_support.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/pg_extended_integer_support_rb.html">lib/sequel/extensions/pg_extended_integer_support.rb</a>
 </li>
 <li class='other'>
 <a href="../../files/lib/sequel/extensions/pg_hstore_rb.html">lib/sequel/extensions/pg_hstore.rb</a>
@@ -96,6 +102,7 @@ Sequel::Postgres
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#method-i-sequel_auto_param_type">sequel_auto_param_type</a></li>
 <li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
 </ol>
 </div>
@@ -114,8 +121,10 @@ Sequel::Postgres
 <h2>Classes and Modules</h2>
 <ol>
 <li><a href="Postgres/ArrayOpMethods.html">Sequel::Postgres::ArrayOpMethods</a></li>
+<li><a href="Postgres/AutoParameterize.html">Sequel::Postgres::AutoParameterize</a></li>
 <li><a href="Postgres/EnumDatabaseMethods.html">Sequel::Postgres::EnumDatabaseMethods</a></li>
 <li><a href="Postgres/ExtendedDateSupport.html">Sequel::Postgres::ExtendedDateSupport</a></li>
+<li><a href="Postgres/ExtendedIntegerSupport.html">Sequel::Postgres::ExtendedIntegerSupport</a></li>
 <li><a href="Postgres/HStoreOpMethods.html">Sequel::Postgres::HStoreOpMethods</a></li>
 <li><a href="Postgres/InetDatabaseMethods.html">Sequel::Postgres::InetDatabaseMethods</a></li>
 <li><a href="Postgres/InetDatasetMethods.html">Sequel::Postgres::InetDatasetMethods</a></li>
@@ -237,6 +246,27 @@ Sequel::Postgres
 </div>
 <div id='methods'>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-sequel_auto_param_type'>
+<a name='method-i-sequel_auto_param_type'></a>
+<div class='synopsis'>
+<span class='name'>sequel_auto_param_type</span><span class='arguments'>(ds)</span>
+
+</div>
+<div class='description'>
+
+<p>Allow automatic parameterization.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sequel_auto_param_type-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>
+<span class="line-num">147</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">148</span>   <span class="ruby-string">&quot;::json&quot;</span>
+<span class="line-num">149</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
 <a name='method-i-sql_literal_append'></a>
 <div class='synopsis'>

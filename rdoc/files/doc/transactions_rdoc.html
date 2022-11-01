@@ -30,7 +30,7 @@ doc/transactions.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-09-27 19:15:06 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -187,29 +187,29 @@ Last Update:
 <span class="ruby-comment"># ArgumentError raised</span>
 </pre>
 
-<p>If you want the current savepoint to be rolled back when the savepoint block exits instead of being committed (even if an exception is not raised), use <code>Database#rollback_on_exit(:savepoint=&gt;true)</code></p>
+<p>If you want the current savepoint to be rolled back when the savepoint block exits instead of being committed (even if an exception is not raised), use <code>Database#rollback_on_exit(savepoint: true)</code></p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
   <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
-    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>)
   <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
 <span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
 
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
   <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
     <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
-      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>)
     <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
   <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>
 <span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
 </pre>
 
-<p>If you want the current savepoint and potentially enclosing savepoints to be rolled back when the savepoint blocks exit  (even if an exception is not raised), use <code>Database#rollback_on_exit(:savepoint=&gt;integer)</code></p>
+<p>If you want the current savepoint and potentially enclosing savepoints to be rolled back when the savepoint blocks exit  (even if an exception is not raised), use <code>Database#rollback_on_exit(savepoint: integer)</code></p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
   <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
     <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
-      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)
+      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-value">2</span>)
     <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
   <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
 <span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
@@ -217,7 +217,7 @@ Last Update:
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>
   <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
     <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>
-      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)
+      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-value">3</span>)
     <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
   <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>
 <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>

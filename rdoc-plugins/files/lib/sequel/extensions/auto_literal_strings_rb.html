@@ -30,7 +30,7 @@ lib/sequel/extensions/auto_literal_strings.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-04-19 16:07:09 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -53,7 +53,7 @@ Last Update:
 
 <p>Named placeholders can also be used with a hash:</p>
 
-<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; :a&quot;</span>, <span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&quot;A&quot;</span>)
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; :a&quot;</span>, <span class="ruby-value">a:</span> <span class="ruby-string">&quot;A&quot;</span>)
 <span class="ruby-comment"># SELECT * FROM table WHERE (name &gt; &#39;A&#39;)</span>
 </pre>
 

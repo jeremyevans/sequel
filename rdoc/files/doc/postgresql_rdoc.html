@@ -30,7 +30,7 @@ doc/postgresql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-09-14 13:38:58 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -330,16 +330,16 @@ Last Update:
   <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
   <span class="ruby-constant">Integer</span> <span class="ruby-value">:i</span>
   <span class="ruby-constant">Integer</span> <span class="ruby-value">:j</span>
-  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:a_id</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">:foreign_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a_a</span>
+  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:a_id</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">foreign_key_constraint_name:</span> <span class="ruby-value">:a_a</span>
   <span class="ruby-identifier">unique</span> [<span class="ruby-value">:i</span>, <span class="ruby-value">:j</span>]
 <span class="ruby-keyword">end</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:b</span>) <span class="ruby-keyword">do</span>
-  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:a_id</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">:foreign_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a_a</span>
+  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:a_id</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">foreign_key_constraint_name:</span> <span class="ruby-value">:a_a</span>
   <span class="ruby-constant">Integer</span> <span class="ruby-value">:c</span>
   <span class="ruby-constant">Integer</span> <span class="ruby-value">:d</span>
-  <span class="ruby-identifier">foreign_key</span> [<span class="ruby-value">:c</span>, <span class="ruby-value">:d</span>], <span class="ruby-value">:a</span>, <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:j</span>, <span class="ruby-value">:i</span>], <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a_c_d</span>
+  <span class="ruby-identifier">foreign_key</span> [<span class="ruby-value">:c</span>, <span class="ruby-value">:d</span>], <span class="ruby-value">:a</span>, <span class="ruby-value">key:</span> [<span class="ruby-value">:j</span>, <span class="ruby-value">:i</span>], <span class="ruby-value">name:</span> <span class="ruby-value">:a_c_d</span>
 <span class="ruby-keyword">end</span>
-<span class="ruby-constant">DB</span>.<span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:reverse</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">reverse:</span> <span class="ruby-keyword">true</span>)
 <span class="ruby-comment"># =&gt; [</span>
 <span class="ruby-comment">#  {:name=&gt;:a_a, :columns=&gt;[:a_id], :key=&gt;[:id], :on_update=&gt;:no_action, :on_delete=&gt;:no_action, :deferrable=&gt;false, :table=&gt;:a, :schema=&gt;:public},</span>
 <span class="ruby-comment">#  {:name=&gt;:a_a, :columns=&gt;[:a_id], :key=&gt;[:id], :on_update=&gt;:no_action, :on_delete=&gt;:no_action, :deferrable=&gt;false, :table=&gt;:b, :schema=&gt;:public},</span>
@@ -444,12 +444,12 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>){<span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>}
 <span class="ruby-comment"># Ignore the given value for id, using the identity&#39;s sequence value.</span>
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">overriding_user_value</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">overriding_user_value</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
 
-<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>){<span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>, <span class="ruby-value">:identity</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>}
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>){<span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>, <span class="ruby-value">identity:</span> <span class="ruby-value">:always</span>}
 <span class="ruby-comment"># Force the use of the given value for id, because otherwise the insert will</span>
 <span class="ruby-comment"># raise an error, since GENERATED ALWAYS was used when creating the column.</span>
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">overriding_system_value</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">overriding_system_value</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
 </pre>
 
 <h3 id="label-Distinct+On+Specific+Columns">Distinct On Specific Columns<span><a href="#label-Distinct+On+Specific+Columns">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -585,7 +585,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:test1</span>){<span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>}
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:test2</span>){<span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>; <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:test1_id</span>, <span class="ruby-value">:test1</span>}
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:test2</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">:test1_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">error_info</span>(<span class="ruby-identifier">$!</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:test2</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">test1_id:</span> <span class="ruby-value">1</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">error_info</span>(<span class="ruby-identifier">$!</span>)
 <span class="ruby-comment"># =&gt; {</span>
 <span class="ruby-comment">#  :schema=&gt;&quot;public&quot;,</span>
 <span class="ruby-comment">#  :table=&gt;&quot;test2&quot;,</span>

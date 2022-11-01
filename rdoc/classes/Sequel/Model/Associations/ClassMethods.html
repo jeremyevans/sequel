@@ -185,9 +185,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-all_association_reflections-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1595</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_association_reflections</span>
-<span class="line-num">1596</span>   <span class="ruby-identifier">association_reflections</span>.<span class="ruby-identifier">values</span>
-<span class="line-num">1597</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1600</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_association_reflections</span>
+<span class="line-num">1601</span>   <span class="ruby-identifier">association_reflections</span>.<span class="ruby-identifier">values</span>
+<span class="line-num">1602</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-associate'>
@@ -377,83 +377,83 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-associate-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1832</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1833</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;invalid association type&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">assoc_class</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">ASSOCIATION_TYPES</span>[<span class="ruby-identifier">type</span>]}
-<span class="line-num">1834</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Model.associate name argument must be a symbol&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
-<span class="line-num">1835</span> 
-<span class="line-num">1836</span>   <span class="ruby-comment"># dup early so we don&#39;t modify opts</span>
-<span class="line-num">1837</span>   <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">1838</span> 
-<span class="line-num">1839</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>]
-<span class="line-num">1840</span>     <span class="ruby-identifier">cloned_assoc</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>])
-<span class="line-num">1841</span>     <span class="ruby-identifier">remove_class_name</span> = <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class_name</span>]
-<span class="line-num">1842</span>     <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">cloned_assoc</span>[<span class="ruby-value">:orig_opts</span>].<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">orig_opts</span>)
-<span class="line-num">1843</span>     <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:class_name</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">remove_class_name</span>
-<span class="line-num">1844</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1845</span> 
-<span class="line-num">1846</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">default_association_options</span>]
-<span class="line-num">1847</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_options</span> = <span class="ruby-identifier">default_association_type_options</span>[<span class="ruby-identifier">type</span>]
-<span class="line-num">1848</span>     <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">type_options</span>)
+<span class="line-num">1837</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1838</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;invalid association type&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">assoc_class</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">ASSOCIATION_TYPES</span>[<span class="ruby-identifier">type</span>]}
+<span class="line-num">1839</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Model.associate name argument must be a symbol&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
+<span class="line-num">1840</span> 
+<span class="line-num">1841</span>   <span class="ruby-comment"># dup early so we don&#39;t modify opts</span>
+<span class="line-num">1842</span>   <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">1843</span> 
+<span class="line-num">1844</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>]
+<span class="line-num">1845</span>     <span class="ruby-identifier">cloned_assoc</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>])
+<span class="line-num">1846</span>     <span class="ruby-identifier">remove_class_name</span> = <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class_name</span>]
+<span class="line-num">1847</span>     <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">cloned_assoc</span>[<span class="ruby-value">:orig_opts</span>].<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">orig_opts</span>)
+<span class="line-num">1848</span>     <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:class_name</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">remove_class_name</span>
 <span class="line-num">1849</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1850</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">orig_opts</span>)
-<span class="line-num">1851</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:cache</span><span class="ruby-operator">=&gt;</span>({} <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache_associations</span>), <span class="ruby-value">:model</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">self</span>)
-<span class="line-num">1852</span> 
-<span class="line-num">1853</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] = <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">1854</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:dataset</span>]
-<span class="line-num">1855</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:instance_specific</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:block</span>])
-<span class="line-num">1856</span>     <span class="ruby-comment"># It&#39;s possible the association is instance specific, in that it depends on</span>
-<span class="line-num">1857</span>     <span class="ruby-comment"># values other than the foreign key value.  This needs to be checked for</span>
-<span class="line-num">1858</span>     <span class="ruby-comment"># in certain places to disable optimizations.</span>
-<span class="line-num">1859</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] = <span class="ruby-identifier">_association_instance_specific_default</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">1860</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1861</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:instance_specific</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:dataset</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:allow_eager</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_loader</span>]
-<span class="line-num">1862</span>     <span class="ruby-comment"># For associations explicitly marked as instance specific, or that use the</span>
-<span class="line-num">1863</span>     <span class="ruby-comment"># :dataset option, where :allow_eager is not set, and no :eager_loader is</span>
-<span class="line-num">1864</span>     <span class="ruby-comment"># provided, disallow eager loading.  In these cases, eager loading is</span>
-<span class="line-num">1865</span>     <span class="ruby-comment"># unlikely to work.  This is not done for implicit setting of :instance_specific,</span>
-<span class="line-num">1866</span>     <span class="ruby-comment"># because implicit use is done by default for all associations with blocks,</span>
-<span class="line-num">1867</span>     <span class="ruby-comment"># and the vast majority of associations with blocks use the block for filtering</span>
-<span class="line-num">1868</span>     <span class="ruby-comment"># in a manner compatible with eager loading.</span>
-<span class="line-num">1869</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_eager</span>] = <span class="ruby-keyword">false</span>
-<span class="line-num">1870</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1871</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">assoc_class</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">1872</span> 
-<span class="line-num">1873</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">cloned_assoc</span>)
-<span class="line-num">1874</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})&quot;</span>)
+<span class="line-num">1850</span> 
+<span class="line-num">1851</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">default_association_options</span>]
+<span class="line-num">1852</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_options</span> = <span class="ruby-identifier">default_association_type_options</span>[<span class="ruby-identifier">type</span>]
+<span class="line-num">1853</span>     <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">type_options</span>)
+<span class="line-num">1854</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1855</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">orig_opts</span>)
+<span class="line-num">1856</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:cache</span><span class="ruby-operator">=&gt;</span>({} <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache_associations</span>), <span class="ruby-value">:model</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">self</span>)
+<span class="line-num">1857</span> 
+<span class="line-num">1858</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] = <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">1859</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:dataset</span>]
+<span class="line-num">1860</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:instance_specific</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:block</span>])
+<span class="line-num">1861</span>     <span class="ruby-comment"># It&#39;s possible the association is instance specific, in that it depends on</span>
+<span class="line-num">1862</span>     <span class="ruby-comment"># values other than the foreign key value.  This needs to be checked for</span>
+<span class="line-num">1863</span>     <span class="ruby-comment"># in certain places to disable optimizations.</span>
+<span class="line-num">1864</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] = <span class="ruby-identifier">_association_instance_specific_default</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">1865</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1866</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:instance_specific</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:dataset</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:allow_eager</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_loader</span>]
+<span class="line-num">1867</span>     <span class="ruby-comment"># For associations explicitly marked as instance specific, or that use the</span>
+<span class="line-num">1868</span>     <span class="ruby-comment"># :dataset option, where :allow_eager is not set, and no :eager_loader is</span>
+<span class="line-num">1869</span>     <span class="ruby-comment"># provided, disallow eager loading.  In these cases, eager loading is</span>
+<span class="line-num">1870</span>     <span class="ruby-comment"># unlikely to work.  This is not done for implicit setting of :instance_specific,</span>
+<span class="line-num">1871</span>     <span class="ruby-comment"># because implicit use is done by default for all associations with blocks,</span>
+<span class="line-num">1872</span>     <span class="ruby-comment"># and the vast majority of associations with blocks use the block for filtering</span>
+<span class="line-num">1873</span>     <span class="ruby-comment"># in a manner compatible with eager loading.</span>
+<span class="line-num">1874</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_eager</span>] = <span class="ruby-keyword">false</span>
 <span class="line-num">1875</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1876</span> 
-<span class="line-num">1877</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:use_placeholder_loader</span>] = <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_graph</span>]
-<span class="line-num">1878</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_block</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:eager_block</span>)
-<span class="line-num">1879</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_join_type</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:left_outer</span>
-<span class="line-num">1880</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order_eager_graph</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:order_eager_graph</span>)
-<span class="line-num">1881</span>   <span class="ruby-identifier">conds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:conditions</span>]
-<span class="line-num">1882</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_alias_base</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span>
-<span class="line-num">1883</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">conds</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:graph_conditions</span>) <span class="ruby-keyword">and</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">conds</span>)
-<span class="line-num">1884</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:graph_conditions</span>, []).<span class="ruby-identifier">to_a</span>
-<span class="line-num">1885</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]
-<span class="line-num">1886</span>   [<span class="ruby-value">:before_add</span>, <span class="ruby-value">:before_remove</span>, <span class="ruby-value">:after_add</span>, <span class="ruby-value">:after_remove</span>, <span class="ruby-value">:after_load</span>, <span class="ruby-value">:before_set</span>, <span class="ruby-value">:after_set</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cb_type</span><span class="ruby-operator">|</span>
-<span class="line-num">1887</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>]
-<span class="line-num">1888</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1889</span> 
-<span class="line-num">1890</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>]
-<span class="line-num">1891</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>])
-<span class="line-num">1892</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:reverse_extend</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>].<span class="ruby-identifier">reverse</span>
+<span class="line-num">1876</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">assoc_class</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">1877</span> 
+<span class="line-num">1878</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">cloned_assoc</span>)
+<span class="line-num">1879</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})&quot;</span>)
+<span class="line-num">1880</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1881</span> 
+<span class="line-num">1882</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:use_placeholder_loader</span>] = <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_graph</span>]
+<span class="line-num">1883</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_block</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:eager_block</span>)
+<span class="line-num">1884</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_join_type</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:left_outer</span>
+<span class="line-num">1885</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order_eager_graph</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:order_eager_graph</span>)
+<span class="line-num">1886</span>   <span class="ruby-identifier">conds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:conditions</span>]
+<span class="line-num">1887</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_alias_base</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span>
+<span class="line-num">1888</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">conds</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:graph_conditions</span>) <span class="ruby-keyword">and</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">conds</span>)
+<span class="line-num">1889</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:graph_conditions</span>, []).<span class="ruby-identifier">to_a</span>
+<span class="line-num">1890</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]
+<span class="line-num">1891</span>   [<span class="ruby-value">:before_add</span>, <span class="ruby-value">:before_remove</span>, <span class="ruby-value">:after_add</span>, <span class="ruby-value">:after_remove</span>, <span class="ruby-value">:after_load</span>, <span class="ruby-value">:before_set</span>, <span class="ruby-value">:after_set</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cb_type</span><span class="ruby-operator">|</span>
+<span class="line-num">1892</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>]
 <span class="line-num">1893</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">1894</span> 
-<span class="line-num">1895</span>   <span class="ruby-identifier">late_binding_class_option</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">singularize</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)
-<span class="line-num">1896</span>   
-<span class="line-num">1897</span>   <span class="ruby-comment"># Remove :class entry if it exists and is nil, to work with cached_fetch</span>
-<span class="line-num">1898</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:class</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>]
+<span class="line-num">1895</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>]
+<span class="line-num">1896</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>])
+<span class="line-num">1897</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:reverse_extend</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>].<span class="ruby-identifier">reverse</span>
+<span class="line-num">1898</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">1899</span> 
-<span class="line-num">1900</span>   <span class="ruby-identifier">def_association</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">1901</span>       
-<span class="line-num">1902</span>   <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:clone</span>)
-<span class="line-num">1903</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_class</span>] = <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class_name</span>]
-<span class="line-num">1904</span>   <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:class_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class_name</span>], <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>], <span class="ruby-value">:block</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>])
-<span class="line-num">1905</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>] = <span class="ruby-identifier">orig_opts</span>
-<span class="line-num">1906</span>   <span class="ruby-comment"># don&#39;t add to association_reflections until we are sure there are no errors</span>
-<span class="line-num">1907</span>   <span class="ruby-identifier">association_reflections</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">opts</span>
-<span class="line-num">1908</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1900</span>   <span class="ruby-identifier">late_binding_class_option</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">singularize</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)
+<span class="line-num">1901</span>   
+<span class="line-num">1902</span>   <span class="ruby-comment"># Remove :class entry if it exists and is nil, to work with cached_fetch</span>
+<span class="line-num">1903</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:class</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>]
+<span class="line-num">1904</span> 
+<span class="line-num">1905</span>   <span class="ruby-identifier">def_association</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">1906</span>       
+<span class="line-num">1907</span>   <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:clone</span>)
+<span class="line-num">1908</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_class</span>] = <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:class_name</span>]
+<span class="line-num">1909</span>   <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:class_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class_name</span>], <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>], <span class="ruby-value">:block</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>])
+<span class="line-num">1910</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>] = <span class="ruby-identifier">orig_opts</span>
+<span class="line-num">1911</span>   <span class="ruby-comment"># don&#39;t add to association_reflections until we are sure there are no errors</span>
+<span class="line-num">1912</span>   <span class="ruby-identifier">association_reflections</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">opts</span>
+<span class="line-num">1913</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-association_reflection'>
@@ -472,9 +472,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-association_reflection-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1911</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">association_reflection</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">1912</span>   <span class="ruby-identifier">association_reflections</span>[<span class="ruby-identifier">name</span>]
-<span class="line-num">1913</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1916</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">association_reflection</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">1917</span>   <span class="ruby-identifier">association_reflections</span>[<span class="ruby-identifier">name</span>]
+<span class="line-num">1918</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-associations'>
@@ -493,9 +493,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-associations-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1916</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associations</span>
-<span class="line-num">1917</span>   <span class="ruby-identifier">association_reflections</span>.<span class="ruby-identifier">keys</span>
-<span class="line-num">1918</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1921</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associations</span>
+<span class="line-num">1922</span>   <span class="ruby-identifier">association_reflections</span>.<span class="ruby-identifier">keys</span>
+<span class="line-num">1923</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-eager_load_results'>
@@ -514,9 +514,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-eager_load_results-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1921</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eager_load_results</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">eo</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1922</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">eo</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1923</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1926</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eager_load_results</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">eo</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1927</span>   <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">eo</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1928</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-finalize_associations'>
@@ -535,9 +535,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-finalize_associations-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1940</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">finalize_associations</span>
-<span class="line-num">1941</span>   <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize</span>)
-<span class="line-num">1942</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1945</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">finalize_associations</span>
+<span class="line-num">1946</span>   <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize</span>)
+<span class="line-num">1947</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -556,15 +556,15 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-freeze-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1926</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">1927</span>   <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
-<span class="line-num">1928</span>   <span class="ruby-ivar">@autoreloading_associations</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
-<span class="line-num">1929</span>   <span class="ruby-ivar">@default_association_options</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1930</span>   <span class="ruby-ivar">@default_association_type_options</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1931</span>   <span class="ruby-ivar">@default_association_type_options</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
-<span class="line-num">1932</span> 
-<span class="line-num">1933</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">1934</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1931</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">1932</span>   <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
+<span class="line-num">1933</span>   <span class="ruby-ivar">@autoreloading_associations</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
+<span class="line-num">1934</span>   <span class="ruby-ivar">@default_association_options</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1935</span>   <span class="ruby-ivar">@default_association_type_options</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1936</span>   <span class="ruby-ivar">@default_association_type_options</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)
+<span class="line-num">1937</span> 
+<span class="line-num">1938</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1939</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-many_to_many'>
@@ -583,9 +583,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-many_to_many-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1945</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1946</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1947</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1950</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1951</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1952</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-many_to_one'>
@@ -604,9 +604,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-many_to_one-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1950</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1951</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1952</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1955</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1956</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1957</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-one_through_one'>
@@ -625,9 +625,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-one_through_one-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1955</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_through_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1956</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1957</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1960</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_through_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1961</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1962</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-one_to_many'>
@@ -646,9 +646,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-one_to_many-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1960</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1961</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1962</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1965</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1966</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1967</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-one_to_one'>
@@ -667,9 +667,9 @@ Project.association_reflection(:portfolio)
 [show source]
 </a>
 <pre id='method-i-one_to_one-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>
-<span class="line-num">1965</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1966</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1967</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1970</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1971</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1972</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

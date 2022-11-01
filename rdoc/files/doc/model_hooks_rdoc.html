@@ -30,7 +30,7 @@ doc/model_hooks.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -289,7 +289,7 @@ Last Update:
 
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>
     <span class="ruby-keyword">super</span>
-    <span class="ruby-constant">AuditLog</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:log</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">&quot;Album #{name} created&quot;</span>)
+    <span class="ruby-constant">AuditLog</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">log:</span> <span class="ruby-node">&quot;Album #{name} created&quot;</span>)
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span>
 </pre>

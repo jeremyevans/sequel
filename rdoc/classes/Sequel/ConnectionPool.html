@@ -70,7 +70,9 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#attribute-i-after_connect">after_connect</a></li>
+<li><a href="#method-i-after_connect-3D">after_connect=</a></li>
 <li><a href="#attribute-i-connect_sqls">connect_sqls</a></li>
+<li><a href="#method-i-connect_sqls-3D">connect_sqls=</a></li>
 <li><a href="#attribute-i-db">db</a></li>
 <li><a href="#method-i-servers">servers</a></li>
 </ol>
@@ -118,18 +120,18 @@ Superclass:
 <td class='context-item-name'>
 <a name='attribute-i-after_connect'>after_connect</a>
 </td>
-<td class='context-item-value'>[RW]</td>
+<td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The <a href="ConnectionPool.html#attribute-i-after_connect"><code>after_connect</code></a> proc used for this pool.  This is called with each new connection made, and is usually used to set custom per-connection settings.</p>
+<p>The <a href="ConnectionPool.html#attribute-i-after_connect"><code>after_connect</code></a> proc used for this pool.  This is called with each new connection made, and is usually used to set custom per-connection settings. Deprecated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>
 <a name='attribute-i-connect_sqls'>connect_sqls</a>
 </td>
-<td class='context-item-value'>[RW]</td>
+<td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>An array of sql strings to execute on each new connection.</p>
+<p>An array of sql strings to execute on each new connection. Deprecated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -154,28 +156,68 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Instantiates a connection pool with the given options.  The block is called with a single symbol (specifying the server/shard to use) every time a new connection is needed.  The following options are respected for all connection pools:</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:after_connect </td><td>
-<p>A callable object called after each new connection is made, with the connection object (and server argument if the callable accepts 2 arguments), useful for customizations that you want to apply to all connections.</p>
-</td></tr><tr><td class='label'>:connect_sqls </td><td>
-<p>An array of sql strings to execute on each new connection, after :after_connect runs.</p>
-</td></tr></tbody></table>
+<p>Instantiates a connection pool with the given Database and options.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
-<span class="line-num">93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">94</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
-<span class="line-num">95</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]
-<span class="line-num">96</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>]
-<span class="line-num">97</span>   <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
+<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>) <span class="ruby-comment"># SEQUEL6: Remove second argument, always use db.opts</span>
+<span class="line-num">102</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
+<span class="line-num">103</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">104</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>] <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">105</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>] <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">106</span>   <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-after_connect-3D'>
+<a name='method-i-after_connect-3D'></a>
+<div class='synopsis'>
+<span class='name'>after_connect=</span><span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Override the <a href="ConnectionPool.html#attribute-i-after_connect"><code>after_connect</code></a> proc for the connection pool. Deprecated. Disables support for shard-specific :after_connect and :connect_sqls if used.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_connect-3D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-after_connect-3D-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
+<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_connect=</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">83</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">84</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-connect_sqls-3D'>
+<a name='method-i-connect_sqls-3D'></a>
+<div class='synopsis'>
+<span class='name'>connect_sqls=</span><span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Override the <a href="ConnectionPool.html#attribute-i-connect_sqls"><code>connect_sqls</code></a> for the connection pool. Deprecated. Disables support for shard-specific :after_connect and :connect_sqls if used.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-connect_sqls-3D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-connect_sqls-3D-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
+<span class="line-num">92</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect_sqls=</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">93</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">94</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-servers'>
 <a name='method-i-servers'></a>
 <div class='synopsis'>
@@ -192,9 +234,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
-<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>
-<span class="line-num">102</span>   [<span class="ruby-value">:default</span>]
-<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>
+<span class="line-num">111</span>   [<span class="ruby-value">:default</span>]
+<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

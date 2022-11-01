@@ -73,6 +73,7 @@ Sequel::Postgres
 <li><a href="Postgres/Database.html">Sequel::Postgres::Database</a></li>
 <li><a href="Postgres/Dataset.html">Sequel::Postgres::Dataset</a></li>
 <li><a href="Postgres/ExclusionConstraintViolation.html">Sequel::Postgres::ExclusionConstraintViolation</a></li>
+<li><a href="Postgres/IntegerOutsideBigintRange.html">Sequel::Postgres::IntegerOutsideBigintRange</a></li>
 </ol>
 </div>
 <div id='section'>
@@ -170,14 +171,14 @@ Sequel::Postgres
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">88</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)
-<span class="line-num">89</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">90</span>     <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">140000</span>
-<span class="line-num">91</span>     <span class="ruby-identifier">initialize_postgres_adapter</span>
-<span class="line-num">92</span>     <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)
-<span class="line-num">93</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">94</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-mock_adapter_setup-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">103</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">104</span>     <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">150000</span>
+<span class="line-num">105</span>     <span class="ruby-identifier">initialize_postgres_adapter</span>
+<span class="line-num">106</span>     <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)
+<span class="line-num">107</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">108</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-sequel_pg_version_supported-3F'>

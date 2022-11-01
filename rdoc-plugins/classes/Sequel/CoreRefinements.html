@@ -197,9 +197,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-hstore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb</span>
-<span class="line-num">342</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>
-<span class="line-num">343</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">344</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">347</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>
+<span class="line-num">348</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">349</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-identifier'>
@@ -274,9 +274,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">521</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">522</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)
-<span class="line-num">523</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">540</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">541</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)
+<span class="line-num">542</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_json'>
@@ -331,9 +331,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-pg_range-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">559</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_range</span>(<span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">560</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">db_type</span>)
-<span class="line-num">561</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">554</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_range</span>(<span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">555</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">556</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_row'>
@@ -350,9 +350,9 @@ Sequel::CoreRefinements
 [show source]
 </a>
 <pre id='method-i-pg_row-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">576</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_row</span>
-<span class="line-num">577</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">578</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">581</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_row</span>
+<span class="line-num">582</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">583</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_expr'>

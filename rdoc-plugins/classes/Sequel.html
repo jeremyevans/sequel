@@ -163,10 +163,16 @@ Sequel
 <a href="../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/extensions/pg_auto_parameterize_rb.html">lib/sequel/extensions/pg_auto_parameterize.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/extensions/pg_enum_rb.html">lib/sequel/extensions/pg_enum.rb</a>
 </li>
 <li class='other'>
 <a href="../files/lib/sequel/extensions/pg_extended_date_support_rb.html">lib/sequel/extensions/pg_extended_date_support.rb</a>
+</li>
+<li class='other'>
+<a href="../files/lib/sequel/extensions/pg_extended_integer_support_rb.html">lib/sequel/extensions/pg_extended_integer_support.rb</a>
 </li>
 <li class='other'>
 <a href="../files/lib/sequel/extensions/pg_hstore_rb.html">lib/sequel/extensions/pg_hstore.rb</a>
@@ -466,6 +472,9 @@ Sequel
 <a href="../files/lib/sequel/plugins/prepared_statements_safe_rb.html">lib/sequel/plugins/prepared_statements_safe.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/plugins/primary_key_lookup_check_values_rb.html">lib/sequel/plugins/primary_key_lookup_check_values.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/plugins/rcte_tree_rb.html">lib/sequel/plugins/rcte_tree.rb</a>
 </li>
 <li class='other'>
@@ -629,6 +638,64 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <p>If :raise is specified, a <a href="Sequel/DuplicateColumnError.html"><code>Sequel::DuplicateColumnError</code></a> is raised. If :warn is specified, you will receive a warning via <code>warn</code>. If a callable is specified, it will be called. If no on_duplicate_columns is specified, the default is :warn.</p>
 
 <p>Related module: <a href="Sequel/DuplicateColumnsHandler.html"><code>Sequel::DuplicateColumnsHandler</code></a></p>
+
+<p>This extension changes Sequel’s postgres adapter to automatically parameterize queries by default.  Sequel’s default behavior has always been to literalize all arguments unless specifically using parameters (via :$arg placeholders and the Dataset#prepare/call methods). This extension makes <a href="Sequel.html"><code>Sequel</code></a> use string, numeric, blob, date, and time types as parameters. Example:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Default</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-comment"># SQL: SELECT * FROM test WHERE a = 1</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_auto_parameterize</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)
+<span class="ruby-comment"># SQL: SELECT * FROM test WHERE a = $1 (args: [1])</span>
+</pre>
+
+<p>Other pg_* extensions that ship with <a href="Sequel.html"><code>Sequel</code></a> and add support for PostgreSQL-specific types support automatically parameterizing those types when used with this extension.</p>
+
+<p>This extension is not generally faster than the default behavior. In some cases it is faster, such as when using large strings. However, the use of parameters avoids potential security issues, in case <a href="Sequel.html"><code>Sequel</code></a> does not correctly literalize one of the arguments that this extension would automatically parameterize.</p>
+
+<p>There are some known issues with automatic parameterization:</p>
+<ol><li>
+<p>In order to avoid most type errors, the extension attempts to guess the appropriate type and automatically casts most placeholders, except plain Ruby strings (which PostgreSQL treats as an unknown type).</p>
+
+<p>Unfortunately, if the type guess is incorrect, or a plain Ruby string is used and PostgreSQL cannot determine the data type for it, the query may result in a <a href="Sequel/DatabaseError.html"><code>DatabaseError</code></a>. To fix both issues, you can explicitly cast values using <code>Sequel.cast(value, type)</code>, and <a href="Sequel.html"><code>Sequel</code></a> will cast to that type.</p>
+</li><li>
+<p>PostgreSQL supports a maximum of 65535 parameters per query. Attempts to use a query with more than this number of parameters will result in a <a href="Sequel/DatabaseError.html"><code>Sequel::DatabaseError</code></a> being raised. <a href="Sequel.html"><code>Sequel</code></a> tries to mitigate this issue by turning <code>column IN (int, ...)</code> queries into <code>column = ANY(CAST($ AS int8[]))</code> using an array parameter, to reduce the number of parameters. It also limits inserting multiple rows at once to a maximum of 40 rows per query by default.  While these mitigations handle the most common cases where a large number of parameters would be used, there are other cases.</p>
+</li><li>
+<p>Automatic parameterization will consider the same objects as equivalent when building <a href="Sequel/SQL.html"><code>SQL</code></a>.  However, for performance, it does not perform equality checks.  So code such as:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">foo</span>(<span class="ruby-string">&#39;a&#39;</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:f</span>)}.<span class="ruby-identifier">group</span>{<span class="ruby-identifier">foo</span>(<span class="ruby-string">&#39;a&#39;</span>)}
+<span class="ruby-comment"># SELECT foo(&#39;a&#39;) AS &quot;f&quot; FROM &quot;t&quot; GROUP BY foo(&#39;a&#39;)</span>
+</pre>
+
+<p>Will get auto paramterized as:</p>
+
+<pre class="ruby"><span class="ruby-comment"># SELECT foo($1) AS &quot;f&quot; FROM &quot;t&quot; GROUP BY foo($2)</span>
+</pre>
+
+<p>Which will result in a <a href="Sequel/DatabaseError.html"><code>DatabaseError</code></a>, since that is not valid <a href="Sequel/SQL.html"><code>SQL</code></a>.</p>
+
+<p>If you use the same expression, it will use the same parameter:</p>
+
+<pre class="ruby"><span class="ruby-identifier">foo</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:foo</span>, <span class="ruby-string">&#39;a&#39;</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">foo</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:f</span>)).<span class="ruby-identifier">group</span>(<span class="ruby-identifier">foo</span>)
+<span class="ruby-comment"># SELECT foo($1) AS &quot;f&quot; FROM &quot;t&quot; GROUP BY foo($1)</span>
+</pre>
+
+<p>Note that Dataset#select_group and similar methods that take arguments used in multiple places in the <a href="Sequel/SQL.html"><code>SQL</code></a> will generally handle this automatically, since they will use the same objects:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">select_group</span>{<span class="ruby-identifier">foo</span>(<span class="ruby-string">&#39;a&#39;</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:f</span>)}
+<span class="ruby-comment"># SELECT foo($1) AS &quot;f&quot; FROM &quot;t&quot; GROUP BY foo($1)</span>
+</pre>
+</li></ol>
+
+<p>You can work around any issues that come up by disabling automatic parameterization by calling the <code>no_auto_parameterize</code> method on the dataset (which returns a clone of the dataset). You can avoid parameterization for specific values in the query by wrapping them with <code>Sequel.skip_pg_auto_param</code>.</p>
+
+<p>It is likely there are corner cases not mentioned above when using this extension.  Users are encouraged to provide feedback when using this extension if they come across such corner cases.</p>
+
+<p>This extension is only compatible when using the pg driver, not when using the sequel-postgres-pr, jeremyevans-postgres-pr, or postgres-pr drivers, as those do not support bound variables.</p>
+
+<p>Related module: <a href="Sequel/Postgres/AutoParameterize.html"><code>Sequel::Postgres::AutoParameterize</code></a></p>
 
 <p>:nocov:</p>
 

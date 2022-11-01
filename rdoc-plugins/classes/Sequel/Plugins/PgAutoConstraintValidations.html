@@ -56,7 +56,7 @@ Sequel::Plugins::PgAutoConstraintValidations
 
 <p>Example:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># Assume no such artist exists</span>
+<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">1</span>) <span class="ruby-comment"># Assume no such artist exists</span>
 <span class="ruby-keyword">begin</span>
   <span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span>
 <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationFailed</span>

@@ -30,7 +30,7 @@ README.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-08-05 07:47:24 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -64,7 +64,7 @@ Last Update:
 <p><a target="_top" href="http://groups.google.com/group/sequel-talk">groups.google.com/group/sequel-talk</a></p>
 </td></tr></tbody></table>
 
-<p>If you have questions about how to use <a href="../classes/Sequel.html"><code>Sequel</code></a>, please ask on the sequel-talk Google Group.  Only use the the bug tracker to report bugs in <a href="../classes/Sequel.html"><code>Sequel</code></a>, not to ask for help on using <a href="../classes/Sequel.html"><code>Sequel</code></a>.</p>
+<p>If you have questions about how to use <a href="../classes/Sequel.html"><code>Sequel</code></a>, please ask on GitHub Discussions or the sequel-talk Google Group. Only use the the bug tracker to report bugs in <a href="../classes/Sequel.html"><code>Sequel</code></a>, not to ask for help on using <a href="../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
 <p>To check out the source code:</p>
 
@@ -94,9 +94,9 @@ Last Update:
 <span class="ruby-identifier">items</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>] <span class="ruby-comment"># Create a dataset</span>
 
 <span class="ruby-comment"># Populate the table</span>
-<span class="ruby-identifier">items</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;abc&#39;</span>, <span class="ruby-value">:price</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">rand</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>)
-<span class="ruby-identifier">items</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;def&#39;</span>, <span class="ruby-value">:price</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">rand</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>)
-<span class="ruby-identifier">items</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;ghi&#39;</span>, <span class="ruby-value">:price</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">rand</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>)
+<span class="ruby-identifier">items</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;abc&#39;</span>, <span class="ruby-value">price:</span> <span class="ruby-identifier">rand</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>)
+<span class="ruby-identifier">items</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;def&#39;</span>, <span class="ruby-value">price:</span> <span class="ruby-identifier">rand</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>)
+<span class="ruby-identifier">items</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;ghi&#39;</span>, <span class="ruby-value">price:</span> <span class="ruby-identifier">rand</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>)
 
 <span class="ruby-comment"># Print out the number of records</span>
 <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Item count: #{items.count}&quot;</span>
@@ -123,7 +123,7 @@ Last Update:
 
 <p>For example, the following one-liner returns the average GDP for countries in the middle east region:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:countries</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:region</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;Middle East&#39;</span>).<span class="ruby-identifier">avg</span>(<span class="ruby-value">:GDP</span>)
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:countries</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">region:</span> <span class="ruby-string">&#39;Middle East&#39;</span>).<span class="ruby-identifier">avg</span>(<span class="ruby-value">:GDP</span>)
 </pre>
 
 <p>Which is equivalent to:</p>
@@ -132,7 +132,7 @@ Last Update:
 
 <p>Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes, and are accessed using an <code>Enumerable</code> interface:</p>
 
-<pre class="ruby"><span class="ruby-identifier">middle_east</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:countries</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:region</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;Middle East&#39;</span>)
+<pre class="ruby"><span class="ruby-identifier">middle_east</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:countries</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">region:</span> <span class="ruby-string">&#39;Middle East&#39;</span>)
 <span class="ruby-identifier">middle_east</span>.<span class="ruby-identifier">order</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>]}
 </pre>
 
@@ -266,13 +266,13 @@ Last Update:
 
 <p>You can also provide a filter when asking for a single record:</p>
 
-<pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">:id</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>)
+<pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
 <span class="ruby-comment"># SELECT * FROM posts WHERE id = 1 LIMIT 1</span>
 </pre>
 
 <p>Or retrieve a single value for a specific record:</p>
 
-<pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:name</span>)
+<pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:name</span>)
 <span class="ruby-comment"># SELECT name FROM posts WHERE id = 1 LIMIT 1</span>
 </pre>
 
@@ -492,9 +492,9 @@ Last Update:
 <p>As with <code>delete</code>, <code>update</code> affects all rows in the dataset, so <code>where</code> first, <code>update</code> second:</p>
 
 <pre class="ruby"><span class="ruby-comment"># DO THIS:</span>
-<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;archived&#39;</span>)
+<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&#39;archived&#39;</span>)
 <span class="ruby-comment"># NOT THIS:</span>
-<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;archived&#39;</span>).<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>)
+<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&#39;archived&#39;</span>).<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>)
 </pre>
 
 <h3 id="label-Merging+records">Merging records<span><a href="#label-Merging+records">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -524,7 +524,7 @@ Last Update:
   <span class="ruby-comment"># BEGIN</span>
   <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-value">author:</span> <span class="ruby-string">&#39;david&#39;</span>)
   <span class="ruby-comment"># INSERT</span>
-  <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;archived&#39;</span>)
+  <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&#39;archived&#39;</span>)
   <span class="ruby-comment"># UPDATE</span>
 <span class="ruby-keyword">end</span>
 <span class="ruby-comment"># COMMIT</span>
@@ -534,9 +534,9 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
   <span class="ruby-comment"># BEGIN</span>
-  <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:category</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-value">:author</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;david&#39;</span>)
+  <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-value">author:</span> <span class="ruby-string">&#39;david&#39;</span>)
   <span class="ruby-comment"># INSERT</span>
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;stamp &lt; ?&#39;</span>, <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:state</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;archived&#39;</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;stamp &lt; ?&#39;</span>, <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&#39;archived&#39;</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
   <span class="ruby-comment"># UPDATE</span>
     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>
   <span class="ruby-keyword">end</span>
@@ -806,8 +806,8 @@ Last Update:
 
 <p>Records can also be deleted en-masse by calling <code>delete</code> and <code>destroy</code> on the model’s dataset. As stated above, you can specify filters for the deleted records:</p>
 
-<pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:category</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">32</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># =&gt; bypasses hooks</span>
-<span class="ruby-constant">Post</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:category</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">32</span>).<span class="ruby-identifier">destroy</span> <span class="ruby-comment"># =&gt; runs hooks</span>
+<pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-value">32</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># =&gt; bypasses hooks</span>
+<span class="ruby-constant">Post</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-value">32</span>).<span class="ruby-identifier">destroy</span> <span class="ruby-comment"># =&gt; runs hooks</span>
 </pre>
 
 <p>Please note that if <code>destroy</code> is called, each record is deleted  separately, but <code>delete</code> deletes all matching records with a single  SQL query.</p>
@@ -819,9 +819,9 @@ Last Update:
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:author</span>
   <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:comments</span>
-  <span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_comment</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Comment</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>
+  <span class="ruby-identifier">one_to_one</span> <span class="ruby-value">:first_comment</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Comment</span>, <span class="ruby-value">order:</span> <span class="ruby-value">:id</span>
   <span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>
-  <span class="ruby-identifier">one_through_one</span> <span class="ruby-value">:first_tag</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Tag</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:name</span>, <span class="ruby-value">:right_key</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tag_id</span>
+  <span class="ruby-identifier">one_through_one</span> <span class="ruby-value">:first_tag</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Tag</span>, <span class="ruby-value">order:</span> <span class="ruby-value">:name</span>, <span class="ruby-value">right_key:</span> <span class="ruby-value">:tag_id</span>
 <span class="ruby-keyword">end</span>
 </pre>
 
@@ -864,7 +864,7 @@ Last Update:
 <p>Associations can be eagerly loaded via <code>eager</code> and the <code>:eager</code> association option. Eager loading is used when loading a group of objects. It loads all associated objects for all of the current objects in one query, instead of using a separate query to get the associated objects for each current object. Eager loading requires that you retrieve all model objects at once via <code>all</code> (instead of individually by <code>each</code>). Eager loading can be cascaded, loading association’s associated objects.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
-  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:posts</span>, <span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:tags</span>]
+  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:posts</span>, <span class="ruby-value">eager:</span> [<span class="ruby-value">:tags</span>]
 <span class="ruby-keyword">end</span>
 
 <span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>

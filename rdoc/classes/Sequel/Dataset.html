@@ -273,6 +273,7 @@ Superclass:
 <li><a href="#method-i-supports_nowait-3F">supports_nowait?</a></li>
 <li><a href="#method-i-supports_offsets_in_correlated_subqueries-3F">supports_offsets_in_correlated_subqueries?</a></li>
 <li><a href="#method-i-supports_ordered_distinct_on-3F">supports_ordered_distinct_on?</a></li>
+<li><a href="#method-i-supports_placeholder_literalizer-3F">supports_placeholder_literalizer?</a></li>
 <li><a href="#method-i-supports_regexp-3F">supports_regexp?</a></li>
 <li><a href="#method-i-supports_replace-3F">supports_replace?</a></li>
 <li><a href="#method-i-supports_returning-3F">supports_returning?</a></li>
@@ -584,7 +585,7 @@ Superclass:
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>).<span class="ruby-identifier">distinct</span>{<span class="ruby-identifier">func</span>(<span class="ruby-value">:id</span>)} <span class="ruby-comment"># SQL: SELECT DISTINCT ON (func(id)) * FROM items ORDER BY id</span>
 </pre>
 
-<p>There is support for emualting the DISTINCT ON support in MySQL, but it does not support the ORDER of the dataset, and also doesn’t work in many cases if the ONLY_FULL_GROUP_BY sql_mode is used, which is the default on MySQL 5.7.5+.</p>
+<p>There is support for emulating the DISTINCT ON support in MySQL, but it does not support the ORDER of the dataset, and also doesn’t work in many cases if the ONLY_FULL_GROUP_BY sql_mode is used, which is the default on MySQL 5.7.5+.</p>
 
 </div>
 <div class='source'>
@@ -1737,7 +1738,7 @@ Superclass:
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a + b&#39;</span>)) <span class="ruby-comment"># SELECT * FROM items ORDER BY a + b</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-value">:b</span>) <span class="ruby-comment"># SELECT * FROM items ORDER BY (a + b)</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:name</span>)) <span class="ruby-comment"># SELECT * FROM items ORDER BY name DESC</span>
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>)) <span class="ruby-comment"># SELECT * FROM items ORDER BY name ASC NULLS LAST</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">nulls:</span> <span class="ruby-value">:last</span>)) <span class="ruby-comment"># SELECT * FROM items ORDER BY name ASC NULLS LAST</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">desc</span>} <span class="ruby-comment"># SELECT * FROM items ORDER BY sum(name) DESC</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">order</span>(<span class="ruby-keyword">nil</span>) <span class="ruby-comment"># SELECT * FROM items</span>
 </pre>
@@ -1902,13 +1903,13 @@ Superclass:
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>(<span class="ruby-keyword">nil</span>) <span class="ruby-comment"># RETURNING NULL</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>) <span class="ruby-comment"># RETURNING id, name</span>
 
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span><span class="ruby-operator">|</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span><span class="ruby-operator">|</span>
   <span class="ruby-comment"># hash for each row inserted, with values for all columns</span>
 <span class="ruby-keyword">end</span>
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span><span class="ruby-operator">|</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span><span class="ruby-operator">|</span>
   <span class="ruby-comment"># hash for each row updated, with values for all columns</span>
 <span class="ruby-keyword">end</span>
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span><span class="ruby-operator">|</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span><span class="ruby-operator">|</span>
   <span class="ruby-comment"># hash for each row deleted, with values for all columns</span>
 <span class="ruby-keyword">end</span>
 </pre>
@@ -2432,7 +2433,7 @@ Superclass:
 
 <p>Return a clone of the dataset with an addition named window that can be referenced in window functions. See <a href="SQL/Window.html"><code>Sequel::SQL::Window</code></a> for a list of options that can be passed in. Example:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">window</span>(<span class="ruby-value">:w</span>, <span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:c1</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:c2</span>)
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">window</span>(<span class="ruby-value">:w</span>, <span class="ruby-value">partition:</span> <span class="ruby-value">:c1</span>, <span class="ruby-value">order:</span> <span class="ruby-value">:c2</span>)
 <span class="ruby-comment"># SELECT * FROM items WINDOW w AS (PARTITION BY c1 ORDER BY c2)</span>
 </pre>
 
@@ -2556,7 +2557,7 @@ Superclass:
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">with_recursive</span>(<span class="ruby-value">:t</span>,
   <span class="ruby-constant">DB</span>[<span class="ruby-value">:i1</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:parent_id</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">parent_id:</span> <span class="ruby-keyword">nil</span>),
   <span class="ruby-constant">DB</span>[<span class="ruby-value">:i1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:t</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:parent_id</span>).<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:i1</span>][<span class="ruby-value">:id</span>], <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:i1</span>][<span class="ruby-value">:parent_id</span>]),
-  <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:id</span>, <span class="ruby-value">:parent_id</span>])
+  <span class="ruby-value">args:</span> [<span class="ruby-value">:id</span>, <span class="ruby-value">:parent_id</span>])
 
 <span class="ruby-comment"># WITH RECURSIVE t(id, parent_id) AS (</span>
 <span class="ruby-comment">#   SELECT id, parent_id FROM i1 WHERE (parent_id IS NULL)</span>
@@ -2646,7 +2647,7 @@ Superclass:
 
 <p>You can also provide a method name and arguments to call to get the SQL:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-value">:insert_sql</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT INTO items (b) VALUES (1)</span>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-value">:insert_sql</span>, <span class="ruby-value">b:</span> <span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT INTO items (b) VALUES (1)</span>
 </pre>
 
 <p>Note that datasets that specify custom <a href="SQL.html"><code>SQL</code></a> using this method will generally ignore future dataset methods that modify the <a href="SQL.html"><code>SQL</code></a> used, as specifying custom <a href="SQL.html"><code>SQL</code></a> overrides Sequel’s <a href="SQL.html"><code>SQL</code></a> generator.  You should probably limit yourself to the following dataset methods when using this method, or use the implicit_subquery extension:</p>
@@ -2956,31 +2957,31 @@ SELECT table.* FROM table</pre>
 [show source]
 </a>
 <pre id='method-i-as_hash-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">823</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">824</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
-<span class="line-num">825</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:all</span>] <span class="ruby-operator">?</span> <span class="ruby-value">:all</span> <span class="ruby-operator">:</span> <span class="ruby-value">:each</span>
-<span class="line-num">826</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
-<span class="line-num">827</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">as_hash</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
-<span class="line-num">828</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">829</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">830</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">831</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">832</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">833</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">834</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">835</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">836</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">837</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">838</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">839</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">840</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">841</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">842</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">k</span>]}] = <span class="ruby-identifier">r</span>}
-<span class="line-num">843</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">844</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>}
-<span class="line-num">845</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">846</span>   <span class="ruby-identifier">h</span>
-<span class="line-num">847</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">831</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">832</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
+<span class="line-num">833</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:all</span>] <span class="ruby-operator">?</span> <span class="ruby-value">:all</span> <span class="ruby-operator">:</span> <span class="ruby-value">:each</span>
+<span class="line-num">834</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
+<span class="line-num">835</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">as_hash</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
+<span class="line-num">836</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">837</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">838</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">839</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">840</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">841</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">842</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">843</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">844</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">845</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">846</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">847</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">848</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">849</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">850</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">k</span>]}] = <span class="ruby-identifier">r</span>}
+<span class="line-num">851</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">852</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>}
+<span class="line-num">853</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">854</span>   <span class="ruby-identifier">h</span>
+<span class="line-num">855</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-avg'>
@@ -3395,13 +3396,18 @@ SELECT table.* FROM table</pre>
 </div>
 <div class='description'>
 
-<p>Inserts multiple records into the associated table. This method can be used to efficiently insert a large number of records into a table in a single query if the database supports it. Inserts are automatically wrapped in a transaction.</p>
+<p>Inserts multiple records into the associated table. This method can be used to efficiently insert a large number of records into a table in a single query if the database supports it. Inserts are automatically wrapped in a transaction if necessary.</p>
 
 <p>This method is called with a columns array and an array of value arrays:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">import</span>([<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>], [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])
 <span class="ruby-comment"># INSERT INTO table (x, y) VALUES (1, 2)</span>
 <span class="ruby-comment"># INSERT INTO table (x, y) VALUES (3, 4)</span>
+</pre>
+
+<p>or, if the database supports it:</p>
+
+<pre class="ruby"><span class="ruby-comment"># INSERT INTO table (x, y) VALUES (1, 2), (3, 4)</span>
 </pre>
 
 <p>This method also accepts a dataset instead of an array of value arrays:</p>
@@ -3412,7 +3418,7 @@ SELECT table.* FROM table</pre>
 
 <p>Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:commit_every </td><td>
-<p>Open a new transaction for every given number of records. For example, if you provide a value of 50, will commit after every 50 records.</p>
+<p>Open a new transaction for every given number of records. For example, if you provide a value of 50, will commit after every 50 records. When a transaction is not required, this option controls the maximum number of values to insert with a single statement; it does not force the use of a transaction.</p>
 </td></tr><tr><td class='label'>:return </td><td>
 <p>When this is set to :primary_key, returns an array of autoincremented primary key values for the rows inserted. This does not have an effect if <code>values</code> is a <a href="Dataset.html"><code>Dataset</code></a>.</p>
 </td></tr><tr><td class='label'>:server </td><td>
@@ -3427,25 +3433,25 @@ SELECT table.* FROM table</pre>
 [show source]
 </a>
 <pre id='method-i-import-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">340</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">341</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>{<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)
-<span class="line-num">342</span> 
-<span class="line-num">343</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">344</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Using Sequel::Dataset#import with an empty column array is not allowed&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">345</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">server</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>
-<span class="line-num">346</span>   
-<span class="line-num">347</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">slice_size</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:commit_every</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:slice</span>, <span class="ruby-identifier">default_import_slice</span>))
-<span class="line-num">348</span>     <span class="ruby-identifier">offset</span> = <span class="ruby-value">0</span>
-<span class="line-num">349</span>     <span class="ruby-identifier">rows</span> = []
-<span class="line-num">350</span>     <span class="ruby-keyword">while</span> <span class="ruby-identifier">offset</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">length</span>
-<span class="line-num">351</span>       <span class="ruby-identifier">rows</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>[<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">slice_size</span>], <span class="ruby-identifier">opts</span>)
-<span class="line-num">352</span>       <span class="ruby-identifier">offset</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">slice_size</span>
-<span class="line-num">353</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">354</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">flatten</span>
-<span class="line-num">355</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">356</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">357</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">358</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">348</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">349</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>{<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)
+<span class="line-num">350</span> 
+<span class="line-num">351</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">352</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Using Sequel::Dataset#import with an empty column array is not allowed&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">353</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">server</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>
+<span class="line-num">354</span>   
+<span class="line-num">355</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">slice_size</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:commit_every</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:slice</span>, <span class="ruby-identifier">default_import_slice</span>))
+<span class="line-num">356</span>     <span class="ruby-identifier">offset</span> = <span class="ruby-value">0</span>
+<span class="line-num">357</span>     <span class="ruby-identifier">rows</span> = []
+<span class="line-num">358</span>     <span class="ruby-keyword">while</span> <span class="ruby-identifier">offset</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">359</span>       <span class="ruby-identifier">rows</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>[<span class="ruby-identifier">offset</span>, <span class="ruby-identifier">slice_size</span>], <span class="ruby-identifier">opts</span>)
+<span class="line-num">360</span>       <span class="ruby-identifier">offset</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">slice_size</span>
+<span class="line-num">361</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">362</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">flatten</span>
+<span class="line-num">363</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">364</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">365</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">366</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert'>
@@ -3503,14 +3509,14 @@ SELECT table.* FROM table</pre>
 [show source]
 </a>
 <pre id='method-i-insert-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">396</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">397</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">398</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">uses_returning?</span>(<span class="ruby-value">:insert</span>)
-<span class="line-num">399</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">400</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">401</span>     <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">402</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">403</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">404</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">405</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">406</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">uses_returning?</span>(<span class="ruby-value">:insert</span>)
+<span class="line-num">407</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">408</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">409</span>     <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">410</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">411</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-last'>
@@ -3536,10 +3542,10 @@ SELECT table.* FROM table</pre>
 [show source]
 </a>
 <pre id='method-i-last-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">415</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">416</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;No order specified&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]
-<span class="line-num">417</span>   <span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">418</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">423</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">424</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;No order specified&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]
+<span class="line-num">425</span>   <span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">426</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-map'>
@@ -3571,19 +3577,19 @@ SELECT table.* FROM table</pre>
 [show source]
 </a>
 <pre id='method-i-map-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">434</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">435</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
-<span class="line-num">436</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Must call Dataset#map with either an argument or a block, not both&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">437</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">map</span>(<span class="ruby-identifier">column</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
-<span class="line-num">438</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">439</span>       <span class="ruby-keyword">super</span>(){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">column</span>)}
-<span class="line-num">440</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">441</span>       <span class="ruby-keyword">super</span>(){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">column</span>]}
-<span class="line-num">442</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">443</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">444</span>     <span class="ruby-keyword">super</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">445</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">446</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">442</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">443</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
+<span class="line-num">444</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Must call Dataset#map with either an argument or a block, not both&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">445</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">map</span>(<span class="ruby-identifier">column</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
+<span class="line-num">446</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">447</span>       <span class="ruby-keyword">super</span>(){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">column</span>)}
+<span class="line-num">448</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">449</span>       <span class="ruby-keyword">super</span>(){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">column</span>]}
+<span class="line-num">450</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">451</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">452</span>     <span class="ruby-keyword">super</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">453</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">454</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-max'>
@@ -3608,10 +3614,10 @@ SELECT table.* FROM table</pre>
 [show source]
 </a>
 <pre id='method-i-max-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">455</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">max</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg</span> = <span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">456</span>   <span class="ruby-identifier">arg</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg</span>
-<span class="line-num">457</span>   <span class="ruby-identifier">_aggregate</span>(<span class="ruby-value">:max</span>, <span class="ruby-identifier">arg</span>)
-<span class="line-num">458</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">463</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">max</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg</span> = <span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">464</span>   <span class="ruby-identifier">arg</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg</span>
+<span class="line-num">465</span>   <span class="ruby-identifier">_aggregate</span>(<span class="ruby-value">:max</span>, <span class="ruby-identifier">arg</span>)
+<span class="line-num">466</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-merge'>
@@ -3674,9 +3680,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-merge-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">505</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge</span>
-<span class="line-num">506</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">merge_sql</span>)
-<span class="line-num">507</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">513</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge</span>
+<span class="line-num">514</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">merge_sql</span>)
+<span class="line-num">515</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-min'>
@@ -3701,10 +3707,10 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-min-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">516</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">min</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg</span> = <span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">517</span>   <span class="ruby-identifier">arg</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg</span>
-<span class="line-num">518</span>   <span class="ruby-identifier">_aggregate</span>(<span class="ruby-value">:min</span>, <span class="ruby-identifier">arg</span>)
-<span class="line-num">519</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">524</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">min</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg</span> = <span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">525</span>   <span class="ruby-identifier">arg</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg</span>
+<span class="line-num">526</span>   <span class="ruby-identifier">_aggregate</span>(<span class="ruby-value">:min</span>, <span class="ruby-identifier">arg</span>)
+<span class="line-num">527</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-multi_insert'>
@@ -3732,11 +3738,11 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-multi_insert-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">533</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">multi_insert</span>(<span class="ruby-identifier">hashes</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">534</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">535</span>   <span class="ruby-identifier">columns</span> = <span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">keys</span>
-<span class="line-num">536</span>   <span class="ruby-identifier">import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">c</span>]}}, <span class="ruby-identifier">opts</span>)
-<span class="line-num">537</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">541</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">multi_insert</span>(<span class="ruby-identifier">hashes</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">542</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">543</span>   <span class="ruby-identifier">columns</span> = <span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">keys</span>
+<span class="line-num">544</span>   <span class="ruby-identifier">import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">hashes</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">c</span>]}}, <span class="ruby-identifier">opts</span>)
+<span class="line-num">545</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-paged_each'>
@@ -3771,7 +3777,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000 OFFSET 1000</span>
 <span class="ruby-comment"># ...</span>
 
-<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>).<span class="ruby-identifier">paged_each</span>(<span class="ruby-value">:rows_per_fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">100</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>).<span class="ruby-identifier">paged_each</span>(<span class="ruby-value">rows_per_fetch:</span> <span class="ruby-value">100</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }
 <span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 100</span>
 <span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100</span>
 <span class="ruby-comment"># ...</span>
@@ -3794,65 +3800,65 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-paged_each-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">594</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">595</span>   <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]
-<span class="line-num">596</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Dataset#paged_each requires the dataset be ordered&quot;</span>
-<span class="line-num">597</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">598</span>   <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
-<span class="line-num">599</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">enum_for</span>(<span class="ruby-value">:paged_each</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">600</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">601</span> 
-<span class="line-num">602</span>   <span class="ruby-identifier">total_limit</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]
-<span class="line-num">603</span>   <span class="ruby-identifier">offset</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]
-<span class="line-num">604</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>]
-<span class="line-num">605</span>     <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]
-<span class="line-num">606</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] = <span class="ruby-identifier">server</span>
-<span class="line-num">607</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">608</span> 
-<span class="line-num">609</span>   <span class="ruby-identifier">rows_per_fetch</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rows_per_fetch</span>] <span class="ruby-operator">||</span> <span class="ruby-value">1000</span>
-<span class="line-num">610</span>   <span class="ruby-identifier">strategy</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">offset</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">total_limit</span>
-<span class="line-num">611</span>     <span class="ruby-value">:offset</span>
-<span class="line-num">612</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">613</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:offset</span>
-<span class="line-num">614</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">615</span> 
-<span class="line-num">616</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">617</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">strategy</span>
-<span class="line-num">618</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:filter</span>
-<span class="line-num">619</span>       <span class="ruby-identifier">filter_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:filter_values</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">exprs</span><span class="ruby-operator">|</span> <span class="ruby-identifier">exprs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[<span class="ruby-identifier">hash_key_symbol</span>(<span class="ruby-identifier">e</span>)]}}
-<span class="line-num">620</span>       <span class="ruby-identifier">base_ds</span> = <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">rows_per_fetch</span>)
-<span class="line-num">621</span>       <span class="ruby-keyword">while</span> <span class="ruby-identifier">ds</span>
-<span class="line-num">622</span>         <span class="ruby-identifier">last_row</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">623</span>         <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
-<span class="line-num">624</span>           <span class="ruby-identifier">last_row</span> = <span class="ruby-identifier">row</span>
-<span class="line-num">625</span>           <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
-<span class="line-num">626</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">627</span>         <span class="ruby-identifier">ds</span> = (<span class="ruby-identifier">base_ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">ignore_values_preceding</span>(<span class="ruby-identifier">last_row</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">filter_values</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">last_row</span>)
-<span class="line-num">628</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">629</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">630</span>       <span class="ruby-identifier">offset</span> <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
-<span class="line-num">631</span>       <span class="ruby-identifier">num_rows_yielded</span> = <span class="ruby-identifier">rows_per_fetch</span>
-<span class="line-num">632</span>       <span class="ruby-identifier">total_rows</span> = <span class="ruby-value">0</span>
-<span class="line-num">633</span> 
-<span class="line-num">634</span>       <span class="ruby-keyword">while</span> <span class="ruby-identifier">num_rows_yielded</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">rows_per_fetch</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">total_limit</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">total_rows</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">total_limit</span>)
-<span class="line-num">635</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">total_limit</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">total_rows</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rows_per_fetch</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">total_limit</span>
-<span class="line-num">636</span>           <span class="ruby-identifier">rows_per_fetch</span> = <span class="ruby-identifier">total_limit</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">total_rows</span>
-<span class="line-num">637</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">638</span> 
-<span class="line-num">639</span>         <span class="ruby-identifier">num_rows_yielded</span> = <span class="ruby-value">0</span>
-<span class="line-num">640</span>         <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">rows_per_fetch</span>, <span class="ruby-identifier">offset</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
-<span class="line-num">641</span>           <span class="ruby-identifier">num_rows_yielded</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
-<span class="line-num">642</span>           <span class="ruby-identifier">total_rows</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">total_limit</span>
-<span class="line-num">643</span>           <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
-<span class="line-num">644</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">645</span> 
-<span class="line-num">646</span>         <span class="ruby-identifier">offset</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">rows_per_fetch</span>
-<span class="line-num">647</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">648</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">649</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">650</span> 
-<span class="line-num">651</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">652</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">602</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">603</span>   <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]
+<span class="line-num">604</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Dataset#paged_each requires the dataset be ordered&quot;</span>
+<span class="line-num">605</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">606</span>   <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">607</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">enum_for</span>(<span class="ruby-value">:paged_each</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">608</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">609</span> 
+<span class="line-num">610</span>   <span class="ruby-identifier">total_limit</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]
+<span class="line-num">611</span>   <span class="ruby-identifier">offset</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]
+<span class="line-num">612</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">613</span>     <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]
+<span class="line-num">614</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] = <span class="ruby-identifier">server</span>
+<span class="line-num">615</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">616</span> 
+<span class="line-num">617</span>   <span class="ruby-identifier">rows_per_fetch</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rows_per_fetch</span>] <span class="ruby-operator">||</span> <span class="ruby-value">1000</span>
+<span class="line-num">618</span>   <span class="ruby-identifier">strategy</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">offset</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">total_limit</span>
+<span class="line-num">619</span>     <span class="ruby-value">:offset</span>
+<span class="line-num">620</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">621</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:offset</span>
+<span class="line-num">622</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">623</span> 
+<span class="line-num">624</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">625</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">strategy</span>
+<span class="line-num">626</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:filter</span>
+<span class="line-num">627</span>       <span class="ruby-identifier">filter_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:filter_values</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">exprs</span><span class="ruby-operator">|</span> <span class="ruby-identifier">exprs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[<span class="ruby-identifier">hash_key_symbol</span>(<span class="ruby-identifier">e</span>)]}}
+<span class="line-num">628</span>       <span class="ruby-identifier">base_ds</span> = <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">rows_per_fetch</span>)
+<span class="line-num">629</span>       <span class="ruby-keyword">while</span> <span class="ruby-identifier">ds</span>
+<span class="line-num">630</span>         <span class="ruby-identifier">last_row</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">631</span>         <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
+<span class="line-num">632</span>           <span class="ruby-identifier">last_row</span> = <span class="ruby-identifier">row</span>
+<span class="line-num">633</span>           <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
+<span class="line-num">634</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">635</span>         <span class="ruby-identifier">ds</span> = (<span class="ruby-identifier">base_ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">ignore_values_preceding</span>(<span class="ruby-identifier">last_row</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">filter_values</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">last_row</span>)
+<span class="line-num">636</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">637</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">638</span>       <span class="ruby-identifier">offset</span> <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+<span class="line-num">639</span>       <span class="ruby-identifier">num_rows_yielded</span> = <span class="ruby-identifier">rows_per_fetch</span>
+<span class="line-num">640</span>       <span class="ruby-identifier">total_rows</span> = <span class="ruby-value">0</span>
+<span class="line-num">641</span> 
+<span class="line-num">642</span>       <span class="ruby-keyword">while</span> <span class="ruby-identifier">num_rows_yielded</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">rows_per_fetch</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">total_limit</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">total_rows</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">total_limit</span>)
+<span class="line-num">643</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">total_limit</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">total_rows</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">rows_per_fetch</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">total_limit</span>
+<span class="line-num">644</span>           <span class="ruby-identifier">rows_per_fetch</span> = <span class="ruby-identifier">total_limit</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">total_rows</span>
+<span class="line-num">645</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">646</span> 
+<span class="line-num">647</span>         <span class="ruby-identifier">num_rows_yielded</span> = <span class="ruby-value">0</span>
+<span class="line-num">648</span>         <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">rows_per_fetch</span>, <span class="ruby-identifier">offset</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
+<span class="line-num">649</span>           <span class="ruby-identifier">num_rows_yielded</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+<span class="line-num">650</span>           <span class="ruby-identifier">total_rows</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">total_limit</span>
+<span class="line-num">651</span>           <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
+<span class="line-num">652</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">653</span> 
+<span class="line-num">654</span>         <span class="ruby-identifier">offset</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">rows_per_fetch</span>
+<span class="line-num">655</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">656</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">657</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">658</span> 
+<span class="line-num">659</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">660</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select_hash'>
@@ -3885,9 +3891,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-select_hash-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">672</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_hash</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">673</span>   <span class="ruby-identifier">_select_hash</span>(<span class="ruby-value">:as_hash</span>, <span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">674</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">680</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_hash</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">681</span>   <span class="ruby-identifier">_select_hash</span>(<span class="ruby-value">:as_hash</span>, <span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">682</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select_hash_groups'>
@@ -3920,9 +3926,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-select_hash_groups-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">693</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">694</span>   <span class="ruby-identifier">_select_hash</span>(<span class="ruby-value">:to_hash_groups</span>, <span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">695</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">701</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">702</span>   <span class="ruby-identifier">_select_hash</span>(<span class="ruby-value">:to_hash_groups</span>, <span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">703</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select_map'>
@@ -3956,9 +3962,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-select_map-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">716</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">717</span>   <span class="ruby-identifier">_select_map</span>(<span class="ruby-identifier">column</span>, <span class="ruby-keyword">false</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">718</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">724</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">725</span>   <span class="ruby-identifier">_select_map</span>(<span class="ruby-identifier">column</span>, <span class="ruby-keyword">false</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">726</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select_order_map'>
@@ -3992,9 +3998,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-select_order_map-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">735</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_order_map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">736</span>   <span class="ruby-identifier">_select_map</span>(<span class="ruby-identifier">column</span>, <span class="ruby-keyword">true</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">737</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">743</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_order_map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">744</span>   <span class="ruby-identifier">_select_map</span>(<span class="ruby-identifier">column</span>, <span class="ruby-keyword">true</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">745</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-single_record'>
@@ -4017,9 +4023,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-single_record-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">745</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_record</span>
-<span class="line-num">746</span>   <span class="ruby-identifier">_single_record_ds</span>.<span class="ruby-identifier">single_record!</span>
-<span class="line-num">747</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">753</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_record</span>
+<span class="line-num">754</span>   <span class="ruby-identifier">_single_record_ds</span>.<span class="ruby-identifier">single_record!</span>
+<span class="line-num">755</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-single_record-21'>
@@ -4042,9 +4048,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-single_record-21-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">757</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_record!</span>
-<span class="line-num">758</span>   <span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">select_sql</span>)
-<span class="line-num">759</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">765</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_record!</span>
+<span class="line-num">766</span>   <span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">select_sql</span>)
+<span class="line-num">767</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-single_value'>
@@ -4067,12 +4073,12 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-single_value-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">767</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_value</span>
-<span class="line-num">768</span>   <span class="ruby-identifier">single_value_ds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
-<span class="line-num">769</span>     <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">v</span>}
-<span class="line-num">770</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">771</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">772</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">775</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_value</span>
+<span class="line-num">776</span>   <span class="ruby-identifier">single_value_ds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+<span class="line-num">777</span>     <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">v</span>}
+<span class="line-num">778</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">779</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">780</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-single_value-21'>
@@ -4095,9 +4101,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-single_value-21-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">782</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_value!</span>
-<span class="line-num">783</span>   <span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-identifier">select_sql</span>)
-<span class="line-num">784</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">790</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_value!</span>
+<span class="line-num">791</span>   <span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-identifier">select_sql</span>)
+<span class="line-num">792</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sum'>
@@ -4122,10 +4128,10 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-sum-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">793</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sum</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg</span> = <span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">794</span>   <span class="ruby-identifier">arg</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg</span>
-<span class="line-num">795</span>   <span class="ruby-identifier">_aggregate</span>(<span class="ruby-value">:sum</span>, <span class="ruby-identifier">arg</span>)
-<span class="line-num">796</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">801</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sum</span>(<span class="ruby-identifier">arg</span>=(<span class="ruby-identifier">no_arg</span> = <span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">802</span>   <span class="ruby-identifier">arg</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_arg</span>
+<span class="line-num">803</span>   <span class="ruby-identifier">_aggregate</span>(<span class="ruby-value">:sum</span>, <span class="ruby-identifier">arg</span>)
+<span class="line-num">804</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_hash'>
@@ -4144,9 +4150,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-to_hash-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">850</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">851</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">852</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">858</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">859</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">860</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_hash_groups'>
@@ -4188,31 +4194,31 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-to_hash_groups-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">878</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">879</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
-<span class="line-num">880</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:all</span>] <span class="ruby-operator">?</span> <span class="ruby-value">:all</span> <span class="ruby-operator">:</span> <span class="ruby-value">:each</span>
-<span class="line-num">881</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
-<span class="line-num">882</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">to_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
-<span class="line-num">883</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">884</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">885</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">886</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">887</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">888</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">889</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">890</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">891</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">892</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">893</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">894</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">895</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">896</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">897</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">k</span>]}] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
-<span class="line-num">898</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">899</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
-<span class="line-num">900</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">901</span>   <span class="ruby-identifier">h</span>
-<span class="line-num">902</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">886</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">887</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
+<span class="line-num">888</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:all</span>] <span class="ruby-operator">?</span> <span class="ruby-value">:all</span> <span class="ruby-operator">:</span> <span class="ruby-value">:each</span>
+<span class="line-num">889</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
+<span class="line-num">890</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">to_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row_proc</span>
+<span class="line-num">891</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">892</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">893</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">894</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">895</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">896</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">897</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">898</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">899</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">900</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">901</span>         <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">902</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">903</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">904</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">905</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">k</span>]}] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
+<span class="line-num">906</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">907</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
+<span class="line-num">908</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">909</span>   <span class="ruby-identifier">h</span>
+<span class="line-num">910</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-truncate'>
@@ -4235,9 +4241,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-truncate-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">908</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>
-<span class="line-num">909</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">truncate_sql</span>)
-<span class="line-num">910</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">916</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>
+<span class="line-num">917</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">truncate_sql</span>)
+<span class="line-num">918</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update'>
@@ -4263,14 +4269,14 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-update-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">921</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">values</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">922</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">update_sql</span>(<span class="ruby-identifier">values</span>)
-<span class="line-num">923</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">uses_returning?</span>(<span class="ruby-value">:update</span>)
-<span class="line-num">924</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">925</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">926</span>     <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">927</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">928</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">929</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">values</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">930</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">update_sql</span>(<span class="ruby-identifier">values</span>)
+<span class="line-num">931</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">uses_returning?</span>(<span class="ruby-value">:update</span>)
+<span class="line-num">932</span>     <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">933</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">934</span>     <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">935</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">936</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where_all'>
@@ -4293,13 +4299,13 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-where_all-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">936</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_all</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">937</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_where_loader</span>([<span class="ruby-identifier">cond</span>], <span class="ruby-keyword">nil</span>)
-<span class="line-num">938</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">all</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">939</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">940</span>     <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">941</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">942</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">944</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_all</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">945</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_where_loader</span>([<span class="ruby-identifier">cond</span>], <span class="ruby-keyword">nil</span>)
+<span class="line-num">946</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">all</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">947</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">948</span>     <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">949</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">950</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where_each'>
@@ -4322,13 +4328,13 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-where_each-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">950</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_each</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">951</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_where_loader</span>([<span class="ruby-identifier">cond</span>], <span class="ruby-keyword">nil</span>)
-<span class="line-num">952</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">each</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">953</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">954</span>     <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">955</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">956</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">958</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_each</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">959</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_where_loader</span>([<span class="ruby-identifier">cond</span>], <span class="ruby-keyword">nil</span>)
+<span class="line-num">960</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">each</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">961</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">962</span>     <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">963</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">964</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where_single_value'>
@@ -4351,16 +4357,16 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-where_single_value-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">965</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_single_value</span>(<span class="ruby-identifier">cond</span>)
-<span class="line-num">966</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_where_placeholder_literalizer</span>([<span class="ruby-identifier">cond</span>], <span class="ruby-keyword">nil</span>, <span class="ruby-value">:_where_single_value_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>
-<span class="line-num">967</span>       <span class="ruby-identifier">single_value_ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>)
-<span class="line-num">968</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">969</span> 
-<span class="line-num">970</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>))
-<span class="line-num">971</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">972</span>     <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">single_value</span>
-<span class="line-num">973</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">974</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">973</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_single_value</span>(<span class="ruby-identifier">cond</span>)
+<span class="line-num">974</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_where_placeholder_literalizer</span>([<span class="ruby-identifier">cond</span>], <span class="ruby-keyword">nil</span>, <span class="ruby-value">:_where_single_value_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>
+<span class="line-num">975</span>       <span class="ruby-identifier">single_value_ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>)
+<span class="line-num">976</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">977</span> 
+<span class="line-num">978</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>))
+<span class="line-num">979</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">980</span>     <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">single_value</span>
+<span class="line-num">981</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">982</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_all'>
@@ -4379,9 +4385,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-with_sql_all-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">978</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_all</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">979</span>   <span class="ruby-identifier">_all</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}}
-<span class="line-num">980</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">986</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_all</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">987</span>   <span class="ruby-identifier">_all</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}}
+<span class="line-num">988</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_delete'>
@@ -4400,9 +4406,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-with_sql_delete-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">985</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_delete</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">986</span>   <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">987</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">993</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_delete</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">994</span>   <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">995</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_each'>
@@ -4420,15 +4426,15 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_sql_each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_sql_each-source'>    <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">991</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_each</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">992</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">row_proc</span>
-<span class="line-num">993</span>     <span class="ruby-identifier">_with_sql_dataset</span>.<span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)}
-<span class="line-num">994</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">995</span>     <span class="ruby-identifier">_with_sql_dataset</span>.<span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">r</span>}
-<span class="line-num">996</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">997</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">998</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_sql_each-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
+<span class="line-num"> 999</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_each</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">1000</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">row_proc</span>
+<span class="line-num">1001</span>     <span class="ruby-identifier">_with_sql_dataset</span>.<span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)}
+<span class="line-num">1002</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1003</span>     <span class="ruby-identifier">_with_sql_dataset</span>.<span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">r</span>}
+<span class="line-num">1004</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1005</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1006</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_first'>
@@ -4447,10 +4453,10 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-with_sql_first-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1002</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_first</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">1003</span>   <span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>}
-<span class="line-num">1004</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">1005</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1010</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_first</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">1011</span>   <span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>}
+<span class="line-num">1012</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">1013</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_insert'>
@@ -4469,9 +4475,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-with_sql_insert-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1018</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_insert</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">1019</span>   <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">1020</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1026</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_insert</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">1027</span>   <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">1028</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_sql_single_value'>
@@ -4490,11 +4496,11 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-with_sql_single_value-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1010</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_single_value</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">1011</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">1012</span>     <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">v</span>}
-<span class="line-num">1013</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1014</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1018</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_sql_single_value</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">1019</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">1020</span>     <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">v</span>}
+<span class="line-num">1021</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1022</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -4506,7 +4512,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </div>
 <div class='description'>
 
-<p>Internals of <a href="Dataset.html#method-i-import"><code>import</code></a>.  If primary key values are requested, use separate insert commands for each row.  Otherwise, call <a href="Dataset.html#method-i-multi_insert_sql"><code>multi_insert_sql</code></a> and execute each statement it gives separately.</p>
+<p>Internals of <a href="Dataset.html#method-i-import"><code>import</code></a>.  If primary key values are requested, use separate insert commands for each row.  Otherwise, call <a href="Dataset.html#method-i-multi_insert_sql"><code>multi_insert_sql</code></a> and execute each statement it gives separately. A transaction is only used if there are multiple statements to execute.</p>
 
 </div>
 <div class='source'>
@@ -4514,16 +4520,16 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-_import-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1027</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">1028</span>   <span class="ruby-identifier">trans_opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]
-<span class="line-num">1029</span>   <span class="ruby-identifier">trans_opts</span>[<span class="ruby-value">:server</span>] = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>]
-<span class="line-num">1030</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>
-<span class="line-num">1031</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">trans_opts</span>){<span class="ruby-identifier">values</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">v</span>)}}
-<span class="line-num">1032</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1033</span>     <span class="ruby-identifier">stmts</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)
-<span class="line-num">1034</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">trans_opts</span>){<span class="ruby-identifier">stmts</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">st</span><span class="ruby-operator">|</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">st</span>)}}
-<span class="line-num">1035</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1036</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1036</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1037</span>   <span class="ruby-identifier">trans_opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]
+<span class="line-num">1038</span>   <span class="ruby-identifier">trans_opts</span>[<span class="ruby-value">:server</span>] = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">1039</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>
+<span class="line-num">1040</span>     <span class="ruby-identifier">_import_transaction</span>(<span class="ruby-identifier">values</span>, <span class="ruby-identifier">trans_opts</span>){<span class="ruby-identifier">values</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">v</span>)}}
+<span class="line-num">1041</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1042</span>     <span class="ruby-identifier">stmts</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)
+<span class="line-num">1043</span>     <span class="ruby-identifier">_import_transaction</span>(<span class="ruby-identifier">stmts</span>, <span class="ruby-identifier">trans_opts</span>){<span class="ruby-identifier">stmts</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">st</span><span class="ruby-operator">|</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">st</span>)}}
+<span class="line-num">1044</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1045</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method protected-instance' id='method-method-i-_select_map_multiple'>
@@ -4542,9 +4548,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-_select_map_multiple-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1039</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_select_map_multiple</span>(<span class="ruby-identifier">ret_cols</span>)
-<span class="line-num">1040</span>   <span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ret_cols</span>)}
-<span class="line-num">1041</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1048</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_select_map_multiple</span>(<span class="ruby-identifier">ret_cols</span>)
+<span class="line-num">1049</span>   <span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ret_cols</span>)}
+<span class="line-num">1050</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method protected-instance' id='method-method-i-_select_map_single'>
@@ -4563,10 +4569,10 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-_select_map_single-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1044</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_select_map_single</span>
-<span class="line-num">1045</span>   <span class="ruby-identifier">k</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">1046</span>   <span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">k</span><span class="ruby-operator">||=</span><span class="ruby-identifier">r</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">first</span>]}
-<span class="line-num">1047</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1053</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_select_map_single</span>
+<span class="line-num">1054</span>   <span class="ruby-identifier">k</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">1055</span>   <span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">k</span><span class="ruby-operator">||=</span><span class="ruby-identifier">r</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">first</span>]}
+<span class="line-num">1056</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method protected-instance' id='method-method-i-single_value_ds'>
@@ -4585,9 +4591,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-single_value_ds-source'>     <span class="ruby-comment"># File lib/sequel/dataset/actions.rb</span>
-<span class="line-num">1050</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_value_ds</span>
-<span class="line-num">1051</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">ungraphed</span>.<span class="ruby-identifier">naked</span>
-<span class="line-num">1052</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1059</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">single_value_ds</span>
+<span class="line-num">1060</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">ungraphed</span>.<span class="ruby-identifier">naked</span>
+<span class="line-num">1061</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -5460,6 +5466,27 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-supports_placeholder_literalizer-3F'>
+<a name='method-i-supports_placeholder_literalizer-3F'></a>
+<div class='synopsis'>
+<span class='name'>supports_placeholder_literalizer?</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Whether placeholder literalizers are supported, true by default.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_placeholder_literalizer-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-supports_placeholder_literalizer-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
+<span class="line-num">156</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_placeholder_literalizer?</span>
+<span class="line-num">157</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">158</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-supports_regexp-3F'>
 <a name='method-i-supports_regexp-3F'></a>
 <div class='synopsis'>
@@ -5476,9 +5503,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_regexp-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">156</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
-<span class="line-num">157</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">158</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">161</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
+<span class="line-num">162</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">163</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_replace-3F'>
@@ -5497,9 +5524,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_replace-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">161</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_replace?</span>
-<span class="line-num">162</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">163</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">166</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_replace?</span>
+<span class="line-num">167</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_returning-3F'>
@@ -5518,9 +5545,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_returning-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">167</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)
-<span class="line-num">168</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">173</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_select_all_and_column-3F'>
@@ -5539,9 +5566,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_select_all_and_column-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">177</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_select_all_and_column?</span>
-<span class="line-num">178</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">182</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_select_all_and_column?</span>
+<span class="line-num">183</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">184</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_skip_locked-3F'>
@@ -5560,9 +5587,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_skip_locked-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
-<span class="line-num">173</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">177</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
+<span class="line-num">178</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -5581,9 +5608,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_timestamp_timezones-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">182</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
-<span class="line-num">183</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">184</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
+<span class="line-num">188</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_usecs-3F'>
@@ -5602,9 +5629,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_timestamp_usecs-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_usecs?</span>
-<span class="line-num">188</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_usecs?</span>
+<span class="line-num">193</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_updating_joins-3F'>
@@ -5623,9 +5650,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_updating_joins-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_updating_joins?</span>
-<span class="line-num">193</span>   <span class="ruby-identifier">supports_modifying_joins?</span>
-<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">197</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_updating_joins?</span>
+<span class="line-num">198</span>   <span class="ruby-identifier">supports_modifying_joins?</span>
+<span class="line-num">199</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -5644,9 +5671,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_where_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">221</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
-<span class="line-num">222</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">223</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
+<span class="line-num">227</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">228</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_clause-3F'>
@@ -5665,9 +5692,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_window_clause-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">198</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>
-<span class="line-num">199</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">203</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>
+<span class="line-num">204</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">205</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_function_frame_option-3F'>
@@ -5686,14 +5713,14 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_window_function_frame_option-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">210</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)
-<span class="line-num">211</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">option</span>
-<span class="line-num">212</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>, <span class="ruby-value">:offset</span>
-<span class="line-num">213</span>     <span class="ruby-keyword">true</span>
-<span class="line-num">214</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">215</span>     <span class="ruby-keyword">false</span>
-<span class="line-num">216</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">217</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">215</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)
+<span class="line-num">216</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">option</span>
+<span class="line-num">217</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>, <span class="ruby-value">:offset</span>
+<span class="line-num">218</span>     <span class="ruby-keyword">true</span>
+<span class="line-num">219</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">220</span>     <span class="ruby-keyword">false</span>
+<span class="line-num">221</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">222</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -5712,9 +5739,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-supports_window_functions-3F-source'>    <span class="ruby-comment"># File lib/sequel/dataset/features.rb</span>
-<span class="line-num">203</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
-<span class="line-num">204</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">205</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
+<span class="line-num">209</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">210</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

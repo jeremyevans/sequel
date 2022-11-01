@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.62.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.62.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.62.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2022-11-01 09:15:13 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with the pg driver has been added back to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.  This extension was originally added in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_34_0_txt.html">3.34.0</a>, but was removed in <a href="4_0_0_txt.html">4.0.0</a> due to the many corner cases it had.  Almost all of the corner cases have now been fixed, and the extension is now recommended for production use.  Compared to the original version in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3, the reintroduced version of the extension includes the following changes:</p>
+<ul><li>
+<p>Handles integers used in LIMIT/ORDER</p>
+</li><li>
+<p>Respects explicit CASTs</p>
+</li><li>
+<p>Tries to convert column IN (int, …) into column = ANY($) with an array parameter</p>
+</li><li>
+<p>Uses the same parameter for the same object used more than once in a query</p>
+</li><li>
+<p>Uses parameters when inserting multiple rows via Dataset#import</p>
+</li><li>
+<p>Supports automatically parameterizing all of the PostgreSQL-specific types that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> ships support for in pg_* extensions (though some values of those types may not support automatic parameterization).</p>
+</li><li>
+<p>Supports skipping auto parameterization for specific values.</p>
+</li></ul>
+
+<p>Automatic parameterization is generally slower than Sequel’s default behavior, since some optimizations <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses by default do not currently support automatic parameterization.</p>
+
+<p>Applications may need changes to work correctly with the pg_auto_parameterize extension, such as the addition of explicit casts.  Please read the extension documentation for more details.</p>
+</li><li>
+<p>Integer column schema entries now include :min_value and :max_value entries on most databases, indicating the minimum and maximum values supported for the column.</p>
+
+<p>The validation_helpers plugin now has validates_max_value and validates_min_value for testing the column value is not greater than the given maximum value and not less than the given minimum value, respectively.</p>
+
+<p>The auto_validations plugin now automatically uses the :min_value and :max_value column schema entries with the new validation_helpers methods to validate that the column values for integer columns are in the allowed range.</p>
+</li><li>
+<p>A primary_key_lookup_check_values plugin has been added for automatically typecasting and checking the primary key values are in the allowed range (given by :min_value and :max_value column schema entries) during lookup. If typecasting fails or the value is outside the allowed range, the primary key lookup will return nil without issuing a query (or will raise a NoMatchingRow error if using with_pk!).</p>
+
+<p>Note that this can change behavior in some cases if you are passing filter conditions during lookup instead of passing primary key values. The plugin tries to support most common filter conditions, but there are still cases that will break.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports shard-specific :after_connect and :connect_sqls Database options, allowing you to customize behavior for specific shards:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;url&#39;</span>, <span class="ruby-value">servers:</span> {
+    <span class="ruby-value">:shard1</span> <span class="ruby-operator">=&gt;</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">after_connect:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>}},
+    <span class="ruby-value">:shard2</span> <span class="ruby-operator">=&gt;</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">connect_sqls:</span> [<span class="ruby-string">&#39;...&#39;</span>]},
+  })
+</pre>
+
+<p>Note that these shard-specific options will not be respected if you are calling after_connect= or connect_sqls= on the Database’s connection pool.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A Sequel::Postgres::IntegerOutsideBigintRange exception will now be raised if trying to literalize an integer outside PostgreSQL bigint range, to avoid PostgreSQL treating the integer as a numeric type and not respecting indexes on the related column.</p>
+
+<p>A pg_extended_integer_support extension has been added for customizing the behavior when literalizing an integer outside PostgreSQL bigint range, either quoting it or getting the historical behavior of using it directly in the query.</p>
+</li><li>
+<p>Dataset#import and multi_insert no longer use transactions when they only run a single query.</p>
+</li><li>
+<p>Fractional seconds in timestamps are now respected in the named_timezones extension.</p>
+</li><li>
+<p>Using hstore[] types as bound variables now works on PostgreSQL.</p>
+</li><li>
+<p>Using BC dates and timestamps in bound variables now works on PostgreSQL.</p>
+</li><li>
+<p>A corner case has been fixed in eager loading where the window function eager limit strategy would be used without removing the row_number entries from the result.</p>
+</li><li>
+<p>The shared postgres adapter now caches reflection datasets, speeding up Database#indexes and similar methods.</p>
+</li><li>
+<p>The mock postgres adapter now assumes PostgreSQL 15 instead of PostgreSQL 14 by default.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>If you are using Ruby integers outside PostgreSQL bigint range when dealing with PostgreSQL numeric column values, this version may not be compatible.  It is recommended you explicitly convert the Ruby integers to BigDecimal objects if you are using them for numeric column values.  You can also use the pg_extended_integer_support extension introduced in this version.</p>
+</li></ul>
+
+<h1 id="label-Workaround+for+Older+Versions">Workaround for Older Versions<span><a href="#label-Workaround+for+Older+Versions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>If you cannot upgrade to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_62_0_txt.html">5.62.0</a>, but still want to avoid the problems that come from using literal large integers on PostgreSQL, you can use the following code, where DB is your <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_integer</span>(<span class="ruby-identifier">v</span>)
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">9223372036854775807</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">-9223372036854775808</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;PostgreSQL int too large: #{v}&quot;</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">super</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This workaround should work all the way back to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_29_0_txt.html">3.29.0</a>, released in November 2011.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

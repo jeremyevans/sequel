@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::ExtendedIntegerSupport</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Postgres::ExtendedIntegerSupport
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/pg_extended_integer_support_rb.html">lib/sequel/extensions/pg_extended_integer_support.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-integer_outside_bigint_range_strategy">integer_outside_bigint_range_strategy</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-integer_outside_bigint_range_strategy'>
+<a name='method-i-integer_outside_bigint_range_strategy'></a>
+<div class='synopsis'>
+<span class='name'>integer_outside_bigint_range_strategy</span><span class='arguments'>(strategy)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the strategy for handling integers outside PostgreSQL bigint range.  Supported values:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:quote </td><td>
+<p>Quote the integer value. PostgreSQL will treat the integer as a unknown type, implicitly casting to any other type as needed. This is the default value when using the pg_extended_integer_support extension.</p>
+</td></tr><tr><td class='label'>:raise </td><td>
+<p>Raise error when attempting to literalize the integer (the default behavior of <a href="../../Sequel.html"><code>Sequel</code></a> on PostgreSQL when not using the pg_extended_integer_support extension).</p>
+</td></tr><tr><td class='label'>:raw </td><td>
+<p>Use raw integer value without quoting. PostgreSQL will treat the integer as a numeric. This was Sequel’s historical behavior, but it is unlikely to be desired.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-integer_outside_bigint_range_strategy-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-integer_outside_bigint_range_strategy-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_extended_integer_support.rb</span>
+<span class="line-num">94</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">integer_outside_bigint_range_strategy</span>(<span class="ruby-identifier">strategy</span>)
+<span class="line-num">95</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:integer_outside_bigint_range_strategy</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">strategy</span>)
+<span class="line-num">96</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

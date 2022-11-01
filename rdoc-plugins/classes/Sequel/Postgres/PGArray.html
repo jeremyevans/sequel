@@ -65,6 +65,7 @@ Superclass:
 <ol>
 <li><a href="#attribute-i-array_type">array_type</a></li>
 <li><a href="#method-i-op">op</a></li>
+<li><a href="#method-i-sequel_auto_param_type">sequel_auto_param_type</a></li>
 <li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
 </ol>
 </div>
@@ -119,10 +120,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">439</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">440</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)
-<span class="line-num">441</span>   <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>
-<span class="line-num">442</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">450</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">451</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)
+<span class="line-num">452</span>   <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>
+<span class="line-num">453</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -147,6 +148,29 @@ Superclass:
 <span class="line-num">296</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-sequel_auto_param_type'>
+<a name='method-i-sequel_auto_param_type'></a>
+<div class='synopsis'>
+<span class='name'>sequel_auto_param_type</span><span class='arguments'>(ds)</span>
+
+</div>
+<div class='description'>
+
+<p>Allow automatic parameterization of the receiver if all elements can be can be automatically parameterized.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sequel_auto_param_type-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
+<span class="line-num">473</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">474</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">array_type</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">x</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">x</span>)}
+<span class="line-num">475</span>     <span class="ruby-node">&quot;::#{array_type}[]&quot;</span>
+<span class="line-num">476</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">477</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
 <a name='method-i-sql_literal_append'></a>
 <div class='synopsis'>
@@ -163,18 +187,18 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">447</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">448</span>   <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>
-<span class="line-num">449</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>
-<span class="line-num">450</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>
-<span class="line-num">451</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">452</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>
-<span class="line-num">453</span>     <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)
-<span class="line-num">454</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">455</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>
-<span class="line-num">456</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>
-<span class="line-num">457</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">458</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">458</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">459</span>   <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>
+<span class="line-num">460</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>
+<span class="line-num">461</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>
+<span class="line-num">462</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">463</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>
+<span class="line-num">464</span>     <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)
+<span class="line-num">465</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">466</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>
+<span class="line-num">467</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>
+<span class="line-num">468</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">469</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

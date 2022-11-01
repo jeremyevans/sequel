@@ -118,7 +118,7 @@ Cook      Executive
 
 <p>Note that when loading from a subclass, because the subclass dataset uses a subquery that by default uses the same alias at the primary table, any qualified identifiers should reference the subquery alias (and qualified identifiers should not be needed unless joining to another table):</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>
 <span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">employees</span>[<span class="ruby-value">:id</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}}.<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>
 <span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">executives</span>[<span class="ruby-value">:id</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}}.<span class="ruby-identifier">first</span> <span class="ruby-comment"># doesn&#39;t work</span>
 </pre>
@@ -127,7 +127,7 @@ Cook      Executive
 
 <pre class="ruby"><span class="ruby-identifier">pks</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">num_staff</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">10</span>}.<span class="ruby-identifier">select_map</span>(<span class="ruby-value">:id</span>)
 <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">cti_tables</span>.<span class="ruby-identifier">reverse_each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">table</span><span class="ruby-operator">|</span>
-  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pks</span>).<span class="ruby-identifier">delete</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">pks</span>).<span class="ruby-identifier">delete</span>
 <span class="ruby-keyword">end</span>
 </pre>
 

@@ -248,7 +248,7 @@ Superclass:
 </a>
 <pre id='method-c-check_current-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
 <span class="line-num">379</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">check_current</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">380</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NotCurrentError</span>, <span class="ruby-string">&#39;migrator is not current&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">is_current?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">380</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NotCurrentError</span>, <span class="ruby-string">&#39;current migration version does not match latest available version&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">is_current?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
 <span class="line-num">381</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

@@ -30,7 +30,7 @@ doc/schema_modification.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-10-30 13:46:56 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -401,7 +401,7 @@ Last Update:
 <p>It is possible to specify a name for the primary key constraint: via the :name option:</p>
 
 <pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:albums_artists</span>) <span class="ruby-keyword">do</span>
-  <span class="ruby-identifier">add_primary_key</span> [<span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>], <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums_artists_pkey</span>
+  <span class="ruby-identifier">add_primary_key</span> [<span class="ruby-value">:album_id</span>, <span class="ruby-value">:artist_id</span>], <span class="ruby-value">name:</span> <span class="ruby-value">:albums_artists_pkey</span>
 <span class="ruby-keyword">end</span>
 </pre>
 

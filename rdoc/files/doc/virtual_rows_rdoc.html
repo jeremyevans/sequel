@@ -30,7 +30,7 @@ doc/virtual_rows.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2021-05-17 07:02:22 -0700</span>
+<span class='datetime'>2022-10-21 09:44:05 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -56,7 +56,7 @@ Last Update:
 
 <h2 id="label-Regular+Procs+vs+Instance+Evaled+Procs">Regular Procs vs Instance Evaled Procs<span><a href="#label-Regular+Procs+vs+Instance+Evaled+Procs">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Virtual row blocks behave differently depending on whether the block accepts an argument.  If the block accepts an argument, it is called with an instance of <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a>.  If it does not accept an argument, it is evaluated in the context of an instance of <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a>.</p>
+<p>Virtual row blocks behave differently depending on whether the block accepts an argument.  If the block accepts an argument, it is called with an instance of <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a>.  If it does not accept an argument, it is evaluated in the <em> context of an instance </em> of <a href="../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]
 <span class="ruby-comment"># Regular block</span>

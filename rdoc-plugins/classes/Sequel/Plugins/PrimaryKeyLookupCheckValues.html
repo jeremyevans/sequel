@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::PrimaryKeyLookupCheckValues</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PrimaryKeyLookupCheckValues
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/primary_key_lookup_check_values_rb.html">lib/sequel/plugins/primary_key_lookup_check_values.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The primary_key_lookup_check_values plugin typecasts given primary key values before performing a lookup by primary key. If the given primary key value cannot be typecasted correctly, the lookup returns nil without issuing a query.  If the schema for the primary key column includes minimum and maximum values, this also checks the given value is not outside the range.  If the given value is outside the allowed range, the lookup returns nil without issuing a query.</p>
+
+<p>This affects the following <a href="../Model.html"><code>Model</code></a> methods:</p>
+<ul><li>
+<p>Model.[] (when called with non-Hash)</p>
+</li><li>
+<p>Model.with_pk</p>
+</li><li>
+<p>Model.with_pk!</p>
+</li></ul>
+
+<p>It also affects the following <a href="../Model.html"><code>Model</code></a> dataset methods:</p>
+<ul><li>
+<p>Dataset#[] (when called with Integer)</p>
+</li><li>
+<p>Dataset#with_pk</p>
+</li><li>
+<p>dataset#with_pk!</p>
+</li></ul>
+
+<p>Note that this can break working code.  The above methods accept any filter condition by default, not just primary key values.  The plugin will handle <a href="../../Symbol.html"><code>Symbol</code></a>, <a href="../SQL/Expression.html"><code>Sequel::SQL::Expression</code></a>, and <a href="../LiteralString.html"><code>Sequel::LiteralString</code></a> objects, but code such as the following will break:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Return first Album where primary key is one of the given values</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_pk</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>])
+</pre>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support checking primary key values before</span>
+<span class="ruby-comment"># lookup # (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:primary_key_lookup_check_values</span>
+
+<span class="ruby-comment"># Make the Album class support checking primary key values before lookup</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:primary_key_lookup_check_values</span>
+</pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="PrimaryKeyLookupCheckValues/ClassMethods.html">Sequel::Plugins::PrimaryKeyLookupCheckValues::ClassMethods</a></li>
+<li><a href="PrimaryKeyLookupCheckValues/DatasetMethods.html">Sequel::Plugins::PrimaryKeyLookupCheckValues::DatasetMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/primary_key_lookup_check_values.rb</span>
+<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">43</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">44</span>     <span class="ruby-identifier">setup_primary_key_lookup_check_values</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
+<span class="line-num">45</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

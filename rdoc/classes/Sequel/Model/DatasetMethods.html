@@ -76,13 +76,13 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">2132</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
-<span class="line-num">2133</span>     <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">i</span>)
-<span class="line-num">2134</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">2135</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">2136</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">2137</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">2133</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
+<span class="line-num">2134</span>     <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">i</span>)
+<span class="line-num">2135</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">2136</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">2137</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">2138</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-as_hash'>
@@ -107,14 +107,14 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-as_hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2190</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">2191</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>
-<span class="line-num">2192</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">2193</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">2194</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key for model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">pk</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>)
-<span class="line-num">2195</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) 
-<span class="line-num">2196</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">2197</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">2192</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>
+<span class="line-num">2193</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">2194</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">2195</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key for model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">pk</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>)
+<span class="line-num">2196</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) 
+<span class="line-num">2197</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">2198</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-destroy'>
@@ -139,10 +139,10 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-destroy-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2148</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>
-<span class="line-num">2149</span>   <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:destroy</span>).<span class="ruby-identifier">length</span>}
-<span class="line-num">2150</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">use_transactions</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>
-<span class="line-num">2151</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2149</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>
+<span class="line-num">2150</span>   <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:destroy</span>).<span class="ruby-identifier">length</span>}
+<span class="line-num">2151</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">use_transactions</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>
+<span class="line-num">2152</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-last'>
@@ -165,13 +165,13 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-last-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">2159</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>
-<span class="line-num">2160</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">2161</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">2162</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">2163</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">2164</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">2160</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>
+<span class="line-num">2161</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">2162</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">2163</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">2164</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">2165</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-model'>
@@ -193,9 +193,9 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-model-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">model</span>
-<span class="line-num">2124</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:model</span>]
-<span class="line-num">2125</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">model</span>
+<span class="line-num">2125</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:model</span>]
+<span class="line-num">2126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-paged_each'>
@@ -221,13 +221,13 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-paged_each-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2174</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">2175</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>
-<span class="line-num">2176</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">2177</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">2178</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">2179</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">2180</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2175</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">2176</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>
+<span class="line-num">2177</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">2178</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">2179</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">2180</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">2181</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_hash'>
@@ -246,9 +246,9 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-to_hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">2201</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">2202</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">2202</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">2203</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_pk'>
@@ -276,13 +276,13 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-with_pk-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2214</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">2215</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_with_pk_loader</span>)
-<span class="line-num">2216</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">pk</span>)
-<span class="line-num">2217</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">2218</span>     <span class="ruby-identifier">first</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>))
-<span class="line-num">2219</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">2220</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2215</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">2216</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_with_pk_loader</span>)
+<span class="line-num">2217</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">pk</span>)
+<span class="line-num">2218</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">2219</span>     <span class="ruby-identifier">first</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>))
+<span class="line-num">2220</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">2221</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_pk-21'>
@@ -301,9 +301,9 @@ Sequel::Model::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-with_pk-21-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">2224</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk!</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">2225</span>   <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NoMatchingRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>))
-<span class="line-num">2226</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2225</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk!</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">2226</span>   <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NoMatchingRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>))
+<span class="line-num">2227</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

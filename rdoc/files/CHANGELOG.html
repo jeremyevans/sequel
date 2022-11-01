@@ -30,12 +30,45 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-09-30 13:30:09 -0700</span>
+<span class='datetime'>2022-11-01 09:15:13 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.62.0+-282022-11-01-29"><a href="doc/release_notes/5_62_0_txt.html">5.62.0</a> (2022-11-01)<span><a href="#label-5.62.0+-282022-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Add back the pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with pg driver (jeremyevans)</p>
+</li><li>
+<p>Add pg_extended_integer_support extension for customizing behavior when literalizing a Ruby integer outside PostgreSQL bigint range (jeremyevans)</p>
+</li><li>
+<p>Raise Postgres::IntegerOutsideBigintRange if attempting to literalize a Ruby integer outside PostgreSQL bigint range (jeremyevans)</p>
+</li><li>
+<p>Add primary_key_lookup_check_values plugin for typecasting and checking primary key values during lookup (jeremyevans)</p>
+</li><li>
+<p>Setup validation of minimum and maximum values for integer columns in auto_validations (jeremyevans)</p>
+</li><li>
+<p>Add validates_max_value and validates_min_value to validation_helpers (jeremyevans)</p>
+</li><li>
+<p>Include :min_value and :max_value schema entries for integer columns on most databases (jeremyevans)</p>
+</li><li>
+<p>Don’t wrap multi-inserts in a transaction when it’s not required (shannoncole, jeremyevans) (#1945)</p>
+</li><li>
+<p>Update mock PostgreSQL adapter to default to PostgreSQL 15 instead of PostgreSQL 14 (jeremyevans)</p>
+</li><li>
+<p>Support fractional seconds in the named_timezones extension (jeremyevans) (#1943)</p>
+</li><li>
+<p>Cache reflection datasets in the postgres adapter to improve performance (jeremyevans)</p>
+</li><li>
+<p>Handle BC dates and timestamps in bound variables when using the pg_extended_date_support extension (jeremyevans)</p>
+</li><li>
+<p>Correctly format hstore[] types in bound variables on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Fix corner case in eager loading where window function eager limit strategy is used, but row number entry is not removed (jeremyevans)</p>
+</li><li>
+<p>Support server/shard specific :after_connect and :connect_sqls Database options (jeremyevans) (#1935)</p>
+</li></ul>
+
 <h3 id="label-5.61.0+-282022-10-01-29"><a href="doc/release_notes/5_61_0_txt.html">5.61.0</a> (2022-10-01)<span><a href="#label-5.61.0+-282022-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make Database#foreign_key_list on PostgreSQL return results for partitioned tables (jeremyevans)</p>

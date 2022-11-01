@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-07-13 14:55:58 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -282,7 +282,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:socket </td><td>
 <p>Can be used to specify a Unix socket file to connect to instead of a TCP host and port.</p>
 </td></tr><tr><td class='label'>:sql_mode </td><td>
-<p>Set the sql_mode(s) for a given connection.  Can be single symbol or string, or an array of symbols or strings (e.g. <code>:sql_mode=&gt;[:no_zero_date, :pipes_as_concat]</code>).</p>
+<p>Set the sql_mode(s) for a given connection.  Can be single symbol or string, or an array of symbols or strings (e.g. <code>sql_mode: [:no_zero_date, :pipes_as_concat]</code>).</p>
 </td></tr><tr><td class='label'>:timeout </td><td>
 <p>Sets the wait_timeout for the connection, defaults to 1 month.</p>
 </td></tr><tr><td class='label'>:read_timeout </td><td>
@@ -303,14 +303,14 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <p>The :database option given ODBC database should be the DSN (Descriptive Service Name) from the ODBC configuration.</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">odbc</span>(<span class="ruby-string">&#39;mydb&#39;</span>, <span class="ruby-value">:user</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;user&quot;</span>, <span class="ruby-value">:password</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;password&quot;</span>)
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">odbc</span>(<span class="ruby-string">&#39;mydb&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&quot;user&quot;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&quot;password&quot;</span>)
 </pre>
 
 <p>The :host and :port options are not respected. The following additional options are supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
 <p>Can be specified as ‘mssql’, ‘progress’, or ‘db2’ to use SQL syntax specific to those databases.</p>
 </td></tr><tr><td class='label'>:drvconnect </td><td>
-<p>Can be given an ODBC connection string, and will use ODBC::Database#drvconnect to do the connection.  Typical usage would be: <code>Sequel.odbc(:drvconnect=&gt;&#39;driver={...};...&#39;)</code></p>
+<p>Can be given an ODBC connection string, and will use ODBC::Database#drvconnect to do the connection.  Typical usage would be: <code>Sequel.odbc(drvconnect: &#39;driver={...};...&#39;)</code></p>
 </td></tr></tbody></table>
 
 <h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -352,7 +352,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:sslrootcert </td><td>
 <p>Specify the path to the root SSL certificate to use.</p>
 </td></tr><tr><td class='label'>:search_path </td><td>
-<p>Set to the schema search_path.  This can either be a single string containing the schemas separated by commas (for use via a URL: <code>postgres:///?search_path=schema1,schema2</code>), or it can be an array of strings (for use via an option: <code>Sequel.postgres(:search_path=&gt;[&#39;schema1&#39;, &#39;schema2&#39;])</code>).</p>
+<p>Set to the schema search_path.  This can either be a single string containing the schemas separated by commas (for use via a URL: <code>postgres:///?search_path=schema1,schema2</code>), or it can be an array of strings (for use via an option: <code>Sequel.postgres(search_path: [&#39;schema1&#39;, &#39;schema2&#39;])</code>).</p>
 </td></tr><tr><td class='label'>:use_iso_date_format </td><td>
 <p>This can be set to false to not force the ISO date format.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> forces it by default to allow for an optimization.</p>
 </td></tr></tbody></table>

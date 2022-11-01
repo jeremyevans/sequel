@@ -61,7 +61,7 @@ Sequel::Plugins::NestedAttributes
 
 <p>In addition to creating new associated objects, you can also update existing associated objects.  You just need to make sure that the primary key field is filled in for the associated object:</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:albums_attributes</span> <span class="ruby-operator">=&gt;</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">name:</span> <span class="ruby-string">&#39;T&#39;</span>}])
+<pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">albums_attributes:</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">name:</span> <span class="ruby-string">&#39;T&#39;</span>}])
 </pre>
 
 <p>Since the primary key field is filled in, the plugin will update the album with id 1 instead of creating a new album.</p>
@@ -69,13 +69,13 @@ Sequel::Plugins::NestedAttributes
 <p>If you would like to delete the associated object instead of updating it, you add a _delete entry to the hash, and also pass the :destroy option when calling <code>nested_attributes</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">destroy:</span> <span class="ruby-keyword">true</span>
-<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:albums_attributes</span> <span class="ruby-operator">=&gt;</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_delete:</span> <span class="ruby-keyword">true</span>}])
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">albums_attributes:</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_delete:</span> <span class="ruby-keyword">true</span>}])
 </pre>
 
 <p>This will delete the related associated object from the database.  If you want to leave the associated object in the database, but just remove it from the association, add a _remove entry in the hash, and also pass the :remove option when calling <code>nested_attributes</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">remove:</span> <span class="ruby-keyword">true</span>
-<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:albums_attributes</span> <span class="ruby-operator">=&gt;</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_remove:</span> <span class="ruby-keyword">true</span>}])
+<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">albums_attributes:</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_remove:</span> <span class="ruby-keyword">true</span>}])
 </pre>
 
 <p>The above example was for a one_to_many association, but the plugin also works similarly for other association types.  For one_to_one and many_to_one associations, you need to pass a single hash instead of an array of hashes.</p>
@@ -107,7 +107,7 @@ Sequel::Plugins::NestedAttributes
 
 <p>You can pass options for individual nested attributes, which will override the default nested attributes options for that association.  This is useful for per-call filtering of the allowed fields:</p>
 
-<pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">set_nested_attributes</span>(<span class="ruby-value">:albums</span>, <span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-value">:fields</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">%w&#39;name&#39;</span>)
+<pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">set_nested_attributes</span>(<span class="ruby-value">:albums</span>, <span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-value">fields:</span> <span class="ruby-node">%w&#39;name&#39;</span>)
 </pre>
 </div>
 <div id='method-list'>

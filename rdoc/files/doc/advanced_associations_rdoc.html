@@ -30,7 +30,7 @@ doc/advanced_associations.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-04-01 09:49:55 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -147,7 +147,7 @@ Last Update:
 
 <p>Or with 2 separate <code>eager_graph</code> queries:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">:tracks</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:lyric</span>)})
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">tracks:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:lyric</span>)})
 <span class="ruby-comment"># 2 Queries:</span>
 <span class="ruby-comment"># SELECT artists.id, artists.name, ...</span>
 <span class="ruby-comment">#        albums.id AS albums_id, albums.name AS albums_name, ...</span>
@@ -245,9 +245,9 @@ Last Update:
 
 <p>and the following three albums in the database:</p>
 
-<pre class="ruby"><span class="ruby-identifier">album1</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>) <span class="ruby-comment"># id: 1</span>
-<span class="ruby-identifier">album2</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>) <span class="ruby-comment"># id: 2</span>
-<span class="ruby-identifier">album3</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>) <span class="ruby-comment"># id: 3</span>
+<pre class="ruby"><span class="ruby-identifier">album1</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">3</span>) <span class="ruby-comment"># id: 1</span>
+<span class="ruby-identifier">album2</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">3</span>) <span class="ruby-comment"># id: 2</span>
+<span class="ruby-identifier">album3</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">2</span>) <span class="ruby-comment"># id: 3</span>
 </pre>
 
 <p>If you try to eager load this dataset:</p>
@@ -262,7 +262,7 @@ Last Update:
 
 <p>The artist id_map contains a mapping of artist_id values to arrays of album objects.  Since both album1 and album2 have the same artist_id, the are both in the array related to that key.  album3 has a different artist_id, so it is in a different array. Eager loading of artists is done by looking for any artist having one of the keys in the hash:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span>
+<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span>
 </pre>
 
 <p>When the artists are retrieved, you can iterate over them, find entries with matching keys, and manually associate them to the albums:</p>
@@ -286,7 +286,7 @@ Last Update:
 
 <p>Now the id_map contains a mapping of id values to arrays of album objects (in this case each array only has a single object, because id is the primary key).  So when looking for tracks to eagerly load, you only need to look for ones that have an album_id with one of the keys in the hash:</p>
 
-<pre class="ruby"><span class="ruby-identifier">tracks</span> = <span class="ruby-constant">Track</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:album_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span>
+<pre class="ruby"><span class="ruby-identifier">tracks</span> = <span class="ruby-constant">Track</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">album_id:</span> <span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span>
 </pre>
 
 <p>When the tracks are retrieved, you can iterate over them, find entries with matching keys, and manually associate them to the albums:</p>
@@ -317,10 +317,10 @@ Last Update:
 
 <p>So putting everything together, the artist eager loader looks like:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">:eager_loader</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">eager_loader:</span> (<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">eo_opts</span>[<span class="ruby-value">:rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:artist</span>] = <span class="ruby-keyword">nil</span>}
   <span class="ruby-identifier">id_map</span> = <span class="ruby-identifier">eo_opts</span>[<span class="ruby-value">:id_map</span>]
-  <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>
     <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">id</span>]
       <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
         <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:artist</span>] = <span class="ruby-identifier">artist</span>
@@ -332,10 +332,10 @@ Last Update:
 
 <p>and the tracks eager loader looks like:</p>
 
-<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>, <span class="ruby-value">:eager_loader</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>, <span class="ruby-value">eager_loader:</span> (<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">eo_opts</span>[<span class="ruby-value">:rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:tracks</span>] = []}
   <span class="ruby-identifier">id_map</span> = <span class="ruby-identifier">eo_opts</span>[<span class="ruby-value">:id_map</span>]
-  <span class="ruby-constant">Track</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:album_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">track</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">Track</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">album_id:</span> <span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">track</span><span class="ruby-operator">|</span>
     <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">track</span>.<span class="ruby-identifier">album_id</span>]
       <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>
         <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:tracks</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">track</span>
@@ -401,7 +401,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:first_10_albums</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Album</span>, <span class="ruby-value">order:</span> <span class="ruby-value">:release_date</span>, <span class="ruby-value">limit:</span> <span class="ruby-value">10</span>,
   <span class="ruby-value">eager_limit_strategy:</span> <span class="ruby-value">:window_function</span>
-<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:first_10_albums</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> [<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:first_10_albums</span>).<span class="ruby-identifier">all</span>
 <span class="ruby-comment"># SELECT * FROM (</span>
 <span class="ruby-comment">#   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x</span>
 <span class="ruby-comment">#   FROM albums</span>
@@ -470,7 +470,7 @@ Last Update:
 
 <p>The :correlated_subquery approach JOINs to a nested subquery using a correlated subquery:</p>
 
-<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph_with_options</span>(<span class="ruby-value">:first_10_albums</span>, <span class="ruby-value">:limit_strategy</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:correlated_subquery</span>).<span class="ruby-identifier">all</span>
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph_with_options</span>(<span class="ruby-value">:first_10_albums</span>, <span class="ruby-value">limit_strategy:</span> <span class="ruby-value">:correlated_subquery</span>).<span class="ruby-identifier">all</span>
 <span class="ruby-comment"># SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,</span>
 <span class="ruby-comment">#        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,</span>
 <span class="ruby-comment">#        first_10_albums.release_date</span>
@@ -801,7 +801,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Project</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tickets</span>
   <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:ticket_hours</span>, <span class="ruby-value">read_only:</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:id</span>,
-   <span class="ruby-value">dataset:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-constant">Ticket</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:project_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id</span>).<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">hours</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">hours</span>)}},
+   <span class="ruby-value">dataset:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-constant">Ticket</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">project_id:</span> <span class="ruby-identifier">id</span>).<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">hours</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">hours</span>)}},
    <span class="ruby-value">eager_loader:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">eo</span>[<span class="ruby-value">:rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:ticket_hours</span>] = <span class="ruby-keyword">nil</span>}
     <span class="ruby-constant">Ticket</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">project_id:</span> <span class="ruby-identifier">eo</span>[<span class="ruby-value">:id_map</span>].<span class="ruby-identifier">keys</span>).

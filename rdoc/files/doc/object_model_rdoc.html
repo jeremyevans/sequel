@@ -30,7 +30,7 @@ doc/object_model.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2022-10-21 08:19:04 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -74,7 +74,7 @@ Last Update:
 <p>and transactions:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
-  <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">value</span>)
+  <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">column:</span> <span class="ruby-identifier">value</span>)
 <span class="ruby-keyword">end</span>
 </pre>
 
@@ -498,7 +498,7 @@ Last Update:
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;&#39;</span>, <span class="ruby-string">&#39; = &#39;</span>], <span class="ruby-value">:a</span>, <span class="ruby-value">1</span>)
 
 <span class="ruby-string">&#39;? = ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># core_extensions extension</span>
-<span class="ruby-string">&#39;:b = :v&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>, <span class="ruby-value">:v</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># core_extensions extension</span>
+<span class="ruby-string">&#39;:b = :v&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-value">b:</span> <span class="ruby-value">:a</span>, <span class="ruby-value">v:</span> <span class="ruby-value">1</span>) <span class="ruby-comment"># core_extensions extension</span>
 </pre>
 
 <h3 id="label-Sequel-3A-3ASQL-3A-3AOrderedExpression"><a href="../../classes/Sequel/SQL/OrderedExpression.html"><code>Sequel::SQL::OrderedExpression</code></a><span><a href="#label-Sequel-3A-3ASQL-3A-3AOrderedExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -511,21 +511,21 @@ Last Update:
 
 <p>Additionally, they take an options hash, which can be used to specify how nulls can be sorted:</p>
 
-<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:first</span>) <span class="ruby-comment"># &quot;a&quot; DESC NULLS FIRST</span>
-<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>) <span class="ruby-comment"># &quot;a&quot; ASC NULLS LAST</span>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">nulls:</span> <span class="ruby-value">:first</span>) <span class="ruby-comment"># &quot;a&quot; DESC NULLS FIRST</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">nulls:</span> <span class="ruby-value">:last</span>) <span class="ruby-comment"># &quot;a&quot; ASC NULLS LAST</span>
 </pre>
 
 <p>The following shortcuts exist for creating <a href="../../classes/Sequel/SQL/OrderedExpression.html"><code>Sequel::SQL::OrderedExpression</code></a> objects:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:a</span>)
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:a</span>)
-<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:first</span>)
-<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>)
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">nulls:</span> <span class="ruby-value">:first</span>)
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">nulls:</span> <span class="ruby-value">:last</span>)
 
 <span class="ruby-value">:a</span>.<span class="ruby-identifier">asc</span> <span class="ruby-comment"># core_extensions extension</span>
 <span class="ruby-value">:a</span>.<span class="ruby-identifier">desc</span> <span class="ruby-comment"># core_extensions extension</span>
-<span class="ruby-value">:a</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:first</span>) <span class="ruby-comment"># core_extensions extension</span>
-<span class="ruby-value">:a</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>) <span class="ruby-comment"># core_extensions extension</span>
+<span class="ruby-value">:a</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">nulls:</span> <span class="ruby-value">:first</span>) <span class="ruby-comment"># core_extensions extension</span>
+<span class="ruby-value">:a</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">nulls:</span> <span class="ruby-value">:last</span>) <span class="ruby-comment"># core_extensions extension</span>
 </pre>
 
 <h3 id="label-Sequel-3A-3ASQL-3A-3ASubscript"><a href="../../classes/Sequel/SQL/Subscript.html"><code>Sequel::SQL::Subscript</code></a><span><a href="#label-Sequel-3A-3ASQL-3A-3ASubscript">&para;</a> <a href="#top">&uarr;</a></span></h3>
