@@ -68,6 +68,10 @@ module Sequel
     private 
     
     if RUBY_VERSION >= '2.6'
+      # Whether Time.at with :nsec and :in is broken.  True on JRuby < 9.3.9.0.
+      BROKEN_TIME_AT_WITH_NSEC = defined?(JRUBY_VERSION) && (JRUBY_VERSION < '9.3' || (JRUBY_VERSION < '9.4' && JRUBY_VERSION.split('.')[2].to_i < 9))
+      private_constant :BROKEN_TIME_AT_WITH_NSEC
+
       # Convert the given input Time (which must be in UTC) to the given input timezone,
       # which should be a TZInfo::Timezone instance.
       def convert_input_time_other(v, input_timezone)
@@ -77,7 +81,7 @@ module Sequel
         period = input_timezone.period_for_local(v, &disamb)
         offset = period.utc_total_offset
         # :nocov:
-        if defined?(JRUBY_VERSION)
+        if BROKEN_TIME_AT_WITH_NSEC
           Time.at(v.to_i - offset, :in => input_timezone) + v.nsec/1000000000.0
         # :nocov:
         else
@@ -89,7 +93,7 @@ module Sequel
       # which should be a TZInfo::Timezone instance.
       def convert_output_time_other(v, output_timezone)
         # :nocov:
-        if defined?(JRUBY_VERSION)
+        if BROKEN_TIME_AT_WITH_NSEC
           Time.at(v.to_i, :in => output_timezone) + v.nsec/1000000000.0
         # :nocov:
         else

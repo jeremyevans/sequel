@@ -1,3 +1,7 @@
+=== master
+
+* Skip use of JRuby workaround on JRuby 9.3.9.0+ in named_timezones extension as JRuby fixed the related bug (jeremyevans)
+
 === 5.62.0 (2022-11-01)
 
 * Add back the pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with pg driver (jeremyevans)
