@@ -76,7 +76,7 @@ describe "A connection pool handling connections" do
     @cpool.hold do
       @cpool.allocated.size.must_equal 1
   
-      @cpool.allocated.must_equal(Thread.current=>:got_connection)
+      Hash[@cpool.allocated.to_a].must_equal(Thread.current=>:got_connection)
     end
   end
 
@@ -192,7 +192,7 @@ describe "A connection pool with a max size of 1" do
     c2.must_be_nil
     
     @pool.available_connections.must_be :empty?
-    @pool.allocated.must_equal(t1=>cc)
+    Hash[@pool.allocated.to_a].must_equal(t1=>cc)
 
     cc.gsub!('rr', 'll')
     q.push nil
@@ -204,7 +204,7 @@ describe "A connection pool with a max size of 1" do
     c2.must_equal 'hello'
 
     @pool.available_connections.must_be :empty?
-    @pool.allocated.must_equal(t2=>cc)
+    Hash[@pool.allocated.to_a].must_equal(t2=>cc)
     
     #connection released
     q.push nil
@@ -348,7 +348,7 @@ threaded_connection_pool_specs = Module.new do
     h = {}
     i = 0
     threads.each{|t| h[t] = (i+=1)}
-    @pool.allocated.must_equal h
+    Hash[@pool.allocated.to_a].must_equal h
     @pool.available_connections.must_equal []
     5.times{q2.push nil}
     threads.each{|t| t.join}
@@ -694,7 +694,7 @@ describe "A connection pool with multiple servers" do
     @pool.size.must_equal 0
     @pool.hold do |c|
       c.must_equal "default1"
-      @pool.allocated.must_equal(Thread.current=>"default1")
+      Hash[@pool.allocated.to_a].must_equal(Thread.current=>"default1")
     end
     @pool.available_connections.must_equal ["default1"]
     @pool.size.must_equal 1
@@ -734,7 +734,7 @@ describe "A connection pool with multiple servers" do
     @pool.size(:read_only).must_equal 0
     @pool.hold(:read_only) do |c|
       c.must_equal "read_only1"
-      @pool.allocated(:read_only).must_equal(Thread.current=>"read_only1")
+      Hash[@pool.allocated(:read_only).to_a].must_equal(Thread.current=>"read_only1")
     end
     @pool.available_connections(:read_only).must_equal ["read_only1"]
     @pool.size(:read_only).must_equal 1
@@ -744,14 +744,14 @@ describe "A connection pool with multiple servers" do
   it "#hold should only yield connections for the server requested" do
     @pool.hold(:read_only) do |c|
       c.must_equal "read_only1"
-      @pool.allocated(:read_only).must_equal(Thread.current=>"read_only1")
+      Hash[@pool.allocated(:read_only).to_a].must_equal(Thread.current=>"read_only1")
       @pool.hold do |d|
         d.must_equal "default1"
         @pool.hold do |e|
           e.must_equal d
           @pool.hold(:read_only){|b| b.must_equal c}
         end
-        @pool.allocated.must_equal(Thread.current=>"default1")
+        Hash[@pool.allocated.to_a].must_equal(Thread.current=>"default1")
       end
     end
     @invoked_counts.must_equal(:read_only=>1, :default=>1)

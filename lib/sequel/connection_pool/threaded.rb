@@ -31,6 +31,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @connection_handling = opts[:connection_handling]
     @available_connections = []
     @allocated = {}
+    @allocated.compare_by_identity
     @timeout = Float(opts[:pool_timeout] || 5)
     @waiter = ConditionVariable.new
   end

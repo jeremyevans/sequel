@@ -1,5 +1,7 @@
 === master
 
+* Use compare_by_identity hashes for Thread-keyed hashes in threaded connection pools (jeremyevans)
+
 * Skip use of JRuby workaround on JRuby 9.3.9.0+ in named_timezones extension as JRuby fixed the related bug (jeremyevans)
 
 === 5.62.0 (2022-11-01)

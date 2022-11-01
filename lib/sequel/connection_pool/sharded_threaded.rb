@@ -22,6 +22,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     @connections_to_disconnect = []
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
     remove_instance_variable(:@waiter)
+    remove_instance_variable(:@allocated)
+    @allocated = {}
     @waiters = {}
 
     add_servers([:default])
@@ -36,7 +38,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
         unless @servers.has_key?(server)
           @servers[server] = server
           @available_connections[server] = []
-          @allocated[server] = {}
+          allocated = {}
+          allocated.compare_by_identity
+          @allocated[server] = allocated
           @waiters[server] = ConditionVariable.new
         end
       end
