@@ -238,11 +238,15 @@ describe "A connection pool with a max size of 1" do
   end
 end
 
-threaded_connection_pool_specs = Module.new do
+concurrent_connection_pool_specs = Module.new do
   extend Minitest::Spec::DSL
 
+  it "should raise error if max_connections is not positive" do
+    proc{get_pool(:max_connections=>0)}.must_raise Sequel::Error
+  end
+
   it "should not have all_connections yield connections allocated to other threads" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>2, :pool_timeout=>0))
+    pool = get_pool(:max_connections=>2, :pool_timeout=>0)
     q, q1 = Queue.new, Queue.new
     t = Thread.new do
       pool.hold do |c1|
@@ -259,7 +263,7 @@ threaded_connection_pool_specs = Module.new do
   end
 
   it "should work when acquire fails and then succeeds" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>2, :pool_timeout=>0))
+    pool = get_pool(:max_connections=>2, :pool_timeout=>0)
     def pool._acquire(*)
       if @called
         super
@@ -276,7 +280,7 @@ threaded_connection_pool_specs = Module.new do
   end
 
   it "should wait until a connection is available if all are checked out" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0.1))
+    pool = get_pool(:max_connections=>1, :pool_timeout=>0.1)
     q, q1 = Queue.new, Queue.new
     t = Thread.new do
       pool.hold do |c|
@@ -292,7 +296,7 @@ threaded_connection_pool_specs = Module.new do
   end
 
   it "should not have all_connections yield all available connections" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>2, :pool_timeout=>0))
+    pool = get_pool(:max_connections=>2, :pool_timeout=>0)
     q, q1 = Queue.new, Queue.new
     b = []
     t = Thread.new do
@@ -317,7 +321,7 @@ threaded_connection_pool_specs = Module.new do
     q, q1 = Queue.new, Queue.new
     db = mock_db.call(&@icpp)
     db.opts[:name] = 'testing'
-    pool = Sequel::ConnectionPool.get_pool(db, @cp_opts.merge(:max_connections=>1, :pool_timeout=>0))
+    pool = get_pool(:db=>db, :max_connections=>1, :pool_timeout=>0)
     t = Thread.new{pool.hold{|c| q1.push nil; q.pop}}
     q1.pop
     e = proc{pool.hold{|c|}}.must_raise(Sequel::PoolTimeout)
@@ -328,7 +332,7 @@ threaded_connection_pool_specs = Module.new do
   end
   
   it "should not add a disconnected connection back to the pool if the disconnection_proc raises an error" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| raise Sequel::Error}, &@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0))
+    pool = get_pool(:max_connections=>1, :pool_timeout=>0, :mock_db_call_args=>[proc{|c| raise Sequel::Error}])
     proc{pool.hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::Error)
     pool.available_connections.length.must_equal 0
   end
@@ -431,7 +435,7 @@ threaded_connection_pool_specs = Module.new do
     # connections in the pool can make the pool later block until the timeout expires,
     # since then the pool will not be signalled correctly.
     # This spec is only added for coverage purposes, to ensure that fallback code is tested.
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:pool_timeout=>0.25))
+    @pool = get_pool(:pool_timeout=>0.25)
 
     cc = {}
     threads = []
@@ -504,27 +508,18 @@ threaded_connection_pool_specs = Module.new do
     exceptions.length.must_equal 5
     cc.values.uniq.length.must_equal 8
     
-    @pool.size.must_equal 3
-    @invoked_count.must_equal 8
-    @pool.available_connections.size.must_equal 3
+    size = @pool.size
+    # Timed Queue pool can use up to 5 because it eagerly sets up additional connections,
+    # while other threads are waiting on the queue.
+    # This is not a bug as long as the number of connections it sets up is still
+    # within the maximum number of connections in the pool.
+    [3,4,5].must_include(size)
+    @invoked_count.must_equal(size+5)
+    @pool.available_connections.size.must_equal size
     @pool.allocated.must_be :empty?
   end
 
-  it "should store connections in a stack if :connection_handling=>:stack" do
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:stack))
-    c2 = nil
-    c = @pool.hold{|cc| Thread.new{@pool.hold{|cc2| c2 = cc2}}.join; cc}
-    @pool.size.must_equal 2
-    @pool.hold{|cc| cc.must_equal c}
-    @pool.hold{|cc| cc.must_equal c}
-    @pool.hold do |cc|
-      cc.must_equal c
-      Thread.new{@pool.hold{|cc2| _(cc2).must_equal c2}}.join
-    end
-  end
-
-  it "should store connections in a queue if :connection_handling=>:queue" do
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:queue))
+  it "should store connections in a queue" do
     c2 = nil
     c = @pool.hold{|cc| Thread.new{@pool.hold{|cc2| c2 = cc2}}.join; cc}
     @pool.size.must_equal 2
@@ -536,32 +531,8 @@ threaded_connection_pool_specs = Module.new do
     end
   end
 
-  it "should not store connections if :connection_handling=>:disconnect" do
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:disconnect))
-    d = []
-    m = @m
-    @pool.db.define_singleton_method(:disconnect_connection){|c| m.synchronize{d << c}}
-    @pool.hold do |cc|
-      cc.must_equal 1
-      Thread.new{@pool.hold{|cc2| _(cc2).must_equal 2}}.join
-      d.must_equal [2]
-      @pool.hold{|cc3| cc3.must_equal 1}
-    end
-    @pool.size.must_equal 0
-    d.must_equal [2, 1]
-
-    @pool.hold{|cc| cc.must_equal 3}
-    @pool.size.must_equal 0
-    d.must_equal [2, 1, 3]
-
-    @pool.hold{|cc| cc.must_equal 4}
-    @pool.size.must_equal 0
-    d.must_equal [2, 1, 3, 4]
-  end
-
-
   it "should handle dead threads with checked out connections" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1))
+    pool = get_pool(:max_connections=>1)
 
     skip = true
     # Leave allocated connection to emulate dead thread with checked out connection
@@ -582,34 +553,127 @@ threaded_connection_pool_specs = Module.new do
   end
 end
 
-describe "Threaded Unsharded Connection Pool" do
-  before do
-    @m = Mutex.new
-    @invoked_count = 0
-    @icpp = proc{@m.synchronize{@invoked_count += 1}}
-    @cp_opts = connection_pool_defaults.merge(:max_connections=>5)
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts)
-  end
-  
-  include threaded_connection_pool_specs
+threaded_connection_pool_specs = Module.new do
+  extend Minitest::Spec::DSL
 
-  it "should work correctly if acquire raises an exception" do
-    @pool.hold{}
-    def @pool.acquire(_) raise Sequel::DatabaseDisconnectError; end
-    proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
+  it "should store connections in a stack if :connection_handling=>:stack" do
+    @pool = get_pool(:connection_handling=>:stack)
+    c2 = nil
+    c = @pool.hold{|cc| Thread.new{@pool.hold{|cc2| c2 = cc2}}.join; cc}
+    @pool.size.must_equal 2
+    @pool.hold{|cc| cc.must_equal c}
+    @pool.hold{|cc| cc.must_equal c}
+    @pool.hold do |cc|
+      cc.must_equal c
+      Thread.new{@pool.hold{|cc2| _(cc2).must_equal c2}}.join
+    end
+  end
+
+  it "should not store connections if :connection_handling=>:disconnect" do
+    @pool = get_pool(:connection_handling=>:disconnect)
+    d = []
+    m = @m
+    @pool.db.define_singleton_method(:disconnect_connection){|c| m.synchronize{d << c}}
+    @pool.hold do |cc|
+      cc.must_equal 1
+      Thread.new{@pool.hold{|cc2| _(cc2).must_equal 2}}.join
+      d.must_equal [2]
+      @pool.hold{|cc3| cc3.must_equal 1}
+    end
+    @pool.size.must_equal 0
+    d.must_equal [2, 1]
+
+    @pool.hold{|cc| cc.must_equal 3}
+    @pool.size.must_equal 0
+    d.must_equal [2, 1, 3]
+
+    @pool.hold{|cc| cc.must_equal 4}
+    @pool.size.must_equal 0
+    d.must_equal [2, 1, 3, 4]
   end
 end
 
-describe "Threaded Sharded Connection Pool" do
+describe "Connection Pool" do
   before do
     @m = Mutex.new
     @invoked_count = 0
     @icpp = proc{@m.synchronize{@invoked_count += 1}}
-    @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :servers=>{})
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts)
   end
 
-  include threaded_connection_pool_specs
+  define_method(:get_pool) do |opts={}|
+    args = opts[:mock_db_call_args] || []
+    Sequel::ConnectionPool.get_pool(opts[:db] || mock_db.call(*args, &@icpp), @cp_opts.merge(opts))
+  end
+
+  describe "Threaded Unsharded" do
+    before do
+      @cp_opts = connection_pool_defaults.merge(:max_connections=>5)
+      @pool = get_pool
+    end
+    
+    include concurrent_connection_pool_specs
+    include threaded_connection_pool_specs
+
+    it "should work correctly if acquire raises an exception" do
+      @pool.hold{}
+      def @pool.acquire(_) raise Sequel::DatabaseDisconnectError; end
+      proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
+    end
+  end
+
+  describe "Threaded Sharded" do
+    before do
+      @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :servers=>{})
+      @pool = get_pool
+    end
+
+    include concurrent_connection_pool_specs
+    include threaded_connection_pool_specs
+  end
+
+  describe "Timed Queue" do
+    def get_pool(opts={})
+      pool = super
+      def pool.allocated; @allocated; end
+      def pool.available_connections
+        conns = []
+        while conn = @queue.pop(timeout: 0)
+          conns << conn
+        end
+        conns.each{|conn| @queue.push(conn)}
+      end
+      pool
+    end
+
+    before do
+      @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :pool_class=>:timed_queue)
+      @pool = get_pool
+    end
+    
+    include concurrent_connection_pool_specs
+
+    it "should handle preconnect(true) where a connection cannot be made due to maximum pool size being reached" do
+      m = Mutex.new
+      called = false
+      @pool.define_singleton_method(:try_make_new){super() if m.synchronize{c = called; called = true; c}}
+
+      i = 0
+      @pool.send(:preconnect, true)
+      @pool.all_connections{|c1| i+=1}
+      i.must_equal(@pool.max_size - 1)
+
+      i = 0
+      @pool.send(:preconnect, true)
+      @pool.all_connections{|c1| i+=1}
+      i.must_equal @pool.max_size
+    end
+
+    it "should work correctly if acquire raises an exception" do
+      @pool.hold{}
+      def @pool.acquire(_) raise Sequel::DatabaseDisconnectError; end
+      proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
+    end
+  end if RUBY_VERSION >= '3.2'
 end
 
 describe "ConnectionPool#disconnect" do
@@ -1111,217 +1175,233 @@ describe "A single threaded pool with multiple servers" do
   end
 end
 
+all_pools = []
 [true, false].each do |k|
   [true, false].each do |v|
-    opts = {:single_threaded=>k, :servers=>(v ? {} : nil)}
-    describe "Connection pool with #{opts.inspect}" do
-      before(:all) do
-        Sequel::ConnectionPool.send(:get_pool, mock_db.call, opts)
+    all_pools << {:single_threaded=>k, :servers=>(v ? {} : nil)}
+  end
+end
+
+all_pools << {:pool_class=>:timed_queue} if RUBY_VERSION >= '3.2'
+
+all_pools.each do |opts|
+  describe "Connection pool with #{opts.inspect}" do
+    before(:all) do
+      Sequel::ConnectionPool.send(:get_pool, mock_db.call, opts)
+    end
+    before do
+      @class = Sequel::ConnectionPool.send(:connection_pool_class, opts)
+    end
+
+    it "should work correctly after being frozen" do
+      o = Object.new
+      db = mock_db.call{o}
+      cp = @class.new(db, {})
+      db.instance_variable_set(:@pool, cp)
+      db.freeze
+      cp.frozen?.must_equal true
+      db.synchronize{|c| c.must_be_same_as o}
+    end
+
+    it "should have pool correctly handle disconnect errors not raised as DatabaseDisconnectError" do
+      db = mock_db.call{Object.new}
+      def db.dec; @dec ||= Class.new(StandardError) end
+      def db.database_error_classes; super + [dec] end
+      def db.disconnect_error?(e, opts); e.message =~ /foo/ end
+      cp = @class.new(db, {})
+
+      conn = nil
+      cp.hold do |c|
+        conn = c
       end
-      before do
-        @class = Sequel::ConnectionPool.send(:connection_pool_class, opts)
-      end
 
-      it "should work correctly after being frozen" do
-        o = Object.new
-        db = mock_db.call{o}
-        cp = @class.new(db, {})
-        db.instance_variable_set(:@pool, cp)
-        db.freeze
-        cp.frozen?.must_equal true
-        db.synchronize{|c| c.must_be_same_as o}
-      end
-
-      it "should have pool correctly handle disconnect errors not raised as DatabaseDisconnectError" do
-        db = mock_db.call{Object.new}
-        def db.dec; @dec ||= Class.new(StandardError) end
-        def db.database_error_classes; super + [dec] end
-        def db.disconnect_error?(e, opts); e.message =~ /foo/ end
-        cp = @class.new(db, {})
-
-        conn = nil
-        cp.hold do |c|
-          conn = c
-        end
-
-        proc do
-          cp.hold do |c|
-            c.must_equal conn
-            raise db.dec, "bar"
-          end
-        end.must_raise db.dec
-
-        proc do
-          cp.hold do |c|
-            c.must_equal conn
-            raise StandardError
-          end
-        end.must_raise StandardError
-
+      proc do
         cp.hold do |c|
           c.must_equal conn
+          raise db.dec, "bar"
         end
+      end.must_raise db.dec
 
-        proc do
-          cp.hold do |c|
-            c.must_equal conn
-            raise db.dec, "foo"
-          end
-        end.must_raise db.dec
-
+      proc do
         cp.hold do |c|
-          c.wont_equal conn
+          c.must_equal conn
+          raise StandardError
         end
+      end.must_raise StandardError
+
+      cp.hold do |c|
+        c.must_equal conn
       end
 
-      it "should have pool_type return a symbol" do
-        @class.new(mock_db.call{123}, {}).pool_type.must_be_kind_of(Symbol)
-      end
+      proc do
+        cp.hold do |c|
+          c.must_equal conn
+          raise db.dec, "foo"
+        end
+      end.must_raise db.dec
 
-      it "should have all_connections yield current and available connections" do
-        p = @class.new(mock_db.call{123}, {})
-        p.hold{|c| p.all_connections{|c1| c.must_equal c1}}
+      cp.hold do |c|
+        c.wont_equal conn
       end
+    end
 
-      it "should have a size method that gives the current size of the pool" do
-        p = @class.new(mock_db.call{123}, {})
-        p.size.must_equal 0
-        p.hold{}
-        p.size.must_equal 1
-      end
+    it "should have pool_type return a symbol" do
+      @class.new(mock_db.call{123}, {}).pool_type.must_be_kind_of(Symbol)
+    end
 
-      it "should have a max_size method that gives the maximum size of the pool" do
-        @class.new(mock_db.call{123}, {}).max_size.must_be :>=,  1
-      end
+    it "should support :pool_class option given as a string" do
+      type = @class.new(mock_db.call{123}, {}).pool_type
+      pool = Sequel::ConnectionPool.send(:connection_pool_class, opts.merge(:pool_class=>type.to_s)).new(mock_db.call{123}, {})
+      pool.pool_type.must_equal type
+    end
 
-      it "should support preconnect method that immediately creates the maximum number of connections" do
-        p = @class.new(mock_db.call{123}, {})
-        p.send(:preconnect)
-        i = 0
-        p.all_connections{|c1| i+=1}
-        i.must_equal p.max_size
-      end
+    it "should have all_connections yield current and available connections" do
+      p = @class.new(mock_db.call{123}, {})
+      p.hold{|c| p.all_connections{|c1| c.must_equal c1}}
+    end
 
-      it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
-        p = @class.new(mock_db.call{123}, {})
-        p.send(:preconnect, true)
-        i = 0
-        p.all_connections{|c1| i+=1}
-        i.must_equal p.max_size
-      end
+    it "should have a size method that gives the current size of the pool" do
+      p = @class.new(mock_db.call{123}, {})
+      p.size.must_equal 0
+      p.hold{}
+      p.size.must_equal 1
+    end
 
-      it "should be able to modify after_connect proc after the pool is created" do
-        a = []
-        p = @class.new(mock_db.call{123}, {})
-        p.after_connect = pr = proc{|c| a << c}
-        p.after_connect.must_equal pr
-        a.must_equal []
-        p.hold{}
-        a.must_equal [123]
+    it "should have a max_size method that gives the maximum size of the pool" do
+      @class.new(mock_db.call{123}, {}).max_size.must_be :>=,  1
+    end
 
-        p.after_connect = proc{|c, s| a = [c, s]}
-        p.disconnect
-        p.hold{}
-        a.must_equal [123, :default]
-      end
+    it "should support preconnect method that immediately creates the maximum number of connections" do
+      p = @class.new(mock_db.call{Object.new}, {})
+      p.send(:preconnect)
+      i = 0
+      p.all_connections{|c1| i+=1}
+      i.must_equal p.max_size
+      p.send(:preconnect)
+      i.must_equal p.max_size
+    end
 
-      it "should be able to modify connect_sqls after the pool is created" do
-        db = mock_db.call
-        p = @class.new(db, {})
-        p.connect_sqls = ['SELECT 1']
-        p.connect_sqls.must_equal ['SELECT 1']
-        db.disconnect
-        p.hold{}
-        db.sqls.must_equal ['SELECT 1']
-      end
+    it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
+      p = @class.new(mock_db.call{Object.new}, {})
+      p.send(:preconnect, true)
+      i = 0
+      p.all_connections{|c1| i+=1}
+      i.must_equal p.max_size
+      p.send(:preconnect, true)
+      i.must_equal p.max_size
+    end
 
-      it "should not raise an error when disconnecting twice" do
-        c = @class.new(mock_db.call{123}, {})
-        c.disconnect
-        c.disconnect
-      end
-      
-      it "should yield a connection created by the initialize block to hold" do
-        x = nil
-        @class.new(mock_db.call{123}, {}).hold{|c| x = c}
-        x.must_equal 123
-      end
-      
-      it "should have the initialize block accept a shard/server argument" do
-        x = nil
-        @class.new(mock_db.call{|c| [c, c]}, {}).hold{|c| x = c}
-        x.must_equal [:default, :default]
-      end
-      
-      it "should have respect an :after_connect proc that is called with each newly created connection" do
-        x = nil
-        db = mock_db.call(nil, :after_connect=>proc{|c| x = [c, c]}){123}
-        @class.new(db, db.opts).hold{}
-        x.must_equal [123, 123]
+    it "should be able to modify after_connect proc after the pool is created" do
+      a = []
+      p = @class.new(mock_db.call{123}, {})
+      p.after_connect = pr = proc{|c| a << c}
+      p.after_connect.must_equal pr
+      a.must_equal []
+      p.hold{}
+      a.must_equal [123]
 
-        x = nil
-        db = mock_db.call(nil, :after_connect=>lambda{|c| x = [c, c]}){123}
-        @class.new(db, db.opts).hold{}
-        x.must_equal [123, 123]
+      p.after_connect = proc{|c, s| a = [c, s]}
+      p.disconnect
+      p.hold{}
+      a.must_equal [123, :default]
+    end
 
-        x = nil
-        db = mock_db.call(nil, :after_connect=>proc{|c, s| x = [c, s]}){123}
-        @class.new(db, db.opts).hold{}
-        x.must_equal [123, :default]
+    it "should be able to modify connect_sqls after the pool is created" do
+      db = mock_db.call
+      p = @class.new(db, {})
+      p.connect_sqls = ['SELECT 1']
+      p.connect_sqls.must_equal ['SELECT 1']
+      db.disconnect
+      p.hold{}
+      db.sqls.must_equal ['SELECT 1']
+    end
 
-        x = nil
-        db = mock_db.call(nil, :after_connect=>lambda{|c, s| x = [c, s]}){123}
-        @class.new(db, db.opts).hold{}
-        x.must_equal [123, :default]
-      end
-      
-      it "should raise a DatabaseConnectionError if the connection raises an exception" do
-        proc{@class.new(mock_db.call{|c| raise Exception}, {}).hold{}}.must_raise(Sequel::DatabaseConnectionError)
-      end
-      
-      it "should raise a DatabaseConnectionError if the initialize block returns nil" do
-        proc{@class.new(mock_db.call{}, {}).hold{}}.must_raise(Sequel::DatabaseConnectionError)
-      end
-      
-      it "should call the disconnection_proc option if the hold block raises a DatabaseDisconnectError" do
-        x = nil
-        proc{@class.new(mock_db.call(proc{|c| x = c}){123}).hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::DatabaseDisconnectError)
-        x.must_equal 123
-      end
-      
-      it "should have a disconnect method that disconnects the connection" do
-        x = nil
-        c = @class.new(mock_db.call(proc{|c1| x = c1}){123})
-        c.hold{}
-        x.must_be_nil
-        c.disconnect
-        x.must_equal 123
-      end
-      
-      it "should have a reentrent hold method" do
-        o = Object.new
-        c = @class.new(mock_db.call{o}, {})
-        c.hold do |x|
-          x.must_equal o
-          c.hold do |x1|
-            x1.must_equal o
-            c.hold do |x2|
-              x2.must_equal o
-            end
+    it "should not raise an error when disconnecting twice" do
+      c = @class.new(mock_db.call{123}, {})
+      c.disconnect
+      c.disconnect
+    end
+    
+    it "should yield a connection created by the initialize block to hold" do
+      x = nil
+      @class.new(mock_db.call{123}, {}).hold{|c| x = c}
+      x.must_equal 123
+    end
+    
+    it "should have the initialize block accept a shard/server argument" do
+      x = nil
+      @class.new(mock_db.call{|c| [c, c]}, {}).hold{|c| x = c}
+      x.must_equal [:default, :default]
+    end
+    
+    it "should have respect an :after_connect proc that is called with each newly created connection" do
+      x = nil
+      db = mock_db.call(nil, :after_connect=>proc{|c| x = [c, c]}){123}
+      @class.new(db, db.opts).hold{}
+      x.must_equal [123, 123]
+
+      x = nil
+      db = mock_db.call(nil, :after_connect=>lambda{|c| x = [c, c]}){123}
+      @class.new(db, db.opts).hold{}
+      x.must_equal [123, 123]
+
+      x = nil
+      db = mock_db.call(nil, :after_connect=>proc{|c, s| x = [c, s]}){123}
+      @class.new(db, db.opts).hold{}
+      x.must_equal [123, :default]
+
+      x = nil
+      db = mock_db.call(nil, :after_connect=>lambda{|c, s| x = [c, s]}){123}
+      @class.new(db, db.opts).hold{}
+      x.must_equal [123, :default]
+    end
+    
+    it "should raise a DatabaseConnectionError if the connection raises an exception" do
+      proc{@class.new(mock_db.call{|c| raise Exception}, {}).hold{}}.must_raise(Sequel::DatabaseConnectionError)
+    end
+    
+    it "should raise a DatabaseConnectionError if the initialize block returns nil" do
+      proc{@class.new(mock_db.call{}, {}).hold{}}.must_raise(Sequel::DatabaseConnectionError)
+    end
+    
+    it "should call the disconnection_proc option if the hold block raises a DatabaseDisconnectError" do
+      x = nil
+      proc{@class.new(mock_db.call(proc{|c| x = c}){123}).hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::DatabaseDisconnectError)
+      x.must_equal 123
+    end
+    
+    it "should have a disconnect method that disconnects the connection" do
+      x = nil
+      c = @class.new(mock_db.call(proc{|c1| x = c1}){123})
+      c.hold{}
+      x.must_be_nil
+      c.disconnect
+      x.must_equal 123
+    end
+    
+    it "should have a reentrent hold method" do
+      o = Object.new
+      c = @class.new(mock_db.call{o}, {})
+      c.hold do |x|
+        x.must_equal o
+        c.hold do |x1|
+          x1.must_equal o
+          c.hold do |x2|
+            x2.must_equal o
           end
         end
       end
-      
-      it "should have a servers method that returns an array of shard/server symbols" do
-        @class.new(mock_db.call{123}, {}).servers.must_equal [:default]
-      end
-      
-      it "should have a servers method that returns an array of shard/server symbols" do
-        c = @class.new(mock_db.call{123}, {})
-        c.size.must_equal 0
-        c.hold{}
-        c.size.must_equal 1
-      end
+    end
+    
+    it "should have a servers method that returns an array of shard/server symbols" do
+      @class.new(mock_db.call{123}, {}).servers.must_equal [:default]
+    end
+    
+    it "should have a servers method that returns an array of shard/server symbols" do
+      c = @class.new(mock_db.call{123}, {})
+      c.size.must_equal 0
+      c.hold{}
+      c.size.must_equal 1
     end
   end
 end

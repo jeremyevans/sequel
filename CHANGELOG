@@ -1,5 +1,9 @@
 === master
 
+* Add support for pool_class: :timed_queue on Ruby 3.2+, using a Queue for available connections (jeremyevans)
+
+* Allow :pool_class Database option to be specified as a string to more easily choose a different pool type (jeremyevans)
+
 * Use compare_by_identity hashes for Thread-keyed hashes in threaded connection pools (jeremyevans)
 
 * Skip use of JRuby workaround on JRuby 9.3.9.0+ in named_timezones extension as JRuby fixed the related bug (jeremyevans)

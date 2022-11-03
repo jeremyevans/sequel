@@ -3,7 +3,7 @@
 # A connection pool allowing multi-threaded access to a pool of connections.
 # This is the default connection pool used by Sequel.
 class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
-  USE_WAITER = true
+  USE_WAITER = true # SEQUEL6: Remove
   Sequel::Deprecation.deprecate_constant(self, :USE_WAITER)
 
   # The maximum number of connections this pool will create (per shard/server
@@ -12,17 +12,17 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   
   # An array of connections that are available for use by the pool.
   # The calling code should already have the mutex before calling this.
-  attr_reader :available_connections
+  attr_reader :available_connections # SEQUEL6: Remove
   
-  # A hash with thread keys and connection values for currently allocated connections.
+  # A hash with thread/fiber keys and connection values for currently allocated connections.
   # The calling code should already have the mutex before calling this.
-  attr_reader :allocated
+  attr_reader :allocated # SEQUEL6: Remove
 
   # The following additional options are respected:
   # :max_connections :: The maximum number of connections the connection pool
   #                     will open (default 4)
   # :pool_timeout :: The amount of seconds to wait to acquire a connection
-  #                  before raising a PoolTimeoutError (default 5)
+  #                  before raising a PoolTimeout error (default 5)
   def initialize(db, opts = OPTS)
     super
     @max_size = Integer(opts[:max_connections] || 4)
@@ -50,8 +50,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     end
   end
   
-  # Removes all connections currently available, optionally
-  # yielding each connection to the given block. This method has the effect of 
+  # Removes all connections currently available. This method has the effect of 
   # disconnecting from the database, assuming that no connections are currently
   # being used.  If you want to be able to disconnect connections that are
   # currently in use, use the ShardedThreadedConnectionPool, which can do that.
@@ -135,7 +134,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # calling this.
   #
   # This should return a connection is one is available within the timeout,
-  # or nil if a connection could not be acquired within the timeout.
+  # or raise PoolTimeout if a connection could not be acquired within the timeout.
   def acquire(thread)
     if conn = assign_connection(thread)
       return conn

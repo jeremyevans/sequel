@@ -30,8 +30,11 @@ class Sequel::ConnectionPool
     :threaded => :ThreadedConnectionPool,
     :single => :SingleConnectionPool,
     :sharded_threaded => :ShardedThreadedConnectionPool,
-    :sharded_single => :ShardedSingleConnectionPool
-  }.freeze
+    :sharded_single => :ShardedSingleConnectionPool,
+    :timed_queue => :TimedQueueConnectionPool,
+  }
+  POOL_CLASS_MAP.to_a.each{|k, v| POOL_CLASS_MAP[k.to_s] = v}
+  POOL_CLASS_MAP.freeze
 
   # Class methods used to return an appropriate pool subclass, separated
   # into a module for easier overridding by extensions.
