@@ -3552,7 +3552,7 @@ module Sequel
         end
 
         # Eagerly load all specified associations.
-        def eager_load(a, m=model, eager_assoc=@opts[:eager])
+        def eager_load(a, eager_assoc=@opts[:eager], m=model)
           return if a.empty?
 
           # Reflections for all associations to eager load

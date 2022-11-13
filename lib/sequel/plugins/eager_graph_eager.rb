@@ -127,7 +127,7 @@ module Sequel
                 current.uniq!(&:object_id)
               end
 
-              last_class.dataset.send(:eager_load, current, model, assocs)
+              last_class.dataset.send(:eager_load, current, assocs)
             end
           end
 

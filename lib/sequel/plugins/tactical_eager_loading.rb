@@ -158,7 +158,7 @@ module Sequel
                 retrieved_with.reject{|x| x.frozen? || x.associations.include?(name)}
               end
             objects = objects.select { |x| x.is_a?(model) }
-            retrieved_by.send(:eager_load, objects, model, name=>dynamic_opts[:eager] || OPTS)
+            retrieved_by.send(:eager_load, objects, {name=>dynamic_opts[:eager] || OPTS}, model)
           end
           super
         end
