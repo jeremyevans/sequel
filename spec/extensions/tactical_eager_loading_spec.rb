@@ -130,7 +130,7 @@ describe "tactical_eager_loading plugin" do
     c = Class.new(@c)
     c.many_to_one :parent2, :class=>@c, :key=>:parent_id
     @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent2 if x.is_a?(c)}
-    sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE id = 101')
+    sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE (t.id IN (101))')
   end
 
   it "association getter methods should not eagerly load the association if an instance is frozen" do

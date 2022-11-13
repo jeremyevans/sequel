@@ -152,20 +152,13 @@ module Sequel
           name = opts[:name]
           eager_reload = dynamic_opts[:eager_reload]
           if (!associations.include?(name) || eager_reload) && opts[:allow_eager] != false && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
-            begin
               objects = if eager_reload
                 retrieved_with.reject(&:frozen?)
               else
                 retrieved_with.reject{|x| x.frozen? || x.associations.include?(name)}
               end
-              retrieved_by.send(:eager_load, objects, name=>dynamic_opts[:eager] || OPTS)
-            rescue Sequel::UndefinedAssociation
-              # This can happen if class table inheritance is used and the association
-              # is only defined in a subclass.  This particular instance can use the
-              # association, but it can't be eagerly loaded as the parent class doesn't
-              # have access to the association, and that's the class doing the eager loading.
-              nil
-            end
+            objects = objects.select { |x| x.is_a?(model) }
+            retrieved_by.send(:eager_load, objects, model, name=>dynamic_opts[:eager] || OPTS)
           end
           super
         end

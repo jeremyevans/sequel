@@ -3552,11 +3552,11 @@ module Sequel
         end
 
         # Eagerly load all specified associations.
-        def eager_load(a, eager_assoc=@opts[:eager])
+        def eager_load(a, m=model, eager_assoc=@opts[:eager])
           return if a.empty?
 
           # Reflections for all associations to eager load
-          reflections = eager_assoc.keys.map{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
+          reflections = eager_assoc.keys.map{|assoc| m.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
 
           perform_eager_loads(prepare_eager_load(a, reflections, eager_assoc))
 
