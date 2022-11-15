@@ -253,6 +253,14 @@ module Sequel
 
         private
 
+        # Limit tactical eager loading objects to objects that support the same association.
+        def _filter_tactical_eager_load_objects(opts)
+          objects = defined?(super) ? super : retrieved_with.dup
+          name = opts[:name]
+          objects.select!{|x| x.model.association_reflections.include?(name)}
+          objects
+        end
+
         # Don't allow use of prepared statements.
         def use_prepared_statements_for?(type)
           false

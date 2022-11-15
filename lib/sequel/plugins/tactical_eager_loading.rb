@@ -152,15 +152,22 @@ module Sequel
           name = opts[:name]
           eager_reload = dynamic_opts[:eager_reload]
           if (!associations.include?(name) || eager_reload) && opts[:allow_eager] != false && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
-              objects = if eager_reload
-                retrieved_with.reject(&:frozen?)
-              else
-                retrieved_with.reject{|x| x.frozen? || x.associations.include?(name)}
-              end
-            objects = objects.select { |x| x.is_a?(model) }
-            retrieved_by.send(:eager_load, objects, {name=>dynamic_opts[:eager] || OPTS}, model)
+            retrieved_by.send(:eager_load, _filter_tactical_eager_load_objects(:eager_reload=>eager_reload, :name=>name), {name=>dynamic_opts[:eager] || OPTS}, model)
           end
           super
+        end
+
+        # Filter the objects used when tactical eager loading.
+        # By default, this removes frozen objects and objects that alreayd have the association loaded
+        def _filter_tactical_eager_load_objects(opts)
+          objects = defined?(super) ? super : retrieved_with.dup
+          if opts[:eager_reload]
+            objects.reject!(&:frozen?)
+          else
+            name = opts[:name]
+            objects.reject!{|x| x.frozen? || x.associations.include?(name)}
+          end
+          objects
         end
       end
 

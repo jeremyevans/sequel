@@ -1,6 +1,6 @@
 === master
 
-* Make tactical_eager_loading plugin work better with class_table_inheritance plugin (rolftimmermans) (#1962)
+* Make tactical_eager_loading plugin work better with table inheritance plugins (rolftimmermans, jeremyevans) (#1962)
 
 * Add support for pool_class: :timed_queue on Ruby 3.2+, using a Queue for available connections (jeremyevans)
 

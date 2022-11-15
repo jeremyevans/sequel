@@ -126,11 +126,59 @@ describe "tactical_eager_loading plugin" do
     sql_match('SELECT * FROM t WHERE (t.parent_id = 1)', 'SELECT * FROM t WHERE (t.parent_id = 2)', 'SELECT * FROM t WHERE (t.parent_id = 101)', 'SELECT * FROM t WHERE (t.parent_id = 102)')
   end
 
-  it "should handle case where an association is valid on an instance, but not on all instances" do
+  it "should handle loading single_table_inheritance after tactical_eager_loading and loading associations defined in parent and subclasses" do
     c = Class.new(@c)
     c.many_to_one :parent2, :class=>@c, :key=>:parent_id
-    @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent2 if x.is_a?(c)}
+    c.plugin :single_table_inheritance, nil
+
+    objs = @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent2 if x.is_a?(c)}
     sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE (t.id IN (101))')
+    objs[0].associations.keys.must_equal [:parent2]
+    objs[1].associations.keys.must_equal []
+
+    objs = @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent}
+    sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE (t.id IN (101, 102))')
+    objs[0].associations.keys.must_equal [:parent]
+    objs[1].associations.keys.must_equal [:parent]
+  end
+
+  it "should handle case where an association is defined in a subclass when loading single_table_inheritance before tactical_eager_loading" do
+    Object.send(:remove_const, :TacticalEagerLoadingModel)
+    class ::TacticalEagerLoadingModel < Sequel::Model(:t)
+      plugin :single_table_inheritance, nil
+      plugin :tactical_eager_loading
+      columns :id, :parent_id
+      many_to_one :parent, :class=>self
+      one_to_many :children, :class=>self, :key=>:parent_id
+      set_dataset dataset.with_fetch(proc do |sql|
+        if sql !~ /WHERE/
+          [{:id=>1, :parent_id=>101}, {:id=>2, :parent_id=>102}, {:id=>101, :parent_id=>nil}, {:id=>102, :parent_id=>nil}]
+        elsif sql =~ /WHERE.*\bid = (\d+)/
+          [{:id=>$1.to_i, :parent_id=>nil}]
+        elsif sql =~ /WHERE.*\bid IN \(([\d, ]*)\)/
+          $1.split(', ').map{|x| {:id=>x.to_i, :parent_id=>nil}}
+        elsif sql =~ /WHERE.*\bparent_id = (\d+)/
+           {:id=>$1.to_i - 100, :parent_id=>$1.to_i} if $1.to_i > 100
+        elsif sql =~ /WHERE.*\bparent_id IN \(([\d, ]*)\)/
+          $1.split(', ').map{|x| {:id=>x.to_i - 100, :parent_id=>x.to_i} if x.to_i > 100}.compact
+        end
+      end)
+    end
+    @c = ::TacticalEagerLoadingModel
+    @ds = TacticalEagerLoadingModel.dataset
+    DB.reset
+    c = Class.new(@c)
+    c.many_to_one :parent2, :class=>@c, :key=>:parent_id
+
+    objs = @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent2 if x.is_a?(c)}
+    sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE (t.id IN (101))')
+    objs[0].associations.keys.must_equal [:parent2]
+    objs[1].associations.keys.must_equal []
+
+    objs = @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent}
+    sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE (t.id IN (101, 102))')
+    objs[0].associations.keys.must_equal [:parent]
+    objs[1].associations.keys.must_equal [:parent]
   end
 
   it "association getter methods should not eagerly load the association if an instance is frozen" do
