@@ -127,6 +127,18 @@ module Sequel
     #
     #   DB[:table].delete # DELETE * FROM table
     #   # => 3
+    #
+    # Some databases support using multiple tables in a DELETE query. This requires
+    # multiple FROM tables (JOINs can also be used). As multiple FROM tables use
+    # an implicit CROSS JOIN, you should make sure your WHERE condition uses the
+    # appropriate filters for the FROM tables:
+    #
+    #  DB.from(:a, :b).join(:c, :d=>Sequel[:b][:e]).where{{a[:f]=>b[:g], a[:id]=>c[:h]}}.
+    #    delete
+    #  # DELETE FROM a
+    #  # USING b
+    #  # INNER JOIN c ON (c.d = b.e)
+    #  # WHERE ((a.f = b.g) AND (a.id = c.h))
     def delete(&block)
       sql = delete_sql
       if uses_returning?(:delete)
@@ -926,6 +938,19 @@ module Sequel
     #
     #   DB[:table].update(x: Sequel[:x]+1, y: 0) # UPDATE table SET x = (x + 1), y = 0
     #   # => 10
+    #
+    # Some databases support using multiple tables in an UPDATE query. This requires
+    # multiple FROM tables (JOINs can also be used). As multiple FROM tables use
+    # an implicit CROSS JOIN, you should make sure your WHERE condition uses the
+    # appropriate filters for the FROM tables:
+    #
+    #  DB.from(:a, :b).join(:c, :d=>Sequel[:b][:e]).where{{a[:f]=>b[:g], a[:id]=>10}}.
+    #    update(:f=>Sequel[:c][:h])
+    #  # UPDATE a
+    #  # SET f = c.h
+    #  # FROM b
+    #  # INNER JOIN c ON (c.d = b.e)
+    #  # WHERE ((a.f = b.g) AND (a.id = 10))
     def update(values=OPTS, &block)
       sql = update_sql(values)
       if uses_returning?(:update)
