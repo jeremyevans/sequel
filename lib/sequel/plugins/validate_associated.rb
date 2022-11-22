@@ -64,27 +64,16 @@ module Sequel
 
           unless obj.valid?
             if ignore_key_errors
-              errs = obj.errors
-              errs.each do |k, vs|
-                # Ignore errors on the key column in the associated object. This column
-                # will be set when saving to a presumably valid value using a column
-                # in the current object (which may not be available until after the current
-                # object is saved).
-                case k
-                when Symbol
-                  next if k == key
-                else # when Array
-                  next if k.include?(key)
-                end
+              # Ignore errors on the key column in the associated object. This column
+              # will be set when saving to a presumably valid value using a column
+              # in the current object (which may not be available until after the current
+              # object is saved).
+              obj.errors.delete(key)
+              obj.errors.delete_if{|k,| Array === k && k.include?(key)}
+            end
 
-                vs.each do |v|
-                  errors.add(association, errs.send(:full_message, k, v))
-                end
-              end
-            else
-              obj.errors.full_messages.each do |m|
-                errors.add(association, m)
-              end
+            obj.errors.full_messages.each do |m|
+              errors.add(association, m)
             end
           end
 
