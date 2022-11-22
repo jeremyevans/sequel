@@ -1,5 +1,7 @@
 === master
 
+* Make validates_associated plugin avoid database type errors for non-integer association keys (jeremyevans) (#1968)
+
 * Make tactical_eager_loading plugin work better with table inheritance plugins (rolftimmermans, jeremyevans) (#1962)
 
 * Add support for pool_class: :timed_queue on Ruby 3.2+, using a Queue for available connections (jeremyevans)

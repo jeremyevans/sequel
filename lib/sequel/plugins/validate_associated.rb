@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The validates_associated plugin allows you to validate associated
+    # The validate_associated plugin allows you to validate associated
     # objects.  It also offers the ability to delay the validation of
     # associated objects until the current object is validated.
     # If the associated object is invalid, validation error messages
@@ -54,22 +54,43 @@ module Sequel
           return if reflection[:validate] == false
           association = reflection[:name]
           if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !(pk_val = obj.values[key])
-            # There could be a presence validation on the foreign key in the associated model,
-            # which will fail if we validate before saving the current object.  If there is
-            # no value for the foreign key, set it to the current primary key value, or a dummy
-            # value of 0 if we haven't saved the current object.
             p_key = pk unless pk.is_a?(Array)
-            obj.values[key] = p_key || 0
-            key = nil if p_key
+            if p_key
+              obj.values[key] = p_key
+            else
+              ignore_key_errors = true
+            end
           end
-          obj.errors.full_messages.each{|m| errors.add(association, m)} unless obj.valid?
-          if key && !pk_val
-            # If we used a dummy value of 0, remove it so it doesn't accidently remain.
-            obj.values.delete(key)
+
+          unless obj.valid?
+            if ignore_key_errors
+              errs = obj.errors
+              errs.each do |k, vs|
+                # Ignore errors on the key column in the associated object. This column
+                # will be set when saving to a presumably valid value using a column
+                # in the current object (which may not be available until after the current
+                # object is saved).
+                case k
+                when Symbol
+                  next if k == key
+                else # when Array
+                  next if k.include?(key)
+                end
+
+                vs.each do |v|
+                  errors.add(association, errs.send(:full_message, k, v))
+                end
+              end
+            else
+              obj.errors.full_messages.each do |m|
+                errors.add(association, m)
+              end
+            end
           end
+
+          nil
         end
       end
     end
   end
 end
-

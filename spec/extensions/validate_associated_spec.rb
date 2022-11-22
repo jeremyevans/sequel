@@ -25,13 +25,46 @@ describe "ValidatesAssociated plugin" do
     @c.class_eval do
       plugin :validation_helpers
       def validate
-        validates_integer :c_id
+        validates_presence :c_id
+        errors.add([:name, :c_id], 'compound error') unless c_id
         super
       end
     end
-    @o.c_id = 5
-    @o.send(:delay_validate_associated_object, @c.association_reflection(:cs), @c.load(:id=>2, :name=>'b', :c_id=>2))
-    @o.valid?.must_equal true
+    o = @c.new(:name=>'a', :c_id=>1)
+    c = @c.new(:name=>'b')
+    o.valid?.must_equal true
+    c.valid?.must_equal false
+
+    o.send(:delay_validate_associated_object, @c.association_reflection(:cs), c)
+    o.valid?.must_equal true
+    c.valid?.must_equal false
+    @db.sqls.must_equal []
+
+    o.save
+    @db.sqls.must_equal ["INSERT INTO cs (name, c_id) VALUES ('a', 1)", "SELECT * FROM cs WHERE (id = 1) LIMIT 1"]
+  end
+
+  it "should handle other errors when validating" do
+    @c.class_eval do
+      plugin :validation_helpers
+      def validate
+        unless c_id
+          validates_presence :id
+          errors.add([:name, :id], 'compound error')
+        end
+        super
+      end
+    end
+    o = @c.new(:name=>'a', :c_id=>1)
+    c = @c.new(:name=>'b')
+    o.valid?.must_equal true
+    c.valid?.must_equal false
+
+    o.send(:delay_validate_associated_object, @c.association_reflection(:cs), c)
+    o.valid?.must_equal false
+    o.errors.on(:cs).must_equal ["id is not present", "name and id compound error"]
+    c.valid?.must_equal false
+    @db.sqls.must_equal []
   end
 
   it "should should not remove existing values from object when validating" do
