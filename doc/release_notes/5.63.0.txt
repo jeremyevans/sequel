@@ -1,0 +1,33 @@
+= New Features
+
+* On Ruby 3.2, the pool_class: :timed_queue Database option can now
+  be used to use an alternative connection pool that stores
+  connections in a queue, and uses the new Queue#pop :timeout option
+  in Ruby 3.2 to implement the pool timeout.  This new connection
+  pool is simpler than the default connection pool.  It is not yet
+  the default connection pool on Ruby 3.2, but it may become the
+  default in a later version.  Users of Ruby 3.2 are encouraged to
+  try out the pool_class: :timed_queue Database option and provide
+  feedback on how it works in their application.
+
+= Other Improvements
+
+* The tactical_eager_loading plugin now works in combination with the
+  single_table_inheritance and class_table_inheritance plugins, when
+  loading an association only defined in a specific subclass.
+  Previously, eager loading would be skipped in such a case.  Now,
+  an eager load will be attempted for all instances supporting the
+  association.
+
+* The validate_associated plugin now avoids database type errors for
+  non-integer association keys.  In cases where the associated object
+  doesn't have a value for the associated key, and the current object
+  does not have a key value that can be set in the associated object,
+  validation errors in the associated object related to the associated
+  key will be ignored.
+
+* Thread-keyed connection pool hashes now use compare_by_identity for
+  better performance.
+
+* The JRuby workaround in the named_timezones extension is no longer
+  used on JRuby 9.3.9.0+, as JRuby fixed the related bug.

@@ -1,4 +1,4 @@
-=== master
+=== 5.63.0 (2022-12-01)
 
 * Make validates_associated plugin avoid database type errors for non-integer association keys (jeremyevans) (#1968)
 
