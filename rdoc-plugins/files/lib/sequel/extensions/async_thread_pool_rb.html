@@ -30,7 +30,7 @@ lib/sequel/extensions/async_thread_pool.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-10-21 08:19:04 -0700</span>
+<span class='datetime'>2022-12-01 07:04:21 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -38,34 +38,38 @@ Last Update:
 <div id='description'>
 <p>The async_thread_pool extension adds support for running database queries in a separate threads using a thread pool. With the following code</p>
 
-<pre>DB.extension :async_thread_pool
-foos = DB[:foos].async.where{name: &#39;A&#39;..&#39;M&#39;}.all
-bar_names = DB[:bar].async.select_order_map(:name)
-baz_1 = DB[:bazes].async.first(id: 1)</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:async_thread_pool</span>
+<span class="ruby-identifier">foos</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">bar_names</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bar</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-identifier">baz_1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bazes</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
+</pre>
 
 <p>All 3 queries will be run in separate threads.  <code>foos</code>, <code>bar_names</code> and <code>baz_1</code> will be proxy objects.  Calling a method on the proxy object will wait for the query to be run, and will return the result of calling that method on the result of the query method. For example, if you run:</p>
 
-<pre>foos = DB[:foos].async.where{name: &#39;A&#39;..&#39;M&#39;}.all
-bar_names = DB[:bars].async.select_order_map(:name)
-baz_1 = DB[:bazes].async.first(id: 1)
-sleep(1)
-foos.size
-bar_names.first
-baz_1.name</pre>
+<pre class="ruby"><span class="ruby-identifier">foos</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">bar_names</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-identifier">baz_1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bazes</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
+<span class="ruby-identifier">sleep</span>(<span class="ruby-value">1</span>)
+<span class="ruby-identifier">foos</span>.<span class="ruby-identifier">size</span>
+<span class="ruby-identifier">bar_names</span>.<span class="ruby-identifier">first</span>
+<span class="ruby-identifier">baz_1</span>.<span class="ruby-identifier">name</span>
+</pre>
 
 <p>These three queries will generally be run concurrently in separate threads.  If you instead run:</p>
 
-<pre>DB[:foos].async.where{name: &#39;A&#39;..&#39;M&#39;}.all.size
-DB[:bars].async.select_order_map(:name).first
-DB[:bazes].async.first(id: 1).name</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">all</span>.<span class="ruby-identifier">size</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">first</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:bazes</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">name</span>
+</pre>
 
 <p>Then will run each query sequentially, since you need the result of one query before running the next query.  The queries will still be run in separate threads (by default).</p>
 
 <p>What is run in the separate thread is the entire method call that returns results.  So with the original example:</p>
 
-<pre>foos = DB[:foos].async.where{name: &#39;A&#39;..&#39;M&#39;}.all
-bar_names = DB[:bars].async.select_order_map(:name)
-baz_1 = DB[:bazes].async.first(id: 1)</pre>
+<pre class="ruby"><span class="ruby-identifier">foos</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">bar_names</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bars</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-identifier">baz_1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bazes</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
+</pre>
 
 <p>The <code>all</code>, <code>select_order_map(:name)</code>, and <code>first(id: 1)</code> calls are run in separate threads.  If a block is passed to a method such as <code>all</code> or <code>each</code>, the block is also run in that thread.  If you have code such as:</p>
 
@@ -153,11 +157,12 @@ baz_1 = DB[:bazes].async.first(id: 1)</pre>
 
 <p>By default, for consistent behavior, the async_thread_pool extension will always run the query in a separate thread. However, in some cases, such as when the async thread pool is busy and the results of a query are needed right away, it can improve performance to allow preemption, so that the query will run in the current thread instead of waiting for an async thread to become available.  With the following code:</p>
 
-<pre>foos = DB[:foos].async.where{name: &#39;A&#39;..&#39;M&#39;}.all
-bar_names = DB[:bar].async.select_order_map(:name)
-if foos.length &gt; 4
-  baz_1 = DB[:bazes].async.first(id: 1)
-end</pre>
+<pre class="ruby"><span class="ruby-identifier">foos</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">all</span>
+<span class="ruby-identifier">bar_names</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bar</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">select_order_map</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-keyword">if</span> <span class="ruby-identifier">foos</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">4</span>
+  <span class="ruby-identifier">baz_1</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bazes</span>].<span class="ruby-identifier">async</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Whether you need the <code>baz_1</code> variable depends on the value of foos. If the async thread pool is busy, and by the time the <code>foos.length</code> call is made, the async thread pool has not started the processing to get the <code>foos</code> value, it can improve performance to start that processing in the current thread, since it is needed immediately to determine whether to schedule query to get the <code>baz_1</code> variable. The default is to not allow preemption, because if the current thread is used, it may have already checked out a connection that could be used, and that connection could be inside a transaction or have some other manner of connection-specific state applied to it. If you want to allow preemption, you can set the <code>:preempt_async_thread</code> Database option before loading the async_thread_pool extension.</p>
 

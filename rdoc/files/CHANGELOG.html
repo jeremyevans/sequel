@@ -30,12 +30,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-11-01 09:15:13 -0700</span>
+<span class='datetime'>2022-12-01 07:04:38 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.63.0+-282022-12-01-29"><a href="doc/release_notes/5_63_0_txt.html">5.63.0</a> (2022-12-01)<span><a href="#label-5.63.0+-282022-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make validates_associated plugin avoid database type errors for non-integer association keys (jeremyevans) (#1968)</p>
+</li><li>
+<p>Make tactical_eager_loading plugin work better with table inheritance plugins (rolftimmermans, jeremyevans) (#1962)</p>
+</li><li>
+<p>Add support for pool_class: :timed_queue on Ruby 3.2+, using a Queue for available connections (jeremyevans)</p>
+</li><li>
+<p>Allow :pool_class Database option to be specified as a string to more easily choose a different pool type (jeremyevans)</p>
+</li><li>
+<p>Use compare_by_identity hashes for Thread-keyed hashes in threaded connection pools (jeremyevans)</p>
+</li><li>
+<p>Skip use of JRuby workaround on JRuby 9.3.9.0+ in named_timezones extension as JRuby fixed the related bug (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.62.0+-282022-11-01-29"><a href="doc/release_notes/5_62_0_txt.html">5.62.0</a> (2022-11-01)<span><a href="#label-5.62.0+-282022-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Add back the pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with pg driver (jeremyevans)</p>

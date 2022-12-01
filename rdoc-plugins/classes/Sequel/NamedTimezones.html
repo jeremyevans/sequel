@@ -51,6 +51,22 @@ Sequel::NamedTimezones
 </ol>
 </div>
 <div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>BROKEN_TIME_AT_WITH_NSEC</td>
+<td>=</td>
+<td class='context-item-value'>defined?(JRUBY_VERSION) && (JRUBY_VERSION < '9.3' || (JRUBY_VERSION < '9.4' && JRUBY_VERSION.split('.')[2].to_i < 9))</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Whether Time.at with :nsec and :in is broken.  True on JRuby &lt; 9.3.9.0.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
 <div id='attribute-list'>
 <h2 class='section-bar'>Attributes</h2>
 <div class='name-list'>

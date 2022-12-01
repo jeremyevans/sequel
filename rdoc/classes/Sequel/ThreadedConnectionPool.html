@@ -86,7 +86,7 @@ Superclass:
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>A hash with thread keys and connection values for currently allocated connections. The calling code should already have the mutex before calling this.</p>
+<p>A hash with thread/fiber keys and connection values for currently allocated connections. The calling code should already have the mutex before calling this.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -124,7 +124,7 @@ Superclass:
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:max_connections </td><td>
 <p>The maximum number of connections the connection pool will open (default 4)</p>
 </td></tr><tr><td class='label'>:pool_timeout </td><td>
-<p>The amount of seconds to wait to acquire a connection before raising a PoolTimeoutError (default 5)</p>
+<p>The amount of seconds to wait to acquire a connection before raising a PoolTimeout error (default 5)</p>
 </td></tr></tbody></table>
 
 </div>
@@ -141,9 +141,10 @@ Superclass:
 <span class="line-num">31</span>   <span class="ruby-ivar">@connection_handling</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connection_handling</span>]
 <span class="line-num">32</span>   <span class="ruby-ivar">@available_connections</span> = []
 <span class="line-num">33</span>   <span class="ruby-ivar">@allocated</span> = {}
-<span class="line-num">34</span>   <span class="ruby-ivar">@timeout</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5</span>)
-<span class="line-num">35</span>   <span class="ruby-ivar">@waiter</span> = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">34</span>   <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">compare_by_identity</span>
+<span class="line-num">35</span>   <span class="ruby-ivar">@timeout</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5</span>)
+<span class="line-num">36</span>   <span class="ruby-ivar">@waiter</span> = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">37</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -163,14 +164,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-all_connections-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb</span>
-<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>
-<span class="line-num">44</span>   <span class="ruby-identifier">hold</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">45</span>     <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
-<span class="line-num">46</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>
-<span class="line-num">47</span>       <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}
-<span class="line-num">48</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">49</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>
+<span class="line-num">45</span>   <span class="ruby-identifier">hold</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">46</span>     <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
+<span class="line-num">47</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>
+<span class="line-num">48</span>       <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}
+<span class="line-num">49</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disconnect'>
@@ -181,7 +182,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Removes all connections currently available, optionally yielding each connection to the given block. This method has the effect of  disconnecting from the database, assuming that no connections are currently being used.  If you want to be able to disconnect connections that are currently in use, use the ShardedThreadedConnectionPool, which can do that. This connection pool does not, for performance reasons. To use the sharded pool, pass the <code>servers: {}</code> option when connecting to the database.</p>
+<p>Removes all connections currently available. This method has the effect of  disconnecting from the database, assuming that no connections are currently being used.  If you want to be able to disconnect connections that are currently in use, use the ShardedThreadedConnectionPool, which can do that. This connection pool does not, for performance reasons. To use the sharded pool, pass the <code>servers: {}</code> option when connecting to the database.</p>
 
 <p>Once a connection is requested using <a href="ThreadedConnectionPool.html#method-i-hold"><code>hold</code></a>, the connection pool creates new connections to the database.</p>
 
