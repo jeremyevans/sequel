@@ -175,8 +175,13 @@ module Sequel
         if !c[:max_length] && c[:type] == :string && (max_length = column_schema_max_length(c[:db_type]))
           c[:max_length] = max_length
         end
-        if !c[:max_value] && !c[:min_value] && c[:type] == :integer && (min_max = column_schema_integer_min_max_values(c[:db_type]))
-          c[:min_value], c[:max_value] = min_max
+        if !c[:max_value] && !c[:min_value]
+          min_max = if c[:type] == :integer
+            column_schema_integer_min_max_values(c[:db_type])
+          elsif c[:type] == :decimal
+            column_schema_decimal_min_max_values(c[:db_type])
+          end
+          c[:min_value], c[:max_value] = min_max if min_max
         end
       end
       schema_post_process(cols)
@@ -301,6 +306,20 @@ module Sequel
         (unsigned || column_schema_tinyint_type_is_unsigned?) ? UNSIGNED_INTEGER1_MIN_MAX : INTEGER1_MIN_MAX
       else
         unsigned ? UNSIGNED_INTEGER4_MIN_MAX : INTEGER4_MIN_MAX
+      end
+    end
+
+    # Look at the db_type and guess the minimum and maximum decimal values for
+    # the column. This is currently only implemented for PostgreSQL.
+    def column_schema_decimal_min_max_values(db_type)
+      match = db_type.match(/\((\d+),\s*(\d+)?\)/)
+
+      if match
+        precision = match[1].to_i
+        scale = match[2].to_i
+
+        limit = BigDecimal("9" * (precision - scale) + (scale.zero? ? ".0" : "." + "9" * scale))
+        [-limit, limit]
       end
     end
 
