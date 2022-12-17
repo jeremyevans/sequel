@@ -176,10 +176,12 @@ describe "Database schema parser" do
   end
 
   int_types = [Integer, :Bignum]
+  limited_decimal_types = []
 
   case DB.database_type
   when :postgres
     int_types.concat([:smallint, :int2, :int4, :int8])
+    limited_decimal_types.concat(["numeric(10, 2)", "decimal(10, 2)"])
   when :mysql
     if DB.send(:supports_check_constraints?)
       int_types.concat([:tinyint, :smallint, :mediumint, 'int(9)', 'tinyint(2)', "integer unsigned", "bigint unsigned", "tinyint unsigned", "smallint unsigned", "mediumint unsigned", 'int(9) unsigned', 'tinyint(2) unsigned'])
@@ -215,6 +217,23 @@ describe "Database schema parser" do
       min = sch[:min_value]
       max.must_be_kind_of Integer
       min.must_be_kind_of Integer
+      ds = DB[:items]
+      proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
+      proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
+      ds.insert(max)
+      ds.insert(min)
+      ds.select_order_map(:a).must_equal [min, max]
+    end
+  end
+
+  limited_decimal_types.each do |type|
+    it "should correctly parse maximum and minimum values for #{type} columns" do
+      DB.create_table!(:items){column :a, type}
+      sch = DB.schema(:items).first.last
+      max = sch[:max_value]
+      min = sch[:min_value]
+      max.must_be_kind_of BigDecimal
+      min.must_be_kind_of BigDecimal
       ds = DB[:items]
       proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
       proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
