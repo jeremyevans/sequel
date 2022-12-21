@@ -500,6 +500,28 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls.must_equal []
   end
 
+  it "should eagerly graph associations with :graph_use_association_block option" do
+    @c1.pg_array_to_many :btags, :key=>:tag_ids, :clone=>:tags, :graph_use_association_block=>true do |ds|
+      ds.where(:foo=>3)
+    end
+    @c2.many_to_pg_array :bartists, :clone=>:artists, :graph_use_association_block=>true do |ds|
+      ds.where(:foo=>4)
+    end
+    @db.sqls
+
+    a = @c1.eager_graph(:btags).with_fetch(:id=>1, :btags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])).all
+    @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, btags.id AS btags_id FROM artists LEFT OUTER JOIN (SELECT * FROM tags WHERE (foo = 3)) AS btags ON (artists.tag_ids @> ARRAY[btags.id])"]
+    a.must_equal [@o1]
+    a.first.btags.must_equal [@o2]
+    @db.sqls.must_equal []
+
+    a = @c2.eager_graph(:bartists).with_fetch(:id=>2, :bartists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])).all
+    @db.sqls.must_equal ["SELECT tags.id, bartists.id AS bartists_id, bartists.tag_ids FROM tags LEFT OUTER JOIN (SELECT * FROM artists WHERE (foo = 4)) AS bartists ON (bartists.tag_ids @> ARRAY[tags.id])"]
+    a.must_equal [@o2]
+    a.first.bartists.must_equal [@o1]
+    @db.sqls.must_equal []
+  end
+
   it "should eagerly graph associations with limits" do
     @c1.pg_array_to_many :tags, :limit=>1
     a = @c1.eager_graph(:tags).with_fetch([{:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}, {:id=>1, :tags_id=>3, :tag_ids=>Sequel.pg_array([1,2,3])}]).all

@@ -1,3 +1,9 @@
+=== master
+
+* Support :graph_use_association_block association option to make eager_graph use the association block (jeremyevans)
+
+* Make many_through_many and many_through_one associations support eager_graph callbacks (jeremyevans)
+
 === 5.63.0 (2022-12-01)
 
 * Make validates_associated plugin avoid database type errors for non-integer association keys (jeremyevans) (#1968)

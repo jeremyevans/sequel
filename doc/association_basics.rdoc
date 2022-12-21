@@ -1498,6 +1498,36 @@ as the qualifiers may not match the aliases automatically used by eager_graph.
 This should contain unqualified identifiers, and eager_graph will automatically
 qualify them with the appropriate alias.
 
+==== :graph_use_association_block
+
+Setting this to true makes eager_graph apply the association block to the
+associated dataset before graphing the associated dataset into the receiver.
+In most cases when this option is used and the association has a block, the
+dataset returned by eager_graph will contain a JOIN to a subquery.
+
+By default (when this option is not used), the association block will be ignored
+when using eager_graph:
+
+  Artist.one_to_many :tracks do |ds|
+    ds.where(foo: 3)
+  end
+  Artist.eager_graph(:tracks)
+  # SELECT albums.id, tracks.id AS tracks_id, tracks.album_id
+  # FROM albums
+  # LEFT OUTER JOIN tracks
+  # ON (tracks.album_id = albums.id)
+
+When this option is used, the block will be respected:
+
+  Artist.one_to_many :tracks, graph_use_association_block: true do |ds|
+    ds.where(foo: 3)
+  end
+  Artist.eager_graph(:tracks)
+  # SELECT albums.id, tracks.id AS tracks_id, tracks.album_id
+  # FROM albums
+  # LEFT OUTER JOIN (SELECT * FROM tracks WHERE (foo = 3)) AS tracks
+  # ON (tracks.album_id = albums.id)
+
 ==== :graph_join_table_conditions [+many_to_many+, +one_through_one+]
 
 The additional conditions to use on the SQL join for the join table when

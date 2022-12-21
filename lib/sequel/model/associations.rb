@@ -1722,6 +1722,8 @@ module Sequel
         # :graph_select :: A column or array of columns to select from the associated table
         #                  when eagerly loading the association via +eager_graph+. Defaults to all
         #                  columns in the associated table.
+        # :graph_use_association_block :: Makes eager_graph consider the association block. Without this, eager_graph
+        #                                 ignores the bock and only use the :graph_* options.
         # :instance_specific :: Marks the association as instance specific. Should be used if the association block
         #                       uses instance specific state, or transient state (accessing current date/time, etc.).
         # :limit :: Limit the number of records to the provided value.  Use
@@ -2461,6 +2463,9 @@ module Sequel
         # Return dataset to graph into given the association reflection, applying the :callback option if set.
         def eager_graph_dataset(opts, eager_options)
           ds = opts.associated_class.dataset
+          if opts[:graph_use_association_block] && (b = opts[:block])
+            ds = b.call(ds)
+          end
           if cb = eager_options[:callback]
             ds = cb.call(ds)
           end

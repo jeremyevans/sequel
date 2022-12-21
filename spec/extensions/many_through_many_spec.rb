@@ -912,6 +912,25 @@ describe "many_through_many eager loading methods" do
     DB.sqls.length.must_equal 0
   end
 
+  it "should eagerly graph a single many_through_many association with an eager callback" do
+    a = @c1.eager_graph(:tags=>proc{|ds| ds.where(:foo=>3)}).all
+    a.must_equal [@c1.load(:id=>1)]
+    DB.sqls.must_equal ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN (SELECT * FROM tags WHERE (foo = 3)) AS tags ON (tags.id = albums_tags.tag_id)']
+    a.first.tags.must_equal [Tag.load(:id=>2)]
+    DB.sqls.length.must_equal 0
+  end
+
+  it "should eagerly graph a single many_through_many association with the :graph_use_association_block option" do
+    @c1.many_through_many :btags, :clone=>:tags, :graph_use_association_block=>true do |ds|
+      ds.where(:foo=>3)
+    end
+    a = @c1.eager_graph(:btags).with_fetch(:id=>1, :btags_id=>2).all
+    a.must_equal [@c1.load(:id=>1)]
+    DB.sqls.must_equal ['SELECT artists.id, btags.id AS btags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN (SELECT * FROM tags WHERE (foo = 3)) AS btags ON (btags.id = albums_tags.tag_id)']
+    a.first.btags.must_equal [Tag.load(:id=>2)]
+    DB.sqls.length.must_equal 0
+  end
+
   it "should eagerly graph a single many_through_many association using the :window_function strategy" do
     Tag.dataset = Tag.dataset.with_extend do
       def supports_window_functions?; true end

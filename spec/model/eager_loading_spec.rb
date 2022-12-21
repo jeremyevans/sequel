@@ -1604,6 +1604,17 @@ describe Sequel::Model, "#eager_graph" do
     a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
   end
   
+  it "should eagerly load a single many_to_one association with :graph_use_association_block option" do
+    GraphAlbum.many_to_one :bband, :clone=>:band, :graph_use_association_block=>true do |ds|
+      ds.where(:foo=>3)
+    end
+    ds = GraphAlbum.eager_graph(:bband)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, bband.id AS bband_id, bband.vocalist_id FROM albums LEFT OUTER JOIN (SELECT * FROM bands WHERE (foo = 3)) AS bband ON (bband.id = albums.band_id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :bband_id=>2, :vocalist_id=>3).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.bband.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+  end
+  
   it "should eagerly load a single many_to_one association with the same name as a column" do
     GraphAlbum.def_column_alias(:band_id_id, :band_id)
     GraphAlbum.many_to_one :band_id, :key_column=>:band_id, :class=>GraphBand
@@ -1694,6 +1705,17 @@ describe Sequel::Model, "#eager_graph" do
     a.first.tracks.must_equal [GraphTrack.load(:id => 3, :album_id=>1)]
   end
 
+  it "should eagerly load a single one_to_many association using :graph_use_association_block option" do
+    GraphAlbum.one_to_many :btracks, :clone=>:tracks, :graph_use_association_block=>true do |ds|
+      ds.where(:foo=>3)
+    end
+    ds = GraphAlbum.eager_graph(:btracks)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, btracks.id AS btracks_id, btracks.album_id FROM albums LEFT OUTER JOIN (SELECT * FROM tracks WHERE (foo = 3)) AS btracks ON (btracks.album_id = albums.id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :btracks_id=>3, :album_id=>1).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.btracks.must_equal [GraphTrack.load(:id => 3, :album_id=>1)]
+  end
+
   it "should eagerly graph a single one_to_many association using the :window_function strategy" do
     sub = Class.new(GraphTrack)
     sub.dataset = sub.dataset.with_extend do
@@ -1714,6 +1736,17 @@ describe Sequel::Model, "#eager_graph" do
     a = ds.with_fetch(:id=>1, :band_id=>2, :genres_id=>4).all
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
     a.first.genres.must_equal [GraphGenre.load(:id => 4)]
+  end
+
+  it "should eagerly load a single many_to_many association with :graph_use_association_block option" do
+    GraphAlbum.many_to_many :bgenres, :clone=>:genres, :graph_use_association_block=>true do |ds|
+      ds.where(:foo=>3)
+    end
+    ds = GraphAlbum.eager_graph(:bgenres)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, bgenres.id AS bgenres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN (SELECT * FROM genres WHERE (foo = 3)) AS bgenres ON (bgenres.id = ag.genre_id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :bgenres_id=>4).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.bgenres.must_equal [GraphGenre.load(:id => 4)]
   end
 
   it "should eagerly graph a single many_to_many association using the :ruby strategy" do
