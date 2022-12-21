@@ -181,8 +181,7 @@ describe "Database schema parser" do
   case DB.database_type
   when :postgres
     int_types.concat([:smallint, :int2, :int4, :int8])
-    decimal_types.concat(["numeric(3, 5)"])
-    decimal_types.concat(["numeric(3, -2)"]) if DB.server_version >= 150000
+    decimal_types.concat(["numeric(3, 5)", "numeric(3, -2)"]) if DB.server_version >= 150000
   when :mysql
     if DB.send(:supports_check_constraints?)
       int_types.concat([:tinyint, :smallint, :mediumint, 'int(9)', 'tinyint(2)', "integer unsigned", "bigint unsigned", "tinyint unsigned", "smallint unsigned", "mediumint unsigned", 'int(9) unsigned', 'tinyint(2) unsigned'])
