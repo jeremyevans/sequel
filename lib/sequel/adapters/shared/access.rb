@@ -60,8 +60,8 @@ module Sequel
       # Access's Byte type will accept much larger values,
       # even though it only stores 0-255.  Do not set min/max
       # values for the Byte type.
-      def column_schema_integer_min_max_values(db_type)
-        return if /byte/i =~ db_type
+      def column_schema_integer_min_max_values(column)
+        return if /byte/i =~ column[:db_type]
         super
       end
 

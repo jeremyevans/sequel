@@ -553,7 +553,7 @@ module Sequel
       # Return nil if CHECK constraints are not supported, because
       # versions that don't support check constraints don't raise
       # errors for values outside of range.
-      def column_schema_integer_min_max_values(db_type)
+      def column_schema_integer_min_max_values(column)
         super if supports_check_constraints?
       end
 

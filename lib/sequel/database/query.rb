@@ -176,10 +176,11 @@ module Sequel
           c[:max_length] = max_length
         end
         if !c[:max_value] && !c[:min_value]
-          min_max = if c[:type] == :integer
-            column_schema_integer_min_max_values(c[:db_type])
-          elsif c[:type] == :decimal
-            column_schema_decimal_min_max_values(c[:db_type])
+          min_max = case c[:type]
+          when :integer
+            column_schema_integer_min_max_values(c)
+          when :decimal
+            column_schema_decimal_min_max_values(c)
           end
           c[:min_value], c[:max_value] = min_max if min_max
         end
@@ -293,7 +294,15 @@ module Sequel
 
     # Look at the db_type and guess the minimum and maximum integer values for
     # the column.
-    def column_schema_integer_min_max_values(db_type)
+    def column_schema_integer_min_max_values(column)
+      db_type = column[:db_type]
+      if /decimal|numeric|number/i =~ db_type
+        if min_max = column_schema_decimal_min_max_values(column)
+          min_max.map!(&:to_i)
+        end
+        return min_max
+      end
+
       unsigned = /unsigned/i =~ db_type
       case db_type
       when /big|int8/i
@@ -310,15 +319,21 @@ module Sequel
     end
 
     # Look at the db_type and guess the minimum and maximum decimal values for
-    # the column. This is currently only implemented for PostgreSQL.
-    def column_schema_decimal_min_max_values(db_type)
-      match = db_type.match(/\((\d+),\s*(\d+)?\)/)
+    # the column.
+    def column_schema_decimal_min_max_values(column)
+      if column[:column_size] && column[:scale]
+        precision = column[:column_size]
+        scale = column[:scale]
+      elsif /\((\d+)(?:,\s*(-?\d+))?\)/ =~ column[:db_type]
+        precision = $1.to_i
+        scale = $2.to_i if $2
+      end
 
-      if match
-        precision = match[1].to_i
-        scale = match[2].to_i
-
-        limit = BigDecimal("9" * (precision - scale) + (scale.zero? ? ".0" : "." + "9" * scale))
+      if precision
+        limit = BigDecimal("9" * precision)
+        if scale
+          limit /= 10**(scale)
+        end
         [-limit, limit]
       end
     end
@@ -389,7 +404,7 @@ module Sequel
         :boolean
       when /\A(real|float( unsigned)?|double( precision)?|double\(\d+,\d+\)( unsigned)?)\z/io
         :float
-      when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(\d+|false|true)\))?))\z/io
+      when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(-?\d+|false|true)\))?))\z/io
         $1 && ['0', 'false'].include?($1) ? :integer : :decimal
       when /bytea|blob|image|(var)?binary/io
         :blob

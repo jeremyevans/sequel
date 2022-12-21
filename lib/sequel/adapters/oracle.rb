@@ -312,6 +312,7 @@ module Sequel
               :char_used => column.char_used?,
               :char_size => column.char_size,
               :data_size => column.data_size,
+              :column_size => column.precision,
               :precision => column.precision,
               :scale => column.scale,
               :fsprecision => column.fsprecision,

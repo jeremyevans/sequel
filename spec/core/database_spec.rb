@@ -2857,9 +2857,9 @@ describe "Database#supports_transaction_isolation_levels?" do
 end
 
 describe "Database#schema min/max values" do
-  def min_max(type, db_type)
+  def min_max(type, db_type, opts={})
     @db = Sequel::Database.new
-    @db.define_singleton_method(:schema_parse_table){|*| [[:a, {:db_type=>db_type, :type=>type}]]}
+    @db.define_singleton_method(:schema_parse_table){|*| [[:a, opts.merge(:db_type=>db_type, :type=>type)]]}
     yield @db if block_given?
     sch = @db.schema(:t)[0][1]
     [sch.fetch(:min_value, :none), sch.fetch(:max_value, :none)]
@@ -2887,15 +2887,43 @@ describe "Database#schema min/max values" do
     min_max(:integer, 'mediumint unsigned').must_equal [0, 16777215]
   end
 
-  it "should parse minimum and maximum values for decimal types" do
+  it "should parse minimum and maximum values for decimal(X, Y) types" do
     min_max(:decimal, 'decimal(8,2)').must_equal [BigDecimal("-999999.99"), BigDecimal("999999.99")]
     min_max(:decimal, 'decimal(8, 2)').must_equal [BigDecimal("-999999.99"), BigDecimal("999999.99")]
-    min_max(:decimal, 'numeric(8,2)').must_equal [BigDecimal("-999999.99"), BigDecimal("999999.99")]
-    min_max(:decimal, 'numeric(8, 2)').must_equal [BigDecimal("-999999.99"), BigDecimal("999999.99")]
+    min_max(:decimal, 'numeric(7,2)').must_equal [BigDecimal("-99999.99"), BigDecimal("99999.99")]
+    min_max(:decimal, 'numeric(7, 2)').must_equal [BigDecimal("-99999.99"), BigDecimal("99999.99")]
+    min_max(:decimal, 'decimal(6,-2)').must_equal [BigDecimal("-99999900.0"), BigDecimal("99999900.0")]
+    min_max(:decimal, 'numeric(6, -2)').must_equal [BigDecimal("-99999900.0"), BigDecimal("99999900.0")]
+    min_max(:decimal, 'numeric(3,5)').must_equal [BigDecimal("-0.00999"), BigDecimal("0.00999")]
+    min_max(:decimal, 'decimal(3, 5)').must_equal [BigDecimal("-0.00999"), BigDecimal("0.00999")]
+  end
+
+  it "should parse minimum and maximum values for decimal(X) types handled as integers" do
+    min_max(:integer, 'decimal(8)').must_equal [-99999999, 99999999]
+    min_max(:integer, 'numeric(7)').must_equal [-9999999, 9999999]
+    min_max(:integer, 'number(7)').must_equal [-9999999, 9999999]
+    min_max(:integer, 'numeric(7)').first.must_be_kind_of Integer
+  end
+
+  it "should parse minimum and maximum values for decimal types with :column_size and :scale schema entries" do
+    min_max(:decimal, 'decimal', :column_size=>8, :scale=>2).must_equal [BigDecimal("-999999.99"), BigDecimal("999999.99")]
+    min_max(:decimal, 'numeric', :column_size=>7, :scale=>2).must_equal [BigDecimal("-99999.99"), BigDecimal("99999.99")]
+    min_max(:decimal, 'decimal', :column_size=>6, :scale=>-2).must_equal [BigDecimal("-99999900.0"), BigDecimal("99999900.0")]
+    min_max(:decimal, 'decimal', :column_size=>3, :scale=>5).must_equal [BigDecimal("-0.00999"), BigDecimal("0.00999")]
+    min_max(:integer, 'decimal', :column_size=>8, :scale=>0).must_equal [-99999999, 99999999]
+    min_max(:integer, 'numeric', :column_size=>7, :scale=>0).must_equal [-9999999, 9999999]
+    min_max(:integer, 'decimal', :column_size=>7, :scale=>0).first.must_be_kind_of Integer
   end
 
   it "should parse minimum and maximum values for tinyint types where database tinyint type is unsigned by default" do
     min_max(:integer, 'tinyint'){|db| def db.column_schema_tinyint_type_is_unsigned?; true end}.must_equal [0, 255]
+  end
+
+  it "should not parse minimum and maximum values for plain decimal or numeric types" do
+    min_max(:integer, 'decimal').must_equal [:none, :none]
+    min_max(:integer, 'numeric').must_equal [:none, :none]
+    min_max(:decimal, 'decimal').must_equal [:none, :none]
+    min_max(:decimal, 'numeric').must_equal [:none, :none]
   end
 
   it "should not parse minimum and maximum values for non-integer types" do

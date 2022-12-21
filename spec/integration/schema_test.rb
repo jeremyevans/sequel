@@ -175,13 +175,14 @@ describe "Database schema parser" do
     DB.schema(:items).first.last[:db_type].must_equal db_type
   end
 
-  int_types = [Integer, :Bignum]
-  limited_decimal_types = []
+  int_types = [Integer, :Bignum, [Numeric, {:size=>7}]]
+  decimal_types = [[Numeric, {:size=>[10, 2]}], [BigDecimal, {:size=>[8, 3]}]]
 
   case DB.database_type
   when :postgres
     int_types.concat([:smallint, :int2, :int4, :int8])
-    limited_decimal_types.concat(["numeric(10, 2)", "decimal(10, 2)"])
+    decimal_types.concat(["numeric(3, 5)"])
+    decimal_types.concat(["numeric(3, -2)"]) if DB.server_version >= 150000
   when :mysql
     if DB.send(:supports_check_constraints?)
       int_types.concat([:tinyint, :smallint, :mediumint, 'int(9)', 'tinyint(2)', "integer unsigned", "bigint unsigned", "tinyint unsigned", "smallint unsigned", "mediumint unsigned", 'int(9) unsigned', 'tinyint(2) unsigned'])
@@ -194,24 +195,33 @@ describe "Database schema parser" do
     int_types.concat([:smallint])
   when :sqlanywhere
     int_types.concat([:tinyint])
-  when :sqlite, :oracle
-    # SQLite doesn't enforce integer type values, even on strict tables.
-    # Oracle only has a number type with variable precision, not a standard integer type.
+  when :sqlite
+    # SQLite doesn't enforce integer/decimal type values, even on strict tables.
     int_types.clear
+    decimal_types.clear
+  when :oracle
+    # Oracle only has a number type with variable precision, not a standard integer type.
+    int_types = [[Numeric, {:size=>7}]]
   end
 
-  if int_types.empty?
-    it "should not parse maximum and minimum values for integer columns" do
-      DB.create_table!(:items){Integer :a}
-      sch = DB.schema(:items).first.last
-      sch.keys.wont_include :max_value
-      sch.keys.wont_include :min_value
+  {
+    Integer=>int_types,
+    [Numeric, {:size=>[10,2]}]=>decimal_types,
+    Numeric=>[1],
+  }.each do |type, types|
+    if types.empty?
+      it "should not parse maximum and minimum values for #{type} columns" do
+        DB.create_table!(:items){column :a, *type}
+        sch = DB.schema(:items).first.last
+        sch.keys.wont_include :max_value
+        sch.keys.wont_include :min_value
+      end
     end
   end
 
   int_types.each do |type|
     it "should correctly parse maximum and minimum values for #{type} columns" do
-      DB.create_table!(:items){column :a, type}
+      DB.create_table!(:items){column :a, *type}
       sch = DB.schema(:items).first.last
       max = sch[:max_value]
       min = sch[:min_value]
@@ -222,24 +232,44 @@ describe "Database schema parser" do
       proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
       ds.insert(max)
       ds.insert(min)
-      ds.select_order_map(:a).must_equal [min, max]
+      if DB.adapter_scheme == :ibmdb
+        ds.select_order_map(Sequel.cast(:a, String)).map{|x| Integer(x)}.must_equal [min, max]
+      else
+        ds.select_order_map(:a).must_equal [min, max]
+      end
     end
   end
 
-  limited_decimal_types.each do |type|
+  decimal_types.each do |type|
     it "should correctly parse maximum and minimum values for #{type} columns" do
-      DB.create_table!(:items){column :a, type}
+      DB.create_table!(:items){column :a, *type}
       sch = DB.schema(:items).first.last
       max = sch[:max_value]
       min = sch[:min_value]
       max.must_be_kind_of BigDecimal
       min.must_be_kind_of BigDecimal
       ds = DB[:items]
-      proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
-      proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
+
+      inc = case max.to_s('F')
+      when /\A9+\.0\z/
+        1
+      when /\A(?:0|9+)\.(0*9+)\z/
+        BigDecimal(1)/(10**$1.length)
+      when /\A(?:9+)(0+)\.0+\z/
+        BigDecimal(1) * (10**$1.length)
+      else
+        raise "spec error, cannot parse maximum value"
+      end
+
+      proc{ds.insert(max+inc)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
+      proc{ds.insert(min-inc)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
       ds.insert(max)
       ds.insert(min)
-      ds.select_order_map(:a).must_equal [min, max]
+      if DB.adapter_scheme == :oracle
+        ds.select_order_map(:a).map{|x| BigDecimal(x.to_s)}.must_equal [min, max]
+      else
+        ds.select_order_map(:a).must_equal [min, max]
+      end
     end
   end
 
