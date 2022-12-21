@@ -37,7 +37,7 @@ module Sequel
           row[:auto_increment] = auto_increment == 1 || auto_increment == true
           row[:primary_key] = row.delete(:pkey) == 'Y'
           row[:allow_null] = row[:nulls_allowed].is_a?(Integer) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
-          row[:db_type] = row.delete(:domain_name)
+          row[:db_type] = row.delete(:domain_name_with_size)
           row[:type] = if row[:db_type] =~ /numeric/i and (row[:scale].is_a?(Integer) ? row[:scale] == 0 : !row[:scale])
             :integer
           else

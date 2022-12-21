@@ -1,5 +1,7 @@
 === master
 
+* Make :db_type column schema entries on SQLAnywhere include precision/scale information (jeremyevans)
+
 * Include :min_value and :max_value schema entries for decimal/numeric columns on most databases (rolftimmermans, jeremyevans) (#1975)
 
 * Support :graph_use_association_block association option to make eager_graph use the association block (jeremyevans)
