@@ -1,0 +1,50 @@
+= New Features
+
+* A :graph_use_association_block association option has been added,
+  which makes eager_graph use the association block (as eager does),
+  generally resulting in a JOIN to a subquery:
+
+    Artist.one_to_many :tracks, graph_use_association_block: true do |ds|
+      ds.where(foo: 3)
+    end
+    Artist.eager_graph(:tracks)
+    # SELECT albums.id, tracks.id AS tracks_id, tracks.album_id
+    # FROM albums
+    # LEFT OUTER JOIN (SELECT * FROM tracks WHERE (foo = 3)) AS tracks
+    # ON (tracks.album_id = albums.id)
+
+  Assuming that the database can optimize the query correctly, using
+  the :graph_use_association_block option is probably simpler than
+  than using other :graph_* options to duplicate the conditions added
+  by the association block.
+
+* Numeric/Decimal column schema entries now include :min_value and
+  :max_value entries on most databases, indicating the minimum and
+  maximum values supported for the column. Similar to the support
+  for integer columns added in 5.62.0, this allows the
+  auto_validations plugin to automatically validate the values of
+  the columns are in the allowed range.
+
+= Other Improvements
+
+* many_through_{one,many} associations now support eager_graph
+  callbacks.
+
+* The :db_type column schema entries on SQLAnywhere now include
+  precision/scale information, to work with the numeric/decimal
+  column min_value/max_value support.
+
+* The oracle adapter now includes a :column_size column schema
+  entry containing the precision of the columns, to work with the
+  numeric/decimal column min_value/max_value support.
+
+= Backwards Compatibility
+
+* The private Database#column_schema_integer_min_max_values method
+  added in 5.62.0 now takes a column schema hash instead of a
+  database type string.
+
+* Code that previously looked at the :db_type column schema entry on
+  SQLAnywhere should be updated to look at the :domain_name entry, and
+  code that looked at the :domain_name_with_size entry should be
+  updated to look at the :db_type entry.
