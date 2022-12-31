@@ -2929,6 +2929,10 @@ describe "Database#schema min/max values" do
   it "should not parse minimum and maximum values for non-integer types" do
     min_max(:string, 'varchar').must_equal [:none, :none]
   end
+
+  it "should handle case where adapter sets min_value and max_value" do
+    min_max(:string, 'varchar', :min_value=>'a', :max_value=>'z').must_equal ['a', 'z']
+  end
 end
 
 describe "Database#column_schema_to_ruby_default" do
