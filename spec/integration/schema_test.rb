@@ -187,6 +187,7 @@ describe "Database schema parser" do
       int_types.concat([:tinyint, :smallint, :mediumint, 'int(9)', 'tinyint(2)', "integer unsigned", "bigint unsigned", "tinyint unsigned", "smallint unsigned", "mediumint unsigned", 'int(9) unsigned', 'tinyint(2) unsigned'])
     else
       int_types.clear 
+      decimal_types.clear
     end
   when :mssql, :h2, :hsqldb
     int_types.concat([:smallint, :tinyint])
