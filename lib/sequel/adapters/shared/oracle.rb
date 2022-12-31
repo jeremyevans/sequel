@@ -182,7 +182,7 @@ module Sequel
       # they use a NUMBER column with a fixed precision
       # and no scale.
       def column_schema_integer_min_max_values(column)
-        super if column[:db_type] =~ /NUMBER\(\d+\)/i
+        super if column[:db_type] =~ /NUMBER\(\d+\)/i || (column[:db_type] == 'NUMBER' && column[:column_size].is_a?(Integer) && column[:scale] == 0)
       end
 
       def create_sequence_sql(name, opts=OPTS)
