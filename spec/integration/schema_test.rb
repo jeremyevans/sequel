@@ -232,7 +232,7 @@ describe "Database schema parser" do
       proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
       ds.insert(max)
       ds.insert(min)
-      if DB.adapter_scheme == :ibmdb
+      if DB.adapter_scheme == :ibmdb || DB.adapter_scheme == :odbc
         ds.select_order_map(Sequel.cast(:a, String)).map{|x| Integer(x)}.must_equal [min, max]
       else
         ds.select_order_map(:a).must_equal [min, max]
@@ -265,7 +265,7 @@ describe "Database schema parser" do
       proc{ds.insert(min-inc)}.must_raise(Sequel::DatabaseError, Sequel::InvalidValue)
       ds.insert(max)
       ds.insert(min)
-      if DB.adapter_scheme == :oracle
+      if DB.adapter_scheme == :oracle || DB.adapter_scheme == :odbc
         ds.select_order_map(:a).map{|x| BigDecimal(x.to_s)}.must_equal [min, max]
       else
         ds.select_order_map(:a).must_equal [min, max]
