@@ -377,7 +377,7 @@ Last Update:
 
 <h4 id="label-~">~<span><a href="#label-~">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>Array#~, Hash#~, and Symbol#~ treat the receiver as a conditions specifier, not matching all of the conditions:</p>
+<p><a href="../../classes/Array.html#method-i-~"><code>Array#~</code></a>, <a href="../../classes/Hash.html#method-i-~"><code>Hash#~</code></a>, and Symbol#~ treat the receiver as a conditions specifier, not matching all of the conditions:</p>
 
 <pre class="ruby"><span class="ruby-operator">~</span>{<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}       <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span>
 <span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]] <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (1, 2)</span>
@@ -477,7 +477,7 @@ Last Update:
 
 <h4 id="label-26">&amp;<span><a href="#label-26">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>Hash#&amp; and Symbol#&amp; return a <a href="../../classes/Sequel.html"><code>Sequel</code></a> boolean expression, matching the condition specified by the receiver and the condition specified by the given argument:</p>
+<p><a href="../../classes/Hash.html#method-i-26"><code>Hash#&amp;</code></a> and Symbol#& return a <a href="../../classes/Sequel.html"><code>Sequel</code></a> boolean expression, matching the condition specified by the receiver and the condition specified by the given argument:</p>
 
 <pre class="ruby"><span class="ruby-value">:a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">:b</span>        <span class="ruby-comment"># SQL: a AND b</span>
 {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>} <span class="ruby-operator">&amp;</span> <span class="ruby-value">:b</span>    <span class="ruby-comment"># SQL: a = 1 AND b</span>
@@ -492,7 +492,7 @@ Last Update:
 
 <h4 id="label-7C">|<span><a href="#label-7C">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>Hash#| returns a <a href="../../classes/Sequel.html"><code>Sequel</code></a> boolean expression, matching the condition specified by the receiver or the condition specified by the given argument:</p>
+<p><a href="../../classes/Hash.html#method-i-7C"><code>Hash#|</code></a> returns a <a href="../../classes/Sequel.html"><code>Sequel</code></a> boolean expression, matching the condition specified by the receiver or the condition specified by the given argument:</p>
 
 <pre class="ruby"><span class="ruby-value">:a</span> <span class="ruby-operator">|</span> <span class="ruby-value">:b</span>        <span class="ruby-comment"># SQL: a OR b</span>
 {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>} <span class="ruby-operator">|</span> <span class="ruby-value">:b</span>    <span class="ruby-comment"># SQL: a = 1 OR b</span>

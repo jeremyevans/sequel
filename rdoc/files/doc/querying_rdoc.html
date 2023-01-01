@@ -507,7 +507,7 @@ Last Update:
 <span class="ruby-comment"># SELECT * FROM artists WHERE (name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;)</span>
 </pre>
 
-<p>You can use <a href="../../classes/Sequel.html"><code>Sequel</code></a>.~ to negate expressions:</p>
+<p>You can use Sequel.~ to negate expressions:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">id:</span> <span class="ruby-value">5</span>))
 <span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span>

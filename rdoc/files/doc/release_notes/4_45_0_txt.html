@@ -91,7 +91,7 @@ Last Update:
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">foo</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">bar</span>}
 </pre>
 </li><li>
-<p>Passing multiple arguments or an array as filter arguments when the array/arguments does not represent a conditions specifier (array of two element arrays, treated like a hash) is now deprecated.  Switch to calling the filter method separately with each argument or using <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.&amp; to combine the arguments:</p>
+<p>Passing multiple arguments or an array as filter arguments when the array/arguments does not represent a conditions specifier (array of two element arrays, treated like a hash) is now deprecated.  Switch to calling the filter method separately with each argument or using Sequel.& to combine the arguments:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Instead of:</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>)

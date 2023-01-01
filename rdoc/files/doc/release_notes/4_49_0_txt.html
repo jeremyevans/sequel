@@ -67,7 +67,7 @@ Last Update:
 </li><li>
 <p>Loading plugins by requiring them via sequel_#{plugin} is now deprecated.  Affected plugins should move the plugin file so it can be required via sequel/plugins/#{plugin}.</p>
 </li><li>
-<p>In the mock adapter, Dataset#autoid=, #_fetch=, and numrows= are now deprecated.  They modified the dataset itself, which would not work for frozen datasets.  Dataset#with_autoid, with_fetch, and with_numrows should be used instead, which return a modified copy.</p>
+<p>In the mock adapter, Dataset#autoid=, _fetch=, and numrows= are now deprecated.  They modified the dataset itself, which would not work for frozen datasets.  Dataset#with_autoid, with_fetch, and with_numrows should be used instead, which return a modified copy.</p>
 </li><li>
 <p>In the null_dataset extension, Dataset#nullify! is now deprecated. It modified the dataset itself, which would not work for frozen datasets.  Dataset#nullify should be used instead, which returns a modified copy.</p>
 </li><li>

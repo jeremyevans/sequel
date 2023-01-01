@@ -118,7 +118,7 @@ Last Update:
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE (((price - 100) &gt; 200) OR ((price / 100) &gt;= 200))</span>
 </pre>
 
-<p>To filter by equality, you use the standard hash, which can be combined with other expressions using <a href="../../classes/Sequel.html"><code>Sequel</code></a>.&amp; and <a href="../../classes/Sequel.html"><code>Sequel</code></a>.|:</p>
+<p>To filter by equality, you use the standard hash, which can be combined with other expressions using Sequel.& and Sequel.|:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>}, (<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>))}.<span class="ruby-identifier">sql</span>
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category = &#39;ruby&#39;) AND ((price + 100) &lt; 200))&quot;</span>
@@ -203,7 +203,7 @@ Last Update:
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price / 100) &lt; 200)</span>
 </pre>
 
-<p>To exclude only parts of conditions, you can use when in combination with <a href="../../classes/Sequel.html"><code>Sequel</code></a>.~ or the ~ method on <a href="../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
+<p>To exclude only parts of conditions, you can use when in combination with Sequel.~ or the ~ method on <a href="../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>), (<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>))}.<span class="ruby-identifier">sql</span>
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category != &#39;ruby&#39;) AND ((price + 100) &lt; 200))&quot;</span>

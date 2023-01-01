@@ -123,7 +123,7 @@ Last Update:
 </li><li>
 <p>The class_table_inheritance plugin now raises an error during Model#update if a query does not modify a single row, just as the default Model#update does.</p>
 </li><li>
-<p>ConnectionPool#size is now thread-safe in both threaded connection pools. Internal callers that already have the connection pool mutex should switch to using #_size (a new private method).</p>
+<p>ConnectionPool#size is now thread-safe in both threaded connection pools. Internal callers that already have the connection pool mutex should switch to using _size (a new private method).</p>
 </li><li>
 <p>Registration of new serialization formats in the serialization plugin is now thread-safe.</p>
 </li><li>
