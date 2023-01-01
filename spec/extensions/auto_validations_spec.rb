@@ -2,7 +2,15 @@ require_relative "spec_helper"
 
 describe "Sequel::Plugins::AutoValidations" do
   before do
-    db = Sequel.mock(:fetch=>proc{|sql| sql =~ /'a{51}'|'uniq'/ ? {:v=>0} : {:v=>1}})
+    fetch_proc = proc do |sql|
+      if sql =~ /'a{51}'|'uniq'/
+        sql =~ /1 AS one/ ? {:v=>nil} : {:v=>0}
+      else
+        {:v=>1}
+      end
+    end
+
+    db = Sequel.mock(:fetch=>fetch_proc)
     def db.schema_parse_table(*) true; end
     def db.schema(t, *)
       t = t.first_source if t.is_a?(Sequel::Dataset)
@@ -86,7 +94,7 @@ describe "Sequel::Plugins::AutoValidations" do
 
   it "should validate using the underlying column values" do
     @c.send(:define_method, :name){super() * 2}
-    @c.db.fetch = {:v=>0}
+    @c.db.fetch = {:v=>nil}
     @m.set(:d=>Date.today, :num=>1, :name=>'b'*26)
     @m.valid?.must_equal true
   end
@@ -247,7 +255,7 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.set(:d=>Date.today, :num=>1)
     @m.valid?.must_equal false
     @m.errors.must_equal([:name, :num]=>["is already taken"])
-    @m.db.sqls.must_equal ["SELECT count(*) AS count FROM test WHERE ((name = '1') AND (num = 1)) LIMIT 1"]
+    @m.db.sqls.must_equal ["SELECT 1 AS one FROM test WHERE ((name = '1') AND (num = 1)) LIMIT 1"]
 
     @m.set(:name=>'a'*51)
     @m.valid?.must_equal false

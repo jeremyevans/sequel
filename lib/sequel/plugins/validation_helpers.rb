@@ -295,7 +295,7 @@ module Sequel
               h = ds.joined_dataset? ? qualified_pk_hash : pk_hash
               ds = ds.exclude(h)
             end
-            errors.add(a, message) unless ds.count == 0
+            errors.add(a, message) unless ds.empty?
           end
         end
         
