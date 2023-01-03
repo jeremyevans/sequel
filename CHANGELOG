@@ -1,3 +1,7 @@
+=== master
+
+* Make Database#indexes return indexes for partitioned tables on PostgreSQL 11+ (jeremyevans)
+
 === 5.64.0 (2023-01-01)
 
 * Make :db_type column schema entries on SQLAnywhere include precision/scale information (jeremyevans)

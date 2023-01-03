@@ -93,6 +93,16 @@ describe 'A PostgreSQL database' do
     @db.tables.must_include :test_2
   end if DB.server_version >= 100000
 
+  it "should provide a list of indexes on partitioned tables" do
+    @db.create_table(:test, :partition_by => :id, :partition_type => :range){Integer :id, :index=>true}
+    @db.create_table(:test_1, :partition_of => :test){from 1; to 3}
+    [:test, :test_1].each do  |t|
+      h = @db.indexes(t)
+      h.size.must_equal 1
+      h.shift[1].must_equal(:columns=>[:id], :unique=>false, :deferrable=>nil)
+    end
+  end if DB.server_version >= 110000
+
   it "should provide a list of foreign keys on partitioned tables" do
     begin
       @db.create_table(:test){primary_key :i}

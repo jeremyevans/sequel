@@ -919,7 +919,7 @@ module Sequel
             join(Sequel[:pg_attribute].as(:att), :attrelid=>Sequel[:tab][:oid], :attnum=>attnums).
             left_join(Sequel[:pg_constraint].as(:con), :conname=>Sequel[:indc][:relname]).
             where{{
-              indc[:relkind]=>'i',
+              indc[:relkind]=>%w'i I',
               ind[:indisprimary]=>false,
               :indexprs=>nil,
               :indisvalid=>true}}.
