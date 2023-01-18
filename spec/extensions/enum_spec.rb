@@ -71,6 +71,23 @@ describe "Sequel enum plugin" do
     @album = @Album.load(:status_id=>3)
   end
 
+  it "should handle value as an array" do
+    @Album.enum :status_id, {:good=>[3, nil], :bad=>5}
+    @album.good?.must_equal true
+    @album.bad?.must_equal false
+
+    @album.status_id = nil
+    @album.good?.must_equal true
+    @album.bad?.must_equal false
+
+    @album.status_id = :good
+    @album[:status_id].must_equal 3
+
+    ds = @Album.where(:id=>1)
+    ds.good.sql.must_equal "SELECT * FROM albums WHERE ((id = 1) AND (status_id IN (3, NULL)))"
+    ds.bad.sql.must_equal "SELECT * FROM albums WHERE ((id = 1) AND (status_id = 5))"
+  end
+
   it "should allow overriding methods in class and calling super" do
     @Album.enum :status_id, {:good=>3, :bad=>5}, :override_accessors=>false
     bad = nil

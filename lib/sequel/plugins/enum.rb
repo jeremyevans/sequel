@@ -34,6 +34,14 @@ module Sequel
     # Album.dataset.bad:: Return a dataset filtered to rows where +status_id+ is +2+
     # Album.dataset.not_bad:: Return a dataset filtered to rows where +status_id+ is not +2+
     #
+    # The enum value can also be an array, for example:
+    #
+    #   Album.enum :status_id, good: [1, 2], bad: 3
+    #
+    # Note that it will prioritize the first value on the assign method <tt>:status_id=</tt>
+    #
+    #   album.status_id = :good # 1
+    #
     # When calling +enum+, you can also provide the following options:
     #
     # :prefix :: Use a prefix for methods defined for each enum value. If +true+ is provided at the value, use the column name as the prefix.
@@ -98,12 +106,20 @@ module Sequel
 
             values.each do |key, value|
               define_method(:"#{prefix}#{key}#{suffix}!") do
-                self[column] = value
+                if value.is_a?(Array)
+                  self[column] = value.first
+                else
+                  self[column] = value
+                end
                 nil
               end
 
               define_method(:"#{prefix}#{key}#{suffix}?") do
-                self[column] == value
+                if value.is_a?(Array)
+                  value.include?(self[column])
+                else
+                  self[column] == value
+                end
               end
             end
           end
