@@ -100,7 +100,10 @@ module Sequel
               end
 
               define_method(:"#{column}=") do |v|
-                super(values.fetch(v, v))
+                enum_v = values.fetch(v, v)
+
+                assign_v = enum_v.is_a?(Array) ? enum_v.first : enum_v
+                super(assign_v)
               end
             end
 
