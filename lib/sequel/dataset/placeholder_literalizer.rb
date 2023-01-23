@@ -77,8 +77,8 @@ module Sequel
         # Yields the receiver and the dataset to the block, which should
         # call #arg on the receiver for each placeholder argument, and
         # return the dataset that you want to load.
-        def loader(dataset, &block)
-          PlaceholderLiteralizer.new(*process(dataset, &block))
+        def loader(pl, dataset, &block)
+          pl.new(*process(dataset, &block))
         end
 
         # Return an Argument with the specified position, or the next position. In
@@ -145,7 +145,7 @@ module Sequel
       # given block, recording the offsets at which the recorders arguments
       # are used in the query.
       def self.loader(dataset, &block)
-        Recorder.new.loader(dataset, &block)
+        Recorder.new.loader(self, dataset, &block)
       end
 
       # Save the dataset, array of SQL fragments, and ending SQL string.
@@ -199,20 +199,31 @@ module Sequel
       # Return the SQL query to use for the given arguments.
       def sql(*args)
         raise Error, "wrong number of arguments (#{args.length} for #{@arity})" unless args.length == @arity
-        s = String.new
+        s = sql_origin
+        append_sql(s, *args)
+      end
+
+      # Append the SQL query to use for the given arguments to the given SQL string.
+      def append_sql(sql, *args)
         ds = @dataset
-        @fragments.each do |sql, i, transformer|
-          s << sql
+        @fragments.each do |s, i, transformer|
+          sql << s
           if i.is_a?(Integer)
             v = args.fetch(i)
             v = transformer.call(v) if transformer
           else
             v = i.call
           end
-          ds.literal_append(s, v)
+          ds.literal_append(sql, v)
         end
-        s << @final_sql
-        s
+        sql << @final_sql
+        sql
+      end
+
+      private
+
+      def sql_origin
+        String.new
       end
     end
   end

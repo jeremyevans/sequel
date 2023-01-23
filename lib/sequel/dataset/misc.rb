@@ -158,6 +158,16 @@ module Sequel
      !!((opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join])
     end
 
+    # The class to use for placeholder literalizers for the current dataset.
+    def placeholder_literalizer_class
+      ::Sequel::Dataset::PlaceholderLiteralizer
+    end
+
+    # A placeholder literalizer loader for the current dataset.
+    def placeholder_literalizer_loader(&block)
+      placeholder_literalizer_class.loader(self, &block)
+    end
+
     # The alias to use for the row_number column, used when emulating OFFSET
     # support and for eager limit strategies
     def row_number_column
@@ -296,7 +306,7 @@ module Sequel
         loader += 1
 
         if loader >= 3
-          loader = Sequel::Dataset::PlaceholderLiteralizer.loader(self){|pl, _| yield pl}
+          loader = placeholder_literalizer_loader{|pl, _| yield pl}
           cache_set(key, loader)
         else
           cache_set(key, loader + 1)

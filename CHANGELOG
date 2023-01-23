@@ -1,5 +1,7 @@
 === master
 
+* Allow pg_auto_parameterize extension to use placeholder loaders (jeremyevans)
+
 * Do not include :min_value and :max_value schema entries for decimal/numeric columns on MySQL versions not supporting check constraints (jeremyevans)
 
 * Make Database#indexes return indexes for partitioned tables on PostgreSQL 11+ (jeremyevans)

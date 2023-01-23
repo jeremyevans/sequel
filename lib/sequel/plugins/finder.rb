@@ -151,7 +151,7 @@ module Sequel
                 ds
               end
 
-              Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block) 
+              model.dataset.placeholder_literalizer_class.loader(model, &block) 
             end
           end
 

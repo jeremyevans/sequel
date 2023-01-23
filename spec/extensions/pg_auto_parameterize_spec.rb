@@ -417,9 +417,34 @@ describe "pg_auto_parameterize extension" do
     sql.args.frozen?.must_equal true
   end
 
-  it "should not support placeholder literalizers unless auto parameterization is disabled" do
-    @db[:table].supports_placeholder_literalizer?.must_be_nil
-    @db[:table].no_auto_parameterize.supports_placeholder_literalizer?.must_equal true
+  it "should support placeholder literalizers with existing arguments when not auto parametizing" do
+    ds = @db[:table].having(:a=>5).no_auto_parameterize
+    3.times do |i|
+      ds.first(:b=>i)
+    end
+    @db.sqls.must_equal ["SELECT * FROM \"table\" WHERE (\"b\" = 0) HAVING (\"a\" = 5) LIMIT 1",
+      "SELECT * FROM \"table\" WHERE (\"b\" = 1) HAVING (\"a\" = 5) LIMIT 1",
+      "SELECT * FROM \"table\" WHERE (\"b\" = 2) HAVING (\"a\" = 5) LIMIT 1"]
+  end
+
+  it "should support placeholder literalizers with existing arguments" do
+    ds = @db[:table].having(:a=>5)
+    3.times do |i|
+      ds.first(:b=>i)
+    end
+    @db.sqls.must_equal ["SELECT * FROM \"table\" WHERE (\"b\" = $1::int4) HAVING (\"a\" = $2::int4) LIMIT 1 -- args: [0, 5]",
+      "SELECT * FROM \"table\" WHERE (\"b\" = $1::int4) HAVING (\"a\" = $2::int4) LIMIT 1 -- args: [1, 5]",
+      "SELECT * FROM \"table\" WHERE (\"b\" = $2::int4) HAVING (\"a\" = $1::int4) LIMIT 1 -- args: [5, 2]"]
+  end
+
+  it "should support placeholder literalizers without arguments" do
+    ds = @db[:table]
+    3.times do |i|
+      ds.first(:b=>i)
+    end
+    @db.sqls.must_equal ["SELECT * FROM \"table\" WHERE (\"b\" = $1::int4) LIMIT 1 -- args: [0]",
+      "SELECT * FROM \"table\" WHERE (\"b\" = $1::int4) LIMIT 1 -- args: [1]",
+      "SELECT * FROM \"table\" WHERE (\"b\" = $1::int4) LIMIT 1 -- args: [2]"]
   end
 
   it "should not automatically parameterize if no_auto_parameterize is used" do

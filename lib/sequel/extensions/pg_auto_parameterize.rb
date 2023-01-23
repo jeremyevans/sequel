@@ -148,13 +148,24 @@ module Sequel
 
         # Freeze the stored arguments when freezing the query string.
         def freeze
-          @args.freeze if @args
+          if @args
+            @args.freeze
+            @arg_map.freeze
+          end
           super
         end
 
         # Show args when the query string is inspected
         def inspect
           @args ? "#{self}; #{@args.inspect}".inspect : super
+        end
+
+        def initialize_copy(other)
+          super
+          if args = other.instance_variable_get(:@args)
+            @args = args.dup
+            @arg_map = other.instance_variable_get(:@arg_map).dup
+          end
         end
       end
 
@@ -166,6 +177,17 @@ module Sequel
           else
             super
           end
+        end
+      end
+
+      # PlacholderLiteralizer subclass with support for stored auto parameters.
+      class PlaceholderLiteralizer < ::Sequel::Dataset::PlaceholderLiteralizer
+        private
+
+        def sql_origin
+          s = @dataset.sql.dup
+          s.clear
+          s
         end
       end
 
@@ -282,9 +304,13 @@ module Sequel
           end
         end
 
-        # Placeholder literalizers are not supported supported when using automatic parameterization.
-        def supports_placeholder_literalizer?
-          @opts[:no_auto_parameterize]
+        # The class to use for placeholder literalizers.
+        def placeholder_literalizer_class
+          if @opts[:no_auto_parameterize]
+            super
+          else
+            PlaceholderLiteralizer
+          end
         end
 
         # Disable automatic parameterization when using a cursor.

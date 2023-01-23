@@ -310,7 +310,17 @@ module Sequel
             loader = union_eager_loader
             joiner = " UNION ALL "
             ids.each_slice(subqueries_per_union).each do |slice|
-              objects.concat(ds.with_sql(slice.map{|k| loader.sql(*k)}.join(joiner)).to_a)
+              sql = ds.send(:sql_string_origin)
+              join = false
+              slice.each do |k|
+                if join
+                  sql << joiner
+                else
+                  join = true
+                end
+                loader.append_sql(sql, *k)
+              end
+              objects.concat(ds.with_sql(sql).to_a)
             end
             ds = ds.eager(cascade) if cascade
             ds.send(:post_load, objects)
@@ -446,7 +456,7 @@ module Sequel
         def placeholder_loader
           if use_placeholder_loader?
             cached_fetch(:placeholder_loader) do
-              Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
+              associated_dataset.placeholder_literalizer_loader do |pl, ds|
                 ds = ds.where(Sequel.&(*predicate_keys.map{|k| SQL::BooleanExpression.new(:'=', k, pl.arg)}))
                 if self[:block]
                   ds = self[:block].call(ds)
@@ -748,8 +758,8 @@ module Sequel
         # A placeholder literalizer used to speed up eager loading.
         def placeholder_eager_loader
           cached_fetch(:placeholder_eager_loader) do
-            Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
-              apply_eager_limit_strategy(eager_loading_dataset.where(predicate_key=>pl.arg), eager_limit_strategy)
+            eager_loading_dataset.placeholder_literalizer_loader do |pl, ds|
+              apply_eager_limit_strategy(ds.where(predicate_key=>pl.arg), eager_limit_strategy)
             end
           end
         end
@@ -808,7 +818,7 @@ module Sequel
         # loading a limited association.
         def union_eager_loader
           cached_fetch(:union_eager_loader) do
-            Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
+            associated_dataset.placeholder_literalizer_loader do |pl, ds|
               ds = self[:eager_block].call(ds) if self[:eager_block]
               keys = predicate_keys
               ds = ds.where(keys.map{pl.arg}.zip(keys))
