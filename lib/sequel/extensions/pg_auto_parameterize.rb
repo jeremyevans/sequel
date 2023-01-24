@@ -182,12 +182,17 @@ module Sequel
 
       # PlacholderLiteralizer subclass with support for stored auto parameters.
       class PlaceholderLiteralizer < ::Sequel::Dataset::PlaceholderLiteralizer
+        def initialize(dataset, fragments, final_sql, arity)
+          s = dataset.sql.dup
+          s.clear
+          @sql_origin = s.freeze
+          super
+        end
+
         private
 
         def sql_origin
-          s = @dataset.sql.dup
-          s.clear
-          s
+          @sql_origin.dup
         end
       end
 
