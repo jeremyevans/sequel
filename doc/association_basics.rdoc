@@ -864,14 +864,14 @@ You can set this to +nil+ to not create a remove_all_<i>association</i> method.
 
 === :no_dataset_method
 
-Setting this to true will not result in the <i>association</i>_dataset method
+Setting this to true will result in the <i>association</i>_dataset method
 not being defined. This can save memory if you only use the <i>association</i>
 method and do not call the <i>association</i>_dataset method directly or
 indirectly.
 
 === :no_association_method
 
-Setting this to true will not result in the <i>association</i> method
+Setting this to true will result in the <i>association</i> method
 not being defined. This can save memory if you only use the
 <i>association</i>_dataset method and do not call the <i>association</i> method
 directly or indirectly.
