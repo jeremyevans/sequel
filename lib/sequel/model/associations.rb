@@ -310,7 +310,7 @@ module Sequel
             loader = union_eager_loader
             joiner = " UNION ALL "
             ids.each_slice(subqueries_per_union).each do |slice|
-              sql = ds.send(:sql_string_origin)
+              sql = loader.send(:sql_origin)
               join = false
               slice.each do |k|
                 if join

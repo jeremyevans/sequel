@@ -1918,6 +1918,9 @@ describe "Sequel::Model Simple Associations" do
       plugin :eager_graph_eager
       one_to_many :albums, :order=>:name
       one_to_one :first_album, :clone=>:albums
+      one_to_one :first_restricted_album, :clone=>:albums, :instance_specific => false, :read_only=>true, :order=>:id do |ds|
+        ds.exclude(:name=>'Al', :id=>2)
+      end
       one_to_one :second_album, :clone=>:albums, :limit=>[nil, 1]
       one_to_one :last_album, :class=>:Album, :order=>Sequel.desc(:name)
       one_to_many :first_two_albums, :clone=>:albums, :limit=>2
@@ -2013,6 +2016,12 @@ describe "Sequel::Model Simple Associations" do
     artists = Artist.eager(:first_two_albums).all
     artists.length.must_equal 100
     artists.each{|a| a.first_two_albums.length.must_equal 1}
+  end
+
+  it "should handle eager loading limited associations with association blocks" do
+    artists = Artist.eager(:first_restricted_album).order(:name).all
+    artists.map(&:name).must_equal ["Ar"]
+    artists.map{|ar| ar.first_restricted_album}.must_equal [nil]
   end
 
   it "should handle the :eager_limit option in eager-loading callbacks" do
