@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
 <title>Sequel::Postgres::AutoParameterize::QueryString</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -50,6 +51,7 @@ Superclass:
 <li><a href="#attribute-i-args">args</a></li>
 <li><a href="#method-i-auto_param-3F">auto_param?</a></li>
 <li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#method-i-initialize_copy">initialize_copy</a></li>
 <li><a href="#method-i-inspect">inspect</a></li>
 <li><a href="#method-i-skip_auto_param">skip_auto_param</a></li>
 </ol>
@@ -167,9 +169,35 @@ Superclass:
 </a>
 <pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize.rb</span>
 <span class="line-num">150</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">151</span>   <span class="ruby-ivar">@args</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@args</span>
-<span class="line-num">152</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">151</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@args</span>
+<span class="line-num">152</span>     <span class="ruby-ivar">@args</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">153</span>     <span class="ruby-ivar">@arg_map</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">154</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">155</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">156</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-initialize_copy'>
+<a name='method-i-initialize_copy'></a>
+<div class='synopsis'>
+<span class='name'>initialize_copy</span><span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-initialize_copy-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-initialize_copy-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize.rb</span>
+<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize_copy</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">164</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">165</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span> = <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@args</span>)
+<span class="line-num">166</span>     <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">167</span>     <span class="ruby-ivar">@arg_map</span> = <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@arg_map</span>).<span class="ruby-identifier">dup</span>
+<span class="line-num">168</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inspect'>
@@ -188,9 +216,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-inspect-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize.rb</span>
-<span class="line-num">156</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
-<span class="line-num">157</span>   <span class="ruby-ivar">@args</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{self}; #{@args.inspect}&quot;</span>.<span class="ruby-identifier">inspect</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>
-<span class="line-num">158</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">160</span>   <span class="ruby-ivar">@args</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{self}; #{@args.inspect}&quot;</span>.<span class="ruby-identifier">inspect</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>
+<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-skip_auto_param'>

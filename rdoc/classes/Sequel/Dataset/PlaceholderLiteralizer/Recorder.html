@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
 <title>Sequel::Dataset::PlaceholderLiteralizer::Recorder</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -82,7 +83,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-loader'>
 <a name='method-i-loader'></a>
 <div class='synopsis'>
-<span class='name'>loader</span><span class='arguments'>(dataset, &block)</span>
+<span class='name'>loader</span><span class='arguments'>(pl, dataset, &block)</span>
 
 </div>
 <div class='description'>
@@ -95,8 +96,8 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-loader-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
-<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">81</span>   <span class="ruby-constant">PlaceholderLiteralizer</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">process</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))
+<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">pl</span>, <span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">81</span>   <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">process</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))
 <span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

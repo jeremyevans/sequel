@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
 <title>Sequel::Postgres::AutoParameterize::SkipAutoParam</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -67,13 +68,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_s_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize.rb</span>
-<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">164</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">QueryString</span>)
-<span class="line-num">165</span>     <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">skip_auto_param</span>{<span class="ruby-keyword">super</span>}
-<span class="line-num">166</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">167</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">168</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">174</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">175</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">QueryString</span>)
+<span class="line-num">176</span>     <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">skip_auto_param</span>{<span class="ruby-keyword">super</span>}
+<span class="line-num">177</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">178</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">179</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

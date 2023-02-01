@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
 <title>CHANGELOG</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -30,12 +31,21 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-12-30 18:41:20 -0800</span>
+<span class='datetime'>2023-02-01 09:28:24 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.65.0+-282023-02-01-29"><a href="doc/release_notes/5_65_0_txt.html">5.65.0</a> (2023-02-01)<span><a href="#label-5.65.0+-282023-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Allow pg_auto_parameterize extension to use placeholder loaders (jeremyevans)</p>
+</li><li>
+<p>Do not include :min_value and :max_value schema entries for decimal/numeric columns on MySQL versions not supporting check constraints (jeremyevans)</p>
+</li><li>
+<p>Make Database#indexes return indexes for partitioned tables on PostgreSQL 11+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.64.0+-282023-01-01-29"><a href="doc/release_notes/5_64_0_txt.html">5.64.0</a> (2023-01-01)<span><a href="#label-5.64.0+-282023-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make :db_type column schema entries on SQLAnywhere include precision/scale information (jeremyevans)</p>

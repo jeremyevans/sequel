@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
 <title>Sequel::Postgres::AutoParameterize::DatabaseMethods</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -65,12 +66,12 @@ Sequel::Postgres::AutoParameterize::DatabaseMethods
 [show source]
 </a>
 <pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize.rb</span>
-<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
-<span class="line-num">174</span>   <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-operator">==</span> <span class="ruby-value">:postgres</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">USES_PG</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-operator">==</span> <span class="ruby-value">:mock</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:postgres</span>)
-<span class="line-num">175</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;pg_auto_parameterize is only supported when using the postgres adapter with the pg driver&quot;</span>
-<span class="line-num">176</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">177</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)
-<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">201</span>   <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-operator">==</span> <span class="ruby-value">:postgres</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">USES_PG</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-operator">==</span> <span class="ruby-value">:mock</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:postgres</span>)
+<span class="line-num">202</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;pg_auto_parameterize is only supported when using the postgres adapter with the pg driver&quot;</span>
+<span class="line-num">203</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">204</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)
+<span class="line-num">205</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -90,12 +91,12 @@ Sequel::Postgres::AutoParameterize::DatabaseMethods
 [show source]
 </a>
 <pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize.rb</span>
-<span class="line-num">182</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>={})
-<span class="line-num">183</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">QueryString</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">args</span> = <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">args</span>)
-<span class="line-num">184</span>     <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:arguments</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>)
-<span class="line-num">185</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">186</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>={})
+<span class="line-num">210</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">QueryString</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">args</span> = <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">args</span>)
+<span class="line-num">211</span>     <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:arguments</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>)
+<span class="line-num">212</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">213</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">214</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

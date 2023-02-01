@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
 <title>Sequel::Dataset::PlaceholderLiteralizer</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -96,6 +97,7 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-all">all</a></li>
+<li><a href="#method-i-append_sql">append_sql</a></li>
 <li><a href="#method-i-each">each</a></li>
 <li><a href="#method-i-first">first</a></li>
 <li><a href="#method-i-freeze">freeze</a></li>
@@ -133,7 +135,7 @@ Superclass:
 </a>
 <pre id='method-c-loader-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
 <span class="line-num">147</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">148</span>   <span class="ruby-constant">Recorder</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">148</span>   <span class="ruby-constant">Recorder</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">loader</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
 <span class="line-num">149</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -182,6 +184,39 @@ Superclass:
 <span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
 <span class="line-num">180</span>   <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_all</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
 <span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-append_sql'>
+<a name='method-i-append_sql'></a>
+<div class='synopsis'>
+<span class='name'>append_sql</span><span class='arguments'>(sql, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Append the <a href="../SQL.html"><code>SQL</code></a> query to use for the given arguments to the given <a href="../SQL.html"><code>SQL</code></a> string.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-append_sql-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-append_sql-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
+<span class="line-num">207</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">append_sql</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">208</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@dataset</span>
+<span class="line-num">209</span>   <span class="ruby-ivar">@fragments</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span>, <span class="ruby-identifier">i</span>, <span class="ruby-identifier">transformer</span><span class="ruby-operator">|</span>
+<span class="line-num">210</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>
+<span class="line-num">211</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
+<span class="line-num">212</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">i</span>)
+<span class="line-num">213</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">transformer</span>
+<span class="line-num">214</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">215</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">i</span>.<span class="ruby-identifier">call</span>
+<span class="line-num">216</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">217</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">218</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">219</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@final_sql</span>
+<span class="line-num">220</span>   <span class="ruby-identifier">sql</span>
+<span class="line-num">221</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -288,21 +323,9 @@ Superclass:
 <pre id='method-i-sql-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>
 <span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
 <span class="line-num">201</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;wrong number of arguments (#{args.length} for #{@arity})&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-ivar">@arity</span>
-<span class="line-num">202</span>   <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">203</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@dataset</span>
-<span class="line-num">204</span>   <span class="ruby-ivar">@fragments</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sql</span>, <span class="ruby-identifier">i</span>, <span class="ruby-identifier">transformer</span><span class="ruby-operator">|</span>
-<span class="line-num">205</span>     <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>
-<span class="line-num">206</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
-<span class="line-num">207</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">i</span>)
-<span class="line-num">208</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">transformer</span>
-<span class="line-num">209</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">210</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">i</span>.<span class="ruby-identifier">call</span>
-<span class="line-num">211</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">212</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">v</span>)
-<span class="line-num">213</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">214</span>   <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@final_sql</span>
-<span class="line-num">215</span>   <span class="ruby-identifier">s</span>
-<span class="line-num">216</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">202</span>   <span class="ruby-identifier">s</span> = <span class="ruby-identifier">sql_origin</span>
+<span class="line-num">203</span>   <span class="ruby-identifier">append_sql</span>(<span class="ruby-identifier">s</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">204</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_dataset'>
