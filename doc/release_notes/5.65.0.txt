@@ -1,0 +1,21 @@
+= Improvements
+
+* The pg_auto_parameterize extension now uses a modified placeholder
+  literalizer for speeding up the generation of SQL queries in the same
+  cases where a standard dataset would use a placeholder literalizer.
+  This can provide a 4% speedup for simple queries, with greater
+  speedups for more complex queries.
+
+* Database#indexes now returns indexes for partitioned tables on
+  PostgreSQL 11+.
+
+* MySQL versions not supporting CHECK constraints no longer include
+  :min_value/:max_value schema entries for decimal/numeric columns.
+
+= Backwards Compatibility
+
+* The Dataset::PlaceholderLiterlizer::Record.loader API has changed,
+  it now accepts the Dataset::PlaceholderLiterlizer class to use as
+  the first argument.  This makes it easier to create
+  Dataset::PlaceholderLiterlizer subclasses, such as the one now used
+  by the pg_auto_parameterize extension.
