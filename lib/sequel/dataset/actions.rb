@@ -173,9 +173,9 @@ module Sequel
     #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
     #   # => false
     def empty?
-      cached_dataset(:_empty_ds) do
+      with_sql_first((cached_dataset(:_empty_ds) do
         single_value_ds.unordered.select(EMPTY_SELECT)
-      end.single_value!.nil?
+      end).select_sql).nil?
     end
 
     # Returns the first matching record if no arguments are given.

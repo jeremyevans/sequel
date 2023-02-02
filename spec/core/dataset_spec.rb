@@ -2279,6 +2279,14 @@ describe "Dataset#empty?" do
     db.sqls.must_equal ["SELECT 1 AS one FROM test WHERE 'f' LIMIT 1"]
   end
 
+  it "should return false if dataset contains record with null field" do
+    db = Sequel.mock(:fetch=>proc{|sql| {1=>nil} unless sql =~ /WHERE 'f'/})
+    db.from(:test).wont_be :empty?
+    db.sqls.must_equal ['SELECT 1 AS one FROM test LIMIT 1']
+    db.from(:test).filter(false).must_be :empty?
+    db.sqls.must_equal ["SELECT 1 AS one FROM test WHERE 'f' LIMIT 1"]
+  end
+
   it "should ignore order" do
     db = Sequel.mock(:fetch=>proc{|sql| {1=>1}})
     db.from(:test).wont_be :empty?
