@@ -385,7 +385,12 @@ module Sequel
       # Use a custom expression with EXISTS to determine whether a dataset
       # is empty.
       def empty?
-        db[:dual].where(@opts[:offset] ? exists : unordered.exists).get(1) == nil
+        if @opts[:sql]
+          naked.each{return false}
+          true
+        else
+          db[:dual].where(@opts[:offset] ? exists : unordered.exists).get(1) == nil
+        end
       end
 
       # Oracle requires SQL standard datetimes
