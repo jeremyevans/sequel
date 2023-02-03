@@ -465,6 +465,43 @@ describe Sequel::Dataset do
     end
   end
 
+  it "should return the correct record count without an expression when using custom SQL" do
+    ds = @d.order(:name).with_sql(:select_sql)
+    ds.count.must_equal 0
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => nil)}
+    5.times do
+      ds.count.must_equal 3
+    end
+  end
+
+  it "should return the correct record count with an expression when using custom SQL" do
+    ds = @d.with_sql(:select_sql)
+    ds.count(:name).must_equal 0
+    ds.count{:value}.must_equal 0
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => nil)}
+    5.times do
+      ds.count(:name).must_equal 3
+      ds.count{:value}.must_equal 2
+    end
+  end
+
+  cspecify "should return the correct record count with an expression when using custom SQL with order", :mssql do
+    ds = @d.order(:name).with_sql(:select_sql)
+    ds.count(:name).must_equal 0
+    ds.count{:value}.must_equal 0
+    wait{@d.insert(:name => 'abc', :value => 123)}
+    wait{@d.insert(:name => 'abc', :value => 456)}
+    wait{@d.insert(:name => 'def', :value => nil)}
+    5.times do
+      ds.count(:name).must_equal 3
+      ds.count{:value}.must_equal 2
+    end
+  end
+
   it "should handle functions with identifier names correctly" do
     wait{@d.insert(:name => 'abc', :value => 6)}
     @d.get{sum.function(:value)}.must_equal 6
@@ -1278,7 +1315,7 @@ describe "Sequel::Dataset convenience methods" do
   end
   
   it "#empty? should handle datasets with custom SQL" do
-    ds = @ds.select(Sequel.as(nil, :v)).with_sql(:select_sql)
+    ds = @ds.select(@ds.select(:a).unordered.where(:a=>1).as(:v)).with_sql(:select_sql)
     ds.empty?.must_equal true
     wait{@ds.insert(20, 10)}
     ds.empty?.must_equal false

@@ -591,6 +591,18 @@ module Sequel
         end
       end
       
+      # For a dataset with custom SQL, since it may include ORDER BY, you
+      # cannot wrap it in a subquery.  Load entire query in this case to get
+      # the number of rows. In general, you should avoid calling this method
+      # on datasets with custom SQL.
+      def count(*a, &block)
+        if (@opts[:sql] && a.empty? && !block)
+          naked.to_a.length
+        else
+          super
+        end
+      end
+
       # Uses CROSS APPLY to join the given table into the current dataset.
       def cross_apply(table)
         join_table(:cross_apply, table)
@@ -599,6 +611,19 @@ module Sequel
       # Disable the use of INSERT OUTPUT
       def disable_insert_output
         clone(:disable_insert_output=>true)
+      end
+
+      # For a dataset with custom SQL, since it may include ORDER BY, you
+      # cannot wrap it in a subquery.  Run query, and if it returns any
+      # records, return true. In general, you should avoid calling this method
+      # on datasets with custom SQL.
+      def empty?
+        if @opts[:sql]
+          naked.each{return false}
+          true
+        else
+          super
+        end
       end
 
       # MSSQL treats [] as a metacharacter in LIKE expresions.
