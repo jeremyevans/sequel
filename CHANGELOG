@@ -1,3 +1,7 @@
+=== master
+
+* Make Dataset#empty? correctly handle datasets with custom SQL or using Dataset#values where the first value is NULL (andy-k, jeremyevans) (#1990)
+
 === 5.65.0 (2023-02-01)
 
 * Allow pg_auto_parameterize extension to use placeholder loaders (jeremyevans)

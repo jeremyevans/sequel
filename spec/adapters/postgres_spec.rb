@@ -724,6 +724,14 @@ describe "A PostgreSQL database" do
     @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
   end
 
+  it "#values should error if given an empty array" do
+    proc{@db.values([])}.must_raise(Sequel::Error)
+  end
+
+  it "#empty? should return true for datasets using VALUES" do
+    @db.values([[nil]]).empty?.must_equal false
+  end
+
   it "should correctly handle various numbers of columns" do
     [1, 2, 15, 16, 17, 63, 64, 65, 255, 256, 257, 1663, 1664].each do |i|
       DB.get((1..i).map{|j| Sequel.as(j, "c#{j}")}).must_equal((1..i).to_a)

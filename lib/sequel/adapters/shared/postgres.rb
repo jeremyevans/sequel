@@ -805,6 +805,7 @@ module Sequel
       #   DB.values([[1, 2], [3, 4]]).order(:column2).limit(1, 1)
       #   # VALUES ((1, 2), (3, 4)) ORDER BY column2 LIMIT 1 OFFSET 1
       def values(v)
+        raise Error, "Cannot provide an empty array for values" if v.empty?
         @default_dataset.clone(:values=>v)
       end
 
@@ -1704,6 +1705,12 @@ module Sequel
       # database connection for currval or lastval).
       def disable_insert_returning
         clone(:disable_insert_returning=>true)
+      end
+
+      # Always return false when using VALUES
+      def empty?
+        return false if @opts[:values]
+        super
       end
 
       # Return the results of an EXPLAIN query as a string

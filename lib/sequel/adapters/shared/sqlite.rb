@@ -169,6 +169,7 @@ module Sequel
       #   DB.values([[1, 2], [3, 4]])
       #   # VALUES ((1, 2), (3, 4))
       def values(v)
+        raise Error, "Cannot provide an empty array for values" if v.empty?
         @default_dataset.clone(:values=>v)
       end
 
@@ -655,6 +656,12 @@ module Sequel
         @opts[:where] ? super : where(1=>1).delete(&block)
       end
       
+      # Always return false when using VALUES
+      def empty?
+        return false if @opts[:values]
+        super
+      end
+
       # Return an array of strings specifying a query explanation for a SELECT of the
       # current dataset. Currently, the options are ignored, but it accepts options
       # to be compatible with other adapters.

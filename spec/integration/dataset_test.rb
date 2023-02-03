@@ -1277,6 +1277,13 @@ describe "Sequel::Dataset convenience methods" do
     ds.empty?.must_equal false
   end
   
+  it "#empty? should handle datasets with custom SQL" do
+    ds = @ds.select(Sequel.as(nil, :v)).with_sql(:select_sql)
+    ds.empty?.must_equal true
+    wait{@ds.insert(20, 10)}
+    ds.empty?.must_equal false
+  end
+  
   it "#group_and_count should return a grouping by count" do
     @ds.group_and_count(:a).order{count(:a)}.all.must_equal []
     wait{@ds.insert(20, 10)}

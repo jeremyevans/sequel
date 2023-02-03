@@ -193,6 +193,14 @@ describe "SQLite VALUES support" do
     @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
   end
 
+  it "#values should error if given an empty array" do
+    proc{@db.values([])}.must_raise(Sequel::Error)
+  end
+
+  it "#empty? should return true for datasets using VALUES" do
+    @db.values([[nil]]).empty?.must_equal false
+  end
+
   it "should support VALUES with unions" do
     @db.values([[1]]).union(@db.values([[3]])).map(&:values).map(&:first).must_equal [1, 3]
   end
