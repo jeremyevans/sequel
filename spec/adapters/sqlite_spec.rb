@@ -197,7 +197,7 @@ describe "SQLite VALUES support" do
     proc{@db.values([])}.must_raise(Sequel::Error)
   end
 
-  it "#empty? should return true for datasets using VALUES" do
+  it "#empty? should return false for datasets using VALUES" do
     @db.values([[nil]]).empty?.must_equal false
   end
 
