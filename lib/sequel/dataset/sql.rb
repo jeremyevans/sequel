@@ -977,7 +977,12 @@ module Sequel
     # order if not. Also removes the row_proc, which isn't needed
     # for aggregate calculations.
     def aggregate_dataset
-      (options_overlap(COUNT_FROM_SELF_OPTS) ? from_self : unordered).naked
+      (aggreate_dataset_use_from_self? ? from_self : unordered).naked
+    end
+
+    # Whether to use from_self for an aggregate dataset.
+    def aggreate_dataset_use_from_self?
+      options_overlap(COUNT_FROM_SELF_OPTS)
     end
 
     # Append aliasing expression to SQL string.

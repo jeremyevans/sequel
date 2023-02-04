@@ -732,6 +732,18 @@ describe "A PostgreSQL database" do
     @db.values([[nil]]).empty?.must_equal false
   end
 
+  it "#count should return correct number of rows for datasets using VALUES when called without arguments" do
+    @db.values([[100]]).count.must_equal 1
+    @db.values([[100, 1]]).count.must_equal 1
+    @db.values([[100], [200]]).count.must_equal 2
+    @db.values([[100, 10], [200, 10]]).count.must_equal 2
+  end
+
+  it "#count should return correct number of rows for datasets using VALUES when called with arguments" do
+    @db.values([[100]]).count(:column1).must_equal 1
+    @db.values([[nil]]).count{:column1}.must_equal 0
+  end
+
   it "should correctly handle various numbers of columns" do
     [1, 2, 15, 16, 17, 63, 64, 65, 255, 256, 257, 1663, 1664].each do |i|
       DB.get((1..i).map{|j| Sequel.as(j, "c#{j}")}).must_equal((1..i).to_a)

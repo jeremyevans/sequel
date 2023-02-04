@@ -875,6 +875,11 @@ module Sequel
         end
       end
 
+      # Use from_self for aggregate dataset using VALUES.
+      def aggreate_dataset_use_from_self?
+        super || @opts[:values]
+      end
+      
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql_append(sql, aliaz, column_aliases=nil)
         raise Error, "sqlite does not support derived column lists" if column_aliases

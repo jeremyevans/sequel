@@ -2132,6 +2132,11 @@ module Sequel
         "TRUNCATE TABLE#{' ONLY' if to[:only]} #{table}#{' RESTART IDENTITY' if to[:restart]}#{' CASCADE' if to[:cascade]}"
       end
 
+      # Use from_self for aggregate dataset using VALUES.
+      def aggreate_dataset_use_from_self?
+        super || @opts[:values]
+      end
+      
       # Allow truncation of multiple source tables.
       def check_truncation_allowed!
         raise(InvalidOperation, "Grouped datasets cannot be truncated") if opts[:group]

@@ -1,5 +1,7 @@
 === master
 
+* Make Dataset#count work correctly for datasets using Dataset#values (jeremyevans) (#1992)
+
 * Make Dataset#count with no argument/block handle dataset with custom SQL using ORDER BY on MSSQL (jeremyevans)
 
 * Make Dataset#empty? correctly handle datasets with custom SQL or using Dataset#values where the first value is NULL (andy-k, jeremyevans) (#1990)
