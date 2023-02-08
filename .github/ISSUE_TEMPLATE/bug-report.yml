@@ -1,0 +1,76 @@
+name: Report a bug 🐛
+description: Create a report to help us improve
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bugs Only
+        If you have
+          - a question, or need help,
+          - or want to request a feature,
+          - or do anything else other than submit a bug report, please use [GitHub Discussions](https://github.com/jeremyevans/sequel/discussions) or the [sequel-talk Google Group  (A Question / Answer Forum)](https://groups.google.com/g/sequel-talk). Why? To protect the maintainer's  time, and (2) as an added incentive, there are many folks watching the discussion board - who will likely point you in the right direction if they know the answer.
+
+        ## Self-help
+        Before you make a bug report, please check our existing resources to see if it has already been discussed/reported:
+        - [Reported bugs](https://github.com/jeremyevans/sequel/issues?q=is%3Aissue+is%3Aclosed)
+        - [GitHub Discussions](https://github.com/jeremyevans/sequel/discussions/)
+        - [sequel-talk Google Group  (A Question / Answer Forum)](https://groups.google.com/g/sequel-talk)                
+
+  - type: textarea
+    attributes:
+      label: Report
+      description: "Complete Description of Issue"
+      placeholder: "Complete Description of Issue"
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: What did you expect to happen?
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: Also tell us, what did you see is happen?
+      placeholder: Tell us what you see that is happening
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Simplest Possible Self-Contained Example Showing the Bug
+      description: How can we reproduce this bug? This is critical to enable a quick fix!
+      value: |
+        1.
+        2. Ruby code to demonstrate the problem.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: SQL Log (if any)
+      description: SQL Log (if any)
+    validations:
+      required: false
+
+  - type: input
+    attributes:
+      label: Ruby Version
+      description: What version of Ruby are you using?
+      placeholder: e.g. ruby 3.0.1p64
+    validations:
+      required: false
+
+  - type: input
+    attributes:
+      label: Sequel Version
+      description: Version of sequel are you using
+      placeholder: e.g. 1.2.3
+    validations:
+      required: false
+
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else?
+      description: "Let us know if you have anything else to share"

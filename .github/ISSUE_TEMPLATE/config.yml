@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions / Feature Requests / Potential bugs
+    url: https://github.com/jeremyevans/sequel/discussions/new?category=general
+    about: Ask here first - you'll probably get a faster response, while easing maintenance burdens.
