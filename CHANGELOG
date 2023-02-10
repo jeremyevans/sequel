@@ -1,5 +1,7 @@
 === master
 
+* Recognize SQLite error related to strict tables as a constraint violation when using the amalgalite adapter (jeremyevans)
+
 * Make Dataset#count work correctly for datasets using Dataset#values (jeremyevans) (#1992)
 
 * Make Dataset#count with no argument/block handle dataset with custom SQL using ORDER BY on MSSQL (jeremyevans)

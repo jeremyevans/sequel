@@ -357,6 +357,7 @@ module Sequel
       DATABASE_ERROR_REGEXPS = {
         /(is|are) not unique\z|PRIMARY KEY must be unique\z|UNIQUE constraint failed: .+\z/ => UniqueConstraintViolation,
         /foreign key constraint failed\z/i => ForeignKeyConstraintViolation,
+        /\ASQLITE ERROR 3091/ => CheckConstraintViolation,
         /\A(SQLITE ERROR 275 \(CONSTRAINT_CHECK\) : )?CHECK constraint failed/ => CheckConstraintViolation,
         /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
         /\Acannot store [A-Z]+ value in [A-Z]+ column / => ConstraintViolation,
