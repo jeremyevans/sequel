@@ -421,6 +421,7 @@ module Sequel
         bool_op(HAS_KEY, key)
       end
       alias include? has_key?
+      alias key? has_key?
 
       # Inserts the given jsonb value at the given path in the receiver.
       # The default is to insert the value before the given path, but
