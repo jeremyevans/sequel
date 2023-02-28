@@ -211,7 +211,7 @@ describe "SQLite VALUES support" do
   it "#count should return correct number of rows for datasets using VALUES when called with arguments" do
     @db.values([[100]]).count(:column1).must_equal 1
     @db.values([[nil]]).count{:column1}.must_equal 0
-  end
+  end if DB.sqlite_version >= 31000
 
   it "should support VALUES with unions" do
     @db.values([[1]]).union(@db.values([[3]])).map(&:values).map(&:first).must_equal [1, 3]
