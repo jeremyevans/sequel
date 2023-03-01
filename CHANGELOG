@@ -1,4 +1,4 @@
-=== master
+=== 5.66.0 (2023-03-01)
 
 * Recognize SQLite error related to strict tables as a constraint violation when using the amalgalite adapter (jeremyevans)
 

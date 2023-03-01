@@ -1,0 +1,24 @@
+= Improvements
+
+* Dataset#empty? now correctly handles datasets using custom SQL or
+  Dataset#values where the first value in the first row is NULL.
+
+* Dataset#count without an argument or block now works correctly on
+  Microsoft SQL Server when using custom SQL that uses ORDER BY.
+
+* Dataset#count now works correctly for datasets using Dataset#values.
+
+* Sequel now recognizes an additional SQLite constraint violation
+  error that occurs with recent versions of amalgalite.
+
+* Dataset#values will now raise an exception when called with an empty
+  array. Previously, an exception would not be raised until the query
+  was sent to the database.
+
+= Backwards Compatibility
+
+* The changes to make Dataset#empty? and #count work with custom SQL
+  on Microsoft SQL Server now result in running the custom SQL, which
+  could result in worse performance than in previous versions. You can
+  wrap such datasets with Dataset#from_self manually to restore the
+  previous behavior.
