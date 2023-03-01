@@ -42,8 +42,10 @@ Sequel::MSSQL::DatasetMethods
 <ol>
 <li><a href="#method-i-complex_expression_sql_append">complex_expression_sql_append</a></li>
 <li><a href="#method-i-constant_sql_append">constant_sql_append</a></li>
+<li><a href="#method-i-count">count</a></li>
 <li><a href="#method-i-cross_apply">cross_apply</a></li>
 <li><a href="#method-i-disable_insert_output">disable_insert_output</a></li>
+<li><a href="#method-i-empty-3F">empty?</a></li>
 <li><a href="#method-i-escape_like">escape_like</a></li>
 <li><a href="#method-i-full_text_search">full_text_search</a></li>
 <li><a href="#method-i-insert_select">insert_select</a></li>
@@ -193,6 +195,31 @@ Sequel::MSSQL::DatasetMethods
 <span class="line-num">592</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-count'>
+<a name='method-i-count'></a>
+<div class='synopsis'>
+<span class='name'>count</span><span class='arguments'>(*a, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>For a dataset with custom SQL, since it may include ORDER BY, you cannot wrap it in a subquery.  Load entire query in this case to get the number of rows. In general, you should avoid calling this method on datasets with custom SQL.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-count-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-count-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
+<span class="line-num">598</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">599</span>   <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">block</span>)
+<span class="line-num">600</span>     <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">to_a</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">601</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">602</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">603</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">604</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-cross_apply'>
 <a name='method-i-cross_apply'></a>
 <div class='synopsis'>
@@ -209,9 +236,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-cross_apply-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">595</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cross_apply</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">596</span>   <span class="ruby-identifier">join_table</span>(<span class="ruby-value">:cross_apply</span>, <span class="ruby-identifier">table</span>)
-<span class="line-num">597</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">607</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cross_apply</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">608</span>   <span class="ruby-identifier">join_table</span>(<span class="ruby-value">:cross_apply</span>, <span class="ruby-identifier">table</span>)
+<span class="line-num">609</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disable_insert_output'>
@@ -230,9 +257,35 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-disable_insert_output-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">600</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disable_insert_output</span>
-<span class="line-num">601</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:disable_insert_output</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">602</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">612</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disable_insert_output</span>
+<span class="line-num">613</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:disable_insert_output</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">614</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-empty-3F'>
+<a name='method-i-empty-3F'></a>
+<div class='synopsis'>
+<span class='name'>empty?</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>For a dataset with custom SQL, since it may include ORDER BY, you cannot wrap it in a subquery.  Run query, and if it returns any records, return true. In general, you should avoid calling this method on datasets with custom SQL.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-empty-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-empty-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
+<span class="line-num">620</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty?</span>
+<span class="line-num">621</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>]
+<span class="line-num">622</span>     <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">each</span>{<span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>}
+<span class="line-num">623</span>     <span class="ruby-keyword">true</span>
+<span class="line-num">624</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">625</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">626</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">627</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-escape_like'>
@@ -251,9 +304,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-escape_like-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">605</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">escape_like</span>(<span class="ruby-identifier">string</span>)
-<span class="line-num">606</span>   <span class="ruby-identifier">string</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/[\\%_\[\]]/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\\#{m}&quot;</span>}
-<span class="line-num">607</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">630</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">escape_like</span>(<span class="ruby-identifier">string</span>)
+<span class="line-num">631</span>   <span class="ruby-identifier">string</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/[\\%_\[\]]/</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\\#{m}&quot;</span>}
+<span class="line-num">632</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-full_text_search'>
@@ -272,10 +325,10 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-full_text_search-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">610</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_search</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">611</span>   <span class="ruby-identifier">terms</span> = <span class="ruby-node">&quot;\&quot;#{terms.join(&#39;&quot; OR &quot;&#39;)}\&quot;&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">612</span>   <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;CONTAINS (?, ?)&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>))
-<span class="line-num">613</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">635</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_search</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">636</span>   <span class="ruby-identifier">terms</span> = <span class="ruby-node">&quot;\&quot;#{terms.join(&#39;&quot; OR &quot;&#39;)}\&quot;&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">637</span>   <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;CONTAINS (?, ?)&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>))
+<span class="line-num">638</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select'>
@@ -294,10 +347,10 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_select-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">618</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">619</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>
-<span class="line-num">620</span>   <span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>
-<span class="line-num">621</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">643</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">644</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>
+<span class="line-num">645</span>   <span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>
+<span class="line-num">646</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select_sql'>
@@ -316,10 +369,10 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_select_sql-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">625</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">626</span>   <span class="ruby-identifier">ds</span> = (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:output</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>]) <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">output</span>(<span class="ruby-keyword">nil</span>, [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:inserted</span>)])
-<span class="line-num">627</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">628</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">650</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">651</span>   <span class="ruby-identifier">ds</span> = (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:output</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>]) <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">output</span>(<span class="ruby-keyword">nil</span>, [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:inserted</span>)])
+<span class="line-num">652</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">653</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-into'>
@@ -338,9 +391,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-into-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">631</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">into</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">632</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:into</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">table</span>)
-<span class="line-num">633</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">656</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">into</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">657</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:into</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">table</span>)
+<span class="line-num">658</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-mssql_unicode_strings'>
@@ -380,9 +433,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-nolock-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">636</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nolock</span>
-<span class="line-num">637</span>   <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:dirty</span>)
-<span class="line-num">638</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">661</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nolock</span>
+<span class="line-num">662</span>   <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:dirty</span>)
+<span class="line-num">663</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-outer_apply'>
@@ -401,9 +454,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-outer_apply-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">641</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">outer_apply</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">642</span>   <span class="ruby-identifier">join_table</span>(<span class="ruby-value">:outer_apply</span>, <span class="ruby-identifier">table</span>)
-<span class="line-num">643</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">666</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">outer_apply</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">667</span>   <span class="ruby-identifier">join_table</span>(<span class="ruby-value">:outer_apply</span>, <span class="ruby-identifier">table</span>)
+<span class="line-num">668</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-output'>
@@ -432,18 +485,18 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-output-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">657</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">output</span>(<span class="ruby-identifier">into</span>, <span class="ruby-identifier">values</span>)
-<span class="line-num">658</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;SQL Server versions 2000 and earlier do not support the OUTPUT clause&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_output_clause?</span>
-<span class="line-num">659</span>   <span class="ruby-identifier">output</span> = {}
-<span class="line-num">660</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">values</span>
-<span class="line-num">661</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
-<span class="line-num">662</span>     <span class="ruby-identifier">output</span>[<span class="ruby-value">:column_list</span>], <span class="ruby-identifier">output</span>[<span class="ruby-value">:select_list</span>] = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">keys</span>, <span class="ruby-identifier">values</span>.<span class="ruby-identifier">values</span>
-<span class="line-num">663</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">664</span>     <span class="ruby-identifier">output</span>[<span class="ruby-value">:select_list</span>] = <span class="ruby-identifier">values</span>
-<span class="line-num">665</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">666</span>   <span class="ruby-identifier">output</span>[<span class="ruby-value">:into</span>] = <span class="ruby-identifier">into</span>
-<span class="line-num">667</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:output</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">output</span>)
-<span class="line-num">668</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">682</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">output</span>(<span class="ruby-identifier">into</span>, <span class="ruby-identifier">values</span>)
+<span class="line-num">683</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;SQL Server versions 2000 and earlier do not support the OUTPUT clause&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_output_clause?</span>
+<span class="line-num">684</span>   <span class="ruby-identifier">output</span> = {}
+<span class="line-num">685</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">values</span>
+<span class="line-num">686</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
+<span class="line-num">687</span>     <span class="ruby-identifier">output</span>[<span class="ruby-value">:column_list</span>], <span class="ruby-identifier">output</span>[<span class="ruby-value">:select_list</span>] = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">keys</span>, <span class="ruby-identifier">values</span>.<span class="ruby-identifier">values</span>
+<span class="line-num">688</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">689</span>     <span class="ruby-identifier">output</span>[<span class="ruby-value">:select_list</span>] = <span class="ruby-identifier">values</span>
+<span class="line-num">690</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">691</span>   <span class="ruby-identifier">output</span>[<span class="ruby-value">:into</span>] = <span class="ruby-identifier">into</span>
+<span class="line-num">692</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:output</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">output</span>)
+<span class="line-num">693</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quoted_identifier_append'>
@@ -462,9 +515,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-quoted_identifier_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">671</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
-<span class="line-num">672</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\]/</span>, <span class="ruby-string">&#39;]]&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;]&#39;</span>
-<span class="line-num">673</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">696</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
+<span class="line-num">697</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\]/</span>, <span class="ruby-string">&#39;]]&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;]&#39;</span>
+<span class="line-num">698</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-returning'>
@@ -483,15 +536,15 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-returning-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">676</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returning</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">677</span>   <span class="ruby-identifier">values</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
-<span class="line-num">678</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">unqualified_column_for</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">679</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot emulate RETURNING via OUTPUT for value: #{v.inspect}&quot;</span>)
-<span class="line-num">680</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">681</span>     <span class="ruby-identifier">r</span>
-<span class="line-num">682</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">683</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:returning</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>)
-<span class="line-num">684</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">701</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returning</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">702</span>   <span class="ruby-identifier">values</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">703</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">unqualified_column_for</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">704</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot emulate RETURNING via OUTPUT for value: #{v.inspect}&quot;</span>)
+<span class="line-num">705</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">706</span>     <span class="ruby-identifier">r</span>
+<span class="line-num">707</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">708</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:returning</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>)
+<span class="line-num">709</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select_sql'>
@@ -510,13 +563,13 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-select_sql-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">690</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_sql</span>
-<span class="line-num">691</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]
-<span class="line-num">692</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Using with_ties is not supported with an offset on Microsoft SQL Server&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit_with_ties</span>]
-<span class="line-num">693</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">order</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">select_sql</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_2012_or_later?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]
-<span class="line-num">694</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">695</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">696</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">715</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_sql</span>
+<span class="line-num">716</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]
+<span class="line-num">717</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Using with_ties is not supported with an offset on Microsoft SQL Server&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit_with_ties</span>]
+<span class="line-num">718</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">order</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">select_sql</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_2012_or_later?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]
+<span class="line-num">719</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">720</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">721</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-server_version'>
@@ -535,9 +588,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-server_version-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">699</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>
-<span class="line-num">700</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])
-<span class="line-num">701</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">724</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>
+<span class="line-num">725</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])
+<span class="line-num">726</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -554,9 +607,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_cte-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">703</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
-<span class="line-num">704</span>   <span class="ruby-identifier">is_2005_or_later?</span>
-<span class="line-num">705</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">728</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
+<span class="line-num">729</span>   <span class="ruby-identifier">is_2005_or_later?</span>
+<span class="line-num">730</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_cube-3F'>
@@ -575,9 +628,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_group_cube-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">708</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>
-<span class="line-num">709</span>   <span class="ruby-identifier">is_2005_or_later?</span>
-<span class="line-num">710</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">733</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>
+<span class="line-num">734</span>   <span class="ruby-identifier">is_2005_or_later?</span>
+<span class="line-num">735</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
@@ -596,9 +649,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_group_rollup-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">713</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>
-<span class="line-num">714</span>   <span class="ruby-identifier">is_2005_or_later?</span>
-<span class="line-num">715</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">738</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>
+<span class="line-num">739</span>   <span class="ruby-identifier">is_2005_or_later?</span>
+<span class="line-num">740</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_grouping_sets-3F'>
@@ -617,9 +670,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_grouping_sets-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">718</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>
-<span class="line-num">719</span>   <span class="ruby-identifier">is_2008_or_later?</span>
-<span class="line-num">720</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">743</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>
+<span class="line-num">744</span>   <span class="ruby-identifier">is_2008_or_later?</span>
+<span class="line-num">745</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_insert_select-3F'>
@@ -638,9 +691,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_insert_select-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">723</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_select?</span>
-<span class="line-num">724</span>   <span class="ruby-identifier">supports_output_clause?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:disable_insert_output</span>]
-<span class="line-num">725</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">748</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_select?</span>
+<span class="line-num">749</span>   <span class="ruby-identifier">supports_output_clause?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:disable_insert_output</span>]
+<span class="line-num">750</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_intersect_except-3F'>
@@ -659,9 +712,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_intersect_except-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">728</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except?</span>
-<span class="line-num">729</span>   <span class="ruby-identifier">is_2005_or_later?</span>
-<span class="line-num">730</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">753</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except?</span>
+<span class="line-num">754</span>   <span class="ruby-identifier">is_2005_or_later?</span>
+<span class="line-num">755</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -680,9 +733,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_is_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">733</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>
-<span class="line-num">734</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">735</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">758</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>
+<span class="line-num">759</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">760</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_join_using-3F'>
@@ -701,9 +754,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_join_using-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">738</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_join_using?</span>
-<span class="line-num">739</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">740</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">763</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_join_using?</span>
+<span class="line-num">764</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">765</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_merge-3F'>
@@ -722,9 +775,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_merge-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">743</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_merge?</span>
-<span class="line-num">744</span>   <span class="ruby-identifier">is_2008_or_later?</span>
-<span class="line-num">745</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">768</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_merge?</span>
+<span class="line-num">769</span>   <span class="ruby-identifier">is_2008_or_later?</span>
+<span class="line-num">770</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_modifying_joins-3F'>
@@ -743,9 +796,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_modifying_joins-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">748</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>
-<span class="line-num">749</span>   <span class="ruby-identifier">is_2005_or_later?</span>
-<span class="line-num">750</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">773</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>
+<span class="line-num">774</span>   <span class="ruby-identifier">is_2005_or_later?</span>
+<span class="line-num">775</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -764,9 +817,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_multiple_column_in-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">753</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>
-<span class="line-num">754</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">755</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">778</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>
+<span class="line-num">779</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">780</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_nowait-3F'>
@@ -785,9 +838,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_nowait-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">758</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>
-<span class="line-num">759</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">760</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">783</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>
+<span class="line-num">784</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">785</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_offsets_in_correlated_subqueries-3F'>
@@ -806,9 +859,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_offsets_in_correlated_subqueries-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">763</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_offsets_in_correlated_subqueries?</span>
-<span class="line-num">764</span>   <span class="ruby-identifier">is_2012_or_later?</span>
-<span class="line-num">765</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">788</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_offsets_in_correlated_subqueries?</span>
+<span class="line-num">789</span>   <span class="ruby-identifier">is_2012_or_later?</span>
+<span class="line-num">790</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_output_clause-3F'>
@@ -827,9 +880,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_output_clause-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">768</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_output_clause?</span>
-<span class="line-num">769</span>   <span class="ruby-identifier">is_2005_or_later?</span>
-<span class="line-num">770</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">793</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_output_clause?</span>
+<span class="line-num">794</span>   <span class="ruby-identifier">is_2005_or_later?</span>
+<span class="line-num">795</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_returning-3F'>
@@ -848,9 +901,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_returning-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">773</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)
-<span class="line-num">774</span>   <span class="ruby-identifier">supports_insert_select?</span>
-<span class="line-num">775</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">798</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">799</span>   <span class="ruby-identifier">supports_insert_select?</span>
+<span class="line-num">800</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_skip_locked-3F'>
@@ -869,9 +922,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_skip_locked-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">778</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
-<span class="line-num">779</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">780</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">803</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
+<span class="line-num">804</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">805</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -890,9 +943,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_where_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">788</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
-<span class="line-num">789</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">790</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">813</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
+<span class="line-num">814</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">815</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -911,9 +964,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_functions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">783</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
-<span class="line-num">784</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">785</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">808</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
+<span class="line-num">809</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">810</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_mssql_unicode_strings'>
@@ -953,9 +1006,9 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-with_ties-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">794</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_ties</span>
-<span class="line-num">795</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit_with_ties</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">796</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">819</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_ties</span>
+<span class="line-num">820</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit_with_ties</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">821</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -975,18 +1028,18 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-_import-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">804</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">805</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:output</span>]
-<span class="line-num">806</span>     <span class="ruby-identifier">output</span>(<span class="ruby-keyword">nil</span>, [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:inserted</span>, <span class="ruby-identifier">first_primary_key</span>)]).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">807</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:output</span>]
-<span class="line-num">808</span>     <span class="ruby-comment"># no transaction: our multi_insert_sql_strategy should guarantee</span>
-<span class="line-num">809</span>     <span class="ruby-comment"># that there&#39;s only ever a single statement.</span>
-<span class="line-num">810</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)[<span class="ruby-value">0</span>]
-<span class="line-num">811</span>     <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}
-<span class="line-num">812</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">813</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">814</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">815</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">829</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">830</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:output</span>]
+<span class="line-num">831</span>     <span class="ruby-identifier">output</span>(<span class="ruby-keyword">nil</span>, [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:inserted</span>, <span class="ruby-identifier">first_primary_key</span>)]).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">832</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:output</span>]
+<span class="line-num">833</span>     <span class="ruby-comment"># no transaction: our multi_insert_sql_strategy should guarantee</span>
+<span class="line-num">834</span>     <span class="ruby-comment"># that there&#39;s only ever a single statement.</span>
+<span class="line-num">835</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)[<span class="ruby-value">0</span>]
+<span class="line-num">836</span>     <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}
+<span class="line-num">837</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">838</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">839</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">840</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method protected-instance' id='method-method-i-compound_from_self'>
@@ -1005,15 +1058,15 @@ Sequel::MSSQL::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-compound_from_self-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
-<span class="line-num">824</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">compound_from_self</span>
-<span class="line-num">825</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">is_2012_or_later?</span>
-<span class="line-num">826</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">LIMIT_ALL</span>).<span class="ruby-identifier">from_self</span>
-<span class="line-num">827</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]  <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>])
-<span class="line-num">828</span>     <span class="ruby-identifier">unordered</span>
-<span class="line-num">829</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">830</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">831</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">832</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">849</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">compound_from_self</span>
+<span class="line-num">850</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">is_2012_or_later?</span>
+<span class="line-num">851</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">LIMIT_ALL</span>).<span class="ruby-identifier">from_self</span>
+<span class="line-num">852</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]  <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>])
+<span class="line-num">853</span>     <span class="ruby-identifier">unordered</span>
+<span class="line-num">854</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">855</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">856</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">857</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

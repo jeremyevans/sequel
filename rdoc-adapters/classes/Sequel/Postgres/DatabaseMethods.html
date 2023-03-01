@@ -1454,8 +1454,9 @@ end_sql
 </a>
 <pre id='method-i-values-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">807</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">808</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
-<span class="line-num">809</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">808</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide an empty array for values&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">809</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
+<span class="line-num">810</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-views'>
@@ -1485,10 +1486,10 @@ end_sql
 [show source]
 </a>
 <pre id='method-i-views-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">819</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">820</span>   <span class="ruby-identifier">relkind</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:materialized</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;m&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;v&#39;</span>
-<span class="line-num">821</span>   <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-identifier">relkind</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">822</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">820</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">821</span>   <span class="ruby-identifier">relkind</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:materialized</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;m&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;v&#39;</span>
+<span class="line-num">822</span>   <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-identifier">relkind</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">823</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

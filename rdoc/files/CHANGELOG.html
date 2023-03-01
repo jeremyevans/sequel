@@ -31,12 +31,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-02-01 09:28:24 -0800</span>
+<span class='datetime'>2023-03-01 08:07:43 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.66.0+-282023-03-01-29"><a href="doc/release_notes/5_66_0_txt.html">5.66.0</a> (2023-03-01)<span><a href="#label-5.66.0+-282023-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize SQLite error related to strict tables as a constraint violation when using the amalgalite adapter (jeremyevans)</p>
+</li><li>
+<p>Make Dataset#count work correctly for datasets using Dataset#values (jeremyevans) (#1992)</p>
+</li><li>
+<p>Make Dataset#count with no argument/block handle dataset with custom SQL using ORDER BY on MSSQL (jeremyevans)</p>
+</li><li>
+<p>Make Dataset#empty? correctly handle datasets with custom SQL or using Dataset#values where the first value is NULL (andy-k, jeremyevans) (#1990)</p>
+</li></ul>
+
 <h3 id="label-5.65.0+-282023-02-01-29"><a href="doc/release_notes/5_65_0_txt.html">5.65.0</a> (2023-02-01)<span><a href="#label-5.65.0+-282023-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Allow pg_auto_parameterize extension to use placeholder loaders (jeremyevans)</p>

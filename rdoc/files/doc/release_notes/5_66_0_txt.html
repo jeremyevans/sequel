@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.66.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.66.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.66.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2023-03-01 08:07:43 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#empty? now correctly handles datasets using custom SQL or Dataset#values where the first value in the first row is NULL.</p>
+</li><li>
+<p>Dataset#count without an argument or block now works correctly on Microsoft SQL Server when using custom SQL that uses ORDER BY.</p>
+</li><li>
+<p>Dataset#count now works correctly for datasets using Dataset#values.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes an additional SQLite constraint violation error that occurs with recent versions of amalgalite.</p>
+</li><li>
+<p>Dataset#values will now raise an exception when called with an empty array. Previously, an exception would not be raised until the query was sent to the database.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The changes to make Dataset#empty? and count work with custom SQL on Microsoft SQL Server now result in running the custom SQL, which could result in worse performance than in previous versions. You can wrap such datasets with Dataset#from_self manually to restore the previous behavior.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

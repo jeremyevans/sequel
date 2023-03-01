@@ -89,6 +89,7 @@ Sequel::SQLite::DatabaseMethods
 <td class='context-item-value'>{
 /(is|are) not unique\z|PRIMARY KEY must be unique\z|UNIQUE constraint failed: .+\z/ => UniqueConstraintViolation,
 /foreign key constraint failed\z/i => ForeignKeyConstraintViolation,
+/\ASQLITE ERROR 3091/ => CheckConstraintViolation,
 /\A(SQLITE ERROR 275 \(CONSTRAINT_CHECK\) : )?CHECK constraint failed/ => CheckConstraintViolation,
 /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
 /\Acannot store [A-Z]+ value in [A-Z]+ column / => ConstraintViolation,
@@ -513,8 +514,9 @@ nil => "BEGIN".freeze
 </a>
 <pre id='method-i-values-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
 <span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">172</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
-<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">172</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide an empty array for values&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">173</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
+<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-views'>
@@ -538,9 +540,9 @@ nil => "BEGIN".freeze
 [show source]
 </a>
 <pre id='method-i-views-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">180</span>   <span class="ruby-identifier">tables_and_views</span>({<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;view&#39;</span>}, <span class="ruby-identifier">opts</span>)
-<span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">181</span>   <span class="ruby-identifier">tables_and_views</span>({<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;view&#39;</span>}, <span class="ruby-identifier">opts</span>)
+<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
