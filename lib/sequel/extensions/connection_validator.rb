@@ -28,7 +28,7 @@
 # connections on every checkout without setting up coarse
 # connection checkouts will hurt performance, in some cases
 # significantly.  Note that setting up coarse connection
-# checkouts reduces the concurrency level acheivable.  For
+# checkouts reduces the concurrency level achievable.  For
 # example, in a web application, using Database#synchronize
 # in a rack middleware will limit the number of concurrent
 # web requests to the number to connections in the database
