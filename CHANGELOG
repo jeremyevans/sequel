@@ -1,3 +1,7 @@
+=== master
+
+* Add set_literalizer extension, for treating set usage in datasets similar to array usage (jeremyevans) (#1997)
+
 === 5.66.0 (2023-03-01)
 
 * Recognize SQLite error related to strict tables as a constraint violation when using the amalgalite adapter (jeremyevans)
