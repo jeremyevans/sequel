@@ -5282,26 +5282,47 @@ describe "Dataset extensions" do
   before do
     @ds = Sequel.mock.dataset
   end
+  after do
+    Sequel::Dataset::EXTENSIONS.delete(:foo)
+    Sequel::Dataset::EXTENSIONS.delete(:bar)
+    h = Sequel::Dataset.const_get(:EXTENSION_MODULES)
+    h.delete(:foo)
+    h.delete(:bar)
+  end
 
   it "should be able to register an extension with a module Database#extension extend the module" do
     Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
     @ds.extension(:foo).a.must_equal 1
   end
 
-  it "should be able to register an extension with a block and Database#extension call the block" do
+  deprecated "should be able to register an extension with a block and Database#extension call the block" do
     Sequel::Dataset.register_extension(:foo){|ds| ds.extend(Module.new{def a; 1; end})}
     @ds.extension(:foo).a.must_equal 1
   end
 
-  it "should be able to register an extension with a callable and Database#extension call the callable" do
+  deprecated "should be able to register an extension with a callable and Database#extension call the callable" do
     Sequel::Dataset.register_extension(:foo, proc{|ds| ds.extend(Module.new{def a; 1; end})})
     @ds.extension(:foo).a.must_equal 1
   end
 
-  it "should be able to load multiple extensions in the same call" do
+  deprecated "should be able to load multiple extensions in the same call" do
     Sequel::Dataset.register_extension(:foo, proc{|ds| ds.send(:cache_set, :_columns, ds.columns + [:a])})
     Sequel::Dataset.register_extension(:bar, proc{|ds| ds.send(:cache_set, :_columns, ds.columns + [:b])})
     @ds.extension(:foo, :bar).columns.must_equal [:a, :b]
+  end
+
+  deprecated "should support using with_extend after using a dataset extension with a block" do
+    Sequel::Dataset.register_extension(:foo, proc{|ds| ds.send(:cache_set, :_columns, ds.columns + [:a])})
+    ds = @ds.extension(:foo).with_extend{def bar; 2 end}.with_extend(Module.new{def foo; 3 end})
+    ds.columns.must_equal [:a]
+    ds.bar.must_equal 2
+    ds.foo.must_equal 3
+  end
+
+  deprecated "should raise for using an extension that doesn't exist after an extension with a block" do
+    Sequel::Dataset.register_extension(:foo, proc{|ds| ds.send(:cache_set, :_columns, ds.columns + [:a])})
+    ds = @ds.extension(:foo)
+    proc{ds.extension(:foo2)}.must_raise Sequel::Error
   end
 
   it "should have #extension not modify the receiver" do

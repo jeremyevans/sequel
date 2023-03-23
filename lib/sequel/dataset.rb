@@ -53,4 +53,5 @@ module Sequel
   require_relative "dataset/sql"
   require_relative "dataset/placeholder_literalizer"
   require_relative "dataset/dataset_module"
+  require_relative "dataset/deprecated_singleton_class_methods" if Dataset::TRUE_FREEZE
 end

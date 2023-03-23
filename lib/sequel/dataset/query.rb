@@ -12,6 +12,10 @@ module Sequel
     # in the extension).
     EXTENSIONS = {}
 
+    # Hash of extension name symbols to modules to load to implement the extension.
+    EXTENSION_MODULES = {}
+    private_constant :EXTENSION_MODULES
+
     EMPTY_ARRAY = [].freeze
 
     # The dataset options that require the removal of cached columns if changed.
@@ -45,12 +49,8 @@ module Sequel
     METHS
 
     # Register an extension callback for Dataset objects.  ext should be the
-    # extension name symbol, and mod should either be a Module that the
-    # dataset is extended with, or a callable object called with the database
-    # object.  If mod is not provided, a block can be provided and is treated
-    # as the mod object.
-    #
-    # If mod is a module, this also registers a Database extension that will
+    # extension name symbol, and mod should be a Module that will be
+    # included in the dataset's class. This also registers a Database extension that will
     # extend all of the database's datasets.
     def self.register_extension(ext, mod=nil, &block)
       if mod
@@ -58,10 +58,16 @@ module Sequel
         if mod.is_a?(Module)
           block = proc{|ds| ds.extend(mod)}
           Sequel::Database.register_extension(ext){|db| db.extend_datasets(mod)}
+          Sequel.synchronize{EXTENSION_MODULES[ext] = mod}
         else
           block = mod
         end
       end
+
+      unless mod.is_a?(Module)
+        Sequel::Deprecation.deprecate("Providing a block or non-module to Sequel::Dataset.register_extension is deprecated and support for it will be removed in Sequel 6.")
+      end
+
       Sequel.synchronize{EXTENSIONS[ext] = block}
     end
 
@@ -195,11 +201,15 @@ module Sequel
     if TRUE_FREEZE
       # Return a clone of the dataset loaded with the given dataset extensions.
       # If no related extension file exists or the extension does not have
-      # specific support for Dataset objects, an Error will be raised.
-      def extension(*a)
-        c = _clone(:freeze=>false)
-        c.send(:_extension!, a)
-        c.freeze
+      # specific support for Dataset objects, an error will be raised.
+      def extension(*exts)
+        Sequel.extension(*exts)
+        mods = exts.map{|ext| Sequel.synchronize{EXTENSION_MODULES[ext]}}
+        if mods.all?
+          with_extend(*mods)
+        else
+          with_extend(DeprecatedSingletonClassMethods).extension(*exts)
+        end
       end
     else
       # :nocov:
@@ -1199,16 +1209,27 @@ module Sequel
     end
     
     if TRUE_FREEZE
-      # Return a clone of the dataset extended with the given modules.
+      # Create a subclass of the receiver's class, and include the given modules
+      # into it. If a block is provided, a DatasetModule is created using the block and
+      # is included into the subclass.  Create an instance of the subclass using the
+      # same db and opts, so that the returned dataset operates similarly to a clone
+      # extended with the given modules.  This approach is used to avoid singleton
+      # classes, which significantly improves performance.
+      #
       # Note that like Object#extend, when multiple modules are provided
-      # as arguments the cloned dataset is extended with the modules in reverse
-      # order.  If a block is provided, a DatasetModule is created using the block and
-      # the clone is extended with that module after any modules given as arguments.
+      # as arguments the subclass includes the modules in reverse order.
       def with_extend(*mods, &block)
-        c = _clone(:freeze=>false)
-        c.extend(*mods) unless mods.empty?
-        c.extend(DatasetModule.new(&block)) if block
-        c.freeze
+        c = Class.new(self.class)
+        c.include(*mods) unless mods.empty?
+        c.include(DatasetModule.new(&block)) if block
+        o = c.freeze.allocate
+        o.instance_variable_set(:@db, @db)
+        o.instance_variable_set(:@opts, @opts)
+        o.instance_variable_set(:@cache, {})
+        if cols = cache_get(:_columns)
+          o.send(:columns=, cols)
+        end
+        o.freeze
       end
     else
       # :nocov:
@@ -1315,17 +1336,19 @@ module Sequel
 
     private
 
-    # Load the extensions into the receiver, without checking if the receiver is frozen.
-    def _extension!(exts)
-      Sequel.extension(*exts)
-      exts.each do |ext|
-        if pr = Sequel.synchronize{EXTENSIONS[ext]}
-          pr.call(self)
-        else
-          raise(Error, "Extension #{ext} does not have specific support handling individual datasets (try: Sequel.extension #{ext.inspect})")
+    unless TRUE_FREEZE
+      # Load the extensions into the receiver, without checking if the receiver is frozen.
+      def _extension!(exts)
+        Sequel.extension(*exts)
+        exts.each do |ext|
+          if pr = Sequel.synchronize{EXTENSIONS[ext]}
+            pr.call(self)
+          else
+            raise(Error, "Extension #{ext} does not have specific support handling individual datasets (try: Sequel.extension #{ext.inspect})")
+          end
         end
+        self
       end
-      self
     end
 
     # If invert is true, invert the condition.

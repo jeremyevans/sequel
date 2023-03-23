@@ -126,6 +126,7 @@ describe Sequel::Model, ".plugin" do
   end
   
   it "should call things in the following order: apply, ClassMethods, InstanceMethods, DatasetMethods, configure" do
+    c = @c
     m = Module.new do
       @args = []
       def self.args; @args; end
@@ -148,6 +149,9 @@ describe Sequel::Model, ".plugin" do
       self::DatasetMethods = Module.new do
         def self.extended(dataset)
           dataset.model.plugins.last.args << :dm
+        end
+        define_singleton_method(:included) do |_|
+          c.plugins.last.args << :dm
         end
       end
     end
