@@ -88,11 +88,11 @@ module Sequel
     # Note that the migration this produces does not have a down
     # block, so you cannot reverse it.
     def dump_foreign_key_migration(options=OPTS)
-      ts = tables(options)
+      ts = _dump_tables(options)
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.sort.map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/, '    ')}
+#{ts.map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/, '    ')}
   end
 end
 END_MIG
@@ -106,11 +106,11 @@ END_MIG
     #                 set to :namespace, prepend the table name to the index name if the
     #                 database does not use a global index namespace.
     def dump_indexes_migration(options=OPTS)
-      ts = tables(options)
+      ts = _dump_tables(options)
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.sort.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/, '    ')}
+#{ts.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/, '    ')}
   end
 end
 END_MIG
@@ -138,7 +138,7 @@ END_MIG
         options[:foreign_keys] = false
       end
 
-      ts = sort_dumped_tables(tables(options), options)
+      ts = sort_dumped_tables(_dump_tables(options), options)
       skipped_fks = if sfk = options[:skipped_foreign_keys]
         # Handle skipped foreign keys by adding them at the end via
         # alter_table/add_foreign_key.  Note that skipped foreign keys
@@ -166,6 +166,21 @@ END_MIG
 
     private
         
+    # Handle schema option to dump tables in a different schema. Such
+    # tables must be schema qualified for this to work correctly.
+    def _dump_tables(opts)
+      if opts[:schema]
+        _literal_table_sort(tables(opts.merge(:qualify=>true)))
+      else
+        tables(opts).sort
+      end
+    end
+
+    # Sort the given table by the literalized value.
+    def _literal_table_sort(tables)
+      tables.sort_by{|s| literal(s)}
+    end
+
     # If a database default exists and can't be converted, and we are dumping with :same_db,
     # return a string with the inspect method modified a literal string is created if the code is evaled.  
     def column_schema_to_ruby_default_fallback(default, options)
@@ -352,7 +367,7 @@ END_MIG
         options[:skipped_foreign_keys] = skipped_foreign_keys
         tables
       else
-        tables.sort
+        tables
       end
     end
 
@@ -377,14 +392,14 @@ END_MIG
           # outstanding foreign keys and skipping those foreign keys.
           # The skipped foreign keys will be added at the end of the
           # migration.
-          skip_table, skip_fks = table_fks.sort_by{|table, fks| [fks.length, table]}.first
+          skip_table, skip_fks = table_fks.sort_by{|table, fks| [fks.length, literal(table)]}.first
           skip_fks_hash = skipped_foreign_keys[skip_table] = {}
           skip_fks.each{|fk| skip_fks_hash[fk[:columns]] = fk}
           this_loop << skip_table
         end
 
         # Add sorted tables from this loop to the final list
-        sorted_tables.concat(this_loop.sort)
+        sorted_tables.concat(_literal_table_sort(this_loop))
 
         # Remove tables that were handled this loop
         this_loop.each{|t| table_fks.delete(t)}

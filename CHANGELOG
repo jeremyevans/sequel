@@ -1,5 +1,7 @@
 === master
 
+* Improve dumping of tables in non-default schemas in the schema_dumper extension (jeremyevans) (#2006)
+
 * Make Database#{tables,views} support :qualify option on Microsoft SQL Server (jeremyevans)
 
 * Avoid use of singleton classes for datasets instances on Ruby 2.4+ (jeremyevans) (#2007)

@@ -86,14 +86,19 @@ end
 describe "Sequel::Database dump methods" do
   before do
     @d = Sequel::Database.new.extension(:schema_dumper)
-    def @d.tables(o) o[:schema] ? [o[:schema]] : [:t1, :t2] end
+    def @d.tables(o)
+      schema = o[:schema]
+      ts = o[:tables] || (schema ? [schema] : [:t1, :t2])
+      ts = ts.map{|t| Sequel.qualify(schema, t)} if o[:qualify]
+      ts
+    end
     @d.singleton_class.send(:alias_method, :tables, :tables)
-    def @d.schema(t, *o)
-      v = case t
-      when :t1, 't__t1', Sequel.identifier(:t__t1)
+    def @d.schema(t, o=OPTS)
+      case t
+      when :t1, 't__t1', Sequel.identifier(:t__t1), Sequel::SQL::QualifiedIdentifier.new("t__t1", "t__t1"), Sequel::SQL::QualifiedIdentifier.new(:x, :t1), Sequel[:x][:t1]
         [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true, :allow_null=>false}],
          [:c2, {:db_type=>'varchar(20)', :allow_null=>true}]]
-      when :t2
+      when :t2, Sequel::SQL::QualifiedIdentifier.new(:x, :t2)
         [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>false}],
          [:c2, {:db_type=>'numeric', :primary_key=>true, :allow_null=>false}]]
       when :t3
@@ -105,19 +110,19 @@ describe "Sequel::Database dump methods" do
         [[:c1, {:db_type=>'integer', :allow_null=>false, :generated=>true, :default=>'1', :ruby_default=>1}]]
       when :t7
         [[:c1, {:db_type=>'integer', :allow_null=>true, :generated=>true, :default=>'(a + b)', :ruby_default=>nil}]]
+      else
+        raise "invalid table in spec: #{t.inspect}"
       end
-
-      if o.first.is_a?(Hash) && o.first[:schema]
-        v.last.last[:db_type] = o.first[:schema]
-      end
-
-      v
     end
     @d.singleton_class.send(:alias_method, :schema, :schema)
   end
 
-  it "should support dumping table with :schema option" do
-    @d.dump_table_schema(:t1, :schema=>'varchar(15)').must_equal "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>15\nend"
+  it "should not include schema qualification when dumping table with :schema option" do
+    @d.dump_table_schema(:t1, :schema=>:foo).must_equal "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
+  end
+
+  it "should include schema qualification when dumping table with implicit schema" do
+    @d.dump_table_schema(Sequel[:x][:t1]).must_equal "create_table(Sequel::SQL::QualifiedIdentifier.new(\"x\", :t1)) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
   end
 
   it "should support dumping table schemas as create_table method calls" do
@@ -244,9 +249,9 @@ OUTPUT
     @d.dump_schema_migration(:schema=>'t__t1').must_equal <<-END_MIG
 Sequel.migration do
   change do
-    create_table("t__t1") do
+    create_table(Sequel::SQL::QualifiedIdentifier.new("t__t1", "t__t1")) do
       primary_key :c1
-      String :c2
+      String :c2, :size=>20
     end
   end
 end
@@ -273,6 +278,26 @@ end
 END_MIG
   end
 
+  it "should sort table names when dumping a migration with the :schema option" do
+    @d.dump_schema_migration(:schema=>:x, :tables=>[:t2, :t1]).must_equal <<-END_MIG
+Sequel.migration do
+  change do
+    create_table(Sequel::SQL::QualifiedIdentifier.new(:x, :t1)) do
+      primary_key :c1
+      String :c2, :size=>20
+    end
+    
+    create_table(Sequel::SQL::QualifiedIdentifier.new(:x, :t2)) do
+      Integer :c1, :null=>false
+      BigDecimal :c2, :null=>false
+      
+      primary_key [:c1, :c2]
+    end
+  end
+end
+END_MIG
+  end
+
   it "should sort table names when dumping a migration" do
     def @d.tables(o) [:t2, :t1] end
     @d.dump_schema_migration.must_equal <<-END_MIG
@@ -288,6 +313,30 @@ Sequel.migration do
       BigDecimal :c2, :null=>false
       
       primary_key [:c1, :c2]
+    end
+  end
+end
+END_MIG
+  end
+
+  it "should sort table names topologically when dumping a migration with foreign keys with :schema option" do
+    def @d.supports_foreign_key_parsing?; true end
+    def @d.foreign_key_list(t)
+      t == Sequel::SQL::QualifiedIdentifier.new(:x, :t1) ? [{:columns=>[:c2], :table=>Sequel::SQL::QualifiedIdentifier.new(:x, :t2), :key=>[:c1]}] : []
+    end
+    @d.dump_schema_migration(:schema=>:x, :tables=>[:t1, :t2]).must_equal <<-END_MIG
+Sequel.migration do
+  change do
+    create_table(Sequel::SQL::QualifiedIdentifier.new(:x, :t2)) do
+      Integer :c1, :null=>false
+      BigDecimal :c2, :null=>false
+      
+      primary_key [:c1, :c2]
+    end
+    
+    create_table(Sequel::SQL::QualifiedIdentifier.new(:x, :t1)) do
+      primary_key :c1
+      foreign_key :c2, Sequel::SQL::QualifiedIdentifier.new(:x, :t2), :type=>String, :size=>20, :key=>[:c1]
     end
   end
 end
