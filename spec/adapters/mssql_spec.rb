@@ -57,6 +57,17 @@ describe "A MSSQL database" do
     ds.insert(:value=>3, :b=>nil)
     ds.order(:value).select_map(:b).must_equal [true, false, nil]
   end
+
+  it "should have tables support :qualify option" do
+    qualified = Sequel.qualify(@db.get(Sequel.function('schema_name')), 'test3')
+    ts = @db.tables
+    ts.must_include(:test3)
+    ts.wont_include(qualified)
+
+    ts = @db.tables(:qualify=>true)
+    ts.wont_include(:test3)
+    ts.must_include(qualified)
+  end
 end
 
 describe "A MSSQL database" do

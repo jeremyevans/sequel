@@ -404,10 +404,15 @@ module Sequel
       # Backbone of the tables and views support.
       def information_schema_tables(type, opts)
         m = output_identifier_meth
-        metadata_dataset.from(Sequel[:information_schema][:tables].as(:t)).
+        schema = opts[:schema]||'dbo'
+        tables = metadata_dataset.from(Sequel[:information_schema][:tables].as(:t)).
           select(:table_name).
-          where(:table_type=>type, :table_schema=>(opts[:schema]||'dbo').to_s).
+          where(:table_type=>type, :table_schema=>schema.to_s).
           map{|x| m.call(x[:table_name])}
+
+        tables.map!{|t| Sequel.qualify(m.call(schema).to_s, m.call(t).to_s)} if opts[:qualify]
+
+        tables
       end
 
       # Always quote identifiers in the metadata_dataset, so schema parsing works.

@@ -1,5 +1,7 @@
 === master
 
+* Make Database#{tables,views} support :qualify option on Microsoft SQL Server (jeremyevans)
+
 * Avoid use of singleton classes for datasets instances on Ruby 2.4+ (jeremyevans) (#2007)
 
 * Deprecate registering datasets extensions using an object other than a module (jeremyevans)
