@@ -3,7 +3,8 @@
 module Sequel
   module Plugins
     # The prepared_statements plugin modifies the model to use prepared statements for
-    # instance level inserts and updates.
+    # instance level inserts and updates. This plugin exists for backwards compatibility
+    # and is not recommended for general use.
     #
     # Note that this plugin is unsafe in some circumstances, as it can allow up to
     # 2^N prepared statements to be created for each type of insert and update query, where

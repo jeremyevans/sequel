@@ -5,7 +5,8 @@ module Sequel
     # The prepared_statements_safe plugin modifies the model to reduce the number of
     # prepared statements that can be created, by setting as many columns as possible
     # before creating, and by changing +save_changes+ to save all columns instead of
-    # just the changed ones.
+    # just the changed ones. This plugin exists for backwards compatibility
+    # and is not recommended for general use.
     #
     # This plugin depends on the +prepared_statements+ plugin.
     # 
