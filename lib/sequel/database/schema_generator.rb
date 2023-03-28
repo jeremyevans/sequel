@@ -307,7 +307,7 @@ module Sequel
       # Examples:
       #   primary_key(:id)
       #   primary_key(:id, type: :Bignum, keep_order: true)
-      #   primary_key([:street_number, :house_number], name: :some constraint_name)
+      #   primary_key([:street_number, :house_number], name: :some_constraint_name)
       def primary_key(name, *args)
         return composite_primary_key(name, *args) if name.is_a?(Array)
         column = @db.serial_primary_key_options.merge({:name => name})
