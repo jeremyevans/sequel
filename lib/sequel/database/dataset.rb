@@ -30,19 +30,29 @@ module Sequel
       @dataset_class.new(self)
     end
 
-    # Fetches records for an arbitrary SQL statement. If a block is given,
-    # it is used to iterate over the records:
+    # Returns a dataset instance for the given SQL string:
+    #
+    #   ds = DB.fetch('SELECT * FROM items')
+    #
+    # You can then call methods on the dataset to retrieve results:
+    #
+    #   ds.all
+    #   # SELECT * FROM items
+    #   # => [{:column=>value, ...}, ...]
+    #
+    # If a block is given, it is passed to #each on the resulting dataset to
+    # iterate over the records returned by the query:
     #
     #   DB.fetch('SELECT * FROM items'){|r| p r}
-    #
-    # The +fetch+ method returns a dataset instance:
-    #
-    #   DB.fetch('SELECT * FROM items').all
+    #   # {:column=>value, ...}
+    #   # ...
     #
     # +fetch+ can also perform parameterized queries for protection against SQL
     # injection:
     #
-    #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).all
+    #   ds = DB.fetch('SELECT * FROM items WHERE name = ?', "my name")
+    #   ds.all
+    #   # SELECT * FROM items WHERE name = 'my name'
     #
     # See caveats listed in Dataset#with_sql regarding datasets using custom
     # SQL and the methods that can be called on them.
