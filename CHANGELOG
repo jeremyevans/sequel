@@ -1,5 +1,7 @@
 === master
 
+* Fix dumping of string column sizes in the schema dumper on MSSQL (jeremyevans) (#2013)
+
 * Improve dumping of tables in non-default schemas in the schema_dumper extension (jeremyevans) (#2006)
 
 * Make Database#{tables,views} support :qualify option on Microsoft SQL Server (jeremyevans)

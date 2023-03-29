@@ -219,12 +219,20 @@ END_MIG
           if database_type == :mysql && h[:type] =~ /\Atimestamp/
             h[:null] = true
           end
+          if database_type == :mssql && schema[:max_length]
+            h[:size] = schema[:max_length]
+          end
           h
         else
           column_schema_to_ruby_type(schema)
         end
         type = col_opts.delete(:type)
-        col_opts.delete(:size) if col_opts[:size].nil?
+        if col_opts.key?(:size) && col_opts[:size].nil?
+          col_opts.delete(:size)
+          if max_length = schema[:max_length]
+            col_opts[:size] = max_length
+          end
+        end
         if schema[:generated]
           if options[:same_db] && database_type == :postgres
             col_opts[:generated_always_as] = column_schema_to_ruby_default_fallback(schema[:default], options)
