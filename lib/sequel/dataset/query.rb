@@ -1336,6 +1336,7 @@ module Sequel
 
     private
 
+    # :nocov:
     unless TRUE_FREEZE
       # Load the extensions into the receiver, without checking if the receiver is frozen.
       def _extension!(exts)
@@ -1350,6 +1351,7 @@ module Sequel
         self
       end
     end
+    # :nocov:
 
     # If invert is true, invert the condition.
     def _invert_filter(cond, invert)
