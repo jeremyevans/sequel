@@ -138,11 +138,11 @@ Sequel::SchemaDumper
 </a>
 <pre id='method-i-dump_foreign_key_migration-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_dumper.rb</span>
 <span class="line-num">90</span>     <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_foreign_key_migration</span>(<span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">91</span>       <span class="ruby-identifier">ts</span> = <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">options</span>)
+<span class="line-num">91</span>       <span class="ruby-identifier">ts</span> = <span class="ruby-identifier">_dump_tables</span>(<span class="ruby-identifier">options</span>)
 <span class="line-num">92</span>       <span class="ruby-identifier">&lt;&lt;END_MIG</span>
 <span class="line-num">93</span> <span class="ruby-value">Sequel.migration do
 <span class="line-num">94</span>   change do
-<span class="line-num">95</span> #{ts.sort.map{|t| dump_table_foreign_keys(t)}.reject{|x| x == &#39;&#39;}.join(&quot;\n\n&quot;).gsub(/^/, &#39;    &#39;)}
+<span class="line-num">95</span> #{ts.map{|t| dump_table_foreign_keys(t)}.reject{|x| x == &#39;&#39;}.join(&quot;\n\n&quot;).gsub(/^/, &#39;    &#39;)}
 <span class="line-num">96</span>   end
 <span class="line-num">97</span> end
 <span class="line-num">98</span> </span><span class="ruby-identifier">END_MIG</span>
@@ -171,11 +171,11 @@ Sequel::SchemaDumper
 </a>
 <pre id='method-i-dump_indexes_migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/schema_dumper.rb</span>
 <span class="line-num">108</span>     <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_indexes_migration</span>(<span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">109</span>       <span class="ruby-identifier">ts</span> = <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">options</span>)
+<span class="line-num">109</span>       <span class="ruby-identifier">ts</span> = <span class="ruby-identifier">_dump_tables</span>(<span class="ruby-identifier">options</span>)
 <span class="line-num">110</span>       <span class="ruby-identifier">&lt;&lt;END_MIG</span>
 <span class="line-num">111</span> <span class="ruby-value">Sequel.migration do
 <span class="line-num">112</span>   change do
-<span class="line-num">113</span> #{ts.sort.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == &#39;&#39;}.join(&quot;\n\n&quot;).gsub(/^/, &#39;    &#39;)}
+<span class="line-num">113</span> #{ts.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == &#39;&#39;}.join(&quot;\n\n&quot;).gsub(/^/, &#39;    &#39;)}
 <span class="line-num">114</span>   end
 <span class="line-num">115</span> end
 <span class="line-num">116</span> </span><span class="ruby-identifier">END_MIG</span>
@@ -216,7 +216,7 @@ Sequel::SchemaDumper
 <span class="line-num">138</span>         <span class="ruby-identifier">options</span>[<span class="ruby-value">:foreign_keys</span>] = <span class="ruby-keyword">false</span>
 <span class="line-num">139</span>       <span class="ruby-keyword">end</span>
 <span class="line-num">140</span> 
-<span class="line-num">141</span>       <span class="ruby-identifier">ts</span> = <span class="ruby-identifier">sort_dumped_tables</span>(<span class="ruby-identifier">tables</span>(<span class="ruby-identifier">options</span>), <span class="ruby-identifier">options</span>)
+<span class="line-num">141</span>       <span class="ruby-identifier">ts</span> = <span class="ruby-identifier">sort_dumped_tables</span>(<span class="ruby-identifier">_dump_tables</span>(<span class="ruby-identifier">options</span>), <span class="ruby-identifier">options</span>)
 <span class="line-num">142</span>       <span class="ruby-identifier">skipped_fks</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">sfk</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:skipped_foreign_keys</span>]
 <span class="line-num">143</span>         <span class="ruby-comment"># Handle skipped foreign keys by adding them at the end via</span>
 <span class="line-num">144</span>         <span class="ruby-comment"># alter_table/add_foreign_key.  Note that skipped foreign keys</span>

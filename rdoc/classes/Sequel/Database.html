@@ -1589,19 +1589,30 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Fetches records for an arbitrary <a href="SQL.html"><code>SQL</code></a> statement. If a block is given, it is used to iterate over the records:</p>
+<p>Returns a dataset instance for the given <a href="SQL.html"><code>SQL</code></a> string:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">r</span>}
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items&#39;</span>)
 </pre>
 
-<p>The <code>fetch</code> method returns a dataset instance:</p>
+<p>You can then call methods on the dataset to retrieve results:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items&#39;</span>).<span class="ruby-identifier">all</span>
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># SELECT * FROM items</span>
+<span class="ruby-comment"># =&gt; [{:column=&gt;value, ...}, ...]</span>
+</pre>
+
+<p>If a block is given, it is passed to each on the resulting dataset to iterate over the records returned by the query:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">r</span>}
+<span class="ruby-comment"># {:column=&gt;value, ...}</span>
+<span class="ruby-comment"># ...</span>
 </pre>
 
 <p><code>fetch</code> can also perform parameterized queries for protection against <a href="SQL.html"><code>SQL</code></a> injection:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items WHERE name = ?&#39;</span>, <span class="ruby-identifier">my_name</span>).<span class="ruby-identifier">all</span>
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items WHERE name = ?&#39;</span>, <span class="ruby-string">&quot;my name&quot;</span>)
+<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>
+<span class="ruby-comment"># SELECT * FROM items WHERE name = &#39;my name&#39;</span>
 </pre>
 
 <p>See caveats listed in <a href="Dataset.html#method-i-with_sql"><code>Dataset#with_sql</code></a> regarding datasets using custom <a href="SQL.html"><code>SQL</code></a> and the methods that can be called on them.</p>
@@ -1612,11 +1623,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-fetch-source'>   <span class="ruby-comment"># File lib/sequel/database/dataset.rb</span>
-<span class="line-num">49</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">50</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">51</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">52</span>   <span class="ruby-identifier">ds</span>
-<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">60</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">61</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">62</span>   <span class="ruby-identifier">ds</span>
+<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-from'>
@@ -1639,15 +1650,15 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-from-source'>   <span class="ruby-comment"># File lib/sequel/database/dataset.rb</span>
-<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">61</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">62</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">63</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">table</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
-<span class="line-num">64</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:cached_dataset</span>, <span class="ruby-value">:&quot;_from_#{table}_ds&quot;</span>){<span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>)}
-<span class="line-num">65</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">66</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">67</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">71</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">72</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">73</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">table</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
+<span class="line-num">74</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:cached_dataset</span>, <span class="ruby-value">:&quot;_from_#{table}_ds&quot;</span>){<span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>)}
+<span class="line-num">75</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">76</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">77</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select'>
@@ -1671,9 +1682,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-select-source'>   <span class="ruby-comment"># File lib/sequel/database/dataset.rb</span>
-<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">76</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">85</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">86</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">87</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

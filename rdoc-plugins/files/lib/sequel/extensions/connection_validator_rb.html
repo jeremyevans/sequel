@@ -31,7 +31,7 @@ lib/sequel/extensions/connection_validator.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-04-17 11:52:37 -0700</span>
+<span class='datetime'>2023-03-07 16:00:58 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -47,7 +47,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_validation_timeout</span> = <span class="ruby-value">-1</span>
 </pre>
 
-<p>Note that if you set the timeout to validate connections on every checkout, you should probably manually control connection checkouts on a coarse basis, using Database#synchronize.  In a web application, the optimal place for that would be a rack middleware.  Validating connections on every checkout without setting up coarse connection checkouts will hurt performance, in some cases significantly.  Note that setting up coarse connection checkouts reduces the concurrency level acheivable.  For example, in a web application, using Database#synchronize in a rack middleware will limit the number of concurrent web requests to the number to connections in the database connection pool.</p>
+<p>Note that if you set the timeout to validate connections on every checkout, you should probably manually control connection checkouts on a coarse basis, using Database#synchronize.  In a web application, the optimal place for that would be a rack middleware.  Validating connections on every checkout without setting up coarse connection checkouts will hurt performance, in some cases significantly.  Note that setting up coarse connection checkouts reduces the concurrency level achievable.  For example, in a web application, using Database#synchronize in a rack middleware will limit the number of concurrent web requests to the number to connections in the database connection pool.</p>
 
 <p>Note that this extension only affects the default threaded and the sharded threaded connection pool.  The single threaded and sharded single threaded connection pools are not affected.  As the only reason to use the single threaded pools is for speed, and this extension makes the connection pool slower, there’s not much point in modifying this extension to work with the single threaded pools.  The threaded pools work fine even in single threaded code, so if you are currently using a single threaded pool and want to use this extension, switch to using a threaded pool.</p>
 

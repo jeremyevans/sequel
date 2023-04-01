@@ -65,10 +65,10 @@ Sequel::Plugins::PreparedStatementsSafe::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_create-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>
-<span class="line-num">68</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_create</span>
-<span class="line-num">69</span>   <span class="ruby-ivar">@values</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">prepared_statements_column_defaults</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-ivar">@values</span>)
-<span class="line-num">70</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_create</span>
+<span class="line-num">70</span>   <span class="ruby-ivar">@values</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">prepared_statements_column_defaults</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-ivar">@values</span>)
+<span class="line-num">71</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-save_changes'>
@@ -87,9 +87,9 @@ Sequel::Plugins::PreparedStatementsSafe::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-save_changes-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>
-<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">76</span>   <span class="ruby-identifier">save</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span>
-<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">76</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">77</span>   <span class="ruby-identifier">save</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span>
+<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

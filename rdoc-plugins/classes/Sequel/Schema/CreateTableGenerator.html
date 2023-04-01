@@ -70,44 +70,44 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-dump_columns-source'>    <span class="ruby-comment"># File lib/sequel/extensions/schema_dumper.rb</span>
-<span class="line-num">407</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_columns</span>
-<span class="line-num">408</span>   <span class="ruby-identifier">strings</span> = []
-<span class="line-num">409</span>   <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">410</span>   <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
-<span class="line-num">411</span>     <span class="ruby-identifier">x</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_delete</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">:on_delete</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
-<span class="line-num">412</span>     <span class="ruby-identifier">x</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_update</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">:on_update</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
-<span class="line-num">413</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">414</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">pkn</span> = <span class="ruby-identifier">primary_key_name</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@primary_key</span>[<span class="ruby-value">:keep_order</span>]
-<span class="line-num">415</span>     <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">pkn</span>}
-<span class="line-num">416</span>     <span class="ruby-identifier">pk</span> = <span class="ruby-ivar">@primary_key</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">417</span>     <span class="ruby-identifier">pkname</span> = <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)
-<span class="line-num">418</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">pk</span>[<span class="ruby-identifier">k</span>]}
-<span class="line-num">419</span>     <span class="ruby-identifier">strings</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;primary_key #{pkname.inspect}#{opts_inspect(pk)}&quot;</span>
-<span class="line-num">420</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">421</span>   <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">422</span>     <span class="ruby-identifier">c</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">423</span>     <span class="ruby-identifier">name</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)
-<span class="line-num">424</span>     <span class="ruby-identifier">strings</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:table</span>)
-<span class="line-num">425</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-constant">Integer</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;integer&#39;</span>
-<span class="line-num">426</span>       <span class="ruby-node">&quot;foreign_key #{name.inspect}, #{table.inspect}#{opts_inspect(c)}&quot;</span>
-<span class="line-num">427</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">pkn</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">name</span>
-<span class="line-num">428</span>       <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">c</span>[<span class="ruby-identifier">k</span>]}
-<span class="line-num">429</span>       <span class="ruby-node">&quot;primary_key #{name.inspect}#{opts_inspect(c)}&quot;</span>
-<span class="line-num">430</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">431</span>       <span class="ruby-identifier">type</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>)
-<span class="line-num">432</span>       <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts_inspect</span>(<span class="ruby-identifier">c</span>)
-<span class="line-num">433</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
-<span class="line-num">434</span>       <span class="ruby-keyword">when</span> <span class="ruby-constant">Class</span>
-<span class="line-num">435</span>         <span class="ruby-node">&quot;#{type.name} #{name.inspect}#{opts}&quot;</span>
-<span class="line-num">436</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:Bignum</span>
-<span class="line-num">437</span>         <span class="ruby-node">&quot;Bignum #{name.inspect}#{opts}&quot;</span>
-<span class="line-num">438</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">439</span>         <span class="ruby-node">&quot;column #{name.inspect}, #{type.inspect}#{opts}&quot;</span>
-<span class="line-num">440</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">441</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">442</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">443</span>   <span class="ruby-identifier">strings</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
-<span class="line-num">444</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">430</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_columns</span>
+<span class="line-num">431</span>   <span class="ruby-identifier">strings</span> = []
+<span class="line-num">432</span>   <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">433</span>   <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+<span class="line-num">434</span>     <span class="ruby-identifier">x</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_delete</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">:on_delete</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
+<span class="line-num">435</span>     <span class="ruby-identifier">x</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_update</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">:on_update</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
+<span class="line-num">436</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">437</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">pkn</span> = <span class="ruby-identifier">primary_key_name</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@primary_key</span>[<span class="ruby-value">:keep_order</span>]
+<span class="line-num">438</span>     <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">pkn</span>}
+<span class="line-num">439</span>     <span class="ruby-identifier">pk</span> = <span class="ruby-ivar">@primary_key</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">440</span>     <span class="ruby-identifier">pkname</span> = <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)
+<span class="line-num">441</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">pk</span>[<span class="ruby-identifier">k</span>]}
+<span class="line-num">442</span>     <span class="ruby-identifier">strings</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;primary_key #{pkname.inspect}#{opts_inspect(pk)}&quot;</span>
+<span class="line-num">443</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">444</span>   <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">445</span>     <span class="ruby-identifier">c</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">446</span>     <span class="ruby-identifier">name</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)
+<span class="line-num">447</span>     <span class="ruby-identifier">strings</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:table</span>)
+<span class="line-num">448</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-constant">Integer</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;integer&#39;</span>
+<span class="line-num">449</span>       <span class="ruby-node">&quot;foreign_key #{name.inspect}, #{table.inspect}#{opts_inspect(c)}&quot;</span>
+<span class="line-num">450</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">pkn</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">name</span>
+<span class="line-num">451</span>       <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">serial_primary_key_options</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">c</span>[<span class="ruby-identifier">k</span>]}
+<span class="line-num">452</span>       <span class="ruby-node">&quot;primary_key #{name.inspect}#{opts_inspect(c)}&quot;</span>
+<span class="line-num">453</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">454</span>       <span class="ruby-identifier">type</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>)
+<span class="line-num">455</span>       <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts_inspect</span>(<span class="ruby-identifier">c</span>)
+<span class="line-num">456</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
+<span class="line-num">457</span>       <span class="ruby-keyword">when</span> <span class="ruby-constant">Class</span>
+<span class="line-num">458</span>         <span class="ruby-node">&quot;#{type.name} #{name.inspect}#{opts}&quot;</span>
+<span class="line-num">459</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:Bignum</span>
+<span class="line-num">460</span>         <span class="ruby-node">&quot;Bignum #{name.inspect}#{opts}&quot;</span>
+<span class="line-num">461</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">462</span>         <span class="ruby-node">&quot;column #{name.inspect}, #{type.inspect}#{opts}&quot;</span>
+<span class="line-num">463</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">464</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">465</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">466</span>   <span class="ruby-identifier">strings</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
+<span class="line-num">467</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-dump_constraints'>
@@ -126,33 +126,33 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-dump_constraints-source'>    <span class="ruby-comment"># File lib/sequel/extensions/schema_dumper.rb</span>
-<span class="line-num">448</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_constraints</span>
-<span class="line-num">449</span>   <span class="ruby-identifier">cs</span> = <span class="ruby-identifier">constraints</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">450</span>     <span class="ruby-identifier">c</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">451</span>     <span class="ruby-identifier">type</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>)
-<span class="line-num">452</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
-<span class="line-num">453</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:check</span>
-<span class="line-num">454</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t dump check/constraint specified with Proc&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:check</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Proc</span>)
-<span class="line-num">455</span>       <span class="ruby-identifier">name</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)
-<span class="line-num">456</span>       <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">name</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:check</span>].<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:check</span>].<span class="ruby-identifier">first</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
-<span class="line-num">457</span>         <span class="ruby-node">&quot;check #{c[:check].first.inspect[1...-1]}&quot;</span>
-<span class="line-num">458</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">459</span>         <span class="ruby-node">&quot;#{name ? &quot;constraint #{name.inspect},&quot; : &#39;check&#39;} #{c[:check].map(&amp;:inspect).join(&#39;, &#39;)}&quot;</span>
-<span class="line-num">460</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">461</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:foreign_key</span>
-<span class="line-num">462</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_delete</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:on_delete</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
-<span class="line-num">463</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_update</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:on_update</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
-<span class="line-num">464</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:deferrable</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:deferrable</span>]
-<span class="line-num">465</span>       <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)
-<span class="line-num">466</span>       <span class="ruby-identifier">table</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:table</span>)
-<span class="line-num">467</span>       <span class="ruby-node">&quot;#{type} #{cols.inspect}, #{table.inspect}#{opts_inspect(c)}&quot;</span>
-<span class="line-num">468</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">469</span>       <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)
-<span class="line-num">470</span>       <span class="ruby-node">&quot;#{type} #{cols.inspect}#{opts_inspect(c)}&quot;</span>
-<span class="line-num">471</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">472</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">473</span>   <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
-<span class="line-num">474</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">471</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_constraints</span>
+<span class="line-num">472</span>   <span class="ruby-identifier">cs</span> = <span class="ruby-identifier">constraints</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">473</span>     <span class="ruby-identifier">c</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">474</span>     <span class="ruby-identifier">type</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:type</span>)
+<span class="line-num">475</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>
+<span class="line-num">476</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:check</span>
+<span class="line-num">477</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t dump check/constraint specified with Proc&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:check</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Proc</span>)
+<span class="line-num">478</span>       <span class="ruby-identifier">name</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:name</span>)
+<span class="line-num">479</span>       <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">name</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:check</span>].<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:check</span>].<span class="ruby-identifier">first</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+<span class="line-num">480</span>         <span class="ruby-node">&quot;check #{c[:check].first.inspect[1...-1]}&quot;</span>
+<span class="line-num">481</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">482</span>         <span class="ruby-node">&quot;#{name ? &quot;constraint #{name.inspect},&quot; : &#39;check&#39;} #{c[:check].map(&amp;:inspect).join(&#39;, &#39;)}&quot;</span>
+<span class="line-num">483</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">484</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:foreign_key</span>
+<span class="line-num">485</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_delete</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:on_delete</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
+<span class="line-num">486</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:on_update</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:on_update</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:no_action</span>
+<span class="line-num">487</span>       <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:deferrable</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">c</span>[<span class="ruby-value">:deferrable</span>]
+<span class="line-num">488</span>       <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)
+<span class="line-num">489</span>       <span class="ruby-identifier">table</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:table</span>)
+<span class="line-num">490</span>       <span class="ruby-node">&quot;#{type} #{cols.inspect}, #{table.inspect}#{opts_inspect(c)}&quot;</span>
+<span class="line-num">491</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">492</span>       <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)
+<span class="line-num">493</span>       <span class="ruby-node">&quot;#{type} #{cols.inspect}#{opts_inspect(c)}&quot;</span>
+<span class="line-num">494</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">495</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">496</span>   <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
+<span class="line-num">497</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-dump_indexes'>
@@ -178,19 +178,19 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-dump_indexes-source'>    <span class="ruby-comment"># File lib/sequel/extensions/schema_dumper.rb</span>
-<span class="line-num">483</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_indexes</span>(<span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">484</span>   <span class="ruby-identifier">is</span> = <span class="ruby-identifier">indexes</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">485</span>     <span class="ruby-identifier">c</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">486</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)
-<span class="line-num">487</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:add_index</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:drop_index</span>]
-<span class="line-num">488</span>       <span class="ruby-node">&quot;#{options[:drop_index] ? &#39;drop&#39; : &#39;add&#39;}_index #{table.inspect}, #{cols.inspect}#{&#39;, :ignore_errors=&gt;true&#39; if options[:ignore_errors]}#{opts_inspect(c)}&quot;</span>
-<span class="line-num">489</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">490</span>       <span class="ruby-node">&quot;index #{cols.inspect}#{opts_inspect(c)}&quot;</span>
-<span class="line-num">491</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">492</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">493</span>   <span class="ruby-identifier">is</span> = <span class="ruby-identifier">is</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:drop_index</span>]
-<span class="line-num">494</span>   <span class="ruby-identifier">is</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
-<span class="line-num">495</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">506</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_indexes</span>(<span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">507</span>   <span class="ruby-identifier">is</span> = <span class="ruby-identifier">indexes</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">508</span>     <span class="ruby-identifier">c</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">509</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)
+<span class="line-num">510</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:add_index</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:drop_index</span>]
+<span class="line-num">511</span>       <span class="ruby-node">&quot;#{options[:drop_index] ? &#39;drop&#39; : &#39;add&#39;}_index #{table.inspect}, #{cols.inspect}#{&#39;, :ignore_errors=&gt;true&#39; if options[:ignore_errors]}#{opts_inspect(c)}&quot;</span>
+<span class="line-num">512</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">513</span>       <span class="ruby-node">&quot;index #{cols.inspect}#{opts_inspect(c)}&quot;</span>
+<span class="line-num">514</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">515</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">516</span>   <span class="ruby-identifier">is</span> = <span class="ruby-identifier">is</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:drop_index</span>]
+<span class="line-num">517</span>   <span class="ruby-identifier">is</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)
+<span class="line-num">518</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
