@@ -1,0 +1,32 @@
+= New Features
+
+* A set_literalizer extension has been added, for treating Set
+  instances in datasets similar to Array instances:
+
+    DB.extension :set_literalizer
+    DB[:table].where(column: Set.new([1, 2, 3]))
+    # SELECT FROM table WHERE (column IN (1, 2, 3))
+
+= Improvements
+
+* Sequel now avoids the use of singleton classes for datasets on Ruby
+  2.4+, instead creating a regular subclass whenever a dataset would
+  be extended via #extension or #with_extend.  This significantly
+  improves performance, up to 20-40% for common dataset usage,
+  because it avoids creating new singleton classes for every dataset
+  clone, and it allows for cached method lookup.
+
+* Database#tables and #views now support a :qualify option on Microsoft
+  SQL Server to returned qualified identifiers.
+
+* The schema_dumper extension can now dump tables in non-default schemas
+  when using Microsoft SQL Server.
+
+* The schema_dumper extension now correctly dumps string column sizes
+  when using Microsoft SQL Server.
+
+= Backwards Compatibility
+
+* Calling Sequel::Dataset.register_extension where the second argument
+  is not a module now issues a deprecation warning.  Support for this
+  will be removed in Sequel 6.

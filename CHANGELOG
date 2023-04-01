@@ -1,4 +1,4 @@
-=== master
+=== 5.67.0 (2023-04-01)
 
 * Fix dumping of string column sizes in the schema dumper on MSSQL (jeremyevans) (#2013)
 
