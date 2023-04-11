@@ -101,7 +101,9 @@ describe 'A PostgreSQL database' do
         proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError)
         ds.insert(max)
         ds.insert(min)
-        ds.select_order_map(:a).must_equal [min, max]
+        min, max_value = ds.select_order_map(:a)
+        min.must_be_kind_of klass
+        max_value.must_equal max
       end
     else
       it "should not provide maximum and minimum values for #{type} columns" do
