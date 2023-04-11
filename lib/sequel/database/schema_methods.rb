@@ -900,7 +900,7 @@ module Sequel
     #
     # Any other object given is just converted to a string, with "_" converted to " " and upcased.
     def on_delete_clause(action)
-      action.to_s.gsub("_", " ").upcase
+      action.to_s.tr("_", " ").upcase
     end
 
     # Alias of #on_delete_clause, since the two usually behave the same.
