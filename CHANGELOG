@@ -1,3 +1,7 @@
+=== master
+
+* Include :min_value and :max_value schema entries for date/timestamp/timestamptz columns on PostgreSQL 9.6+ (jeremyevans)
+
 === 5.67.0 (2023-04-01)
 
 * Fix dumping of string column sizes in the schema dumper on MSSQL (jeremyevans) (#2013)

@@ -1538,7 +1538,7 @@ module Sequel
       end
 
       # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in
-      # a rename table operation, so speciying a new schema in new_name will not have an effect.
+      # a rename table operation, so specifying a new schema in new_name will not have an effect.
       def rename_table_sql(name, new_name)
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
       end
@@ -1554,6 +1554,10 @@ module Sequel
         end
       end
 
+      MIN_DATE = Date.new(-4713, 11, 24)
+      MAX_DATE = Date.new(5874897, 12, 31)
+      MIN_TIMESTAMP = Time.utc(-4713, 11, 24).freeze
+      MAX_TIMESTAMP = (Time.utc(294277) - Rational(1, 1000000)).freeze
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])
@@ -1574,6 +1578,22 @@ module Sequel
           if row[:primary_key]
             row[:auto_increment] = !!(row[:default] =~ /\A(?:nextval)/i) || identity == 'a' || identity == 'd'
           end
+
+          # :nocov:
+          if server_version >= 90600
+          # :nocov:
+            case row[:oid]
+            when 1082
+              row[:min_value] = MIN_DATE
+              row[:max_value] = MAX_DATE
+            when 1184, 1114
+              if Sequel.datetime_class == Time
+                row[:min_value] = MIN_TIMESTAMP
+                row[:max_value] = MAX_TIMESTAMP
+              end
+            end
+          end
+
           [m.call(row.delete(:name)), row]
         end
       end

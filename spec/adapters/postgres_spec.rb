@@ -5,6 +5,7 @@ require_relative 'spec_helper'
 uses_pg = Sequel::Postgres::USES_PG if DB.adapter_scheme == :postgres
 uses_pg_or_jdbc = uses_pg || DB.adapter_scheme == :jdbc
 
+Sequel.extension :pg_extended_date_support
 DB.extension :pg_array, :pg_range, :pg_row, :pg_inet, :pg_json, :pg_enum
 begin
   DB.extension :pg_interval
@@ -59,6 +60,8 @@ describe 'A PostgreSQL database' do
   end
   after do
     @db.drop_table?(:test)
+    @db.timezone = nil
+    Sequel.datetime_class = Time
   end
 
   it "should provide a list of existing ordinary tables" do
@@ -77,6 +80,47 @@ describe 'A PostgreSQL database' do
     blob = Sequel.blob("\0\1\254\255").force_encoding('BINARY')
     @db[:test].insert(blob)
     @db[:test].get(:blob).force_encoding('BINARY').must_equal blob
+  end
+
+  {
+    Date=>Date,
+    'timestamp'=>Time,
+    'timestamptz'=>Time,
+  }.each do |type, klass|
+    if DB.server_version >= 90600
+      it "should correctly parse maximum and minimum values for #{type} columns" do
+        @db.create_table!(:test){column :a, type}
+        @db.timezone = :utc
+        sch = @db.schema(:test).first.last
+        max = sch[:max_value]
+        min = sch[:min_value]
+        max.must_be_kind_of klass
+        min.must_be_kind_of klass
+        ds = @db[:test].with_extend(Sequel::Postgres::ExtendedDateSupport::DatasetMethods)
+        proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError)
+        proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError)
+        ds.insert(max)
+        ds.insert(min)
+        ds.select_order_map(:a).must_equal [min, max]
+      end
+    else
+      it "should not provide maximum and minimum values for #{type} columns" do
+        @db.create_table!(:test){column :a, type}
+        sch = @db.schema(:test).first.last
+        sch[:max_value].must_be_nil
+        sch[:min_value].must_be_nil
+      end
+    end
+
+    if klass == Time
+      it "should not provide maximum and minimum values for #{type} columns when Sequel.datetime_class is DateTime" do
+        Sequel.datetime_class = DateTime
+        @db.create_table!(:test){column :a, type}
+        sch = @db.schema(:test).first.last
+        sch[:max_value].must_be_nil
+        sch[:min_value].must_be_nil
+      end
+    end
   end
 
   it "should provide a list of existing partitioned tables" do

@@ -22,7 +22,6 @@
 module Sequel
   module Postgres
     module ExtendedDateSupport
-      DATE_YEAR_1 = Date.new(1)
       DATETIME_YEAR_1 = DateTime.new(1)
       TIME_YEAR_1 = Time.at(-62135596800).utc
       INFINITE_TIMESTAMP_STRINGS = ['infinity'.freeze, '-infinity'.freeze].freeze
@@ -181,7 +180,7 @@ module Sequel
 
         # Handle BC Date objects.
         def literal_date(date)
-          if date < DATE_YEAR_1
+          if date.year < 1
             date <<= ((date.year) * 24 - 12)
             date.strftime("'%Y-%m-%d BC'")
           else
