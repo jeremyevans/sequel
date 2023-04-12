@@ -136,4 +136,11 @@ describe "pg_extended_date_support extension" do
     @db.bound_variable_arg(1, nil).must_equal 1
     @db.bound_variable_arg(1, nil).must_equal 1
   end
+
+  it "should remove timestamp entries from @oid_convertor_map if present" do
+    @db = Sequel.mock(:host=>'postgres', :fetch=>{:v=>1})
+    @db.instance_variable_set(:@oid_convertor_map, 1114=>true, 1184=>true, 1=>true)
+    @db.extension(:pg_extended_date_support)
+    @db.instance_variable_get(:@oid_convertor_map).must_equal(1=>true)
+  end
 end

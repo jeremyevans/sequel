@@ -37,6 +37,15 @@ module Sequel
         procs = db.conversion_procs
         procs[1082] = ::Sequel.method(:string_to_date)
         procs[1184] = procs[1114] = db.method(:to_application_timestamp)
+        if ocps = db.instance_variable_get(:@oid_convertor_map)
+          # Clear the oid convertor map entries for timestamps if they
+          # exist, so it will regenerate new ones that use this extension.
+          # This is only taken when using the jdbc adapter.
+          Sequel.synchronize do
+            ocps.delete(1184)
+            ocps.delete(1114)
+          end
+        end
       end
 
       # Handle BC dates and times in bound variables. This is necessary for Date values
