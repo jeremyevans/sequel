@@ -120,11 +120,22 @@ describe 'A PostgreSQL database' do
         min = sch[:min_value]
         max.must_be_kind_of klass
         min.must_be_kind_of klass
-        ds = @db[:test].with_extend(Sequel::Postgres::ExtendedDateSupport::DatasetMethods)
+        insert_max = max
+        insert_min = min
+        if ENV['SEQUEL_PG_AUTO_PARAMETERIZE']
+          @db.extension :pg_extended_date_support
+          ds = @db[:test]
+          if type == 'timestamptz'
+            insert_max = Sequel.cast(max, 'timestamptz')
+            insert_min = Sequel.cast(min, 'timestamptz')
+          end
+        else
+          ds = @db[:test].with_extend(Sequel::Postgres::ExtendedDateSupport::DatasetMethods)
+        end
         proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError)
         proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError)
-        ds.insert(max)
-        ds.insert(min)
+        ds.insert(insert_max)
+        ds.insert(insert_min)
         min, max_value = ds.select_order_map(:a)
         min.must_be_kind_of klass
         max_value.must_equal max
@@ -1383,7 +1394,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     end
     @d = @db[:test3]
     if @db.adapter_scheme == :postgres
-      @db.convert_infinite_timestamps.must_equal false
+      @db.convert_infinite_timestamps.must_equal false unless ENV['SEQUEL_PG_AUTO_PARAMETERIZE']
       @db.convert_infinite_timestamps = false
       @db.convert_infinite_timestamps = true
       @db.convert_infinite_timestamps = false
