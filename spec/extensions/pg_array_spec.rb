@@ -205,7 +205,7 @@ describe "pg_array extension" do
   end
 
   it "should parse array types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]'}, {:name=>'f', :db_type=>'real[]'}, {:name=>'d', :db_type=>'numeric[]'}, {:name=>'t', :db_type=>'text[]'}]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]', :is_array=>true}, {:name=>'f', :db_type=>'real[]', :is_array=>true}, {:name=>'d', :db_type=>'numeric[]', :is_array=>true}, {:name=>'t', :db_type=>'text[]', :is_array=>true}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :integer_array, :real_array, :decimal_array, :string_array]
   end
 
@@ -271,14 +271,14 @@ describe "pg_array extension" do
   it "should support registering custom array types" do
     @db.register_array_type('foo')
     @db.typecast_value(:foo_array, []).class.must_equal(Sequel::Postgres::PGArray)
-    @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
+    @db.fetch = [{:name=>'id', :db_type=>'foo[]', :is_array=>true}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foo_array]
   end
 
   it "should support registering custom types with :type_symbol option" do
     @db.register_array_type('foo', :type_symbol=>:bar)
     @db.typecast_value(:bar_array, []).class.must_equal(Sequel::Postgres::PGArray)
-    @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
+    @db.fetch = [{:name=>'id', :db_type=>'foo[]', :is_array=>true}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:bar_array]
   end
 
@@ -333,7 +333,7 @@ describe "pg_array extension" do
   it "should support registering custom array types on a per-Database basis" do
     @db.register_array_type('banana', :oid=>7865){|s| s}
     @db.typecast_value(:banana_array, []).class.must_equal(Sequel::Postgres::PGArray)
-    @db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
+    @db.fetch = [{:name=>'id', :db_type=>'banana[]', :is_array=>true}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana_array]
     @db.conversion_procs.must_include(7865)
     @db.respond_to?(:typecast_value_banana_array, true).must_equal true
@@ -348,7 +348,7 @@ describe "pg_array extension" do
   end
 
   it "should automatically look up the array and scalar oids when registering per-Database types" do
-    @db.fetch = [[{:oid=>21, :typarray=>7866}], [{:name=>'id', :db_type=>'banana[]'}]]
+    @db.fetch = [[{:oid=>21, :typarray=>7866}], [{:name=>'id', :db_type=>'banana[]', :is_array=>true}]]
     @db.register_array_type('banana', :scalar_typecast=>:integer)
     @db.sqls.must_equal ["SELECT typarray, oid FROM pg_type WHERE (typname = 'banana') LIMIT 1"]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana_array]

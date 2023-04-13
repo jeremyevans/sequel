@@ -1,5 +1,7 @@
 === master
 
+* Skip normal type name parsing for enum/array/composite/range/multirange types on PostgreSQL (jeremyevans) (#2019)
+
 * Fix corner case where pg_extended_date_support did not work correctly when using the jdbc/postgresql adapter (jeremyevans)
 
 * Include :min_value and :max_value schema entries for date/timestamp/timestamptz columns on PostgreSQL 9.6+ (jeremyevans)

@@ -82,6 +82,30 @@ describe 'A PostgreSQL database' do
     @db[:test].get(:blob).force_encoding('BINARY').must_equal blob
   end
 
+  it "should not include :min_value or :max_value for enums" do
+    begin
+      @db.drop_enum(:intro_type) rescue nil
+      @db.create_enum(:intro_type, %w(foo bar))
+      @db.create_table(:test){intro_type :baz; column :bazs, 'intro_type[]'}
+      sch = @db.schema(:test).first.last
+      sch[:max_value].must_be_nil
+      sch[:min_value].must_be_nil
+
+      sch = @db.schema(:test).last.last
+      sch[:max_value].must_be_nil
+      sch[:min_value].must_be_nil
+    ensure
+      @db.drop_enum(:intro_type) rescue nil
+    end
+  end
+
+  it "should not include :min_value or :max_value for arrays" do
+    @db.create_table(:test){column :baz, 'integer[]'}
+    sch = @db.schema(:test).first.last
+    sch[:max_value].must_be_nil
+    sch[:min_value].must_be_nil
+  end
+
   {
     Date=>Date,
     'timestamp'=>Time,

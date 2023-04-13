@@ -234,7 +234,7 @@ module Sequel
         private
 
         # Recognize the registered database range types.
-        def schema_column_type(db_type)
+        def schema_range_type(db_type)
           @pg_range_schema_types[db_type] || super
         end
 

@@ -193,8 +193,8 @@ describe "pg_row extension" do
     p1.column_oids.must_equal [4, 5]
     p1.column_converters.must_equal [p4, p5]
     p1.oid.must_equal 1
-    @db.send(:schema_column_type, 'foo').must_equal :pg_row_foo
-    @db.send(:schema_column_type, 'integer').must_equal :integer
+    @db.send(:schema_composite_type, 'foo').must_equal :pg_row_foo
+    @db.send(:schema_composite_type, 'other').must_equal :composite
 
     c = p1.converter
     c.superclass.must_equal @m::HashRow

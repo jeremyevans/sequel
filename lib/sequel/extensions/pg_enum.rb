@@ -166,8 +166,7 @@ module Sequel
       def schema_post_process(_)
         super.each do |_, s|
           oid = s[:oid]
-          if values = Sequel.synchronize{@enum_labels[oid]}
-            s[:type] = :enum
+          if s[:type] == :enum && (values = Sequel.synchronize{@enum_labels[oid]})
             s[:enum_values] = values
           end
         end

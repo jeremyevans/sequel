@@ -257,7 +257,7 @@ module Sequel
         end
 
         # Make the column type detection handle registered array types.
-        def schema_column_type(db_type)
+        def schema_array_type(db_type)
           if (db_type =~ /\A([^(]+)(?:\([^(]+\))?\[\]\z/io) && (type = pg_array_schema_type($1))
             type
           else

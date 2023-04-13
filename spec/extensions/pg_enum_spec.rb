@@ -6,7 +6,7 @@ describe "pg_enum extension" do
   mod = Module.new do
     private
     def schema_parse_table(*)
-      [[:a, {:oid=>1}], [:b, {:oid=>1234}]]
+      [[:a, {:oid=>1, :type=>:enum}], [:b, {:oid=>1234}]]
     end
     def _metadata_dataset
       super.with_fetch([[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}], [{:typname=>'enum1', :v=>212389}]])

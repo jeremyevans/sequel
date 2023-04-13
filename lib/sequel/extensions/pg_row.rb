@@ -538,12 +538,8 @@ module Sequel
         private
 
         # Make the column type detection handle registered row types.
-        def schema_column_type(db_type)
-          if type = @row_schema_types[db_type]
-            type
-          else
-            super
-          end
+        def schema_composite_type(db_type)
+          @row_schema_types[db_type] || super
         end
       end
     end

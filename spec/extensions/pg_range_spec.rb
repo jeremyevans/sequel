@@ -123,12 +123,12 @@ describe "pg_range extension" do
   end
 
   it "should parse range types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range'}, {:name=>'i8', :db_type=>'int8range'}, {:name=>'n', :db_type=>'numrange'}, {:name=>'d', :db_type=>'daterange'}, {:name=>'ts', :db_type=>'tsrange'}, {:name=>'tz', :db_type=>'tstzrange'}]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range', :typtype=>'r'}, {:name=>'i8', :db_type=>'int8range', :typtype=>'r'}, {:name=>'n', :db_type=>'numrange', :typtype=>'r'}, {:name=>'d', :db_type=>'daterange', :typtype=>'r'}, {:name=>'ts', :db_type=>'tsrange', :typtype=>'r'}, {:name=>'tz', :db_type=>'tstzrange', :typtype=>'r'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range, :int8range, :numrange, :daterange, :tsrange, :tstzrange]
   end
 
   it "should parse arrays of range types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range[]'}, {:name=>'i8', :db_type=>'int8range[]'}, {:name=>'n', :db_type=>'numrange[]'}, {:name=>'d', :db_type=>'daterange[]'}, {:name=>'ts', :db_type=>'tsrange[]'}, {:name=>'tz', :db_type=>'tstzrange[]'}]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range[]', :is_array=>true}, {:name=>'i8', :db_type=>'int8range[]', :is_array=>true}, {:name=>'n', :db_type=>'numrange[]', :is_array=>true}, {:name=>'d', :db_type=>'daterange[]', :is_array=>true}, {:name=>'ts', :db_type=>'tsrange[]', :is_array=>true}, {:name=>'tz', :db_type=>'tstzrange[]', :is_array=>true}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range_array, :int8range_array, :numrange_array, :daterange_array, :tsrange_array, :tstzrange_array]
   end
 
@@ -217,7 +217,7 @@ describe "pg_range extension" do
   it "should support registering custom range types" do
     @db.register_range_type('foorange')
     @db.typecast_value(:foorange, 1..2).must_be_kind_of(@R)
-    @db.fetch = [{:name=>'id', :db_type=>'foorange'}]
+    @db.fetch = [{:name=>'id', :db_type=>'foorange', :typtype=>'r'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foorange]
   end
 
@@ -265,7 +265,7 @@ describe "pg_range extension" do
   it "should support registering custom range types on a per-Database basis" do
     @db.register_range_type('banana', :oid=>7865){|s| s}
     @db.typecast_value(:banana, '[1,2]').class.must_equal(Sequel::Postgres::PGRange)
-    @db.fetch = [{:name=>'id', :db_type=>'banana'}]
+    @db.fetch = [{:name=>'id', :db_type=>'banana', :typtype=>'r'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana]
     @db.conversion_procs.must_include(7865)
     @db.respond_to?(:typecast_value_banana, true).must_equal true
@@ -280,7 +280,7 @@ describe "pg_range extension" do
   end
 
   it "should automatically look up the range and subtype oids when registering per-Database types" do
-    @db.fetch = [[{:rngsubtype=>21, :rngtypid=>7866}], [{:name=>'id', :db_type=>'banana'}]]
+    @db.fetch = [[{:rngsubtype=>21, :rngtypid=>7866}], [{:name=>'id', :db_type=>'banana', :typtype=>'r'}]]
     @db.register_range_type('banana', :subtype_typecast=>:integer)
     @db.sqls.must_equal ["SELECT rngtypid, rngsubtype FROM pg_range INNER JOIN pg_type ON (pg_type.oid = pg_range.rngtypid) WHERE (typname = 'banana') LIMIT 1"]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana]

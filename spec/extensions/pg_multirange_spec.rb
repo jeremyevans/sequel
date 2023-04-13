@@ -97,12 +97,12 @@ describe "pg_multirange extension" do
   end
 
   it "should parse multirange types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4multirange'}, {:name=>'i8', :db_type=>'int8multirange'}, {:name=>'n', :db_type=>'nummultirange'}, {:name=>'d', :db_type=>'datemultirange'}, {:name=>'ts', :db_type=>'tsmultirange'}, {:name=>'tz', :db_type=>'tstzmultirange'}]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4multirange', :typtype=>'m'}, {:name=>'i8', :db_type=>'int8multirange', :typtype=>'m'}, {:name=>'n', :db_type=>'nummultirange', :typtype=>'m'}, {:name=>'d', :db_type=>'datemultirange', :typtype=>'m'}, {:name=>'ts', :db_type=>'tsmultirange', :typtype=>'m'}, {:name=>'tz', :db_type=>'tstzmultirange', :typtype=>'m'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4multirange, :int8multirange, :nummultirange, :datemultirange, :tsmultirange, :tstzmultirange]
   end
 
   it "should parse arrays of range types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4multirange[]'}, {:name=>'i8', :db_type=>'int8multirange[]'}, {:name=>'n', :db_type=>'nummultirange[]'}, {:name=>'d', :db_type=>'datemultirange[]'}, {:name=>'ts', :db_type=>'tsmultirange[]'}, {:name=>'tz', :db_type=>'tstzmultirange[]'}]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4multirange[]', :is_array=>true}, {:name=>'i8', :db_type=>'int8multirange[]', :is_array=>true}, {:name=>'n', :db_type=>'nummultirange[]', :is_array=>true}, {:name=>'d', :db_type=>'datemultirange[]', :is_array=>true}, {:name=>'ts', :db_type=>'tsmultirange[]', :is_array=>true}, {:name=>'tz', :db_type=>'tstzmultirange[]', :is_array=>true}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4multirange_array, :int8multirange_array, :nummultirange_array, :datemultirange_array, :tsmultirange_array, :tstzmultirange_array]
   end
 
@@ -186,7 +186,7 @@ describe "pg_multirange extension" do
   it "should support registering custom range types" do
     @db.register_multirange_type('foomultirange', :range_oid=>3904)
     @db.typecast_value(:foomultirange, [1..2]).class.must_equal @MR
-    @db.fetch = [{:name=>'id', :db_type=>'foomultirange'}]
+    @db.fetch = [{:name=>'id', :db_type=>'foomultirange', :typtype=>'m'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foomultirange]
   end
 
@@ -241,7 +241,7 @@ describe "pg_multirange extension" do
   it "should support registering custom multirange types on a per-Database basis" do
     @db.register_multirange_type('banana', :oid=>7865){|s| s}
     @db.conversion_procs[7865].call('{}').must_equal @MR.new([], 'banana')
-    @db.fetch = [{:name=>'id', :db_type=>'banana'}]
+    @db.fetch = [{:name=>'id', :db_type=>'banana', :typtype=>'m'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana]
     @db.conversion_procs.must_include(7865)
     @db.respond_to?(:typecast_value_banana, true).must_equal true
@@ -250,14 +250,14 @@ describe "pg_multirange extension" do
     def db.server_version(*) 140000 end
     db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
     db.extension(:pg_multirange)
-    db.fetch = [{:name=>'id', :db_type=>'banana'}]
-    db.schema(:items).map{|e| e[1][:type]}.must_equal [nil]
+    db.fetch = [{:name=>'id', :db_type=>'banana', :typtype=>'m'}]
+    db.schema(:items).map{|e| e[1][:type]}.must_equal [:multirange]
     db.conversion_procs.wont_include(7865)
     db.respond_to?(:typecast_value_banana, true).must_equal false
   end
 
   it "should automatically look up the multirange and subtype oids when registering per-Database types" do
-    @db.fetch = [[{:rngtypid=>3904, :rngmultitypid=>7866}], [{:name=>'id', :db_type=>'banana'}]]
+    @db.fetch = [[{:rngtypid=>3904, :rngmultitypid=>7866}], [{:name=>'id', :db_type=>'banana', :typtype=>'m'}]]
     @db.register_multirange_type('banana')
     @db.sqls.must_equal ["SELECT rngmultitypid, rngtypid FROM pg_range INNER JOIN pg_type ON (pg_type.oid = pg_range.rngmultitypid) WHERE (typname = 'banana') LIMIT 1"]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana]

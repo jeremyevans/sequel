@@ -1007,11 +1007,15 @@ module Sequel
               SQL::Function.new(:format_type, pg_type[:oid], pg_attribute[:atttypmod]).as(:db_type),
               SQL::Function.new(:pg_get_expr, pg_attrdef[:adbin], pg_class[:oid]).as(:default),
               SQL::BooleanExpression.new(:NOT, pg_attribute[:attnotnull]).as(:allow_null),
-              SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(pg_attribute[:attnum] => SQL::Function.new(:ANY, pg_index[:indkey])), false).as(:primary_key)]}.
+              SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(pg_attribute[:attnum] => SQL::Function.new(:ANY, pg_index[:indkey])), false).as(:primary_key),
+              Sequel[:pg_type][:typtype],
+              (~Sequel[Sequel[:elementtype][:oid]=>nil]).as(:is_array),
+            ]}.
             from(:pg_class).
             join(:pg_attribute, :attrelid=>:oid).
             join(:pg_type, :oid=>:atttypid).
             left_outer_join(Sequel[:pg_type].as(:basetype), :oid=>:typbasetype).
+            left_outer_join(Sequel[:pg_type].as(:elementtype), :typarray=>Sequel[:pg_type][:oid]).
             left_outer_join(:pg_attrdef, :adrelid=>Sequel[:pg_class][:oid], :adnum=>Sequel[:pg_attribute][:attnum]).
             left_outer_join(:pg_index, :indrelid=>Sequel[:pg_class][:oid], :indisprimary=>true).
             where{{pg_attribute[:attisdropped]=>false}}.
@@ -1543,6 +1547,7 @@ module Sequel
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
       end
 
+      # Handle interval and citext types.
       def schema_column_type(db_type)
         case db_type
         when /\Ainterval\z/io
@@ -1554,10 +1559,43 @@ module Sequel
         end
       end
 
+      # The schema :type entry to use for array types.
+      def schema_array_type(db_type)
+        :array
+      end
+
+      # The schema :type entry to use for row/composite types.
+      def schema_composite_type(db_type)
+        :composite
+      end
+
+      # The schema :type entry to use for enum types.
+      def schema_enum_type(db_type)
+        :enum
+      end
+
+      # The schema :type entry to use for range types.
+      def schema_range_type(db_type)
+        :range
+      end
+
+      # The schema :type entry to use for multirange types.
+      def schema_multirange_type(db_type)
+        :multirange
+      end
+
       MIN_DATE = Date.new(-4713, 11, 24)
       MAX_DATE = Date.new(5874897, 12, 31)
       MIN_TIMESTAMP = Time.utc(-4713, 11, 24).freeze
       MAX_TIMESTAMP = (Time.utc(294277) - Rational(1, 1000000)).freeze
+      TYPTYPE_METHOD_MAP = {
+        'c' => :schema_composite_type,
+        'e' => :schema_enum_type,
+        'r' => :schema_range_type,
+        'm' => :schema_multirange_type,
+      }
+      TYPTYPE_METHOD_MAP.default = :schema_column_type
+      TYPTYPE_METHOD_MAP.freeze
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])
@@ -1573,7 +1611,13 @@ module Sequel
             row.delete(:base_oid)
             row.delete(:db_base_type)
           end
-          row[:type] = schema_column_type(row[:db_type])
+
+          db_type = row[:db_type]
+          row[:type] = if row.delete(:is_array)
+            schema_array_type(db_type)
+          else
+            send(TYPTYPE_METHOD_MAP[row.delete(:typtype)], db_type)
+          end
           identity = row.delete(:attidentity)
           if row[:primary_key]
             row[:auto_increment] = !!(row[:default] =~ /\A(?:nextval)/i) || identity == 'a' || identity == 'd'
