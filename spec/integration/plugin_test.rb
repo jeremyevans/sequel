@@ -2139,6 +2139,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
       operator :<, 'm', :exactlen, opts.merge(:name=>:lt)
       operator :>=, 5, :num, opts.merge(:name=>:gte)
       presence [:m1, :m2, :m3], opts.merge(:name=>:pm)
+      operator :>=, 1, :m4, opts.merge(:name=>:gte1)
     end
     @valid_row = {:pre=>'a', :exactlen=>'12345', :minlen=>'12345', :maxlen=>'12345', :lenrange=>'1234', :lik=>'fooabc', :ilik=>'FooABC', :inc=>'abc', :uniq=>'u', :num=>5, :m1=>'a', :m2=>1, :m3=>'a'}
     @violations = [
@@ -2299,6 +2300,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
           String :m1
           Integer :m2
           String :m3
+          Integer :m4, :null=>false, :default=>3
           validate(&validate_block)
         end
       end
@@ -2348,6 +2350,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
           add_column :m1, String
           add_column :m2, Integer
           add_column :m3, String
+          add_column :m4, Integer, :null=>false, :default=>3
           validate(&validate_block)
         end
       end

@@ -1,5 +1,7 @@
 === master
 
+* Make constraint_validations plugin not validate missing columns that have a default value (jeremyevans) (#2023)
+
 * Skip normal type name parsing for enum/array/composite/range/multirange types on PostgreSQL (jeremyevans) (#2019)
 
 * Fix corner case where pg_extended_date_support did not work correctly when using the jdbc/postgresql adapter (jeremyevans)

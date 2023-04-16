@@ -45,7 +45,7 @@ describe "Sequel::Plugins::AutoValidations" do
 
         @c.db.sqls.must_equal ["SELECT * FROM sequel_constraint_validations"]
         @c.db.constraint_validations.must_equal("test"=>[{:allow_nil=>true, :constraint_name=>nil, :message=>'this is a bad column', :validation_type=>"presence", :column=>"name", :argument=>nil, :table=>"test"}])
-        @c.constraint_validations.must_equal [[:validates_presence, :name, {:message=>'this is a bad column', :allow_nil=>false}]]
+        @c.constraint_validations.must_equal [[:validates_presence, :name, {:message=>'this is a bad column', :allow_nil=>false, :from=>:values}]]
         @c.constraint_validation_reflections.must_equal(:name=>[[:presence, {:message=>'this is a bad column', :allow_nil=>true}]])
         @m.name = ''
         @m.valid?.must_equal false

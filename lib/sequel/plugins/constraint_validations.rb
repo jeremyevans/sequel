@@ -125,14 +125,15 @@ module Sequel
             ds = @dataset.with_quote_identifiers(false)
             table_name = ds.literal(ds.first_source_table)
             reflections = {}
-            @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections)}
+            allow_missing_columns = db_schema.select{|col, sch| sch[:allow_null] == false && nil != sch[:default]}.map(&:first)
+            @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections, allow_missing_columns)}
             @constraint_validation_reflections = reflections
           end
         end
 
         # Given a specific database constraint validation metadata row hash, transform
         # it in an validation method call array suitable for splatting to send.
-        def constraint_validation_array(r, reflections)
+        def constraint_validation_array(r, reflections, allow_missing_columns=EMPTY_ARRAY)
           opts = {}
           opts[:message] = r[:message] if r[:message]
           opts[:allow_nil] = true if db.typecast_value(:boolean, r[:allow_nil])
@@ -191,10 +192,12 @@ module Sequel
             reflection_opts[:argument] = arg
           end 
 
-          a << column
-          unless opts.empty?
-            a << opts
+          opts[:from] = :values
+          if column.is_a?(Symbol) && allow_missing_columns.include?(column)
+            opts[:allow_missing] = true
           end
+
+          a << column << opts
 
           if column.is_a?(Array) && column.length == 1
             column = column.first

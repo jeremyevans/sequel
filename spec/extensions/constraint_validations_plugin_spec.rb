@@ -1,6 +1,8 @@
 require_relative "spec_helper"
 
 describe "Sequel::Plugins::ConstraintValidations" do
+  from_values = {:from=>:values}.freeze
+
   def model_class(opts={})
     return @c if @c
     @c = Class.new(Sequel::Model(@db[:items]))
@@ -32,7 +34,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @c = model_class
     @db.sqls.must_equal ["SELECT * FROM sequel_constraint_validations"]
     @db.constraint_validations.must_equal("items"=>[{:allow_nil=>nil, :constraint_name=>nil, :message=>nil, :validation_type=>"presence", :column=>"name", :argument=>nil, :table=>"items"}])
-    @c.constraint_validations.must_equal [[:validates_presence, :name]]
+    @c.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -42,7 +44,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     c.plugin :constraint_validations, :constraint_validations_table=>:foo
     @db.sqls.must_equal ["SELECT * FROM foo"]
     @db.constraint_validations.must_equal("items"=>[{:allow_nil=>nil, :constraint_name=>nil, :message=>nil, :validation_type=>"presence", :column=>"name", :argument=>nil, :table=>"items"}])
-    c.constraint_validations.must_equal [[:validates_presence, :name]]
+    c.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     c.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -53,7 +55,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc = Class.new(c)
     sc.set_dataset @ds
     @db.sqls.must_equal []
-    sc.constraint_validations.must_equal [[:validates_presence, :name]]
+    sc.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -66,7 +68,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc.constraint_validations_table.must_equal :foo
     sc.set_dataset @ds
     @db.sqls.must_equal []
-    sc.constraint_validations.must_equal [[:validates_presence, :name]]
+    sc.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -79,7 +81,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc = Class.new(c)
     sc.set_dataset @ds
     @db.sqls.must_equal []
-    sc.constraint_validations.must_equal [[:validates_presence, :name]]
+    sc.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -90,7 +92,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc = Class.new(c)
     sc.set_dataset @ds
     @db.sqls.must_equal ["SELECT * FROM sequel_constraint_validations"]
-    sc.constraint_validations.must_equal [[:validates_presence, :name]]
+    sc.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -101,138 +103,148 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc = Class.new(c)
     sc.set_dataset @ds
     @db.sqls.must_equal ["SELECT * FROM foo"]
-    sc.constraint_validations.must_equal [[:validates_presence, :name]]
+    sc.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
   it "should correctly retrieve :message option from constraint validations table" do
-    model_class(:message=>'foo').constraint_validations.must_equal [[:validates_presence, :name, {:message=>'foo'}]]
+    model_class(:message=>'foo').constraint_validations.must_equal [[:validates_presence, :name, from_values.merge(:message=>'foo')]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:presence, {:message=>'foo'}]])
   end
 
   it "should correctly retrieve :allow_nil option from constraint validations table" do
-    model_class(:allow_nil=>true).constraint_validations.must_equal [[:validates_presence, :name, {:allow_nil=>true}]]
+    model_class(:allow_nil=>true).constraint_validations.must_equal [[:validates_presence, :name, from_values.merge(:allow_nil=>true)]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:presence, {:allow_nil=>true}]])
   end
 
   it "should handle presence validation" do
-    model_class(:validation_type=>'presence').constraint_validations.must_equal [[:validates_presence, :name]]
+    model_class(:validation_type=>'presence').constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
   it "should handle exact_length validation" do
-    model_class(:validation_type=>'exact_length', :argument=>'5').constraint_validations.must_equal [[:validates_exact_length, 5, :name]]
+    model_class(:validation_type=>'exact_length', :argument=>'5').constraint_validations.must_equal [[:validates_exact_length, 5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:exact_length, {:argument=>5}]])
   end
 
+  it "should handle min_length validation for column not allowing NULL with default value" do
+    def @db.supports_schema_parsing?; true end
+    def @db.schema(*) [[:name, {:default=>'123456', :allow_null=>false}]] end
+    c = Class.new(Sequel::Model(@db[:items]))
+    set_fetch(:validation_type=>'min_length', :argument=>'5')
+    c.plugin :constraint_validations
+    c.constraint_validations.must_equal [[:validates_min_length, 5, :name, from_values.merge(:allow_missing=>true)]]
+    c.constraint_validation_reflections.must_equal(:name=>[[:min_length, {:argument=>5}]])
+  end
+
   it "should handle min_length validation" do
-    model_class(:validation_type=>'min_length', :argument=>'5').constraint_validations.must_equal [[:validates_min_length, 5, :name]]
+    model_class(:validation_type=>'min_length', :argument=>'5').constraint_validations.must_equal [[:validates_min_length, 5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:min_length, {:argument=>5}]])
   end
 
   it "should handle max_length validation" do
-    model_class(:validation_type=>'max_length', :argument=>'5').constraint_validations.must_equal [[:validates_max_length, 5, :name]]
+    model_class(:validation_type=>'max_length', :argument=>'5').constraint_validations.must_equal [[:validates_max_length, 5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:max_length, {:argument=>5}]])
   end
 
   it "should handle length_range validation" do
-    model_class(:validation_type=>'length_range', :argument=>'3..5').constraint_validations.must_equal [[:validates_length_range, 3..5, :name]]
+    model_class(:validation_type=>'length_range', :argument=>'3..5').constraint_validations.must_equal [[:validates_length_range, 3..5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:length_range, {:argument=>3..5}]])
   end
 
   it "should handle length_range validation with an exclusive end" do
-    model_class(:validation_type=>'length_range', :argument=>'3...5').constraint_validations.must_equal [[:validates_length_range, 3...5, :name]]
+    model_class(:validation_type=>'length_range', :argument=>'3...5').constraint_validations.must_equal [[:validates_length_range, 3...5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:length_range, {:argument=>3...5}]])
   end
 
   it "should handle format validation" do
-    model_class(:validation_type=>'format', :argument=>'^foo.*').constraint_validations.must_equal [[:validates_format, /^foo.*/, :name]]
+    model_class(:validation_type=>'format', :argument=>'^foo.*').constraint_validations.must_equal [[:validates_format, /^foo.*/, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/^foo.*/}]])
   end
 
   it "should handle format validation with case insensitive format" do
-    model_class(:validation_type=>'iformat', :argument=>'^foo.*').constraint_validations.must_equal [[:validates_format, /^foo.*/i, :name]]
+    model_class(:validation_type=>'iformat', :argument=>'^foo.*').constraint_validations.must_equal [[:validates_format, /^foo.*/i, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/^foo.*/i}]])
   end
 
   it "should handle includes validation with array of strings" do
-    model_class(:validation_type=>'includes_str_array', :argument=>'a,b,c').constraint_validations.must_equal [[:validates_includes, %w'a b c', :name]]
+    model_class(:validation_type=>'includes_str_array', :argument=>'a,b,c').constraint_validations.must_equal [[:validates_includes, %w'a b c', :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:includes, {:argument=>%w'a b c'}]])
   end
 
   it "should handle includes validation with array of integers" do
-    model_class(:validation_type=>'includes_int_array', :argument=>'1,2,3').constraint_validations.must_equal [[:validates_includes, [1, 2, 3], :name]]
+    model_class(:validation_type=>'includes_int_array', :argument=>'1,2,3').constraint_validations.must_equal [[:validates_includes, [1, 2, 3], :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:includes, {:argument=>[1, 2, 3]}]])
   end
 
   it "should handle includes validation with inclusive range of integers" do
-    model_class(:validation_type=>'includes_int_range', :argument=>'3..5').constraint_validations.must_equal [[:validates_includes, 3..5, :name]]
+    model_class(:validation_type=>'includes_int_range', :argument=>'3..5').constraint_validations.must_equal [[:validates_includes, 3..5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:includes, {:argument=>3..5}]])
   end
 
   it "should handle includes validation with exclusive range of integers" do
-    model_class(:validation_type=>'includes_int_range', :argument=>'3...5').constraint_validations.must_equal [[:validates_includes, 3...5, :name]]
+    model_class(:validation_type=>'includes_int_range', :argument=>'3...5').constraint_validations.must_equal [[:validates_includes, 3...5, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:includes, {:argument=>3...5}]])
   end
 
   it "should handle like validation" do
-    model_class(:validation_type=>'like', :argument=>'foo').constraint_validations.must_equal [[:validates_format, /\Afoo\z/, :name]]
+    model_class(:validation_type=>'like', :argument=>'foo').constraint_validations.must_equal [[:validates_format, /\Afoo\z/, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\Afoo\z/}]])
   end
 
   it "should handle ilike validation" do
-    model_class(:validation_type=>'ilike', :argument=>'foo').constraint_validations.must_equal [[:validates_format, /\Afoo\z/i, :name]]
+    model_class(:validation_type=>'ilike', :argument=>'foo').constraint_validations.must_equal [[:validates_format, /\Afoo\z/i, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\Afoo\z/i}]])
   end
 
   it "should handle operator validation" do
     [[:str_lt, :<], [:str_lte, :<=], [:str_gt, :>], [:str_gte, :>=]].each do |vt, op|
-      model_class(:validation_type=>vt.to_s, :argument=>'a').constraint_validations.must_equal [[:validates_operator, op, 'a', :name]]
+      model_class(:validation_type=>vt.to_s, :argument=>'a').constraint_validations.must_equal [[:validates_operator, op, 'a', :name, from_values]]
       @c.constraint_validation_reflections.must_equal(:name=>[[:operator, {:operator=>op, :argument=>'a'}]])
       @c = @c.db.constraint_validations = nil
     end
 
     [[:int_lt, :<], [:int_lte, :<=], [:int_gt, :>], [:int_gte, :>=]].each do |vt, op|
-      model_class(:validation_type=>vt.to_s, :argument=>'1').constraint_validations.must_equal [[:validates_operator, op, 1, :name]]
+      model_class(:validation_type=>vt.to_s, :argument=>'1').constraint_validations.must_equal [[:validates_operator, op, 1, :name, from_values]]
       @c.constraint_validation_reflections.must_equal(:name=>[[:operator, {:operator=>op, :argument=>1}]])
       @c = @c.db.constraint_validations = nil
     end
   end
 
   it "should handle like validation with % metacharacter" do
-    model_class(:validation_type=>'like', :argument=>'%foo%').constraint_validations.must_equal [[:validates_format, /\A.*foo.*\z/, :name]]
+    model_class(:validation_type=>'like', :argument=>'%foo%').constraint_validations.must_equal [[:validates_format, /\A.*foo.*\z/, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\A.*foo.*\z/}]])
   end
 
   it "should handle like validation with %% metacharacter" do
-    model_class(:validation_type=>'like', :argument=>'%%foo%%').constraint_validations.must_equal [[:validates_format, /\A%foo%\z/, :name]]
+    model_class(:validation_type=>'like', :argument=>'%%foo%%').constraint_validations.must_equal [[:validates_format, /\A%foo%\z/, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\A%foo%\z/}]])
   end
 
   it "should handle like validation with _ metacharacter" do
-    model_class(:validation_type=>'like', :argument=>'f_o').constraint_validations.must_equal [[:validates_format, /\Af.o\z/, :name]]
+    model_class(:validation_type=>'like', :argument=>'f_o').constraint_validations.must_equal [[:validates_format, /\Af.o\z/, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\Af.o\z/}]])
   end
 
   it "should handle like validation with Regexp metacharacter" do
-    model_class(:validation_type=>'like', :argument=>'\wfoo\d').constraint_validations.must_equal [[:validates_format, /\A\\wfoo\\d\z/, :name]]
+    model_class(:validation_type=>'like', :argument=>'\wfoo\d').constraint_validations.must_equal [[:validates_format, /\A\\wfoo\\d\z/, :name, from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\A\\wfoo\\d\z/}]])
   end
 
   it "should handle unique validation" do
-    model_class(:validation_type=>'unique').constraint_validations.must_equal [[:validates_unique, [:name]]]
+    model_class(:validation_type=>'unique').constraint_validations.must_equal [[:validates_unique, [:name], from_values]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:unique, {}]])
   end
 
   it "should handle unique validation with multiple columns" do
-    model_class(:validation_type=>'unique', :column=>'name,id').constraint_validations.must_equal [[:validates_unique, [:name, :id]]]
+    model_class(:validation_type=>'unique', :column=>'name,id').constraint_validations.must_equal [[:validates_unique, [:name, :id], from_values]]
     @c.constraint_validation_reflections.must_equal([:name, :id]=>[[:unique, {}]])
   end
 
   it "should handle :validation_options" do
     c = model_class(:validation_type=>'unique', :column=>'name')
     c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad'}}
-    c.constraint_validations.must_equal [[:validates_unique, [:name], {:message=>'is bad'}]]
+    c.constraint_validations.must_equal [[:validates_unique, [:name], from_values.merge(:message=>'is bad')]]
     c.constraint_validation_reflections.must_equal(:name=>[[:unique, {:message=>'is bad'}]])
     c.dataset = c.dataset.with_fetch(:count=>1)
     o = c.new(:name=>'a')
@@ -243,7 +255,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
   it "should handle :validation_options merging with constraint validation options" do
     c = model_class(:validation_type=>'unique', :column=>'name', :allow_nil=>true)
     c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad'}}
-    c.constraint_validations.must_equal [[:validates_unique, [:name], {:message=>'is bad', :allow_nil=>true}]]
+    c.constraint_validations.must_equal [[:validates_unique, [:name], from_values.merge(:message=>'is bad', :allow_nil=>true)]]
     c.constraint_validation_reflections.must_equal(:name=>[[:unique, {:message=>'is bad', :allow_nil=>true}]])
     c.dataset = c.dataset.with_fetch(:count=>1)
     o = c.new(:name=>'a')
@@ -256,7 +268,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad', :allow_nil=>true}}
     sc = Class.new(c)
     sc.plugin :constraint_validations, :validation_options=>{:unique=>{:allow_missing=>true, :allow_nil=>false}}
-    sc.constraint_validations.must_equal [[:validates_unique, [:name], {:message=>'is bad', :allow_missing=>true, :allow_nil=>false}]]
+    sc.constraint_validations.must_equal [[:validates_unique, [:name], from_values.merge(:message=>'is bad', :allow_missing=>true, :allow_nil=>false)]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:unique, {:message=>'is bad', :allow_missing=>true, :allow_nil=>false}]])
     sc.dataset = sc.dataset.with_fetch(:count=>1)
     o = sc.new(:name=>'a')
@@ -274,7 +286,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     set_fetch(:table=>'sch__items')
     c = Class.new(Sequel::Model(@db[Sequel.identifier(:sch__items)]))
     c.plugin :constraint_validations
-    c.constraint_validations.must_equal [[:validates_presence, :name]]
+    c.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     c.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
@@ -282,7 +294,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     set_fetch(:table=>'sch.items')
     c = Class.new(Sequel::Model(@db[Sequel.qualify(:sch, :items)]))
     c.plugin :constraint_validations
-    c.constraint_validations.must_equal [[:validates_presence, :name]]
+    c.constraint_validations.must_equal [[:validates_presence, :name, from_values]]
     c.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
 
