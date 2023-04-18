@@ -28,7 +28,9 @@ module Sequel
     #
     # This plugin only works on the postgres adapter when using the pg 0.16+ driver,
     # PostgreSQL 9.3+ server, and PostgreSQL 9.3+ client library (libpq). In other cases
-    # it will be a no-op.
+    # it will be a no-op. Additionally, the plugin only handles models that select
+    # from tables.  It does not handle models that select from subqueries, such as
+    # subclasses of models using the class_table_inheritance plugin.
     #
     # Example:
     #
