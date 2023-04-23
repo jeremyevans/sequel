@@ -34,7 +34,7 @@ jobs:
     env:
       BUNDLE_GEMFILE: .ci.gemfile
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -yqq install libpq-dev libmysqlclient-dev
     - run: sudo apt-get -yqq install libxml2-dev libxslt-dev
       if: startsWith(matrix.ruby, 'truffleruby')
