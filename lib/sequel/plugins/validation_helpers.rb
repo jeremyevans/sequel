@@ -75,6 +75,10 @@ module Sequel
     #       "#{Array(attribute).join(I18n.t('errors.joiner'))} #{error_msg}"
     #     end
     #   end
+    #
+    # It is recommended that users of this plugin that use validates_schema_types also use
+    # the validation_helpers_generic_type_messages plugin for more useful type validation
+    # failure messages.
     module ValidationHelpers
       DEFAULT_OPTIONS = {
         :exact_length=>{:message=>lambda{|exact| "is not #{exact} characters"}},
@@ -211,7 +215,7 @@ module Sequel
           klass = klass.to_s.constantize if klass.is_a?(String) || klass.is_a?(Symbol)
           validatable_attributes_for_type(:type, atts, opts) do |a,v,m|
             if klass.is_a?(Array) ? !klass.any?{|kls| v.is_a?(kls)} : !v.is_a?(klass)
-              validation_error_message(m, klass)
+              validates_type_error_message(m, klass)
             end
           end
         end
@@ -338,6 +342,9 @@ module Sequel
         def validation_error_message(message, *args)
           message.is_a?(Proc) ? message.call(*args) : message
         end
+
+        # The validation error message for type validations, for the given class.
+        alias validates_type_error_message validation_error_message
       end
     end
   end

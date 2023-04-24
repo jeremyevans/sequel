@@ -1,5 +1,7 @@
 === master
 
+* Add validation_helpers_generic_type_messages plugin for more useful type validation failure messages (jeremyevans) (#2028)
+
 * Make constraint_validations plugin not validate missing columns that have a default value (jeremyevans) (#2023)
 
 * Skip normal type name parsing for enum/array/composite/range/multirange types on PostgreSQL (jeremyevans) (#2019)
