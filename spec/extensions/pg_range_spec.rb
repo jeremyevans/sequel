@@ -123,13 +123,13 @@ describe "pg_range extension" do
   end
 
   it "should parse range types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range', :typtype=>'r'}, {:name=>'i8', :db_type=>'int8range', :typtype=>'r'}, {:name=>'n', :db_type=>'numrange', :typtype=>'r'}, {:name=>'d', :db_type=>'daterange', :typtype=>'r'}, {:name=>'ts', :db_type=>'tsrange', :typtype=>'r'}, {:name=>'tz', :db_type=>'tstzrange', :typtype=>'r'}]
-    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range, :int8range, :numrange, :daterange, :tsrange, :tstzrange]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range', :typtype=>'r'}, {:name=>'i8', :db_type=>'int8range', :typtype=>'r'}, {:name=>'n', :db_type=>'numrange', :typtype=>'r'}, {:name=>'d', :db_type=>'daterange', :typtype=>'r'}, {:name=>'ts', :db_type=>'tsrange', :typtype=>'r'}, {:name=>'tz', :db_type=>'tstzrange', :typtype=>'r'}, {:name=>'o', :db_type=>'otherrange', :typtype=>'r'}]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range, :int8range, :numrange, :daterange, :tsrange, :tstzrange, :range]
   end
 
   it "should parse arrays of range types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range[]', :is_array=>true}, {:name=>'i8', :db_type=>'int8range[]', :is_array=>true}, {:name=>'n', :db_type=>'numrange[]', :is_array=>true}, {:name=>'d', :db_type=>'daterange[]', :is_array=>true}, {:name=>'ts', :db_type=>'tsrange[]', :is_array=>true}, {:name=>'tz', :db_type=>'tstzrange[]', :is_array=>true}]
-    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range_array, :int8range_array, :numrange_array, :daterange_array, :tsrange_array, :tstzrange_array]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i4', :db_type=>'int4range[]', :is_array=>true}, {:name=>'i8', :db_type=>'int8range[]', :is_array=>true}, {:name=>'n', :db_type=>'numrange[]', :is_array=>true}, {:name=>'d', :db_type=>'daterange[]', :is_array=>true}, {:name=>'ts', :db_type=>'tsrange[]', :is_array=>true}, {:name=>'tz', :db_type=>'tstzrange[]', :is_array=>true}, {:name=>'o', :db_type=>'otherrange[]', :is_array=>true}]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range_array, :int8range_array, :numrange_array, :daterange_array, :tsrange_array, :tstzrange_array, :array]
   end
 
   it "should set :ruby_default schema entries if default value is recognized" do

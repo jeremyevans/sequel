@@ -205,8 +205,8 @@ describe "pg_array extension" do
   end
 
   it "should parse array types from the schema correctly" do
-    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]', :is_array=>true}, {:name=>'f', :db_type=>'real[]', :is_array=>true}, {:name=>'d', :db_type=>'numeric[]', :is_array=>true}, {:name=>'t', :db_type=>'text[]', :is_array=>true}]
-    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :integer_array, :real_array, :decimal_array, :string_array]
+    @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]', :is_array=>true}, {:name=>'f', :db_type=>'real[]', :is_array=>true}, {:name=>'d', :db_type=>'numeric[]', :is_array=>true}, {:name=>'t', :db_type=>'text[]', :is_array=>true}, {:name=>'t', :db_type=>'other[]', :is_array=>true}]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :integer_array, :real_array, :decimal_array, :string_array, :array]
   end
 
   it "should set :callable_default schema entries if default value is recognized" do
