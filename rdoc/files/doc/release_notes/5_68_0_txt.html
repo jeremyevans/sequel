@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.68.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.68.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.68.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2023-05-01 07:26:38 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>On PostgreSQL 9.6+, date, timestamp, and timestamptz columns now have min_value and max_value column schema entries, allowing the auto_validations plugin to automatically enforce minimum and maximum values for these column types, raising a validation error before saving, instead of database error when the query is sent to the database.</p>
+</li><li>
+<p>A validation_helpers_generic_type_messages plugin has been added, which improves the default type validation error messages in validation_helpers.  This change was not made directly to validation_helpers for backwards compatibility reasons, but will probably become the default behavior in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6.  Some examples of the improvements:</p>
+
+<pre class="ruby"><span class="ruby-comment"># :blob type</span>
+<span class="ruby-comment"># validation_helpers default: &quot;value is not a valid sequel::sql::blob&quot;</span>
+<span class="ruby-comment"># with this plugin: &quot;value is not a blob&quot;</span>
+
+<span class="ruby-comment"># :boolean type</span>
+<span class="ruby-comment"># validation_helpers default: &quot;value is not a valid trueclass or falseclass&quot;</span>
+<span class="ruby-comment"># with this plugin: &quot;value is not true or false&quot;</span>
+
+<span class="ruby-comment"># :datetime type</span>
+<span class="ruby-comment"># validation_helpers default: &quot;value is not a valid time or datetime&quot;</span>
+<span class="ruby-comment"># with this plugin: &quot;value is not a valid timestamp&quot;</span>
+
+<span class="ruby-comment"># custom/database-specific types</span>
+<span class="ruby-comment"># validation_helpers default: &quot;value is not a valid sequel::class_name&quot;</span>
+<span class="ruby-comment"># with this plugin: &quot;value is not the expected type&quot;</span>
+</pre>
+</li></ul>
+
+<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The constraint_validations plugin no longer raises validation errors for missing columns that have a default value. If a column is missing but has a default value, we can assume the default value is valid.  Additionally, the constraint validations are now based on the underlying column value and not any deserialized value, so that the validation matches the constraint.</p>
+</li><li>
+<p>On PostgreSQL, normal type name parsing is skipped for enum, array, composite, range, and multirange types, ensuring that such types will not be treated incorrectly based on their type name.</p>
+</li><li>
+<p>The pg_extended_date_support extension now works correctly with the jdbc/postgresql adapter if there is already an entry in the oid_convertor_map for the timestamp and timestamptz types.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#schema_column_type is no longer called for all columns on PostgreSQL when parsing schema. Enum, array, composite, range, and multirange types each have their own separate type parsing method.  So if you were overriding Database#schema_column_type to implement custom column schema parsing, you may need to adjust your code.</p>
+</li><li>
+<p>The Sequel::Postgres::ExtendedDateSupport::DATE_YEAR_1 constant has been removed.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

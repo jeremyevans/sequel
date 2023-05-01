@@ -621,15 +621,15 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-pg_row-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">554</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_row</span>(<span class="ruby-identifier">expr</span>)
-<span class="line-num">555</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">expr</span>
-<span class="line-num">556</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">557</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>)
-<span class="line-num">558</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">559</span>     <span class="ruby-comment"># Will only work if pg_row_ops extension is loaded</span>
-<span class="line-num">560</span>     <span class="ruby-identifier">pg_row_op</span>(<span class="ruby-identifier">expr</span>)
-<span class="line-num">561</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">562</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">550</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_row</span>(<span class="ruby-identifier">expr</span>)
+<span class="line-num">551</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">expr</span>
+<span class="line-num">552</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">553</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>)
+<span class="line-num">554</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">555</span>     <span class="ruby-comment"># Will only work if pg_row_ops extension is loaded</span>
+<span class="line-num">556</span>     <span class="ruby-identifier">pg_row_op</span>(<span class="ruby-identifier">expr</span>)
+<span class="line-num">557</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">558</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_row_op'>

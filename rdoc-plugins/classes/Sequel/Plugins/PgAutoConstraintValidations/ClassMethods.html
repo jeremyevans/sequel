@@ -92,11 +92,11 @@ Sequel::Plugins::PgAutoConstraintValidations::ClassMethods
 [show source]
 </a>
 <pre id='method-i-dump_pg_auto_constraint_validations_cache-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_constraint_validations.rb</span>
-<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_pg_auto_constraint_validations_cache</span>
-<span class="line-num">133</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No pg_auto_constraint_validations setup&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">file</span> = <span class="ruby-ivar">@pg_auto_constraint_validations_cache_file</span>
-<span class="line-num">134</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-ivar">@pg_auto_constraint_validations_cache</span>))}
-<span class="line-num">135</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">134</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_pg_auto_constraint_validations_cache</span>
+<span class="line-num">135</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No pg_auto_constraint_validations setup&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">file</span> = <span class="ruby-ivar">@pg_auto_constraint_validations_cache_file</span>
+<span class="line-num">136</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-ivar">@pg_auto_constraint_validations_cache</span>))}
+<span class="line-num">137</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_auto_constraint_validation_override'>
@@ -115,14 +115,14 @@ Sequel::Plugins::PgAutoConstraintValidations::ClassMethods
 [show source]
 </a>
 <pre id='method-i-pg_auto_constraint_validation_override-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_constraint_validations.rb</span>
-<span class="line-num">139</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_auto_constraint_validation_override</span>(<span class="ruby-identifier">constraint</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">message</span>)
-<span class="line-num">140</span>   <span class="ruby-identifier">pgacv</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@pg_auto_constraint_validations</span>]
-<span class="line-num">141</span>   <span class="ruby-identifier">overrides</span> = <span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>] = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>]]
-<span class="line-num">142</span>   <span class="ruby-identifier">overrides</span>[<span class="ruby-identifier">constraint</span>] = [<span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-identifier">message</span>].<span class="ruby-identifier">freeze</span>
-<span class="line-num">143</span>   <span class="ruby-identifier">overrides</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">144</span>   <span class="ruby-ivar">@pg_auto_constraint_validations</span> = <span class="ruby-identifier">pgacv</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">145</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">146</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_auto_constraint_validation_override</span>(<span class="ruby-identifier">constraint</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">message</span>)
+<span class="line-num">142</span>   <span class="ruby-identifier">pgacv</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@pg_auto_constraint_validations</span>]
+<span class="line-num">143</span>   <span class="ruby-identifier">overrides</span> = <span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>] = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>]]
+<span class="line-num">144</span>   <span class="ruby-identifier">overrides</span>[<span class="ruby-identifier">constraint</span>] = [<span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-identifier">message</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">145</span>   <span class="ruby-identifier">overrides</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">146</span>   <span class="ruby-ivar">@pg_auto_constraint_validations</span> = <span class="ruby-identifier">pgacv</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">147</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

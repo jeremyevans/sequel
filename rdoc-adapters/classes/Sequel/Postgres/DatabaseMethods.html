@@ -125,6 +125,34 @@ Sequel::Postgres::DatabaseMethods
 <td class='context-item-desc'></td>
 </tr>
 <tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MAX_DATE</td>
+<td>=</td>
+<td class='context-item-value'>Date.new(5874897, 12, 31)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MAX_TIMESTAMP</td>
+<td>=</td>
+<td class='context-item-value'>(Time.utc(294277) - Rational(1, 1000000)).freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MIN_DATE</td>
+<td>=</td>
+<td class='context-item-value'>Date.new(-4713, 11, 24)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MIN_TIMESTAMP</td>
+<td>=</td>
+<td class='context-item-value'>Time.utc(-4713, 11, 24).freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
 <td class='context-item-name'>ON_COMMIT</td>
 <td>=</td>
 <td class='context-item-value'>{:drop => 'DROP', :delete_rows => 'DELETE ROWS', :preserve_rows => 'PRESERVE ROWS'}.freeze</td>
@@ -196,6 +224,18 @@ end_sql
 <td class='context-item-desc'>
 <p>SQL fragment for getting sequence associated with table’s primary key, assuming it was a serial primary key column.</p>
 </td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>TYPTYPE_METHOD_MAP</td>
+<td>=</td>
+<td class='context-item-value'>{
+'c' => :schema_composite_type,
+'e' => :schema_enum_type,
+'r' => :schema_range_type,
+'m' => :schema_multirange_type,
+}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>VALID_CLIENT_MIN_MESSAGES</td>

@@ -31,7 +31,7 @@ doc/advanced_associations.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-10-21 08:19:04 -0700</span>
+<span class='datetime'>2023-04-23 09:38:27 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -628,8 +628,10 @@ Last Update:
 
 <p>If you must use them, look for the sequel_polymorphic external plugin, as it makes using polymorphic associations in <a href="../../classes/Sequel.html"><code>Sequel</code></a> about as easy as it is in ActiveRecord.  However, here’s how they can be done using Sequel’s custom associations (the sequel_polymorphic external plugin is just a generic version of this code):</p>
 
-<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Asset</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
-  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:attachable</span>, <span class="ruby-value">reciprocal:</span> <span class="ruby-value">:assets</span>,
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:inflector</span> <span class="ruby-comment"># for attachable_type.constantize</span>
+
+<span class="ruby-keyword">class</span> <span class="ruby-constant">Asset</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:attachable</span>, <span class="ruby-value">reciprocal:</span> <span class="ruby-value">:assets</span>, <span class="ruby-value">reciprocal_type:</span> <span class="ruby-value">:one_to_many</span>,
     <span class="ruby-value">setter:</span> (<span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">attachable</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword">self</span>[<span class="ruby-value">:attachable_id</span>] = (<span class="ruby-identifier">attachable</span>.<span class="ruby-identifier">pk</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">attachable</span>)
       <span class="ruby-keyword">self</span>[<span class="ruby-value">:attachable_type</span>] = (<span class="ruby-identifier">attachable</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">attachable</span>)
