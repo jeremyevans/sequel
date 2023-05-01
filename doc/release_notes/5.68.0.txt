@@ -1,0 +1,61 @@
+= New Features
+
+* On PostgreSQL 9.6+, date, timestamp, and timestamptz columns now
+  have min_value and max_value column schema entries, allowing the
+  auto_validations plugin to automatically enforce minimum and
+  maximum values for these column types, raising a validation error
+  before saving, instead of database error when the query is sent
+  to the database.
+
+* A validation_helpers_generic_type_messages plugin has been added,
+  which improves the default type validation error messages in
+  validation_helpers.  This change was not made directly to
+  validation_helpers for backwards compatibility reasons, but will
+  probably become the default behavior in Sequel 6.  Some examples
+  of the improvements:
+
+    # :blob type
+    # validation_helpers default: "value is not a valid sequel::sql::blob"
+    # with this plugin: "value is not a blob"
+
+    # :boolean type
+    # validation_helpers default: "value is not a valid trueclass or falseclass"
+    # with this plugin: "value is not true or false"
+
+    # :datetime type
+    # validation_helpers default: "value is not a valid time or datetime"
+    # with this plugin: "value is not a valid timestamp"
+
+    # custom/database-specific types
+    # validation_helpers default: "value is not a valid sequel::class_name"
+    # with this plugin: "value is not the expected type"
+
+= Improvements
+
+* The constraint_validations plugin no longer raises validation
+  errors for missing columns that have a default value. If a column
+  is missing but has a default value, we can assume the default
+  value is valid.  Additionally, the constraint validations are now
+  based on the underlying column value and not any deserialized
+  value, so that the validation matches the constraint.
+
+* On PostgreSQL, normal type name parsing is skipped for enum,
+  array, composite, range, and multirange types, ensuring that
+  such types will not be treated incorrectly based on their
+  type name.
+
+* The pg_extended_date_support extension now works correctly with
+  the jdbc/postgresql adapter if there is already an entry in the
+  oid_convertor_map for the timestamp and timestamptz types.
+
+= Backwards Compatibility
+
+* Database#schema_column_type is no longer called for all columns
+  on PostgreSQL when parsing schema. Enum, array, composite, range,
+  and multirange types each have their own separate type parsing
+  method.  So if you were overriding Database#schema_column_type to
+  implement custom column schema parsing, you may need to adjust
+  your code.
+
+* The Sequel::Postgres::ExtendedDateSupport::DATE_YEAR_1 constant
+  has been removed.
