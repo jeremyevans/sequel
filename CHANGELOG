@@ -1,3 +1,7 @@
+=== master
+
+* Add trilogy adapter (jeremyevans)
+
 === 5.68.0 (2023-05-01)
 
 * Add validation_helpers_generic_type_messages plugin for more useful type validation failure messages (jeremyevans) (#2028)

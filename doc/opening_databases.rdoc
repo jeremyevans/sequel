@@ -279,7 +279,7 @@ if either the :sslca or :sslkey option is given.
 
 === mysql2
 
-This is a newer MySQL adapter that does typecasting in C, so it is often faster than the
+This is a MySQL adapter that does typecasting in C, so it is often faster than the
 mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation
 for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized
 options supported by the mysql adapter are also supported for mysql2 adapter (and any other adapters connecting to
@@ -423,3 +423,10 @@ Other Sequel specific options:
              This should be specified as an integer.  If you plan on setting large
              text or blob values via tinytds, you should use this option or modify
              your freetds.conf file.
+
+=== trilogy
+
+This is a MySQL adapter that does typecasting in C, and does not require any mysql client libraries installed.
+The options given are passed to Trilogy.new, see the trilogy documentation for details on what options are
+supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized
+options supported by the mysql adapter are also supported for trilogy adapter.

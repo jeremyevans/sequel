@@ -123,7 +123,7 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>11}]
   end
   
-  it "should have update return the number of matched rows" do
+  cspecify "should have update return the number of matched rows", [:trilogy] do
     @ds.update(:number=>:number).must_equal 1
     @ds.filter(:id=>1).update(:number=>:number).must_equal 1
     @ds.filter(:id=>2).update(:number=>:number).must_equal 0
@@ -1149,7 +1149,7 @@ describe Sequel::SQL::Constants do
     d.to_s.must_equal Date.today.to_s
   end
 
-  cspecify "should have working CURRENT_TIME", [:jdbc, :sqlite], [:mysql2], [:tinytds], [:ado] do
+  cspecify "should have working CURRENT_TIME", [:jdbc, :sqlite], [:mysql2], [:tinytds], [:ado], [:trilogy] do
     @db.create_table!(:constants){Time :t, :only_time=>true}
     @ds.insert(:t=>Sequel::CURRENT_TIME)
     (Time.now - @c[@ds.get(:t)]).must_be_close_to 0, 60

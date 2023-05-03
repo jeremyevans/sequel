@@ -344,7 +344,7 @@ describe "Bound Argument Types" do
     @ds.filter(:d=>:$x).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].must_equal @vs[:d]
   end
 
-  cspecify "should handle datetime type", [:mysql2], [:jdbc, :sqlite], [:tinytds], [:oracle] do
+  cspecify "should handle datetime type", [:mysql2], [:jdbc, :sqlite], [:tinytds], [:oracle], [:trilogy] do
     Sequel.datetime_class = DateTime
     @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].must_equal @vs[:dt]
   end

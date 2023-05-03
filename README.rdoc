@@ -13,7 +13,7 @@ toolkit for Ruby.
   database sharding.
 * Sequel currently has adapters for ADO, Amalgalite, 
   IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle,
-  PostgreSQL, SQLAnywhere, SQLite3, and TinyTDS.
+  PostgreSQL, SQLAnywhere, SQLite3, TinyTDS, and Trilogy.
 
 == Resources
 

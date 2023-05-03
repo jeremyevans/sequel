@@ -75,7 +75,7 @@ describe "Supported types" do
     ds.first[:dat].to_s.must_equal d.to_s
   end
   
-  cspecify "should support generic time type", [:odbc], [:jdbc, :mssql], [:jdbc, :sqlite], [:mysql2], [:tinytds], :oracle, [:ado] do
+  cspecify "should support generic time type", [:odbc], [:jdbc, :mssql], [:jdbc, :sqlite], [:mysql2], [:tinytds], :oracle, [:ado], [:trilogy] do
     ds = create_items_table_with_column(:tim, Time, :only_time=>true)
     t = Sequel::SQLTime.now
     ds.insert(:tim => t)
@@ -100,7 +100,7 @@ describe "Supported types" do
     ds.first[:tim].strftime('%Y%m%d%H%M%S').must_equal t.strftime('%Y%m%d%H%M%S')
   end
   
-  cspecify "should support generic file type", [:odbc, :mssql], [:mysql2], [:tinytds] do
+  cspecify "should support generic file type", [:odbc, :mssql], [:mysql2], [:tinytds], [:trilogy] do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name =>Sequel.blob("a\0"*300))
     ds.all.must_equal [{:name=>Sequel.blob("a\0"*300)}]
