@@ -24,7 +24,7 @@ module Sequel
 
       def disconnect_connection(c)
         c.discard!
-      rescue Trilogy::Error
+      rescue ::Trilogy::Error
         nil
       end
 
