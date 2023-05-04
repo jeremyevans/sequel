@@ -17,6 +17,7 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         opts[:username] ||= opts.delete(:user)
+        opts[:found_rows] = true
         conn = ::Trilogy.new(opts)
         mysql_connection_setting_sqls.each{|sql| log_connection_yield(sql, conn){conn.query(sql)}}
         conn
@@ -98,10 +99,6 @@ module Sequel
         self
       end
       
-      def provides_accurate_rows_matched?
-        false
-      end
-
       private
 
       def execute(sql, opts=OPTS)
