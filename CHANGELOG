@@ -1,5 +1,7 @@
 === master
 
+* Add Model::DatasetModule#model accessor (davekaro) (#2040)
+
 * Add trilogy adapter (jeremyevans)
 
 === 5.68.0 (2023-05-01)
