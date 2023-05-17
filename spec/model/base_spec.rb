@@ -180,7 +180,11 @@ describe Sequel::Model, ".dataset_module" do
   before do
     @c = Class.new(Sequel::Model(:items))
   end
-  
+ 
+  it "should expose the model class on the dataset module" do
+    @c.dataset_module.model.must_equal @c
+  end
+
   it "should extend the dataset with the module if the model has a dataset" do
     @c.dataset_module{def return_3() 3 end}
     @c.dataset.return_3.must_equal 3

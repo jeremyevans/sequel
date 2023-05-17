@@ -8,6 +8,9 @@ module Sequel
     # automatically creates class methods for public dataset
     # methods.
     class DatasetModule < Dataset::DatasetModule
+      # The model class related to this dataset module.
+      attr_reader :model
+
       # Store the model related to this dataset module.
       def initialize(model)
         @model = model
