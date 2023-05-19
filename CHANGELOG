@@ -1,5 +1,9 @@
 === master
 
+* Avoid unsupported flag warning when using the mysql adapter with ruby-mysql 3+ (jeremyevans)
+
+* Make mysql adapter work with ruby-mysql 4+ (jeremyevans)
+
 * Add Model::DatasetModule#model accessor (davekaro) (#2040)
 
 * Add trilogy adapter (jeremyevans)

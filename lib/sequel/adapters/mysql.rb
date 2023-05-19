@@ -29,6 +29,21 @@ module Sequel
     end
     MYSQL_TYPES.freeze
 
+    RUBY_MYSQL_3 = !Mysql.respond_to?(:init)
+    RUBY_MYSQL_4 = RUBY_MYSQL_3 && ::Mysql::VERSION.to_i >= 4
+
+    if RUBY_MYSQL_3
+      class Adapter < ::Mysql
+        alias real_connect connect
+        alias use_result store_result
+        if RUBY_MYSQL_4
+          def initialize(**opts)
+            super(**opts.merge(:cast=>false))
+          end
+        end
+      end
+    end
+
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
       include Sequel::MySQL::MysqlMysql2::DatabaseMethods
@@ -72,7 +87,7 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
 
-        if Mysql.respond_to?(:init)
+        if !RUBY_MYSQL_3
           conn = Mysql.init
           conn.options(Mysql::READ_DEFAULT_GROUP, opts[:config_default_group] || "client")
           conn.options(Mysql::OPT_LOCAL_INFILE, opts[:config_local_infile]) if opts.has_key?(:config_local_infile)
@@ -88,8 +103,8 @@ module Sequel
             conn.options(Mysql::OPT_CONNECT_TIMEOUT, connect_timeout)
           end
         else
-          # ruby-mysql 3 API
-          conn = Mysql.new
+          # ruby-mysql 3+ API
+          conn = Adapter.new
           # no support for default group
           conn.local_infile = opts[:config_local_infile] if opts.has_key?(:config_local_infile)
           if encoding = opts[:encoding] || opts[:charset]
@@ -101,10 +116,7 @@ module Sequel
           if connect_timeout = opts[:connect_timeout]
             conn.connect_timeout = connect_timeout
           end
-          conn.singleton_class.class_eval do
-            alias real_connect connect
-            alias use_result store_result
-          end
+          opts[:compress] = false
         end
 
         conn.ssl_set(opts[:sslkey], opts[:sslcert], opts[:sslca], opts[:sslcapath], opts[:sslcipher]) if opts[:sslca] || opts[:sslkey]

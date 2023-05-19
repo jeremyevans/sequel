@@ -902,7 +902,7 @@ if DB.adapter_scheme == :mysql or DB.adapter_scheme == :jdbc or DB.adapter_schem
 
     # Mysql2 doesn't support stored procedures that return result sets, probably because
     # CLIENT_MULTI_RESULTS is not set.
-    unless DB.adapter_scheme == :mysql2
+    unless DB.adapter_scheme == :mysql2 || (defined?(Sequel::MySQL::RUBY_MYSQL_4) && Sequel::MySQL::RUBY_MYSQL_4)
       it "should be callable on the dataset object" do
         DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
         DB[:items].delete
@@ -1016,7 +1016,7 @@ if DB.adapter_scheme == :mysql
     it "should not allow splitting a graphed dataset" do
       proc{DB[:a].graph(:b, :b=>:a).split_multiple_result_sets}.must_raise(Sequel::Error)
     end
-  end
+  end unless defined?(Sequel::MySQL::RUBY_MYSQL_4) && Sequel::MySQL::RUBY_MYSQL_4
 end
 
 if DB.adapter_scheme == :mysql2
