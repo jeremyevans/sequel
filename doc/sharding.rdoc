@@ -39,7 +39,9 @@ is the simplest configuration:
     servers: {read_only: {host: 'replica_server'}})
 
 This will use the replica_server for SELECT queries and primary_server for
-other queries.
+other queries. Note that `:read_only` is a special key. Using any other key
+will result in the main database connection being used for all queries, unless
+one or more of the methods described below are used to switch to another connection.
 
 If you want to ensure your queries are going to a specific database, you
 can force this for a given query by using the .server method and passing 
