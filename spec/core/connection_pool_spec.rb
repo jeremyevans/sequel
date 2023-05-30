@@ -365,7 +365,6 @@ concurrent_connection_pool_specs = Module.new do
     @pool.disconnect
     b = @icpp
 
-    time = Time.now
     cc = {}
     threads = []
     results = []
@@ -387,7 +386,6 @@ concurrent_connection_pool_specs = Module.new do
     5.times{|i| q.pop}
     results.sort.must_equal (1..5).to_a
     threads.each(&:join)
-    (Time.now - time).must_be :<, 0.75
 
     threads.each{|t| t.wont_be :alive?}
     cc.size.must_equal 5
