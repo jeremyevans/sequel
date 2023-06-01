@@ -1,0 +1,26 @@
+= New Features
+
+* An adapter has been added for the trilogy MySQL driver. One large
+  advantage over mysql2 is that trilogy does not require any MySQL
+  client libraries installed on the machine. The trilogy adapter
+  has basically the same issues/skipped specs as the mysql2 adapter,
+  but it also does not support an application_timezone different
+  than the database_timezone.
+
+* Model dataset modules now have a model accessor, allowing for
+  code such as:
+
+    class Foo < Sequel::Model
+      dataset_module do
+        where :kept, Sequel[model.table_name][:discarded_at] => nil
+      end
+    end
+
+= Improvements
+
+* The mysql adapter now works with ruby-mysql 4 (the pure-ruby
+  MySQL driver).  Note that multi-results support does not work
+  with ruby-mysql 4 (it doesn't work with mysql2, trilogy, or
+  other Sequel adapters in general).
+
+* Warnings for unsupported flags are now avoided on ruby-mysql 3.
