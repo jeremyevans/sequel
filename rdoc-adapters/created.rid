@@ -1,4 +1,4 @@
-Mon, 01 May 2023 07:40:27 -0700
+Thu, 01 Jun 2023 07:42:49 -0700
 lib/sequel/adapters/ado.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/ado/access.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/ado/mssql.rb	Mon, 28 Jan 2019 08:29:19 -0800
@@ -19,7 +19,7 @@ lib/sequel/adapters/jdbc/sqlite.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/adapters/jdbc/sqlserver.rb	Mon, 25 Feb 2019 08:20:33 -0800
 lib/sequel/adapters/jdbc/transactions.rb	Fri, 07 Dec 2018 10:50:17 -0800
 lib/sequel/adapters/mock.rb	Fri, 02 Sep 2022 09:11:30 -0700
-lib/sequel/adapters/mysql.rb	Fri, 02 Sep 2022 09:11:30 -0700
+lib/sequel/adapters/mysql.rb	Fri, 19 May 2023 09:45:26 -0700
 lib/sequel/adapters/mysql2.rb	Wed, 26 Jan 2022 09:30:48 -0800
 lib/sequel/adapters/odbc.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/odbc/db2.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -39,6 +39,7 @@ lib/sequel/adapters/shared/sqlite.rb	Fri, 10 Feb 2023 08:50:54 -0800
 lib/sequel/adapters/sqlanywhere.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/sqlite.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/adapters/tinytds.rb	Tue, 21 Sep 2021 14:24:30 -0700
+lib/sequel/adapters/trilogy.rb	Thu, 04 May 2023 13:25:27 -0700
 lib/sequel/adapters/utils/columns_limit_1.rb	Wed, 13 Oct 2021 12:18:25 -0700
 lib/sequel/adapters/utils/emulate_offset_with_reverse_and_count.rb	Fri, 03 Aug 2018 16:28:24 -0700
 lib/sequel/adapters/utils/emulate_offset_with_row_number.rb	Tue, 01 Aug 2017 08:12:00 -0700

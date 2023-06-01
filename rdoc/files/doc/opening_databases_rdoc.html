@@ -31,7 +31,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-10-21 08:19:04 -0700</span>
+<span class='datetime'>2023-05-03 13:14:12 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -296,7 +296,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>This is a newer MySQL adapter that does typecasting in C, so it is often faster than the mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized options supported by the mysql adapter are also supported for mysql2 adapter (and any other adapters connecting to mysql, such as the jdbc/mysql adapter).</p>
+<p>This is a MySQL adapter that does typecasting in C, so it is often faster than the mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized options supported by the mysql adapter are also supported for mysql2 adapter (and any other adapters connecting to mysql, such as the jdbc/mysql adapter).</p>
 
 <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -419,6 +419,10 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:textsize </td><td>
 <p>Override the default TEXTSIZE setting for this connection.  The FreeTDS default is small (around 64000 bytes), but can be set up to around 2GB. This should be specified as an integer.  If you plan on setting large text or blob values via tinytds, you should use this option or modify your freetds.conf file.</p>
 </td></tr></tbody></table>
+
+<h3 id="label-trilogy">trilogy<span><a href="#label-trilogy">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>This is a MySQL adapter that does typecasting in C, and does not require any mysql client libraries installed. The options given are passed to Trilogy.new, see the trilogy documentation for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized options supported by the mysql adapter are also supported for trilogy adapter.</p>
 </div>
 <div id='context'>
 </div>

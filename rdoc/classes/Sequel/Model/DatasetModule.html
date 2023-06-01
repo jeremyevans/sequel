@@ -50,12 +50,29 @@ Superclass:
 </ol>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#attribute-i-model">model</a></li>
 <li><a href="#method-i-subset">subset</a></li>
 </ol>
 </div>
 <div id='context'>
 </div>
 <div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-model'>model</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The model class related to this dataset module.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
 <div id='methods'>
 <h2>Public Class methods</h2>
 <div class='method public-class' id='method-method-c-new'>
@@ -74,9 +91,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/model/dataset_module.rb</span>
-<span class="line-num">12</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">model</span>)
-<span class="line-num">13</span>   <span class="ruby-ivar">@model</span> = <span class="ruby-identifier">model</span>
-<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">15</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">16</span>   <span class="ruby-ivar">@model</span> = <span class="ruby-identifier">model</span>
+<span class="line-num">17</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -96,9 +113,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-subset-source'>   <span class="ruby-comment"># File lib/sequel/model/dataset_module.rb</span>
-<span class="line-num">17</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">18</span>   <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">19</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">20</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">21</span>   <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">22</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

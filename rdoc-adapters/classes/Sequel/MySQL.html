@@ -64,6 +64,7 @@ Sequel::MySQL
 <li><a href="MySQL/DatasetMethods.html">Sequel::MySQL::DatasetMethods</a></li>
 <li><a href="MySQL/MysqlMysql2.html">Sequel::MySQL::MysqlMysql2</a></li>
 <li><a href="MySQL/PreparedStatements.html">Sequel::MySQL::PreparedStatements</a></li>
+<li><a href="MySQL/Adapter.html">Sequel::MySQL::Adapter</a></li>
 <li><a href="MySQL/Database.html">Sequel::MySQL::Database</a></li>
 <li><a href="MySQL/Dataset.html">Sequel::MySQL::Dataset</a></li>
 </ol>
@@ -81,6 +82,20 @@ Sequel::MySQL
 <td class='context-item-desc'>
 <p>Hash with integer keys and callable values for converting <a href="MySQL.html"><code>MySQL</code></a> types.</p>
 </td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>RUBY_MYSQL_3</td>
+<td>=</td>
+<td class='context-item-value'>!Mysql.respond_to?(:init)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>RUBY_MYSQL_4</td>
+<td>=</td>
+<td class='context-item-value'>RUBY_MYSQL_3 && ::Mysql::VERSION.to_i >= 4</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>TYPE_TRANSLATOR_BOOLEAN</td>
