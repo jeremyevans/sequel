@@ -48,7 +48,7 @@ describe "bin/sequel" do
       if File.file?(file)
         begin
           File.delete(file)
-        rescue Errno::ENOENT
+        rescue Errno::ENOENT, Errno::EACCES
           nil
         end
       end
