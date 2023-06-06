@@ -117,10 +117,12 @@ describe "Sequel::Plugins::XmlSerializer" do
   end
 
   it "should support a :camelize option when serializing and :underscore option when deserializing" do
+    skip "to_xml :camelize option requires String#camelize, which is not supported" unless "".respond_to?(:camelize)
     Album.from_xml(@album.to_xml(:camelize=>true), :underscore=>true).must_equal @album
   end
 
-  it "should support a :camelize option when serializing and :underscore option when deserializing" do
+  it "should support a :dasherize option when serializing and :underscore option when deserializing" do
+    skip "to_xml :dasherize option requires String#camelize, which is not supported" unless "".respond_to?(:dasherize)
     Album.from_xml(@album.to_xml(:dasherize=>true), :underscore=>true).must_equal @album
   end
 
