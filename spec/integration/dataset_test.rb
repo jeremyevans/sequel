@@ -1141,7 +1141,7 @@ describe Sequel::SQL::Constants do
     @db.drop_table?(:constants)
   end
   
-  cspecify "should have working CURRENT_DATE", [:jdbc, :sqlite], :oracle do
+  cspecify "should have working CURRENT_DATE", [:jdbc, :sqlite], [:odbc, :mssql], :oracle do
     @db.create_table!(:constants){Date :d}
     @ds.insert(:d=>Sequel::CURRENT_DATE)
     d = @c2[@ds.get(:d)]
