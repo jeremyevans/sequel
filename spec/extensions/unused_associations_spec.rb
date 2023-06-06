@@ -13,7 +13,7 @@ describe "unused_associations plugin" do
   end
 
   def check(code, env={})
-    ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_INSTALL_NAME'])
+    ruby = RbConfig.ruby
     runner = File.expand_path('../files/unused_associations/run_tua.rb', File.dirname(__FILE__))
     input_read, input_write = IO.pipe
     output_read, output_write = IO.pipe

@@ -6,7 +6,7 @@ if ENV['COVERAGE']
   SimpleCov.sequel_coverage(:subprocesses=>true)
 end
 
-RUBY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_INSTALL_NAME'])
+RUBY = RbConfig.ruby
 OUTPUT = "spec/bin-sequel-spec-output-#{$$}.log"
 TMP_FILE = "spec/bin-sequel-tmp-#{$$}.rb"
 BIN_SPEC_DB = "spec/bin-sequel-spec-db-#{$$}.sqlite3"
