@@ -274,6 +274,12 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     end
 
     @waiter.signal
+    
+    # Ensure that after signalling the condition, some other thread is given the
+    # opportunity to acquire the mutex.
+    # See <https://github.com/socketry/async/issues/99> for more context.
+    sleep(0)
+    
     nil
   end
 
