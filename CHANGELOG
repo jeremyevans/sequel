@@ -1,3 +1,7 @@
+=== master
+
+* Workaround possible resource starvation in threaded connection pool (ioquatix) (#2048)
+
 === 5.69.0 (2023-06-01)
 
 * Avoid unsupported flag warning when using the mysql adapter with ruby-mysql 3+ (jeremyevans)
