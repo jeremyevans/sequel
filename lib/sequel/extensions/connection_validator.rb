@@ -61,6 +61,10 @@ module Sequel
 
     # Initialize the data structures used by this extension.
     def self.extended(pool)
+      unless pool.pool_type == :threaded || pool.pool_type == :sharded_threaded
+        raise Error, "can only load connection_validator extension if using threaded or sharded_threaded connection pool"
+      end
+
       pool.instance_exec do
         sync do
           @connection_timestamps ||= {}
@@ -120,4 +124,3 @@ module Sequel
 
   Database.register_extension(:connection_validator){|db| db.pool.extend(ConnectionValidator)}
 end
-
