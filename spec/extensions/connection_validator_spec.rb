@@ -130,6 +130,12 @@ connection_validator_specs = Module.new do
   end
 end
 
+describe "Sequel::ConnectionValidator with single threaded pool" do
+  it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
+    db = Sequel.mock(:test=>false, :single_threaded=>true)
+    proc{db.extension(:connection_validator)}.must_raise Sequel::Error
+  end
+end
 describe "Sequel::ConnectionValidator with threaded pool" do
   def db
     Sequel.mock(:test=>false)
