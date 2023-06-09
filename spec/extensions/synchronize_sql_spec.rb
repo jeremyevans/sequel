@@ -11,7 +11,7 @@ describe "synchronize_sql extension" do
   before do
     @db = Sequel.mock
     @db.pool.extend(Module.new do
-      def assign_connection(*args)
+      def acquire(*args)
         r = super
         @times_connection_acquired ||= 0
         @times_connection_acquired += 1 if r
