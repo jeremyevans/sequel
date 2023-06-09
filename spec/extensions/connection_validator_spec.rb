@@ -63,14 +63,6 @@ connection_validator_specs = Module.new do
     @db.sqls.must_equal ['disconnect']
   end
 
-  it "should handle :connection_handling => :disconnect setting" do
-    @db = Sequel.mock(@db.opts.merge(:connection_handling => :disconnect))
-    @db.extend @m
-    @db.extension(:connection_validator)
-    @db.synchronize{}
-    @db.sqls.must_equal ['disconnect']
-  end
-
   it "should disconnect multiple connections repeatedly if they are not valid" do
     q, q1 = Queue.new, Queue.new
     c1 = nil
@@ -130,21 +122,51 @@ connection_validator_specs = Module.new do
   end
 end
 
+threaded_connection_validator_specs = Module.new do
+  extend Minitest::Spec::DSL
+
+  it "should handle :connection_handling => :disconnect setting" do
+    @db = Sequel.mock(@db.opts.merge(:connection_handling => :disconnect))
+    @db.extend @m
+    @db.extension(:connection_validator)
+    @db.synchronize{}
+    @db.sqls.must_equal ['disconnect']
+  end
+end
+
 describe "Sequel::ConnectionValidator with single threaded pool" do
   it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
     db = Sequel.mock(:test=>false, :single_threaded=>true)
     proc{db.extension(:connection_validator)}.must_raise Sequel::Error
   end
 end
+
+describe "Sequel::ConnectionValidator with sharded single threaded pool" do
+  it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
+    db = Sequel.mock(:test=>false, :single_threaded=>true, :servers=>{})
+    proc{db.extension(:connection_validator)}.must_raise Sequel::Error
+  end
+end
+
 describe "Sequel::ConnectionValidator with threaded pool" do
   def db
-    Sequel.mock(:test=>false)
+    Sequel.mock(:test=>false, :pool_class=>:threaded)
   end
   include connection_validator_specs
+  include threaded_connection_validator_specs
 end
+
 describe "Sequel::ConnectionValidator with sharded threaded pool" do
   def db
-    Sequel.mock(:test=>false, :servers=>{})
+    Sequel.mock(:test=>false, :servers=>{}, :pool_class=>:sharded_threaded)
   end
   include connection_validator_specs
+  include threaded_connection_validator_specs
 end
+
+describe "Sequel::ConnectionValidator with timed_queue pool" do
+  def db
+    Sequel.mock(:test=>false, :pool_class=>:timed_queue)
+  end
+  include connection_validator_specs
+end if RUBY_VERSION >= '3.2'

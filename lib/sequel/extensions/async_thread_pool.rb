@@ -338,8 +338,9 @@ module Sequel
     module DatabaseMethods
       def self.extended(db)
         db.instance_exec do
-          unless pool.pool_type == :threaded || pool.pool_type == :sharded_threaded
-            raise Error, "can only load async_thread_pool extension if using threaded or sharded_threaded connection pool"
+          case pool.pool_type
+          when :single, :sharded_single
+            raise Error, "cannot load async_thread_pool extension if using single or sharded_single connection pool"
           end
 
           num_async_threads = opts[:num_async_threads] ? typecast_value_integer(opts[:num_async_threads]) : (Integer(opts[:max_connections] || 4))

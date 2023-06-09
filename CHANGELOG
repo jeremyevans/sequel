@@ -1,5 +1,9 @@
 === master
 
+* Make connection_{validator,expiration} and async_thread_pool extensions work with timed_queue connection pool (jeremyevans)
+
+* Make connection_{validator,expiration} extensions raise error when used with single threaded pools (HoneyryderChuck, jeremyevans) (#2049)
+
 * Workaround possible resource starvation in threaded connection pool (ioquatix) (#2048)
 
 === 5.69.0 (2023-06-01)

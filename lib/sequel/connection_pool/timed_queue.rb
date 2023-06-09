@@ -245,7 +245,14 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   #
   # Calling code should not have the mutex when calling this.
   def release(thread)
-    @queue.push(sync{@allocated.delete(thread)})
+    checkin_connection(sync{@allocated.delete(thread)})
+    nil
+  end
+
+  # Adds a connection to the queue of available connections, returns the connection.
+  def checkin_connection(conn)
+    @queue.push(conn)
+    conn
   end
 
   # Yield to the block while inside the mutex.

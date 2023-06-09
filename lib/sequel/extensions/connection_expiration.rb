@@ -15,16 +15,16 @@
 #
 #   DB.pool.connection_expiration_timeout = 3600 # 1 hour
 #
-# Note that this extension only affects the default threaded
-# and the sharded threaded connection pool.  The single
-# threaded and sharded single threaded connection pools are
-# not affected.  As the only reason to use the single threaded
+# Note that this extension does not work with the single
+# threaded and sharded single threaded connection pools.
+# As the only reason to use the single threaded
 # pools is for speed, and this extension makes the connection
 # pool slower, there's not much point in modifying this
 # extension to work with the single threaded pools.  The
-# threaded pools work fine even in single threaded code, so if
-# you are currently using a single threaded pool and want to
-# use this extension, switch to using a threaded pool.
+# non-single threaded pools work fine even in single threaded
+# code, so if you are currently using a single threaded pool
+# and want to use this extension, switch to using another
+# pool.
 #
 # Related module: Sequel::ConnectionExpiration
 
@@ -45,6 +45,11 @@ module Sequel
 
     # Initialize the data structures used by this extension.
     def self.extended(pool)
+      case pool.pool_type
+      when :single, :sharded_single
+        raise Error, "cannot load connection_expiration extension if using single or sharded_single connection pool"
+      end
+
       pool.instance_exec do
         sync do
           @connection_expiration_timestamps ||= {}

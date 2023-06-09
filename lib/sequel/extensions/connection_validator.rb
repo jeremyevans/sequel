@@ -34,16 +34,16 @@
 # web requests to the number to connections in the database
 # connection pool.
 #
-# Note that this extension only affects the default threaded
-# and the sharded threaded connection pool.  The single
-# threaded and sharded single threaded connection pools are
-# not affected.  As the only reason to use the single threaded
+# Note that this extension does not work with the single
+# threaded and sharded single threaded connection pools.
+# As the only reason to use the single threaded
 # pools is for speed, and this extension makes the connection
 # pool slower, there's not much point in modifying this
 # extension to work with the single threaded pools.  The
-# threaded pools work fine even in single threaded code, so if
-# you are currently using a single threaded pool and want to
-# use this extension, switch to using a threaded pool.
+# non-single threaded pools work fine even in single threaded
+# code, so if you are currently using a single threaded pool
+# and want to use this extension, switch to using another
+# pool.
 #
 # Related module: Sequel::ConnectionValidator
 
@@ -61,8 +61,9 @@ module Sequel
 
     # Initialize the data structures used by this extension.
     def self.extended(pool)
-      unless pool.pool_type == :threaded || pool.pool_type == :sharded_threaded
-        raise Error, "can only load connection_validator extension if using threaded or sharded_threaded connection pool"
+      case pool.pool_type
+      when :single, :sharded_single
+        raise Error, "cannot load connection_validator extension if using single or sharded_single connection pool"
       end
 
       pool.instance_exec do
