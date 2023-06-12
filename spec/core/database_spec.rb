@@ -99,7 +99,7 @@ describe "A new Database" do
     db.pool.must_be_kind_of(Sequel::ConnectionPool)
     db = Sequel::Database.new(:single_threaded=>'0'){123}
     db.pool.must_be_kind_of(Sequel::ConnectionPool)
-  end
+  end unless ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
 
   it "should just use a :uri option for jdbc with the full connection string" do
     db = Sequel::Database.stub(:adapter_class, Class.new(Sequel::Database){def connect(*); Object.new end}) do
@@ -765,7 +765,7 @@ end
 
 describe "Database#synchronize" do
   before do
-    @db = Sequel::Database.new(:max_connections => 1)
+    @db = Sequel::Database.new(:max_connections => 1, :pool_class=>:threaded)
     @db.define_singleton_method(:connect){|c| 12345}
   end
   
@@ -1873,7 +1873,7 @@ describe "A single threaded database" do
     db = Sequel::Database.new{123}
     db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
   end
-end
+end unless ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
 
 describe "A single threaded database" do
   before do
@@ -2153,7 +2153,7 @@ end
 
 describe "Database#remove_servers" do
   before do
-    @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
+    @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}}, :pool_class=>:sharded_threaded)
   end
 
   it "should remove servers from the connection pool" do

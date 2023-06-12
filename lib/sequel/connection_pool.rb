@@ -32,6 +32,7 @@ class Sequel::ConnectionPool
     :sharded_threaded => :ShardedThreadedConnectionPool,
     :sharded_single => :ShardedSingleConnectionPool,
     :timed_queue => :TimedQueueConnectionPool,
+    :sharded_timed_queue => :ShardedTimedQueueConnectionPool,
   }
   POOL_CLASS_MAP.to_a.each{|k, v| POOL_CLASS_MAP[k.to_s] = v}
   POOL_CLASS_MAP.freeze
@@ -42,7 +43,8 @@ class Sequel::ConnectionPool
     # Return a pool subclass instance based on the given options.  If a <tt>:pool_class</tt>
     # option is provided is provided, use that pool class, otherwise
     # use a new instance of an appropriate pool subclass based on the
-    # <tt>:single_threaded</tt> and <tt>:servers</tt> options.
+    # +SEQUEL_DEFAULT_CONNECTION_POOL+ environment variable if set, or
+    # the <tt>:single_threaded</tt> and <tt>:servers</tt> options, otherwise.
     def get_pool(db, opts = OPTS)
       connection_pool_class(opts).new(db, opts)
     end
@@ -62,9 +64,13 @@ class Sequel::ConnectionPool
         end
 
         pc
+      elsif pc = ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
+        connection_pool_class(:pool_class=>ENV['SEQUEL_DEFAULT_CONNECTION_POOL'])
       else
         pc = if opts[:single_threaded]
           opts[:servers] ? :sharded_single : :single
+        #elsif RUBY_VERSION >= '3.2' # SEQUEL6 or maybe earlier
+        #  opts[:servers] ? :sharded_timed_queue : :timed_queue
         else
           opts[:servers] ? :sharded_threaded : :threaded
         end

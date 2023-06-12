@@ -2,7 +2,7 @@
 
 require_relative 'threaded'
 
-# The slowest and most advanced connection, dealing with both multi-threaded
+# The slowest and most advanced connection pool, dealing with both multi-threaded
 # access and configurations with multiple shards/servers.
 #
 # In addition, this pool subclass also handles scheduling in-use connections
@@ -112,7 +112,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # available, creates a new connection.  Passes the connection to the supplied
   # block:
   # 
-  #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
+  #   pool.hold(:server1) {|conn| conn.execute('DROP TABLE posts')}
   # 
   # Pool#hold is re-entrant, meaning it can be called recursively in
   # the same thread without blocking.
@@ -145,12 +145,13 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # except that after it is used, future requests for the server will use the
   # :default server instead.
   def remove_servers(servers)
-    conns = nil
+    conns = []
+    raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
+
     sync do
-      raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
       servers.each do |server|
         if @servers.include?(server)
-          conns = disconnect_server_connections(server)
+          conns.concat(disconnect_server_connections(server))
           @waiters.delete(server)
           @available_connections.delete(server)
           @allocated.delete(server)
@@ -159,9 +160,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       end
     end
 
-    if conns
-      disconnect_connections(conns)
-    end
+    nil
+  ensure
+    disconnect_connections(conns)
   end
 
   # Return an array of symbols for servers in the connection pool.
@@ -186,7 +187,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # is available. The calling code should NOT already have the mutex when
   # calling this.
   #
-  # This should return a connection is one is available within the timeout,
+  # This should return a connection if one is available within the timeout,
   # or nil if a connection could not be acquired within the timeout.
   def acquire(thread, server)
     if conn = assign_connection(thread, server)
@@ -325,7 +326,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # Create the maximum number of connections immediately.  The calling code should
   # NOT have the mutex before calling this.
   def preconnect(concurrent = false)
-    conn_servers = @servers.keys.map!{|s| Array.new(max_size - _size(s), s)}.flatten!
+    conn_servers = sync{@servers.keys}.map!{|s| Array.new(max_size - _size(s), s)}.flatten!
 
     if concurrent
       conn_servers.map!{|s| Thread.new{[s, make_new(s)]}}.map!(&:value)

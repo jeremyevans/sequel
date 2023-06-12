@@ -84,8 +84,9 @@ module Sequel
            (cet = sync{@connection_expiration_timestamps[conn]}) &&
            Sequel.elapsed_seconds_since(cet[0]) > cet[1]
 
-          if pool_type == :sharded_threaded
-            sync{allocated(a.last).delete(Sequel.current)}
+          case pool_type
+          when :sharded_threaded, :sharded_timed_queue
+            sync{@allocated[a.last].delete(Sequel.current)}
           else
             sync{@allocated.delete(Sequel.current)}
           end

@@ -1,8 +1,40 @@
 require_relative "spec_helper"
 require_relative '../../lib/sequel/connection_pool/sharded_threaded'
 
-connection_pool_defaults = {:pool_timeout=>5, :max_connections=>4}
-st_connection_pool_defaults = connection_pool_defaults.merge(:single_threaded=>true)
+connection_pool_defaults = {:pool_class=>:threaded, :pool_timeout=>5, :max_connections=>4}
+st_connection_pool_defaults = connection_pool_defaults.merge(:pool_class=>:single, :single_threaded=>true)
+
+if RUBY_VERSION >= '3.2'
+  require_relative '../../lib/sequel/connection_pool/timed_queue'
+  require_relative '../../lib/sequel/connection_pool/sharded_timed_queue'
+
+  # Patch timed queue connection pools to add allocated/available_connections
+  # methods.  The tests heavily rely on these methods, but I do not want to
+  # support them as public API.
+
+  timed_queue_connection_pool = Class.new(Sequel::TimedQueueConnectionPool) do
+    def allocated; @allocated; end
+    def available_connections
+      conns = []
+      while conn = @queue.pop(timeout: 0)
+        conns << conn
+      end
+      conns.each{|conn| @queue.push(conn)}
+    end
+  end
+
+  sharded_timed_queue_connection_pool = Class.new(Sequel::ShardedTimedQueueConnectionPool) do
+    def allocated(server=:default); @allocated[server]; end
+    def available_connections(server=:default)
+      return unless queue = @queues[server]
+      conns = []
+      while conn = queue.pop(timeout: 0)
+        conns << conn
+      end
+      conns.each{|conn| queue.push(conn)}
+    end
+  end
+end
 
 mock_db = lambda do |a=nil, opts={}, &b|
   db = Sequel.mock(opts)
@@ -40,6 +72,20 @@ describe "An empty ConnectionPool" do
   it "should raise Error for bad pool class" do
     proc{Sequel::ConnectionPool.get_pool(mock_db.call, :pool_class=>:foo)}.must_raise Sequel::Error
   end
+
+  it "should respect SEQUEL_DEFAULT_CONNECTION_POOL environment variable if set" do
+    begin
+      ENV['SEQUEL_DEFAULT_CONNECTION_POOL'] = 'single'
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call)
+      pool.must_be_instance_of Sequel::SingleConnectionPool
+
+      ENV['SEQUEL_DEFAULT_CONNECTION_POOL'] = 'sharded_threaded'
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call)
+      pool.must_be_instance_of Sequel::ShardedThreadedConnectionPool
+    ensure
+      ENV.delete('SEQUEL_DEFAULT_CONNECTION_POOL')
+    end
+  end unless ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
 end
 
 describe "ConnectionPool options" do
@@ -332,7 +378,7 @@ concurrent_connection_pool_specs = Module.new do
   end
   
   it "should not add a disconnected connection back to the pool if the disconnection_proc raises an error" do
-    pool = get_pool(:max_connections=>1, :pool_timeout=>0, :mock_db_call_args=>[proc{|c| raise Sequel::Error}])
+    pool = get_pool(:pool_class=>:threaded, :max_connections=>1, :pool_timeout=>0, :mock_db_call_args=>[proc{|c| raise Sequel::Error}])
     proc{pool.hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::Error)
     pool.available_connections.length.must_equal 0
   end
@@ -603,7 +649,7 @@ describe "Connection Pool" do
     Sequel::ConnectionPool.get_pool(opts[:db] || mock_db.call(*args, &@icpp), @cp_opts.merge(opts))
   end
 
-  describe "Threaded Unsharded" do
+  describe "Threaded" do
     before do
       @cp_opts = connection_pool_defaults.merge(:max_connections=>5)
       @pool = get_pool
@@ -619,9 +665,9 @@ describe "Connection Pool" do
     end
   end
 
-  describe "Threaded Sharded" do
+  describe "Sharded Threaded" do
     before do
-      @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :servers=>{})
+      @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :pool_class=>:sharded_threaded)
       @pool = get_pool
     end
 
@@ -629,47 +675,36 @@ describe "Connection Pool" do
     include threaded_connection_pool_specs
   end
 
-  describe "Timed Queue" do
-    def get_pool(opts={})
-      pool = super
-      def pool.allocated; @allocated; end
-      def pool.available_connections
-        conns = []
-        while conn = @queue.pop(timeout: 0)
-          conns << conn
-        end
-        conns.each{|conn| @queue.push(conn)}
+  {timed_queue_connection_pool=>"Timed Queue", sharded_timed_queue_connection_pool=>"Sharded Timed Queue"}.each do |pc, desc|
+    describe desc do
+      before do
+        @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :pool_class=>pc)
+        @pool = get_pool
       end
-      pool
-    end
+      
+      include concurrent_connection_pool_specs
 
-    before do
-      @cp_opts = connection_pool_defaults.merge(:max_connections=>5, :pool_class=>:timed_queue)
-      @pool = get_pool
-    end
-    
-    include concurrent_connection_pool_specs
+      it "should handle preconnect(true) where a connection cannot be made due to maximum pool size being reached" do
+        m = Mutex.new
+        called = false
+        @pool.define_singleton_method(:try_make_new){|*a| super(*a) if m.synchronize{c = called; called = true; c}}
 
-    it "should handle preconnect(true) where a connection cannot be made due to maximum pool size being reached" do
-      m = Mutex.new
-      called = false
-      @pool.define_singleton_method(:try_make_new){super() if m.synchronize{c = called; called = true; c}}
+        i = 0
+        @pool.send(:preconnect, true)
+        @pool.all_connections{|c1| i+=1}
+        i.must_equal(@pool.max_size - 1)
 
-      i = 0
-      @pool.send(:preconnect, true)
-      @pool.all_connections{|c1| i+=1}
-      i.must_equal(@pool.max_size - 1)
+        i = 0
+        @pool.send(:preconnect, true)
+        @pool.all_connections{|c1| i+=1}
+        i.must_equal @pool.max_size
+      end
 
-      i = 0
-      @pool.send(:preconnect, true)
-      @pool.all_connections{|c1| i+=1}
-      i.must_equal @pool.max_size
-    end
-
-    it "should work correctly if acquire raises an exception" do
-      @pool.hold{}
-      def @pool.acquire(_) raise Sequel::DatabaseDisconnectError; end
-      proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
+      it "should work correctly if acquire raises an exception" do
+        @pool.hold{}
+        def @pool.acquire(_,_=nil) raise Sequel::DatabaseDisconnectError; end
+        proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
+      end
     end
   end if RUBY_VERSION >= '3.2'
 end
@@ -678,7 +713,7 @@ describe "ConnectionPool#disconnect" do
   before do
     @count = 0
     cp = proc{@count += 1}
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{{:id => cp.call}}, connection_pool_defaults.merge(:max_connections=>5, :servers=>{}))
+    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{{:id => cp.call}}, connection_pool_defaults.merge(:max_connections=>5, :pool_class=>:sharded_threaded))
     threads = []
     q, q1 = Queue.new, Queue.new
     5.times {|i| threads << Thread.new {@pool.hold {|c| q1.push nil; q.pop}}}
@@ -718,278 +753,318 @@ describe "ConnectionPool#disconnect" do
   end
 end
 
-describe "A connection pool with multiple servers" do
-  before do
-    ic = @invoked_counts = Hash.new(0)
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, connection_pool_defaults.merge(:servers=>{:read_only=>{}}))
-  end
-  
-  it "should support preconnect method that immediately creates the maximum number of connections" do
-    @pool.send(:preconnect)
-    i = 0
-    @pool.all_connections{|c1| i+=1}
-    i.must_equal(@pool.max_size * 2)
-  end
-
-  it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
-    @pool.send(:preconnect, true)
-    i = 0
-    @pool.all_connections{|c1| i+=1}
-    i.must_equal(@pool.max_size * 2)
-  end
-
-  it "#all_connections should return connections for all servers" do
-    @pool.hold{}
-    @pool.all_connections{|c1| c1.must_equal "default1"}
-    a = []
-    @pool.hold(:read_only) do |c|
-      @pool.all_connections{|c1| a << c1}
+sharded_pool_classes = {:sharded_threaded=>"sharded threaded"}
+sharded_pool_classes[sharded_timed_queue_connection_pool] = "sharded timed queue" if RUBY_VERSION >= '3.2'
+sharded_pool_classes.each do |pool_class, desc|
+  describe "#{desc} connection pool" do
+    before do
+      ic = @invoked_counts = Hash.new(0)
+      @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, connection_pool_defaults.merge(:pool_class=>pool_class, :servers=>{:read_only=>{}}))
     end
-    a.sort_by{|c| c.to_s}.must_equal ["default1", "read_only1"]
-  end
-  
-  it "#servers should return symbols for all servers" do
-    @pool.servers.sort_by{|s| s.to_s}.must_equal [:default, :read_only]
-  end
-
-  it "should use the :default server by default" do
-    @pool.size.must_equal 0
-    @pool.hold do |c|
-      c.must_equal "default1"
-      Hash[@pool.allocated.to_a].must_equal(Thread.current=>"default1")
+    
+    it "should support preconnect method that immediately creates the maximum number of connections" do
+      @pool.send(:preconnect)
+      i = 0
+      @pool.all_connections{|c1| i+=1}
+      i.must_equal(@pool.max_size * 2)
     end
-    @pool.available_connections.must_equal ["default1"]
-    @pool.size.must_equal 1
-    @invoked_counts.must_equal(:default=>1)
-  end
-  
-  it "should use the :default server an invalid server is used" do
-    @pool.hold do |c1|
-      c1.must_equal "default1"
-      @pool.hold(:blah) do |c2|
-        c2.must_equal c1
-        @pool.hold(:blah2) do |c3|
-          c2.must_equal c3
-        end
+
+    it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
+      @pool.send(:preconnect, true)
+      i = 0
+      @pool.all_connections{|c1| i+=1}
+      i.must_equal(@pool.max_size * 2)
+    end
+
+    it "#all_connections should return connections for all servers" do
+      @pool.hold{}
+      @pool.all_connections{|c1| c1.must_equal "default1"}
+      a = []
+      @pool.hold(:read_only) do |c|
+        @pool.all_connections{|c1| a << c1}
       end
+      a.sort_by{|c| c.to_s}.must_equal ["default1", "read_only1"]
     end
-  end
-
-  it "should support a :servers_hash option used for converting the server argument" do
-    ic = @invoked_counts
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, connection_pool_defaults.merge(:servers_hash=>Hash.new(:read_only), :servers=>{:read_only=>{}}))
-    @pool.hold(:blah) do |c1|
-      c1.must_equal "read_only1"
-      @pool.hold(:blah) do |c2|
-        c2.must_equal c1
-        @pool.hold(:blah2) do |c3|
-          c2.must_equal c3
-        end
-      end
+    
+    it "#servers should return symbols for all servers" do
+      @pool.servers.sort_by{|s| s.to_s}.must_equal [:default, :read_only]
     end
 
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, connection_pool_defaults.merge(:servers_hash=>Hash.new{|h,k| raise Sequel::Error}, :servers=>{:read_only=>{}}))
-    proc{@pool.hold(:blah){|c1|}}.must_raise(Sequel::Error)
-  end
-
-  it "should use the requested server if server is given" do
-    @pool.size(:read_only).must_equal 0
-    @pool.hold(:read_only) do |c|
-      c.must_equal "read_only1"
-      Hash[@pool.allocated(:read_only).to_a].must_equal(Thread.current=>"read_only1")
-    end
-    @pool.available_connections(:read_only).must_equal ["read_only1"]
-    @pool.size(:read_only).must_equal 1
-    @invoked_counts.must_equal(:read_only=>1)
-  end
-  
-  it "#hold should only yield connections for the server requested" do
-    @pool.hold(:read_only) do |c|
-      c.must_equal "read_only1"
-      Hash[@pool.allocated(:read_only).to_a].must_equal(Thread.current=>"read_only1")
-      @pool.hold do |d|
-        d.must_equal "default1"
-        @pool.hold do |e|
-          e.must_equal d
-          @pool.hold(:read_only){|b| b.must_equal c}
-        end
+    it "should use the :default server by default" do
+      @pool.size.must_equal 0
+      @pool.hold do |c|
+        c.must_equal "default1"
         Hash[@pool.allocated.to_a].must_equal(Thread.current=>"default1")
       end
+      @pool.available_connections.must_equal ["default1"]
+      @pool.size.must_equal 1
+      @invoked_counts.must_equal(:default=>1)
     end
-    @invoked_counts.must_equal(:read_only=>1, :default=>1)
-  end
-  
-  it "#disconnect should disconnect from all servers" do
-    @pool.hold(:read_only){}
-    @pool.hold{}
-    conns = []
-    @pool.size.must_equal 1
-    @pool.size(:read_only).must_equal 1
-    @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
-    @pool.disconnect
-    conns.sort.must_equal %w'default1 read_only1'
-    @pool.size.must_equal 0
-    @pool.size(:read_only).must_equal 0
-    @pool.hold(:read_only){|c| c.must_equal 'read_only2'}
-    @pool.hold{|c| c.must_equal 'default2'}
-  end
-
-  it "#disconnect with :server should disconnect from specific servers" do
-    @pool.hold(:read_only){}
-    @pool.hold{}
-    conns = []
-    @pool.size.must_equal 1
-    @pool.size(:read_only).must_equal 1
-    @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
-    @pool.disconnect(:server=>:default)
-    conns.sort.must_equal %w'default1'
-    @pool.size.must_equal 0
-    @pool.size(:read_only).must_equal 1
-    @pool.hold(:read_only){|c| c.must_equal 'read_only1'}
-    @pool.hold{|c| c.must_equal 'default2'}
-  end
-  
-  it "#disconnect with invalid :server should raise error" do
-    proc{@pool.disconnect(:server=>:foo)}.must_raise Sequel::Error
-  end
-  
-  it "#add_servers should add new servers to the pool" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :servers=>{:server1=>{}})
     
-    pool.hold{}
-    pool.hold(:server2){}
-    pool.hold(:server3){}
-    pool.hold(:server1) do
-      pool.allocated.length.must_equal 0
-      pool.allocated(:server1).length.must_equal 1
-      pool.allocated(:server2).must_be_nil
-      pool.allocated(:server3).must_be_nil
-      pool.available_connections.length.must_equal 1
-      pool.available_connections(:server1).length.must_equal 0
-      pool.available_connections(:server2).must_be_nil
-      pool.available_connections(:server3).must_be_nil
+    it "should use the :default server an invalid server is used" do
+      @pool.hold do |c1|
+        c1.must_equal "default1"
+        @pool.hold(:blah) do |c2|
+          c2.must_equal c1
+          @pool.hold(:blah2) do |c3|
+            c2.must_equal c3
+          end
+        end
+      end
+    end
 
-      pool.add_servers([:server2, :server3])
+    it "should support a :servers_hash option used for converting the server argument" do
+      ic = @invoked_counts
+      @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, connection_pool_defaults.merge(:pool_class=>pool_class, :servers_hash=>Hash.new(:read_only), :servers=>{:read_only=>{}}))
+      @pool.hold(:blah) do |c1|
+        c1.must_equal "read_only1"
+        @pool.hold(:blah) do |c2|
+          c2.must_equal c1
+          @pool.hold(:blah2) do |c3|
+            c2.must_equal c3
+          end
+        end
+      end
+
+      @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, connection_pool_defaults.merge(:pool_class=>pool_class, :servers_hash=>Hash.new{|h,k| raise Sequel::Error}, :servers=>{:read_only=>{}}))
+      proc{@pool.hold(:blah){|c1|}}.must_raise(Sequel::Error)
+    end
+
+    it "should use the requested server if server is given" do
+      @pool.size(:read_only).must_equal 0
+      @pool.hold(:read_only) do |c|
+        c.must_equal "read_only1"
+        Hash[@pool.allocated(:read_only).to_a].must_equal(Thread.current=>"read_only1")
+      end
+      @pool.available_connections(:read_only).must_equal ["read_only1"]
+      @pool.size(:read_only).must_equal 1
+      @invoked_counts.must_equal(:read_only=>1)
+    end
+    
+    it "#hold should only yield connections for the server requested" do
+      @pool.hold(:read_only) do |c|
+        c.must_equal "read_only1"
+        Hash[@pool.allocated(:read_only).to_a].must_equal(Thread.current=>"read_only1")
+        @pool.hold do |d|
+          d.must_equal "default1"
+          @pool.hold do |e|
+            e.must_equal d
+            @pool.hold(:read_only){|b| b.must_equal c}
+          end
+          Hash[@pool.allocated.to_a].must_equal(Thread.current=>"default1")
+        end
+      end
+      @invoked_counts.must_equal(:read_only=>1, :default=>1)
+    end
+    
+    it "#disconnect should disconnect from all servers" do
+      @pool.hold(:read_only){}
+      @pool.hold{}
+      conns = []
+      @pool.size.must_equal 1
+      @pool.size(:read_only).must_equal 1
+      @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
+      @pool.disconnect
+      conns.sort.must_equal %w'default1 read_only1'
+      @pool.size.must_equal 0
+      @pool.size(:read_only).must_equal 0
+      @pool.hold(:read_only){|c| c.must_equal 'read_only2'}
+      @pool.hold{|c| c.must_equal 'default2'}
+    end
+
+    it "#disconnect with :server should disconnect from specific servers" do
+      @pool.hold(:read_only){}
+      @pool.hold{}
+      conns = []
+      @pool.size.must_equal 1
+      @pool.size(:read_only).must_equal 1
+      @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
+      @pool.disconnect(:server=>:default)
+      conns.sort.must_equal %w'default1'
+      @pool.size.must_equal 0
+      @pool.size(:read_only).must_equal 1
+      @pool.hold(:read_only){|c| c.must_equal 'read_only1'}
+      @pool.hold{|c| c.must_equal 'default2'}
+    end
+    
+    it "#disconnect with invalid :server should raise error" do
+      proc{@pool.disconnect(:server=>:foo)}.must_raise Sequel::Error
+    end
+    
+    it "#add_servers should add new servers to the pool" do
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      
+      pool.hold{}
       pool.hold(:server2){}
-      pool.hold(:server3) do 
+      pool.hold(:server3){}
+      pool.hold(:server1) do
         pool.allocated.length.must_equal 0
         pool.allocated(:server1).length.must_equal 1
-        pool.allocated(:server2).length.must_equal 0
-        pool.allocated(:server3).length.must_equal 1
+        pool.allocated(:server2).must_be_nil
+        pool.allocated(:server3).must_be_nil
         pool.available_connections.length.must_equal 1
         pool.available_connections(:server1).length.must_equal 0
-        pool.available_connections(:server2).length.must_equal 1
-        pool.available_connections(:server3).length.must_equal 0
+        pool.available_connections(:server2).must_be_nil
+        pool.available_connections(:server3).must_be_nil
+
+        pool.add_servers([:server2, :server3])
+        pool.hold(:server2){}
+        pool.hold(:server3) do 
+          pool.allocated.length.must_equal 0
+          pool.allocated(:server1).length.must_equal 1
+          pool.allocated(:server2).length.must_equal 0
+          pool.allocated(:server3).length.must_equal 1
+          pool.available_connections.length.must_equal 1
+          pool.available_connections(:server1).length.must_equal 0
+          pool.available_connections(:server2).length.must_equal 1
+          pool.available_connections(:server3).length.must_equal 0
+        end
       end
     end
-  end
 
-  it "#add_servers should ignore existing keys" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :servers=>{:server1=>{}})
-    
-    pool.allocated.length.must_equal 0
-    pool.allocated(:server1).length.must_equal 0
-    pool.available_connections.length.must_equal 0
-    pool.available_connections(:server1).length.must_equal 0
-    pool.hold do |c1| 
-      c1.must_equal :default
-      pool.allocated.length.must_equal 1
+    it "#add_servers should ignore existing keys" do
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      
+      pool.allocated.length.must_equal 0
       pool.allocated(:server1).length.must_equal 0
       pool.available_connections.length.must_equal 0
       pool.available_connections(:server1).length.must_equal 0
-      pool.hold(:server1) do |c2| 
-        c2.must_equal :server1
+      pool.hold do |c1| 
+        c1.must_equal :default
         pool.allocated.length.must_equal 1
-        pool.allocated(:server1).length.must_equal 1
+        pool.allocated(:server1).length.must_equal 0
         pool.available_connections.length.must_equal 0
         pool.available_connections(:server1).length.must_equal 0
+        pool.hold(:server1) do |c2| 
+          c2.must_equal :server1
+          pool.allocated.length.must_equal 1
+          pool.allocated(:server1).length.must_equal 1
+          pool.available_connections.length.must_equal 0
+          pool.available_connections(:server1).length.must_equal 0
+          pool.add_servers([:default, :server1])
+          pool.allocated.length.must_equal 1
+          pool.allocated(:server1).length.must_equal 1
+          pool.available_connections.length.must_equal 0
+          pool.available_connections(:server1).length.must_equal 0
+        end
+        pool.allocated.length.must_equal 1
+        pool.allocated(:server1).length.must_equal 0
+        pool.available_connections.length.must_equal 0
+        pool.available_connections(:server1).length.must_equal 1
         pool.add_servers([:default, :server1])
         pool.allocated.length.must_equal 1
-        pool.allocated(:server1).length.must_equal 1
+        pool.allocated(:server1).length.must_equal 0
         pool.available_connections.length.must_equal 0
-        pool.available_connections(:server1).length.must_equal 0
+        pool.available_connections(:server1).length.must_equal 1
       end
-      pool.allocated.length.must_equal 1
+      pool.allocated.length.must_equal 0
       pool.allocated(:server1).length.must_equal 0
-      pool.available_connections.length.must_equal 0
+      pool.available_connections.length.must_equal 1
       pool.available_connections(:server1).length.must_equal 1
       pool.add_servers([:default, :server1])
-      pool.allocated.length.must_equal 1
+      pool.allocated.length.must_equal 0
       pool.allocated(:server1).length.must_equal 0
-      pool.available_connections.length.must_equal 0
+      pool.available_connections.length.must_equal 1
       pool.available_connections(:server1).length.must_equal 1
     end
-    pool.allocated.length.must_equal 0
-    pool.allocated(:server1).length.must_equal 0
-    pool.available_connections.length.must_equal 1
-    pool.available_connections(:server1).length.must_equal 1
-    pool.add_servers([:default, :server1])
-    pool.allocated.length.must_equal 0
-    pool.allocated(:server1).length.must_equal 0
-    pool.available_connections.length.must_equal 1
-    pool.available_connections(:server1).length.must_equal 1
-  end
-  
-  it "#remove_servers should disconnect available connections immediately" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :max_connections=>5, :servers=>{:server1=>{}})
-    threads = []
-    q, q1 = Queue.new, Queue.new
-    5.times {|i| threads << Thread.new {pool.hold(:server1){|c| q1.push nil; q.pop}}}
-    5.times{q1.pop}
-    5.times{q.push nil}
-    threads.each {|t| t.join}
     
-    pool.size(:server1).must_equal 5
-    pool.remove_servers([:server1])
-    pool.size(:server1).must_equal 0
-  end
-  
-  it "#remove_servers should disconnect connections in use as soon as they are returned to the pool" do
-    dc = []
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :servers=>{:server1=>{}})
-    c1 = nil
-    pool.hold(:server1) do |c|
+    it "#remove_servers should disconnect available connections immediately" do
+      disconnects = []
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|s| disconnects << s}){|s| s}, :max_connections=>5, :pool_class=>pool_class, :servers=>{:server1=>{}, :server2=>{}})
+      threads = []
+      q, q1 = Queue.new, Queue.new
+      5.times {|i| threads << Thread.new {pool.hold(:server1){|c| q1.push nil; q.pop}}}
+      5.times{q1.pop}
+      5.times{q.push nil}
+      threads.each {|t| t.join}
+      5.times {|i| threads << Thread.new {pool.hold(:server2){|c| q1.push nil; q.pop}}}
+      5.times{q1.pop}
+      5.times{q.push nil}
+      threads.each {|t| t.join}
+      
+      pool.size(:server1).must_equal 5
+      pool.size(:server2).must_equal 5
+      disconnects.must_equal([])
+      pool.remove_servers([:server1, :server2])
+      disconnects.must_equal([:server1] * 5 + [:server2] * 5)
+      [0, nil].must_include pool.size(:server1)
+      [0, nil].must_include pool.size(:server2)
+    end
+
+    it "#remove_servers should disconnect connections in use as soon as they are returned to the pool" do
+      dc = []
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      c1 = nil
+      pool.hold(:server1) do |c|
+        pool.size(:server1).must_equal 1
+        dc.must_equal []
+        pool.remove_servers([:server1])
+        pool.size(:server1).must_equal 0
+        dc.must_equal []
+        c1 = c
+      end
+      pool.size(:server1).must_equal 0
+      dc.must_equal [c1]
+    end if pool_class == :sharded_threaded
+    
+    it "#remove_servers should disconnect connections in use as soon as they are returned to the pool" do
+      dc = []
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      pool.hold(:server1) do |c|
+        pool.size(:server1).must_equal 1
+        dc.must_equal []
+        proc{pool.remove_servers([:server1])}.must_raise Sequel::Error
+        pool.size(:server1).must_equal 1
+        dc.must_equal []
+      end
+      pool.size(:server1).must_equal 1
+      dc.must_equal []
+    end if pool_class == sharded_timed_queue_connection_pool
+    
+    it "#remove_servers should remove server related data structures immediately" do
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      pool.available_connections(:server1).must_equal []
+      pool.allocated(:server1).must_equal({})
+      pool.remove_servers([:server1])
+      pool.available_connections(:server1).must_be_nil
+      pool.allocated(:server1).must_be_nil
+    end
+    
+    it "#remove_servers should not allow the removal of the default server" do
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      pool.remove_servers([:server1])
+      proc{pool.remove_servers([:default])}.must_raise(Sequel::Error)
+    end
+    
+    it "#remove_servers should ignore servers that have already been removed" do
+      dc = []
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      c1 = nil
+      pool.hold(:server1) do |c|
+        pool.size(:server1).must_equal 1
+        dc.must_equal []
+        pool.remove_servers([:server1])
+        pool.remove_servers([:server1])
+        pool.size(:server1).must_equal 0
+        dc.must_equal []
+        c1 = c
+      end
+      pool.size(:server1).must_equal 0
+      dc.must_equal [c1]
+    end if pool_class == :sharded_threaded
+    
+    it "#remove_servers should ignore servers that have already been removed" do
+      dc = []
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      c1 = nil
+      pool.hold(:server1){|c| c1 = c}
       pool.size(:server1).must_equal 1
       dc.must_equal []
       pool.remove_servers([:server1])
-      pool.size(:server1).must_equal 0
-      dc.must_equal []
-      c1 = c
-    end
-    pool.size(:server1).must_equal 0
-    dc.must_equal [c1]
-  end
-  
-  it "#remove_servers should remove server related data structures immediately" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :servers=>{:server1=>{}})
-    pool.available_connections(:server1).must_equal []
-    pool.allocated(:server1).must_equal({})
-    pool.remove_servers([:server1])
-    pool.available_connections(:server1).must_be_nil
-    pool.allocated(:server1).must_be_nil
-  end
-  
-  it "#remove_servers should not allow the removal of the default server" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :servers=>{:server1=>{}})
-    pool.remove_servers([:server1])
-    proc{pool.remove_servers([:default])}.must_raise(Sequel::Error)
-  end
-  
-  it "#remove_servers should ignore servers that have already been removed" do
-    dc = []
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :servers=>{:server1=>{}})
-    c1 = nil
-    pool.hold(:server1) do |c|
-      pool.size(:server1).must_equal 1
-      dc.must_equal []
+      dc.must_equal [c1]
       pool.remove_servers([:server1])
-      pool.remove_servers([:server1])
-      pool.size(:server1).must_equal 0
-      dc.must_equal []
-      c1 = c
-    end
-    pool.size(:server1).must_equal 0
-    dc.must_equal [c1]
+      pool.size(:server1).must_be_nil
+    end if pool_class == sharded_timed_queue_connection_pool
   end
 end
 
@@ -1027,7 +1102,7 @@ describe "A single threaded pool with multiple servers" do
   before do
     @max_size=2
     msp = proc{@max_size += 1}
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| msp.call}){|c| c}, st_connection_pool_defaults.merge(:servers=>{:read_only=>{}}))
+    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| msp.call}){|c| c}, st_connection_pool_defaults.merge(:pool_class=>:sharded_single, :servers=>{:read_only=>{}}))
   end
   
   it "should support preconnect method that immediately creates the maximum number of connections" do
@@ -1173,6 +1248,26 @@ describe "A single threaded pool with multiple servers" do
   end
 end
 
+describe "Connection pool" do
+  db = mock_db.call
+
+  it "should default to :single for :single_threaded without :servers" do
+    Sequel::ConnectionPool.send(:get_pool, db, :single_threaded=>true).pool_type.must_equal :single
+  end
+
+  it "should default to :sharded_single for :single_threaded with :servers" do
+    Sequel::ConnectionPool.send(:get_pool, db, :single_threaded=>true, :servers=>{}).pool_type.must_equal :sharded_single
+  end
+
+  it "should default to :single without :single_threaded or :servers" do
+    Sequel::ConnectionPool.send(:get_pool, db, {}).pool_type.must_equal :threaded
+  end
+
+  it "should default to :single without :single_threaded with :servers" do
+    Sequel::ConnectionPool.send(:get_pool, db, :servers=>{}).pool_type.must_equal :sharded_threaded
+  end
+end unless ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
+
 all_pools = []
 [true, false].each do |k|
   [true, false].each do |v|
@@ -1180,10 +1275,21 @@ all_pools = []
   end
 end
 
-all_pools << {:pool_class=>:timed_queue} if RUBY_VERSION >= '3.2'
+all_pools = {
+  :single=>"single",
+  :sharded_single=>"sharded_single",
+  :threaded=>"threaded",
+  :sharded_threaded=>"sharded_threaded",
+}
 
-all_pools.each do |opts|
-  describe "Connection pool with #{opts.inspect}" do
+if RUBY_VERSION >= '3.2'
+  all_pools[timed_queue_connection_pool] = "timed_queue"
+  all_pools[sharded_timed_queue_connection_pool] = "sharded_timed_queue"
+end
+
+all_pools.each do |pc, desc|
+  opts = {:pool_class=>pc}
+  describe "#{desc} connection pool" do
     before(:all) do
       Sequel::ConnectionPool.send(:get_pool, mock_db.call, opts)
     end

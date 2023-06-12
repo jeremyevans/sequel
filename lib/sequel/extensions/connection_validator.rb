@@ -108,8 +108,9 @@ module Sequel
            Sequel.elapsed_seconds_since(timer) > @connection_validation_timeout &&
            !db.valid_connection?(conn)
 
-          if pool_type == :sharded_threaded
-            sync{allocated(a.last).delete(Sequel.current)}
+          case pool_type
+          when :sharded_threaded, :sharded_timed_queue
+            sync{@allocated[a.last].delete(Sequel.current)}
           else
             sync{@allocated.delete(Sequel.current)}
           end

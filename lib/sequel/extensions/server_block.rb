@@ -69,7 +69,8 @@ module Sequel
     # Also defines the with_server method on the receiver for easy use.
     def self.extended(db)
       pool = db.pool
-      if defined?(ShardedThreadedConnectionPool) && pool.is_a?(ShardedThreadedConnectionPool)
+      case pool.pool_type
+      when :sharded_threaded, :sharded_timed_queue
         pool.extend(ThreadedServerBlock)
         pool.instance_variable_set(:@default_servers, {})
       else

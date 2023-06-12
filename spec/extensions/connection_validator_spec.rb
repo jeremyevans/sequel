@@ -136,14 +136,14 @@ end
 
 describe "Sequel::ConnectionValidator with single threaded pool" do
   it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
-    db = Sequel.mock(:test=>false, :single_threaded=>true)
+    db = Sequel.mock(:test=>false, :pool_class=>:single)
     proc{db.extension(:connection_validator)}.must_raise Sequel::Error
   end
 end
 
 describe "Sequel::ConnectionValidator with sharded single threaded pool" do
   it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
-    db = Sequel.mock(:test=>false, :single_threaded=>true, :servers=>{})
+    db = Sequel.mock(:test=>false, :pool_class=>:sharded_single)
     proc{db.extension(:connection_validator)}.must_raise Sequel::Error
   end
 end
@@ -167,6 +167,13 @@ end
 describe "Sequel::ConnectionValidator with timed_queue pool" do
   def db
     Sequel.mock(:test=>false, :pool_class=>:timed_queue)
+  end
+  include connection_validator_specs
+end if RUBY_VERSION >= '3.2'
+
+describe "Sequel::ConnectionValidator with sharded_timed_queue pool" do
+  def db
+    Sequel.mock(:test=>false, :pool_class=>:sharded_timed_queue)
   end
   include connection_validator_specs
 end if RUBY_VERSION >= '3.2'

@@ -143,15 +143,15 @@ threaded_connection_expiration_specs = Module.new do
 end
 
 describe "Sequel::ConnectionExpiration with single threaded pool" do
-  it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
-    db = Sequel.mock(:test=>false, :single_threaded=>true)
+  it "should raise an error if trying to load the connection_expiration extension into a single connection pool" do
+    db = Sequel.mock(:test=>false, :pool_class=>:single)
     proc{db.extension(:connection_expiration)}.must_raise Sequel::Error
   end
 end
 
 describe "Sequel::ConnectionExpiration with sharded single threaded pool" do
-  it "should raise an error if trying to load the connection_validator extension into a single connection pool" do
-    db = Sequel.mock(:test=>false, :single_threaded=>true, :servers=>{})
+  it "should raise an error if trying to load the connection_expiration extension into a single connection pool" do
+    db = Sequel.mock(:test=>false, :pool_class=>:sharded_single)
     proc{db.extension(:connection_expiration)}.must_raise Sequel::Error
   end
 end
@@ -172,9 +172,16 @@ describe "Sequel::ConnectionExpiration with sharded threaded pool" do
   include threaded_connection_expiration_specs
 end
 
-describe "Sequel::ConnectionValidator with timed_queue pool" do
+describe "Sequel::ConnectionExpiration with timed_queue pool" do
   def db
     Sequel.mock(:test=>false, :pool_class=>:timed_queue)
+  end
+  include connection_expiration_specs
+end if RUBY_VERSION >= '3.2'
+
+describe "Sequel::ConnectionExpiration with sharded_timed_queue pool" do
+  def db
+    Sequel.mock(:test=>false, :pool_class=>:sharded_timed_queue)
   end
   include connection_expiration_specs
 end if RUBY_VERSION >= '3.2'

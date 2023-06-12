@@ -81,7 +81,7 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   # connection can be acquired, a Sequel::PoolTimeout is raised.
   def hold(server=nil)
     t = Sequel.current
-    if conn = sync{@allocated[t]}
+    if conn = owned_connection(t)
       return yield(conn)
     end
 
@@ -223,8 +223,14 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
     end
   end
 
+  # Returns the connection owned by the supplied thread,
+  # if any. The calling code should NOT already have the mutex before calling this.
+  def owned_connection(thread)
+    sync{@allocated[thread]}
+  end
+  
   # Create the maximum number of connections immediately. This should not be called
-  # with a true argument unles no code is currently operating on the database.
+  # with a true argument unless no code is currently operating on the database.
   #
   # Calling code should not have the mutex when calling this.
   def preconnect(concurrent = false)

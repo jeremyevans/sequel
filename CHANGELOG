@@ -1,5 +1,11 @@
 === master
 
+* Fix ShardedThreadedConnectionPool#remove_server to disconnect all connections if removing multiple servers (jeremyevans)
+
+* Support SEQUEL_DEFAULT_CONNECTION_POOL environment variable for choosing connection pool when :pool_class Database option is not set (jeremyevans)
+
+* Add sharded_timed_queue connection pool (jeremyevans)
+
 * Make connection_{validator,expiration} and async_thread_pool extensions work with timed_queue connection pool (jeremyevans)
 
 * Make connection_{validator,expiration} extensions raise error when used with single threaded pools (HoneyryderChuck, jeremyevans) (#2049)

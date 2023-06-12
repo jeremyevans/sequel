@@ -264,7 +264,7 @@ end
 
 describe "async_thread_pool extension" do
   it "should raise an error if trying to load the async_thread_pool extension into a single connection pool" do
-    db = Sequel.mock(:keep_reference=>false, :single_threaded=>true)
+    db = Sequel.mock(:keep_reference=>false, :pool_class=>:single)
     proc{db.extension(:async_thread_pool)}.must_raise Sequel::Error
   end
 
