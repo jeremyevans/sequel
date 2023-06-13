@@ -65,7 +65,8 @@ class Sequel::ConnectionPool
 
         pc
       elsif pc = ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
-        connection_pool_class(:pool_class=>ENV['SEQUEL_DEFAULT_CONNECTION_POOL'])
+        pc = "sharded_#{pc}" if opts[:servers] && !pc.start_with?('sharded_')
+        connection_pool_class(:pool_class=>pc)
       else
         pc = if opts[:single_threaded]
           opts[:servers] ? :sharded_single : :single

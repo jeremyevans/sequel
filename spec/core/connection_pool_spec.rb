@@ -82,6 +82,10 @@ describe "An empty ConnectionPool" do
       ENV['SEQUEL_DEFAULT_CONNECTION_POOL'] = 'sharded_threaded'
       pool = Sequel::ConnectionPool.get_pool(mock_db.call)
       pool.must_be_instance_of Sequel::ShardedThreadedConnectionPool
+
+      ENV['SEQUEL_DEFAULT_CONNECTION_POOL'] = 'single'
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call, :servers=>{})
+      pool.must_be_instance_of Sequel::ShardedSingleConnectionPool
     ensure
       ENV.delete('SEQUEL_DEFAULT_CONNECTION_POOL')
     end
