@@ -64,6 +64,9 @@ module Sequel
       def self.configure(model, opts=OPTS)
         model.instance_exec do
           @static_cache_frozen = opts.fetch(:frozen, true)
+          if @static_cache_frozen && defined?(::Sequel::Plugins::ForbidLazyLoad::ClassMethods) && is_a?(::Sequel::Plugins::ForbidLazyLoad::ClassMethods)
+            extend ForbidLazyLoadClassMethods
+          end
           load_cache
         end
       end
@@ -90,7 +93,7 @@ module Sequel
           if defined?(yield) || args.length > 1 || (args.length == 1 && !args[0].is_a?(Integer))
             super
           else
-            @all.first(*args)
+            _static_cached_first(*args)
           end
         end
 
@@ -222,6 +225,11 @@ module Sequel
 
         private
 
+        # Use static cache to return first arguments.
+        def _static_cached_first(*args)
+          @all.first(*args)
+        end
+
         # Load the static cache rows from the database.
         def load_static_cache_rows
           ret = super if defined?(super)
@@ -242,6 +250,41 @@ module Sequel
             o
           elsif o
             call(Hash[o.values])
+          end
+        end
+      end
+
+      module ForbidLazyLoadClassMethods
+        # Do not forbid lazy loading for single object retrieval.
+        def cache_get_pk(pk)
+          primary_key_lookup(pk)
+        end
+
+        private
+
+        # Use static cache to return first arguments.
+        def _static_cached_first(*args)
+          if args.empty?
+            if o = @all.first(*args)
+              _static_cache_frozen_copy(o)
+            end
+          else
+            @all.first(*args).map!{|o| _static_cache_frozen_copy(o)}
+          end
+        end
+
+        # Return a frozen copy of the object that does not have lazy loading
+        # forbidden.
+        def _static_cache_frozen_copy(o)
+          o = call(Hash[o.values])
+          o.errors.freeze
+          o.freeze
+        end
+
+        # Do not forbid lazy loading for single object retrieval.
+        def primary_key_lookup(pk)
+          if o = cache[pk]
+            _static_cache_frozen_copy(o)
           end
         end
       end

@@ -1,5 +1,7 @@
 === master
 
+* Make static_cache plugin better handle cases where forbid_lazy_load plugin is already loaded (jeremyevans)
+
 * Fix ShardedThreadedConnectionPool#remove_server to disconnect all connections if removing multiple servers (jeremyevans)
 
 * Support SEQUEL_DEFAULT_CONNECTION_POOL environment variable for choosing connection pool when :pool_class Database option is not set (jeremyevans)

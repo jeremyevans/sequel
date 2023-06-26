@@ -294,15 +294,8 @@ describe "Sequel::Plugins::StaticCache" do
     end
   end
 
-  describe "without options" do
-    before do
-      @c.plugin :static_cache
-      @c1 = @c.cache[1]
-      @c2 = @c.cache[2]
-      @db.sqls
-    end
-
-    include static_cache_specs
+  unfrozen_static_cache_specs = Module.new do
+    extend Minitest::Spec::DSL
 
     it "should work correctly with composite keys" do
       @db.fetch = [{:id=>1, :id2=>1}, {:id=>2, :id2=>1}]
@@ -320,16 +313,6 @@ describe "Sequel::Plugins::StaticCache" do
 
     it "all of the static cache values (model instances) should be frozen" do
       @c.all.all?{|o| o.frozen?}.must_equal true
-    end
-
-    it "should make .[] method with primary key return cached instances" do
-      @c[1].must_be_same_as(@c1)
-      @c[2].must_be_same_as(@c2)
-    end
-
-    it "should have cache_get_pk return cached instances" do
-      @c.cache_get_pk(1).must_be_same_as(@c1)
-      @c.cache_get_pk(2).must_be_same_as(@c2)
     end
 
     it "should have each yield cached objects" do
@@ -390,6 +373,91 @@ describe "Sequel::Plugins::StaticCache" do
     it "should not allow the destroying of existing objects" do
       @db.fetch = {:id=>1}
       proc{@c.first(:id=>1).destroy}.must_raise(Sequel::HookFailed)
+    end
+  end
+
+  describe "without options" do
+    before do
+      @c.plugin :static_cache
+      @c1 = @c.cache[1]
+      @c2 = @c.cache[2]
+      @db.sqls
+    end
+
+    include static_cache_specs
+    include unfrozen_static_cache_specs
+
+    it "should make .[] method with primary key return cached instances" do
+      @c[1].must_be_same_as(@c1)
+      @c[2].must_be_same_as(@c2)
+    end
+
+    it "should have cache_get_pk return cached instances" do
+      @c.cache_get_pk(1).must_be_same_as(@c1)
+      @c.cache_get_pk(2).must_be_same_as(@c2)
+    end
+  end
+
+  describe "with forbid_lazy_load plugin" do
+    before do
+      @c.plugin :forbid_lazy_load
+      @c.plugin :static_cache
+      @c.many_to_one :c, :class=>Class.new(Sequel::Model(@db[:t])), :key=>:id
+      @c1 = @c.cache[1]
+      @c2 = @c.cache[2]
+      @db.sqls
+    end
+
+    include static_cache_specs
+    include unfrozen_static_cache_specs
+
+    it "should return nil for unmatched pk" do
+      @c[3].must_be_nil
+    end
+
+    it "should make .[] method with primary key return frozen copies of cached instances" do
+      @c[1].wont_be_same_as(@c1)
+      @c[2].wont_be_same_as(@c2)
+      @c[1].must_be :frozen?
+      @c[2].must_be :frozen?
+    end
+
+    it "should make allow lazy loading of associations after []" do
+      @c[1].c.values.must_equal(:id=>1)
+    end
+
+    it "should have cache_get_pk return frozen copies of cached instances" do
+      @c.cache_get_pk(1).wont_be_same_as(@c1)
+      @c.cache_get_pk(2).wont_be_same_as(@c2)
+      @c.cache_get_pk(1).must_be :frozen?
+      @c.cache_get_pk(2).must_be :frozen?
+    end
+
+    it "should make allow lazy loading of associations after cache_get_pk" do
+      @c.cache_get_pk(1).c.values.must_equal(:id=>1)
+    end
+
+    it "should return nil for empty cache" do
+      @c.instance_variable_set(:@all, [])
+      @c.first.must_be_nil
+    end
+
+    it "should have first without arguments return frozen copies of cached instances" do
+      @c.first.wont_be_same_as(@c1)
+      @c.first.must_be :frozen?
+    end
+
+    it "should make allow lazy loading of associations after first without arguments" do
+      @c.first.c.values.must_equal(:id=>1)
+    end
+
+    it "should have first with single Integer argument return frozen copies of cached instances" do
+      @c.first(1)[0].wont_be_same_as(@c1)
+      @c.first(1)[0].must_be :frozen?
+    end
+
+    it "should make allow lazy loading of associations after first with single Integer argument" do
+      @c.first(1)[0].c.values.must_equal(:id=>1)
     end
   end
 
