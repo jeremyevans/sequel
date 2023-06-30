@@ -780,6 +780,14 @@ sharded_pool_classes.each do |pool_class, desc|
       i.must_equal(@pool.max_size * 2)
     end
 
+    it "should handle case where the maximum connections have already been created during preconnect" do
+      @pool.define_singleton_method(:can_make_new?){|server, current_size| super(server, current_size) if current_size == 0}
+      @pool.send(:preconnect)
+      i = 0
+      @pool.all_connections{|c1| i+=1}
+      i.must_equal 2
+    end if pool_class == sharded_timed_queue_connection_pool
+    
     it "#all_connections should return connections for all servers" do
       @pool.hold{}
       @pool.all_connections{|c1| c1.must_equal "default1"}
