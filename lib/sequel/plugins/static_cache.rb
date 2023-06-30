@@ -93,7 +93,7 @@ module Sequel
           if defined?(yield) || args.length > 1 || (args.length == 1 && !args[0].is_a?(Integer))
             super
           else
-            _static_cached_first(*args)
+            @all.first(*args)
           end
         end
 
@@ -225,11 +225,6 @@ module Sequel
 
         private
 
-        # Use static cache to return first arguments.
-        def _static_cached_first(*args)
-          @all.first(*args)
-        end
-
         # Load the static cache rows from the database.
         def load_static_cache_rows
           ret = super if defined?(super)
@@ -260,18 +255,18 @@ module Sequel
           primary_key_lookup(pk)
         end
 
-        private
-
         # Use static cache to return first arguments.
-        def _static_cached_first(*args)
-          if args.empty?
-            if o = @all.first(*args)
+        def first(*args)
+          if !defined?(yield) && args.empty?
+            if o = @all.first
               _static_cache_frozen_copy(o)
             end
           else
-            @all.first(*args).map!{|o| _static_cache_frozen_copy(o)}
+            super
           end
         end
+
+        private
 
         # Return a frozen copy of the object that does not have lazy loading
         # forbidden.

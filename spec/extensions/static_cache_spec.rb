@@ -422,7 +422,7 @@ describe "Sequel::Plugins::StaticCache" do
       @c[2].must_be :frozen?
     end
 
-    it "should make allow lazy loading of associations after []" do
+    it "should allow lazy loading of associations after []" do
       @c[1].c.values.must_equal(:id=>1)
     end
 
@@ -433,7 +433,7 @@ describe "Sequel::Plugins::StaticCache" do
       @c.cache_get_pk(2).must_be :frozen?
     end
 
-    it "should make allow lazy loading of associations after cache_get_pk" do
+    it "should allow lazy loading of associations after cache_get_pk" do
       @c.cache_get_pk(1).c.values.must_equal(:id=>1)
     end
 
@@ -447,17 +447,16 @@ describe "Sequel::Plugins::StaticCache" do
       @c.first.must_be :frozen?
     end
 
-    it "should make allow lazy loading of associations after first without arguments" do
+    it "should allow lazy loading of associations after first without arguments" do
       @c.first.c.values.must_equal(:id=>1)
     end
 
-    it "should have first with single Integer argument return frozen copies of cached instances" do
-      @c.first(1)[0].wont_be_same_as(@c1)
-      @c.first(1)[0].must_be :frozen?
+    it "should have first with single Integer argument return cached instances" do
+      @c.first(1)[0].must_be_same_as(@c1)
     end
 
-    it "should make allow lazy loading of associations after first with single Integer argument" do
-      @c.first(1)[0].c.values.must_equal(:id=>1)
+    it "should not allow lazy loading of associations after first with single Integer argument" do
+      proc{@c.first(1)[0].c}.must_raise Sequel::Plugins::ForbidLazyLoad::Error
     end
   end
 
