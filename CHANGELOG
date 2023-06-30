@@ -1,4 +1,4 @@
-=== master
+=== 5.70.0 (2023-07-01)
 
 * Make static_cache plugin better handle cases where forbid_lazy_load plugin is already loaded (jeremyevans)
 

@@ -1,0 +1,35 @@
+= New Features
+
+* A sharded_timed_queue connection pool has been added. This offers
+  most of the same features as the sharded_threaded connection pool,
+  but uses the new Queue#pop :timeout features added in Ruby 3.2 to
+  allow for a simpler and possibly faster and more robust
+  implementation.
+
+* If a :pool_class option is not specified when creating a Database,
+  Sequel will now look at the SEQUEL_DEFAULT_CONNECTION_POOL
+  environment variable to determine the connection pool class to use.
+  This allows you to set SEQUEL_DEFAULT_CONNECTION_POOL=timed_queue
+  on Ruby 3.2 to test with the timed_queue connection pool without
+  making any code changes.  If the :servers Database option is given,
+  Sequel will automatically use the sharded version of the connection
+  pool specified by SEQUEL_DEFAULT_CONNECTION_POOL.
+
+= Other Improvements
+
+* The connection_validator, connection_expiration, and
+  async_thread_pool extensions now work with the timed_queue and
+  sharded_timed_queue connection pools.
+
+* The sharded_threaded connection pool now disconnects connections
+  for all specified servers instead of just the last specified server
+  when using remove_server.
+
+* The static_cache plugin now recognizes when the forbid_lazy_load
+  plugin is already loaded, and does not return instances that
+  forbid lazy load for methods that return a single object, such as
+  Database.{[],cache_get_pk,first}.
+
+* Sequel now displays an informative error message if attempting to
+  load the connection_validator or connection_expiration extensions
+  when using the single threaded connection pool.
