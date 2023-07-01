@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::StaticCache::ForbidLazyLoadClassMethods</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::StaticCache::ForbidLazyLoadClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/static_cache_rb.html">lib/sequel/plugins/static_cache.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-cache_get_pk">cache_get_pk</a></li>
+<li><a href="#method-i-first">first</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-cache_get_pk'>
+<a name='method-i-cache_get_pk'></a>
+<div class='synopsis'>
+<span class='name'>cache_get_pk</span><span class='arguments'>(pk)</span>
+
+</div>
+<div class='description'>
+
+<p>Do not forbid lazy loading for single object retrieval.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_get_pk-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-cache_get_pk-source'>    <span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb</span>
+<span class="line-num">254</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">255</span>   <span class="ruby-identifier">primary_key_lookup</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">256</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-first'>
+<a name='method-i-first'></a>
+<div class='synopsis'>
+<span class='name'>first</span><span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Use static cache to return first arguments.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-first-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-first-source'>    <span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb</span>
+<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">260</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">261</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">o</span> = <span class="ruby-ivar">@all</span>.<span class="ruby-identifier">first</span>
+<span class="line-num">262</span>       <span class="ruby-identifier">_static_cache_frozen_copy</span>(<span class="ruby-identifier">o</span>)
+<span class="line-num">263</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">264</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">265</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">266</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">267</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -71,16 +71,16 @@ Sequel::Database::AsyncThreadPool::DatasetMethods
 [show source]
 </a>
 <pre id='method-c-define_async_args_or_block_method-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">402</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_args_or_block_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)
-<span class="line-num">403</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
-<span class="line-num">404</span>     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]
-<span class="line-num">405</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>
-<span class="line-num">406</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">407</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">408</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">409</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">410</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">411</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">403</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_args_or_block_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)
+<span class="line-num">404</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
+<span class="line-num">405</span>     <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]
+<span class="line-num">406</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>
+<span class="line-num">407</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">408</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">409</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">410</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">411</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">412</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-define_async_block_method'>
@@ -99,16 +99,16 @@ Sequel::Database::AsyncThreadPool::DatasetMethods
 [show source]
 </a>
 <pre id='method-c-define_async_block_method-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">389</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_block_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)
-<span class="line-num">390</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
-<span class="line-num">391</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]
-<span class="line-num">392</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>
-<span class="line-num">393</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">394</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">395</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">396</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">397</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">398</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">390</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_block_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)
+<span class="line-num">391</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
+<span class="line-num">392</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]
+<span class="line-num">393</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>
+<span class="line-num">394</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">395</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">396</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">397</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">398</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">399</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-define_async_method'>
@@ -127,16 +127,16 @@ Sequel::Database::AsyncThreadPool::DatasetMethods
 [show source]
 </a>
 <pre id='method-c-define_async_method-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">376</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)
-<span class="line-num">377</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
-<span class="line-num">378</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]
-<span class="line-num">379</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>
-<span class="line-num">380</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">381</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">382</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">383</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">384</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">385</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">377</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">define_async_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">method</span>)
+<span class="line-num">378</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">method</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
+<span class="line-num">379</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:async</span>]
+<span class="line-num">380</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">sync</span>
+<span class="line-num">381</span>       <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:async_run</span>){<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">382</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">383</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">384</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">385</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">386</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -156,11 +156,11 @@ Sequel::Database::AsyncThreadPool::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-async-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">421</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">async</span>
-<span class="line-num">422</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_async</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">423</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:async</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">424</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">425</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">422</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">async</span>
+<span class="line-num">423</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_async</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">424</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:async</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">425</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">426</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sync'>
@@ -179,11 +179,11 @@ Sequel::Database::AsyncThreadPool::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-sync-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">429</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sync</span>
-<span class="line-num">430</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_sync</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">431</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:async</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
-<span class="line-num">432</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">433</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">430</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sync</span>
+<span class="line-num">431</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_sync</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">432</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:async</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="line-num">433</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">434</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

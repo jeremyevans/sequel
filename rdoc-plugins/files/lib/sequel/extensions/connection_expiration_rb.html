@@ -31,7 +31,7 @@ lib/sequel/extensions/connection_expiration.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-04-17 11:52:37 -0700</span>
+<span class='datetime'>2023-06-12 13:05:49 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -47,7 +47,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_expiration_timeout</span> = <span class="ruby-value">3600</span> <span class="ruby-comment"># 1 hour</span>
 </pre>
 
-<p>Note that this extension only affects the default threaded and the sharded threaded connection pool.  The single threaded and sharded single threaded connection pools are not affected.  As the only reason to use the single threaded pools is for speed, and this extension makes the connection pool slower, there’s not much point in modifying this extension to work with the single threaded pools.  The threaded pools work fine even in single threaded code, so if you are currently using a single threaded pool and want to use this extension, switch to using a threaded pool.</p>
+<p>Note that this extension does not work with the single threaded and sharded single threaded connection pools. As the only reason to use the single threaded pools is for speed, and this extension makes the connection pool slower, there’s not much point in modifying this extension to work with the single threaded pools.  The non-single threaded pools work fine even in single threaded code, so if you are currently using a single threaded pool and want to use this extension, switch to using another pool.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/ConnectionExpiration.html"><code>Sequel::ConnectionExpiration</code></a></p>
 </div>

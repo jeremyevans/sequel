@@ -97,6 +97,7 @@ Sequel::Plugins::StaticCache
 <h2>Classes and Modules</h2>
 <ol>
 <li><a href="StaticCache/ClassMethods.html">Sequel::Plugins::StaticCache::ClassMethods</a></li>
+<li><a href="StaticCache/ForbidLazyLoadClassMethods.html">Sequel::Plugins::StaticCache::ForbidLazyLoadClassMethods</a></li>
 <li><a href="StaticCache/InstanceMethods.html">Sequel::Plugins::StaticCache::InstanceMethods</a></li>
 </ol>
 </div>
@@ -125,9 +126,12 @@ Sequel::Plugins::StaticCache
 <span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
 <span class="line-num">65</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
 <span class="line-num">66</span>     <span class="ruby-ivar">@static_cache_frozen</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:frozen</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">67</span>     <span class="ruby-identifier">load_cache</span>
-<span class="line-num">68</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">67</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@static_cache_frozen</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">ForbidLazyLoad</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">ForbidLazyLoad</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)
+<span class="line-num">68</span>       <span class="ruby-identifier">extend</span> <span class="ruby-constant">ForbidLazyLoadClassMethods</span>
+<span class="line-num">69</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">70</span>     <span class="ruby-identifier">load_cache</span>
+<span class="line-num">71</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

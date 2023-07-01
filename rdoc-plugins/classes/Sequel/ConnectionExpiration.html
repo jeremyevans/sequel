@@ -101,14 +101,19 @@ Sequel::ConnectionExpiration
 </a>
 <pre id='method-c-extended-source'>   <span class="ruby-comment"># File lib/sequel/extensions/connection_expiration.rb</span>
 <span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">pool</span>)
-<span class="line-num">48</span>   <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">49</span>     <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
-<span class="line-num">50</span>       <span class="ruby-ivar">@connection_expiration_timestamps</span> <span class="ruby-operator">||=</span> {}
-<span class="line-num">51</span>       <span class="ruby-ivar">@connection_expiration_timeout</span> <span class="ruby-operator">||=</span> <span class="ruby-value">14400</span>
-<span class="line-num">52</span>       <span class="ruby-ivar">@connection_expiration_random_delay</span> <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
-<span class="line-num">53</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">54</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">48</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span>
+<span class="line-num">49</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:single</span>, <span class="ruby-value">:sharded_single</span>
+<span class="line-num">50</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot load connection_expiration extension if using single or sharded_single connection pool&quot;</span>
+<span class="line-num">51</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">52</span> 
+<span class="line-num">53</span>   <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">54</span>     <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
+<span class="line-num">55</span>       <span class="ruby-ivar">@connection_expiration_timestamps</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">56</span>       <span class="ruby-ivar">@connection_expiration_timeout</span> <span class="ruby-operator">||=</span> <span class="ruby-value">14400</span>
+<span class="line-num">57</span>       <span class="ruby-ivar">@connection_expiration_random_delay</span> <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+<span class="line-num">58</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">59</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

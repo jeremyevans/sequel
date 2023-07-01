@@ -1,11 +1,11 @@
-Thu, 01 Jun 2023 07:41:50 -0700
+Sat, 01 Jul 2023 12:52:54 -0700
 README.rdoc	Wed, 03 May 2023 13:14:12 -0700
-CHANGELOG	Thu, 01 Jun 2023 07:29:33 -0700
+CHANGELOG	Fri, 30 Jun 2023 11:23:18 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Fri, 02 Sep 2022 09:11:30 -0700
-lib/sequel/connection_pool.rb	Thu, 03 Nov 2022 12:28:15 -0700
+lib/sequel/connection_pool.rb	Tue, 13 Jun 2023 11:57:43 -0700
 lib/sequel/core.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/database.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset.rb	Fri, 31 Mar 2023 14:57:15 -0700
@@ -14,12 +14,13 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Thu, 01 Jun 2023 07:29:33 -0700
+lib/sequel/version.rb	Fri, 30 Jun 2023 11:23:18 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/connection_pool/sharded_threaded.rb	Tue, 01 Nov 2022 15:22:13 -0700
+lib/sequel/connection_pool/sharded_threaded.rb	Mon, 12 Jun 2023 13:05:49 -0700
+lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/connection_pool/single.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/connection_pool/threaded.rb	Thu, 03 Nov 2022 12:28:15 -0700
-lib/sequel/connection_pool/timed_queue.rb	Thu, 03 Nov 2022 12:28:15 -0700
+lib/sequel/connection_pool/threaded.rb	Thu, 08 Jun 2023 16:14:04 -0700
+lib/sequel/connection_pool/timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/database/connecting.rb	Wed, 03 May 2023 13:14:12 -0700
 lib/sequel/database/dataset.rb	Tue, 28 Mar 2023 14:16:05 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -264,6 +265,7 @@ doc/release_notes/5.67.0.txt	Sat, 01 Apr 2023 07:30:20 -0700
 doc/release_notes/5.68.0.txt	Mon, 01 May 2023 07:26:38 -0700
 doc/release_notes/5.69.0.txt	Thu, 01 Jun 2023 07:29:33 -0700
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
+doc/release_notes/5.70.0.txt	Fri, 30 Jun 2023 11:23:18 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
 lib/sequel/extensions/migration.rb	Mon, 24 Oct 2022 11:55:52 -0700

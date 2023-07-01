@@ -31,12 +31,29 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-06-01 07:29:33 -0700</span>
+<span class='datetime'>2023-06-30 11:23:18 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.70.0+-282023-07-01-29"><a href="doc/release_notes/5_70_0_txt.html">5.70.0</a> (2023-07-01)<span><a href="#label-5.70.0+-282023-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make static_cache plugin better handle cases where forbid_lazy_load plugin is already loaded (jeremyevans)</p>
+</li><li>
+<p>Fix ShardedThreadedConnectionPool#remove_server to disconnect all connections if removing multiple servers (jeremyevans)</p>
+</li><li>
+<p>Support SEQUEL_DEFAULT_CONNECTION_POOL environment variable for choosing connection pool when :pool_class Database option is not set (jeremyevans)</p>
+</li><li>
+<p>Add sharded_timed_queue connection pool (jeremyevans)</p>
+</li><li>
+<p>Make connection_{validator,expiration} and async_thread_pool extensions work with timed_queue connection pool (jeremyevans)</p>
+</li><li>
+<p>Make connection_{validator,expiration} extensions raise error when used with single threaded pools (HoneyryderChuck, jeremyevans) (#2049)</p>
+</li><li>
+<p>Workaround possible resource starvation in threaded connection pool (ioquatix) (#2048)</p>
+</li></ul>
+
 <h3 id="label-5.69.0+-282023-06-01-29"><a href="doc/release_notes/5_69_0_txt.html">5.69.0</a> (2023-06-01)<span><a href="#label-5.69.0+-282023-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Avoid unsupported flag warning when using the mysql adapter with ruby-mysql 3+ (jeremyevans)</p>

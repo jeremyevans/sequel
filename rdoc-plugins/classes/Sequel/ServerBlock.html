@@ -70,14 +70,15 @@ Sequel::ServerBlock
 <pre id='method-c-extended-source'>   <span class="ruby-comment"># File lib/sequel/extensions/server_block.rb</span>
 <span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
 <span class="line-num">71</span>   <span class="ruby-identifier">pool</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>
-<span class="line-num">72</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ShardedThreadedConnectionPool</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ShardedThreadedConnectionPool</span>)
-<span class="line-num">73</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">ThreadedServerBlock</span>)
-<span class="line-num">74</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, {})
-<span class="line-num">75</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">76</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">UnthreadedServerBlock</span>)
-<span class="line-num">77</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, [])
-<span class="line-num">78</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">79</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">72</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span>
+<span class="line-num">73</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:sharded_threaded</span>, <span class="ruby-value">:sharded_timed_queue</span>
+<span class="line-num">74</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">ThreadedServerBlock</span>)
+<span class="line-num">75</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, {})
+<span class="line-num">76</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">77</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">UnthreadedServerBlock</span>)
+<span class="line-num">78</span>     <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, [])
+<span class="line-num">79</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">80</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -97,9 +98,9 @@ Sequel::ServerBlock
 [show source]
 </a>
 <pre id='method-i-with_server-source'>   <span class="ruby-comment"># File lib/sequel/extensions/server_block.rb</span>
-<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">83</span>   <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">83</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">84</span>   <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

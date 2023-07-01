@@ -205,7 +205,7 @@ Superclass:
 <pre id='method-i-hold-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/timed_queue.rb</span>
 <span class="line-num"> 82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
 <span class="line-num"> 83</span>   <span class="ruby-identifier">t</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">current</span>
-<span class="line-num"> 84</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@allocated</span>[<span class="ruby-identifier">t</span>]}
+<span class="line-num"> 84</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>)
 <span class="line-num"> 85</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)
 <span class="line-num"> 86</span>   <span class="ruby-keyword">end</span>
 <span class="line-num"> 87</span> 
