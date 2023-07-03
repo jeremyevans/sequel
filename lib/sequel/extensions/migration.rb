@@ -270,6 +270,10 @@ module Sequel
     def rename_column(name, new_name)
       @actions << [:rename_column, new_name, name]
     end
+
+    def set_column_allow_null(name, allow_null=true)
+      @actions << [:set_column_allow_null, name, !allow_null]
+    end
   end
 
   # The preferred method for writing Sequel migrations, using a DSL:

@@ -145,6 +145,9 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         add_full_text_index :e, :name=>'e_ft'
         add_spatial_index :e, :name=>'e_s'
         rename_column :e, :g
+        set_column_allow_null :c
+        set_column_allow_null :d, true
+        set_column_allow_null :d, false
       end
       create_view(:c, 'SELECT * FROM b', :foo=>:bar)
       create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
@@ -170,7 +173,10 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         [:add_index, :e, {:name=>"e_n"}],
         [:add_full_text_index, :e, {:name=>"e_ft"}],
         [:add_spatial_index, :e, {:name=>"e_s"}],
-        [:rename_column, :e, :g]]
+        [:rename_column, :e, :g],
+        [:set_column_allow_null, :c],
+        [:set_column_allow_null, :d, true],
+        [:set_column_allow_null, :d, false]]
       ],
       [:create_view, :c, "SELECT * FROM b", {:foo=>:bar}],
       [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
@@ -183,6 +189,9 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
       [:drop_view, :c, {:foo=>:bar}],
       [:alter_table, [
+        [:set_column_allow_null, :d, true],
+        [:set_column_allow_null, :d, false],
+        [:set_column_allow_null, :c, false],
         [:rename_column, :g, :e],
         [:drop_index, :e, {:name=>"e_s"}],
         [:drop_index, :e, {:name=>"e_ft"}],

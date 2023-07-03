@@ -86,6 +86,7 @@ the following methods:
   * +add_full_text_index+
   * +add_spatial_index+
   * +rename_column+
+  * +set_column_allow_null+
 
 If you use any other methods, you should create your own +down+ block.
 
