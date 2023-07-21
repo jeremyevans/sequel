@@ -5650,3 +5650,82 @@ SQL
     @m1.all.must_equal [{:i1=>1, :a=>3}]
   end
 end if DB.server_version >= 150000
+
+describe "pg_xmin_optimistic_locking plugin" do
+  before do
+    @db = DB
+    @db.create_table! :items do
+      primary_key :id
+      String :name, :size => 20
+    end
+   end
+  after do
+    @db.drop_table?(:items)
+  end
+
+  it "should not allow stale updates" do
+    c = Class.new(Sequel::Model(:items))
+    c.plugin :pg_xmin_optimistic_locking
+    o = c.create(:name=>'test')
+    o2 = c.first
+    xmin = c.dataset.naked.get(:xmin)
+    xmin.wont_equal nil
+    xmin.must_equal o.xmin
+    xmin.must_equal o2.xmin
+    o.name = 'test2'
+    o.save
+    xmin.wont_equal o.xmin
+    xmin.wont_equal c.dataset.naked.get(:xmin)
+    proc{o2.save}.must_raise(Sequel::NoExistingObject)
+  end
+
+  it "should work with subclasses" do
+    c = Class.new(Sequel::Model)
+    c.plugin :pg_xmin_optimistic_locking
+    sc = c::Model(:items)
+    o = sc.create(:name=>'test')
+    o2 = sc.first
+    xmin = sc.dataset.naked.get(:xmin)
+    xmin.wont_equal nil
+    xmin.must_equal o.xmin
+    xmin.must_equal o2.xmin
+    o.name = 'test2'
+    o.save
+    xmin.wont_equal o.xmin
+    xmin.wont_equal sc.dataset.naked.get(:xmin)
+    proc{o2.save}.must_raise(Sequel::NoExistingObject)
+  end
+
+  it "should allow updates when xmin is not selected" do
+    c = Class.new(Sequel::Model(:items))
+    c.plugin :pg_xmin_optimistic_locking
+    c.create(:name=>'test')
+    o = c.select_all(:items).first
+    o2 = c.first
+    o.xmin.must_be_nil
+    o.name = 'test2'
+    o.save
+    o.xmin.wont_be_nil
+    o.xmin.must_equal c.dataset.naked.get(:xmin)
+    proc{o2.save}.must_raise(Sequel::NoExistingObject)
+  end
+
+  it "should not select xmin when selecting from subquery" do
+    c = Class.new(Sequel::Model(@db[:items].from_self))
+    c.plugin :pg_xmin_optimistic_locking
+    @db[:items].insert(:name=>'test')
+    c.first.values[:xmin].must_be_nil
+  end
+
+  it "should not select xmin when selecting from view" do
+    begin
+      @db.create_view(:items_view, @db[:items])
+      c = Class.new(Sequel::Model(:items_view))
+      c.plugin :pg_xmin_optimistic_locking
+      @db[:items].insert(:name=>'test')
+      c.first.values[:xmin].must_be_nil
+    ensure
+      @db.drop_view(:items_view)
+    end
+  end
+end

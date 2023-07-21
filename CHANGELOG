@@ -1,5 +1,7 @@
 === master
 
+* Add pg_xmin_optimistic_locking plugin for optimistic locking for all models without database changes (jeremyevans)
+
 * Recognize the xid PostgreSQL type as an integer type in the jdbc/postgresql adapter (jeremyevans)
 
 * Make set_column_allow_null method reversible in migrations (enescakir) (#2060)
