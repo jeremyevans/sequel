@@ -199,6 +199,7 @@ module Sequel
           v.strftime("'%H:%M:%S#{sprintf(".%03d", (v.usec/1000.0).round)}'")
         end
 
+        INTEGER_TYPE = Java::JavaSQL::Types::INTEGER
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
         PG_SPECIFIC_TYPES = [Java::JavaSQL::Types::ARRAY, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze
@@ -219,6 +220,8 @@ module Sequel
             oid = meta.getField(i).getOID
             if pr = db.oid_convertor_proc(oid)
               pr
+            elsif oid == 28 # XID (Transaction ID)
+              map[INTEGER_TYPE]
             elsif oid == 2950 # UUID
               map[STRING_TYPE]
             elsif meta.getPGType(i) == 'hstore'

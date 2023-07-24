@@ -1,5 +1,7 @@
 === master
 
+* Recognize the xid PostgreSQL type as an integer type in the jdbc/postgresql adapter (jeremyevans)
+
 * Make set_column_allow_null method reversible in migrations (enescakir) (#2060)
 
 === 5.70.0 (2023-07-01)
