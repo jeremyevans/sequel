@@ -391,6 +391,10 @@ module Sequel
         sql << '('
         literal_append(sql, args[0])
         sql << ' ' << op.to_s << ' '
+        if requires_like_escape?
+          sql << " ESCAPE "
+          literal_append(sql, "\\")
+        end
         literal_append(sql, args[1])
         sql << ')'
       when :ILIKE, :'NOT ILIKE'
