@@ -2,7 +2,7 @@
 
 source 'http://rubygems.org'
 
-gem 'minitest-hooks'
+gem 'minitest-hooks', '>=1.5.1'
 gem 'minitest-global_expectations'
 
 # Plugin/Extension Dependencies
