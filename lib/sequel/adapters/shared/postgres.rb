@@ -1745,8 +1745,10 @@ module Sequel
           literal_append(sql, args[0])
           sql << ' ' << op.to_s << ' '
           literal_append(sql, args[1])
-          sql << " ESCAPE "
-          literal_append(sql, "\\")
+          if requires_like_escape?
+            sql << " ESCAPE "
+            literal_append(sql, "\\")
+          end
           sql << ')'
         else
           super
