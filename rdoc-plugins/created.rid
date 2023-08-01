@@ -1,4 +1,4 @@
-Sat, 01 Jul 2023 12:54:00 -0700
+Tue, 01 Aug 2023 07:55:38 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -37,7 +37,7 @@ lib/sequel/extensions/inflector.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/extensions/integer64.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/extensions/is_distinct_from.rb	Tue, 02 Aug 2022 16:36:07 -0700
 lib/sequel/extensions/looser_typecasting.rb	Thu, 22 Sep 2022 15:08:16 -0700
-lib/sequel/extensions/migration.rb	Mon, 24 Oct 2022 11:55:52 -0700
+lib/sequel/extensions/migration.rb	Mon, 03 Jul 2023 08:26:16 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Tue, 01 Nov 2022 13:39:51 -0700
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -143,12 +143,14 @@ lib/sequel/plugins/lazy_attributes.rb	Mon, 01 Nov 2021 09:23:49 -0700
 lib/sequel/plugins/list.rb	Fri, 22 Jul 2022 11:48:42 -0700
 lib/sequel/plugins/many_through_many.rb	Mon, 12 Dec 2022 21:25:25 -0800
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
-lib/sequel/plugins/mssql_optimistic_locking.rb	Sat, 20 Jan 2018 09:44:46 -0800
+lib/sequel/plugins/mssql_optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
 lib/sequel/plugins/nested_attributes.rb	Wed, 28 Dec 2022 11:43:04 -0800
-lib/sequel/plugins/optimistic_locking.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
+lib/sequel/plugins/optimistic_locking_base.rb	Mon, 24 Jul 2023 12:06:10 -0700
 lib/sequel/plugins/pg_array_associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
 lib/sequel/plugins/pg_auto_constraint_validations.rb	Tue, 18 Apr 2023 12:21:29 -0700
 lib/sequel/plugins/pg_row.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/pg_xmin_optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
 lib/sequel/plugins/prepared_statements.rb	Fri, 24 Mar 2023 09:21:08 -0700
 lib/sequel/plugins/prepared_statements_safe.rb	Fri, 24 Mar 2023 09:21:08 -0700
 lib/sequel/plugins/primary_key_lookup_check_values.rb	Sun, 30 Oct 2022 19:13:54 -0700

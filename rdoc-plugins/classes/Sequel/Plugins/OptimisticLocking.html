@@ -44,10 +44,13 @@ Sequel::Plugins::OptimisticLocking
 <span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]
 <span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]
 <span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># works</span>
-<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># raises Sequel::Plugins::OptimisticLocking::Error</span>
+<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># raises Sequel::NoExistingObject</span>
 </pre>
 
-<p>In order for this plugin to work, you need to make sure that the database table has a <code>lock_version</code> column (or other column you name via the lock_column class level accessor) that defaults to 0.</p>
+<p>In order for this plugin to work, you need to make sure that the database table has a <code>lock_version</code> column that defaults to 0. To change the column used, provide a <code>:lock_column</code> option when loading the plugin:</p>
+
+<pre class="ruby"><span class="ruby-identifier">plugin</span> <span class="ruby-value">:optimistic_locking</span>, <span class="ruby-value">lock_column:</span> <span class="ruby-value">:version</span>
+</pre>
 
 <p>This plugin relies on the instance_filters plugin.</p>
 </div>
@@ -64,7 +67,6 @@ Sequel::Plugins::OptimisticLocking
 <div id='class-list'>
 <h2>Classes and Modules</h2>
 <ol>
-<li><a href="OptimisticLocking/ClassMethods.html">Sequel::Plugins::OptimisticLocking::ClassMethods</a></li>
 <li><a href="OptimisticLocking/InstanceMethods.html">Sequel::Plugins::OptimisticLocking::InstanceMethods</a></li>
 </ol>
 </div>
@@ -95,17 +97,15 @@ Sequel::Plugins::OptimisticLocking
 </div>
 <div class='description'>
 
-<p>Load the instance_filters plugin into the model.</p>
-
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
 <pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb</span>
-<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">28</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>
-<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">29</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:optimistic_locking_base</span>)
+<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -116,7 +116,7 @@ Sequel::Plugins::OptimisticLocking
 </div>
 <div class='description'>
 
-<p>Set the lock_column to the :lock_column option, or :lock_version if that option is not given.</p>
+<p>Set the lock column</p>
 
 </div>
 <div class='source'>
@@ -125,7 +125,7 @@ Sequel::Plugins::OptimisticLocking
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb</span>
 <span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:lock_version</span>
+<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> <span class="ruby-operator">||</span> <span class="ruby-value">:lock_version</span>
 <span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

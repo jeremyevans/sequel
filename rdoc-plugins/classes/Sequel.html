@@ -461,6 +461,9 @@ Sequel
 <a href="../files/lib/sequel/plugins/optimistic_locking_rb.html">lib/sequel/plugins/optimistic_locking.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/plugins/optimistic_locking_base_rb.html">lib/sequel/plugins/optimistic_locking_base.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/plugins/pg_array_associations_rb.html">lib/sequel/plugins/pg_array_associations.rb</a>
 </li>
 <li class='other'>
@@ -468,6 +471,9 @@ Sequel
 </li>
 <li class='other'>
 <a href="../files/lib/sequel/plugins/pg_row_rb.html">lib/sequel/plugins/pg_row.rb</a>
+</li>
+<li class='other'>
+<a href="../files/lib/sequel/plugins/pg_xmin_optimistic_locking_rb.html">lib/sequel/plugins/pg_xmin_optimistic_locking.rb</a>
 </li>
 <li class='other'>
 <a href="../files/lib/sequel/plugins/prepared_statements_rb.html">lib/sequel/plugins/prepared_statements.rb</a>
@@ -912,9 +918,9 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 [show source]
 </a>
 <pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">292</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">295</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">296</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">297</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

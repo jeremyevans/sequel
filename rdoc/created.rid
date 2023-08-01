@@ -1,6 +1,6 @@
-Sat, 01 Jul 2023 12:52:54 -0700
+Tue, 01 Aug 2023 07:54:33 -0700
 README.rdoc	Wed, 03 May 2023 13:14:12 -0700
-CHANGELOG	Fri, 30 Jun 2023 11:23:18 -0700
+CHANGELOG	Tue, 01 Aug 2023 07:39:28 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Fri, 30 Jun 2023 11:23:18 -0700
+lib/sequel/version.rb	Tue, 01 Aug 2023 07:39:28 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -60,7 +60,7 @@ doc/dataset_filtering.rdoc	Tue, 14 Jul 2020 07:08:21 -0700
 doc/extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/fork_safety.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
 doc/mass_assignment.rdoc	Thu, 13 Sep 2018 07:44:12 -0700
-doc/migration.rdoc	Fri, 29 Oct 2021 08:26:19 -0700
+doc/migration.rdoc	Mon, 03 Jul 2023 08:26:16 -0700
 doc/model_dataset_method_design.rdoc	Wed, 01 Apr 2020 09:49:55 -0700
 doc/model_hooks.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
@@ -266,6 +266,7 @@ doc/release_notes/5.68.0.txt	Mon, 01 May 2023 07:26:38 -0700
 doc/release_notes/5.69.0.txt	Thu, 01 Jun 2023 07:29:33 -0700
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
 doc/release_notes/5.70.0.txt	Fri, 30 Jun 2023 11:23:18 -0700
+doc/release_notes/5.71.0.txt	Tue, 01 Aug 2023 07:39:28 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
-lib/sequel/extensions/migration.rb	Mon, 24 Oct 2022 11:55:52 -0700
+lib/sequel/extensions/migration.rb	Mon, 03 Jul 2023 08:26:16 -0700

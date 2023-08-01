@@ -126,35 +126,35 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">525</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">526</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">527</span>   <span class="ruby-ivar">@current</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:current</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">current_migration_version</span>
-<span class="line-num">528</span> 
-<span class="line-num">529</span>   <span class="ruby-identifier">latest_version</span> = <span class="ruby-identifier">latest_migration_version</span>
-<span class="line-num">530</span>   <span class="ruby-ivar">@target</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]
-<span class="line-num">531</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]
-<span class="line-num">532</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:relative</span>]
-<span class="line-num">533</span>     <span class="ruby-ivar">@current</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:relative</span>]
-<span class="line-num">534</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">535</span>     <span class="ruby-identifier">latest_version</span>
-<span class="line-num">536</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">537</span> 
-<span class="line-num">538</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No target and/or latest version available, probably because no migration files found or filenames don&#39;t follow the migration filename convention&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">latest_version</span>
-<span class="line-num">539</span> 
-<span class="line-num">540</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@target</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">latest_version</span>
-<span class="line-num">541</span>     <span class="ruby-ivar">@target</span> = <span class="ruby-identifier">latest_version</span>
-<span class="line-num">542</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@target</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>
-<span class="line-num">543</span>     <span class="ruby-ivar">@target</span> = <span class="ruby-value">0</span>
-<span class="line-num">544</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">545</span> 
-<span class="line-num">546</span>   <span class="ruby-ivar">@direction</span> = <span class="ruby-identifier">current</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">?</span> <span class="ruby-value">:up</span> <span class="ruby-operator">:</span> <span class="ruby-value">:down</span>
-<span class="line-num">547</span> 
-<span class="line-num">548</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@direction</span> <span class="ruby-operator">==</span> <span class="ruby-value">:down</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@current</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@allow_missing_migration_files</span>
-<span class="line-num">549</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Migrator</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Missing migration version(s) needed to migrate down to target version (current: #{current}, target: #{target})&quot;</span>
-<span class="line-num">550</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">529</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">530</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">531</span>   <span class="ruby-ivar">@current</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:current</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">current_migration_version</span>
+<span class="line-num">532</span> 
+<span class="line-num">533</span>   <span class="ruby-identifier">latest_version</span> = <span class="ruby-identifier">latest_migration_version</span>
+<span class="line-num">534</span>   <span class="ruby-ivar">@target</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]
+<span class="line-num">535</span>     <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]
+<span class="line-num">536</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:relative</span>]
+<span class="line-num">537</span>     <span class="ruby-ivar">@current</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:relative</span>]
+<span class="line-num">538</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">539</span>     <span class="ruby-identifier">latest_version</span>
+<span class="line-num">540</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">541</span> 
+<span class="line-num">542</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No target and/or latest version available, probably because no migration files found or filenames don&#39;t follow the migration filename convention&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">latest_version</span>
+<span class="line-num">543</span> 
+<span class="line-num">544</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@target</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">latest_version</span>
+<span class="line-num">545</span>     <span class="ruby-ivar">@target</span> = <span class="ruby-identifier">latest_version</span>
+<span class="line-num">546</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@target</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>
+<span class="line-num">547</span>     <span class="ruby-ivar">@target</span> = <span class="ruby-value">0</span>
+<span class="line-num">548</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">549</span> 
+<span class="line-num">550</span>   <span class="ruby-ivar">@direction</span> = <span class="ruby-identifier">current</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">?</span> <span class="ruby-value">:up</span> <span class="ruby-operator">:</span> <span class="ruby-value">:down</span>
 <span class="line-num">551</span> 
-<span class="line-num">552</span>   <span class="ruby-ivar">@migrations</span> = <span class="ruby-identifier">get_migrations</span>
-<span class="line-num">553</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">552</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@direction</span> <span class="ruby-operator">==</span> <span class="ruby-value">:down</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@current</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@allow_missing_migration_files</span>
+<span class="line-num">553</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Migrator</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Missing migration version(s) needed to migrate down to target version (current: #{current}, target: #{target})&quot;</span>
+<span class="line-num">554</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">555</span> 
+<span class="line-num">556</span>   <span class="ruby-ivar">@migrations</span> = <span class="ruby-identifier">get_migrations</span>
+<span class="line-num">557</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -174,9 +174,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-is_current-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">556</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_current?</span>
-<span class="line-num">557</span>   <span class="ruby-identifier">current_migration_version</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">target</span>
-<span class="line-num">558</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">560</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_current?</span>
+<span class="line-num">561</span>   <span class="ruby-identifier">current_migration_version</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">target</span>
+<span class="line-num">562</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-run'>
@@ -195,19 +195,19 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-run-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">561</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>
-<span class="line-num">562</span>   <span class="ruby-identifier">migrations</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">version_numbers</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
-<span class="line-num">563</span>     <span class="ruby-identifier">timer</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">start_timer</span>
-<span class="line-num">564</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Begin applying migration version #{v}, direction: #{direction}&quot;</span>)
-<span class="line-num">565</span>     <span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">566</span>       <span class="ruby-identifier">m</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)
-<span class="line-num">567</span>       <span class="ruby-identifier">set_migration_version</span>(<span class="ruby-identifier">up?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span><span class="ruby-value">-1</span>)
-<span class="line-num">568</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">569</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Finished applying migration version #{v}, direction: #{direction}, took #{sprintf(&#39;%0.6f&#39;, Sequel.elapsed_seconds_since(timer))} seconds&quot;</span>)
-<span class="line-num">570</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">571</span>   
-<span class="line-num">572</span>   <span class="ruby-identifier">target</span>
-<span class="line-num">573</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">565</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>
+<span class="line-num">566</span>   <span class="ruby-identifier">migrations</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">version_numbers</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">567</span>     <span class="ruby-identifier">timer</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">start_timer</span>
+<span class="line-num">568</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Begin applying migration version #{v}, direction: #{direction}&quot;</span>)
+<span class="line-num">569</span>     <span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">570</span>       <span class="ruby-identifier">m</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)
+<span class="line-num">571</span>       <span class="ruby-identifier">set_migration_version</span>(<span class="ruby-identifier">up?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span><span class="ruby-value">-1</span>)
+<span class="line-num">572</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">573</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Finished applying migration version #{v}, direction: #{direction}, took #{sprintf(&#39;%0.6f&#39;, Sequel.elapsed_seconds_since(timer))} seconds&quot;</span>)
+<span class="line-num">574</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">575</span>   
+<span class="line-num">576</span>   <span class="ruby-identifier">target</span>
+<span class="line-num">577</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

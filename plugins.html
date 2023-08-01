@@ -45,7 +45,7 @@
     <div class="main__container">
       <section class="plugins">
 
-<h1 class="h1">Sequel::Model Plugins for v5.70.0</h1>
+<h1 class="h1">Sequel::Model Plugins for v5.71.0</h1>
 
 <div class="plugins__sidebar">
 <aside class="plugins__sidebar-aside">
@@ -325,6 +325,10 @@
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking </a>
 <span class="ul__span">Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PgXminOptimisticLocking.html">pg_xmin_optimistic_locking </a>
+<span class="ul__span">Uses the xmin system column on PostgreSQL to prevent concurrent updates overwriting changes.</span>
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding </a>

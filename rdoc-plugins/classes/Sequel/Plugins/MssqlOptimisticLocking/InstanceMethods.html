@@ -36,64 +36,9 @@ Sequel::Plugins::MssqlOptimisticLocking::InstanceMethods
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
-<div id='method-list'>
-<h2>Methods</h2>
-<h3>Public Instance</h3>
-<ol>
-<li><a href="#method-i-before_destroy">before_destroy</a></li>
-<li><a href="#method-i-before_update">before_update</a></li>
-</ol>
-</div>
 <div id='context'>
 </div>
 <div id='section'>
-<div id='methods'>
-<h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-before_destroy'>
-<a name='method-i-before_destroy'></a>
-<div class='synopsis'>
-<span class='name'>before_destroy</span><span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Add the lock column instance filter to the object before destroying it.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_destroy-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-before_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>
-<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>
-<span class="line-num">47</span>   <span class="ruby-identifier">lock_column_instance_filter</span>
-<span class="line-num">48</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-before_update'>
-<a name='method-i-before_update'></a>
-<div class='synopsis'>
-<span class='name'>before_update</span><span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Add the lock column instance filter to the object before updating it.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_update-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-before_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>
-<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_update</span>
-<span class="line-num">53</span>   <span class="ruby-identifier">lock_column_instance_filter</span>
-<span class="line-num">54</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-</div>
 </div>
 
 </div>

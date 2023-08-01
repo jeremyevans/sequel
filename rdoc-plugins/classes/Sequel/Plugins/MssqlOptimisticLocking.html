@@ -67,7 +67,6 @@ Sequel::Plugins::MssqlOptimisticLocking
 <div id='class-list'>
 <h2>Classes and Modules</h2>
 <ol>
-<li><a href="MssqlOptimisticLocking/ClassMethods.html">Sequel::Plugins::MssqlOptimisticLocking::ClassMethods</a></li>
 <li><a href="MssqlOptimisticLocking/InstanceMethods.html">Sequel::Plugins::MssqlOptimisticLocking::InstanceMethods</a></li>
 </ol>
 </div>
@@ -91,7 +90,7 @@ Sequel::Plugins::MssqlOptimisticLocking
 </a>
 <pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>
 <span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">29</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>
+<span class="line-num">29</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:optimistic_locking_base</span>)
 <span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -103,7 +102,7 @@ Sequel::Plugins::MssqlOptimisticLocking
 </div>
 <div class='description'>
 
-<p>Set the lock_column to the :lock_column option (default: :timestamp)</p>
+<p>Set the lock column</p>
 
 </div>
 <div class='source'>
@@ -112,7 +111,7 @@ Sequel::Plugins::MssqlOptimisticLocking
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/mssql_optimistic_locking.rb</span>
 <span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:timestamp</span>
+<span class="line-num">34</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> <span class="ruby-operator">||</span> <span class="ruby-value">:timestamp</span>
 <span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
