@@ -1,4 +1,4 @@
-=== master
+=== 5.71.0 (2023-08-01)
 
 * Support ILIKE ANY on PostgreSQL by not forcing the use of ESCAPE for ILIKE (gilesbowkett) (#2066)
 

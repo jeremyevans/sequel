@@ -1,0 +1,21 @@
+= New Features
+
+* A pg_xmin_optimistic_locking plugin has been added.  This plugin
+  uses PostgreSQL's xmin system column to implement optimistic
+  locking.  The xmin system column is automatically updated whenever
+  the database row is updated.  You can load this plugin into a
+  base model and have all models that subclass from it use optimistic
+  locking, without needing any user-defined lock columns.
+
+= Other Improvements
+
+* set_column_allow_null is now a reversible migration method inside
+  alter_table blocks.
+
+* The use of ILIKE no longer forces the ESCAPE clause on PostgreSQL,
+  which allows the use of ILIKE ANY and other constructions.  There
+  is no need to use the ESCAPE clause with ILIKE, because the value
+  Sequel uses is PostgreSQL's default.
+
+* The xid PostgreSQL type is now recognized as an integer type in the
+  jdbc/postgresql adapter.
