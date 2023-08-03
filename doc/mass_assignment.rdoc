@@ -48,7 +48,7 @@ If you want to change mass assignment so it ignores attempts to access restricte
 Since mass assignment by default allows modification of all column values except for primary key columns, it can be a security risk in some cases.
 If you are dealing with untrusted input, you are generally going to want to restrict what should be updated.
 
-Sequel has <tt>Model#set_fields</tt> and <tt>Model#update_fields</tt> methods, which are designed to be used with untrused input.
+Sequel has <tt>Model#set_fields</tt> and <tt>Model#update_fields</tt> methods, which are designed to be used with untrusted input.
 These methods take two arguments, the untrusted hash as the first argument, and a trusted array of field names as the second argument:
 
   post.set_fields({title: 'T', body: 'B'}, [:title, :body])
