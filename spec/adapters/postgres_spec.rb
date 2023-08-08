@@ -13,7 +13,17 @@ rescue LoadError
 end
 DB.extension :pg_hstore if DB.type_supported?('hstore')
 DB.extension :pg_multirange if DB.server_version >= 140000
-DB.extension :pg_auto_parameterize if uses_pg && ENV['SEQUEL_PG_AUTO_PARAMETERIZE']
+
+if uses_pg && ENV['SEQUEL_PG_AUTO_PARAMETERIZE']
+  if ENV['SEQUEL_PG_AUTO_PARAMETERIZE'] = 'in_array_string'
+    DB.extension :pg_auto_parameterize_in_array
+    DB.opts[:treat_string_list_as_text_array] = 't'
+  elsif ENV['SEQUEL_PG_AUTO_PARAMETERIZE'] = 'in_array'
+    DB.extension :pg_auto_parameterize_in_array
+  else
+    DB.extension :pg_auto_parameterize
+  end
+end
 
 describe 'PostgreSQL adapter' do
   before do
@@ -62,6 +72,74 @@ describe 'A PostgreSQL database' do
     @db.drop_table?(:test)
     @db.timezone = nil
     Sequel.datetime_class = Time
+  end
+
+  it "should be able to handle various types of IN/NOT IN queries" do
+    ds = @db.select(1)
+    ds.where(2=>[2, 3]).wont_be_empty
+    ds.where(4=>[2, 3]).must_be_empty
+    ds.exclude(4=>[2, 3]).wont_be_empty
+    ds.exclude(2=>[2, 4]).must_be_empty
+
+    ds.where('2'=>%w[2 3]).wont_be_empty
+    ds.where('4'=>%w[2 3]).must_be_empty
+    ds.exclude('4'=>%w[2 3]).wont_be_empty
+    ds.exclude('2'=>%w[2 3]).must_be_empty
+
+    ds.where(2=>[2, 3].map{|i| BigDecimal(i)}).wont_be_empty
+    ds.where(4=>[2, 3].map{|i| BigDecimal(i)}).must_be_empty
+    ds.exclude(4=>[2, 3].map{|i| BigDecimal(i)}).wont_be_empty
+    ds.exclude(2=>[2, 3].map{|i| BigDecimal(i)}).must_be_empty
+
+    ds.where(Date.new(2021, 2)=>[2, 3].map{|i| Date.new(2021, i)}).wont_be_empty
+    ds.where(Date.new(2021, 4)=>[2, 3].map{|i| Date.new(2021, i)}).must_be_empty
+    ds.exclude(Date.new(2021, 4)=>[2, 3].map{|i| Date.new(2021, i)}).wont_be_empty
+    ds.exclude(Date.new(2021, 2)=>[2, 3].map{|i| Date.new(2021, i)}).must_be_empty
+
+    ds.where(DateTime.new(2021, 2)=>[2, 3].map{|i| DateTime.new(2021, i)}).wont_be_empty
+    ds.where(DateTime.new(2021, 4)=>[2, 3].map{|i| DateTime.new(2021, i)}).must_be_empty
+    ds.exclude(DateTime.new(2021, 4)=>[2, 3].map{|i| DateTime.new(2021, i)}).wont_be_empty
+    ds.exclude(DateTime.new(2021, 2)=>[2, 3].map{|i| DateTime.new(2021, i)}).must_be_empty
+
+    ds.where(Time.local(2021, 2)=>[2, 3].map{|i| Time.local(2021, i)}).wont_be_empty
+    ds.where(Time.local(2021, 4)=>[2, 3].map{|i| Time.local(2021, i)}).must_be_empty
+    ds.exclude(Time.local(2021, 4)=>[2, 3].map{|i| Time.local(2021, i)}).wont_be_empty
+    ds.exclude(Time.local(2021, 2)=>[2, 3].map{|i| Time.local(2021, i)}).must_be_empty
+
+    ds.where(Sequel::SQLTime.create(2, 0, 0)=>[2, 3].map{|i| Sequel::SQLTime.create(i, 0, 0)}).wont_be_empty
+    ds.where(Sequel::SQLTime.create(4, 0, 0)=>[2, 3].map{|i| Sequel::SQLTime.create(i, 0, 0)}).must_be_empty
+    ds.exclude(Sequel::SQLTime.create(4, 0, 0)=>[2, 3].map{|i| Sequel::SQLTime.create(i, 0, 0)}).wont_be_empty
+    ds.exclude(Sequel::SQLTime.create(2, 0, 0)=>[2, 3].map{|i| Sequel::SQLTime.create(i, 0, 0)}).must_be_empty
+
+    ds.where(2=>[2, 3].map{|i| Float(i)}).wont_be_empty
+    ds.where(4=>[2, 3].map{|i| Float(i)}).must_be_empty
+    ds.exclude(4=>[2, 3].map{|i| Float(i)}).wont_be_empty
+    ds.exclude(2=>[2, 3].map{|i| Float(i)}).must_be_empty
+
+    ds.where(2=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).wont_be_empty
+    ds.where(4=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).must_be_empty
+    ds.exclude(4=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).wont_be_empty
+    ds.exclude(2=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).must_be_empty
+
+    ds.where(Sequel.blob('2')=>%w[2 3].map{|i| Sequel.blob(i)}).wont_be_empty
+    ds.where(Sequel.blob('4')=>%w[2 3].map{|i| Sequel.blob(i)}).must_be_empty
+    ds.exclude(Sequel.blob('4')=>%w[2 3].map{|i| Sequel.blob(i)}).wont_be_empty
+    ds.exclude(Sequel.blob('2')=>%w[2 3].map{|i| Sequel.blob(i)}).must_be_empty
+
+    ds.where(2=>[2, 3.0]).wont_be_empty
+    ds.where(4=>[2, 3.0]).must_be_empty
+    ds.exclude(4=>[2, 3.0]).wont_be_empty
+    ds.exclude(2=>[2, 4.0]).must_be_empty
+
+    ds.where(2=>[2]).wont_be_empty
+    ds.where(4=>[2]).must_be_empty
+    ds.exclude(4=>[2]).wont_be_empty
+    ds.exclude(2=>[2]).must_be_empty
+
+    ds.where(2=>[2, 3, nil]).wont_be_empty
+    ds.where(4=>[2, 3, nil]).must_be_empty
+    ds.exclude(4=>[2, 3, nil]).must_be_empty # NOT IN (..., NULL) predicate always false
+    ds.exclude(2=>[2, 4, nil]).must_be_empty
   end
 
   it "should provide a list of existing ordinary tables" do
