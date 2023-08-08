@@ -233,6 +233,14 @@ module Sequel
             a
           when String
             bound_variable_array_string(a)
+          when Float
+            if a.infinite?
+              a > 0 ? '"Infinity"' : '"-Infinity"'
+            elsif a.nan?
+              '"NaN"'
+            else
+              literal(a)
+            end
           else
             if (s = bound_variable_arg(a, nil)).is_a?(String)
               bound_variable_array_string(s)

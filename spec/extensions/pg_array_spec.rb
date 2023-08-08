@@ -89,6 +89,15 @@ describe "pg_array extension" do
     c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.must_equal [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]
   end
 
+  it "should parse infinite and NaN values in arrays" do
+    c = @converter[1022]
+    i, ni, nan = a = c.call('{"Infinity","-Infinity","NaN"}').to_a
+    a.all?{|x| Float === x}.must_equal true
+    i.infinite?.must_equal 1
+    ni.infinite?.must_equal(-1)
+    nan.nan?.must_equal true
+  end
+
   it "should parse single dimensional decimal arrays" do
     c = @converter[1231]
     c.call("{}").to_a.must_equal []
@@ -200,6 +209,7 @@ describe "pg_array extension" do
     @db.bound_variable_arg([1,2], nil).must_equal '{1,2}'
     @db.bound_variable_arg([[1,2]], nil).must_equal '{{1,2}}'
     @db.bound_variable_arg([1.0,2.0], nil).must_equal '{1.0,2.0}'
+    @db.bound_variable_arg([1.0/0.0, -1.0/0.0, 0.0/0.0], nil).must_equal '{"Infinity","-Infinity","NaN"}'
     @db.bound_variable_arg([Sequel.lit('a'), Sequel.blob("a\0'\"")], nil).must_equal '{a,"a\\\\000\\\\047\\""}'
     @db.bound_variable_arg(["\\ \"", 'NULL', nil], nil).must_equal '{"\\\\ \\"","NULL",NULL}'
   end
