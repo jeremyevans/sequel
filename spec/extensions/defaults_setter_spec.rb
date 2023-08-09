@@ -162,4 +162,12 @@ describe "Sequel::Plugins::DefaultsSetter" do
     c.freeze
     c.default_values.frozen?.must_equal true
   end
+
+  it "should work correctly for complex data types" do
+    @c.dataset = @pr.call([[]]).dataset
+    instance_1 = @c.new
+    instance_1.a.first << 1
+    instance_2 = @c.new
+    instance_2.a.must_equal [[]]
+  end
 end

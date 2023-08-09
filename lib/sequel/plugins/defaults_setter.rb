@@ -118,6 +118,7 @@ module Sequel
           if new? && !values.has_key?(k)
             v = model.default_values.fetch(k){return}
             v = v.call if v.respond_to?(:call)
+            v = Marshal.load(Marshal.dump(v))
             values[k] = v if model.cache_default_values?
             v
           else
