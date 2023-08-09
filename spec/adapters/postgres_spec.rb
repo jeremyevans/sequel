@@ -116,10 +116,12 @@ describe 'A PostgreSQL database' do
     ds.exclude(4=>[2, 3].map{|i| Float(i)}).wont_be_empty
     ds.exclude(2=>[2, 3].map{|i| Float(i)}).must_be_empty
 
-    ds.where(2=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).wont_be_empty
-    ds.where(4=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).must_be_empty
-    ds.exclude(4=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).wont_be_empty
-    ds.exclude(2=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).must_be_empty
+    if @db.server_version >= 140000
+      ds.where(2=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).wont_be_empty
+      ds.where(4=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).must_be_empty
+      ds.exclude(4=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).wont_be_empty
+      ds.exclude(2=>[2.0, 3.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]).must_be_empty
+    end
 
     ds.where(Sequel.blob('2')=>%w[2 3].map{|i| Sequel.blob(i)}).wont_be_empty
     ds.where(Sequel.blob('4')=>%w[2 3].map{|i| Sequel.blob(i)}).must_be_empty
