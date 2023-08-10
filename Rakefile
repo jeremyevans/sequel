@@ -27,8 +27,8 @@ end
 RDOC_DEFAULT_OPTS = ["--line-numbers", '--title', 'Sequel: The Database Toolkit for Ruby']
 
 begin
-  # Sequel uses hanna-nouveau for the website RDoc.
-  gem 'hanna-nouveau'
+  # Sequel uses hanna for the website RDoc.
+  gem 'hanna'
   RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
 rescue Gem::LoadError
 end
