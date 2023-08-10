@@ -1,5 +1,7 @@
 === master
 
+* Change the defaults_setter plugin do a deep-copy of database default hash/array values and delegates (jeremyevans) (#2069)
+
 * Add pg_auto_parameterize_in_array extension, for converting IN/NOT IN to = ANY or != ALL for more types (jeremyevans)
 
 * Fix literalization of infinite and NaN float values in PostgreSQL array bound variables (jeremyevans)

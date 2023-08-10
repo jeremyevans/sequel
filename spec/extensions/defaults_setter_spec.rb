@@ -1,5 +1,7 @@
 require_relative "spec_helper"
 
+require 'delegate'
+
 describe "Sequel::Plugins::DefaultsSetter" do
   before do
     @db = db = Sequel.mock
@@ -44,6 +46,46 @@ describe "Sequel::Plugins::DefaultsSetter" do
     t = @pr.call(Sequel::CURRENT_TIMESTAMP).new.a
     t.must_be_kind_of(Time)
     (t - Time.now).must_be :<,  1
+  end
+
+  it "should not reuse the same default hash for multiple objects" do
+    h = {}
+    c = @pr.call(h)
+    c.new.a.must_equal(h)
+    c.new.a.wont_be_same_as c.new.a
+    c.default_values[:a].must_be_kind_of Proc
+  end
+
+  it "should not reuse the same default array for multiple objects" do
+    h = []
+    c = @pr.call(h)
+    c.new.a.must_equal(h)
+    c.new.a.wont_be_same_as c.new.a
+    c.default_values[:a].must_be_kind_of Proc
+  end
+
+  it "should not reuse the same default hash delegate for multiple objects" do
+    h = DelegateClass(Hash).new({})
+    c = @pr.call(h)
+    c.new.a.must_equal(h)
+    c.new.a.wont_be_same_as c.new.a
+    c.default_values[:a].must_be_kind_of Proc
+  end
+
+  it "should not reuse the same default array delegate for multiple objects" do
+    h = DelegateClass(Array).new([])
+    c = @pr.call(h)
+    c.new.a.must_equal(h)
+    c.new.a.wont_be_same_as c.new.a
+    c.default_values[:a].must_be_kind_of Proc
+  end
+
+  it "should use other object delegates as-is" do
+    h = DelegateClass(Integer).new(1)
+    c = @pr.call(h)
+    c.new.a.must_equal(h)
+    c.new.a.object_id.must_equal c.new.a.object_id
+    c.default_values[:a].object_id.must_equal h.object_id
   end
 
   it "should handle :callable_default values in schema in preference to :ruby_default" do

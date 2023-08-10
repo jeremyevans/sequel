@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+require 'delegate'
+
 module Sequel
   module Plugins
     # The defaults_setter plugin makes the column getter methods return the default
@@ -106,6 +108,20 @@ module Sequel
             lambda{Date.today}
           when Sequel::CURRENT_TIMESTAMP
             lambda{dataset.current_datetime}
+          when Hash, Array
+            v = Marshal.dump(v).freeze
+            lambda{Marshal.load(v)}
+          when Delegator
+            # DelegateClass returns an anonymous case, which cannot be marshalled, so marshal the
+            # underlying object and create a new instance of the class with the unmarshalled object.
+            klass = v.class
+            case o = v.__getobj__
+            when Hash, Array
+              v = Marshal.dump(o).freeze
+              lambda{klass.new(Marshal.load(v))}
+            else
+              v
+            end
           else
             v
           end
