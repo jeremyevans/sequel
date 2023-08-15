@@ -825,7 +825,7 @@ You can dynamically customize eager loads for both +eager+ and +eager_graph+ whi
 
 === Joining with Associations
 
-You can use the +association_join+ method to add a join to the model's dataset based on the assocation:
+You can use the +association_join+ method to add a join to the model's dataset based on the association:
 
   Post.association_join(:author)
   # SELECT * FROM posts
