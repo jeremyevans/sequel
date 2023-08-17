@@ -1,5 +1,7 @@
 === master
 
+* Sort caches before marshalling when using schema_caching, index_caching, static_cache_cache, and pg_auto_constraint_validations (jeremyevans)
+
 * Change the defaults_setter plugin do a deep-copy of database default hash/array values and delegates (jeremyevans) (#2069)
 
 * Add pg_auto_parameterize_in_array extension, for converting IN/NOT IN to = ANY or != ALL for more types (jeremyevans)

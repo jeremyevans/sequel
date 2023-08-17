@@ -56,7 +56,11 @@ module Sequel
     
     # Dump the index cache to the filename given in Marshal format.
     def dump_index_cache(file)
-      File.open(file, 'wb'){|f| f.write(Marshal.dump(@indexes))}
+      indexes = {}
+      @indexes.sort.each do |k, v|
+        indexes[k] = v
+      end
+      File.open(file, 'wb'){|f| f.write(Marshal.dump(indexes))}
       nil
     end
 

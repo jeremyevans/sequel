@@ -216,6 +216,41 @@ describe "pg_auto_constraint_validations plugin" do
     end
   end
 
+  it "should sort cache file by table name" do
+    cache_file = "spec/files/pgacv-spec-#{$$}.cache"
+    begin
+      c = Class.new(Sequel::Model)
+      c.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
+      
+      @ds = @db[:items]
+      @ds.send(:columns=, [:id, :i])
+      @db.fetch = @metadata_results.dup
+      @db.sqls
+      c1 = c::Model(@ds)
+      def c1.name; 'Foo' end
+      @db.sqls.length.must_equal 5
+
+      @ds = @db[:bars]
+      @ds.send(:columns=, [:id, :i])
+      @db.fetch = @metadata_results.dup
+      @db.sqls
+      c2 = c::Model(@ds)
+      c2.set_dataset @ds
+      def c2.name; 'Bar' end
+      @db.sqls.length.must_equal 5
+
+      c.instance_variable_get(:@pg_auto_constraint_validations_cache).keys.must_equal %w["items" "bars"]
+      c.dump_pg_auto_constraint_validations_cache
+      c.instance_variable_get(:@pg_auto_constraint_validations_cache).keys.must_equal %w["items" "bars"]
+
+      c3 = Class.new(Sequel::Model)
+      c3.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
+      c3.instance_variable_get(:@pg_auto_constraint_validations_cache).keys.must_equal %w["bars" "items"]
+    ensure
+      File.delete(cache_file) if File.file?(cache_file)
+    end
+  end
+
   it "should raise error if attempting to dump cached metadata when not using caching" do
     proc{@c.dump_pg_auto_constraint_validations_cache}.must_raise Sequel::Error
   end

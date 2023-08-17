@@ -52,7 +52,7 @@ module Sequel
     # Dump the cached schema to the filename given in Marshal format.
     def dump_schema_cache(file)
       sch = {}
-      @schemas.each do |k,v|
+      @schemas.sort.each do |k,v|
         sch[k] = v.map do |c, h|
           h = Hash[h]
           h.delete(:callable_default)

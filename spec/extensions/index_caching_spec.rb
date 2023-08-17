@@ -42,6 +42,14 @@ describe "index_caching extension" do
     File.size(@filename).must_be :>,  0
   end
 
+  it "Database#dump_index_cache should dump index information sorted by table" do
+    @indexes['"foo"'] = {:table_idx_unique=>{:columns=>[:first_col, :second_col], :unique=>true, :deferrable=>nil}}
+    @db.dump_index_cache(@filename)
+    @db.instance_variable_get(:@indexes).keys.must_equal ['"table"', '"foo"']
+    @db.load_index_cache(@filename)
+    @db.instance_variable_get(:@indexes).keys.must_equal ['"foo"', '"table"']
+  end
+
   it "Database#load_index_cache should load the index cache from the given file dumped by #dump_index_cache" do
     @db.dump_index_cache(@filename)
     db = Sequel::Database.new.extension(:index_caching)

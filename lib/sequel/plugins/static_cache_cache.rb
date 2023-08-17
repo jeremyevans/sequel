@@ -26,7 +26,11 @@ module Sequel
       module ClassMethods
         # Dump the in-memory cached rows to the cache file.
         def dump_static_cache_cache
-          File.open(@static_cache_cache_file, 'wb'){|f| f.write(Marshal.dump(@static_cache_cache))}
+          static_cache_cache = {}
+          @static_cache_cache.sort.each do |k, v|
+            static_cache_cache[k] = v
+          end
+          File.open(@static_cache_cache_file, 'wb'){|f| f.write(Marshal.dump(static_cache_cache))}
           nil
         end
 

@@ -133,7 +133,11 @@ module Sequel
         # Dump the in-memory cached metadata to the cache file.
         def dump_pg_auto_constraint_validations_cache
           raise Error, "No pg_auto_constraint_validations setup" unless file = @pg_auto_constraint_validations_cache_file
-          File.open(file, 'wb'){|f| f.write(Marshal.dump(@pg_auto_constraint_validations_cache))}
+          pg_auto_constraint_validations_cache = {}
+          @pg_auto_constraint_validations_cache.sort.each do |k, v|
+            pg_auto_constraint_validations_cache[k] = v
+          end
+          File.open(file, 'wb'){|f| f.write(Marshal.dump(pg_auto_constraint_validations_cache))}
           nil
         end
 

@@ -18,6 +18,14 @@ describe "schema_caching extension" do
     File.size(@filename).must_be :>,  0
   end
 
+  it "Database#dump_schema_cache should dump schema sorted by table name" do
+    @schemas['"foo"'] = [[:column, {:db_type=>"integer", :default=>"nextval('table_id_seq'::regclass)", :allow_null=>false, :primary_key=>true, :type=>:integer, :ruby_default=>nil}]]
+    @db.dump_schema_cache(@filename)
+    @db.instance_variable_get(:@schemas).keys.must_equal ['"table"', '"foo"']
+    @db.load_schema_cache(@filename)
+    @db.instance_variable_get(:@schemas).keys.must_equal ['"foo"', '"table"']
+  end
+
   it "Database#dump_schema_cache/load_schema_cache should work with :callable_default values set in schema_post_process" do
     @schemas['"table"'][0][1][:callable_default] = lambda{1}
     @schemas['"table"'][0][1][:default] = 'call_1'
