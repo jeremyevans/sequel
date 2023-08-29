@@ -1,0 +1,33 @@
+= New Features
+
+* A pg_auto_parameterize_in_array extension has been added, which
+  handles conversion of IN/NOT IN to = ANY or != ALL for more types.
+  The pg_auto_parameterize extension only handles integer types by
+  default, because other types require the pg_array extension. This
+  new extension adds handling for Float, BigDecimal, Date, Time,
+  DateTime, Sequel::SQLTime, and Sequel::SQL::Blob types.  It can
+  also handle String types if the :treat_string_list_as_text_array
+  Database option is present, using the text type for that. Handling
+  String values as text is not the default because that may cause
+  issues for some queries.
+
+= Other Improvements
+
+* The defaults_setter plugin now does a deep copy of database
+  default values that are hash/array or delegates to hash/array.
+  This fixes cases where the database default values are mutated.
+
+* Sequel now correctly handles infinite and NaN float values used
+  inside PostgreSQL array bound variables.
+
+* The data in the cache files used by the schema_caching and
+  index_caching extensions and static_cache_cache and
+  pg_auto_constraint_validations plugins are now sorted before the
+  cache file is saved, increasing consistency between runs.
+
+* bigdecimal has been added as a dependency.  bigdecimal is currently
+  a default gem in Ruby from 1.9 to 3.2, but it will move to a
+  bundled gem in Ruby 3.4, and there will be warnings in Ruby 3.3
+  for cases that will break in Ruby 3.4.  Adding bigdecimal as a
+  dependency should avoid warnings when using bundler in Ruby 3.3,
+  and should avoid errors in Ruby 3.4.
