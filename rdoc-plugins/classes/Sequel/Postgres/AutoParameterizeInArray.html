@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::AutoParameterizeInArray</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Postgres::AutoParameterizeInArray
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/pg_auto_parameterize_in_array_rb.html">lib/sequel/extensions/pg_auto_parameterize_in_array.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Enable automatically parameterizing queries.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-complex_expression_sql_append">complex_expression_sql_append</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
+<a name='method-i-complex_expression_sql_append'></a>
+<div class='synopsis'>
+<span class='name'>complex_expression_sql_append</span><span class='arguments'>(sql, op, args)</span>
+
+</div>
+<div class='description'>
+
+<p>Transform column IN (…) expressions into column = ANY($) and column NOT IN (…) expressions into column != ALL($) using an array bound variable for the ANY/ALL argument, if all values inside the predicate are of the same type and the type is handled by the extension. This is the same optimization PostgreSQL performs internally, but this reduces the number of bound variables.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-complex_expression_sql_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-complex_expression_sql_append-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize_in_array.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">48</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">49</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
+<span class="line-num">50</span>     <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">51</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">auto_param?</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">type</span> = <span class="ruby-identifier">_bound_variable_type_for_array</span>(<span class="ruby-identifier">r</span>))
+<span class="line-num">52</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span> 
+<span class="line-num">53</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:&quot;=&quot;</span>
+<span class="line-num">54</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ANY</span>
+<span class="line-num">55</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">56</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:!=</span>
+<span class="line-num">57</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ALL</span>
+<span class="line-num">58</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">59</span>       <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">l</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">func</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">type</span>))]
+<span class="line-num">60</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">61</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">62</span> 
+<span class="line-num">63</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

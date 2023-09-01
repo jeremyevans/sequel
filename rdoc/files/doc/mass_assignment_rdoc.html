@@ -31,7 +31,7 @@ doc/mass_assignment.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-09-13 07:44:12 -0700</span>
+<span class='datetime'>2023-08-03 09:06:34 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -85,7 +85,7 @@ Last Update:
 
 <p>Since mass assignment by default allows modification of all column values except for primary key columns, it can be a security risk in some cases. If you are dealing with untrusted input, you are generally going to want to restrict what should be updated.</p>
 
-<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> has <code>Model#set_fields</code> and <code>Model#update_fields</code> methods, which are designed to be used with untrused input. These methods take two arguments, the untrusted hash as the first argument, and a trusted array of field names as the second argument:</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> has <code>Model#set_fields</code> and <code>Model#update_fields</code> methods, which are designed to be used with untrusted input. These methods take two arguments, the untrusted hash as the first argument, and a trusted array of field names as the second argument:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_fields</span>({<span class="ruby-value">title:</span> <span class="ruby-string">&#39;T&#39;</span>, <span class="ruby-value">body:</span> <span class="ruby-string">&#39;B&#39;</span>}, [<span class="ruby-value">:title</span>, <span class="ruby-value">:body</span>])
 </pre>
@@ -152,7 +152,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
 </div>
 </body>
 </html>

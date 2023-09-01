@@ -202,6 +202,7 @@ div.header {
     font: 14px Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
     background: #ffffe3;
     padding: 2px 3px;
+    overflow-wrap: break-word;
     line-height: 1.4; }
   #content h1 code, #content h1 tt, #content h2 code, #content h2 tt, #content h3 code, #content h3 tt, #content h4 code, #content h4 tt, #content h5 code, #content h5 tt, #content h6 code, #content h6 tt {
     font-size: 1.1em; }

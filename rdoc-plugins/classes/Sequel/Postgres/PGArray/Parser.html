@@ -75,13 +75,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">326</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">327</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">source</span>)
-<span class="line-num">328</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span> 
-<span class="line-num">329</span>   <span class="ruby-ivar">@stack</span> = [[]]
-<span class="line-num">330</span>   <span class="ruby-ivar">@encoding</span> = <span class="ruby-identifier">string</span>.<span class="ruby-identifier">encoding</span>
-<span class="line-num">331</span>   <span class="ruby-ivar">@recorded</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">force_encoding</span>(<span class="ruby-ivar">@encoding</span>)
-<span class="line-num">332</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">334</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">335</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">source</span>)
+<span class="line-num">336</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span> 
+<span class="line-num">337</span>   <span class="ruby-ivar">@stack</span> = [[]]
+<span class="line-num">338</span>   <span class="ruby-ivar">@encoding</span> = <span class="ruby-identifier">string</span>.<span class="ruby-identifier">encoding</span>
+<span class="line-num">339</span>   <span class="ruby-ivar">@recorded</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">force_encoding</span>(<span class="ruby-ivar">@encoding</span>)
+<span class="line-num">340</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -101,18 +101,18 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-new_entry-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">336</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new_entry</span>(<span class="ruby-identifier">include_empty</span>=<span class="ruby-keyword">false</span>)
-<span class="line-num">337</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">include_empty</span>
-<span class="line-num">338</span>     <span class="ruby-identifier">entry</span> = <span class="ruby-ivar">@recorded</span>
-<span class="line-num">339</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">entry</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;NULL&#39;</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">include_empty</span>
-<span class="line-num">340</span>       <span class="ruby-identifier">entry</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">341</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@converter</span>
-<span class="line-num">342</span>       <span class="ruby-identifier">entry</span> = <span class="ruby-ivar">@converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">entry</span>)
-<span class="line-num">343</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">344</span>     <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">entry</span>)
-<span class="line-num">345</span>     <span class="ruby-ivar">@recorded</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">force_encoding</span>(<span class="ruby-ivar">@encoding</span>)
-<span class="line-num">346</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">347</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">344</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new_entry</span>(<span class="ruby-identifier">include_empty</span>=<span class="ruby-keyword">false</span>)
+<span class="line-num">345</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">include_empty</span>
+<span class="line-num">346</span>     <span class="ruby-identifier">entry</span> = <span class="ruby-ivar">@recorded</span>
+<span class="line-num">347</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">entry</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;NULL&#39;</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">include_empty</span>
+<span class="line-num">348</span>       <span class="ruby-identifier">entry</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">349</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@converter</span>
+<span class="line-num">350</span>       <span class="ruby-identifier">entry</span> = <span class="ruby-ivar">@converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">entry</span>)
+<span class="line-num">351</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">352</span>     <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">entry</span>)
+<span class="line-num">353</span>     <span class="ruby-ivar">@recorded</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">force_encoding</span>(<span class="ruby-ivar">@encoding</span>)
+<span class="line-num">354</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">355</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-parse'>
@@ -131,63 +131,63 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-parse-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">351</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">parse</span>
-<span class="line-num">352</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, empty string&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">eos?</span>
-<span class="line-num">353</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, doesn&#39;t start with {&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/((\[\d+:\d+\])+=)?\{/</span>)
-<span class="line-num">354</span> 
-<span class="line-num">355</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">356</span>   <span class="ruby-keyword">while</span> <span class="ruby-operator">!</span><span class="ruby-identifier">eos?</span>
-<span class="line-num">357</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">358</span>     <span class="ruby-identifier">char</span> = <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/[{}&quot;,]|[^{}&quot;,]+/</span>)
-<span class="line-num">359</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;,&#39;</span>
-<span class="line-num">360</span>       <span class="ruby-comment"># Comma outside quoted string indicates end of current entry</span>
-<span class="line-num">361</span>       <span class="ruby-identifier">new_entry</span>
-<span class="line-num">362</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&quot;&#39;</span>
-<span class="line-num">363</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, opening quote with existing recorded data&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">364</span>       <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">365</span>       <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
-<span class="line-num">366</span>       <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">367</span>         <span class="ruby-identifier">char</span> = <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/[&quot;\\]|[^&quot;\\]+/</span>)
-<span class="line-num">368</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;\\&#39;</span>
-<span class="line-num">369</span>           <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">getch</span>
-<span class="line-num">370</span>         <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&quot;&#39;</span>
-<span class="line-num">371</span>           <span class="ruby-identifier">n</span> = <span class="ruby-identifier">peek</span>(<span class="ruby-value">1</span>)
-<span class="line-num">372</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, closing quote not followed by comma or closing brace&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;,&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;}&#39;</span>
-<span class="line-num">373</span>           <span class="ruby-keyword">break</span>
-<span class="line-num">374</span>         <span class="ruby-keyword">else</span>
-<span class="line-num">375</span>           <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">char</span>
-<span class="line-num">376</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">377</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">378</span>       <span class="ruby-identifier">new_entry</span>(<span class="ruby-keyword">true</span>)
-<span class="line-num">379</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;{&#39;</span>
-<span class="line-num">380</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, opening brace with existing recorded data&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">381</span> 
-<span class="line-num">382</span>       <span class="ruby-comment"># Start of new array, add it to the stack</span>
-<span class="line-num">383</span>       <span class="ruby-identifier">new</span> = []
-<span class="line-num">384</span>       <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">new</span>
-<span class="line-num">385</span>       <span class="ruby-ivar">@stack</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">new</span>
-<span class="line-num">386</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;}&#39;</span>
-<span class="line-num">387</span>       <span class="ruby-comment"># End of current array, add current entry to the current array</span>
-<span class="line-num">388</span>       <span class="ruby-identifier">new_entry</span>
+<span class="line-num">359</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">parse</span>
+<span class="line-num">360</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, empty string&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">eos?</span>
+<span class="line-num">361</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, doesn&#39;t start with {&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/((\[\d+:\d+\])+=)?\{/</span>)
+<span class="line-num">362</span> 
+<span class="line-num">363</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">364</span>   <span class="ruby-keyword">while</span> <span class="ruby-operator">!</span><span class="ruby-identifier">eos?</span>
+<span class="line-num">365</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">366</span>     <span class="ruby-identifier">char</span> = <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/[{}&quot;,]|[^{}&quot;,]+/</span>)
+<span class="line-num">367</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;,&#39;</span>
+<span class="line-num">368</span>       <span class="ruby-comment"># Comma outside quoted string indicates end of current entry</span>
+<span class="line-num">369</span>       <span class="ruby-identifier">new_entry</span>
+<span class="line-num">370</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&quot;&#39;</span>
+<span class="line-num">371</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, opening quote with existing recorded data&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">372</span>       <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">373</span>       <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
+<span class="line-num">374</span>       <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">375</span>         <span class="ruby-identifier">char</span> = <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/[&quot;\\]|[^&quot;\\]+/</span>)
+<span class="line-num">376</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;\\&#39;</span>
+<span class="line-num">377</span>           <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">getch</span>
+<span class="line-num">378</span>         <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&quot;&#39;</span>
+<span class="line-num">379</span>           <span class="ruby-identifier">n</span> = <span class="ruby-identifier">peek</span>(<span class="ruby-value">1</span>)
+<span class="line-num">380</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, closing quote not followed by comma or closing brace&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;,&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;}&#39;</span>
+<span class="line-num">381</span>           <span class="ruby-keyword">break</span>
+<span class="line-num">382</span>         <span class="ruby-keyword">else</span>
+<span class="line-num">383</span>           <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">char</span>
+<span class="line-num">384</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">385</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">386</span>       <span class="ruby-identifier">new_entry</span>(<span class="ruby-keyword">true</span>)
+<span class="line-num">387</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;{&#39;</span>
+<span class="line-num">388</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;invalid array, opening brace with existing recorded data&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@recorded</span>.<span class="ruby-identifier">empty?</span>
 <span class="line-num">389</span> 
-<span class="line-num">390</span>       <span class="ruby-keyword">if</span> <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
-<span class="line-num">391</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;array parsing finished without parsing entire string&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">eos?</span>
-<span class="line-num">392</span> 
-<span class="line-num">393</span>         <span class="ruby-comment"># Top level of array, parsing should be over.</span>
-<span class="line-num">394</span>         <span class="ruby-comment"># Pop current array off stack and return it as result</span>
-<span class="line-num">395</span>         <span class="ruby-keyword">return</span> <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">pop</span>
-<span class="line-num">396</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">397</span>         <span class="ruby-comment"># Nested array, pop current array off stack</span>
-<span class="line-num">398</span>         <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">pop</span>
-<span class="line-num">399</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">400</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">401</span>       <span class="ruby-comment"># Add the character to the recorded character buffer.</span>
-<span class="line-num">402</span>       <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">char</span>
-<span class="line-num">403</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">404</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">405</span> 
-<span class="line-num">406</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;array parsing finished with array unclosed&quot;</span>
-<span class="line-num">407</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">390</span>       <span class="ruby-comment"># Start of new array, add it to the stack</span>
+<span class="line-num">391</span>       <span class="ruby-identifier">new</span> = []
+<span class="line-num">392</span>       <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">new</span>
+<span class="line-num">393</span>       <span class="ruby-ivar">@stack</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">new</span>
+<span class="line-num">394</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">char</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;}&#39;</span>
+<span class="line-num">395</span>       <span class="ruby-comment"># End of current array, add current entry to the current array</span>
+<span class="line-num">396</span>       <span class="ruby-identifier">new_entry</span>
+<span class="line-num">397</span> 
+<span class="line-num">398</span>       <span class="ruby-keyword">if</span> <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">399</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;array parsing finished without parsing entire string&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">eos?</span>
+<span class="line-num">400</span> 
+<span class="line-num">401</span>         <span class="ruby-comment"># Top level of array, parsing should be over.</span>
+<span class="line-num">402</span>         <span class="ruby-comment"># Pop current array off stack and return it as result</span>
+<span class="line-num">403</span>         <span class="ruby-keyword">return</span> <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">pop</span>
+<span class="line-num">404</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">405</span>         <span class="ruby-comment"># Nested array, pop current array off stack</span>
+<span class="line-num">406</span>         <span class="ruby-ivar">@stack</span>.<span class="ruby-identifier">pop</span>
+<span class="line-num">407</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">408</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">409</span>       <span class="ruby-comment"># Add the character to the recorded character buffer.</span>
+<span class="line-num">410</span>       <span class="ruby-ivar">@recorded</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">char</span>
+<span class="line-num">411</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">412</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">413</span> 
+<span class="line-num">414</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;array parsing finished with array unclosed&quot;</span>
+<span class="line-num">415</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -199,7 +199,7 @@ Superclass:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
 </div>
 </body>
 </html>

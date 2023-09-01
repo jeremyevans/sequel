@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>pg_auto_parameterize_in_array.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>pg_auto_parameterize_in_array.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/pg_auto_parameterize_in_array.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2023-08-08 15:45:53 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_auto_parameterize_in_array extension builds on the pg_auto_parameterize extension, adding support for handling additional types when converting from IN to = ANY and NOT IN to != ALL:</p>
+
+<pre>DB[:table].where(column: [1.0, 2.0, ...])
+# Without extension: column IN ($1::numeric, $2:numeric, ...) # bound variables: 1.0, 2.0, ...
+# With extension:    column = ANY($1::numeric[]) # bound variables: [1.0, 2.0, ...]</pre>
+
+<p>This prevents the use of an unbounded number of bound variables based on the size of the array, as well as using different SQL for different array sizes.</p>
+
+<p>The following types are supported when doing the conversions, with the database type used:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>Float </td><td>
+<p>if any are infinite or NaN, double precision, otherwise numeric</p>
+</td></tr><tr><td class='label'>BigDecimal </td><td>
+<p>numeric</p>
+</td></tr><tr><td class='label'>Date </td><td>
+<p>date</p>
+</td></tr><tr><td class='label'>Time </td><td>
+<p>timestamp (or timestamptz if pg_timestamptz extension is used)</p>
+</td></tr><tr><td class='label'>DateTime </td><td>
+<p>timestamp (or timestamptz if pg_timestamptz extension is used)</p>
+</td></tr><tr><td class='label'>Sequel::SQLTime </td><td>
+<p>time</p>
+</td></tr><tr><td class='label'>Sequel::SQL::Blob </td><td>
+<p>bytea</p>
+</td></tr></tbody></table>
+
+<p><a href="../../../../classes/String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the  <code>:treat_string_list_as_text_array</code> Database option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
+
+<p>The conversion is only done for single dimensional arrays that have more than two elements, where all elements are of the same class (other than nil values).</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/AutoParameterizeInArray.html"><code>Sequel::Postgres::AutoParameterizeInArray</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

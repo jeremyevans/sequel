@@ -127,12 +127,12 @@ Sequel::Plugins::DefaultsSetter
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb</span>
-<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">56</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">57</span>     <span class="ruby-identifier">set_default_values</span>
-<span class="line-num">58</span>     <span class="ruby-ivar">@cache_default_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cache</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:cache</span>)
-<span class="line-num">59</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">57</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">58</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">59</span>     <span class="ruby-identifier">set_default_values</span>
+<span class="line-num">60</span>     <span class="ruby-ivar">@cache_default_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cache</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:cache</span>)
+<span class="line-num">61</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
@@ -144,7 +144,7 @@ Sequel::Plugins::DefaultsSetter
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
 </div>
 </body>
 </html>

@@ -31,12 +31,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-08-01 07:39:28 -0700</span>
+<span class='datetime'>2023-08-29 11:56:10 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.72.0+-282023-09-01-29"><a href="doc/release_notes/5_72_0_txt.html">5.72.0</a> (2023-09-01)<span><a href="#label-5.72.0+-282023-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Sort caches before marshalling when using schema_caching, index_caching, static_cache_cache, and pg_auto_constraint_validations (jeremyevans)</p>
+</li><li>
+<p>Change the defaults_setter plugin do a deep-copy of database default hash/array values and delegates (jeremyevans) (#2069)</p>
+</li><li>
+<p>Add pg_auto_parameterize_in_array extension, for converting IN/NOT IN to = ANY or != ALL for more types (jeremyevans)</p>
+</li><li>
+<p>Fix literalization of infinite and NaN float values in PostgreSQL array bound variables (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.71.0+-282023-08-01-29"><a href="doc/release_notes/5_71_0_txt.html">5.71.0</a> (2023-08-01)<span><a href="#label-5.71.0+-282023-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support ILIKE ANY on PostgreSQL by not forcing the use of ESCAPE for ILIKE (gilesbowkett) (#2066)</p>
@@ -1351,7 +1362,7 @@ Last Update:
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
 </div>
 </body>
 </html>

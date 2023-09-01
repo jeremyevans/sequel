@@ -274,21 +274,21 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">504</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">array_type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">505</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">506</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>
-<span class="line-num">507</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">array_type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">array_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">array_type</span>
-<span class="line-num">508</span>       <span class="ruby-identifier">v</span>
-<span class="line-num">509</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">510</span>       <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_a</span>, <span class="ruby-identifier">array_type</span>)
-<span class="line-num">511</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">512</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">513</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">array_type</span>)
-<span class="line-num">514</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">515</span>     <span class="ruby-comment"># May not be defined unless the pg_array_ops extension is used</span>
-<span class="line-num">516</span>     <span class="ruby-identifier">pg_array_op</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">517</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">518</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">512</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">array_type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">513</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">514</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>
+<span class="line-num">515</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">array_type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">array_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">array_type</span>
+<span class="line-num">516</span>       <span class="ruby-identifier">v</span>
+<span class="line-num">517</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">518</span>       <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_a</span>, <span class="ruby-identifier">array_type</span>)
+<span class="line-num">519</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">520</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">521</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">array_type</span>)
+<span class="line-num">522</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">523</span>     <span class="ruby-comment"># May not be defined unless the pg_array_ops extension is used</span>
+<span class="line-num">524</span>     <span class="ruby-identifier">pg_array_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">525</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">526</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_array_op'>
@@ -730,7 +730,7 @@ Sequel::SQL::Builders
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
 </div>
 </body>
 </html>

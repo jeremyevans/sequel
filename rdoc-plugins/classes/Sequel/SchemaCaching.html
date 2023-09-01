@@ -69,7 +69,7 @@ Sequel::SchemaCaching
 <pre id='method-i-dump_schema_cache-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>
 <span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache</span>(<span class="ruby-identifier">file</span>)
 <span class="line-num">54</span>   <span class="ruby-identifier">sch</span> = {}
-<span class="line-num">55</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">55</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
 <span class="line-num">56</span>     <span class="ruby-identifier">sch</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span><span class="ruby-operator">|</span>
 <span class="line-num">57</span>       <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">h</span>]
 <span class="line-num">58</span>       <span class="ruby-identifier">h</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:callable_default</span>)
@@ -155,7 +155,7 @@ Sequel::SchemaCaching
 <div id='footer-push'></div>
 </div>
 <div id='footer'>
-<a href="https://github.com/jeremyevans/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
 </div>
 </body>
 </html>
