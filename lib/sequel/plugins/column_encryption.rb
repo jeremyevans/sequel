@@ -31,7 +31,6 @@ rescue RuntimeError, OpenSSL::Cipher::CipherError
   # :nocov:
 end
 
-require 'base64'
 require 'securerandom'
 
 module Sequel
@@ -375,7 +374,7 @@ module Sequel
         # Decrypt using any supported format and any available key.
         def decrypt(data)
           begin
-            data = Base64.urlsafe_decode64(data)
+            data = urlsafe_decode64(data)
           rescue ArgumentError
             raise Error, "Unable to decode encrypted column: invalid base64"
           end
@@ -448,7 +447,7 @@ module Sequel
         # The prefix string of columns for the given search type and the first configured encryption key.
         # Used to find values that do not use this prefix in order to perform reencryption.
         def current_key_prefix(search_type)
-          Base64.urlsafe_encode64("#{search_type.chr}\0#{@key_id.chr}")
+          urlsafe_encode64("#{search_type.chr}\0#{@key_id.chr}")
         end
 
         # The prefix values to search for the given data (an array of strings), assuming the column uses
@@ -472,11 +471,40 @@ module Sequel
 
         private
 
+        if RUBY_VERSION >= '2.4'
+          def decode64(str)
+            str.unpack1("m0")
+          end
+        # :nocov:
+        else
+          def decode64(str)
+            str.unpack("m0")[0]
+          end
+        # :nocov:
+        end
+
+        def urlsafe_encode64(bin)
+          str = [bin].pack("m0")
+          str.chomp!("=") unless str.chomp!("==")
+          str.tr!("+/", "-_")
+          str
+        end
+
+        def urlsafe_decode64(str)
+          if str.length % 4 == 0
+            str = str.tr("-_", "+/")
+          else
+            str = str.ljust((str.length + 3) & ~3, "=")
+            str.tr!("-_", "+/")
+          end
+          decode64(str)
+        end
+
         # An array of strings, one for each configured encryption key, to find encypted values matching
         # the given data and search format.
         def _search_prefixes(data, search_type)
           @key_map.map do |key_id, (key, _)|
-            Base64.urlsafe_encode64(_search_prefix(data, search_type, key_id, key))
+            urlsafe_encode64(_search_prefix(data, search_type, key_id, key))
           end
         end
 
@@ -509,7 +537,7 @@ module Sequel
           cipher_text << cipher.update(data) if data_size > 0
           cipher_text << cipher.final
 
-          Base64.urlsafe_encode64("#{prefix}#{random_data}#{cipher_iv}#{cipher.auth_tag}#{cipher_text}")
+          urlsafe_encode64("#{prefix}#{random_data}#{cipher_iv}#{cipher.auth_tag}#{cipher_text}")
         end
       end
 

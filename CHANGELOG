@@ -1,3 +1,7 @@
+=== master
+
+* Stop using base64 library in column_encryption plugin (jeremyevans)
+
 === 5.72.0 (2023-09-01)
 
 * Sort caches before marshalling when using schema_caching, index_caching, static_cache_cache, and pg_auto_constraint_validations (jeremyevans)

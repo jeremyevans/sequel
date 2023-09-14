@@ -395,16 +395,16 @@ describe "column_encryption plugin" do
     @obj[:enc] = enc.dup.tap{|x| x[0] = '%'}
     proc{@obj.enc}.must_raise Sequel::Error # invalid base-64
 
-    @obj[:enc] = enc.dup.tap{|x| x[0,4] = Base64.urlsafe_encode64("\4\0\0")}
+    @obj[:enc] = enc.dup.tap{|x| x[0,4] = "BAAA"} # "\4\0\0" base64
     proc{@obj.enc}.must_raise Sequel::Error # invalid flags
 
-    @obj[:enc] = enc.dup.tap{|x| x[0,4] = Base64.urlsafe_encode64("\0\1\0")}
+    @obj[:enc] = enc.dup.tap{|x| x[0,4] = "AAEA"} # "\0\1\0" base64
     proc{@obj.enc}.must_raise Sequel::Error # invalid reserved byte
 
-    @obj[:enc] = enc.dup.tap{|x| x[0,4] = Base64.urlsafe_encode64("\0\0\1")}
+    @obj[:enc] = enc.dup.tap{|x| x[0,4] = "AAAB"} # "\0\0\1" base64
     proc{@obj.enc}.must_raise Sequel::Error # invalid key id
 
-    @obj[:enc] = enc.dup.tap{|x| x[0,4] = Base64.urlsafe_encode64("\1\0\0")}
+    @obj[:enc] = enc.dup.tap{|x| x[0,4] = "AQAA"} # "\1\0\0" base64
     proc{@obj.enc}.must_raise Sequel::Error # invalid minimum size for searchable
 
     @obj[:enc] = enc.dup.tap{|x| x.slice!(60, 1000)}
