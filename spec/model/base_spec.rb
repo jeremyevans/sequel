@@ -664,11 +664,25 @@ describe Sequel::Model, ".strict_param_setting" do
   end
 
   it "should raise an error if a missing/restricted column/method is accessed" do
-    proc{@c.new(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    err = proc{@c.new(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    err.message.must_equal("method a= doesn't exist")
     proc{@c.create(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     c = @c.new
     proc{c.set(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.update(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+  end
+
+  it "should add class name to error message" do
+    item = Class.new(Sequel::Model(:items)) do
+      columns :id
+    end
+
+    item.class_eval do
+      def self.name; 'Item' end
+    end
+
+    err = proc{item.new(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    err.message.must_equal("method a= doesn't exist for class Item")
   end
 
   it "should be disabled by strict_param_setting = false" do
