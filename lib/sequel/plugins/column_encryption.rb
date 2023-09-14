@@ -485,7 +485,6 @@ module Sequel
 
         def urlsafe_encode64(bin)
           str = [bin].pack("m0")
-          str.chomp!("=") unless str.chomp!("==")
           str.tr!("+/", "-_")
           str
         end
