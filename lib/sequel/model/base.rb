@@ -2035,20 +2035,15 @@ module Sequel
           if meths.include?(m)
             set_column_value(m, v)
           elsif strict
-            err_msg = -> (msg) do
-              msg += " for class #{self.class.name}" if self.class.name
-              msg
-            end
-
             # Avoid using respond_to? or creating symbols from user input
             if public_methods.map(&:to_s).include?(m)
               if Array(model.primary_key).map(&:to_s).member?(k.to_s) && model.restrict_primary_key?
-                raise MassAssignmentRestriction, err_msg.call("#{k} is a restricted primary key")
+                raise MassAssignmentRestriction.new("#{k} is a restricted primary key", self)
               else
-                raise MassAssignmentRestriction, err_msg.call("#{k} is a restricted column")
+                raise MassAssignmentRestriction.new("#{k} is a restricted column", self)
               end
             else
-              raise MassAssignmentRestriction, err_msg.call("method #{m} doesn't exist")
+              raise MassAssignmentRestriction.new("method #{m} doesn't exist", self)
             end
           end
         end

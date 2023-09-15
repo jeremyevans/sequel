@@ -24,11 +24,18 @@ module Sequel
   UndefinedAssociation = Class.new(Error)
   ).name
 
-  (
   # Raised when a mass assignment method is called in strict mode with either a restricted column
   # or a column without a setter method.
-  MassAssignmentRestriction = Class.new(Error)
-  ).name
+  class MassAssignmentRestriction < Error
+    # The Sequel::Model object related to this exception.
+    attr_reader :model
+
+    def initialize(msg, model)
+      @model = model
+      msg += " for class #{model.class.name}" if model.class.name
+      super(msg)
+    end
+  end
   
   # Exception class raised when +raise_on_save_failure+ is set and validation fails
   class ValidationFailed < Error
