@@ -31,9 +31,10 @@ module Sequel
     attr_reader :model
 
     def self.create(msg, model)
-      @model = model
       msg += " for class #{model.class.name}" if model.class.name
-      new(msg)
+      new(msg).tap do |err|
+        err.instance_variable_set(:@model, model)
+      end
     end
   end
   

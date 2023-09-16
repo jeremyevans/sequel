@@ -683,6 +683,7 @@ describe Sequel::Model, ".strict_param_setting" do
 
     err = proc{item.new(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     err.message.must_equal("method a= doesn't exist for class Item")
+    err.model.class.must_equal(item)
   end
 
   it "should be disabled by strict_param_setting = false" do
