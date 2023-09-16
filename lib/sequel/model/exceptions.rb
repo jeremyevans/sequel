@@ -30,10 +30,10 @@ module Sequel
     # The Sequel::Model object related to this exception.
     attr_reader :model
 
-    def initialize(msg, model)
+    def self.create(msg, model)
       @model = model
       msg += " for class #{model.class.name}" if model.class.name
-      super(msg)
+      new(msg)
     end
   end
   
