@@ -30,11 +30,15 @@ module Sequel
     # The Sequel::Model object related to this exception.
     attr_reader :model
 
-    def self.create(msg, model)
-      msg += " for class #{model.class.name}" if model.class.name
-      new(msg).tap do |err|
-        err.instance_variable_set(:@model, model)
-      end
+    # The column related to this exception, as a string.
+    attr_reader :column
+
+    # Create an instance of this class with the model and column set.
+    def self.create(msg, model, column)
+      e = new("#{msg} for class #{model.class.inspect}")
+      e.instance_variable_set(:@model, model)
+      e.instance_variable_set(:@column, column)
+      e
     end
   end
   

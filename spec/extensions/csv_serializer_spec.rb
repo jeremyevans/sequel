@@ -164,7 +164,9 @@ describe "Sequel::Plugins::CsvSerializer" do
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do
     @Artist.restrict_primary_key
     err = proc{@Artist.from_csv(@artist.to_csv)}.must_raise(Sequel::MassAssignmentRestriction)
-    err.message.must_equal("id is a restricted primary key for class Artist")
+    err.message.must_include("id is a restricted primary key for class ")
+    err.model.class.must_equal @Artist
+    err.column.must_equal "id"
   end
 
   it "should use a dataset's selected columns" do

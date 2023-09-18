@@ -2031,19 +2031,20 @@ module Sequel
         meths = setter_methods(type)
         strict = strict_param_setting
         hash.each do |k,v|
+          k = k.to_s
           m = "#{k}="
           if meths.include?(m)
             set_column_value(m, v)
           elsif strict
             # Avoid using respond_to? or creating symbols from user input
             if public_methods.map(&:to_s).include?(m)
-              if Array(model.primary_key).map(&:to_s).member?(k.to_s) && model.restrict_primary_key?
-                raise MassAssignmentRestriction.create("#{k} is a restricted primary key", self)
+              if Array(model.primary_key).map(&:to_s).member?(k) && model.restrict_primary_key?
+                raise MassAssignmentRestriction.create("#{k} is a restricted primary key", self, k)
               else
-                raise MassAssignmentRestriction.create("#{k} is a restricted column", self)
+                raise MassAssignmentRestriction.create("#{k} is a restricted column", self, k)
               end
             else
-              raise MassAssignmentRestriction.create("method #{m} doesn't exist", self)
+              raise MassAssignmentRestriction.create("method #{m} doesn't exist", self, k)
             end
           end
         end

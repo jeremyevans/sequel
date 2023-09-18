@@ -1,5 +1,7 @@
 === master
 
+* Add MassAssignmentRestriction#model and #column for getting the model instance and related column for mass assignment errors (artofhuman, jeremyevans) (#2079)
+
 * Stop using base64 library in column_encryption plugin (jeremyevans)
 
 === 5.72.0 (2023-09-01)
