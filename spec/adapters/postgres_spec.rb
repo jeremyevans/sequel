@@ -1359,11 +1359,9 @@ describe "A PostgreSQL dataset" do
     @d.count.must_equal 1
     @d.truncate(:cascade => true)
     @d.count.must_equal 0
-    if @d.db.server_version > 80400
-      @d.insert( :name => 'abc', :value => 1)
-      @d.truncate(:cascade => true, :only=>true, :restart=>true)
-      @d.count.must_equal 0
-    end
+    @d.insert( :name => 'abc', :value => 1)
+    @d.truncate(:cascade => true, :only=>true, :restart=>true)
+    @d.count.must_equal 0
   end
 
   it "should truncate multiple tables at once" do
@@ -1837,7 +1835,7 @@ describe "A PostgreSQL database" do
     @db[:posts].insert(:title=>t1)
     @db[:posts].insert(:title=>t2)
     @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).must_equal [t2, t1]
-  end if DB.server_version >= 80300
+  end
 
   it "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}
@@ -2365,40 +2363,38 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
 
 end
 
-if DB.server_version >= 80300
-  describe "PostgreSQL tsearch2" do
-    before(:all) do
-      DB.create_table! :test6 do
-        text :title
-        text :body
-        full_text_index [:title, :body]
-      end
-      @ds = DB[:test6]
+describe "PostgreSQL tsearch2" do
+  before(:all) do
+    DB.create_table! :test6 do
+      text :title
+      text :body
+      full_text_index [:title, :body]
     end
-    after do
-      DB[:test6].delete
-    end
-    after(:all) do
-      DB.drop_table?(:test6)
-    end
+    @ds = DB[:test6]
+  end
+  after do
+    DB[:test6].delete
+  end
+  after(:all) do
+    DB.drop_table?(:test6)
+  end
 
-    it "should search by indexed column" do
-      record =  {:title => "oopsla conference", :body => "test"}
-      @ds.insert(record)
-      @ds.full_text_search(:title, "oopsla").all.must_equal [record]
-    end
+  it "should search by indexed column" do
+    record =  {:title => "oopsla conference", :body => "test"}
+    @ds.insert(record)
+    @ds.full_text_search(:title, "oopsla").all.must_equal [record]
+  end
 
-    it "should join multiple coumns with spaces to search by last words in row" do
-      record = {:title => "multiple words", :body => "are easy to search"}
-      @ds.insert(record)
-      @ds.full_text_search([:title, :body], "words").all.must_equal [record]
-    end
+  it "should join multiple coumns with spaces to search by last words in row" do
+    record = {:title => "multiple words", :body => "are easy to search"}
+    @ds.insert(record)
+    @ds.full_text_search([:title, :body], "words").all.must_equal [record]
+  end
 
-    it "should return rows with a NULL in one column if a match in another column" do
-      record = {:title => "multiple words", :body =>nil}
-      @ds.insert(record)
-      @ds.full_text_search([:title, :body], "words").all.must_equal [record]
-    end
+  it "should return rows with a NULL in one column if a match in another column" do
+    record = {:title => "multiple words", :body =>nil}
+    @ds.insert(record)
+    @ds.full_text_search([:title, :body], "words").all.must_equal [record]
   end
 end
 
@@ -3380,9 +3376,7 @@ describe 'PostgreSQL array handling' do
     @ds.get(Sequel.pg_array(:i).length).must_equal 3
     @ds.get(Sequel.pg_array(:i).lower).must_equal 1
 
-    if @db.server_version >= 80400
-      @ds.select(Sequel.pg_array(:i).unnest).from_self.count.must_equal 3
-    end
+    @ds.select(Sequel.pg_array(:i).unnest).from_self.count.must_equal 3
     if @db.server_version >= 90000
       @ds.get(Sequel.pg_array(:i5).join).must_equal '15'
       @ds.get(Sequel.pg_array(:i5).join(':')).must_equal '1:5'
