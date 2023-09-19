@@ -1798,7 +1798,7 @@ module Sequel
       # :phrase :: Similar to :plain, but also adding an ILIKE filter to ensure that
       #            returned rows also include the exact phrase used.
       # :rank :: Set to true to order by the rank, so that closer matches are returned first.
-      # :to_tsquery :: Can be set to :plain or :phrase to specify the function to use to
+      # :to_tsquery :: Can be set to :plain, :phrase, or :websearch to specify the function to use to
       #                convert the terms to a ts_query.
       # :tsquery :: Specifies the terms argument is already a valid SQL expression returning a
       #             tsquery, and can be used directly in the query.
@@ -1818,6 +1818,8 @@ module Sequel
           query_func = case to_tsquery = opts[:to_tsquery]
           when :phrase, :plain
             :"#{to_tsquery}to_tsquery"
+          when :websearch
+            :"websearch_to_tsquery"
           else
             (opts[:phrase] || opts[:plain]) ? :plainto_tsquery : :to_tsquery
           end
