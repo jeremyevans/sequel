@@ -85,7 +85,8 @@ platforms :ruby do
   end
 
   # Test current sequel_pg on half of the MRIs, and pure-ruby on the other half
-  if sequel_pg
+  # Avoid pulling in bigdecimal gem on Ruby < 2.1
+  if sequel_pg && RUBY_VERSION >= '2.1'
     gem 'sequel_pg', git: 'https://github.com/jeremyevans/sequel_pg', require: 'sequel'
   end
 end
