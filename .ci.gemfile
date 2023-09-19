@@ -62,7 +62,9 @@ else
   gem 'minitest', '>= 5.7.0'
 end
 
-if RUBY_VERSION < '2.4'
+if RUBY_VERSION < '2.0'
+  gem 'bigdecimal', '<1.2'
+elsif RUBY_VERSION < '2.4'
   gem 'bigdecimal', '<1.3'
 else
   gem 'bigdecimal'
