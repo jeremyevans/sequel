@@ -63,7 +63,9 @@ else
 end
 
 if RUBY_VERSION < '2.0'
-  gem 'bigdecimal', '<1.2'
+  # don't require bigdecimal, because bigdecimal 1.1.0 gem is
+  # not the same as the bigdecimal library that ships in Ruby 1.9.3
+  # (which is labeled 1.1.0).
 elsif RUBY_VERSION < '2.4'
   gem 'bigdecimal', '<1.3'
 else
