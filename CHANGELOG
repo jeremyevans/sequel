@@ -1,5 +1,7 @@
 === master
 
+* Add paged_update_delete plugin for paged deletes and updates (jeremyevans) (#2080)
+
 * Support to_tsquery: :websearch option to Dataset#full_text_search on PostgreSQL 11+ (jeremyevans) (#2075)
 
 * Add MassAssignmentRestriction#model and #column for getting the model instance and related column for mass assignment errors (artofhuman, jeremyevans) (#2079)

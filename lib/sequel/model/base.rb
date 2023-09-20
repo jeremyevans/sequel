@@ -2229,11 +2229,17 @@ module Sequel
 
       private
 
+      # Return the dataset ordered by the model's primary key.  This should not
+      # be used if the model does not have a primary key.
+      def _force_primary_key_order
+        cached_dataset(:_pk_order_ds){order(*model.primary_key)}
+      end
+
       # If the dataset is not already ordered, and the model has a primary key,
       # return a clone ordered by the primary key.
       def _primary_key_order
-        if @opts[:order].nil? && model && (pk = model.primary_key)
-          cached_dataset(:_pk_order_ds){order(*pk)}
+        if @opts[:order].nil? && model && model.primary_key
+          _force_primary_key_order
         end
       end
 
