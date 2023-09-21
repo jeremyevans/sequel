@@ -166,6 +166,8 @@ module Sequel
     #               uses :auto_savepoint, you can set this to false to not use a savepoint.
     #               If the value given for this option is :only, it will only create a
     #               savepoint if it is inside a transaction.
+    # :skip_transaction :: If set, do not actually open a transaction or savepoint,
+    #                      just checkout a connection and yield it.
     #
     # PostgreSQL specific options:
     #
@@ -193,6 +195,10 @@ module Sequel
         end
       else
         synchronize(opts[:server]) do |conn|
+          if opts[:skip_transaction]
+            return yield(conn)
+          end
+
           if opts[:savepoint] == :only
             if supports_savepoints?
               if _trans(conn)

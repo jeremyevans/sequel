@@ -1,5 +1,9 @@
 === master
 
+* Support skipping transactions in Dataset#{import,paged_each} using :skip_transaction option (jeremyevans)
+
+* Add Database#transaction :skip_transaction option to skip creating a transaction or savepoint (jeremyevans)
+
 * Stop using a transaction for a single query if calling Dataset#import with a dataset (jeremyevans)
 
 * Add paged_update_delete plugin for paged deletes and updates (jeremyevans) (#2080)

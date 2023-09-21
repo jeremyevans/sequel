@@ -712,8 +712,9 @@ module Sequel
       e = options[:ignore_index_errors] || options[:if_not_exists]
       generator.indexes.each do |index|
         begin
-          pr = proc{index_sql_list(name, [index]).each{|sql| execute_ddl(sql)}}
-          supports_transactional_ddl? ? transaction(:savepoint=>:only, &pr) : pr.call
+          transaction(:savepoint=>:only, :skip_transaction=>supports_transactional_ddl? == false) do
+            index_sql_list(name, [index]).each{|sql| execute_ddl(sql)}
+          end
         rescue Error
           raise unless e
         end

@@ -1945,8 +1945,10 @@ module Sequel
       end
       
       # If transactions should be used, wrap the yield in a transaction block.
-      def checked_transaction(opts=OPTS)
-        use_transaction?(opts) ? db.transaction({:server=>this_server}.merge!(opts)){yield} : yield
+      def checked_transaction(opts=OPTS, &block)
+        h = {:server=>this_server}.merge!(opts)
+        h[:skip_transaction] = true unless use_transaction?(opts)
+        db.transaction(h, &block)
       end
 
       # Change the value of the column to given value, recording the change.
@@ -2148,8 +2150,9 @@ module Sequel
       #   # DELETE FROM artists WHERE (id = 2)
       #   # ...
       def destroy
-        pr = proc{all(&:destroy).length}
-        model.use_transactions ? @db.transaction(:server=>opts[:server], &pr) : pr.call
+        @db.transaction(:server=>opts[:server], :skip_transaction=>model.use_transactions == false) do
+          all(&:destroy).length
+        end
       end
 
       # If there is no order already defined on this dataset, order it by

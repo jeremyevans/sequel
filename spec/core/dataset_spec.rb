@@ -3374,6 +3374,14 @@ describe "Dataset#import" do
       'COMMIT']
   end
 
+  it "should accept a :skip_transaction option to skip transactions" do
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :skip_transaction=>true)
+    @db.sqls.must_equal [
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+    ]
+  end
+
   it "should accept a columns array and a dataset" do
     @ds2 = @ds.from(:cats).filter(:purr => true).select(:a, :b)
     
@@ -5456,6 +5464,11 @@ describe "Dataset#paged_each" do
     sqls = @ds.db.sqls
     sqls[0].must_equal 'BEGIN'
     sqls[-1].must_equal 'COMMIT'
+  end
+
+  it "should not use a transaction if the :skip_transaction option is given" do
+    @ds.paged_each(:skip_transaction=>true, &@proc)
+    @ds.db.sqls.must_equal ['SELECT * FROM test ORDER BY x LIMIT 1000 OFFSET 0']
   end
 
   it "should use a limit and offset to go through the dataset in chunks at a time" do

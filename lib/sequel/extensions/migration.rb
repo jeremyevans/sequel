@@ -482,11 +482,7 @@ module Sequel
         @use_transactions
       end
 
-      if use_trans
-        db.transaction(&block)
-      else
-        yield
-      end
+      db.transaction(:skip_transaction=>use_trans == false, &block)
     end
 
     # Load the migration file, raising an exception if the file does not define

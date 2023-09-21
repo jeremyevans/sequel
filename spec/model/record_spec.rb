@@ -272,7 +272,7 @@ describe "Model#save" do
     DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
-  it "should use :transaction option if given" do
+  it "should use :transaction option if given to override use_transactions setting" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     o.save(:columns=>:y, :transaction=>false)
@@ -281,6 +281,13 @@ describe "Model#save" do
     o.use_transactions = false
     o.save(:columns=>:y, :transaction=>true)
     DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+  end
+
+  it "should respect :skip_transaction=>true option if given" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.save(:columns=>:y, :skip_transaction=>true)
+    DB.sqls.must_equal ["UPDATE items SET y = NULL WHERE (id = 3)"]
   end
 
   it "should rollback if before_save calls cancel_action and raise_on_save_failure = true" do
