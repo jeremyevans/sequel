@@ -3378,9 +3378,7 @@ describe "Dataset#import" do
     @ds2 = @ds.from(:cats).filter(:purr => true).select(:a, :b)
     
     @ds.import([:x, :y], @ds2)
-    @db.sqls.must_equal ['BEGIN',
-      "INSERT INTO items (x, y) SELECT a, b FROM cats WHERE (purr IS TRUE)",
-      'COMMIT']
+    @db.sqls.must_equal ["INSERT INTO items (x, y) SELECT a, b FROM cats WHERE (purr IS TRUE)"]
   end
 
   it "should slice based on the default_import_slice option" do

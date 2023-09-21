@@ -358,7 +358,7 @@ module Sequel
     #            queries.
     # :slice :: Same as :commit_every, :commit_every takes precedence.
     def import(columns, values, opts=OPTS)
-      return @db.transaction{insert(columns, values)} if values.is_a?(Dataset)
+      return insert(columns, values) if values.is_a?(Dataset)
 
       return if values.empty?
       raise(Error, 'Using Sequel::Dataset#import with an empty column array is not allowed') if columns.empty?

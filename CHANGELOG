@@ -1,5 +1,7 @@
 === master
 
+* Stop using a transaction for a single query if calling Dataset#import with a dataset (jeremyevans)
+
 * Add paged_update_delete plugin for paged deletes and updates (jeremyevans) (#2080)
 
 * Support to_tsquery: :websearch option to Dataset#full_text_search on PostgreSQL 11+ (jeremyevans) (#2075)
