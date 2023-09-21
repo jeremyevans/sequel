@@ -3062,6 +3062,21 @@ describe "paged_update_delete plugin" do
     @model.select_order_map([:id, :o]).must_equal expected
   end
 
+  it "Model#paged_datasets should work on unfiltered dataset" do
+    final_counts = [1, 2, 1, 10, 1, 2, 1, 100, 100]
+    @sizes.zip(final_counts).each do |rows, expected_fc|
+      @db.transaction(:rollback=>:always) do
+        counts = []
+        @model.paged_update_delete_size(rows).paged_datasets{|ds| counts << ds.count}
+        counts.pop.must_equal expected_fc
+        counts.each{|c| c.must_equal rows}
+      end
+    end
+    counts = []
+    @model.paged_datasets{|ds| counts << ds.count}
+    counts.must_equal [100]
+  end
+
   it "Model#paged_delete should work on filtered dataset" do
     ds = @model.where{id < 50}
     @sizes.each do |rows|
@@ -3091,5 +3106,21 @@ describe "paged_update_delete plugin" do
     ds.paged_update(:o=>Sequel[:o] + 200).must_equal 49
     ds.select_order_map([:id, :o]).must_equal ds_expected
     other.select_order_map([:id, :o]).must_equal other_expected
+  end
+
+  it "Model#paged_datasets should work on filtered dataset" do
+    ds = @model.where{id < 50}
+    final_counts = [1, 1, 1, 9, 5, 49, 49, 49, 49]
+    @sizes.zip(final_counts).each do |rows, expected_fc|
+      @db.transaction(:rollback=>:always) do
+        counts = []
+        ds.paged_update_delete_size(rows).paged_datasets{|ds| counts << ds.count}
+        counts.pop.must_equal expected_fc
+        counts.each{|c| c.must_equal rows}
+      end
+    end
+    counts = []
+    ds.paged_datasets{|ds| counts << ds.count}
+    counts.must_equal [49]
   end
 end

@@ -14,11 +14,11 @@ describe "paged_update_delete plugin" do
   it "#paged_delete should delete using multiple queries" do
     @ds.paged_delete.must_equal 2002
     @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE (id < 1002)",
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE (id < 2002)",
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums"
     ]
   end
@@ -26,12 +26,42 @@ describe "paged_update_delete plugin" do
   it "#paged_update should update using multiple queries" do
     @ds.paged_update(:x=>1).must_equal 2002
     @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE (id < 1002)",
-      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE ((id < 2002) AND (id >= 1002))",
-      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE (id >= 2002)"
+    ]
+  end
+
+  it "#paged_datasets should yield multiple datasets making up dataset" do
+    sqls = []
+    @ds.paged_datasets{|ds| sqls << ds.sql}
+    sqls.must_equal [
+      "SELECT * FROM albums WHERE (id < 1002)",
+      "SELECT * FROM albums WHERE ((id < 2002) AND (id >= 1002))",
+      "SELECT * FROM albums WHERE (id >= 2002)"
+    ]
+    @db.sqls.must_equal [
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1000",
+    ]
+  end
+
+  it "#paged_datasets should support returning enum" do
+    enum = @ds.paged_datasets
+    enum.must_be_kind_of Enumerator
+    enum.map(&:sql).must_equal [
+      "SELECT * FROM albums WHERE (id < 1002)",
+      "SELECT * FROM albums WHERE ((id < 2002) AND (id >= 1002))",
+      "SELECT * FROM albums WHERE (id >= 2002)"
+    ]
+    @db.sqls.must_equal [
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1000",
     ]
   end
 
@@ -40,7 +70,7 @@ describe "paged_update_delete plugin" do
     @db.numrows = [2]
     @ds.paged_delete.must_equal 2
     @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums"
     ]
   end
@@ -50,19 +80,25 @@ describe "paged_update_delete plugin" do
     @db.numrows = [2]
     @ds.paged_update(:x=>1).must_equal 2
     @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1"
     ]
+  end
+
+  it "#paged_datasets should handle case where number of rows is less than page size" do
+    @db.fetch = []
+    @ds.paged_datasets.map(&:sql).must_equal ['SELECT * FROM albums']
+    @db.sqls.must_equal ["SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000"]
   end
 
   it "#paged_delete should respect existing filters" do
     @ds.where{x > 3}.paged_delete.must_equal 2002
     @db.sqls.must_equal [
-      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE ((x > 3) AND (id < 1002))",
-      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE ((x > 3) AND (id < 2002))",
-      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE (x > 3)"
     ]
   end
@@ -70,18 +106,32 @@ describe "paged_update_delete plugin" do
   it "#paged_update should respect existing filters" do
     @ds.where{x > 3}.paged_update(:x=>1).must_equal 2002
     @db.sqls.must_equal [
-      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE ((x > 3) AND (id < 1002))",
-      "SELECT id FROM albums WHERE ((x > 3) AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE ((x > 3) AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE ((x > 3) AND (id < 2002) AND (id >= 1002))",
-      "SELECT id FROM albums WHERE ((x > 3) AND (id >= 2002)) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE ((x > 3) AND (id >= 2002)) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE ((x > 3) AND (id >= 2002))"
+    ]
+  end
+
+  it "#paged_datasets should respect existing filters" do
+    @ds.where{x > 3}.paged_datasets.map(&:sql).must_equal [
+      "SELECT * FROM albums WHERE ((x > 3) AND (id < 1002))",
+      "SELECT * FROM albums WHERE ((x > 3) AND (id < 2002) AND (id >= 1002))",
+      "SELECT * FROM albums WHERE ((x > 3) AND (id >= 2002))"
+    ]
+
+    @db.sqls.must_equal [
+      "SELECT id FROM albums WHERE (x > 3) ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE ((x > 3) AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE ((x > 3) AND (id >= 2002)) ORDER BY id LIMIT 1 OFFSET 1000",
     ]
   end
 
   it "#paged_update_delete_size should set the page size for paged_update" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_update_delete_size(3).paged_delete.must_equal 10
+    @ds.paged_update_delete_size(4).paged_delete.must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "DELETE FROM albums WHERE (id < 1002)",
@@ -94,7 +144,7 @@ describe "paged_update_delete plugin" do
 
   it "#paged_update_delete_size should set the page size for paged_delete" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_update_delete_size(3).paged_update(:x=>1).must_equal 10
+    @ds.paged_update_delete_size(4).paged_update(:x=>1).must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "UPDATE albums SET x = 1 WHERE (id < 1002)",
@@ -105,6 +155,19 @@ describe "paged_update_delete plugin" do
     ]
   end
 
+  it "#paged_update_delete_size should set the page size for paged_datasets" do
+    @db.numrows = [4, 4, 2]
+    @ds.paged_update_delete_size(4).paged_datasets.map(&:sql).must_equal [
+      "SELECT * FROM albums WHERE (id < 1002)",
+      "SELECT * FROM albums WHERE ((id < 2002) AND (id >= 1002))",
+      "SELECT * FROM albums WHERE (id >= 2002)"
+    ]
+    @db.sqls.must_equal [
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
+      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 4",
+      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 4",
+    ]
+  end
   it "should raise error for invalid size passed to paged_update_delete_size" do
     proc{@ds.paged_update_delete_size(0)}.must_raise Sequel::Error
     proc{@ds.paged_update_delete_size(-1)}.must_raise Sequel::Error
@@ -113,33 +176,37 @@ describe "paged_update_delete plugin" do
   it "should raise error for dataset with limit" do
     proc{@ds.limit(1).paged_delete}.must_raise Sequel::Error
     proc{@ds.limit(1).paged_update(:x=>1)}.must_raise Sequel::Error
+    proc{@ds.limit(1).paged_datasets{}}.must_raise Sequel::Error
   end
 
   it "should raise error for dataset with offset" do
     proc{@ds.offset(1).paged_delete}.must_raise Sequel::Error
     proc{@ds.offset(1).paged_update(:x=>1)}.must_raise Sequel::Error
+    proc{@ds.offset(1).paged_datasets{}}.must_raise Sequel::Error
   end
 
   it "should raise error for model with composite primary key" do
     @c.set_primary_key [:id, :x]
     proc{@c.dataset.paged_delete}.must_raise Sequel::Error
     proc{@c.dataset.paged_update(:x=>1)}.must_raise Sequel::Error
+    proc{@c.dataset.paged_datasets{}}.must_raise Sequel::Error
   end
 
   it "should raise error for model with no primary key" do
     @c.no_primary_key
     proc{@c.dataset.paged_delete}.must_raise Sequel::Error
     proc{@c.dataset.paged_update(:x=>1)}.must_raise Sequel::Error
+    proc{@c.dataset.paged_datasets{}}.must_raise Sequel::Error
   end
 
   it "should offer paged_delete class method" do
     @c.paged_delete.must_equal 2002
     @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE (id < 1002)",
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums WHERE (id < 2002)",
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "DELETE FROM albums"
     ]
   end
@@ -147,18 +214,31 @@ describe "paged_update_delete plugin" do
   it "should offer paged_update class method" do
     @c.paged_update(:x=>1).must_equal 2002
     @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE (id < 1002)",
-      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE ((id < 2002) AND (id >= 1002))",
-      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1001",
+      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1000",
       "UPDATE albums SET x = 1 WHERE (id >= 2002)"
+    ]
+  end
+
+  it "should offer paged_datasets class method" do
+    @c.paged_datasets.map(&:sql).must_equal [
+      "SELECT * FROM albums WHERE (id < 1002)",
+      "SELECT * FROM albums WHERE ((id < 2002) AND (id >= 1002))",
+      "SELECT * FROM albums WHERE (id >= 2002)"
+    ]
+    @db.sqls.must_equal [
+      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1000",
+      "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1000",
     ]
   end
 
   it "should offer paged_update_delete_size class method" do
     @db.numrows = [4, 4, 2]
-    @c.paged_update_delete_size(3).paged_delete.must_equal 10
+    @c.paged_update_delete_size(4).paged_delete.must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "DELETE FROM albums WHERE (id < 1002)",

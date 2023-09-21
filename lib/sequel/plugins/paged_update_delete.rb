@@ -6,7 +6,8 @@ module Sequel
     # +paged_delete+ dataset methods.  These behave similarly to
     # the default +update+ and +delete+ dataset methods, except
     # that the update or deletion is done in potentially multiple
-    # queries.  For a large table, this prevents the change from
+    # queries (by default, affected 1000 rows per query).
+    # For a large table, this prevents the change from
     # locking the table for a long period of time.
     #
     # Because the point of this is to prevent locking tables for
@@ -50,9 +51,22 @@ module Sequel
     #   # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 12345)) ORDER BY id LIMIT 1 OFFSET 4
     #   # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND (id >= 12345))
     # 
-    # You should avoid using +paged_update+ with updates that
-    # modify the primary key, as such usage is not supported by
-    # this plugin.
+    # The plugin also adds a +paged_datasets+ method that will yield
+    # separate datasets limited in size that in total handle all
+    # rows in the receiver:
+    #
+    #   Album.where{name > 'M'}.paged_datasets{|ds| puts ds.sql}
+    #   # Runs: SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1001
+    #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 1002))
+    #   # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1001
+    #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 1002) AND (id >= 1002))
+    #   # ...
+    #   # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1001
+    #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND (id >= 10002))
+    #
+    # You should avoid using +paged_update+ or +paged_datasets+
+    # with updates that modify the primary key, as such usage is
+    # not supported by this plugin.
     #
     # This plugin only supports models with scalar primary keys.
     #
@@ -66,10 +80,36 @@ module Sequel
     #   Album.plugin :paged_update_delete
     module PagedUpdateDelete
       module ClassMethods
-        Plugins.def_dataset_methods(self, [:paged_delete, :paged_update, :paged_update_delete_size])
+        Plugins.def_dataset_methods(self, [:paged_datasets, :paged_delete, :paged_update, :paged_update_delete_size])
       end
 
       module DatasetMethods
+        # Yield datasets for subsets of the receiver that are limited
+        # to no more than 1000 rows (you can configure the number of
+        # rows using paged_update_delete_size).
+        def paged_datasets
+          unless defined?(yield)
+            return enum_for(:paged_datasets)
+          end
+
+          pk = _paged_update_delete_pk(:paged_update)
+          base_offset_ds = offset_ds = _paged_update_delete_offset_ds
+          first = nil
+
+          while last = offset_ds.get(pk)
+            ds = where(pk < last)
+            ds = ds.where(pk >= first) if first
+            yield ds
+            first = last
+            offset_ds = base_offset_ds.where(pk >= first)
+          end
+
+          ds = self
+          ds = ds.where(pk >= first) if first
+          yield ds
+          nil
+        end
+
         # Delete all rows of the dataset using using multiple queries so that
         # no more than 1000 rows are deleted at a time (you can configure the
         # number of rows using paged_update_delete_size).
@@ -88,21 +128,11 @@ module Sequel
         # number of rows using paged_update_delete_size). All arguments are
         # passed to Dataset#update.
         def paged_update(*args)
-          pk = _paged_update_delete_pk(:paged_update)
           rows_updated = 0
-          base_offset_ds = offset_ds = _paged_update_delete_offset_ds
-          first = nil
-
-          while last = offset_ds.get(pk)
-            ds = where(pk < last)
-            ds = ds.where(pk >= first) if first
+          paged_datasets do |ds|
             rows_updated += ds.update(*args)
-            first = last
-            offset_ds = base_offset_ds.where(pk >= first)
           end
-          ds = self
-          ds = ds.where(pk >= first) if first
-          rows_updated + ds.update(*args)
+          rows_updated
         end
 
         # Set the number of rows to update or delete per query when using
@@ -133,7 +163,7 @@ module Sequel
         # to get the upper limit for the next UPDATE or DELETE query.
         def _paged_update_delete_offset_ds
           offset = @opts[:paged_updated_delete_rows] || 1000
-          _force_primary_key_order.offset(offset+1)
+          _force_primary_key_order.offset(offset)
         end
       end
     end
