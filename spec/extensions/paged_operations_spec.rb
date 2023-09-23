@@ -129,9 +129,9 @@ describe "paged_operations plugin" do
     ]
   end
 
-  it "#paged_operations_size should set the page size for paged_update" do
+  it "#paged_delete should support :rows_per_page option" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_operations_size(4).paged_delete.must_equal 10
+    @ds.paged_delete(:rows_per_page=>4).must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "DELETE FROM albums WHERE (id < 1002)",
@@ -142,9 +142,9 @@ describe "paged_operations plugin" do
     ]
   end
 
-  it "#paged_operations_size should set the page size for paged_delete" do
+  it "#paged_update should support :rows_per_page option" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_operations_size(4).paged_update(:x=>1).must_equal 10
+    @ds.paged_update({:x=>1}, :rows_per_page=>4).must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "UPDATE albums SET x = 1 WHERE (id < 1002)",
@@ -155,9 +155,9 @@ describe "paged_operations plugin" do
     ]
   end
 
-  it "#paged_operations_size should set the page size for paged_datasets" do
+  it "#paged_datasets should support :rows_per_page option" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_operations_size(4).paged_datasets.map(&:sql).must_equal [
+    @ds.paged_datasets(:rows_per_page=>4).map(&:sql).must_equal [
       "SELECT * FROM albums WHERE (id < 1002)",
       "SELECT * FROM albums WHERE ((id < 2002) AND (id >= 1002))",
       "SELECT * FROM albums WHERE (id >= 2002)"
@@ -168,9 +168,11 @@ describe "paged_operations plugin" do
       "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 4",
     ]
   end
-  it "should raise error for invalid size passed to paged_operations_size" do
-    proc{@ds.paged_operations_size(0)}.must_raise Sequel::Error
-    proc{@ds.paged_operations_size(-1)}.must_raise Sequel::Error
+  it "should raise error for invalid :rows_per_page option" do
+    proc{@ds.paged_datasets(:rows_per_page=>0){}}.must_raise Sequel::Error
+    proc{@ds.paged_datasets(:rows_per_page=>-1){}}.must_raise Sequel::Error
+    proc{@ds.paged_delete(:rows_per_page=>0)}.must_raise Sequel::Error
+    proc{@ds.paged_update({:x=>1}, :rows_per_page=>0)}.must_raise Sequel::Error
   end
 
   it "should raise error for dataset with limit" do
@@ -233,19 +235,6 @@ describe "paged_operations plugin" do
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 1000",
       "SELECT id FROM albums WHERE (id >= 1002) ORDER BY id LIMIT 1 OFFSET 1000",
       "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 1000",
-    ]
-  end
-
-  it "should offer paged_operations_size class method" do
-    @db.numrows = [4, 4, 2]
-    @c.paged_operations_size(4).paged_delete.must_equal 10
-    @db.sqls.must_equal [
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
-      "DELETE FROM albums WHERE (id < 1002)",
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
-      "DELETE FROM albums WHERE (id < 2002)",
-      "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
-      "DELETE FROM albums"
     ]
   end
 end
