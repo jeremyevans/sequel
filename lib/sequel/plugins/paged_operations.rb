@@ -73,7 +73,7 @@ module Sequel
     #   # (called before loading subclasses)
     #   Sequel::Model.plugin :paged_operations
     #
-    #   # Make the Album class support paged update/delete/datasts
+    #   # Make the Album class support paged update/delete/datasets
     #   Album.plugin :paged_operations
     module PagedOperations
       module ClassMethods
@@ -83,11 +83,11 @@ module Sequel
       module DatasetMethods
         # Yield datasets for subsets of the receiver that are limited
         # to no more than 1000 rows (you can configure the number of
-        # rows using paged_operations_size).
+        # rows using +:rows_per_page+).
         #
         # Options:
-        # :rows_per_fetch :: The maximum number of rows in each yielded dataset
-        #                    (unless concurrent modifications are made to the table).
+        # :rows_per_page :: The maximum number of rows in each yielded dataset
+        #                   (unless concurrent modifications are made to the table).
         def paged_datasets(opts=OPTS)
           unless defined?(yield)
             return enum_for(:paged_datasets, opts)
@@ -113,11 +113,11 @@ module Sequel
 
         # Delete all rows of the dataset using using multiple queries so that
         # no more than 1000 rows are deleted at a time (you can configure the
-        # number of rows using paged_operations_size).
+        # number of rows using +:rows_per_page+).
         #
         # Options:
-        # :rows_per_fetch :: The maximum number of rows affected by each DELETE query
-        #                    (unless concurrent modifications are made to the table).
+        # :rows_per_page :: The maximum number of rows affected by each DELETE query
+        #                   (unless concurrent modifications are made to the table).
         def paged_delete(opts=OPTS)
           pk = _paged_operations_pk(:paged_delete)
           rows_deleted = 0
@@ -130,12 +130,12 @@ module Sequel
 
         # Update all rows of the dataset using using multiple queries so that
         # no more than 1000 rows are updated at a time (you can configure the
-        # number of rows using paged_operations_size). All arguments are
+        # number of rows using +:rows_per_page+). All arguments are
         # passed to Dataset#update.
         #
         # Options:
-        # :rows_per_fetch :: The maximum number of rows affected by each UPDATE query
-        #                    (unless concurrent modifications are made to the table).
+        # :rows_per_page :: The maximum number of rows affected by each UPDATE query
+        #                   (unless concurrent modifications are made to the table).
         def paged_update(values, opts=OPTS)
           rows_updated = 0
           paged_datasets(opts) do |ds|
