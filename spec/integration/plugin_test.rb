@@ -3017,7 +3017,7 @@ describe "column_encryption plugin" do
   end if DB.database_type == :postgres
 end if RUBY_VERSION >= '2.3' && (begin; require 'sequel/plugins/column_encryption'; true; rescue LoadError; false end)
 
-describe "paged_update_delete plugin" do
+describe "paged_operations plugin" do
   before(:all) do
     @db = DB
     @db.create_table!(:pud_test) do
@@ -3026,7 +3026,7 @@ describe "paged_update_delete plugin" do
     end
     @model = Class.new(Sequel::Model)
     @model.set_dataset @db[:pud_test]
-    @model.plugin :paged_update_delete
+    @model.plugin :paged_operations
     @sizes = [1, 2, 3, 10, 11, 98, 99, 100, 101]
   end
   before do
@@ -3042,7 +3042,7 @@ describe "paged_update_delete plugin" do
   it "Model#paged_delete should work on unfiltered dataset" do
     @sizes.each do |rows|
       @db.transaction(:rollback=>:always) do
-        @model.paged_update_delete_size(rows).paged_delete.must_equal 100
+        @model.paged_operations_size(rows).paged_delete.must_equal 100
         @model.count.must_equal 0
       end
     end
@@ -3054,7 +3054,7 @@ describe "paged_update_delete plugin" do
     expected = 100.times.map{|i| [i+1, i+200]}
     @sizes.each do |rows|
       @db.transaction(:rollback=>:always) do
-        @model.paged_update_delete_size(rows).paged_update(:o=>Sequel[:o] + 200).must_equal 100
+        @model.paged_operations_size(rows).paged_update(:o=>Sequel[:o] + 200).must_equal 100
         @model.select_order_map([:id, :o]).must_equal expected
       end
     end
@@ -3067,7 +3067,7 @@ describe "paged_update_delete plugin" do
     @sizes.zip(final_counts).each do |rows, expected_fc|
       @db.transaction(:rollback=>:always) do
         counts = []
-        @model.paged_update_delete_size(rows).paged_datasets{|ds| counts << ds.count}
+        @model.paged_operations_size(rows).paged_datasets{|ds| counts << ds.count}
         counts.pop.must_equal expected_fc
         counts.each{|c| c.must_equal rows}
       end
@@ -3081,7 +3081,7 @@ describe "paged_update_delete plugin" do
     ds = @model.where{id < 50}
     @sizes.each do |rows|
       @db.transaction(:rollback=>:always) do
-        ds.paged_update_delete_size(rows).paged_delete.must_equal 49
+        ds.paged_operations_size(rows).paged_delete.must_equal 49
         ds.count.must_equal 0
         @model.count.must_equal 51
       end
@@ -3098,7 +3098,7 @@ describe "paged_update_delete plugin" do
     other_expected = 51.times.map{|i| [i+50, i+49]}
     @sizes.each do |rows|
       @db.transaction(:rollback=>:always) do
-        ds.paged_update_delete_size(rows).paged_update(:o=>Sequel[:o] + 200).must_equal 49
+        ds.paged_operations_size(rows).paged_update(:o=>Sequel[:o] + 200).must_equal 49
         ds.select_order_map([:id, :o]).must_equal ds_expected
         other.select_order_map([:id, :o]).must_equal other_expected
       end
@@ -3114,7 +3114,7 @@ describe "paged_update_delete plugin" do
     @sizes.zip(final_counts).each do |rows, expected_fc|
       @db.transaction(:rollback=>:always) do
         counts = []
-        ds.paged_update_delete_size(rows).paged_datasets{|ds| counts << ds.count}
+        ds.paged_operations_size(rows).paged_datasets{|ds| counts << ds.count}
         counts.pop.must_equal expected_fc
         counts.each{|c| c.must_equal rows}
       end

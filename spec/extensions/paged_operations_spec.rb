@@ -1,10 +1,10 @@
 require_relative "spec_helper"
 
-describe "paged_update_delete plugin" do
+describe "paged_operations plugin" do
   before do
     @db = Sequel.mock
     @c = Class.new(Sequel::Model(@db[:albums]))
-    @c.plugin :paged_update_delete
+    @c.plugin :paged_operations
     @ds = @c.dataset
     @db.sqls
     @db.fetch = [[{:id=>1002}], [{:id=>2002}]]
@@ -129,9 +129,9 @@ describe "paged_update_delete plugin" do
     ]
   end
 
-  it "#paged_update_delete_size should set the page size for paged_update" do
+  it "#paged_operations_size should set the page size for paged_update" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_update_delete_size(4).paged_delete.must_equal 10
+    @ds.paged_operations_size(4).paged_delete.must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "DELETE FROM albums WHERE (id < 1002)",
@@ -142,9 +142,9 @@ describe "paged_update_delete plugin" do
     ]
   end
 
-  it "#paged_update_delete_size should set the page size for paged_delete" do
+  it "#paged_operations_size should set the page size for paged_delete" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_update_delete_size(4).paged_update(:x=>1).must_equal 10
+    @ds.paged_operations_size(4).paged_update(:x=>1).must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "UPDATE albums SET x = 1 WHERE (id < 1002)",
@@ -155,9 +155,9 @@ describe "paged_update_delete plugin" do
     ]
   end
 
-  it "#paged_update_delete_size should set the page size for paged_datasets" do
+  it "#paged_operations_size should set the page size for paged_datasets" do
     @db.numrows = [4, 4, 2]
-    @ds.paged_update_delete_size(4).paged_datasets.map(&:sql).must_equal [
+    @ds.paged_operations_size(4).paged_datasets.map(&:sql).must_equal [
       "SELECT * FROM albums WHERE (id < 1002)",
       "SELECT * FROM albums WHERE ((id < 2002) AND (id >= 1002))",
       "SELECT * FROM albums WHERE (id >= 2002)"
@@ -168,9 +168,9 @@ describe "paged_update_delete plugin" do
       "SELECT id FROM albums WHERE (id >= 2002) ORDER BY id LIMIT 1 OFFSET 4",
     ]
   end
-  it "should raise error for invalid size passed to paged_update_delete_size" do
-    proc{@ds.paged_update_delete_size(0)}.must_raise Sequel::Error
-    proc{@ds.paged_update_delete_size(-1)}.must_raise Sequel::Error
+  it "should raise error for invalid size passed to paged_operations_size" do
+    proc{@ds.paged_operations_size(0)}.must_raise Sequel::Error
+    proc{@ds.paged_operations_size(-1)}.must_raise Sequel::Error
   end
 
   it "should raise error for dataset with limit" do
@@ -236,9 +236,9 @@ describe "paged_update_delete plugin" do
     ]
   end
 
-  it "should offer paged_update_delete_size class method" do
+  it "should offer paged_operations_size class method" do
     @db.numrows = [4, 4, 2]
-    @c.paged_update_delete_size(4).paged_delete.must_equal 10
+    @c.paged_operations_size(4).paged_delete.must_equal 10
     @db.sqls.must_equal [
       "SELECT id FROM albums ORDER BY id LIMIT 1 OFFSET 4",
       "DELETE FROM albums WHERE (id < 1002)",
