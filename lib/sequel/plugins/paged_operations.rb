@@ -119,6 +119,9 @@ module Sequel
         # :rows_per_page :: The maximum number of rows affected by each DELETE query
         #                   (unless concurrent modifications are made to the table).
         def paged_delete(opts=OPTS)
+          if db.database_type == :oracle && !supports_fetch_next_rows?
+            raise Error, "paged_delete is not supported on Oracle when using emulated offsets"
+          end
           pk = _paged_operations_pk(:paged_delete)
           rows_deleted = 0
           offset_ds = _paged_operations_offset_ds(opts)
