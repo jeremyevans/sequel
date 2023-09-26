@@ -215,6 +215,18 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
+      DISCONNECT_SQL_STATES = %w'40003 08001 08003'.freeze
+      def disconnect_error?(exception, opts)
+        sqlstate = database_exception_sqlstate(exception, opts)
+
+        case sqlstate
+        when *DISCONNECT_SQL_STATES
+          true
+        else
+          super
+        end
+      end
+
       # DB2 has issues with quoted identifiers, so
       # turn off database quoting by default.
       def quote_identifiers_default

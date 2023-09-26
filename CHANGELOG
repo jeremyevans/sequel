@@ -1,5 +1,7 @@
 === master
 
+* Handle disconnect errors in ibmdb and jdbc/db2 adapters (jeremyevans) (#2083)
+
 * Support skipping transactions in Dataset#{import,paged_each} using :skip_transaction option (jeremyevans)
 
 * Add Database#transaction :skip_transaction option to skip creating a transaction or savepoint (jeremyevans)

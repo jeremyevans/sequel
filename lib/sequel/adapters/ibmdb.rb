@@ -301,7 +301,7 @@ module Sequel
       end
 
       def database_exception_sqlstate(exception, opts)
-        exception.sqlstate
+        exception.sqlstate if exception.respond_to?(:sqlstate)
       end
 
       def dataset_class_default

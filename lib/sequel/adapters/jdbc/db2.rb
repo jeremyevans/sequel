@@ -36,6 +36,10 @@ module Sequel
 
         private
 
+        def database_exception_sqlstate(exception, opts)
+          exception.sql_state if exception.respond_to?(:sql_state)
+        end
+
         def set_ps_arg(cps, arg, i)
           case arg
           when Sequel::SQL::Blob
