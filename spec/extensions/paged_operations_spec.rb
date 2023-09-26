@@ -181,6 +181,14 @@ describe "paged_operations plugin" do
     proc{@ds.limit(1).paged_datasets{}}.must_raise Sequel::Error
   end
 
+  it "should raise error for DB2 with emulated offsets" do
+    @c.dataset = Sequel.mock('db2')[:t]
+    ds = @c.dataset
+    proc{ds.offset(1).paged_delete}.must_raise Sequel::Error
+    proc{ds.offset(1).paged_update(:x=>1)}.must_raise Sequel::Error
+    proc{ds.offset(1).paged_datasets{}}.must_raise Sequel::Error
+  end
+
   it "should raise error for dataset with offset" do
     proc{@ds.offset(1).paged_delete}.must_raise Sequel::Error
     proc{@ds.offset(1).paged_update(:x=>1)}.must_raise Sequel::Error

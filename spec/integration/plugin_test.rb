@@ -3123,4 +3123,4 @@ describe "paged_operations plugin" do
     ds.paged_datasets{|ds| counts << ds.count}
     counts.must_equal [49]
   end
-end
+end unless DB.database_type == :db2 && DB.offset_strategy == :emulate

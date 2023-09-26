@@ -150,6 +150,9 @@ module Sequel
         # and return the primary key to operate on as a Sequel::Identifier.
         def _paged_operations_pk(meth)
           raise Error, "cannot use #{meth} if dataset has a limit or offset" if @opts[:limit] || @opts[:offset]
+          if db.database_type == :db2 && db.offset_strategy == :emulate
+            raise Error, "the paged_operations plugin is not supported on DB2 when using emulated offsets, set the :offset_strategy Database option to 'limit_offset' or 'offset_fetch'"
+          end
 
           case pk = model.primary_key
           when Symbol
