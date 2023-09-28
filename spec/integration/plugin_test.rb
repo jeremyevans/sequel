@@ -3048,7 +3048,7 @@ describe "paged_operations plugin" do
     end
     @model.paged_delete.must_equal 100
     @model.count.must_equal 0
-  end unless (DB.database_type == :oracle && !DB.dataset.supports_fetch_next_rows?)
+  end unless (DB.database_type == :oracle && !DB.dataset.supports_fetch_next_rows?) || (DB.database_type == :mssql && !DB.dataset.send(:is_2012_or_later?))
 
   it "Model#paged_update should work on unfiltered dataset" do
     expected = 100.times.map{|i| [i+1, i+200]}
@@ -3089,7 +3089,7 @@ describe "paged_operations plugin" do
     ds.paged_delete.must_equal 49
     ds.count.must_equal 0
     @model.count.must_equal 51
-  end unless (DB.database_type == :oracle && !DB.dataset.supports_fetch_next_rows?)
+  end unless (DB.database_type == :oracle && !DB.dataset.supports_fetch_next_rows?) || (DB.database_type == :mssql && !DB.dataset.send(:is_2012_or_later?))
 
   it "Model#paged_update should work on filtered dataset" do
     ds = @model.where{id < 50}

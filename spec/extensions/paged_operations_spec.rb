@@ -181,6 +181,14 @@ describe "paged_operations plugin" do
     proc{@ds.limit(1).paged_datasets{}}.must_raise Sequel::Error
   end
 
+  it "should raise error paged_delete for MSSQL with emulated offsets" do
+    db = Sequel.connect('mock://mssql')
+    def db.server_version(_=nil); 10000000; end
+    @c.dataset = db[:t]
+    ds = @c.dataset
+    proc{ds.paged_delete}.must_raise Sequel::Error
+  end
+
   it "should raise error for DB2 with emulated offsets" do
     @c.dataset = Sequel.connect('mock://db2')[:t]
     ds = @c.dataset
