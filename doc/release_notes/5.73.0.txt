@@ -1,0 +1,66 @@
+= New Features
+
+* A paged_operations plugin has been added, which adds support for
+  paged_datasets, paged_update, and paged_delete dataset methods.
+  This methods are designed to be used on large datasets, to split 
+  a large query into separate smaller queries, to avoid locking the
+  related database table for a long period of time.
+  paged_update and paged_delete operate the same as update and delete,
+  returning the number of rows updated or deleted. paged_datasets yields
+  one or more datasets representing subsets of the receiver, with the
+  union of all of those datasets comprising all records in the receiver:
+
+    Album.plugin :paged_operations
+
+    Album.where{name > 'M'}.paged_datasets{|ds| puts ds.sql}
+    # Runs: SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1000
+    # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 1002))
+    # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1000
+    # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 2002) AND (id >= 1002))
+    # ...
+    # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1000
+    # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND (id >= 10002))
+
+    Album.where{name <= 'M'}.paged_update(:updated_at=>Sequel::CURRENT_TIMESTAMP)
+    # SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1000
+    # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND ("id" < 1002))
+    # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1000
+    # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND ("id" < 2002) AND (id >= 1002))
+    # ...
+    # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1000
+    # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND (id >= 10002))
+
+    Album.where{name > 'M'}.paged_delete
+    # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1000
+    # DELETE FROM albums WHERE ((name > 'M') AND (id < 1002))
+    # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1000
+    # DELETE FROM albums WHERE ((name > 'M') AND (id < 2002))
+    # ...
+    # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1000
+    # DELETE FROM albums WHERE (name > 'M')
+
+* A Dataset#transaction :skip_transaction option is now support to
+  checkout a connection from the pool without opening a transaction.  This
+  makes it easier to handle cases where a transaction may or not be used
+  based on configuration/options.  Dataset#import and Dataset#paged_each
+  now both support the :skip_transaction option to skip transactions.
+
+* Dataset#full_text_search now supports the to_tsquery: :websearch option
+  on PostgreSQL 11+, to use the websearch_to_tsquery database function.
+
+* The Sequel::MassAssignmentRestriction exception now supports model
+  and column methods to get provide additional information about the
+  exception.  Additionally, the exception message now includes information
+  about the model class.
+
+= Other Improvements
+
+* The ibmdb and jdbc/db2 adapter now both handle disconnect errors
+  correctly, removing the related connection from the pool.
+
+* Dataset#import no longer uses an explicit transaction if given a dataset
+  value, as in that case, only a single query is used.
+
+* The column_encryption plugin no longer uses the base64 library.  The
+  base64 library is moving from the standard library to a bundled gem
+  in Ruby 3.4, and this avoids having a dependency on it.

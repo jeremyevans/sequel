@@ -1,4 +1,4 @@
-=== master
+=== 5.73.0 (2023-10-01)
 
 * Handle disconnect errors in ibmdb and jdbc/db2 adapters (jeremyevans) (#2083)
 
