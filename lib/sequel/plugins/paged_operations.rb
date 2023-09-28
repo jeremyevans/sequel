@@ -20,21 +20,21 @@ module Sequel
     # Examples:
     #
     #   Album.where{name <= 'M'}.paged_update(updated_at: Sequel::CURRENT_TIMESTAMP)
-    #   # SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1001
+    #   # SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1000
     #   # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND ("id" < 1002))
-    #   # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1001
-    #   # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND ("id" < 1002) AND (id >= 1002))
+    #   # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1000
+    #   # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND ("id" < 2002) AND (id >= 1002))
     #   # ...
-    #   # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1001
+    #   # SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1000
     #   # UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name <= 'M') AND (id >= 10002))
     #
     #   Album.where{name > 'M'}.paged_delete
-    #   # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1001
+    #   # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1000
     #   # DELETE FROM albums WHERE ((name > 'M') AND (id < 1002))
-    #   # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1001
+    #   # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1000
     #   # DELETE FROM albums WHERE ((name > 'M') AND (id < 2002))
     #   # ...
-    #   # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 10001
+    #   # SELECT id FROM albums WHERE (name > 'M') ORDER BY id LIMIT 1 OFFSET 1000
     #   # DELETE FROM albums WHERE (name > 'M')
     #
     # The plugin also adds a +paged_datasets+ method that will yield
@@ -42,12 +42,12 @@ module Sequel
     # rows in the receiver:
     #
     #   Album.where{name > 'M'}.paged_datasets{|ds| puts ds.sql}
-    #   # Runs: SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1001
+    #   # Runs: SELECT id FROM albums WHERE (name <= 'M') ORDER BY id LIMIT 1 OFFSET 1000
     #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 1002))
-    #   # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1001
-    #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 1002) AND (id >= 1002))
+    #   # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 1002)) ORDER BY id LIMIT 1 OFFSET 1000
+    #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND ("id" < 2002) AND (id >= 1002))
     #   # ...
-    #   # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1001
+    #   # Runs: SELECT id FROM albums WHERE ((name <= 'M') AND (id >= 10002)) ORDER BY id LIMIT 1 OFFSET 1000
     #   # Prints: SELECT * FROM albums WHERE ((name <= 'M') AND (id >= 10002))
     #
     # To set the number of rows per page, pass a :rows_per_page option:
