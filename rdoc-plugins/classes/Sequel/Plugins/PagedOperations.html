@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::PagedOperations</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PagedOperations
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/paged_operations_rb.html">lib/sequel/plugins/paged_operations.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The paged_operations plugin adds <code>paged_update</code> and <code>paged_delete</code> dataset methods.  These behave similarly to the default <code>update</code> and <code>delete</code> dataset methods, except that the update or deletion is done in potentially multiple queries (by default, affecting 1000 rows per query). For a large table, this prevents the change from locking the table for a long period of time.</p>
+
+<p>Because the point of this is to prevent locking tables for long periods of time, the separate queries are not contained in a transaction, which means if a later query fails, earlier queries will still be committed.  You could prevent this by using a transaction manually, but that defeats the purpose of using these methods.</p>
+
+<p>Examples:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_update</span>(<span class="ruby-value">updated_at:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>)
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &lt;= &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 1002))</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 1002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 2002) AND (id &gt;= 1002))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002))</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_delete</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &gt; &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE ((name &gt; &#39;M&#39;) AND (id &lt; 1002))</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &gt; &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE ((name &gt; &#39;M&#39;) AND (id &lt; 2002))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &gt; &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE (name &gt; &#39;M&#39;)</span>
+</pre>
+
+<p>The plugin also adds a <code>paged_datasets</code> method that will yield separate datasets limited in size that in total handle all rows in the receiver:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_datasets</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span>}
+<span class="ruby-comment"># Runs: SELECT id FROM albums WHERE (name &lt;= &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># Prints: SELECT * FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 1002))</span>
+<span class="ruby-comment"># Runs: SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 1002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># Prints: SELECT * FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 2002) AND (id &gt;= 1002))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># Runs: SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># Prints: SELECT * FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002))</span>
+</pre>
+
+<p>To set the number of rows per page, pass a :rows_per_page option:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_update</span>({<span class="ruby-value">x:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:x</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>}, <span class="ruby-value">rows_per_page:</span> <span class="ruby-value">4</span>)
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &lt;= &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 4</span>
+<span class="ruby-comment"># UPDATE albums SET x = x + 1 WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 5))</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 5)) ORDER BY id LIMIT 1 OFFSET 4</span>
+<span class="ruby-comment"># UPDATE albums SET x = x + 1 WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 9) AND (id &gt;= 5))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 12345)) ORDER BY id LIMIT 1 OFFSET 4</span>
+<span class="ruby-comment"># UPDATE albums SET x = x + 1 WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 12345))</span>
+</pre>
+
+<p>You should avoid using <code>paged_update</code> or <code>paged_datasets</code> with updates that modify the primary key, as such usage is not supported by this plugin.</p>
+
+<p>This plugin only supports models with scalar primary keys.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support paged update/delete/datasets</span>
+<span class="ruby-comment"># (called before loading subclasses)</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:paged_operations</span>
+
+<span class="ruby-comment"># Make the Album class support paged update/delete/datasets</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:paged_operations</span>
+</pre>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="PagedOperations/ClassMethods.html">Sequel::Plugins::PagedOperations::ClassMethods</a></li>
+<li><a href="PagedOperations/DatasetMethods.html">Sequel::Plugins::PagedOperations::DatasetMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -66,7 +66,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)
 </pre>
 
-<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> will raise a Sequel::MassAssignmentRestriction exception, since by default setting the primary key is not allowed.</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> will raise a <a href="../../classes/Sequel/MassAssignmentRestriction.html"><code>Sequel::MassAssignmentRestriction</code></a> exception, since by default setting the primary key is not allowed.</p>
 
 <p>To enable use of primary key setters, you need to call <code>unrestrict_primary_key</code> for that model:</p>
 

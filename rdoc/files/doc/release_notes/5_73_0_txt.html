@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.73.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.73.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.73.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2023-09-28 16:13:36 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A paged_operations plugin has been added, which adds support for paged_datasets, paged_update, and paged_delete dataset methods. This methods are designed to be used on large datasets, to split  a large query into separate smaller queries, to avoid locking the related database table for a long period of time. paged_update and paged_delete operate the same as update and delete, returning the number of rows updated or deleted. paged_datasets yields one or more datasets representing subsets of the receiver, with the union of all of those datasets comprising all records in the receiver:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:paged_operations</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_datasets</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span>}
+<span class="ruby-comment"># Runs: SELECT id FROM albums WHERE (name &lt;= &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># Prints: SELECT * FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 1002))</span>
+<span class="ruby-comment"># Runs: SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 1002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># Prints: SELECT * FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 2002) AND (id &gt;= 1002))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># Runs: SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># Prints: SELECT * FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002))</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_update</span>(<span class="ruby-value">:updated_at</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>)
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &lt;= &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 1002))</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 1002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name &lt;= &#39;M&#39;) AND (&quot;id&quot; &lt; 2002) AND (id &gt;= 1002))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002)) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE ((name &lt;= &#39;M&#39;) AND (id &gt;= 10002))</span>
+
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">paged_delete</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &gt; &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE ((name &gt; &#39;M&#39;) AND (id &lt; 1002))</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &gt; &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE ((name &gt; &#39;M&#39;) AND (id &lt; 2002))</span>
+<span class="ruby-comment"># ...</span>
+<span class="ruby-comment"># SELECT id FROM albums WHERE (name &gt; &#39;M&#39;) ORDER BY id LIMIT 1 OFFSET 1000</span>
+<span class="ruby-comment"># DELETE FROM albums WHERE (name &gt; &#39;M&#39;)</span>
+</pre>
+</li><li>
+<p>A Dataset#transaction :skip_transaction option is now support to checkout a connection from the pool without opening a transaction.  This makes it easier to handle cases where a transaction may or not be used based on configuration/options.  Dataset#import and Dataset#paged_each now both support the :skip_transaction option to skip transactions.</p>
+</li><li>
+<p>Dataset#full_text_search now supports the to_tsquery: :websearch option on PostgreSQL 11+, to use the websearch_to_tsquery database function.</p>
+</li><li>
+<p>The <a href="../../../classes/Sequel/MassAssignmentRestriction.html"><code>Sequel::MassAssignmentRestriction</code></a> exception now supports model and column methods to get provide additional information about the exception.  Additionally, the exception message now includes information about the model class.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The ibmdb and jdbc/db2 adapter now both handle disconnect errors correctly, removing the related connection from the pool.</p>
+</li><li>
+<p>Dataset#import no longer uses an explicit transaction if given a dataset value, as in that case, only a single query is used.</p>
+</li><li>
+<p>The column_encryption plugin no longer uses the base64 library.  The base64 library is moving from the standard library to a bundled gem in Ruby 3.4, and this avoids having a dependency on it.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

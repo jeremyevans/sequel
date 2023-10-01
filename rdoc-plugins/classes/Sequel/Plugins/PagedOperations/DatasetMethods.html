@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::PagedOperations::DatasetMethods</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PagedOperations::DatasetMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/paged_operations_rb.html">lib/sequel/plugins/paged_operations.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-paged_datasets">paged_datasets</a></li>
+<li><a href="#method-i-paged_delete">paged_delete</a></li>
+<li><a href="#method-i-paged_update">paged_update</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-paged_datasets'>
+<a name='method-i-paged_datasets'></a>
+<div class='synopsis'>
+<span class='name'>paged_datasets</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Yield datasets for subsets of the receiver that are limited to no more than 1000 rows (you can configure the number of rows using <code>:rows_per_page</code>).</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:rows_per_page </td><td>
+<p>The maximum number of rows in each yielded dataset (unless concurrent modifications are made to the table).</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-paged_datasets-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-paged_datasets-source'>    <span class="ruby-comment"># File lib/sequel/plugins/paged_operations.rb</span>
+<span class="line-num"> 91</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_datasets</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num"> 92</span>   <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num"> 93</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">enum_for</span>(<span class="ruby-value">:paged_datasets</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num"> 94</span>   <span class="ruby-keyword">end</span>
+<span class="line-num"> 95</span> 
+<span class="line-num"> 96</span>   <span class="ruby-identifier">pk</span> = <span class="ruby-identifier">_paged_operations_pk</span>(<span class="ruby-value">:paged_update</span>)
+<span class="line-num"> 97</span>   <span class="ruby-identifier">base_offset_ds</span> = <span class="ruby-identifier">offset_ds</span> = <span class="ruby-identifier">_paged_operations_offset_ds</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num"> 98</span>   <span class="ruby-identifier">first</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num"> 99</span> 
+<span class="line-num">100</span>   <span class="ruby-keyword">while</span> <span class="ruby-identifier">last</span> = <span class="ruby-identifier">offset_ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">101</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">last</span>)
+<span class="line-num">102</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">first</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">first</span>
+<span class="line-num">103</span>     <span class="ruby-keyword">yield</span> <span class="ruby-identifier">ds</span>
+<span class="line-num">104</span>     <span class="ruby-identifier">first</span> = <span class="ruby-identifier">last</span>
+<span class="line-num">105</span>     <span class="ruby-identifier">offset_ds</span> = <span class="ruby-identifier">base_offset_ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">first</span>)
+<span class="line-num">106</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">107</span> 
+<span class="line-num">108</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">self</span>
+<span class="line-num">109</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">first</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">first</span>
+<span class="line-num">110</span>   <span class="ruby-keyword">yield</span> <span class="ruby-identifier">ds</span>
+<span class="line-num">111</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-paged_delete'>
+<a name='method-i-paged_delete'></a>
+<div class='synopsis'>
+<span class='name'>paged_delete</span><span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Delete all rows of the dataset using using multiple queries so that no more than 1000 rows are deleted at a time (you can configure the number of rows using <code>:rows_per_page</code>).</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:rows_per_page </td><td>
+<p>The maximum number of rows affected by each DELETE query (unless concurrent modifications are made to the table).</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-paged_delete-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-paged_delete-source'>    <span class="ruby-comment"># File lib/sequel/plugins/paged_operations.rb</span>
+<span class="line-num">121</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_delete</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">122</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:oracle</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">supports_fetch_next_rows?</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:mssql</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">is_2012_or_later?</span>)
+<span class="line-num">123</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;paged_delete is not supported on MSSQL/Oracle when using emulated offsets&quot;</span>
+<span class="line-num">124</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">125</span>   <span class="ruby-identifier">pk</span> = <span class="ruby-identifier">_paged_operations_pk</span>(<span class="ruby-value">:paged_delete</span>)
+<span class="line-num">126</span>   <span class="ruby-identifier">rows_deleted</span> = <span class="ruby-value">0</span>
+<span class="line-num">127</span>   <span class="ruby-identifier">offset_ds</span> = <span class="ruby-identifier">_paged_operations_offset_ds</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">128</span>   <span class="ruby-keyword">while</span> <span class="ruby-identifier">last</span> = <span class="ruby-identifier">offset_ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">129</span>     <span class="ruby-identifier">rows_deleted</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">last</span>).<span class="ruby-identifier">delete</span>
+<span class="line-num">130</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">131</span>   <span class="ruby-identifier">rows_deleted</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">delete</span>
+<span class="line-num">132</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-paged_update'>
+<a name='method-i-paged_update'></a>
+<div class='synopsis'>
+<span class='name'>paged_update</span><span class='arguments'>(values, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Update all rows of the dataset using using multiple queries so that no more than 1000 rows are updated at a time (you can configure the number of rows using <code>:rows_per_page</code>). All arguments are passed to Dataset#update.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:rows_per_page </td><td>
+<p>The maximum number of rows affected by each UPDATE query (unless concurrent modifications are made to the table).</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-paged_update-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-paged_update-source'>    <span class="ruby-comment"># File lib/sequel/plugins/paged_operations.rb</span>
+<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_update</span>(<span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">143</span>   <span class="ruby-identifier">rows_updated</span> = <span class="ruby-value">0</span>
+<span class="line-num">144</span>   <span class="ruby-identifier">paged_datasets</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
+<span class="line-num">145</span>     <span class="ruby-identifier">rows_updated</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">values</span>)
+<span class="line-num">146</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">147</span>   <span class="ruby-identifier">rows_updated</span>
+<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
