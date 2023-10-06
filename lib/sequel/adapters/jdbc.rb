@@ -396,11 +396,16 @@ module Sequel
 
       def database_exception_sqlstate(exception, opts)
         if database_exception_use_sqlstates?
-          while exception.respond_to?(:cause)
-            exception = exception.cause
-            return exception.getSQLState if exception.respond_to?(:getSQLState)
-          end
+          _database_exception_sqlstate(exception, opts)
         end
+      end
+
+      def _database_exception_sqlstate(exception, opts)
+        16.times do
+          return exception.getSQLState if exception.respond_to?(:getSQLState)
+          break unless exception.respond_to?(:cause) && (exception = exception.cause)
+        end
+
         nil
       end
 
@@ -415,8 +420,7 @@ module Sequel
 
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
-        cause = exception.respond_to?(:cause) ? exception.cause : exception
-        super || (cause.respond_to?(:getSQLState) && cause.getSQLState =~ /^08/)
+        super || (_database_exception_sqlstate(exception, opts) =~ /^08/)
       end
 
       # Execute the prepared statement.  If the provided name is a
