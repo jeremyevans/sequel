@@ -1,5 +1,7 @@
 === master
 
+* Re-add is_json and is_not_json methods to the pg_json_ops extension, as the support was re-added in PostgreSQL 16 (jeremyevans)
+
 * Avoid infinite loop when handling exceptions with a cause loop in jdbc adapter (jeremyevans)
 
 === 5.73.0 (2023-10-01)

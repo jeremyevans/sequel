@@ -123,6 +123,15 @@
 #   c = Sequel.pg_jsonb_op(:c)
 #   DB[:t].update(c['key1'] => 1.to_json, c['key2'] => "a".to_json)
 #
+# On PostgreSQL 16+, the <tt>IS [NOT] JSON</tt> operator is supported:
+#
+#   j.is_json                              # j IS JSON
+#   j.is_json(type: :object)               # j IS JSON OBJECT
+#   j.is_json(type: :object, unique: true) # j IS JSON OBJECT WITH UNIQUE
+#   j.is_not_json                          # j IS NOT JSON
+#   j.is_not_json(type: :array)                # j IS NOT JSON ARRAY
+#   j.is_not_json(unique: true)                # j IS NOT JSON WITH UNIQUE
+#
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
 # JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
@@ -150,6 +159,18 @@ module Sequel
       GET_TEXT = ["(".freeze, " ->> ".freeze, ")".freeze].freeze
       GET_PATH = ["(".freeze, " #> ".freeze, ")".freeze].freeze
       GET_PATH_TEXT = ["(".freeze, " #>> ".freeze, ")".freeze].freeze
+
+      IS_JSON = ["(".freeze, " IS JSON".freeze, "".freeze, ")".freeze].freeze
+      IS_NOT_JSON = ["(".freeze, " IS NOT JSON".freeze, "".freeze, ")".freeze].freeze
+      EMPTY_STRING = Sequel::LiteralString.new('').freeze
+      WITH_UNIQUE = Sequel::LiteralString.new(' WITH UNIQUE').freeze
+      IS_JSON_MAP = {
+        nil => EMPTY_STRING,
+        :value => Sequel::LiteralString.new(' VALUE').freeze,
+        :scalar => Sequel::LiteralString.new(' SCALAR').freeze,
+        :object => Sequel::LiteralString.new(' OBJECT').freeze,
+        :array => Sequel::LiteralString.new(' ARRAY').freeze
+      }.freeze
 
       # Get JSON array element or object field as json.  If an array is given,
       # gets the object at the specified path.
@@ -233,6 +254,30 @@ module Sequel
         end
       end
 
+      # Return whether the json object can be parsed as JSON.
+      #
+      # Options:
+      # :type :: Check whether the json object can be parsed as a specific type
+      #          of JSON (:value, :scalar, :object, :array).
+      # :unique :: Check JSON objects for unique keys.
+      #
+      #   json_op.is_json                 # json IS JSON
+      #   json_op.is_json(type: :object)  # json IS JSON OBJECT
+      #   json_op.is_json(unique: true)   # json IS JSON WITH UNIQUE
+      def is_json(opts=OPTS)
+        _is_json(IS_JSON, opts)
+      end
+
+      # Return whether the json object cannot be parsed as JSON. The opposite
+      # of #is_json. See #is_json for options.
+      #
+      #   json_op.is_not_json                 # json IS NOT JSON
+      #   json_op.is_not_json(type: :object)  # json IS NOT JSON OBJECT
+      #   json_op.is_not_json(unique: true)   # json IS NOT JSON WITH UNIQUE
+      def is_not_json(opts=OPTS)
+        _is_json(IS_NOT_JSON, opts)
+      end
+
       # Returns a set of keys AS text in the json object.
       #
       #   json_op.keys # json_object_keys(json)
@@ -285,6 +330,13 @@ module Sequel
       end
 
       private
+
+      # Internals of IS [NOT] JSON support
+      def _is_json(lit_array, opts)
+        raise Error, "invalid is_json :type option: #{opts[:type].inspect}" unless type = IS_JSON_MAP[opts[:type]]
+        unique = opts[:unique] ? WITH_UNIQUE : EMPTY_STRING
+        Sequel::SQL::BooleanExpression.new(:NOOP, Sequel::SQL::PlaceholderLiteralString.new(lit_array, [self, type, unique]))
+      end
 
       # Return a placeholder literal with the given str and args, wrapped
       # in an JSONOp or JSONBOp, used by operators that return json or jsonb.
