@@ -504,7 +504,6 @@ module Sequel
             # table_xinfo PRAGMA used, remove hidden columns
             # that are not generated columns
             if row[:generated] = (row.delete(:hidden) != 0)
-              next unless row[:type].end_with?(' GENERATED ALWAYS')
               row[:type] = row[:type].sub(' GENERATED ALWAYS', '')
             end
           end

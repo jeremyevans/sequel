@@ -1,5 +1,7 @@
 === master
 
+* Make generated columns show up in Database#schema when using SQLite 3.37+ (jeremyevans) (#2087)
+
 * Add revert method for Sequel.migration blocks, to revert changes inside the block on up, and apply the changes on down (jeremyevans)
 
 * Re-add is_json and is_not_json methods to the pg_json_ops extension, as the support was re-added in PostgreSQL 16 (jeremyevans)

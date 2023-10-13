@@ -157,10 +157,7 @@ describe "An SQLite database" do
     @db.create_table!(:fk){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1; Integer :d, :generated_always_as=>Sequel[:a] * 2 + :b + 2, :generated_type=>:stored; ; Integer :e, :generated_always_as=>Sequel[:a] * 2 + :b + 3, :generated_type=>:virtual}
     @db[:fk].insert(:a=>100, :b=>10)
     @db[:fk].select_order_map([:a, :b, :c, :d, :e]).must_equal [[100, 10, 211, 212, 213]]
-
-    # Generated columns do not show up in schema on SQLite 3.37.0 (or maybe 3.38.0)
-    expected = DB.sqlite_version >= 33700 ? [false, false] : [false, false, true, true, true]
-    @db.schema(:fk).map{|_,v| v[:generated]}.must_equal expected
+    @db.schema(:fk).map{|_,v| v[:generated]}.must_equal [false, false, true, true, true]
   end if DB.sqlite_version >= 33100
 end
 
