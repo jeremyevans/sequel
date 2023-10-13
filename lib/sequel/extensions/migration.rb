@@ -159,6 +159,19 @@ module Sequel
       migration.up = block
       migration.down = MigrationReverser.new.reverse(&block)
     end
+
+    # Creates a revert migration.  This is the same as creating
+    # the same block with +down+, but it also calls the block and attempts
+    # to create a +up+ block that will reverse the changes made by
+    # the block.  This is designed to revert the changes in the
+    # provided block.
+    #
+    # There are no guarantees that this will work perfectly
+    # in all cases, but it works for some simple cases.
+    def revert(&block)
+      migration.down = block
+      migration.up = MigrationReverser.new.reverse(&block)
+    end
   end
 
   # Handles the reversing of reversible migrations.  Basically records

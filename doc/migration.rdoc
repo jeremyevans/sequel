@@ -90,6 +90,20 @@ the following methods:
 
 If you use any other methods, you should create your own +down+ block.
 
+To revert a migration created with +change+, you can copy the migration to a new file, and
+replace +change+ with +revert+. For example, if you no longer need the artists table, you
+can use the following migration.  This will drop the artists table when migrating up, and
+recreate it when migrating down:
+
+  Sequel.migration do
+    revert do
+      create_table(:artists) do
+        primary_key :id
+        String :name, null: false
+      end
+    end
+  end
+
 In normal usage, when Sequel's migrator runs, it runs the +up+ blocks for all
 migrations that have not yet been applied.  However, you can use the <tt>-M</tt>
 switch to specify the version to which to migrate, and if it is lower than the

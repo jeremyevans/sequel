@@ -101,7 +101,7 @@ describe "SimpleMigration#apply" do
   end
 end
 
-describe "Reversible Migrations with Sequel.migration{change{}}" do
+describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
   before do
     @c = Class.new do
       self::AT = Class.new do
@@ -154,7 +154,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
     end
   end
   
-  it "should apply up with normal actions in normal order" do
+  it "change should apply up with given actions in given order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :up)
     @db.actions.must_equal [[:create_table, :a, {:foo=>:bar}],
@@ -182,7 +182,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
   end
 
-  it "should execute down with reversing actions in reverse order" do
+  it "change should execute down with reversing actions in reverse order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :down)
     @db.actions.must_equal [
@@ -258,6 +258,63 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
     error = proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
     error.message.must_match(/irreversible migration method used in .*spec\/extensions\/migration_spec.rb/)
   end
+
+  it "revert should apply down with given actions in given order" do
+    p = @p
+    Sequel.migration{revert(&p)}.apply(@db, :down)
+    @db.actions.must_equal [[:create_table, :a, {:foo=>:bar}],
+      [:add_column, :a, :b, String],
+      [:add_index, :a, :b],
+      [:rename_column, :a, :b, :c],
+      [:rename_table, :a, :b],
+      [:alter_table, [
+        [:add_column, :d, String],
+        [:add_constraint, :blah, "d IS NOT NULL"],
+        [:add_constraint, {:name=>:merp}, "a > 1"],
+        [:add_foreign_key, :e, :b],
+        [:add_foreign_key, [:e], :b, {:name=>"e_fk"}],
+        [:add_foreign_key, [:e, :a], :b],
+        [:add_primary_key, :f, :b],
+        [:add_index, :e, {:name=>"e_n"}],
+        [:add_full_text_index, :e, {:name=>"e_ft"}],
+        [:add_spatial_index, :e, {:name=>"e_s"}],
+        [:rename_column, :e, :g],
+        [:set_column_allow_null, :c],
+        [:set_column_allow_null, :d, true],
+        [:set_column_allow_null, :d, false]]
+      ],
+      [:create_view, :c, "SELECT * FROM b", {:foo=>:bar}],
+      [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
+  end
+
+  it "revert should execute up with reversing actions in reverse order" do
+    p = @p
+    Sequel.migration{revert(&p)}.apply(@db, :up)
+    @db.actions.must_equal [
+      [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
+      [:drop_view, :c, {:foo=>:bar}],
+      [:alter_table, [
+        [:set_column_allow_null, :d, true],
+        [:set_column_allow_null, :d, false],
+        [:set_column_allow_null, :c, false],
+        [:rename_column, :g, :e],
+        [:drop_index, :e, {:name=>"e_s"}],
+        [:drop_index, :e, {:name=>"e_ft"}],
+        [:drop_index, :e, {:name=>"e_n"}],
+        [:drop_column, :f],
+        [:drop_foreign_key, [:e, :a]],
+        [:drop_foreign_key, [:e], {:name=>"e_fk"}],
+        [:drop_foreign_key, :e],
+        [:drop_constraint, :merp],
+        [:drop_constraint, :blah],
+        [:drop_column, :d]]
+      ],
+      [:rename_table, :b, :a],
+      [:rename_column, :a, :c, :b],
+      [:drop_index, :a, :b],
+      [:drop_column, :a, :b],
+      [:drop_table, :a, {:foo=>:bar}]]
+  end
 end
 
 describe "Sequel::Migrator.migrator_class" do
@@ -277,7 +334,6 @@ describe "Sequel::Migrator.migrator_class" do
   it "should raise an error if the migration folder does not exist" do
     proc{Sequel::Migrator.apply(@db, "spec/files/nonexistant_migration_path")}.must_raise(Sequel::Migrator::Error)
   end
-  
 end
 
 describe "Sequel::IntegerMigrator" do
