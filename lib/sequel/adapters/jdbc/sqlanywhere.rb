@@ -36,6 +36,10 @@ module Sequel
 
         private
 
+        def database_exception_use_sqlstates?
+          false
+        end
+
         # Use @@IDENTITY to get the last inserted id
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
