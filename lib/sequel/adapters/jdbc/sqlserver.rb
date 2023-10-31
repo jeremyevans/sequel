@@ -79,6 +79,10 @@ module Sequel
           super.with_extend(MetadataDatasetMethods)
         end
 
+        def database_exception_use_sqlstates?
+          false
+        end
+
         def disconnect_error?(exception, opts)
           super || (exception.message =~ /connection is closed/)
         end
