@@ -1,4 +1,4 @@
-=== master
+=== 5.74.0 (2023-11-01)
 
 * Make generated columns show up in Database#schema when using SQLite 3.37+ (jeremyevans) (#2087)
 

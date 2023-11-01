@@ -1,0 +1,45 @@
+= New Features
+
+* Sequel.migration blocks now support a revert method, which reverts
+  the changes in the block on up, and applies them on down.  So if
+  you have a migration such as:
+
+    Sequel.migration do
+      change do
+        create_table :table do
+          # ...
+        end
+      end
+    end
+
+  and you later want to add a migration that drops the table, you
+  can use:
+
+    Sequel.migration do
+      revert do
+        create_table :table do
+          # ...
+        end
+      end
+    end
+
+  This will drop the table when migrating up, and create a table 
+  with the given schema when migrating down.
+
+* is_json and is_not_json methods have been added to the pg_json_ops
+  extension, for the IS [NOT] JSON operator supported in PostgreSQL
+  16+.  These were previously added in Sequel 5.59.0, and removed
+  in Sequel 5.61.0 as support was removed in PostgreSQL 15 beta 4.
+  PostgreSQL 16 shipped with support for them, so support has been
+  recommitted to Sequel.
+
+= Other Improvements
+
+* SQLite generated columns now show up in Database#schema when using
+  SQLite 3.37+.
+
+* Sequel now attempts to avoid an infinite loop in pathlogical cases
+  in the jdbc adapter, where the exception cause chain has a loop.
+  Additionally, if an exception is already recognized as a disconnect,
+  or an exception already responds to a getSQLState method, Sequel no
+  longer looks at the causes of the exception.
