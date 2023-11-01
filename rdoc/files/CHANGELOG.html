@@ -31,12 +31,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-09-28 16:13:36 -0700</span>
+<span class='datetime'>2023-11-01 08:38:41 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.74.0+-282023-11-01-29"><a href="doc/release_notes/5_74_0_txt.html">5.74.0</a> (2023-11-01)<span><a href="#label-5.74.0+-282023-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make generated columns show up in Database#schema when using SQLite 3.37+ (jeremyevans) (#2087)</p>
+</li><li>
+<p>Add revert method for <a href="../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> blocks, to revert changes inside the block on up, and apply the changes on down (jeremyevans)</p>
+</li><li>
+<p>Re-add is_json and is_not_json methods to the pg_json_ops extension, as the support was re-added in PostgreSQL 16 (jeremyevans)</p>
+</li><li>
+<p>Avoid infinite loop when handling exceptions with a cause loop in jdbc adapter (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.73.0+-282023-10-01-29"><a href="doc/release_notes/5_73_0_txt.html">5.73.0</a> (2023-10-01)<span><a href="#label-5.73.0+-282023-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Handle disconnect errors in ibmdb and jdbc/db2 adapters (jeremyevans) (#2083)</p>

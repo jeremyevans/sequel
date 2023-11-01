@@ -55,6 +55,7 @@ Superclass:
 <li><a href="#method-i-down">down</a></li>
 <li><a href="#attribute-i-migration">migration</a></li>
 <li><a href="#method-i-no_transaction">no_transaction</a></li>
+<li><a href="#method-i-revert">revert</a></li>
 <li><a href="#method-i-transaction">transaction</a></li>
 <li><a href="#method-i-up">up</a></li>
 </ol>
@@ -187,6 +188,30 @@ Superclass:
 <span class="line-num">137</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">no_transaction</span>
 <span class="line-num">138</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>
 <span class="line-num">139</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-revert'>
+<a name='method-i-revert'></a>
+<div class='synopsis'>
+<span class='name'>revert</span><span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Creates a revert migration.  This is the same as creating the same block with <code>down</code>, but it also calls the block and attempts to create a <code>up</code> block that will reverse the changes made by the block.  This is designed to revert the changes in the provided block.</p>
+
+<p>There are no guarantees that this will work perfectly in all cases, but it works for some simple cases.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-revert-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-revert-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
+<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">revert</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">172</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-identifier">block</span>
+<span class="line-num">173</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-constant">MigrationReverser</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-transaction'>

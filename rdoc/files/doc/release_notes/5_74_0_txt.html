@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.74.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.74.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.74.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2023-11-01 08:38:41 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> blocks now support a revert method, which reverts the changes in the block on up, and applies them on down.  So if you have a migration such as:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">create_table</span> <span class="ruby-value">:table</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-comment"># ...</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>and you later want to add a migration that drops the table, you can use:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">revert</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">create_table</span> <span class="ruby-value">:table</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-comment"># ...</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This will drop the table when migrating up, and create a table  with the given schema when migrating down.</p>
+</li><li>
+<p>is_json and is_not_json methods have been added to the pg_json_ops extension, for the IS [NOT] JSON operator supported in PostgreSQL 16+.  These were previously added in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_59_0_txt.html">5.59.0</a>, and removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_61_0_txt.html">5.61.0</a> as support was removed in PostgreSQL 15 beta 4. PostgreSQL 16 shipped with support for them, so support has been recommitted to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>SQLite generated columns now show up in Database#schema when using SQLite 3.37+.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now attempts to avoid an infinite loop in pathlogical cases in the jdbc adapter, where the exception cause chain has a loop. Additionally, if an exception is already recognized as a disconnect, or an exception already responds to a getSQLState method, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer looks at the causes of the exception.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

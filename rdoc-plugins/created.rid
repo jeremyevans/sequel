@@ -1,4 +1,4 @@
-Sun, 01 Oct 2023 08:02:14 -0700
+Wed, 01 Nov 2023 08:56:10 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -37,7 +37,7 @@ lib/sequel/extensions/inflector.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/extensions/integer64.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/extensions/is_distinct_from.rb	Tue, 02 Aug 2022 16:36:07 -0700
 lib/sequel/extensions/looser_typecasting.rb	Thu, 22 Sep 2022 15:08:16 -0700
-lib/sequel/extensions/migration.rb	Thu, 21 Sep 2023 15:53:42 -0700
+lib/sequel/extensions/migration.rb	Fri, 13 Oct 2023 09:45:09 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Tue, 01 Nov 2022 13:39:51 -0700
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -56,7 +56,7 @@ lib/sequel/extensions/pg_inet.rb	Sun, 30 Oct 2022 19:13:54 -0700
 lib/sequel/extensions/pg_inet_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
 lib/sequel/extensions/pg_interval.rb	Sun, 30 Oct 2022 19:13:54 -0700
 lib/sequel/extensions/pg_json.rb	Sun, 30 Oct 2022 19:13:54 -0700
-lib/sequel/extensions/pg_json_ops.rb	Wed, 14 Sep 2022 08:46:24 -0700
+lib/sequel/extensions/pg_json_ops.rb	Fri, 06 Oct 2023 16:04:02 -0700
 lib/sequel/extensions/pg_loose_count.rb	Mon, 24 May 2021 12:25:38 -0700
 lib/sequel/extensions/pg_multirange.rb	Thu, 13 Apr 2023 12:51:52 -0700
 lib/sequel/extensions/pg_range.rb	Thu, 13 Apr 2023 12:51:52 -0700

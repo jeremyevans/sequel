@@ -126,19 +126,19 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-cast_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">584</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)
-<span class="line-num">585</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Time</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>
-<span class="line-num">586</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;datetime(&quot;</span>
-<span class="line-num">587</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)
-<span class="line-num">588</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">589</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Date</span>
-<span class="line-num">590</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;date(&quot;</span>
-<span class="line-num">591</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)
-<span class="line-num">592</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">593</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">594</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">595</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">596</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">583</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)
+<span class="line-num">584</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Time</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>
+<span class="line-num">585</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;datetime(&quot;</span>
+<span class="line-num">586</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)
+<span class="line-num">587</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">588</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Date</span>
+<span class="line-num">589</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;date(&quot;</span>
+<span class="line-num">590</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)
+<span class="line-num">591</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">592</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">593</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">594</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">595</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
@@ -157,48 +157,48 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-complex_expression_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">600</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">601</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
-<span class="line-num">602</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:&quot;NOT LIKE&quot;</span>, <span class="ruby-value">:&quot;NOT ILIKE&quot;</span>
-<span class="line-num">603</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;NOT &#39;</span>
-<span class="line-num">604</span>     <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&quot;NOT ILIKE&quot;</span> <span class="ruby-operator">?</span> <span class="ruby-value">:ILIKE</span> <span class="ruby-operator">:</span> <span class="ruby-value">:LIKE</span>), <span class="ruby-identifier">args</span>)
-<span class="line-num">605</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>
-<span class="line-num">606</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;((~(&quot;</span>, <span class="ruby-string">&quot; &amp; &quot;</span>, <span class="ruby-string">&quot;)) &amp; (&quot;</span>, <span class="ruby-string">&quot; | &quot;</span>, <span class="ruby-string">&quot;))&quot;</span>], <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)}
-<span class="line-num">607</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:**</span>
-<span class="line-num">608</span>     <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">exp</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
-<span class="line-num">609</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;can only emulate exponentiation on SQLite if exponent is an integer, given #{exp.inspect}&quot;</span>)
-<span class="line-num">610</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">611</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">exp</span>
-<span class="line-num">612</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">0</span>
-<span class="line-num">613</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;1&#39;</span>
-<span class="line-num">614</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">615</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
-<span class="line-num">616</span>       <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
-<span class="line-num">617</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">exp</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>
-<span class="line-num">618</span>         <span class="ruby-identifier">invert</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">619</span>         <span class="ruby-identifier">exp</span> = <span class="ruby-identifier">exp</span>.<span class="ruby-identifier">abs</span>
-<span class="line-num">620</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(1.0 / (&#39;</span>
-<span class="line-num">621</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">622</span>       (<span class="ruby-identifier">exp</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> 
-<span class="line-num">623</span>         <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">arg</span>)
-<span class="line-num">624</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; * &quot;</span>
-<span class="line-num">625</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">626</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">arg</span>)
-<span class="line-num">627</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">628</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">invert</span>
-<span class="line-num">629</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;))&quot;</span>
-<span class="line-num">630</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">631</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">632</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>
-<span class="line-num">633</span>     <span class="ruby-identifier">part</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
-<span class="line-num">634</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unsupported extract argument: #{part.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">EXTRACT_MAP</span>[<span class="ruby-identifier">part</span>]
-<span class="line-num">635</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;CAST(strftime(&quot;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">format</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;, &#39;</span>
-<span class="line-num">636</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
-<span class="line-num">637</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;) AS &#39;</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">part</span> <span class="ruby-operator">==</span> <span class="ruby-value">:second</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39;NUMERIC&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;INTEGER&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">638</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">639</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">640</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">641</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">599</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">600</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">601</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:&quot;NOT LIKE&quot;</span>, <span class="ruby-value">:&quot;NOT ILIKE&quot;</span>
+<span class="line-num">602</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;NOT &#39;</span>
+<span class="line-num">603</span>     <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&quot;NOT ILIKE&quot;</span> <span class="ruby-operator">?</span> <span class="ruby-value">:ILIKE</span> <span class="ruby-operator">:</span> <span class="ruby-value">:LIKE</span>), <span class="ruby-identifier">args</span>)
+<span class="line-num">604</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>
+<span class="line-num">605</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;((~(&quot;</span>, <span class="ruby-string">&quot; &amp; &quot;</span>, <span class="ruby-string">&quot;)) &amp; (&quot;</span>, <span class="ruby-string">&quot; | &quot;</span>, <span class="ruby-string">&quot;))&quot;</span>], <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)}
+<span class="line-num">606</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:**</span>
+<span class="line-num">607</span>     <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">exp</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
+<span class="line-num">608</span>       <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;can only emulate exponentiation on SQLite if exponent is an integer, given #{exp.inspect}&quot;</span>)
+<span class="line-num">609</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">610</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">exp</span>
+<span class="line-num">611</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">0</span>
+<span class="line-num">612</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;1&#39;</span>
+<span class="line-num">613</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">614</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
+<span class="line-num">615</span>       <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+<span class="line-num">616</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">exp</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>
+<span class="line-num">617</span>         <span class="ruby-identifier">invert</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">618</span>         <span class="ruby-identifier">exp</span> = <span class="ruby-identifier">exp</span>.<span class="ruby-identifier">abs</span>
+<span class="line-num">619</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(1.0 / (&#39;</span>
+<span class="line-num">620</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">621</span>       (<span class="ruby-identifier">exp</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> 
+<span class="line-num">622</span>         <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">arg</span>)
+<span class="line-num">623</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; * &quot;</span>
+<span class="line-num">624</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">625</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">arg</span>)
+<span class="line-num">626</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">627</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">invert</span>
+<span class="line-num">628</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;))&quot;</span>
+<span class="line-num">629</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">630</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">631</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>
+<span class="line-num">632</span>     <span class="ruby-identifier">part</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+<span class="line-num">633</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unsupported extract argument: #{part.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">EXTRACT_MAP</span>[<span class="ruby-identifier">part</span>]
+<span class="line-num">634</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;CAST(strftime(&quot;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">format</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;, &#39;</span>
+<span class="line-num">635</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+<span class="line-num">636</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;) AS &#39;</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">part</span> <span class="ruby-operator">==</span> <span class="ruby-value">:second</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39;NUMERIC&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;INTEGER&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">637</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">638</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">639</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">640</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-constant_sql_append'>
@@ -217,13 +217,13 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-constant_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">645</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constant_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">constant</span>)
-<span class="line-num">646</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">c</span> = <span class="ruby-constant">CONSTANT_MAP</span>[<span class="ruby-identifier">constant</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">current_timestamp_utc</span>
-<span class="line-num">647</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span>
-<span class="line-num">648</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">649</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">650</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">651</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">644</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constant_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">constant</span>)
+<span class="line-num">645</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">c</span> = <span class="ruby-constant">CONSTANT_MAP</span>[<span class="ruby-identifier">constant</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">current_timestamp_utc</span>
+<span class="line-num">646</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span>
+<span class="line-num">647</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">648</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">649</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">650</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-delete'>
@@ -242,9 +242,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-delete-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">656</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">657</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:where</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">super</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">delete</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">658</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">655</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">656</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:where</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">super</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">where</span>(<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">delete</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">657</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-empty-3F'>
@@ -263,10 +263,10 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-empty-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">661</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty?</span>
-<span class="line-num">662</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:values</span>]
-<span class="line-num">663</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">664</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">660</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty?</span>
+<span class="line-num">661</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:values</span>]
+<span class="line-num">662</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">663</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-explain'>
@@ -285,14 +285,14 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-explain-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">669</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">explain</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">670</span>   <span class="ruby-comment"># Load the PrettyTable class, needed for explain output</span>
-<span class="line-num">671</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:_pretty_table</span>) <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">PrettyTable</span>)
-<span class="line-num">672</span> 
-<span class="line-num">673</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:metadata_dataset</span>).<span class="ruby-identifier">clone</span>(<span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">&quot;EXPLAIN #{select_sql}&quot;</span>)
-<span class="line-num">674</span>   <span class="ruby-identifier">rows</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>
-<span class="line-num">675</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">PrettyTable</span>.<span class="ruby-identifier">string</span>(<span class="ruby-identifier">rows</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">columns</span>)
-<span class="line-num">676</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">668</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">explain</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">669</span>   <span class="ruby-comment"># Load the PrettyTable class, needed for explain output</span>
+<span class="line-num">670</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:_pretty_table</span>) <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">PrettyTable</span>)
+<span class="line-num">671</span> 
+<span class="line-num">672</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:metadata_dataset</span>).<span class="ruby-identifier">clone</span>(<span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">&quot;EXPLAIN #{select_sql}&quot;</span>)
+<span class="line-num">673</span>   <span class="ruby-identifier">rows</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>
+<span class="line-num">674</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">PrettyTable</span>.<span class="ruby-identifier">string</span>(<span class="ruby-identifier">rows</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">columns</span>)
+<span class="line-num">675</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-having'>
@@ -311,10 +311,10 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-having-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">679</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">having</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>)
-<span class="line-num">680</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">InvalidOperation</span>, <span class="ruby-string">&quot;Can only specify a HAVING clause on a grouped dataset&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:group</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">33900</span>
-<span class="line-num">681</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">682</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">678</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">having</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>)
+<span class="line-num">679</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">InvalidOperation</span>, <span class="ruby-string">&quot;Can only specify a HAVING clause on a grouped dataset&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:group</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">33900</span>
+<span class="line-num">680</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">681</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_conflict'>
@@ -374,19 +374,19 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_conflict-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">757</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-value">:ignore</span>)
-<span class="line-num">758</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>
-<span class="line-num">759</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>
-<span class="line-num">760</span>     <span class="ruby-keyword">unless</span> <span class="ruby-constant">INSERT_CONFLICT_RESOLUTIONS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>)
-<span class="line-num">761</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid symbol or string passed to Dataset#insert_conflict: #{opts.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace&quot;</span>
-<span class="line-num">762</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">763</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)
-<span class="line-num">764</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
-<span class="line-num">765</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_on_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)
-<span class="line-num">766</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">767</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid value passed to Dataset#insert_conflict: #{opts.inspect}, should use a symbol or a hash&quot;</span>
-<span class="line-num">768</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">769</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">756</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-value">:ignore</span>)
+<span class="line-num">757</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>
+<span class="line-num">758</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>
+<span class="line-num">759</span>     <span class="ruby-keyword">unless</span> <span class="ruby-constant">INSERT_CONFLICT_RESOLUTIONS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>)
+<span class="line-num">760</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid symbol or string passed to Dataset#insert_conflict: #{opts.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace&quot;</span>
+<span class="line-num">761</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">762</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)
+<span class="line-num">763</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
+<span class="line-num">764</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_on_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)
+<span class="line-num">765</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">766</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid value passed to Dataset#insert_conflict: #{opts.inspect}, should use a symbol or a hash&quot;</span>
+<span class="line-num">767</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">768</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_ignore'>
@@ -409,9 +409,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_ignore-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">776</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>
-<span class="line-num">777</span>   <span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:ignore</span>)
-<span class="line-num">778</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">775</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>
+<span class="line-num">776</span>   <span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:ignore</span>)
+<span class="line-num">777</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select'>
@@ -430,11 +430,11 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_select-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">686</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">687</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>
-<span class="line-num">688</span>   <span class="ruby-comment"># Handle case where query does not return a row</span>
-<span class="line-num">689</span>   <span class="ruby-identifier">server?</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>
-<span class="line-num">690</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">685</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">686</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>
+<span class="line-num">687</span>   <span class="ruby-comment"># Handle case where query does not return a row</span>
+<span class="line-num">688</span>   <span class="ruby-identifier">server?</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>
+<span class="line-num">689</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select_sql'>
@@ -453,10 +453,10 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-insert_select_sql-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">694</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">695</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">returning</span>
-<span class="line-num">696</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">697</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">693</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">694</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">returning</span>
+<span class="line-num">695</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">696</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quoted_identifier_append'>
@@ -475,9 +475,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-quoted_identifier_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">700</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>)
-<span class="line-num">701</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;`&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;`&#39;</span>, <span class="ruby-string">&#39;``&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;`&#39;</span>
-<span class="line-num">702</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">699</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>)
+<span class="line-num">700</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;`&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;`&#39;</span>, <span class="ruby-string">&#39;``&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;`&#39;</span>
+<span class="line-num">701</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-returning'>
@@ -496,11 +496,11 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-returning-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">781</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returning</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">782</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">783</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;RETURNING is not supported on #{db.database_type}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:insert</span>)
-<span class="line-num">784</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:returning</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">_returning_values</span>(<span class="ruby-identifier">values</span>).<span class="ruby-identifier">freeze</span>)
-<span class="line-num">785</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">780</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returning</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">781</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">782</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;RETURNING is not supported on #{db.database_type}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:insert</span>)
+<span class="line-num">783</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:returning</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">_returning_values</span>(<span class="ruby-identifier">values</span>).<span class="ruby-identifier">freeze</span>)
+<span class="line-num">784</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select'>
@@ -519,13 +519,13 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-select-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">708</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)
-<span class="line-num">709</span>   <span class="ruby-keyword">if</span> ((<span class="ruby-identifier">f</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">t</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>))}) <span class="ruby-operator">||</span> ((<span class="ruby-identifier">j</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:join</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">j</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">table</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)})
-<span class="line-num">710</span>     <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">alias_qualified_column</span>(<span class="ruby-identifier">c</span>)})
-<span class="line-num">711</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">712</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">713</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">714</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">707</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)
+<span class="line-num">708</span>   <span class="ruby-keyword">if</span> ((<span class="ruby-identifier">f</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">t</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">expression</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>))}) <span class="ruby-operator">||</span> ((<span class="ruby-identifier">j</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:join</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">j</span>.<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">table</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)})
+<span class="line-num">709</span>     <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">alias_qualified_column</span>(<span class="ruby-identifier">c</span>)})
+<span class="line-num">710</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">711</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">712</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">713</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -544,9 +544,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_cte-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">788</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
-<span class="line-num">789</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30803</span>
-<span class="line-num">790</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">787</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
+<span class="line-num">788</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30803</span>
+<span class="line-num">789</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte_in_subqueries-3F'>
@@ -565,9 +565,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_cte_in_subqueries-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">793</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>
-<span class="line-num">794</span>   <span class="ruby-identifier">supports_cte?</span>
-<span class="line-num">795</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">792</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>
+<span class="line-num">793</span>   <span class="ruby-identifier">supports_cte?</span>
+<span class="line-num">794</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_deleting_joins-3F'>
@@ -586,9 +586,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_deleting_joins-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">803</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_deleting_joins?</span>
-<span class="line-num">804</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">805</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">802</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_deleting_joins?</span>
+<span class="line-num">803</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">804</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_derived_column_lists-3F'>
@@ -607,9 +607,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_derived_column_lists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">798</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>
-<span class="line-num">799</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">800</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">797</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>
+<span class="line-num">798</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">799</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_intersect_except_all-3F'>
@@ -628,9 +628,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_intersect_except_all-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">808</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except_all?</span>
-<span class="line-num">809</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">810</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">807</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except_all?</span>
+<span class="line-num">808</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">809</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -649,9 +649,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_is_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">813</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>
-<span class="line-num">814</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">815</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">812</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>
+<span class="line-num">813</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">814</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_modifying_joins-3F'>
@@ -670,9 +670,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_modifying_joins-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">818</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>
-<span class="line-num">819</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">33300</span>
-<span class="line-num">820</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">817</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>
+<span class="line-num">818</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">33300</span>
+<span class="line-num">819</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -691,9 +691,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_multiple_column_in-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">823</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>
-<span class="line-num">824</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">825</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">822</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>
+<span class="line-num">823</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">824</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_returning-3F'>
@@ -712,9 +712,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_returning-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">828</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">_</span>)
-<span class="line-num">829</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">33500</span>
-<span class="line-num">830</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">827</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">_</span>)
+<span class="line-num">828</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">33500</span>
+<span class="line-num">829</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -733,9 +733,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_timestamp_timezones-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">835</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
-<span class="line-num">836</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">use_timestamp_timezones?</span>
-<span class="line-num">837</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">834</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
+<span class="line-num">835</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">use_timestamp_timezones?</span>
+<span class="line-num">836</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -754,9 +754,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_where_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">840</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
-<span class="line-num">841</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">842</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">839</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
+<span class="line-num">840</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">841</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_clause-3F'>
@@ -775,9 +775,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_clause-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">845</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>
-<span class="line-num">846</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">32800</span>
-<span class="line-num">847</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">844</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>
+<span class="line-num">845</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">32800</span>
+<span class="line-num">846</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_function_frame_option-3F'>
@@ -796,9 +796,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_function_frame_option-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">858</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)
-<span class="line-num">859</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">32800</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>
-<span class="line-num">860</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">857</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)
+<span class="line-num">858</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">32800</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>
+<span class="line-num">859</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -817,9 +817,9 @@ Sequel::SQLite::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_functions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">853</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
-<span class="line-num">854</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">32600</span>
-<span class="line-num">855</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">852</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
+<span class="line-num">853</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">32600</span>
+<span class="line-num">854</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
