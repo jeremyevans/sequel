@@ -479,6 +479,47 @@ describe "PostgreSQL", '#create_table' do
     end
   end
 
+  it "should have #immediate_constraints and #defer_constraints for deferring/checking deferrable constraints" do
+    @db.create_table(:tmp_dolls) do
+      primary_key :id
+      foreign_key(:x, :tmp_dolls, :foreign_key_constraint_name=>:x_fk, :deferrable=>true)
+      foreign_key(:y, :tmp_dolls, :foreign_key_constraint_name=>:y_fk, :deferrable=>true)
+    end
+
+    ds = @db[:tmp_dolls]
+    @db.transaction do
+      @db.immediate_constraints
+      ds.insert(:id=>1)
+      @db.defer_constraints
+      ds.insert(:id=>2, :x=>1, :y=>3)
+      proc{@db.immediate_constraints}.must_raise Sequel::ForeignKeyConstraintViolation
+    end
+    @db[:tmp_dolls].must_be_empty
+    
+    @db.transaction do
+      @db.immediate_constraints
+      @db.defer_constraints(:constraints=>:y_fk)
+      ds.insert(:id=>1, :x=>1, :y=>2)
+      proc{@db.immediate_constraints}.must_raise Sequel::ForeignKeyConstraintViolation
+    end
+    @db[:tmp_dolls].must_be_empty
+
+    @db.transaction do
+      @db.defer_constraints
+      ds.insert(:id=>1, :x=>1, :y=>2)
+      proc{@db.immediate_constraints(:constraints=>:y_fk)}.must_raise Sequel::ForeignKeyConstraintViolation
+    end
+    @db[:tmp_dolls].must_be_empty
+
+    @db.transaction do
+      @db.immediate_constraints
+      @db.defer_constraints(:constraints=>[:x_fk, :y_fk])
+      ds.insert(:id=>1, :x=>3, :y=>2)
+      ds.update(:id=>1, :x=>1, :y=>1)
+    end
+    @db[:tmp_dolls].count.must_equal 1
+  end
+
   it "should have #check_constraints method for getting check constraints" do
     @db.create_table(:tmp_dolls) do
       Integer :i

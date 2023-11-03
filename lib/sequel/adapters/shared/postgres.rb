@@ -498,6 +498,25 @@ module Sequel
         :postgres
       end
 
+      # For constraints that are deferrable, defer constraints until 
+      # transaction commit. Options:
+      #
+      # :constraints :: An identifier of the constraint, or an array of
+      #                 identifiers for constraints, to apply this
+      #                 change to specific constraints.
+      # :server :: The server/shard on which to run the query.
+      #
+      # Examples:
+      #
+      #   DB.defer_constraints
+      #   # SET CONSTRAINTS ALL DEFERRED
+      #
+      #   DB.defer_constraints(constraints: [:c1, Sequel[:sc][:c2]])
+      #   # SET CONSTRAINTS "c1", "sc"."s2" DEFERRED
+      def defer_constraints(opts=OPTS)
+        _set_constraints(' DEFERRED', opts)
+      end
+
       # Use PostgreSQL's DO syntax to execute an anonymous code block.  The code should
       # be the literal code string to use in the underlying procedural language.  Options:
       #
@@ -609,6 +628,24 @@ module Sequel
         _reverse_foreign_key_list_ds
         @conversion_procs.freeze
         super
+      end
+
+      # Immediately apply deferrable constraints.
+      #
+      # :constraints :: An identifier of the constraint, or an array of
+      #                 identifiers for constraints, to apply this
+      #                 change to specific constraints.
+      # :server :: The server/shard on which to run the query.
+      #
+      # Examples:
+      #
+      #   DB.immediate_constraints
+      #   # SET CONSTRAINTS ALL IMMEDIATE
+      #
+      #   DB.immediate_constraints(constraints: [:c1, Sequel[:sc][:c2]])
+      #   # SET CONSTRAINTS "c1", "sc"."s2" IMMEDIATE
+      def immediate_constraints(opts=OPTS)
+        _set_constraints(' IMMEDIATE', opts)
       end
 
       # Use the pg_* system tables to determine indexes on a table
@@ -1036,6 +1073,23 @@ module Sequel
 
           ds
         end
+      end
+
+      # Internals of defer_constraints/immediate_constraints
+      def _set_constraints(type, opts)
+        execute_ddl(_set_constraints_sql(type, opts), opts)
+      end
+
+      # SQL to use for SET CONSTRAINTS
+      def _set_constraints_sql(type, opts)
+        sql = String.new
+        sql << "SET CONSTRAINTS "
+        if constraints = opts[:constraints]
+          dataset.send(:source_list_append, sql, Array(constraints))
+        else
+          sql << "ALL"
+        end
+        sql << type
       end
 
       def alter_table_add_column_sql(table, op)

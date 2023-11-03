@@ -145,7 +145,7 @@ describe "Sequel Mock Adapter" do
     rs.must_equal [{:a=>1}] * 2
   end
 
-  it "should be able to set an exception to raise by setting the :fetch option to an exception class " do
+  it "should be able to set an exception to raise by setting the :fetch option to an exception class" do
     db = Sequel.mock(:fetch=>ArgumentError)
     proc{db[:t].all}.must_raise(Sequel::DatabaseError)
     begin
@@ -212,7 +212,7 @@ describe "Sequel Mock Adapter" do
     db[:b].delete.must_equal 1
   end
 
-  it "should be able to set an exception to raise by setting the :numrows option to an exception class " do
+  it "should be able to set an exception to raise by setting the :numrows option to an exception class" do
     db = Sequel.mock(:numrows=>ArgumentError)
     proc{db[:t].update(:a=>1)}.must_raise(Sequel::DatabaseError)
     begin
@@ -280,7 +280,7 @@ describe "Sequel Mock Adapter" do
     db[:b].insert(:a=>1).must_equal 1
   end
 
-  it "should be able to set an exception to raise by setting the :autoid option to an exception class " do
+  it "should be able to set an exception to raise by setting the :autoid option to an exception class" do
     db = Sequel.mock(:autoid=>ArgumentError)
     proc{db[:t].insert(:a=>1)}.must_raise(Sequel::DatabaseError)
     begin
@@ -868,6 +868,26 @@ describe "PostgreSQL support" do
 
   it "should recognize 40P01 SQL state as a serialization failure" do
     @db.send(:database_specific_error_class_from_sqlstate, '40P01').must_equal Sequel::SerializationFailure
+  end
+
+  it "should use correct SQL for defer_constraints and immediate_constraints" do
+    @db.defer_constraints
+    @db.sqls.must_equal ['SET CONSTRAINTS ALL DEFERRED']
+    @db.immediate_constraints
+    @db.sqls.must_equal ['SET CONSTRAINTS ALL IMMEDIATE']
+
+    @db.defer_constraints(:constraints=>:a)
+    @db.sqls.must_equal ['SET CONSTRAINTS "a" DEFERRED']
+    @db.immediate_constraints(:constraints=>[:a, :b])
+    @db.sqls.must_equal ['SET CONSTRAINTS "a", "b" IMMEDIATE']
+  end
+
+  it "should correctly handle defer_constraints and immediate_constraints :server option" do
+    db = Sequel.connect("mock://postgres", :servers=>{:test=>{}})
+    db.defer_constraints(:server=>:test)
+    db.sqls.must_equal ['SET CONSTRAINTS ALL DEFERRED -- test']
+    db.immediate_constraints(:server=>:test)
+    db.sqls.must_equal ['SET CONSTRAINTS ALL IMMEDIATE -- test']
   end
 end
 
