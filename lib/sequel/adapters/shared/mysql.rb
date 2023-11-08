@@ -646,7 +646,7 @@ module Sequel
       MATCH_AGAINST_BOOLEAN = ["MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE)".freeze].freeze
 
       Dataset.def_sql_method(self, :delete, %w'with delete from where order limit')
-      Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
+      Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update returning')
       Dataset.def_sql_method(self, :select, %w'with select distinct calc_found_rows columns from join where group having window compounds order limit lock')
       Dataset.def_sql_method(self, :update, %w'with update ignore table set where order limit')
 
@@ -774,6 +774,21 @@ module Sequel
         clone(:insert_ignore=>true)
       end
 
+      # Support insert select for associations, so that the model code can use
+      # returning instead of a separate query.
+      def insert_select(*values)
+        return unless supports_insert_select?
+        # Handle case where query does not return a row
+        server?(:default).with_sql_first(insert_select_sql(*values)) || false
+      end
+
+      # The SQL to use for an insert_select, adds a RETURNING clause to the insert
+      # unless the RETURNING clause is already present.
+      def insert_select_sql(*values)
+        ds = opts[:returning] ? self : returning
+        ds.insert_sql(*values)
+      end
+
       # Sets up the insert methods to use ON DUPLICATE KEY UPDATE
       # If you pass no arguments, ALL fields will be
       # updated with the new values.  If you pass the fields you
@@ -869,6 +884,11 @@ module Sequel
       # MySQL supports pattern matching via regular expressions
       def supports_regexp?
         true
+      end
+
+      # MariaDB 10.5.0 supports INSERT RETURNING.
+      def supports_returning?(type)
+        (type == :insert && db.mariadb? && db.adapter_scheme != :jdbc) ? (db.server_version >= 100500) : false
       end
 
       # MySQL 8+ supports SKIP LOCKED.

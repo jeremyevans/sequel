@@ -1,5 +1,7 @@
 === master
 
+* Support INSERT RETURNING on MariaDB 10.5+, and use it when saving new model objects (jeremyevans)
+
 * Add Database#{defer,immediate}_constraints on PostgreSQL for changing handling of deferrable constraints in a transaction (jeremyevans)
 
 === 5.74.0 (2023-11-01)
