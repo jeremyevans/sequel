@@ -966,4 +966,35 @@ describe "Sequel::TimestampMigrator" do
     proc{Sequel::TimestampMigrator.run(@db, "spec/files/transaction_unspecified_migrations", :use_transactions=>false)}.must_raise Sequel::DatabaseError
     @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)"]
   end
+
+  it "should handle single migration up or down to specific timestamps" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir, 1273253851)
+
+    migration_path = 'spec/files/timestamped_migrations/1273253849_create_sessions.rb'
+
+    Sequel::TimestampMigrator.run_single(@db, migration_path, direction: :down)
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253851_create_nodes.rb'
+
+    Sequel::TimestampMigrator.run_single(@db, migration_path, direction: :up)
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
+  end
+
+  it "should not apply down action to single migration where up action hasn't been applied" do
+    migration_path = 'spec/files/timestamped_migrations/1273253849_create_sessions.rb'
+    Sequel::TimestampMigrator.run_single(@db, migration_path, direction: :down)
+
+    @db.sqls.map{|x| x =~ /\ADROP.*(\d+)/ ? $1.to_i : nil}.compact.must_equal []
+  end
+
+  it "should not apply up action to single migration where down action hasn't been applied" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir, 1273253851)
+    @db.sqls
+
+    migration_path = 'spec/files/timestamped_migrations/1273253849_create_sessions.rb'
+    Sequel::TimestampMigrator.run_single(@db, migration_path, direction: :up)
+
+    @db.sqls.map{|x| x =~ /\ACREATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal []
+  end
 end

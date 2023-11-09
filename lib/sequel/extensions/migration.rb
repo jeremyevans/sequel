@@ -693,6 +693,10 @@ module Sequel
       @migration_tuples = get_migration_tuples
     end
 
+    def self.run_single(db, path, opts=OPTS)
+      new(db, File.dirname(path), opts).run_single(path, opts[:direction])
+    end
+
     # The timestamp migrator is current if there are no migrations to apply
     # in either direction.
     def is_current?
@@ -712,6 +716,25 @@ module Sequel
         db.log_info("Finished applying migration #{f}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end
       nil
+    end
+
+    # Apply single migration tuple on the database
+    def run_single(path, direction)
+      migration = load_migration_file(path)
+      file_name = File.basename(path)
+      fi = file_name.downcase
+      direction ||= :up
+
+      return if (applied_migrations.include?(fi) && direction == :up) ||
+                (!applied_migrations.include?(fi) && direction == :down)
+
+      t = Time.now
+      db.log_info("Begin applying migration #{file_name}, direction: #{direction}")
+      checked_transaction(migration) do
+        migration.apply(db, direction)
+        direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
+      end
+      db.log_info("Finished applying migration #{file_name}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
     end
 
     private
