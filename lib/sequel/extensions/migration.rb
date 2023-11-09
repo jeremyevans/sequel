@@ -697,7 +697,6 @@ module Sequel
     def initialize(db, directory, opts=OPTS)
       super
       @target = opts[:target]
-      @direction = opts[:direction]
       @applied_migrations = get_applied_migrations
       @migration_tuples = get_migration_tuples
     end
