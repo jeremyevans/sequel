@@ -730,7 +730,7 @@ module Sequel
     def run_single
       if version_numbers.include?(target)
         path = files.select{|f| f.match(target.to_s)}.first
-        file_name = File.basename(path).downcase
+        file_name = File.basename(path)
         migration = load_migration_file(path)
         m_direction = direction ? direction : :up
 
