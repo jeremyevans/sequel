@@ -426,8 +426,8 @@ module Sequel
       migrator_class(directory).new(db, directory, opts).run
     end
 
-    def self.run_single(db, directory, opts=OPTS)
-      migrator_class(directory).new(db, directory, opts).run_single
+    def self.run_single(db, path, opts=OPTS)
+      new(db, File.dirname(path), opts).run_single(path, opts[:direction])
     end
 
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
@@ -589,7 +589,7 @@ module Sequel
       target
     end
 
-    def run_single
+    def run_single(path, direction)
       raise 'NotImplemented'
     end
 
@@ -693,9 +693,6 @@ module Sequel
     # Get tuples of migrations, filenames, and actions for each migration
     attr_reader :migration_tuples
 
-    # The direction of the migrator, either :up or :down
-    attr_reader :direction
-
     # Set up all state for the migrator instance
     def initialize(db, directory, opts=OPTS)
       super
@@ -727,22 +724,19 @@ module Sequel
     end
 
     # Apply single migration tuple on the database
-    def run_single
-      if version_numbers.include?(target)
-        path = files.select{|f| f.match(target.to_s)}.first
-        file_name = File.basename(path)
-        migration = load_migration_file(path)
-        m_direction = direction ? direction : :up
+    def run_single(path, direction)
+      migration = load_migration_file(path)
+      file_name = File.basename(path)
+      direction = direction ? direction : :up
 
-        return if applied_migrations.include?(file_name) && m_direction == :up
-
-        db.log_info("Begin applying migration #{file_name}, direction: #{m_direction}")
-        t = Time.now
+      t = Time.now
+      db.log_info("Begin applying migration #{file_name}, direction: #{direction}")
+      checked_transaction(migration) do
         fi = file_name.downcase
-        migration.apply(db, m_direction)
-        m_direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
-        db.log_info("Finished applying migration #{file_name}, direction: #{m_direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
+        migration.apply(db, direction)
+        direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
       end
+      db.log_info("Finished applying migration #{file_name}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
     end
 
     private

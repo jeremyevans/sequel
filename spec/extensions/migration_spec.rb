@@ -971,10 +971,12 @@ describe "Sequel::TimestampMigrator" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir, 1273253851)
 
-    Sequel::TimestampMigrator.run_single(@db, @dir, target: 1273253849, direction: :down)
+    migration_path = 'spec/files/timestamped_migrations/1273253849_create_sessions.rb'
+
+    Sequel::TimestampMigrator.run_single(@db, migration_path, direction: :down)
     @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253851_create_nodes.rb'
 
-    Sequel::TimestampMigrator.run_single(@db, @dir, target: 1273253849, direction: :up)
+    Sequel::TimestampMigrator.run_single(@db, migration_path, direction: :up)
     @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
   end
 end
