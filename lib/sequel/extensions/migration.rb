@@ -426,6 +426,10 @@ module Sequel
       migrator_class(directory).new(db, directory, opts).run
     end
 
+    def self.run_single(db, directory, opts=OPTS)
+      migrator_class(directory).new(db, directory, opts).run_single
+    end
+
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
     # if the version number is greater than 20000101, otherwise uses the IntegerMigrator.
     def self.migrator_class(directory)
@@ -585,6 +589,10 @@ module Sequel
       target
     end
 
+    def run_single
+      raise 'NotImplemented'
+    end
+
     private
 
     # Gets the current migration version stored in the database. If no version
@@ -685,10 +693,14 @@ module Sequel
     # Get tuples of migrations, filenames, and actions for each migration
     attr_reader :migration_tuples
 
+    # The direction of the migrator, either :up or :down
+    attr_reader :direction
+
     # Set up all state for the migrator instance
     def initialize(db, directory, opts=OPTS)
       super
       @target = opts[:target]
+      @direction = opts[:direction]
       @applied_migrations = get_applied_migrations
       @migration_tuples = get_migration_tuples
     end
@@ -712,6 +724,25 @@ module Sequel
         db.log_info("Finished applying migration #{f}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end
       nil
+    end
+
+    # Apply single migration tuple on the database
+    def run_single
+      if version_numbers.include?(target)
+        path = files.select{|f| f.match(target.to_s)}.first
+        file_name = File.basename(path).downcase
+        migration = load_migration_file(path)
+        m_direction = direction ? direction : :up
+
+        return if applied_migrations.include?(file_name) && m_direction == :up
+
+        db.log_info("Begin applying migration #{file_name}, direction: #{m_direction}")
+        t = Time.now
+        fi = file_name.downcase
+        migration.apply(db, m_direction)
+        m_direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
+        db.log_info("Finished applying migration #{file_name}, direction: #{m_direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
+      end
     end
 
     private
@@ -805,6 +836,17 @@ module Sequel
         raise(Error, "Migrator table #{table} does not contain column #{c}")
       end
       ds
+    end
+
+    # An array of numbers corresponding to the migrations
+    def version_numbers
+      @version_numbers ||= begin
+        versions = files.
+          compact.
+          map{|f| migration_version_from_file(File.basename(f))}.
+          sort
+        versions
+      end
     end
   end
 end

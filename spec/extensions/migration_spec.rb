@@ -966,4 +966,15 @@ describe "Sequel::TimestampMigrator" do
     proc{Sequel::TimestampMigrator.run(@db, "spec/files/transaction_unspecified_migrations", :use_transactions=>false)}.must_raise Sequel::DatabaseError
     @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)"]
   end
+
+  it "should handle single migrating up or down to specific timestamps" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir, 1273253851)
+
+    Sequel::TimestampMigrator.run_single(@db, @dir, target: 1273253849, direction: :down)
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253851_create_nodes.rb'
+
+    Sequel::TimestampMigrator.run_single(@db, @dir, target: 1273253849, direction: :up)
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
+  end
 end
