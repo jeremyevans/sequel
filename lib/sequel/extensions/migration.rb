@@ -831,16 +831,5 @@ module Sequel
       end
       ds
     end
-
-    # An array of numbers corresponding to the migrations
-    def version_numbers
-      @version_numbers ||= begin
-        versions = files.
-          compact.
-          map{|f| migration_version_from_file(File.basename(f))}.
-          sort
-        versions
-      end
-    end
   end
 end
