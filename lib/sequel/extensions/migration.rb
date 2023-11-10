@@ -426,10 +426,6 @@ module Sequel
       migrator_class(directory).new(db, directory, opts).run
     end
 
-    def self.run_single(db, path, opts=OPTS)
-      new(db, File.dirname(path), opts).run_single(path, opts[:direction])
-    end
-
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
     # if the version number is greater than 20000101, otherwise uses the IntegerMigrator.
     def self.migrator_class(directory)
@@ -589,10 +585,6 @@ module Sequel
       target
     end
 
-    def run_single(path, direction)
-      raise 'NotImplemented'
-    end
-
     private
 
     # Gets the current migration version stored in the database. If no version
@@ -701,6 +693,10 @@ module Sequel
       @migration_tuples = get_migration_tuples
     end
 
+    def self.run_single(db, path, opts=OPTS)
+      new(db, File.dirname(path), opts).run_single(path, opts[:direction])
+    end
+
     # The timestamp migrator is current if there are no migrations to apply
     # in either direction.
     def is_current?
@@ -726,12 +722,15 @@ module Sequel
     def run_single(path, direction)
       migration = load_migration_file(path)
       file_name = File.basename(path)
-      direction = direction ? direction : :up
+      fi = file_name.downcase
+      direction ||= :up
+
+      return if (applied_migrations.include?(fi) && direction == :up) ||
+                (!applied_migrations.include?(fi) && direction == :down)
 
       t = Time.now
       db.log_info("Begin applying migration #{file_name}, direction: #{direction}")
       checked_transaction(migration) do
-        fi = file_name.downcase
         migration.apply(db, direction)
         direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
       end
