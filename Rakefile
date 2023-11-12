@@ -105,9 +105,6 @@ task :default => :spec
 desc "Run the core, model, and extension/plugin specs"
 task :spec => [:spec_core, :spec_model, :spec_plugin]
 
-desc "Run the core, model, and extension/plugin specs with warnings"
-task :spec_w => [:spec_core_w, :spec_model_w, :spec_plugin_w]
-
 spec_task.call("Run core and model specs together", :spec_core_model, 'spec/core_model_spec.rb', "core-model", false)
 spec_task.call("Run core specs", :spec_core, 'spec/core_spec.rb', false, false)
 spec_task.call("Run model specs", :spec_model, 'spec/model_spec.rb', false, false)
