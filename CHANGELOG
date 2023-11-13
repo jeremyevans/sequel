@@ -1,5 +1,7 @@
 === master
 
+* Add TimestampMigrator.run_single to run a single migration file up or down (opya, jeremyevans) (#2093)
+
 * Support INSERT RETURNING on MariaDB 10.5+, and use it when saving new model objects (jeremyevans)
 
 * Add Database#{defer,immediate}_constraints on PostgreSQL for changing handling of deferrable constraints in a transaction (jeremyevans)

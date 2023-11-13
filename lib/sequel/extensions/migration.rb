@@ -693,8 +693,11 @@ module Sequel
       @migration_tuples = get_migration_tuples
     end
 
+    # Apply the migration in the given file path.  See Migrator.run for the
+    # available options.  Additionally, this method supports the :direction
+    # option for whether to run the migration up (default) or down.
     def self.run_single(db, path, opts=OPTS)
-      new(db, File.dirname(path), opts).run_single(path, opts[:direction])
+      new(db, File.dirname(path), opts).run_single(path, opts[:direction] || :up)
     end
 
     # The timestamp migrator is current if there are no migrations to apply
@@ -706,29 +709,31 @@ module Sequel
     # Apply all migration tuples on the database
     def run
       migration_tuples.each do |m, f, direction|
-        t = Time.now
-        db.log_info("Begin applying migration #{f}, direction: #{direction}")
-        checked_transaction(m) do
-          m.apply(db, direction)
-          fi = f.downcase
-          direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
-        end
-        db.log_info("Finished applying migration #{f}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
+        apply_migration(m, f, direction)
       end
       nil
     end
 
-    # Apply single migration tuple on the database
+    # Apply single migration tuple at the given path with the given direction
+    # on the database.
     def run_single(path, direction)
       migration = load_migration_file(path)
       file_name = File.basename(path)
+      already_applied = applied_migrations.include?(file_name.downcase)
+
+      return if direction == :up ? already_applied : !already_applied
+
+      apply_migration(migration, file_name, direction)
+      nil
+    end
+
+    private
+
+    # Apply a single migration with the given filename in the given direction.
+    def apply_migration(migration, file_name, direction)
       fi = file_name.downcase
-      direction ||= :up
-
-      return if (applied_migrations.include?(fi) && direction == :up) ||
-                (!applied_migrations.include?(fi) && direction == :down)
-
       t = Time.now
+
       db.log_info("Begin applying migration #{file_name}, direction: #{direction}")
       checked_transaction(migration) do
         migration.apply(db, direction)
@@ -736,8 +741,6 @@ module Sequel
       end
       db.log_info("Finished applying migration #{file_name}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
     end
-
-    private
 
     # Convert the schema_info table to the new schema_migrations table format,
     # using the version of the schema_info table and the current migration files.
