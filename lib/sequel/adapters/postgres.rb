@@ -672,6 +672,7 @@ module Sequel
       #          cursor usage.
       # :rows_per_fetch :: The number of rows per fetch (default 1000).  Higher
       #                    numbers result in fewer queries but greater memory use.
+      # :skip_transaction :: Same as :hold, but :hold takes priority.
       #
       # Usage:
       #
@@ -764,13 +765,13 @@ module Sequel
 
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql)
-        server_opts = {:server=>@opts[:server] || :read_only}
         cursor = @opts[:cursor]
-        hold = cursor[:hold]
+        hold = cursor.fetch(:hold){cursor[:skip_transaction]}
+        server_opts = {:server=>@opts[:server] || :read_only, :skip_transaction=>hold}
         cursor_name = quote_identifier(cursor[:cursor_name] || 'sequel_cursor')
         rows_per_fetch = cursor[:rows_per_fetch].to_i
 
-        db.public_send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 
+        db.transaction(server_opts) do 
           begin
             execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITH#{'OUT' unless hold} HOLD FOR #{sql}", server_opts)
             rows_per_fetch = 1000 if rows_per_fetch <= 0
