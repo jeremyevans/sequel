@@ -223,7 +223,8 @@ module Sequel
             :password => opts[:password],
             :connect_timeout => opts[:connect_timeout] || 20,
             :sslmode => opts[:sslmode],
-            :sslrootcert => opts[:sslrootcert]
+            :sslrootcert => opts[:sslrootcert],
+            :hostaddr => opts[:hostaddr]
           }.delete_if { |key, value| blank_object?(value) }
           # :nocov:
           connection_params.merge!(opts[:driver_options]) if opts[:driver_options]
