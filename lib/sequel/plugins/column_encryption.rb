@@ -325,7 +325,7 @@ module Sequel
     #   DB.alter_table(:ce_test) do
     #     c = Sequel[:encrypted_column_name]
     #     add_constraint(:enc_base64) do
-    #       octet_length(decode(regexp_replace(regexp_replace(c, '_', '/', 'g'), '-', '+', 'g'), 'base64')) >= 65}
+    #       octet_length(decode(regexp_replace(regexp_replace(c, '_', '/', 'g'), '-', '+', 'g'), 'base64')) >= 65
     #     end
     #   end
     #
