@@ -1,5 +1,7 @@
 === master
 
+* Make any_not_empty? extension support passing pattern argument to any? (jeremyevans) (#2100)
+
 * Respect :skip_transaction option in PostgreSQL Dataset#paged_each (jeremyevans) (#2097)
 
 * Add TimestampMigrator.run_single to run a single migration file up or down (opya, jeremyevans) (#2093)

@@ -20,4 +20,13 @@ describe "any_not_empty extension" do
     @ds.with_fetch([]).any?{|x| x[:one] == 1}.must_equal false
     @ds.db.sqls.must_equal ["SELECT * FROM t"]
   end
+
+  it "should use default behavior if argument is given" do
+    @ds.with_fetch(:one=>1).any?(Hash).must_equal true
+    @ds.db.sqls.must_equal ["SELECT * FROM t"]
+    @ds.with_fetch(:one=>1).any?(Array).must_equal false
+    @ds.db.sqls.must_equal ["SELECT * FROM t"]
+    @ds.with_fetch([]).any?(Hash).must_equal false
+    @ds.db.sqls.must_equal ["SELECT * FROM t"]
+  end if RUBY_VERSION >= '2.5'
 end
