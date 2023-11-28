@@ -526,43 +526,45 @@ module Sequel
     Error = Migrator::Error
 
     # The current version for this migrator
-    attr_reader :current
-
-    # The direction of the migrator, either :up or :down
-    attr_reader :direction
-
-    # The migrations used by this migrator
-    attr_reader :migrations
+    attr_reader :initial_current
 
     # Set up all state for the migrator instance
     def initialize(db, directory, opts=OPTS)
       super
-      @current = opts[:current] || current_migration_version
 
-      latest_version = latest_migration_version
-      @target = if opts[:target]
-        opts[:target]
-      elsif opts[:relative]
-        @current + opts[:relative]
+      @opts = opts
+      @initial_current = current
+    end
+
+    # The direction of the migrator, either :up or :down
+    def direction
+      initial_current < target ? :up : :down
+    end
+
+    def current
+      @opts[:current] || current_migration_version
+    end
+
+    def target
+      return @target if @target
+
+      @target = if @opts[:target]
+        @opts[:target]
+      elsif @opts[:relative]
+        current + @opts[:relative]
       else
-        latest_version
+        latest_migration_version
       end
 
-      raise(Error, "No target and/or latest version available, probably because no migration files found or filenames don't follow the migration filename convention") unless target && latest_version
+      raise(Error, "No target and/or latest version available, probably because no migration files found or filenames don't follow the migration filename convention") unless @target && latest_migration_version
 
-      if @target > latest_version
-        @target = latest_version
+      if @target > latest_migration_version
+        @target = latest_migration_version
       elsif @target < 0
         @target = 0
       end
 
-      @direction = current < target ? :up : :down
-
-      if @direction == :down && @current >= @files.length && !@allow_missing_migration_files
-        raise Migrator::Error, "Missing migration version(s) needed to migrate down to target version (current: #{current}, target: #{target})"
-      end
-
-      @migrations = get_migrations
+      @target
     end
 
     # The integer migrator is current if the current version is the same as the target version.
@@ -572,6 +574,8 @@ module Sequel
     
     # Apply all migrations on the database
     def run
+      check_missing
+
       migrations.zip(version_numbers).each do |m, v|
         timer = Sequel.start_timer
         db.log_info("Begin applying migration version #{v}, direction: #{direction}")
@@ -586,6 +590,12 @@ module Sequel
     end
 
     private
+
+    def check_missing
+      if direction == :down && current >= @files.length && !@allow_missing_migration_files
+        raise Migrator::Error, "Missing migration version(s) needed to migrate down to target version (current: #{current}, target: #{target})"
+      end
+    end
 
     # Gets the current migration version stored in the database. If no version
     # number is stored, 0 is returned.
@@ -621,8 +631,8 @@ module Sequel
     
     # Returns a list of migration classes filtered for the migration range and
     # ordered according to the migration direction.
-    def get_migrations
-      version_numbers.map{|n| load_migration_file(files[n])}
+    def migrations
+      @migrations ||= version_numbers.map{|n| load_migration_file(files[n])}
     end
     
     # Returns the latest version available in the specified directory.
@@ -663,7 +673,7 @@ module Sequel
         versions = files.
           compact.
           map{|f| migration_version_from_file(File.basename(f))}.
-          select{|v| up? ? (v > current && v <= target) : (v <= current && v > target)}.
+          select{|v| up? ? (v > initial_current && v <= target) : (v <= initial_current && v > target)}.
           sort
         versions.reverse! unless up?
         versions
