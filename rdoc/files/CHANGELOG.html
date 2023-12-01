@@ -31,12 +31,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-11-01 08:38:41 -0700</span>
+<span class='datetime'>2023-12-01 08:25:58 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.75.0+-282023-12-01-29"><a href="doc/release_notes/5_75_0_txt.html">5.75.0</a> (2023-12-01)<span><a href="#label-5.75.0+-282023-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make any_not_empty? extension support passing pattern argument to any? (jeremyevans) (#2100)</p>
+</li><li>
+<p>Respect :skip_transaction option in PostgreSQL Dataset#paged_each (jeremyevans) (#2097)</p>
+</li><li>
+<p>Add TimestampMigrator.run_single to run a single migration file up or down (opya, jeremyevans) (#2093)</p>
+</li><li>
+<p>Support INSERT RETURNING on MariaDB 10.5+, and use it when saving new model objects (jeremyevans)</p>
+</li><li>
+<p>Add Database#{defer,immediate}_constraints on PostgreSQL for changing handling of deferrable constraints in a transaction (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.74.0+-282023-11-01-29"><a href="doc/release_notes/5_74_0_txt.html">5.74.0</a> (2023-11-01)<span><a href="#label-5.74.0+-282023-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make generated columns show up in Database#schema when using SQLite 3.37+ (jeremyevans) (#2087)</p>

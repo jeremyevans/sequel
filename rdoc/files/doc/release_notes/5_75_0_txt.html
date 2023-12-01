@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.75.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.75.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.75.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2023-12-01 08:25:58 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#{defer,immediate}_constraints methods have been added on PostgreSQL for changing handling of deferrable constraints inside a transaction. defer_constraints sets deferrable constraints to be deferred (not checked until transaction commit), and immediate_constraints sets deferrable constraints to be checked as part of the related query, and any already deferred constraint checks to be applied immediately. You can pass the :constraints option to only apply the changes to specific constraints.</p>
+</li><li>
+<p>TimestampMigrator.run_single has been added, to migrate a single migration up or down.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>INSERT RETURNING is now supported on MariaDB 10.5+, and used automatically when saving new model objects. Note that this is not supported when using the jdbc adapter, because the jdbc-mysql driver doesn’t support it.  A jdbc/mariadb adapter could be added, as it’s likely recent versions of the jdbc-mariadb driver would support it, but the jdbc-mariadb gem  hasn’t been updated in over 4 years.  Talk to the jdbc-mariadb gem maintainers if you want to use this feature with the jdbc adapter.</p>
+</li><li>
+<p>The Dataset#paged_each optimization in the postgres adapter now respects the :skip_transaction option, making it the same as the :hold option.  Note that this has effects beyond just skipping the transaction, but non-HOLD cursors are only supported inside transactions.</p>
+</li><li>
+<p>The any_not_empty? extension’s Dataset#any? method now supports an argument, passing it to Enumerable#any? (which has supported an argument since Ruby 2.5).</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

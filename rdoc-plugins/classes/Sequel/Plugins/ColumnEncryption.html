@@ -250,12 +250,13 @@ Sequel::Plugins::ColumnEncryption
 
 <p>If possible, it’s also best to check that the column is valid urlsafe base64 data of sufficient length. This can be done on PostgreSQL using a combination of octet_length, decode, and regexp_replace:</p>
 
-<pre>DB.alter_table(:ce_test) do
-  c = Sequel[:encrypted_column_name]
-  add_constraint(:enc_base64) do
-    octet_length(decode(regexp_replace(regexp_replace(c, &#39;_&#39;, &#39;/&#39;, &#39;g&#39;), &#39;-&#39;, &#39;+&#39;, &#39;g&#39;), &#39;base64&#39;)) &gt;= 65}
-  end
-end</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:ce_test</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:encrypted_column_name</span>]
+  <span class="ruby-identifier">add_constraint</span>(<span class="ruby-value">:enc_base64</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">octet_length</span>(<span class="ruby-identifier">decode</span>(<span class="ruby-identifier">regexp_replace</span>(<span class="ruby-identifier">regexp_replace</span>(<span class="ruby-identifier">c</span>, <span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&#39;/&#39;</span>, <span class="ruby-string">&#39;g&#39;</span>), <span class="ruby-string">&#39;-&#39;</span>, <span class="ruby-string">&#39;+&#39;</span>, <span class="ruby-string">&#39;g&#39;</span>), <span class="ruby-string">&#39;base64&#39;</span>)) <span class="ruby-operator">&gt;=</span> <span class="ruby-value">65</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
 
 <p>Such constraints will probably be sufficient to protect against most unintentional corruption of encrypted columns.</p>
 

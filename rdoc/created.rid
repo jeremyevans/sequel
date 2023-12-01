@@ -1,6 +1,6 @@
-Wed, 01 Nov 2023 08:55:05 -0700
+Fri, 01 Dec 2023 08:34:34 -0800
 README.rdoc	Tue, 19 Sep 2023 10:01:52 -0700
-CHANGELOG	Wed, 01 Nov 2023 08:38:41 -0700
+CHANGELOG	Fri, 01 Dec 2023 08:25:58 -0800
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Wed, 01 Nov 2023 08:38:41 -0700
+lib/sequel/version.rb	Fri, 01 Dec 2023 08:25:58 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -270,6 +270,7 @@ doc/release_notes/5.71.0.txt	Tue, 01 Aug 2023 07:39:28 -0700
 doc/release_notes/5.72.0.txt	Tue, 29 Aug 2023 11:56:10 -0700
 doc/release_notes/5.73.0.txt	Thu, 28 Sep 2023 16:13:36 -0700
 doc/release_notes/5.74.0.txt	Wed, 01 Nov 2023 08:38:41 -0700
+doc/release_notes/5.75.0.txt	Fri, 01 Dec 2023 08:25:58 -0800
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
-lib/sequel/extensions/migration.rb	Fri, 13 Oct 2023 09:45:09 -0700
+lib/sequel/extensions/migration.rb	Mon, 13 Nov 2023 09:50:21 -0800

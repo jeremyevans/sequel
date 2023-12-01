@@ -1,4 +1,4 @@
-Wed, 01 Nov 2023 08:56:05 -0700
+Fri, 01 Dec 2023 08:35:34 -0800
 lib/sequel/adapters/ado.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/ado/access.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/adapters/ado/mssql.rb	Mon, 28 Jan 2019 08:29:19 -0800
@@ -26,14 +26,14 @@ lib/sequel/adapters/odbc/db2.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/odbc/mssql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/odbc/oracle.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/oracle.rb	Wed, 21 Dec 2022 15:06:01 -0800
-lib/sequel/adapters/postgres.rb	Sun, 30 Oct 2022 19:13:54 -0700
+lib/sequel/adapters/postgres.rb	Thu, 16 Nov 2023 09:13:26 -0800
 lib/sequel/adapters/postgresql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/shared/access.rb	Wed, 21 Dec 2022 15:06:01 -0800
 lib/sequel/adapters/shared/db2.rb	Tue, 26 Sep 2023 09:59:16 -0700
 lib/sequel/adapters/shared/mssql.rb	Thu, 23 Mar 2023 13:17:57 -0700
-lib/sequel/adapters/shared/mysql.rb	Fri, 06 Jan 2023 13:58:57 -0800
+lib/sequel/adapters/shared/mysql.rb	Wed, 08 Nov 2023 14:30:19 -0800
 lib/sequel/adapters/shared/oracle.rb	Fri, 03 Feb 2023 15:15:42 -0800
-lib/sequel/adapters/shared/postgres.rb	Tue, 19 Sep 2023 16:05:21 -0700
+lib/sequel/adapters/shared/postgres.rb	Fri, 03 Nov 2023 15:32:09 -0700
 lib/sequel/adapters/shared/sqlanywhere.rb	Wed, 21 Dec 2022 15:06:01 -0800
 lib/sequel/adapters/shared/sqlite.rb	Fri, 13 Oct 2023 10:59:44 -0700
 lib/sequel/adapters/sqlanywhere.rb	Tue, 21 Sep 2021 14:24:30 -0700

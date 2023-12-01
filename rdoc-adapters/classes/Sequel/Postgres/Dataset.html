@@ -114,9 +114,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-bound_variable_modules-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">737</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_modules</span>
-<span class="line-num">738</span>   [<span class="ruby-constant">BindArgumentMethods</span>]
-<span class="line-num">739</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">738</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_modules</span>
+<span class="line-num">739</span>   [<span class="ruby-constant">BindArgumentMethods</span>]
+<span class="line-num">740</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -179,9 +179,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-prepared_arg_placeholder-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">747</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_arg_placeholder</span>
-<span class="line-num">748</span>   <span class="ruby-constant">PREPARED_ARG_PLACEHOLDER</span>
-<span class="line-num">749</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">748</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_arg_placeholder</span>
+<span class="line-num">749</span>   <span class="ruby-constant">PREPARED_ARG_PLACEHOLDER</span>
+<span class="line-num">750</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_statement_modules'>
@@ -198,9 +198,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-prepared_statement_modules-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">741</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement_modules</span>
-<span class="line-num">742</span>   [<span class="ruby-constant">PreparedStatementMethods</span>]
-<span class="line-num">743</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">742</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement_modules</span>
+<span class="line-num">743</span>   [<span class="ruby-constant">PreparedStatementMethods</span>]
+<span class="line-num">744</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-use_cursor'>
@@ -218,6 +218,8 @@ Superclass:
 <p>Declare the cursor WITH HOLD and don’t use transaction around the cursor usage.</p>
 </td></tr><tr><td class='label'>:rows_per_fetch </td><td>
 <p>The number of rows per fetch (default 1000).  Higher numbers result in fewer queries but greater memory use.</p>
+</td></tr><tr><td class='label'>:skip_transaction </td><td>
+<p>Same as :hold, but :hold takes priority.</p>
 </td></tr></tbody></table>
 
 <p>Usage:</p>
@@ -235,9 +237,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-use_cursor-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">684</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use_cursor</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">685</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:cursor</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:rows_per_fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1000</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))
-<span class="line-num">686</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">685</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use_cursor</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">686</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:cursor</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:rows_per_fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1000</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))
+<span class="line-num">687</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where_current_of'>
@@ -261,9 +263,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-where_current_of-source'>    <span class="ruby-comment"># File lib/sequel/adapters/postgres.rb</span>
-<span class="line-num">696</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_current_of</span>(<span class="ruby-identifier">cursor_name</span>=<span class="ruby-string">&#39;sequel_cursor&#39;</span>)
-<span class="line-num">697</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:where</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;CURRENT OF &#39;</span>], <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">cursor_name</span>)))
-<span class="line-num">698</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">697</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_current_of</span>(<span class="ruby-identifier">cursor_name</span>=<span class="ruby-string">&#39;sequel_cursor&#39;</span>)
+<span class="line-num">698</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:where</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;CURRENT OF &#39;</span>], <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">cursor_name</span>)))
+<span class="line-num">699</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
