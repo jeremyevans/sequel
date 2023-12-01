@@ -1,0 +1,35 @@
+= New Features
+
+* Database#{defer,immediate}_constraints methods have been added on
+  PostgreSQL for changing handling of deferrable constraints inside
+  a transaction. defer_constraints sets deferrable constraints to
+  be deferred (not checked until transaction commit), and
+  immediate_constraints sets deferrable constraints to be checked
+  as part of the related query, and any already deferred constraint
+  checks to be applied immediately. You can pass the :constraints
+  option to only apply the changes to specific constraints.
+
+* TimestampMigrator.run_single has been added, to migrate a single
+  migration up or down.
+
+= Other Improvements
+
+* INSERT RETURNING is now supported on MariaDB 10.5+, and used
+  automatically when saving new model objects. Note that this
+  is not supported when using the jdbc adapter, because the
+  jdbc-mysql driver doesn't support it.  A jdbc/mariadb adapter
+  could be added, as it's likely recent versions of the
+  jdbc-mariadb driver would support it, but the jdbc-mariadb gem 
+  hasn't been updated in over 4 years.  Talk to the jdbc-mariadb
+  gem maintainers if you want to use this feature with the jdbc
+  adapter.
+
+* The Dataset#paged_each optimization in the postgres adapter
+  now respects the :skip_transaction option, making it the
+  same as the :hold option.  Note that this has effects beyond
+  just skipping the transaction, but non-HOLD cursors are only
+  supported inside transactions.
+
+* The any_not_empty? extension's Dataset#any? method now supports
+  an argument, passing it to Enumerable#any? (which has supported
+  an argument since Ruby 2.5).
