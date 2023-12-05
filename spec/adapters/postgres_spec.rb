@@ -211,6 +211,9 @@ describe 'A PostgreSQL database' do
           end
         else
           ds = @db[:test].with_extend(Sequel::Postgres::ExtendedDateSupport::DatasetMethods)
+          if type == 'timestamptz'
+            ds = ds.extension(:pg_timestamptz)
+          end
         end
         proc{ds.insert(max+1)}.must_raise(Sequel::DatabaseError)
         proc{ds.insert(min-1)}.must_raise(Sequel::DatabaseError)
@@ -1606,12 +1609,12 @@ describe "A PostgreSQL dataset with a timestamp field" do
     Sequel.default_timezone = :utc
     t = Time.at(-100000000000).utc + 0.5
     @db.get(Sequel.cast(t, Time)).must_equal t
-    @db.get(Sequel.cast(t, :timestamptz)).must_equal t
+    @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(t, :timestamptz)).must_equal t
 
     Sequel.datetime_class = DateTime
     dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
     @db.get(Sequel.cast(dt, DateTime)).must_equal dt
-    @db.get(Sequel.cast(dt, :timestamptz)).must_equal dt
+    @db.dataset.extension(:pg_timestamptz).get(Sequel.cast(dt, :timestamptz)).must_equal dt
   end
 
   it "should handle BC times and dates in bound variables" do

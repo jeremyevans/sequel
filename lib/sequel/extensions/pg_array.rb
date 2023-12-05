@@ -241,6 +241,14 @@ module Sequel
             else
               literal(a)
             end
+          when SQLTime
+            dataset.send(:literal_sqltime, a)
+          when Time
+            dataset.send(:literal_time, a)
+          when DateTime
+            dataset.send(:literal_datetime, a)
+          when Date
+            dataset.send(:literal_date, a)
           else
             if (s = bound_variable_arg(a, nil)).is_a?(String)
               bound_variable_array_string(s)

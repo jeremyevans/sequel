@@ -2,6 +2,7 @@
 
 Sequel::JDBC.load_driver('org.hsqldb.jdbcDriver', :HSQLDB)
 require_relative 'transactions'
+require_relative '../../extensions/auto_cast_date_and_time'
 
 module Sequel
   module JDBC
@@ -15,6 +16,7 @@ module Sequel
 
     module HSQLDB
       module DatabaseMethods
+        include AutoCastDateAndTime
         include ::Sequel::JDBC::Transactions
 
         def database_type

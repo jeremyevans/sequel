@@ -50,6 +50,7 @@ DB.extension :index_caching if ENV['SEQUEL_INDEX_CACHING']
 DB.extension :error_sql if ENV['SEQUEL_ERROR_SQL']
 DB.extension :synchronize_sql if ENV['SEQUEL_SYNCHRONIZE_SQL']
 DB.extension :integer64 if ENV['SEQUEL_INTEGER64']
+DB.extension :auto_cast_date_and_time if ENV['SEQUEL_AUTO_CAST_DATE_TIME']
 
 if ENV['SEQUEL_CONNECTION_VALIDATOR']
   DB.extension(:connection_validator)

@@ -82,7 +82,7 @@ module Sequel
       when DateTime
         literal_datetime_append(sql, v)
       when Date
-        sql << literal_date(v)
+        literal_date_append(sql, v)
       when Dataset
         literal_dataset_append(sql, v)
       else
@@ -1106,7 +1106,7 @@ module Sequel
     
     # The strftime format to use when literalizing the time.
     def default_timestamp_format
-      requires_sql_standard_datetimes? ? "TIMESTAMP '%Y-%m-%d %H:%M:%S%N%z'" : "'%Y-%m-%d %H:%M:%S%N%z'"
+      "'%Y-%m-%d %H:%M:%S%N%z'"
     end
 
     def delete_delete_sql(sql)
@@ -1347,11 +1347,12 @@ module Sequel
 
     # SQL fragment for Date, using the ISO8601 format.
     def literal_date(v)
-      if requires_sql_standard_datetimes?
-        v.strftime("DATE '%Y-%m-%d'")
-      else
-        v.strftime("'%Y-%m-%d'")
-      end
+      v.strftime("'%Y-%m-%d'")
+    end
+
+    # Append literalization of date to SQL string.
+    def literal_date_append(sql, v)
+      sql << literal_date(v)
     end
 
     # SQL fragment for DateTime

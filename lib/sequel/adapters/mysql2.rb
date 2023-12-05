@@ -182,8 +182,14 @@ module Sequel
             1
           when false
             0
-          when DateTime, Time
-            literal(arg)[1...-1]
+          when SQLTime
+            dataset.send(:literal_sqltime, arg)[1...-1]
+          when Time
+            dataset.send(:literal_time, arg)[1...-1]
+          when DateTime
+            dataset.send(:literal_datetime, arg)[1...-1]
+          when Date
+            dataset.send(:literal_date, arg)[1...-1]
           else
             arg
           end

@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
 Sequel::JDBC.load_driver('org.h2.Driver', :H2)
+require_relative '../../extensions/auto_cast_date_and_time'
 
 module Sequel
   module JDBC
@@ -14,6 +15,8 @@ module Sequel
 
     module H2
       module DatabaseMethods
+        include AutoCastDateAndTime
+
         def commit_prepared_transaction(transaction_id, opts=OPTS)
           run("COMMIT TRANSACTION #{transaction_id}", opts)
         end

@@ -1102,13 +1102,6 @@ describe "Dataset#literal" do
     @dataset.literal(d).must_equal s
   end
 
-  it "should literalize Time, DateTime, Date properly if SQL standard format is required" do
-    @dataset = @dataset.with_extend{def requires_sql_standard_datetimes?; true end}
-    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "TIMESTAMP '2010-01-02 03:04:05.500000'"
-    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "TIMESTAMP '2010-01-02 03:04:05.500000'"
-    @dataset.literal(Date.new(2010, 1, 2)).must_equal "DATE '2010-01-02'"
-  end
-  
   it "should literalize Time and DateTime properly if the database support timezones in timestamps" do
     @dataset = @dataset.with_extend{def supports_timestamp_timezones?; true end}
     @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500000+0000'"

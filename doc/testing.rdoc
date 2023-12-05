@@ -159,6 +159,7 @@ The SEQUEL_INTEGRATION_URL environment variable specifies the Database connectio
 
 === Other
 
+SEQUEL_AUTO_CAST_DATE_TIME :: Use the auto_cast_date_and_time extension when running the specs
 SEQUEL_ASYNC_THREAD_POOL :: Use the async_thread_pool extension when running the specs
 SEQUEL_ASYNC_THREAD_POOL_PREEMPT :: Use the async_thread_pool extension when running the specs, with the :preempt_async_thread option
 SEQUEL_CHECK_PENDING :: Try running all specs (note, can cause lockups for some adapters), and raise errors for skipped specs that don't fail

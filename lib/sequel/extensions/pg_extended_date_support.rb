@@ -53,8 +53,14 @@ module Sequel
       # on jdbc.
       def bound_variable_arg(arg, conn)
         case arg
-        when Date, Time
-          literal(arg)
+        when SQLTime
+          dataset.send(:literal_sqltime, arg)
+        when Time
+          dataset.send(:literal_time, arg)
+        when DateTime
+          dataset.send(:literal_datetime, arg)
+        when Date
+          dataset.send(:literal_date, arg)
         else
           super
         end

@@ -25,11 +25,16 @@ module Sequel
       false
     end
 
+    # :nocov:
+
     # Whether the dataset requires SQL standard datetimes. False by default,
-    # as most allow strings with ISO 8601 format.
+    # as most allow strings with ISO 8601 format. Only for backwards compatibility,
+    # no longer used internally, do not use in new code.
     def requires_sql_standard_datetimes?
+      # SEQUEL6: Remove
       false
     end
+    # :nocov:
 
     # Whether type specifiers are required for prepared statement/bound
     # variable argument placeholders (i.e. :bv__integer), false by default.

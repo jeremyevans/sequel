@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
 require_relative '../utils/emulate_offset_with_row_number'
+require_relative '../../extensions/auto_cast_date_and_time'
 
 module Sequel
   module Oracle
@@ -326,6 +327,8 @@ module Sequel
     end
 
     module DatasetMethods
+      include AutoCastDateAndTime
+
       ROW_NUMBER_EXPRESSION = LiteralString.new('ROWNUM').freeze
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
 
@@ -623,7 +626,7 @@ module Sequel
 
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
-        "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'"
+        "'%Y-%m-%d %H:%M:%S%N %z'"
       end
 
       def empty_from_sql
