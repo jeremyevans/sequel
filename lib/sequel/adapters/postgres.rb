@@ -188,12 +188,8 @@ module Sequel
         # :nocov:
         # Not covered by tests as tests use pg_extended_date_support
         # extension, which has basically the same code.
-        when SQLTime
-          dataset.send(:literal_sqltime, arg)
-        when Time
-          dataset.send(:literal_time, arg)
-        when DateTime
-          dataset.send(:literal_datetime, arg)
+        when Time, DateTime
+          @default_dataset.literal_date_or_time(arg)
         # :nocov:
         else
           arg

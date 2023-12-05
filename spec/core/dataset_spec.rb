@@ -917,6 +917,30 @@ describe "Dataset#as" do
   end
 end
 
+describe "Dataset#literal_date_or_time" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+  
+  it "should convert date and time as SQL string" do
+    @ds.literal_date_or_time(Time.utc(2000)).must_equal "'2000-01-01 00:00:00.000000'"
+    @ds.literal_date_or_time(DateTime.new(2000)).must_equal "'2000-01-01 00:00:00.000000'"
+    @ds.literal_date_or_time(Date.new(2000)).must_equal "'2000-01-01'"
+    @ds.literal_date_or_time(Sequel::SQLTime.create(10, 20, 30)).must_equal "'10:20:30.000000'"
+  end
+  
+  it "should provide raw value if the raw argument is true" do
+    @ds.literal_date_or_time(Time.utc(2000), true).must_equal "2000-01-01 00:00:00.000000"
+    @ds.literal_date_or_time(DateTime.new(2000), true).must_equal "2000-01-01 00:00:00.000000"
+    @ds.literal_date_or_time(Date.new(2000), true).must_equal "2000-01-01"
+    @ds.literal_date_or_time(Sequel::SQLTime.create(10, 20, 30), true).must_equal "10:20:30.000000"
+  end
+
+  it "should raise TypeError for unsupported types" do
+    proc{@ds.literal_date_or_time(Object.new)}.must_raise TypeError
+  end
+end
+
 describe "Dataset#literal with expressions" do
   before do
     @ds = Sequel.mock.dataset

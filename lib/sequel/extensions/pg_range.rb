@@ -494,14 +494,8 @@ module Sequel
         case k
         when nil
           ''
-        when SQLTime
-          ds.send(:literal_sqltime, k)[1...-1]
-        when Time
-          ds.send(:literal_time, k)[1...-1]
-        when DateTime
-          ds.send(:literal_datetime, k)[1...-1]
-        when Date
-          ds.send(:literal_date, k)[1...-1]
+        when Time, Date
+          ds.literal_date_or_time(k, true)
         when Integer, Float
           k.to_s
         when BigDecimal

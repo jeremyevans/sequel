@@ -115,6 +115,33 @@ module Sequel
       sql
     end
 
+    # Literalize a date or time value, as a SQL string value with no
+    # typecasting. If +raw+ is true, remove the surrounding single
+    # quotes.  This is designed for usage by bound argument code that
+    # can work even if the auto_cast_date_and_time extension is
+    # used (either manually or implicitly in the related adapter).
+    def literal_date_or_time(dt, raw=false)
+      value = case dt
+      when SQLTime
+        literal_sqltime(dt)
+      when Time
+        literal_time(dt)
+      when DateTime
+        literal_datetime(dt)
+      when Date
+        literal_date(dt)
+      else
+        raise TypeError, "unsupported type: #{dt.inspect}"
+      end
+
+      if raw
+        value.sub!(/\A'/, '')
+        value.sub!(/'\z/, '')
+      end
+
+      value
+    end
+
     # Returns an array of insert statements for inserting multiple records.
     # This method is used by +multi_insert+ to format insert statements and
     # expects a keys array and and an array of value arrays.
