@@ -35,7 +35,7 @@ module Sequel
 
       # Round Sequel::SQLTime values before literalizing
       def literal_sqltime(v)
-        super(v.round(timestamp_precision))
+        super(v.round(sqltime_precision))
       end
 
       # Round Time values before literalizing
