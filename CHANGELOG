@@ -1,5 +1,7 @@
 === master
 
+* Support fractional times and timestamps on SQLAnywhere (jeremyevans)
+
 * Make round_timestamps extension use Dataset#sqltime_precision for rounding Sequel::SQLTime values (jeremyevans)
 
 * Remove special handling of %N modifier in Dataset#default_timestamp_format (jeremyevans)

@@ -281,10 +281,6 @@ module Sequel
         false
       end
 
-      def supports_timestamp_usecs?
-        false
-      end
-
       def supports_window_clause?
         true
       end
