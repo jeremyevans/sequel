@@ -203,7 +203,7 @@ module Sequel
             date <<= ((date.year) * 24 - 12)
             date = db.from_application_timestamp(date)
             minutes = (date.offset * 1440).to_i
-            date.strftime("'%Y-%m-%d %H:%M:%S.%N#{format_timestamp_offset(*minutes.divmod(60))} BC'")
+            date.strftime("'%Y-%m-%d %H:%M:%S.%N#{sprintf("%+03i%02i", *minutes.divmod(60))} BC'")
           else
             super
           end
@@ -247,7 +247,7 @@ module Sequel
           def literal_time(time)
             if time < TIME_YEAR_1
               time = db.from_application_timestamp(time)
-              time.strftime("'#{sprintf('%04i', time.year.abs+1)}-%m-%d %H:%M:%S.%N#{format_timestamp_offset(*(time.utc_offset/RATIONAL_60).divmod(60))} BC'")
+              time.strftime("'#{sprintf('%04i', time.year.abs+1)}-%m-%d %H:%M:%S.%N#{sprintf("%+03i%02i", *(time.utc_offset/RATIONAL_60).divmod(60))} BC'")
             else
               super
             end

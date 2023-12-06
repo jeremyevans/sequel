@@ -1,5 +1,7 @@
 === master
 
+* Remove Dataset#format_timestamp_offset private method (jeremyevans)
+
 * Remove special handling of %z modifier in Dataset#default_timestamp_format (jeremyevans)
 
 * Add Dataset#literal_date_or_time, for simpler use by bound argument code (jeremyevans)

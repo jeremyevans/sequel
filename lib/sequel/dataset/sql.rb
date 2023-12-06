@@ -1211,11 +1211,6 @@ module Sequel
       v2.strftime(fmt)
     end
     
-    # Return the SQL timestamp fragment to use for the timezone offset.
-    def format_timestamp_offset(hour, minute)
-      sprintf("%+03i%02i", hour, minute)
-    end
-
     # Return the SQL timestamp fragment to use for the fractional time part.
     # Should start with the decimal point.  Uses 6 decimal places by default.
     def format_timestamp_usec(usec, ts=timestamp_precision)

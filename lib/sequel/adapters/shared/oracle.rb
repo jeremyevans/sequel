@@ -626,7 +626,7 @@ module Sequel
 
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
-        "'%Y-%m-%d %H:%M:%S%N %z'"
+        "'%Y-%m-%d %H:%M:%S%N %:z'"
       end
 
       def empty_from_sql
@@ -661,11 +661,6 @@ module Sequel
         end
         opts[:sequence] = @opts[:sequence]
         super
-      end
-
-      # Use a colon for the timestamp offset, since Oracle appears to require it.
-      def format_timestamp_offset(hour, minute)
-        sprintf("%+03i:%02i", hour, minute)
       end
 
       # Oracle doesn't support empty values when inserting.
