@@ -932,7 +932,7 @@ module Sequel
       # since that is the format that is multilanguage and not
       # DATEFORMAT dependent.
       def default_timestamp_format
-        "'%Y-%m-%dT%H:%M:%S%N%z'"
+        "'%Y-%m-%dT%H:%M:%S.%3N'"
       end
 
       # Only include the primary table in the main delete clause

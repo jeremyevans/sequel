@@ -9,8 +9,12 @@ describe "pg_range extension" do
     @db = Sequel.connect('mock://postgres')
     @R = Sequel::Postgres::PGRange
     @db.extend_datasets do
-      def supports_timestamp_timezones?; false end
-      def supports_timestamp_usecs?; false end
+      def default_time_format
+        "'%H:%M:%S'"
+      end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S'"
+      end
       def quote_identifiers?; false end
     end
     @db.extension(:pg_array, :pg_range)

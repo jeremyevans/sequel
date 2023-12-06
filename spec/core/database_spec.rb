@@ -2377,7 +2377,11 @@ describe "Database#typecast_value" do
         v.offset.must_equal o.offset
       end
     end
-    @db.extend_datasets(Module.new{def supports_timestamp_timezones?; true; end})
+    @db.extend_datasets(Module.new do
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%6N%z'"
+      end
+    end)
     begin
       @db.typecast_value(:datetime, dt).must_equal t
       @db.typecast_value(:datetime, dt2).must_equal t2

@@ -1089,21 +1089,48 @@ describe "Dataset#literal" do
   end
   
   it "should literalize times properly for databases not supporting fractional seconds" do
-    @dataset = @dataset.with_extend{def supports_timestamp_usecs?; false end}
+    @dataset = @dataset.with_extend do
+      def default_time_format
+        "'%H:%M:%S'"
+      end
+
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S'"
+      end
+    end
+
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05'"
   end
   
   it "should literalize times properly for databases supporting millisecond precision" do
-    @dataset = @dataset.with_extend{def timestamp_precision; 3 end}
+    @dataset = @dataset.with_extend do
+      def default_time_format
+        "'%H:%M:%S.%3N'"
+      end
+
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%3N'"
+      end
+    end
+
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500'"
   end
   
   it "should literalize times properly for databases with different time and timestamp precision" do
-    @dataset = @dataset.with_extend{def timestamp_precision; 3 end; def sqltime_precision; 6 end}
+    @dataset = @dataset.with_extend do
+      def default_time_format
+        "'%H:%M:%S.%6N'"
+      end
+
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%3N'"
+      end
+    end
+
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500000'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500'"
@@ -1127,11 +1154,20 @@ describe "Dataset#literal" do
   end
 
   it "should literalize Time and DateTime properly if the database support timezones in timestamps" do
-    @dataset = @dataset.with_extend{def supports_timestamp_timezones?; true end}
+    @dataset = @dataset.with_extend do
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%6N%z'"
+      end
+    end
+
     @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500000+0000'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500000+0000'"
 
-    @dataset = @dataset.with_extend{def supports_timestamp_usecs?; false end}
+    @dataset = @dataset.with_extend do
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S%z'"
+      end
+    end
     @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5)).must_equal "'2010-01-02 03:04:05+0000'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5)).must_equal "'2010-01-02 03:04:05+0000'"
   end
@@ -4601,8 +4637,9 @@ describe "Sequel timezone support" do
   before do
     @db = Sequel::Database.new
     @dataset = @db.dataset.with_extend do
-      def supports_timestamp_timezones?; true end
-      def supports_timestamp_usecs?; false end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S%z'"
+      end
     end
     @utc_time = Time.utc(2010, 1, 2, 3, 4, 5)
     @local_time = Time.local(2010, 1, 2, 3, 4, 5)

@@ -117,22 +117,22 @@ describe "pg_extended_date_support extension" do
   end
 
   it "should format BC and AD datetimes" do
-    @db.literal(DateTime.new(-1199, 2, 15, 14, 13, 20)).must_equal "'1200-02-15 14:13:20.000000000+0000 BC'"
+    @db.literal(DateTime.new(-1199, 2, 15, 14, 13, 20)).must_equal "'1200-02-15 14:13:20.000000+0000 BC'"
     @db.literal(DateTime.new(1200, 2, 15, 14, 13, 20)).must_equal "'1200-02-15 14:13:20.000000+0000'"
   end
 
   it "should format BC and AD times" do
-    @db.literal(Time.at(-100000000000).utc).must_equal "'1200-02-15 14:13:20.000000000+0000 BC'"
+    @db.literal(Time.at(-100000000000).utc).must_equal "'1200-02-15 14:13:20.000000+0000 BC'"
     @db.literal(Time.at(100000000000).utc).must_equal "'5138-11-16 09:46:40.000000+0000'"
   end
 
   it "should format BC and AD dates and times in bound variables" do
     @db.bound_variable_arg(Date.new(-1091, 10, 20), nil).must_equal "'1092-10-20 BC'"
     @db.bound_variable_arg(Date.new(1092, 10, 20), nil).must_equal "'1092-10-20'"
-    @db.bound_variable_arg(DateTime.new(-1091, 10, 20), nil).must_equal "'1092-10-20 00:00:00.000000000+0000 BC'"
+    @db.bound_variable_arg(DateTime.new(-1091, 10, 20), nil).must_equal "'1092-10-20 00:00:00.000000+0000 BC'"
     @db.bound_variable_arg(DateTime.new(1092, 10, 20), nil).must_equal "'1092-10-20 00:00:00.000000+0000'"
-    @db.bound_variable_arg(Time.at(-100000000000).utc, nil).must_equal "'1200-02-15 14:13:20.000000000+0000 BC'"
-    @db.bound_variable_arg(Time.at(-100000000000).utc, nil).must_equal "'1200-02-15 14:13:20.000000000+0000 BC'"
+    @db.bound_variable_arg(Time.at(-100000000000).utc, nil).must_equal "'1200-02-15 14:13:20.000000+0000 BC'"
+    @db.bound_variable_arg(Time.at(-100000000000).utc, nil).must_equal "'1200-02-15 14:13:20.000000+0000 BC'"
     @db.bound_variable_arg(1, nil).must_equal 1
     @db.bound_variable_arg(1, nil).must_equal 1
   end

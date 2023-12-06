@@ -16,7 +16,15 @@ describe "Sequel::Dataset::RoundTimestamps" do
   end
   
   it "should round times properly for databases supporting millisecond precision" do
-    @dataset = @dataset.with_extend{def timestamp_precision; 3 end}
+    @dataset = @dataset.with_extend do
+      def timestamp_precision; 3 end
+      def default_time_format
+        "'%H:%M:%S.%3N'"
+      end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%3N'"
+      end
+    end
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 499500)).must_equal "'01:02:03.500'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5.4995)).must_equal "'2010-01-02 03:04:05.500'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(54995, 10000))).must_equal "'2010-01-02 03:04:05.500'"
@@ -28,6 +36,15 @@ describe "Sequel::Dataset::RoundTimestamps" do
   
   it "should round times properly for databases supporting second precision" do
     @dataset = @dataset.with_extend{def supports_timestamp_usecs?; false end}
+    @dataset = @dataset.with_extend do
+      def supports_timestamp_usecs?; false end
+      def default_time_format
+        "'%H:%M:%S'"
+      end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S'"
+      end
+    end
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:04'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5.5)).must_equal "'2010-01-02 03:04:06'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:06'"

@@ -13,8 +13,9 @@ describe "datetime_parse_to_time extension" do
   before do
     @db = Sequel::Database.new
     @dataset = @db.dataset.with_extend do
-      def supports_timestamp_timezones?; true end
-      def supports_timestamp_usecs?; false end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S%z'"
+      end
     end
     @utc_time = Time.utc(2010, 1, 2, 3, 4, 5)
     @local_time = Time.local(2010, 1, 2, 3, 4, 5)

@@ -45,8 +45,9 @@ describe "Sequel named_timezones extension with DateTime class" do
     
   it "should convert datetimes going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
-      def supports_timestamp_timezones?; true; end
-      def supports_timestamp_usecs?; false; end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S%z'"
+      end
     end
     ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30,-7/24.0), DateTime.civil(2009,6,1,6,20,30,-1/6.0)])
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
@@ -54,7 +55,9 @@ describe "Sequel named_timezones extension with DateTime class" do
   
   it "should convert datetimes going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
-      def supports_timestamp_timezones?; true; end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%6N%z'"
+      end
     end
     @dt += Rational(555555, 1000000*86400)
     ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30.555555,-7/24.0), DateTime.civil(2009,6,1,6,20,30.555555,-1/6.0)])
@@ -156,8 +159,9 @@ describe "Sequel named_timezones extension with Time class" do
     
   it "should convert times going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
-      def supports_timestamp_timezones?; true; end
-      def supports_timestamp_usecs?; false; end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S%z'"
+      end
     end
     ds.insert([Time.new(2009,6,1,3,20,30, RUBY_VERSION >= '2.6' ? @tz_in : -25200), Time.new(2009,6,1,3,20,30,-25200), Time.new(2009,6,1,6,20,30,-14400)])
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
@@ -165,7 +169,9 @@ describe "Sequel named_timezones extension with Time class" do
   
   it "should convert times with fractional seconds going into the database to named database_timezone" do
     ds = @db[:a].with_extend do
-      def supports_timestamp_timezones?; true; end
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%6N%z'"
+      end
     end
     ds.insert([Time.new(2009,6,1,3,20,30.5555554, RUBY_VERSION >= '2.6' ? @tz_in : -25200), Time.new(2009,6,1,3,20,30.5555554,-25200), Time.new(2009,6,1,6,20,30.5555554,-14400)])
     @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400', '2009-06-01 06:20:30.555555-0400')"]

@@ -378,6 +378,16 @@ module Sequel
 
       private
 
+      # SQLAnywhere only supports 3 digits after the decimal point for times.
+      def default_time_format
+        "'%H:%M:%S.%3N'"
+      end
+
+      # SQLAnywhere only supports 3 digits after the decimal point for timestamps.
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S.%3N'"
+      end
+
       # Use 1 for true on Sybase
       def literal_true
         '1'

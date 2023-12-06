@@ -626,7 +626,7 @@ module Sequel
 
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
-        "'%Y-%m-%d %H:%M:%S%N %:z'"
+        "'%Y-%m-%d %H:%M:%S.%6N %:z'"
       end
 
       def empty_from_sql

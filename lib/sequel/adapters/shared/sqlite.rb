@@ -919,7 +919,7 @@ module Sequel
 
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
-        db.use_timestamp_timezones? ? "'%Y-%m-%d %H:%M:%S%N%z'" : super
+        db.use_timestamp_timezones? ? "'%Y-%m-%d %H:%M:%S.%6N%z'" : super
       end
 
       # SQL fragment specifying a list of identifiers

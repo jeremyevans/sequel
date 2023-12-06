@@ -1,5 +1,9 @@
 === master
 
+* Remove special handling of %N modifier in Dataset#default_timestamp_format (jeremyevans)
+
+* Add Dataset#default_time_format private method, for adapters to override for time (not timestamp) formatting (jeremyevans)
+
 * Remove Dataset#format_timestamp_offset private method (jeremyevans)
 
 * Remove special handling of %z modifier in Dataset#default_timestamp_format (jeremyevans)

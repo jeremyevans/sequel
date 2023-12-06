@@ -43,7 +43,7 @@ module Sequel
         # Use ODBC format, not Microsoft format, as the ODBC layer does
         # some translation, but allow for millisecond precision.
         def default_timestamp_format
-          "{ts '%Y-%m-%d %H:%M:%S%N'}"
+          "{ts '%Y-%m-%d %H:%M:%S.%3N'}"
         end
 
         # Use ODBC format, not Microsoft format, as the ODBC layer does

@@ -1131,9 +1131,14 @@ module Sequel
       :"t#{number}"
     end
     
-    # The strftime format to use when literalizing the time.
+    # The strftime format to use when literalizing time (Sequel::SQLTime) values.
+    def default_time_format
+      "'%H:%M:%S.%6N'"
+    end
+
+    # The strftime format to use when literalizing timestamp (Time/DateTime) values.
     def default_timestamp_format
-      "'%Y-%m-%d %H:%M:%S%N'"
+      "'%Y-%m-%d %H:%M:%S.%6N'"
     end
 
     def delete_delete_sql(sql)
@@ -1196,19 +1201,9 @@ module Sequel
       {1 => ((op == :IN) ? 0 : 1)}
     end
     
-    # Format the timestamp based on the default_timestamp_format, with a couple
-    # of modifiers.  First, allow %N to be used for fractions seconds (if the
-    # database supports them), and override %z to always use a numeric offset
-    # of hours and minutes.
+    # Format the timestamp based on the default_timestamp_format.
     def format_timestamp(v)
-      v2 = db.from_application_timestamp(v)
-      fmt = default_timestamp_format.gsub(/%N/) do |m|
-        # Ruby 1.9 supports %N in timestamp formats, but Sequel has supported %N
-        # for longer in a different way, where the . is already appended and only 6
-        # decimal places are used by default.
-        format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(1000000) : v.usec) if supports_timestamp_usecs?
-      end
-      v2.strftime(fmt)
+      db.from_application_timestamp(v).strftime(default_timestamp_format)
     end
     
     # Return the SQL timestamp fragment to use for the fractional time part.
@@ -1428,7 +1423,7 @@ module Sequel
 
     # SQL fragment for Sequel::SQLTime, containing just the time part
     def literal_sqltime(v)
-      v.strftime("'%H:%M:%S#{format_timestamp_usec(v.usec, sqltime_precision) if supports_timestamp_usecs?}'")
+      v.strftime(default_time_format)
     end
 
     # Append literalization of Sequel::SQLTime to SQL string.

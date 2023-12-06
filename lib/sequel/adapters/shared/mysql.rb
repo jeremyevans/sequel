@@ -929,6 +929,16 @@ module Sequel
         super if type == :truncate || @opts[:offset]
       end
 
+      # The strftime format to use when literalizing time (Sequel::SQLTime) values.
+      def default_time_format
+        db.supports_timestamp_usecs? ? super : "'%H:%M:%S'"
+      end
+
+      # The strftime format to use when literalizing timestamp (Time/DateTime) values.
+      def default_timestamp_format
+        db.supports_timestamp_usecs? ? super : "'%Y-%m-%d %H:%M:%S'"
+      end
+
       # Consider the first table in the joined dataset is the table to delete
       # from, but include the others for the purposes of selecting rows.
       def delete_from_sql(sql)
