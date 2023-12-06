@@ -1133,7 +1133,7 @@ module Sequel
     
     # The strftime format to use when literalizing the time.
     def default_timestamp_format
-      "'%Y-%m-%d %H:%M:%S%N%z'"
+      "'%Y-%m-%d %H:%M:%S%N'"
     end
 
     def delete_delete_sql(sql)
@@ -1202,20 +1202,11 @@ module Sequel
     # of hours and minutes.
     def format_timestamp(v)
       v2 = db.from_application_timestamp(v)
-      fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
-        if m == '%N'
-          # Ruby 1.9 supports %N in timestamp formats, but Sequel has supported %N
-          # for longer in a different way, where the . is already appended and only 6
-          # decimal places are used by default.
-          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(1000000) : v.usec) if supports_timestamp_usecs?
-        else
-          if supports_timestamp_timezones?
-            # Would like to just use %z format, but it doesn't appear to work on Windows
-            # Instead, the offset fragment is constructed manually
-            minutes = (v2.is_a?(DateTime) ? v2.offset * 1440 : v2.utc_offset/60).to_i
-            format_timestamp_offset(*minutes.divmod(60))
-          end
-        end
+      fmt = default_timestamp_format.gsub(/%N/) do |m|
+        # Ruby 1.9 supports %N in timestamp formats, but Sequel has supported %N
+        # for longer in a different way, where the . is already appended and only 6
+        # decimal places are used by default.
+        format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(1000000) : v.usec) if supports_timestamp_usecs?
       end
       v2.strftime(fmt)
     end

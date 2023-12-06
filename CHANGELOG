@@ -1,5 +1,7 @@
 === master
 
+* Remove special handling of %z modifier in Dataset#default_timestamp_format (jeremyevans)
+
 * Add Dataset#literal_date_or_time, for simpler use by bound argument code (jeremyevans)
 
 * Add auto_cast_date_and_time extension, for casting date and time values using SQL standard functions (jeremyevans)

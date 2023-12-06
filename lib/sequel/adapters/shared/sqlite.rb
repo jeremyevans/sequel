@@ -917,6 +917,11 @@ module Sequel
         500
       end
 
+      # The strftime format to use when literalizing the time.
+      def default_timestamp_format
+        db.use_timestamp_timezones? ? "'%Y-%m-%d %H:%M:%S%N%z'" : super
+      end
+
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(', ')

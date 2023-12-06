@@ -2261,6 +2261,11 @@ module Sequel
         raise(InvalidOperation, "Joined datasets cannot be truncated") if opts[:join]
       end
 
+      # The strftime format to use when literalizing the time.
+      def default_timestamp_format
+        "'%Y-%m-%d %H:%M:%S%N%z'"
+      end
+
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
         sql << ' FROM '
