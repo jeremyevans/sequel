@@ -56,6 +56,17 @@ module Sequel
 
         private
 
+        # JDBC SQLAnywhere driver does not appear to handle fractional
+        # times correctly.
+        def default_time_format
+          "'%H:%M:%S'"
+        end
+
+        # Set to zero to work around JDBC SQLAnywhere driver bug.
+        def sqltime_precision
+          0
+        end
+
         SMALLINT_TYPE = Java::JavaSQL::Types::SMALLINT
         BOOLEAN_METHOD = Object.new
         def BOOLEAN_METHOD.call(r, i)
