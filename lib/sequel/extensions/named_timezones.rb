@@ -136,7 +136,7 @@ module Sequel
         v = output_timezone.utc_to_local(v.new_offset(0))
 
         # Force DateTime output instead of TZInfo::DateTimeWithOffset
-        DateTime.jd(v.jd, v.hour, v.minute, v.second + v.sec_fraction, v.offset, v.start)
+        DateTime.civil(v.year, v.month, v.day, v.hour, v.minute, v.second + v.sec_fraction, v.offset, v.start)
       end
       # :nodoc:
       # :nocov:

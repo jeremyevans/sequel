@@ -1,5 +1,7 @@
 === master
 
+* Work around DateTime.jd fractional second bug on JRuby in named_timezones extension (jeremyevans)
+
 * Support fractional times and timestamps on SQLAnywhere (jeremyevans)
 
 * Make round_timestamps extension use Dataset#sqltime_precision for rounding Sequel::SQLTime values (jeremyevans)
