@@ -74,6 +74,27 @@ describe 'A PostgreSQL database' do
     Sequel.datetime_class = Time
   end
 
+  it "should return true for table_exists? if table exists but is locked" do
+    begin
+      @db.create_table(:test){Integer :id}
+      t = []
+      @db[:test].lock('ACCESS EXCLUSIVE') do
+        Thread.new do
+          @db.run "SET lock_timeout = 1"
+          t << @db.table_exists?(:test)
+         end.join
+        Thread.new do
+          @db.run "SET statement_timeout = 1"
+          t << @db.table_exists?(:test)
+         end.join
+      end
+      t.must_equal [true, true]
+    ensure
+      # Must disconnect to ensure connections with lock/statement timeout are not left in the pool
+      @db.disconnect
+    end
+  end
+
   it "should be able to handle various types of IN/NOT IN queries" do
     ds = @db.select(1)
     ds.where(2=>[2, 3]).wont_be_empty

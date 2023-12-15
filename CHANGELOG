@@ -1,5 +1,7 @@
 === master
 
+* Make Database#table_exists? on PostgreSQL handle lock or statement timeout errors as evidence the table exists (jeremyevans) (#2106)
+
 * Work around DateTime.jd fractional second bug on JRuby in named_timezones extension (jeremyevans)
 
 * Support fractional times and timestamps on SQLAnywhere (jeremyevans)

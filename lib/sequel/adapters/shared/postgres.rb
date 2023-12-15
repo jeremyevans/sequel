@@ -1092,6 +1092,14 @@ module Sequel
         sql << type
       end
 
+      # Consider lock or statement timeout errors as evidence that the table exists
+      # but is locked.
+      def _table_exists?(ds)
+        super
+      rescue DatabaseError => e    
+        raise e unless /canceling statement due to (?:statement|lock) timeout/ =~ e.message 
+      end
+    
       def alter_table_add_column_sql(table, op)
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
       end
