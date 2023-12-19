@@ -1,6 +1,6 @@
 === master
 
-* Support generating rcte queries using UNION or UNION ALL in the rcte plugin (jonathanfrias)
+* Support generating rcte queries using UNION or UNION ALL in the rcte plugin (jonathanfrias) (#2107)
 
 * Make Database#table_exists? on PostgreSQL handle lock or statement timeout errors as evidence the table exists (jeremyevans) (#2106)
 
