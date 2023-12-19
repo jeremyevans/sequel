@@ -71,6 +71,8 @@ module Sequel
     #              (default: :t)
     # :level_alias :: The symbol identifier to use when eagerly loading descendants
     #                 up to a given level (default: :x_level_x)
+    # :union_all :: Whether to use UNION ALL or UNION with the recursive
+    #               common table expression (default: true)
     module RcteTree
       # Create the appropriate parent, children, ancestors, and descendants
       # associations for the model.
@@ -80,6 +82,7 @@ module Sequel
         opts = opts.dup
         opts[:class] = model
         opts[:methods_module] = Module.new
+        opts[:union_all] = opts[:union_all].nil? ? true : opts[:union_all]
         model.send(:include, opts[:methods_module])
         
         key = opts[:key] ||= :parent_id
@@ -142,7 +145,7 @@ module Sequel
           model.from(SQL::AliasedExpression.new(t, table_alias)).
            with_recursive(t, col_aliases ? base_ds.select(*col_aliases) : base_ds.select_all,
             recursive_ds.select(*c_all),
-            :args=>col_aliases)
+            :args=>col_aliases, union_all: opts[:union_all])
         end
         aal = Array(a[:after_load])
         aal << proc do |m, ancs|
@@ -191,7 +194,7 @@ module Sequel
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           ds = model.from(SQL::AliasedExpression.new(t, table_alias)).
             with_recursive(t, base_case, recursive_case,
-             :args=>((key_aliases + col_aliases) if col_aliases))
+             :args=>((key_aliases + col_aliases) if col_aliases), union_all: opts[:union_all])
           ds = r.apply_eager_dataset_changes(ds)
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
           model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil)) do |obj|
@@ -240,7 +243,7 @@ module Sequel
           model.from(SQL::AliasedExpression.new(t, table_alias)).
            with_recursive(t, col_aliases ? base_ds.select(*col_aliases) : base_ds.select_all,
             recursive_ds.select(*c_all),
-            :args=>col_aliases)
+            :args=>col_aliases, union_all: opts[:union_all])
           end
         dal = Array(d[:after_load])
         dal << proc do |m, descs|
@@ -299,7 +302,7 @@ module Sequel
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           ds = model.from(SQL::AliasedExpression.new(t, table_alias)).
             with_recursive(t, base_case, recursive_case,
-              :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases))
+              :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases), union_all: opts[:union_all])
           ds = r.apply_eager_dataset_changes(ds)
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
           model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>OPTS)) do |obj|
