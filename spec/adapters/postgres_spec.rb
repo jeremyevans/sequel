@@ -2508,6 +2508,9 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.create_schema(:sequel)
     @d.create_schema(:sequel, :if_not_exists=>true) if @d.server_version >= 90300
     @d.create_table(Sequel[:sequel][:test]){Integer :a}
+    @d.tables(:schema=>:sequel).must_equal [:test]
+    @d.tables(:schema=>'sequel').must_equal [:test]
+    @d.tables(:schema=>Sequel[:sequel]).must_equal [:test]
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
   end
 

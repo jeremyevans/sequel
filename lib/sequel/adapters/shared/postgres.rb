@@ -1513,7 +1513,11 @@ module Sequel
       # currently visible schemas.
       def filter_schema(ds, opts)
         expr = if schema = opts[:schema]
-          schema.to_s
+          if schema.is_a?(SQL::Identifier)
+            schema.value.to_s
+          else
+            schema.to_s
+          end
         else
           Sequel.function(:any, Sequel.function(:current_schemas, false))
         end
