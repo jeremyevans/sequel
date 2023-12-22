@@ -126,8 +126,9 @@ module Sequel
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
 
         if typecast_value_boolean(opts[:setup_regexp_function])
+          @regexp_cache = Hash.new{|h,k| h[k] = Regexp.new(k)}
           db.create_function("regexp", 2) do |func, regexp_str, string|
-            func.result = Regexp.new(regexp_str).match(string) ? 1 : 0
+            func.result = @regexp_cache[regexp_str].match(string) ? 1 : 0
           end
         end
         
