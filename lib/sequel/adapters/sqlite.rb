@@ -111,6 +111,10 @@ module Sequel
       #              static data that you do not want to modify
       # :timeout :: how long to wait for the database to be available if it
       #             is locked, given in milliseconds (default is 5000)
+      # :setup_regexp_function :: enable use of Regexp objects with SQL
+      #             'REGEXP' operator (with regexp cache if ':cached', or
+      #             custom behavior if it's a Proc like
+      #             +proc{|regex_str,str| ...}+)
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
@@ -126,9 +130,7 @@ module Sequel
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
 
         if typecast_value_boolean(opts[:setup_regexp_function])
-          db.create_function("regexp", 2) do |func, regexp_str, string|
-            func.result = Regexp.new(regexp_str).match(string) ? 1 : 0
-          end
+          setup_regexp_function(db, opts[:setup_regexp_function])
         end
         
         class << db
@@ -201,6 +203,20 @@ module Sequel
         @conversion_procs = SQLITE_TYPES.dup
         @conversion_procs['datetime'] = @conversion_procs['timestamp'] = method(:to_application_timestamp)
         set_integer_booleans
+      end
+
+      def setup_regexp_function(db, how)
+        case how
+        when :cached
+          cache = Hash.new{|h,k| h[k] = Regexp.new(k)}
+          cb = proc { |func, regexp_str, str| func.result = cache[regexp_str].match(str) ? 1 : 0 }
+        when Proc
+          cb = proc { |func, regexp_str, str| func.result = how.call(regexp_str, str) ? 1 : 0 }
+        else
+          cb = proc { |func, regexp_str, str| func.result = Regexp.new(regexp_str).match(str) ? 1 : 0 }
+        end
+
+        db.create_function("regexp", 2, &cb)
       end
       
       # Yield an available connection.  Rescue

@@ -24,6 +24,8 @@
 
 * Add auto_cast_date_and_time extension, for casting date and time values using SQL standard functions (jeremyevans)
 
+* Improve performance and flexibility of regexp matching in sqlite adapter (paddor)
+
 === 5.75.0 (2023-12-01)
 
 * Make any_not_empty? extension support passing pattern argument to any? (jeremyevans) (#2100)
