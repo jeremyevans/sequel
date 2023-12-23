@@ -24,7 +24,7 @@
 
 * Add auto_cast_date_and_time extension, for casting date and time values using SQL standard functions (jeremyevans)
 
-* Cache regexp objects in the sqlite adapter to improve performance (paddor)
+* Improve performance and flexibility of regexp matching in sqlite adapter (paddor)
 
 === 5.75.0 (2023-12-01)
 

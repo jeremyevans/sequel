@@ -112,7 +112,9 @@ module Sequel
       # :timeout :: how long to wait for the database to be available if it
       #             is locked, given in milliseconds (default is 5000)
       # :setup_regexp_function :: enable use of Regexp objects with SQL
-      #             'REGEXP' operator (with regexp cache if ':cached')
+      #             'REGEXP' operator (with regexp cache if ':cached', or
+      #             custom behavior if it's a Proc like
+      #             +proc{|regex_str,str| ...}+)
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
@@ -208,6 +210,8 @@ module Sequel
         when :cached
           cache = Hash.new{|h,k| h[k] = Regexp.new(k)}
           cb = proc { |func, regexp_str, str| func.result = cache[regexp_str].match(str) ? 1 : 0 }
+        when Proc
+          cb = proc { |func, regexp_str, str| func.result = how.call(regexp_str, str) ? 1 : 0 }
         else
           cb = proc { |func, regexp_str, str| func.result = Regexp.new(regexp_str).match(str) ? 1 : 0 }
         end
