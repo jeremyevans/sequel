@@ -1,5 +1,7 @@
 === master
 
+* Improve performance and flexibility of regexp matching in sqlite adapter (paddor) (#2108)
+
 * Support SQL::Identifier for Database#tables :schema option values on PostgreSQL (jeremyevans)
 
 * Support generating rcte queries using UNION or UNION ALL in the rcte plugin (jonathanfrias) (#2107)
@@ -23,8 +25,6 @@
 * Add Dataset#literal_date_or_time, for simpler use by bound argument code (jeremyevans)
 
 * Add auto_cast_date_and_time extension, for casting date and time values using SQL standard functions (jeremyevans)
-
-* Improve performance and flexibility of regexp matching in sqlite adapter (paddor)
 
 === 5.75.0 (2023-12-01)
 

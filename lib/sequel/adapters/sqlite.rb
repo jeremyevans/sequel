@@ -112,9 +112,12 @@ module Sequel
       # :timeout :: how long to wait for the database to be available if it
       #             is locked, given in milliseconds (default is 5000)
       # :setup_regexp_function :: enable use of Regexp objects with SQL
-      #             'REGEXP' operator (with regexp cache if ':cached', or
-      #             custom behavior if it's a Proc like
-      #             +proc{|regex_str,str| ...}+)
+      #             'REGEXP' operator. If the value is :cached or "cached",
+      #             caches the generated regexps, which can result in a memory
+      #             leak if dynamic regexps are used.  If the value is a Proc,
+      #             it will be called with a string for the regexp and a string
+      #             for the value to compare, and should return whether the regexp
+      #             matches.
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
@@ -207,16 +210,18 @@ module Sequel
 
       def setup_regexp_function(db, how)
         case how
-        when :cached
-          cache = Hash.new{|h,k| h[k] = Regexp.new(k)}
-          cb = proc { |func, regexp_str, str| func.result = cache[regexp_str].match(str) ? 1 : 0 }
         when Proc
-          cb = proc { |func, regexp_str, str| func.result = how.call(regexp_str, str) ? 1 : 0 }
+          # nothing
+        when :cached, "cached"
+          cache = Hash.new{|h,k| h[k] = Regexp.new(k)}
+          how = lambda{|regexp_str, str| cache[regexp_str].match(str)}
         else
-          cb = proc { |func, regexp_str, str| func.result = Regexp.new(regexp_str).match(str) ? 1 : 0 }
+          how = lambda{|regexp_str, str| Regexp.new(regexp_str).match(str)}
         end
 
-        db.create_function("regexp", 2, &cb)
+        db.create_function("regexp", 2) do |func, regexp_str, str|
+          func.result = how.call(regexp_str, str) ? 1 : 0
+        end
       end
       
       # Yield an available connection.  Rescue
