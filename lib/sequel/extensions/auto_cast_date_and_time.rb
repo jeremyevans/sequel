@@ -57,18 +57,23 @@ module Sequel
 
     private
 
-    # Explicitly cast SQLTime time objects to TIME.
+    # Explicitly cast SQLTime objects to TIME.
     def literal_sqltime_append(sql, v)
       sql << "TIME "
       super
     end
 
-    # Explicitly cast Time time objects to TIMESTAMP.
+    # Explicitly cast Time objects to TIMESTAMP.
     def literal_time_append(sql, v)
       sql << literal_datetime_timestamp_cast
       super
     end
-    alias literal_datetime_append literal_time_append
+
+    # Explicitly cast DateTime objects to TIMESTAMP.
+    def literal_datetime_append(sql, v)
+      sql << literal_datetime_timestamp_cast
+      super
+    end
 
     # Explicitly cast Date objects to DATE.
     def literal_date_append(sql, v)
