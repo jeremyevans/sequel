@@ -1,4 +1,4 @@
-=== master
+=== 5.76.0 (2024-01-01)
 
 * Improve performance and flexibility of regexp matching in sqlite adapter (paddor) (#2108)
 

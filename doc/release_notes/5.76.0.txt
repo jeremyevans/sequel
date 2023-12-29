@@ -1,0 +1,86 @@
+= New Features
+
+* An auto_cast_date_and_time extension has been added, which will
+  automatically cast date and time values using SQL standard functions.
+  This makes sure the database will treat the value as a date, time,
+  or timestamp, instead of treating it as a string or unknown type:
+
+    DB.get(Date.today).class
+    # SELECT '2024-01-01' AS v LIMIT 1
+    String
+
+    DB.extension(:auto_cast_date_and_time)
+    DB.get(Date.today).class
+    # SELECT DATE '2024-01-01' AS v LIMIT 1
+    Date
+
+  This was already Sequel's default behavior on adapters that required
+  it.  This extension is usable on PostgreSQL and MySQL.  It is not
+  usable on SQLite (no date/time types) or Microsoft SQL Server (no
+  support for the SQL standard conversion syntax).
+
+  This extension can break code that currently works. If using it on
+  PostgreSQL, it will cast the values to TIMESTAMP, not TIMESTAMP
+  WITH TIME ZONE, which can break code that depended on an implicit
+  conversion to TIMESTAMP WITH TIME ZONE.  The pg_timestamptz
+  extension integrates with the the auto_cast_date_and_time extension
+  and will implicitly cast Time/DateTime to TIMESTAMP WITH TIME ZONE.
+
+* The sqlite adapter now supports a :cached value for the
+  :setup_regexp_function Database option, which will cache regexp
+  values instead of creating a new regexp per value to compare.  This
+  is much faster when using a regexp comparison on a large dataset,
+  but can result in a memory leak if using dynamic regexps. You can
+  also provide a Proc value for the :setup_regexp_function option,
+  which will be passed both the regexp source string and the database
+  string to compare, and should return whether the database string
+  matches the regexp string.
+
+* The rcte_tree plugin now supports a :union_all option, which can
+  be set to false to use UNION instead of UNION ALL in the recursive
+  common table expression.
+
+= Other Improvements
+
+* Time/DateTime/SQLite literalization speed has more than doubled
+  compared to the previous version.  The internal code is also much
+  simpler, as the speedup resulted from removing multiple abstraction
+  layers that mostly existed for Ruby 1.8 support.
+
+* Database#table_exists? on PostgreSQL now handles lock or statement
+  timeout errors as evidence the table exists.
+
+* The round_timestamps extension now correctly rounds SQLTime values
+  on Microsoft SQL Server (the only database Sequel supports where
+  time precision is different than timestamp precision).
+
+* Fractional times and timestamps are now supported on SQLAnywhere,
+  except for time values when using the jdbc adapter due to a
+  limitation in the JDBC sqlanywhere driver.
+
+* Database#tables and #views on PostgreSQL now supports
+  SQL::Identifier values for the :schema option.
+
+* The named_timezones extension now works around a bug in DateTime.jd
+  on JRuby.
+
+= Backwards Compatibility
+
+* Time/DateTime/SQLTime literalization internals have changed.
+  If you are using an external adapter and the external adapter
+  overrides or calls any of the following methods:
+
+  * requires_sql_standard_datetimes?
+  * supports_timestamp_usecs?
+  * supports_timestamp_timezones?
+  * timestamp_precision
+  * sqltime_precision
+
+  then the adapter may need to be updated to support Sequel 5.76.0.
+  Additionally, if the adapter uses %N or %z in
+  default_timestamp_format, it may need to be updated. Adapters
+  should now just override default_timestamp_format and/or
+  default_time_format methods as appropriate for the database.
+
+* The Dataset#format_timestamp_offset private method has been
+  removed.
