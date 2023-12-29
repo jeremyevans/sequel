@@ -2150,10 +2150,14 @@ module Sequel
         server_version >= 90500
       end
 
+      # :nocov:
+
       # PostgreSQL supports timezones in literal timestamps
       def supports_timestamp_timezones?
+        # SEQUEL6: Remove
         true
       end
+      # :nocov:
 
       # PostgreSQL 8.4+ supports WINDOW clause.
       def supports_window_clause?

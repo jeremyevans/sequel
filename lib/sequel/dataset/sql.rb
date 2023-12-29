@@ -1206,14 +1206,18 @@ module Sequel
       db.from_application_timestamp(v).strftime(default_timestamp_format)
     end
     
+    # :nocov:
+
     # Return the SQL timestamp fragment to use for the fractional time part.
     # Should start with the decimal point.  Uses 6 decimal places by default.
     def format_timestamp_usec(usec, ts=timestamp_precision)
+      # SEQUEL6: Remove
       unless ts == 6
         usec = usec/(10 ** (6 - ts))
       end
       sprintf(".%0#{ts}d", usec)
     end
+    # :nocov:
 
     # Append literalization of identifier to SQL string, considering regular strings
     # as SQL identifiers instead of SQL strings.

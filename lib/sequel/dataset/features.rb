@@ -188,10 +188,14 @@ module Sequel
       true
     end
 
+    # :nocov:
+
     # Whether the dataset supports timezones in literal timestamps, false by default.
     def supports_timestamp_timezones?
+      # SEQUEL6: Remove
       false
     end
+    # :nocov:
     
     # Whether the dataset supports fractional seconds in literal timestamps, true by default.
     def supports_timestamp_usecs?
