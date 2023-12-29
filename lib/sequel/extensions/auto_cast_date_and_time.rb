@@ -45,8 +45,6 @@
 #
 module Sequel
   module AutoCastDateAndTime
-    private
-
     # :nocov:
 
     # Mark the datasets as requiring sql standard date times.  This is only needed
@@ -56,6 +54,8 @@ module Sequel
       true
     end
     # :nocov:
+
+    private
 
     # Explicitly cast SQLTime time objects to TIME.
     def literal_sqltime_append(sql, v)

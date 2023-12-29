@@ -8,13 +8,14 @@ describe "pg_array extension" do
   before do
     @db = Sequel.connect('mock://postgres')
     @db.extend_datasets(Module.new do
+      def quote_identifiers?; false end
+      private
       def default_time_format
         "'%H:%M:%S'"
       end
       def default_timestamp_format
         "'%Y-%m-%d %H:%M:%S'"
       end
-      def quote_identifiers?; false end
     end)
     @db.extension(:pg_array)
     @m = Sequel::Postgres
