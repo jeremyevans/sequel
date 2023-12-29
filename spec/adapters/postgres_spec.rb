@@ -93,7 +93,7 @@ describe 'A PostgreSQL database' do
       # Must disconnect to ensure connections with lock/statement timeout are not left in the pool
       @db.disconnect
     end
-  end
+  end if DB.server_version >= 90300
 
   it "should be able to handle various types of IN/NOT IN queries" do
     ds = @db.select(1)
