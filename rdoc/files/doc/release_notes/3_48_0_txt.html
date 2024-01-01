@@ -116,7 +116,7 @@ Last Update:
 </li><li>
 <p>Dataset#qualify_to and qualify_to_first_source will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
-<p>Remove default methods that raise Sequel::NotImplemented:  Database#connect, execute, foreign_key_list, indexes, tables, and views, and Dataset#fetch_rows.</p>
+<p>Remove default methods that raise Sequel::NotImplemented: Database#connect, execute, foreign_key_list, indexes, tables, and views, and Dataset#fetch_rows.</p>
 </li><li>
 <p>Sequel::SQL::Expression#to_s will be removed.</p>
 </li><li>
@@ -173,13 +173,13 @@ Last Update:
 </li><li>
 <p>Model string column setters will consider array and hash input to be invalid.</p>
 </li><li>
-<p>Remove save taking multiple arguments for the columns to save. Add Model#save :columns option for saving specific columns. </p>
+<p>Remove save taking multiple arguments for the columns to save. Add Model#save :columns option for saving specific columns.</p>
 </li><li>
 <p>Don’t automatically choose a reciprocal association with a condition or block.</p>
 </li><li>
 <p>Don’t automatically set up reciprocal associations if multiple ones match.</p>
 </li><li>
-<p>Model::Errors#[] will no longer modify the receiver.  If you want autovivification, use the active_model plugin. </p>
+<p>Model::Errors#[] will no longer modify the receiver.  If you want autovivification, use the active_model plugin.</p>
 </li><li>
 <p>Model.set_primary_key will not longer accept composite keys as multiple arguments.</p>
 </li><li>
@@ -218,7 +218,7 @@ Last Update:
 </li><li>
 <p>The validates_type validation will raise validation errors for nil if :allow_nil=&gt;true is not used.</p>
 </li><li>
-<p>auto_validate_presence_columns will be removed from the auto_validations plugin </p>
+<p>auto_validate_presence_columns will be removed from the auto_validations plugin</p>
 </li><li>
 <p>The identity_map plugin will be removed.</p>
 </li></ul>
@@ -283,7 +283,7 @@ Last Update:
 </li><li>
 <p>Sequel.object_to_json and Sequel.json_parser_error_class have been added and all internal json usage uses them, so you can now override these methods if you want to use an alternative json library with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li><li>
-<p>The association_proxies plugin now accepts a block allowing the user control over which methods are proxied to the dataset or the cached array of instances.  You can base the decision on where to send the method using a variety of factors including the method name, the method arguments, the state of the current instance, or the related association.  Here’s an example of a simple case just depending on the name of the method; </p>
+<p>The association_proxies plugin now accepts a block allowing the user control over which methods are proxied to the dataset or the cached array of instances.  You can base the decision on where to send the method using a variety of factors including the method name, the method arguments, the state of the current instance, or the related association.  Here’s an example of a simple case just depending on the name of the method;</p>
 
 <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_proxies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opts</span><span class="ruby-operator">|</span>
  [<span class="ruby-value">:find</span>, <span class="ruby-value">:where</span>, <span class="ruby-value">:create</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:method</span>])
@@ -351,7 +351,7 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses aliases for many internal Dataset#get calls, such as those used by table_exists? and max. </p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses aliases for many internal Dataset#get calls, such as those used by table_exists? and max.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now no longer uses class variables internally.  Instead, instance variables of the <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> class are used.</p>
 </li><li>

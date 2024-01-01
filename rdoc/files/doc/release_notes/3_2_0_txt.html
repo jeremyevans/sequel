@@ -124,7 +124,7 @@ DB[:t].select{sum(:over, :args=&gt;col1,
 </li><li>
 <p>You can now specify the table and column <a href="../../../classes/Sequel/Migrator.html"><code>Sequel::Migrator</code></a> will use to record the current schema version.  The new Migrator.run method must be used to use these new options.</p>
 </li><li>
-<p>The JDBC adapter now accepts :user and :password options, instead of requiring them to be specified in the connection string and  handled by the JDBC driver.  This should allow connections to Oracle using the Thin JDBC driver.</p>
+<p>The JDBC adapter now accepts :user and :password options, instead of requiring them to be specified in the connection string and handled by the JDBC driver.  This should allow connections to Oracle using the Thin JDBC driver.</p>
 </li><li>
 <p>You can now specify the max_connections, pool_timeout, and single_threaded settings directly in the connection string:</p>
 
@@ -174,7 +174,7 @@ postgres:///database?max_connections=10&amp;pool_timeout=20</pre>
 </li><li>
 <p>Changing a columns name, type, or NULL status on MySQL now supports a much wider selection of column defaults.</p>
 </li><li>
-<p>The stored procedure code is now thread-safe.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is thread-safe in general, but due to a bug the previous stored  procedure code was not thread-safe.</p>
+<p>The stored procedure code is now thread-safe.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is thread-safe in general, but due to a bug the previous stored procedure code was not thread-safe.</p>
 </li><li>
 <p>The ODBC adapter now drops statements automatically instead of requiring the user to do so manually, making it more similar to other adapters.</p>
 </li><li>
@@ -205,7 +205,7 @@ postgres:///database?max_connections=10&amp;pool_timeout=20</pre>
 </li><li>
 <p>The pool_timeout setting is now converted to an Integer, so if you used to pass in a Float, it no longer works the same way.</p>
 </li><li>
-<p>Most files in adapters/utils have been removed, in favor of  integrating the code directly into Database and Dataset.  If you were previously checking for the UnsupportedIntersectExcept or related modules, use the Dataset introspection methods instead (e.g. supports_intersect_except?).</p>
+<p>Most files in adapters/utils have been removed, in favor of integrating the code directly into Database and Dataset.  If you were previously checking for the UnsupportedIntersectExcept or related modules, use the Dataset introspection methods instead (e.g. supports_intersect_except?).</p>
 </li><li>
 <p>If you were using the ODBC adapter and manually dropping returned statements, you should note that now statements are dropped automatically, and the execute method doesn’t return a statement object.</p>
 </li><li>

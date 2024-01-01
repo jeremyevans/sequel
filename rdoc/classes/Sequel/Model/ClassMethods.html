@@ -297,9 +297,9 @@ Sequel::Model::ClassMethods
 
 <p>Lets you create a <a href="../Model.html"><code>Model</code></a> subclass with its dataset already set. <code>source</code> should be an instance of one of the following classes:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="../Database.html"><code>Database</code></a> </td><td>
-<p>Sets the database for this model to <code>source</code>. Generally only useful when subclassing directly from the returned class, where the name of the subclass sets the table name (which is combined with the <code>Database</code> in <code>source</code> to create the dataset to use) </p>
+<p>Sets the database for this model to <code>source</code>. Generally only useful when subclassing directly from the returned class, where the name of the subclass sets the table name (which is combined with the <code>Database</code> in <code>source</code> to create the dataset to use)</p>
 </td></tr><tr><td class='label'><a href="../Dataset.html"><code>Dataset</code></a> </td><td>
-<p>Sets the dataset for this model to <code>source</code>. </p>
+<p>Sets the dataset for this model to <code>source</code>.</p>
 </td></tr><tr><td class='label'>other </td><td>
 <p>Sets the table name for this model to <code>source</code>. The class will use the default database for model classes in order to create the dataset.</p>
 </td></tr></tbody></table>
@@ -1169,7 +1169,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Sets the primary key for this model. You can use either a regular  or a composite primary key.  To not use a primary key, set to nil or use <code>no_primary_key</code>. On most adapters, <a href="../../Sequel.html"><code>Sequel</code></a> can automatically determine the primary key to use, so this method is not needed often.</p>
+<p>Sets the primary key for this model. You can use either a regular or a composite primary key.  To not use a primary key, set to nil or use <code>no_primary_key</code>. On most adapters, <a href="../../Sequel.html"><code>Sequel</code></a> can automatically determine the primary key to use, so this method is not needed often.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-comment"># regular key</span>

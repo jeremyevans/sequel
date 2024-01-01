@@ -291,7 +291,7 @@ Last Update:
 </li><li>
 <p>Database#drop_table? has been added, for dropping tables if they already exist.  This uses DROP TABLE IF EXISTS on the databases that support it.  Database#supports_drop_table_if_exists? has been added for checking whether the database supports that syntax.</p>
 </li><li>
-<p>Database#create_join_table has been added that allows easy  creation of many_to_many join tables:</p>
+<p>Database#create_join_table has been added that allows easy creation of many_to_many join tables:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_join_table</span>(<span class="ruby-value">:album_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artists</span>)
 </pre>
@@ -425,7 +425,7 @@ Last Update:
 </li><li>
 <p>Using a bound variable for a limit is now supported in the ibmdb adapter on ruby 1.9.</p>
 </li><li>
-<p>Connecting to PostgreSQL via the swift adapter has been fixed when using newer versions of swift. </p>
+<p>Connecting to PostgreSQL via the swift adapter has been fixed when using newer versions of swift.</p>
 </li><li>
 <p>The mock adapter now handles calling the Database#execute methods directly (instead of via a dataset).</p>
 </li><li>

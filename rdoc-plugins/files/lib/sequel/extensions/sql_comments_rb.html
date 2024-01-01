@@ -75,7 +75,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)
 </pre>
 
-<p>Loading the sql_comments extension into the database also adds  support for block-level comment support via Database#with_comments. You call with_comments with a hash.  Queries inside the hash will include a comment based on the hash (assuming they are inside the same thread):</p>
+<p>Loading the sql_comments extension into the database also adds support for block-level comment support via Database#with_comments. You call with_comments with a hash.  Queries inside the hash will include a comment based on the hash (assuming they are inside the same thread):</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">model:</span> <span class="ruby-constant">Album</span>, <span class="ruby-value">action:</span> <span class="ruby-value">:all</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">all</span>

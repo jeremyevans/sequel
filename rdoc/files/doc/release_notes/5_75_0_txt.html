@@ -46,7 +46,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>INSERT RETURNING is now supported on MariaDB 10.5+, and used automatically when saving new model objects. Note that this is not supported when using the jdbc adapter, because the jdbc-mysql driver doesn’t support it.  A jdbc/mariadb adapter could be added, as it’s likely recent versions of the jdbc-mariadb driver would support it, but the jdbc-mariadb gem  hasn’t been updated in over 4 years.  Talk to the jdbc-mariadb gem maintainers if you want to use this feature with the jdbc adapter.</p>
+<p>INSERT RETURNING is now supported on MariaDB 10.5+, and used automatically when saving new model objects. Note that this is not supported when using the jdbc adapter, because the jdbc-mysql driver doesn’t support it.  A jdbc/mariadb adapter could be added, as it’s likely recent versions of the jdbc-mariadb driver would support it, but the jdbc-mariadb gem hasn’t been updated in over 4 years.  Talk to the jdbc-mariadb gem maintainers if you want to use this feature with the jdbc adapter.</p>
 </li><li>
 <p>The Dataset#paged_each optimization in the postgres adapter now respects the :skip_transaction option, making it the same as the :hold option.  Note that this has effects beyond just skipping the transaction, but non-HOLD cursors are only supported inside transactions.</p>
 </li><li>

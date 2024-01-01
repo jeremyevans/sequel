@@ -40,7 +40,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The <code>Migrator</code> class performs migrations based on migration files in a  specified directory. The migration files should be named using the following pattern:</p>
+<p>The <code>Migrator</code> class performs migrations based on migration files in a specified directory. The migration files should be named using the following pattern:</p>
 
 <pre>&lt;version&gt;_&lt;title&gt;.rb</pre>
 
@@ -60,7 +60,7 @@ Superclass:
 
 <p>Migrations are generally run via the sequel command line tool, using the -m and -M switches.  The -m switch specifies the migration directory, and the -M switch specifies the version to which to migrate.</p>
 
-<p>You can apply migrations using the <a href="Migrator.html"><code>Migrator</code></a> API, as well (this is necessary if you want to specify the version from which to migrate in addition to the version to which to migrate). To apply a migrator, the <code>apply</code> method must be invoked with the database instance, the directory of migration files and the target version. If no current version is supplied, it is read from the database. The migrator automatically creates a table (schema_info for integer migrations and schema_migrations for timestamped migrations). in the database to keep track of the current migration version. If no migration version is stored in the database, the version is considered to be 0. If no target version is  specified, or the target version specified is greater than the latest version available, the database is migrated to the latest version available in the migration directory.</p>
+<p>You can apply migrations using the <a href="Migrator.html"><code>Migrator</code></a> API, as well (this is necessary if you want to specify the version from which to migrate in addition to the version to which to migrate). To apply a migrator, the <code>apply</code> method must be invoked with the database instance, the directory of migration files and the target version. If no current version is supplied, it is read from the database. The migrator automatically creates a table (schema_info for integer migrations and schema_migrations for timestamped migrations). in the database to keep track of the current migration version. If no migration version is stored in the database, the version is considered to be 0. If no target version is specified, or the target version specified is greater than the latest version available, the database is migrated to the latest version available in the migration directory.</p>
 
 <p>For example, to migrate the database to the latest version:</p>
 
@@ -357,7 +357,7 @@ Superclass:
 <p>The target version to which to migrate.  If not given, migrates to the maximum version.</p>
 </td></tr></tbody></table>
 
-<p>Examples: </p>
+<p>Examples:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&quot;migrations&quot;</span>)
 <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&quot;migrations&quot;</span>, <span class="ruby-value">target:</span> <span class="ruby-value">15</span>, <span class="ruby-value">current:</span> <span class="ruby-value">10</span>)

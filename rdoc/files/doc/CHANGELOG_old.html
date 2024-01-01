@@ -6075,7 +6075,7 @@ Last Update:
 <ul><li>
 <p>Changed MySQL adapter to support specifying socket option.</p>
 </li><li>
-<p>Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz). </p>
+<p>Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz).</p>
 </li><li>
 <p>Added new Dataset#from_self method that returns a dataset selecting from the original dataset.</p>
 </li></ul>
@@ -6197,7 +6197,7 @@ Last Update:
 </li><li>
 <p>Fixed Dataset#count to work properly with datasets with fixed SQL (when using fetch).</p>
 </li><li>
-<p>Added Model.create_with_params method that filters the given parameters accordring to the model’s columns (thanks Aman Gupta). </p>
+<p>Added Model.create_with_params method that filters the given parameters accordring to the model’s columns (thanks Aman Gupta).</p>
 </li></ul>
 
 <h3 id="label-0.4.2.1+-282007-12-09-29">0.4.2.1 (2007-12-09)<span><a href="#label-0.4.2.1+-282007-12-09-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -7075,7 +7075,7 @@ text :def
 <ul><li>
 <p>Fixed Dataset#reverse_order to provide chainability. This method can be called without arguments to invert the current order or with arguments to provide a descending order.</p>
 </li><li>
-<p>Fixed literal representation of literals in SQLite adapter (thanks Christian Neukirchen!) </p>
+<p>Fixed literal representation of literals in SQLite adapter (thanks Christian Neukirchen!)</p>
 </li><li>
 <p>Refactored insert code in Postgres adapter (in preparation for fetching the last insert id for pre-8.1 versions).</p>
 </li></ul>
@@ -7133,7 +7133,7 @@ text :def
 </li><li>
 <p>Refactored Dataset#where_equal_condition into Dataset#where_condition, allowing arrays and ranges, e.g. posts.filter(:stamp =&gt; (3.days.ago)..(1.day.ago)), or posts.filter(:category =&gt; [‘ruby’, ‘postgres’, ‘linux’]).</p>
 </li><li>
-<p>Added Model#[]= method for changing column values and Model#save </p>
+<p>Added Model#[]= method for changing column values and Model#save</p>
 </li></ul>
 
 <p>method for saving them.</p>

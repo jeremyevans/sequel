@@ -39,7 +39,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A few new features were added to query logging.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now includes execution time when logging queries.  Queries that raise exceptions are now logged at ERROR level.  You can now set the log_warn_duration attribute on the Database instance and queries that take longer than that will be logged at WARN  level.  By using different log levels, you can now only log queries that raise errors, or only log queries that take a long time.</p>
+<p>A few new features were added to query logging.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now includes execution time when logging queries.  Queries that raise exceptions are now logged at ERROR level.  You can now set the log_warn_duration attribute on the Database instance and queries that take longer than that will be logged at WARN level.  By using different log levels, you can now only log queries that raise errors, or only log queries that take a long time.</p>
 
 <pre class="ruby"><span class="ruby-comment"># The default - Log all successful queries at INFO level</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_warn_duration</span> = <span class="ruby-keyword">nil</span>
@@ -158,7 +158,7 @@ Last Update:
 <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">h</span>)
 </pre>
 
-<p>Before, this would raise an error if both name and number were nil. </p>
+<p>Before, this would raise an error if both name and number were nil.</p>
 </li><li>
 <p>Numeric and decimal columns with a 0 scale are now treated as integer columns by the model typecasting code, since such columns cannot store non-integer values.</p>
 </li><li>
@@ -207,7 +207,7 @@ Last Update:
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer creates #{plugin_name}_opts class, instance, and dataset methods for each plugin loaded.  No built-in plugin used them, and I couldn’t find an external plugin that did either.</p>
 </li><li>
-<p>The Model#associations method is no longer available if the  default Associations plugin is not loaded due to the  SEQUEL_NO_ASSOCIATIONS constant or environment variable being set.</p>
+<p>The Model#associations method is no longer available if the default Associations plugin is not loaded due to the SEQUEL_NO_ASSOCIATIONS constant or environment variable being set.</p>
 </li><li>
 <p>DISTINCT ON support is turned off by default, and only enabled when using PostgreSQL, since that appears to be the only database that supports it.  Previously, it was enabled by default and most common adapters turned it off.</p>
 </li></ul>

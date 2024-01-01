@@ -39,7 +39,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A paged_operations plugin has been added, which adds support for paged_datasets, paged_update, and paged_delete dataset methods. This methods are designed to be used on large datasets, to split  a large query into separate smaller queries, to avoid locking the related database table for a long period of time. paged_update and paged_delete operate the same as update and delete, returning the number of rows updated or deleted. paged_datasets yields one or more datasets representing subsets of the receiver, with the union of all of those datasets comprising all records in the receiver:</p>
+<p>A paged_operations plugin has been added, which adds support for paged_datasets, paged_update, and paged_delete dataset methods. This methods are designed to be used on large datasets, to split a large query into separate smaller queries, to avoid locking the related database table for a long period of time. paged_update and paged_delete operate the same as update and delete, returning the number of rows updated or deleted. paged_datasets yields one or more datasets representing subsets of the receiver, with the union of all of those datasets comprising all records in the receiver:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:paged_operations</span>
 

@@ -62,7 +62,7 @@ Last Update:
 <p>bytea</p>
 </td></tr></tbody></table>
 
-<p><a href="../../../../classes/String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the  <code>:treat_string_list_as_text_array</code> Database option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
+<p><a href="../../../../classes/String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the <code>:treat_string_list_as_text_array</code> Database option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
 
 <p>The conversion is only done for single dimensional arrays that have more than two elements, where all elements are of the same class (other than nil values).</p>
 

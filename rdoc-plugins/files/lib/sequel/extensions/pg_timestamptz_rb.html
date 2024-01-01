@@ -31,20 +31,29 @@ lib/sequel/extensions/pg_timestamptz.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-04-16 13:01:31 -0700</span>
+<span class='datetime'>2023-12-06 16:41:40 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_timestamptz extension changes the default timestamp type for the database to be <code>timestamptz</code> (+timestamp with time zone+) instead of <code>timestamp</code> (+timestamp without time zone+).  This is recommended if you are dealing with multiple timezones in your application.</p>
+<p>The pg_timestamptz extension changes the default timestamp type for the database to be <code>timestamptz</code> (<code>timestamp with time zone</code>) instead of <code>timestamp</code> (<code>timestamp without time zone</code>).  This is recommended if you are dealing with multiple timezones in your application.</p>
+
+<p>If you are using the auto_cast_date_and_time extension, the pg_timestamptz extension will automatically cast Time and DateTime values to <code>TIMESTAMP WITH TIME ZONE</code> instead of <code>TIMESTAMP</code>.</p>
 
 <p>To load the extension into the database:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_timestamptz</span>
 </pre>
 
-<p>Related module: <a href="../../../../classes/Sequel/Postgres/Timestamptz.html"><code>Sequel::Postgres::Timestamptz</code></a></p>
+<p>To load the extension into individual datasets:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_timestamptz</span>)
+</pre>
+
+<p>Note that the loading into individual datasets only affects the integration with the auto_cast_date_and_time extension.</p>
+
+<p>Related modules: <a href="../../../../classes/Sequel/Postgres/Timestamptz.html"><code>Sequel::Postgres::Timestamptz</code></a>, <a href="../../../../classes/Sequel/Postgres/TimestamptzDatasetMethods.html"><code>Sequel::Postgres::TimestamptzDatasetMethods</code></a></p>
 </div>
 <div id='context'>
 </div>

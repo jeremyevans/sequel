@@ -31,7 +31,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-05-03 13:14:12 -0700</span>
+<span class='datetime'>2023-12-27 10:10:07 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -82,7 +82,7 @@ Last Update:
 <span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;blog&#39;</span>)
 </pre>
 
-<p>Note that using an adapter method forces the use of the specified adapter, not a database type, even though some adapters have the same name as the database type.  So if you want to connect to SQLite, for example, you can do so using the sqlite, amalgalite, and jdbc adapters. If you want to connect to SQLite on JRuby using the jdbc adapter, you should not use <code>Sequel.sqlite</code> for example, as that uses the C-based sqlite3 gem. Instead, the <code>Sequel.jdbc</code> would be appropriate (though as mentioned below, using <code>Sequel.connect</code> is recommended instead of <code>Sequel.jdbc</code>). </p>
+<p>Note that using an adapter method forces the use of the specified adapter, not a database type, even though some adapters have the same name as the database type.  So if you want to connect to SQLite, for example, you can do so using the sqlite, amalgalite, and jdbc adapters. If you want to connect to SQLite on JRuby using the jdbc adapter, you should not use <code>Sequel.sqlite</code> for example, as that uses the C-based sqlite3 gem. Instead, the <code>Sequel.jdbc</code> would be appropriate (though as mentioned below, using <code>Sequel.connect</code> is recommended instead of <code>Sequel.jdbc</code>).</p>
 
 <h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -157,7 +157,7 @@ Last Update:
 
 <h3 id="label-ado">ado<span><a href="#label-ado">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>Requires: win32ole </p>
+<p>Requires: win32ole</p>
 
 <p>The ADO adapter provides connectivity to ADO databases in Windows. It relies on WIN32OLE library, so it isn’t usable on other operating systems (except possibly through WINE, but that’s unlikely).</p>
 
@@ -217,7 +217,7 @@ Last Update:
 
 <p>Note that when using a JDBC adapter, the best way to use <a href="../../classes/Sequel.html"><code>Sequel</code></a> is via Sequel.connect using a connection string, NOT Sequel.jdbc.  Use the JDBC connection string when connecting, which will be in a different format than the native connection string.  The connection string should start with ‘jdbc:’.  For PostgreSQL, use ‘jdbc:postgresql:’, and for SQLite you do not need 2 preceding slashes for the database name (use no preceding slashes for a relative path, and one preceding slash for an absolute path).</p>
 
-<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> does no preprocessing of JDBC connection strings, it passes them directly to JDBC. So if you have problems getting a connection string to work, look up the  documentation for the JDBC driver.</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> does no preprocessing of JDBC connection strings, it passes them directly to JDBC. So if you have problems getting a connection string to work, look up the documentation for the JDBC driver.</p>
 
 <p>The jdbc adapter does not handle common options such as <code>:host</code>, <code>:user</code>, and <code>:port</code>.  If you must use a hash of options when connecting, provide the full JDBC connection string as the :uri option.</p>
 
@@ -339,7 +339,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:convert_infinite_timestamps </td><td>
 <p>Whether infinite timestamps/dates should be converted on retrieval.  By default, no conversion is done, so an error is raised if you attempt to retrieve an infinite timestamp/date.  You can set this to :nil to convert to nil, :string to leave as a string, or :float to convert to an infinite float.</p>
 </td></tr><tr><td class='label'>:conn_str </td><td>
-<p>Use connection string (in form of ‘host=x port=y …`). Ignores all other options, only supported with pg library. See <a target="_top" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING</a> and  <a target="_top" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS</a> for format and list of supported options.</p>
+<p>Use connection string (in form of ‘host=x port=y …`). Ignores all other options, only supported with pg library. See <a target="_top" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING</a> and <a target="_top" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS</a> for format and list of supported options.</p>
 </td></tr><tr><td class='label'>:connect_timeout </td><td>
 <p>Set the number of seconds to wait for a connection (default 20, only respected if using the pg library).</p>
 </td></tr><tr><td class='label'>:driver_options </td><td>
@@ -400,7 +400,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:timeout </td><td>
 <p>the busy timeout to use in milliseconds (default: 5000).</p>
 </td></tr><tr><td class='label'>:setup_regexp_function </td><td>
-<p>Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so allows you to use regexp support in dataset expressions.  Note that this creates a new Regexp object per call to the function, so it is not an efficient implementation.</p>
+<p>Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so allows you to use regexp support in dataset expressions.  If <code>:cached</code> or <code>&quot;cached&quot;</code>+, caches each unique regex (more efficient but risk of memory leak). If a Proc is provided, it will be called with a string for the regexp and a string for the value to compare, and should return whether the regexp string matches the string value to compare. The default Proc used does <code>Regexp.new(regexp_str).match(str)</code>.</p>
 </td></tr></tbody></table>
 
 <p>Note that SQLite memory databases are restricted to a single connection by default.  This is because SQLite does not allow multiple connections to a single memory database.  For this reason, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets the maximum number of connections in the connection pool to 1 by default when an SQLite memory database is used.  Attempts to force the use of more than 1 connection can result in weird behavior, since the connections will be to separate memory databases.</p>

@@ -177,7 +177,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-value">:column</span> <span class="ruby-comment"># &quot;COLUMN&quot; on some databases</span>
 </pre>
 
-<p>A plain symbol is usually treated as an unqualified identifier.  However, if you are using multiple tables in a query, and you want to reference a column in one of the tables that has the same name as a column in another one of the tables, you need to qualify that reference.  Note that you can’t use a period to separate them: </p>
+<p>A plain symbol is usually treated as an unqualified identifier.  However, if you are using multiple tables in a query, and you want to reference a column in one of the tables that has the same name as a column in another one of the tables, you need to qualify that reference.  Note that you can’t use a period to separate them:</p>
 
 <pre class="ruby"><span class="ruby-value">:table</span>.<span class="ruby-identifier">column</span> <span class="ruby-comment"># calls the column method on the symbol</span>
 </pre>

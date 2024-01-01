@@ -41,7 +41,7 @@ Last Update:
 <ul><li>
 <p>A :preconnect Database option has been added, for automatically creating the maximum number of connections to the database on instantiation.  This is useful when there is high latency for initial connection setup, where Sequel’s usual approach of connecting as needed can cause pauses at runtime.</p>
 </li><li>
-<p>Database#sharded? has been added for checking whether the Database object uses multiple servers. </p>
+<p>Database#sharded? has been added for checking whether the Database object uses multiple servers.</p>
 </li><li>
 <p>Dataset#server? has been added, for returning a cloned dataset associated with the given server/shard if the dataset does not already have a server set.  This returns the receiver if the server has already been set or the Database is not sharded.</p>
 </li></ul>

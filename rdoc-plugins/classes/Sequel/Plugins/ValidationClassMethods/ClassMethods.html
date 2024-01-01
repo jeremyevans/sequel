@@ -230,7 +230,7 @@ Sequel::Plugins::ValidationClassMethods::ClassMethods
 </div>
 <div class='description'>
 
-<p>Defines validations by converting a longhand block into a series of  shorthand definitions. For example:</p>
+<p>Defines validations by converting a longhand block into a series of shorthand definitions. For example:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">MyClass</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">validates</span> <span class="ruby-keyword">do</span>
@@ -344,7 +344,7 @@ Sequel::Plugins::ValidationClassMethods::ClassMethods
 </div>
 <div class='description'>
 
-<p>Adds a validation for each of the given attributes using the supplied block. The block must accept three arguments: instance, attribute and  value, e.g.:</p>
+<p>Adds a validation for each of the given attributes using the supplied block. The block must accept three arguments: instance, attribute and value, e.g.:</p>
 
 <pre class="ruby"><span class="ruby-identifier">validates_each</span> <span class="ruby-value">:name</span>, <span class="ruby-value">:password</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span>, <span class="ruby-identifier">attribute</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">object</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">attribute</span>, <span class="ruby-string">&#39;is not nice&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nice?</span>
@@ -353,7 +353,7 @@ Sequel::Plugins::ValidationClassMethods::ClassMethods
 
 <p>Possible Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_blank </td><td>
-<p>Whether to skip the validation if the value is blank. </p>
+<p>Whether to skip the validation if the value is blank.</p>
 </td></tr><tr><td class='label'>:allow_missing </td><td>
 <p>Whether to skip the validation if the attribute isn’t a key in the values hash.  This is different from allow_nil, because <a href="../../../Sequel.html"><code>Sequel</code></a> only sends the attributes in the values when doing an insert or update.  If the attribute is not present, <a href="../../../Sequel.html"><code>Sequel</code></a> doesn’t specify it, so the database will use the table’s default value.  This is different from having an attribute in values with a value of nil, which <a href="../../../Sequel.html"><code>Sequel</code></a> will send as NULL. If your database table has a non NULL default, this may be a good option to use.  You don’t want to use allow_nil, because if the attribute is in values but has a value nil, <a href="../../../Sequel.html"><code>Sequel</code></a> will attempt to insert a NULL value into the database, instead of using the database’s default.</p>
 </td></tr><tr><td class='label'>:allow_nil </td><td>
@@ -634,7 +634,7 @@ Sequel::Plugins::ValidationClassMethods::ClassMethods
 </div>
 <div class='description'>
 
-<p>Validates whether an attribute has the correct ruby type for the associated database type.  This is generally useful in conjunction with raise_on_typecast_failure = false, to handle typecasting errors at validation time instead of at setter time. </p>
+<p>Validates whether an attribute has the correct ruby type for the associated database type.  This is generally useful in conjunction with raise_on_typecast_failure = false, to handle typecasting errors at validation time instead of at setter time.</p>
 
 <p>Possible Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>

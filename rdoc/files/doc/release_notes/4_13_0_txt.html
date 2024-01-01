@@ -84,7 +84,7 @@ Last Update:
 </li><li>
 <p>For associations that require joins, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now use the associated model’s selection directly (instead of associated_table.*) if the associated model’s selection consists solely of qualified columns.</p>
 
-<p>Among other things, this means that a many_to_many association to  a model that uses lazy attributes will not eagerly load the lazy attributes by default.</p>
+<p>Among other things, this means that a many_to_many association to a model that uses lazy attributes will not eagerly load the lazy attributes by default.</p>
 </li><li>
 <p>Model#save now uses insert_select if there is an existing RETURNING clause used by the underlying dataset, even if the model selects specific columns.</p>
 </li><li>

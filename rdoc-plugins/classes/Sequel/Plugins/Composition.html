@@ -56,7 +56,7 @@ Sequel::Plugins::Composition
 <span class="ruby-keyword">self</span>.<span class="ruby-identifier">day</span> = <span class="ruby-identifier">date</span>.<span class="ruby-identifier">day</span>
 </pre>
 
-<p>The :mapping option is just a shortcut that works in particular cases.  To handle any case, you can define a custom :composer and :decomposer procs.  The :composer and :decomposer procs will be used to define instance methods.  The :composer will be called the first time the getter is called, and the :decomposer  will be called before saving.  The above example could also be implemented as:</p>
+<p>The :mapping option is just a shortcut that works in particular cases.  To handle any case, you can define a custom :composer and :decomposer procs.  The :composer and :decomposer procs will be used to define instance methods.  The :composer will be called the first time the getter is called, and the :decomposer will be called before saving.  The above example could also be implemented as:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">composition</span> <span class="ruby-value">:date</span>,
   <span class="ruby-value">composer:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-constant">Date</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">year</span>, <span class="ruby-identifier">month</span>, <span class="ruby-identifier">day</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">year</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">month</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">day</span>},

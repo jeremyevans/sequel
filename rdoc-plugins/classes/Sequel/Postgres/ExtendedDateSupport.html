@@ -201,8 +201,8 @@ Sequel::Postgres::ExtendedDateSupport
 <pre id='method-i-bound_variable_arg-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_extended_date_support.rb</span>
 <span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)
 <span class="line-num">55</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>
-<span class="line-num">56</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Date</span>, <span class="ruby-constant">Time</span>
-<span class="line-num">57</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">56</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Time</span>, <span class="ruby-constant">Date</span>
+<span class="line-num">57</span>     <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">literal_date_or_time</span>(<span class="ruby-identifier">arg</span>)
 <span class="line-num">58</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">59</span>     <span class="ruby-keyword">super</span>
 <span class="line-num">60</span>   <span class="ruby-keyword">end</span>

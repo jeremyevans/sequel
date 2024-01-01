@@ -47,6 +47,9 @@ Sequel
 <a href="../files/lib/sequel/extensions/async_thread_pool_rb.html">lib/sequel/extensions/async_thread_pool.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/extensions/auto_cast_date_and_time_rb.html">lib/sequel/extensions/auto_cast_date_and_time.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/extensions/auto_literal_strings_rb.html">lib/sequel/extensions/auto_literal_strings.rb</a>
 </li>
 <li class='other'>
@@ -741,7 +744,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <p>bytea</p>
 </td></tr></tbody></table>
 
-<p><a href="String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the  <code>:treat_string_list_as_text_array</code> <a href="Database.html"><code>Database</code></a> option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
+<p><a href="String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the <code>:treat_string_list_as_text_array</code> <a href="Database.html"><code>Database</code></a> option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
 
 <p>The conversion is only done for single dimensional arrays that have more than two elements, where all elements are of the same class (other than nil values).</p>
 
@@ -835,6 +838,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <ol>
 <li><a href="Sequel/AnyNotEmpty.html">Sequel::AnyNotEmpty</a></li>
 <li><a href="Sequel/ArbitraryServers.html">Sequel::ArbitraryServers</a></li>
+<li><a href="Sequel/AutoCastDateAndTime.html">Sequel::AutoCastDateAndTime</a></li>
 <li><a href="Sequel/CallerLogging.html">Sequel::CallerLogging</a></li>
 <li><a href="Sequel/ColumnsIntrospection.html">Sequel::ColumnsIntrospection</a></li>
 <li><a href="Sequel/ConnectionExpiration.html">Sequel::ConnectionExpiration</a></li>

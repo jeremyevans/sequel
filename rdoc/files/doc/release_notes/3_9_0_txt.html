@@ -40,7 +40,7 @@ Last Update:
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>The ConnectionPool classes were refactored from 2 separate classes to a 5 class hierarchy, with one main class and 4  subclasses, one for each combination of sharding and threading.</p>
+<p>The ConnectionPool classes were refactored from 2 separate classes to a 5 class hierarchy, with one main class and 4 subclasses, one for each combination of sharding and threading.</p>
 
 <p>The primary reason for this refactoring is to make it so that the user doesn’t have to pay a performance penalty for sharding if they aren’t using it.  A connection pool that supports sharding is automatically used if the :servers option is used when setting up the database connection.</p>
 

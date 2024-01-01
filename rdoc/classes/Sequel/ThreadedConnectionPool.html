@@ -183,7 +183,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Removes all connections currently available. This method has the effect of  disconnecting from the database, assuming that no connections are currently being used.  If you want to be able to disconnect connections that are currently in use, use the ShardedThreadedConnectionPool, which can do that. This connection pool does not, for performance reasons. To use the sharded pool, pass the <code>servers: {}</code> option when connecting to the database.</p>
+<p>Removes all connections currently available. This method has the effect of disconnecting from the database, assuming that no connections are currently being used.  If you want to be able to disconnect connections that are currently in use, use the ShardedThreadedConnectionPool, which can do that. This connection pool does not, for performance reasons. To use the sharded pool, pass the <code>servers: {}</code> option when connecting to the database.</p>
 
 <p>Once a connection is requested using <a href="ThreadedConnectionPool.html#method-i-hold"><code>hold</code></a>, the connection pool creates new connections to the database.</p>
 

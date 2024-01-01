@@ -148,7 +148,7 @@ Last Update:
 
 <p>Among other things, the default cast types for cast_string and cast_numeric now work in the MySQL adapter.</p>
 </li><li>
-<p>Model#set_associated_object was added.  The many_to_one association setter method calls it.  This allows you to easily override the association setters for all many_to_one associations of a class by modifying a single method. </p>
+<p>Model#set_associated_object was added.  The many_to_one association setter method calls it.  This allows you to easily override the association setters for all many_to_one associations of a class by modifying a single method.</p>
 </li><li>
 <p>Typecasting invalid date strings now raises a Sequel::Error::InvalidValue instead of an argument error, which means that you can use raise_on_typecast_failure = false and not have an error raised when an invalid date format is used.</p>
 </li><li>
@@ -194,7 +194,7 @@ Last Update:
 </li><li>
 <p>The private Model#cache_delete_unless_new method has been removed.</p>
 </li><li>
-<p>Sequel::SQL::IrregularFunction was removed, as it was a bad hack that is not used by <a href="../../../classes/Sequel.html"><code>Sequel</code></a> anymore.  Unless you were instantiating it directly or using a plugin/extension that did, this shouldn’t affect you.  Using a <a href="../../../classes/Sequel/SQL/Function.html"><code>Sequel::SQL::Function</code></a> with a  <a href="../../../classes/Sequel/SQL/PlaceholderLiteralString.html"><code>Sequel::SQL::PlaceholderLiteralString</code></a> is recommended instead, see the substring example above.</p>
+<p>Sequel::SQL::IrregularFunction was removed, as it was a bad hack that is not used by <a href="../../../classes/Sequel.html"><code>Sequel</code></a> anymore.  Unless you were instantiating it directly or using a plugin/extension that did, this shouldn’t affect you.  Using a <a href="../../../classes/Sequel/SQL/Function.html"><code>Sequel::SQL::Function</code></a> with a <a href="../../../classes/Sequel/SQL/PlaceholderLiteralString.html"><code>Sequel::SQL::PlaceholderLiteralString</code></a> is recommended instead, see the substring example above.</p>
 </li></ul>
 </div>
 <div id='context'>

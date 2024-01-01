@@ -31,12 +31,41 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-12-01 08:25:58 -0800</span>
+<span class='datetime'>2024-01-01 08:48:15 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.76.0+-282024-01-01-29"><a href="doc/release_notes/5_76_0_txt.html">5.76.0</a> (2024-01-01)<span><a href="#label-5.76.0+-282024-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Improve performance and flexibility of regexp matching in sqlite adapter (paddor) (#2108)</p>
+</li><li>
+<p>Support SQL::Identifier for Database#tables :schema option values on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Support generating rcte queries using UNION or UNION ALL in the rcte plugin (jonathanfrias) (#2107)</p>
+</li><li>
+<p>Make Database#table_exists? on PostgreSQL handle lock or statement timeout errors as evidence the table exists (jeremyevans) (#2106)</p>
+</li><li>
+<p>Work around DateTime.jd fractional second bug on JRuby in named_timezones extension (jeremyevans)</p>
+</li><li>
+<p>Support fractional times and timestamps on SQLAnywhere (jeremyevans)</p>
+</li><li>
+<p>Make round_timestamps extension use Dataset#sqltime_precision for rounding <a href="../classes/Sequel/SQLTime.html"><code>Sequel::SQLTime</code></a> values (jeremyevans)</p>
+</li><li>
+<p>Remove special handling of %N modifier in Dataset#default_timestamp_format (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#default_time_format private method, for adapters to override for time (not timestamp) formatting (jeremyevans)</p>
+</li><li>
+<p>Remove Dataset#format_timestamp_offset private method (jeremyevans)</p>
+</li><li>
+<p>Remove special handling of %z modifier in Dataset#default_timestamp_format (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#literal_date_or_time, for simpler use by bound argument code (jeremyevans)</p>
+</li><li>
+<p>Add auto_cast_date_and_time extension, for casting date and time values using SQL standard functions (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.75.0+-282023-12-01-29"><a href="doc/release_notes/5_75_0_txt.html">5.75.0</a> (2023-12-01)<span><a href="#label-5.75.0+-282023-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make any_not_empty? extension support passing pattern argument to any? (jeremyevans) (#2100)</p>
@@ -1387,7 +1416,7 @@ Last Update:
 </li><li>
 <p>Make datasets frozen by default (jeremyevans)</p>
 </li><li>
-<p>Drop support for ruby 1.8.7, minimum now is 1.9.2 (jeremyevans) </p>
+<p>Drop support for ruby 1.8.7, minimum now is 1.9.2 (jeremyevans)</p>
 </li><li>
 <p>Remove deprecated adapters, extensions, plugins, constants, and features (jeremyevans)</p>
 </li></ul>

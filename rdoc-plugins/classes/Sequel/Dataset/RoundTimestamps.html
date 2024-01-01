@@ -88,7 +88,7 @@ Sequel::Dataset::RoundTimestamps
 </a>
 <pre id='method-i-literal_sqltime-source'>   <span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb</span>
 <span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_sqltime</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">38</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))
+<span class="line-num">38</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">sqltime_precision</span>))
 <span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

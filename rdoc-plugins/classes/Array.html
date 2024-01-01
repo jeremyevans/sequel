@@ -117,9 +117,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>
-<span class="line-num">539</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">540</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)
-<span class="line-num">541</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">541</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">542</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)
+<span class="line-num">543</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_json'>
@@ -295,7 +295,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::ValueList</code> created from this array.  Used if this array contains all two element arrays and you want it treated as an SQL value list (IN predicate)  instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
+<p>Return a <code>Sequel::SQL::ValueList</code> created from this array.  Used if this array contains all two element arrays and you want it treated as an SQL value list (IN predicate) instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>]<span class="ruby-operator">=&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: ((a, b) IN ((1, 2), (3, 4)))</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: ((a, b) IN ((1 = 2) AND (3 = 4)))</span>

@@ -64,7 +64,7 @@ Last Update:
 
 <p>This will use the replica_server for SELECT queries and primary_server for other queries. The :read_only key in the :servers hash is special in that it sets the default database for Dataset methods that use SELECT queries (which are generally read queries that do not modify the database).</p>
 
-<p>If you want to ensure your queries are going to a specific database, you can force this for a given query by using the .server method and passing  the symbol name defined in the connect options. For example:</p>
+<p>If you want to ensure your queries are going to a specific database, you can force this for a given query by using the .server method and passing the symbol name defined in the connect options. For example:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Force the SELECT to run on the primary server</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span>

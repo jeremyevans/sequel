@@ -36,9 +36,38 @@ Sequel::Postgres::Timestamptz
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-extended">extended</a></li>
+</ol>
+</div>
 <div id='context'>
 </div>
 <div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-extended'>
+<a name='method-c-extended'></a>
+<div class='synopsis'>
+<span class='name'>extended</span><span class='arguments'>(db)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-extended-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-extended-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_timestamptz.rb</span>
+<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">30</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">TimestamptzDatasetMethods</span>)
+<span class="line-num">31</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
 </div>
 
 </div>

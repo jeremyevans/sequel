@@ -67,7 +67,7 @@ Sequel::Model::Associations::ClassMethods
 
 <p>If you want to override the behavior of the add_/remove_/remove_all_/ methods or the association setter method, use the :adder, :remover, :clearer, and/or :setter options.  These options override the default behavior.</p>
 
-<p>By default the classes for the associations are inferred from the association name, so for example the Project#portfolio will return an instance of  Portfolio, and Project#milestones will return an array of Milestone  instances.  You can use the :class option to change which class is used.</p>
+<p>By default the classes for the associations are inferred from the association name, so for example the Project#portfolio will return an instance of Portfolio, and Project#milestones will return an array of Milestone instances.  You can use the :class option to change which class is used.</p>
 
 <p>Association definitions are also reflected by the class, e.g.:</p>
 
@@ -201,7 +201,7 @@ Project.association_reflection(:portfolio)
 
 <p>Associates a related model with the current model. The following types are supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:many_to_one </td><td>
-<p>Foreign key in current model’s table points to  associated model’s primary key.  Each associated model object can be associated with more than one current model objects.  Each current model object can be associated with only one associated model object.</p>
+<p>Foreign key in current model’s table points to associated model’s primary key.  Each associated model object can be associated with more than one current model objects.  Each current model object can be associated with only one associated model object.</p>
 </td></tr><tr><td class='label'>:one_to_many </td><td>
 <p>Foreign key in associated model’s table points to this model’s primary key.   Each current model object can be associated with more than one associated model objects.  Each associated model object can be associated with only one current model object.</p>
 </td></tr><tr><td class='label'>:one_through_one </td><td>
@@ -240,7 +240,7 @@ Project.association_reflection(:portfolio)
 </td></tr><tr><td class='label'>:cartesian_product_number </td><td>
 <p>the number of joins completed by this association that could cause more than one row for each row in the current table (default: 0 for <a href="ClassMethods.html#method-i-many_to_one"><code>many_to_one</code></a>, <a href="ClassMethods.html#method-i-one_to_one"><code>one_to_one</code></a>, and <a href="ClassMethods.html#method-i-one_through_one"><code>one_through_one</code></a> associations, 1 for <a href="ClassMethods.html#method-i-one_to_many"><code>one_to_many</code></a> and <a href="ClassMethods.html#method-i-many_to_many"><code>many_to_many</code></a> associations).</p>
 </td></tr><tr><td class='label'>:class </td><td>
-<p>The associated class or its name as a string or symbol. If not given, uses the association’s name, which is camelized (and singularized unless the type is :many_to_one, :one_to_one, or <a href="ClassMethods.html#method-i-one_through_one"><code>one_through_one</code></a>).  If this is specified as a string or symbol, you must specify the full class name (e.g. “::SomeModule::MyModel”). </p>
+<p>The associated class or its name as a string or symbol. If not given, uses the association’s name, which is camelized (and singularized unless the type is :many_to_one, :one_to_one, or <a href="ClassMethods.html#method-i-one_through_one"><code>one_through_one</code></a>).  If this is specified as a string or symbol, you must specify the full class name (e.g. “::SomeModule::MyModel”).</p>
 </td></tr><tr><td class='label'>:class_namespace </td><td>
 <p>If :class is given as a string or symbol, sets the default namespace in which to look for the class.  <code>class: &#39;Foo&#39;, class_namespace: &#39;Bar&#39;</code> looks for <code>::Bar::Foo</code>.)</p>
 </td></tr><tr><td class='label'>:clearer </td><td>

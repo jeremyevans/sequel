@@ -94,7 +94,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span>
 </pre>
 </li><li>
-<p>Model schema methods (e.g. Model.set_schema, Model.create_table,  Model.drop_table) have been moved to a plugin.  The use of these methods has been discouraged for a long time.  If you want to use them:</p>
+<p>Model schema methods (e.g. Model.set_schema, Model.create_table, Model.drop_table) have been moved to a plugin.  The use of these methods has been discouraged for a long time.  If you want to use them:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:schema</span>
 </pre>
@@ -345,7 +345,7 @@ end</pre>
 
 <p>It is slightly inconsistent with ~{:col=&gt;1}, since that won’t return values where col is NULL, but it gives the user the ability to create an IS [NOT] (TRUE|FALSE) filter, which <a href="../../../classes/Sequel.html"><code>Sequel</code></a> previously did not support.</p>
 
-<p>If you really want the old behavior, you can change it to  ~{true=&gt;:bool_col}.</p>
+<p>If you really want the old behavior, you can change it to ~{true=&gt;:bool_col}.</p>
 </li><li>
 <p>Model.use_transactions was added for setting whether model objects should use transactions when destroying or saving records.  Like most <a href="../../../classes/Sequel.html"><code>Sequel</code></a> options, it’s settable on a global, per model, and per object basis:</p>
 

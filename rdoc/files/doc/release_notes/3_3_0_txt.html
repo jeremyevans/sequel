@@ -147,7 +147,7 @@ Last Update:
 
 <p>If you use MySQL with tinyint columns, these changes have the potential to break applications.  Care should be taken when upgrading if these changes apply to you.</p>
 </li><li>
-<p>Model classes now default to associating to other classes in the same scope.  It’s highly unlikely anyone was relying on the previous behavior, but if you have a model inside a module that you are associating to a model outside of a module, you now need to specify the associated class using the :class option. </p>
+<p>Model classes now default to associating to other classes in the same scope.  It’s highly unlikely anyone was relying on the previous behavior, but if you have a model inside a module that you are associating to a model outside of a module, you now need to specify the associated class using the :class option.</p>
 </li><li>
 <p>Model#save no longer includes the primary key fields in the SET clause of the UPDATE query, only in the WHERE clause.  I’m not sure if this affects backwards compatibility of production code, but it can break tests that expect specific SQL.</p>
 </li><li>

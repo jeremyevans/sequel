@@ -180,7 +180,7 @@ Last Update:
 </td></tr><tr><td class='label'>:graph_conditions </td><td>
 <p>Additional conditions to put on join (needs to be a hash or array of all two pairs).  Automatically assumes unqualified symbols or first element of the pair to be columns of the associated model, and unqualified symbols of the second element of the pair to be columns of the current model.</p>
 </td></tr><tr><td class='label'>:graph_block </td><td>
-<p>A block passed to <code>join_table</code>, allowing you to specify conditions other than equality, or to use OR, or set up any arbitrary condition.  The block is passed the associated table alias, current table  alias, and an array of previous joins clause objects.</p>
+<p>A block passed to <code>join_table</code>, allowing you to specify conditions other than equality, or to use OR, or set up any arbitrary condition.  The block is passed the associated table alias, current table alias, and an array of previous joins clause objects.</p>
 </td></tr><tr><td class='label'>:graph_only_conditions </td><td>
 <p>Use these conditions instead of the standard association conditions. This is necessary when you don’t want to have an equal condition between the foreign key and primary key of the tables. You can also use this to have a JOIN USING (array of symbols), or a NATURAL or CROSS JOIN (nil, with the appropriate <code>:graph_join_type</code>).</p>
 </td></tr></tbody></table>
@@ -238,7 +238,7 @@ Last Update:
 
 <p>Since you are given all of the records, you can do things like filter on associations that are specified by multiple keys, or do multiple queries depending on the content of the records (which would be necessary for polymorphic associations).  Inside the <code>:eager_loader</code> proc, you should get the related objects and populate the associations cache for all objects in the array of records.  The hash of dependent associations is available for you to cascade the eager loading down multiple levels, but it is up to you to use it.</p>
 
-<p>The id_map is a performance enhancement that is used by the default association loaders and is also available to you.  It is a hash with keys foreign/primary key values, and values being arrays of current model objects having the foreign/primary key value associated with the key.  This may be hard to visualize, so I’ll give an example.  Let’s say you have the following associations</p>
+<p>The id_map is a performance enhancement that is used by the default association loaders and is also available to you.  It is a hash with keys foreign/primary key values, and values being arrays of current model objects having the foreign/primary key value associated with the key. This may be hard to visualize, so I’ll give an example.  Let’s say you have the following associations</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>
@@ -346,7 +346,7 @@ Last Update:
 <span class="ruby-keyword">end</span>)
 </pre>
 
-<p>Now, these are both overly simplistic eager loaders that don’t respect cascaded associations or any of the association options.  But hopefully they both provide simple examples that you can more easily build and learn from, as  the custom eager loaders described later in this page are more complex.</p>
+<p>Now, these are both overly simplistic eager loaders that don’t respect cascaded associations or any of the association options.  But hopefully they both provide simple examples that you can more easily build and learn from, as the custom eager loaders described later in this page are more complex.</p>
 
 <p>Basically, the eager loading steps can be broken down into:</p>
 <ol><li>

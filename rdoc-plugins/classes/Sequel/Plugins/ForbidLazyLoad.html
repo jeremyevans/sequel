@@ -96,7 +96,7 @@ Sequel::Plugins::ForbidLazyLoad
 
 <p>However, you probably don’t want to do this as it will forbid any lazy loading of the association, even if the loading could not result in an N+1 issue.</p>
 
-<p>On the flip side, you can allow lazy loading using the  <code>:forbid_lazy_load</code> association option with a <code>false</code> value:</p>
+<p>On the flip side, you can allow lazy loading using the <code>:forbid_lazy_load</code> association option with a <code>false</code> value:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">forbid_lazy_load:</span> <span class="ruby-keyword">false</span>
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artist</span> <span class="ruby-comment"># no error</span>

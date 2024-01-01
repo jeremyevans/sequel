@@ -219,7 +219,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Removes all connections currently available on all servers, optionally yielding each connection to the given block. This method has the effect of  disconnecting from the database, assuming that no connections are currently being used.  If connections are being used, they are scheduled to be disconnected as soon as they are returned to the pool.</p>
+<p>Removes all connections currently available on all servers, optionally yielding each connection to the given block. This method has the effect of disconnecting from the database, assuming that no connections are currently being used.  If connections are being used, they are scheduled to be disconnected as soon as they are returned to the pool.</p>
 
 <p>Once a connection is requested using <a href="ShardedThreadedConnectionPool.html#method-i-hold"><code>hold</code></a>, the connection pool creates new connections to the database. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>

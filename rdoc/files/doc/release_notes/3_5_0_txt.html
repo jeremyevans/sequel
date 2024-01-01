@@ -109,7 +109,7 @@ Staff     Manager
 
 <p>This plugin works directly with the association datasets and does not use any cached association values.  The :delete action will delete all associated objects from the database in a single SQL call. The :destroy action will load each associated object from the database and call the destroy method on it.</p>
 
-<p>The plugin call takes a hash of association symbol keys and  dependency action symbol values.  Alternatively, you can specify additional dependencies later using add_association_dependencies:</p>
+<p>The plugin call takes a hash of association symbol keys and dependency action symbol values.  Alternatively, you can specify additional dependencies later using add_association_dependencies:</p>
 
 <pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>, <span class="ruby-value">:address</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:delete</span>
 <span class="ruby-comment"># or:</span>
@@ -173,7 +173,7 @@ Staff     Manager
 <p>New Extensions</p>
 <hr>
 <ul><li>
-<p>A named_timezones extension was added, allowing you to use named timezones such as “America/Los_Angeles” (the default <a href="../../../classes/Sequel.html"><code>Sequel</code></a> timezone support only supports UTC or local time). This extension requires TZInfo.  It also sets the Sequel.datetime_class to  DateTime, so database timestamps will be returned as DateTime instances instead of Time instances.  This is because ruby’s Time class doesn’t support timezones other than UTC and local time.</p>
+<p>A named_timezones extension was added, allowing you to use named timezones such as “America/Los_Angeles” (the default <a href="../../../classes/Sequel.html"><code>Sequel</code></a> timezone support only supports UTC or local time). This extension requires TZInfo.  It also sets the Sequel.datetime_class to DateTime, so database timestamps will be returned as DateTime instances instead of Time instances.  This is because ruby’s Time class doesn’t support timezones other than UTC and local time.</p>
 
 <p>This plugin allows you to pass either strings or TZInfo::Timezone instance to Sequel.database_timezone=, application_timezone=, and typecast_timezone=.  If a string is passed, it is converted to a TZInfo::Timezone using TZInfo::Timezone.get.</p>
 

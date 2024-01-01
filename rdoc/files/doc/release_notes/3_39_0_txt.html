@@ -165,7 +165,7 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The defaults_setter plugin’s behavior changed due to the  current date/timestamp support.  Previously, it would not set a value for the column, since the default wasn’t recognized. Therefore, the database would use the default value on insert, which would be the database’s current timestamp.</p>
+<p>The defaults_setter plugin’s behavior changed due to the current date/timestamp support.  Previously, it would not set a value for the column, since the default wasn’t recognized. Therefore, the database would use the default value on insert, which would be the database’s current timestamp.</p>
 
 <p>Now, the value is set to the current Date/Time/DateTime on model object instantiation, so the database wouldn’t use the column default.  Instead of the database’s current timestamp on insert, the column value will be the application’s current timestamp on model instantiation.</p>
 

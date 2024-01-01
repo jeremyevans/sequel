@@ -215,7 +215,7 @@ Last Update:
 <ul><li>
 <p>The keys in the :key_hash entry passed to the :eager_loader proc are now method references instead of column references.  For most associations, they are the same thing, but for associations using the :key_column/:primary_key_column/:left_primary_key_column options, the values could be different.  If you were using one of those options and had a custom eager_loader, you should switch from indexing into the :key_hash option to just using the :id_map option.</p>
 </li><li>
-<p>The :key_hash entry passed to the :eager_loader proc is now no longer guaranteed to contain key maps for associations other than the one currently being eagerly loaded.  Previously, it contained  key maps for all associations that were being eagerly loaded.  If you have a custom :eager_loader proc that accessed a key map for a separate association that was being loaded concurrently, you’ll now have to build the key map manually if it doesn’t exist.</p>
+<p>The :key_hash entry passed to the :eager_loader proc is now no longer guaranteed to contain key maps for associations other than the one currently being eagerly loaded.  Previously, it contained key maps for all associations that were being eagerly loaded.  If you have a custom :eager_loader proc that accessed a key map for a separate association that was being loaded concurrently, you’ll now have to build the key map manually if it doesn’t exist.</p>
 </li><li>
 <p>If you previously explicitly specified an :eager_loader_key option when defining an association, you may need to change it so that it is a method reference instead of a column reference, or possibly just omit the option.</p>
 </li><li>

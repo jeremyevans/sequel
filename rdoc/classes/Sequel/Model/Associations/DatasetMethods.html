@@ -66,7 +66,7 @@ Sequel::Model::Associations::DatasetMethods
 <pre class="ruby"><span class="ruby-constant">Albums</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">artist:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:name</span>)})
 </pre>
 
-<p>To cascade eager loading while using a callback, you substitute the cascaded associations with a single entry hash that has the proc callback as the key and  the cascaded associations as the value.  This will load artists with their albums since 1990, and also the tracks on those albums and the genre for those tracks:</p>
+<p>To cascade eager loading while using a callback, you substitute the cascaded associations with a single entry hash that has the proc callback as the key and the cascaded associations as the value.  This will load artists with their albums since 1990, and also the tracks on those albums and the genre for those tracks:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">albums:</span> {<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">year</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1990</span>}}<span class="ruby-operator">=&gt;</span>{<span class="ruby-value">tracks:</span> <span class="ruby-value">:genre</span>}})
 </pre>
@@ -225,7 +225,7 @@ Sequel::Model::Associations::DatasetMethods
 </div>
 <div class='description'>
 
-<p>If the expression is in the form <code>x = y</code> where <code>y</code> is a <code>Sequel::Model</code> instance, array of <code>Sequel::Model</code> instances, or a <code>Sequel::Model</code> dataset, assume <code>x</code> is an association symbol and look up the association reflection via the dataset’s model.  From there, return the appropriate <a href="../../SQL.html"><code>SQL</code></a> based on the type of association and the values of the foreign/primary keys of <code>y</code>.  For most association types, this is a simple transformation, but for <code>many_to_many</code> associations this  creates a subquery to the join table.</p>
+<p>If the expression is in the form <code>x = y</code> where <code>y</code> is a <code>Sequel::Model</code> instance, array of <code>Sequel::Model</code> instances, or a <code>Sequel::Model</code> dataset, assume <code>x</code> is an association symbol and look up the association reflection via the dataset’s model.  From there, return the appropriate <a href="../../SQL.html"><code>SQL</code></a> based on the type of association and the values of the foreign/primary keys of <code>y</code>.  For most association types, this is a simple transformation, but for <code>many_to_many</code> associations this creates a subquery to the join table.</p>
 
 </div>
 <div class='source'>
@@ -293,7 +293,7 @@ Sequel::Model::Associations::DatasetMethods
 
 <p>This implementation avoids the complexity of extracting an object graph out of a single dataset, by building the object graph out of multiple datasets, one for each association.  By using a separate dataset for each association, it avoids problems such as aliasing conflicts and creating cartesian product result sets if multiple one_to_many or many_to_many eager associations are requested.</p>
 
-<p>One limitation of using this method is that you cannot filter the current dataset based on values of columns in an associated table, since the associations are loaded in separate queries.  To do that you need to load all associations in the same query, and extract an object graph from the results of that query. If you need to filter based on columns in associated tables, look at <code>eager_graph</code> or join the tables you need to filter on manually. </p>
+<p>One limitation of using this method is that you cannot filter the current dataset based on values of columns in an associated table, since the associations are loaded in separate queries.  To do that you need to load all associations in the same query, and extract an object graph from the results of that query. If you need to filter based on columns in associated tables, look at <code>eager_graph</code> or join the tables you need to filter on manually.</p>
 
 <p>Each association’s order, if defined, is respected. If the association uses a block or has an :eager_block argument, it is used.</p>
 

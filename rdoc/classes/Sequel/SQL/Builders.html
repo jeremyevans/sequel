@@ -212,7 +212,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default Integer type if none given), and return the result as a <code>NumericExpression</code>, so you can use the bitwise operators on the result. </p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default Integer type if none given), and return the result as a <code>NumericExpression</code>, so you can use the bitwise operators on the result.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># CAST(a AS integer)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(a AS double precision)</span>
@@ -794,7 +794,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return a <code>SQL::ValueList</code> created from the given array.  Used if the array contains all two element arrays and you want it treated as an <a href="../SQL.html"><code>SQL</code></a> value list (IN predicate)  instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
+<p>Return a <code>SQL::ValueList</code> created from the given array.  Used if the array contains all two element arrays and you want it treated as an <a href="../SQL.html"><code>SQL</code></a> value list (IN predicate) instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>]<span class="ruby-operator">=&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1, 2), (3, 4))</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1 = 2) AND (3 = 4))</span>

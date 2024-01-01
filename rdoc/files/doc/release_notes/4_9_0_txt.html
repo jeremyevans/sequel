@@ -85,7 +85,7 @@ Last Update:
 
 <p>Unfortunately, there are enough corner cases to this approach that it cannot be used by default.  At the least, the dataset needs to be selecting the columns it is ordering by, not aliasing the columns it is ordering by in the SELECT clause, not have NULLs in any of the columns being ordered by, and not itself use a limit or offset.</p>
 
-<p>If you are ordering by expressions that are not simple column values, you can provide a :filter_value option proc that takes the last retrieved row and array of order by expressions, and returns  an array of values in the last retrieved row for those order by expressions.</p>
+<p>If you are ordering by expressions that are not simple column values, you can provide a :filter_value option proc that takes the last retrieved row and array of order by expressions, and returns an array of values in the last retrieved row for those order by expressions.</p>
 </li><li>
 <p>In the postgres adapter, Dataset#paged_each now automatically uses a cursor for improved performance.</p>
 </li><li>

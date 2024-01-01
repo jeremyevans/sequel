@@ -71,7 +71,7 @@ Last Update:
 
 <p>The :same_db option causes <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to not translate column types to generic column types.  By default, the migration created will use generic types so it will run on other databases.  However, if you only want to support a single database, using the :same_db option will make the migration use the exact database type parsed from the database.</p>
 
-<p>The :indexes=&gt;false option causes indexes not be included in the migration.  The dump_indexes_migration can be used to create a separate migration with the indexes.  This can be useful if you  plan on loading a lot of data right after creating the tables, since it is faster to add indexes after the data has been added.</p>
+<p>The :indexes=&gt;false option causes indexes not be included in the migration.  The dump_indexes_migration can be used to create a separate migration with the indexes.  This can be useful if you plan on loading a lot of data right after creating the tables, since it is faster to add indexes after the data has been added.</p>
 </li><li>
 <p>Using options with the generic database types is now supported to a limited extent.  For example, the following code now works:</p>
 
@@ -129,7 +129,7 @@ Last Update:
 </li><li>
 <p>The PostgreSQL shared adapter now handles sequences that need to be quoted correctly (previously these were quoted twice).</p>
 </li><li>
-<p>String quoting on Oracle no longer doubles backslashes. </p>
+<p>String quoting on Oracle no longer doubles backslashes.</p>
 </li><li>
 <p>Database#count now works correctly when used on MSSQL when using an adapter that doesn’t handle unnamed columns.</p>
 </li><li>

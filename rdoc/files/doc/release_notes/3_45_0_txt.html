@@ -131,7 +131,7 @@ Last Update:
 </li><li>
 <p>The Dataset#def_mutation_method instance method has been removed. This method added mutation methods directly on the dataset instance, which is generally not desired.  Using the def_mutation_method class method with the :module option is now the recommended approach.</p>
 </li><li>
-<p>The switch to using ESCAPE for LIKE characters is backwards incompatible on databases that don’t use escaping by default,  when backslash is used in a LIKE pattern as a regular character. Now you have to double the backslash in the pattern.</p>
+<p>The switch to using ESCAPE for LIKE characters is backwards incompatible on databases that don’t use escaping by default, when backslash is used in a LIKE pattern as a regular character. Now you have to double the backslash in the pattern.</p>
 </li><li>
 <p>Database#database_error_regexps private method now can return any enumerable yielding regexp/exception class pairs, it is no longer specified to return a hash.</p>
 </li></ul>

@@ -60,7 +60,7 @@ Last Update:
 
 <p>It is highly recommended that you start using the freeze_datasets extension in your applications using <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, as this extension will become the default and only behavior in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.  Unfrozen datasets and dataset mutation will not be supported in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.</p>
 </li><li>
-<p>The dataset methods created by Model#subset and Model::DatasetModule#subset now cache the returned dataset if the current dataset is frozen, none of the arguments are Procs, and a block is not provided.  This can result in up to a 3x performance  improvement for method chains that use subsets, such as:</p>
+<p>The dataset methods created by Model#subset and Model::DatasetModule#subset now cache the returned dataset if the current dataset is frozen, none of the arguments are Procs, and a block is not provided.  This can result in up to a 3x performance improvement for method chains that use subsets, such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">subset1</span>.<span class="ruby-identifier">subset2</span>.<span class="ruby-identifier">subset3</span>.<span class="ruby-identifier">first</span>
 </pre>
@@ -117,7 +117,7 @@ Last Update:
 </li><li>
 <p>SQL::Expression subclass instances are now always frozen.</p>
 </li><li>
-<p>Dataset::PlaceholderLiteralizer and  Dataset::PlaceholderLiteralizer::Argument instances are now always frozen.</p>
+<p>Dataset::PlaceholderLiteralizer and Dataset::PlaceholderLiteralizer::Argument instances are now always frozen.</p>
 </li><li>
 <p>Dataset#ungraphed now works on a frozen model dataset.</p>
 </li><li>
