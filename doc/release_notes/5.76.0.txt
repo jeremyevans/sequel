@@ -42,7 +42,7 @@
 
 = Other Improvements
 
-* Time/DateTime/SQLite literalization speed has more than doubled
+* Time/DateTime/SQLTime literalization speed has more than doubled
   compared to the previous version.  The internal code is also much
   simpler, as the speedup resulted from removing multiple abstraction
   layers that mostly existed for Ruby 1.8 support.
