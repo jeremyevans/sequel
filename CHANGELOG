@@ -1,5 +1,7 @@
 === master
 
+* Switch default connection pool to timed_queue on Ruby 3.4+ (jeremyevans)
+
 * Support on_duplicate_columns={raise,warn} parameter in connection URL when using duplicate_columns_handler extension (jeremyevans)
 
 * Add transaction_connection_validator extension for retrying transactions on new connection if ther is a disconnect error when starting transaction (jeremyevans)
