@@ -1,4 +1,4 @@
-require_relative "spec_helper"
+require_relative "../adapters/spec_helper"
 
 one_to_one_eager_limit_strategies = Module.new do
   extend Minitest::Spec::DSL

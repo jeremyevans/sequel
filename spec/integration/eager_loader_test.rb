@@ -1,4 +1,4 @@
-require_relative "spec_helper"
+require_relative "../adapters/spec_helper"
 
 describe "Eagerly loading a tree structure" do
   before(:all) do

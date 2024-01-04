@@ -1,4 +1,4 @@
-require_relative "spec_helper"
+require_relative "../adapters/spec_helper"
 
 describe "Sequel timezone support" do
   def _test_timezone(timezone=Sequel.application_timezone)

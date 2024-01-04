@@ -1,4 +1,4 @@
-require_relative "spec_helper"
+require_relative "../adapters/spec_helper"
 
 describe "Simple Dataset operations" do
   before do

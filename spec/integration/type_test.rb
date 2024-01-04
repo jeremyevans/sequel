@@ -1,4 +1,4 @@
-require_relative "spec_helper"
+require_relative "../adapters/spec_helper"
 
 describe "Supported types" do
   def create_items_table_with_column(name, type, opts={})
