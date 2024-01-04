@@ -1,3 +1,7 @@
+=== master
+
+* Add transaction_connection_validator extension for retrying transactions on new connection if ther is a disconnect error when starting transaction (jeremyevans)
+
 === 5.76.0 (2024-01-01)
 
 * Improve performance and flexibility of regexp matching in sqlite adapter (paddor) (#2108)

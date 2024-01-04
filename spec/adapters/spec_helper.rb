@@ -40,6 +40,15 @@ DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 
 require_relative '../async_spec_helper'
 
+if ENV['SEQUEL_TRANSACTION_CONNECTION_VALIDATOR']
+  DB.extension(:transaction_connection_validator)
+end
+
+if ENV['SEQUEL_CONNECTION_VALIDATOR']
+  DB.extension(:connection_validator)
+  DB.pool.connection_validation_timeout = -1
+end
+
 DB.extension :pg_timestamptz if ENV['SEQUEL_PG_TIMESTAMPTZ']
 DB.extension :integer64 if ENV['SEQUEL_INTEGER64']
 DB.extension :index_caching if ENV['SEQUEL_INDEX_CACHING']
