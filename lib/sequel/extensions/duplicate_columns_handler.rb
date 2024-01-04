@@ -14,12 +14,12 @@
 #
 #   ds = DB[:items].extension(:duplicate_columns_handler)
 #
-# A database option is introduced: :on_duplicate_columns. It accepts a Symbol
-# or any object that responds to :call.
+# If the Database option :on_duplicate_columns is set, it configures how this
+# extension works. The value should be # or any object that responds to :call.
 #
-#   on_duplicate_columns: :raise
-#   on_duplicate_columns: :warn
-#   on_duplicate_columns: :ignore
+#   on_duplicate_columns: :raise # or 'raise'
+#   on_duplicate_columns: :warn # or 'warn'
+#   on_duplicate_columns: :ignore # or anything unrecognized
 #   on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}
 #
 # You may also configure duplicate columns handling for a specific dataset:
@@ -30,9 +30,10 @@
 #   ds.on_duplicate_columns{|columns| arbitrary_condition? ? :raise : :warn}
 #   ds.on_duplicate_columns(lambda{|columns| arbitrary_condition? ? :raise : :warn})
 #
-# If :raise is specified, a Sequel::DuplicateColumnError is raised.
-# If :warn is specified, you will receive a warning via +warn+.
+# If :raise or 'raise' is specified, a Sequel::DuplicateColumnError is raised.
+# If :warn or 'warn' is specified, you will receive a warning via +warn+.
 # If a callable is specified, it will be called.
+# For other values, duplicate columns are ignored (Sequel's default behavior)
 # If no on_duplicate_columns is specified, the default is :warn.
 #
 # Related module: Sequel::DuplicateColumnsHandler
@@ -64,9 +65,9 @@ module Sequel
       message = "#{caller(*CALLER_ARGS).first}: One or more duplicate columns present in #{cols.inspect}"
 
       case duplicate_columns_handler_type(cols)
-      when :raise
+      when :raise, 'raise'
         raise DuplicateColumnError, message
-      when :warn
+      when :warn, 'warn'
         warn message
       end
     end

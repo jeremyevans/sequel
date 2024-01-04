@@ -12,8 +12,11 @@ duplicate_columns_handler_specs = Module.new do
 
     check(:warn, @cols)
     @warned.must_include("One or more duplicate columns present in #{@cols.inspect}")
+    check('warn', @cols)
+    @warned.must_include("One or more duplicate columns present in #{@cols.inspect}")
 
     proc{check(:raise, @cols)}.must_raise(Sequel::DuplicateColumnError)
+    proc{check('raise', @cols)}.must_raise(Sequel::DuplicateColumnError)
 
     cols = nil
     check(proc{|cs| cols = cs; nil}, @cols)
