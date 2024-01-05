@@ -185,10 +185,13 @@ module Sequel
         end
 
         # Set the value of the position_field to the maximum value plus 1 unless the
-        # position field already has a value.
+        # position field already has a value. If the list is empty, the position will
+        # be set to the model's +top_of_list+ value.
         def before_validation
           unless get_column_value(position_field)
-            set_column_value("#{position_field}=", list_dataset.max(position_field).to_i+1)
+            current_max = list_dataset.max(position_field)
+            value = current_max.nil? ? model.top_of_list : current_max.to_i + 1
+            set_column_value("#{position_field}=", value)
           end
           super
         end
