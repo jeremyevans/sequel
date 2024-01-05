@@ -878,3 +878,44 @@ describe 'SQLite Database' do
     @db.get(ja.valid).must_equal 1
   end
 end if DB.sqlite_version >= 33800
+
+
+describe 'Regexp support' do
+  before do
+    @db = DB
+
+    @db.create_table(:names) do
+      primary_key :id
+      String :name
+    end
+
+    @db[:names].insert(name: 'Adam')
+    @db[:names].insert(name: 'Jane')
+    @db[:names].insert(name: 'John')
+    @db[:names].insert(name: 'Leo')
+    @db[:names].insert(name: 'Tim')
+    @db[:names].insert(name: 'Tom')
+  end
+  after do
+    @db.drop_table?(:names)
+  end
+
+  it "should support regexp" do
+    @db.must_be :allow_regexp?
+  end
+
+  it "should find by regexp" do
+    names = @db[:names].where(name: /^J/).map { |row| row[:name] }
+    names.must_include 'Jane'
+    names.must_include 'John'
+    names.wont_include 'Adam'
+  end
+
+  it "caches regexp" do
+    before = ObjectSpace.count_objects[:T_REGEXP]
+    @db[:names].where(name: /^J/)
+    after = ObjectSpace.count_objects[:T_REGEXP]
+    diff = after - before
+    diff.must_be :<=, 1
+  end if [:cached, "cached"].include? DB.opts[:setup_regexp_function]
+end if DB.adapter_scheme == :sqlite && DB.opts[:setup_regexp_function]
