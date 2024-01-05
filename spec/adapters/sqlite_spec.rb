@@ -879,43 +879,46 @@ describe 'SQLite Database' do
   end
 end if DB.sqlite_version >= 33800
 
-
+# Force a separate Database object for these tests, so SQLite regexp support is always
+# tested if testing the sqlite adapter.
 describe 'Regexp support' do
-  before do
-    @db = DB
+  def setup_db(opts)
+    db = Sequel.sqlite(opts)
 
-    @db.create_table(:names) do
+    db.create_table(:names) do
       primary_key :id
       String :name
     end
 
-    @db[:names].insert(name: 'Adam')
-    @db[:names].insert(name: 'Jane')
-    @db[:names].insert(name: 'John')
-    @db[:names].insert(name: 'Leo')
-    @db[:names].insert(name: 'Tim')
-    @db[:names].insert(name: 'Tom')
-  end
-  after do
-    @db.drop_table?(:names)
+    db[:names].insert(name: 'Adam')
+    db[:names].insert(name: 'Jane')
+    db[:names].insert(name: 'John')
+    db
   end
 
-  it "should support regexp" do
-    @db.must_be :allow_regexp?
+  it "should support setup_regexp_function: true option" do
+    db = setup_db(:setup_regexp_function=>true, :keep_reference=>false)
+    db.must_be :allow_regexp?
+    db[:names].where(name: /^J/).select_order_map(:name).must_equal %w[Jane John]
   end
 
-  it "should find by regexp" do
-    names = @db[:names].where(name: /^J/).map { |row| row[:name] }
-    names.must_include 'Jane'
-    names.must_include 'John'
-    names.wont_include 'Adam'
+  it "should support setup_regexp_function: :cached option" do
+    db = setup_db(:setup_regexp_function=>:cached, :keep_reference=>false)
+    db.must_be :allow_regexp?
+    db[:names].where(name: /^J/).select_order_map(:name).must_equal %w[Jane John]
   end
 
-  it "caches regexp" do
-    before = ObjectSpace.count_objects[:T_REGEXP]
-    @db[:names].where(name: /^J/)
-    after = ObjectSpace.count_objects[:T_REGEXP]
-    diff = after - before
-    diff.must_be :<=, 1
-  end if [:cached, "cached"].include? DB.opts[:setup_regexp_function]
-end if DB.adapter_scheme == :sqlite && DB.opts[:setup_regexp_function]
+  it "should support :regexp_function_cache option with setup_regexp_function: :cached option" do
+    cache = {}
+    db = setup_db(:setup_regexp_function=>:cached, :regexp_function_cache=>proc{cache}, :keep_reference=>false)
+    db.must_be :allow_regexp?
+    db[:names].where(name: /^J/).select_order_map(:name).must_equal %w[Jane John]
+    cache.size.must_equal 1
+  end
+
+  it "should support :regexp_function_cache option with WeakKeyMap with setup_regexp_function: :cached option" do
+    db = setup_db(:setup_regexp_function=>:cached, :regexp_function_cache=>ObjectSpace::WeakKeyMap, :keep_reference=>false)
+    db.must_be :allow_regexp?
+    db[:names].where(name: /^J/).select_order_map(:name).must_equal %w[Jane John]
+  end if RUBY_VERSION >= '3.3'
+end if DB.adapter_scheme == :sqlite

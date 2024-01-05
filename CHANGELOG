@@ -1,5 +1,9 @@
 === master
 
+* Speed up regexp matches in sqlite adapter on Ruby 2.4+ (jeremyevans)
+
+* Add sqlite adapter :regexp_function_cache option for specifying the cache object to use (paddor, jeremyevans) (#2116)
+
 * Respect list plugin :top option when inserting the first row into the model's table (johanmagnusson) (#2115)
 
 * Switch default connection pool to timed_queue on Ruby 3.4+ (jeremyevans)
