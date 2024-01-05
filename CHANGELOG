@@ -1,5 +1,7 @@
 === master
 
+* Respect list plugin :top option when inserting the first row into the model's table (johanmagnusson) (#2115)
+
 * Switch default connection pool to timed_queue on Ruby 3.4+ (jeremyevans)
 
 * Support on_duplicate_columns={raise,warn} parameter in connection URL when using duplicate_columns_handler extension (jeremyevans)
