@@ -118,6 +118,8 @@ module Sequel
       #             it will be called with a string for the regexp and a string
       #             for the value to compare, and should return whether the regexp
       #             matches.
+      # :regexp_function_cache_class :: Defaults to Hash. To avoid a potential
+      #             memory leak, pass ObjectSpace::WeakKeyMap.
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
@@ -133,7 +135,7 @@ module Sequel
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
 
         if typecast_value_boolean(opts[:setup_regexp_function])
-          setup_regexp_function(db, opts[:setup_regexp_function])
+          setup_regexp_function(db, opts[:setup_regexp_function], opts[:regexp_function_cache_class])
         end
         
         class << db
@@ -208,13 +210,22 @@ module Sequel
         set_integer_booleans
       end
 
-      def setup_regexp_function(db, how)
+      def setup_regexp_function(db, how, cache_class)
         case how
         when Proc
           # nothing
         when :cached, "cached"
-          cache = Hash.new{|h,k| h[k] = Regexp.new(k)}
-          how = lambda{|regexp_str, str| cache[regexp_str].match(str)}
+          cache_class ||= Hash
+          cache = cache_class.new
+          how = lambda do |regexp_str, str|
+            if regexp = cache[regexp_str]
+              regexp.match(str)
+            else
+              regexp = Regexp.new(regexp_str)
+              cache[regexp_str] = regexp
+              regexp.match(str)
+            end
+          end
         else
           how = lambda{|regexp_str, str| Regexp.new(regexp_str).match(str)}
         end
