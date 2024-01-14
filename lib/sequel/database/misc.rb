@@ -263,8 +263,8 @@ module Sequel
     # Proxy the literal call to the dataset.
     #
     #   DB.literal(1)   # 1
-    #   DB.literal(:a)  # a
-    #   DB.literal('a') # 'a'
+    #   DB.literal(:a)  # "a" # or `a`, [a], or a, depending on identifier quoting
+    #   DB.literal("a") # 'a'
     def literal(v)
       schema_utility_dataset.literal(v)
     end
