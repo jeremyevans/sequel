@@ -1,5 +1,7 @@
 === master
 
+* Warn by default if trying to eager_graph/association_join an association that uses a block, when the block would be ignored (jeremyevans)
+
 * Speed up validates_unique in validation_helpers plugin by using empty? instead of count == 0 (numbata) (#2122)
 
 * Speed up regexp matches in sqlite adapter on Ruby 2.4+ (jeremyevans)

@@ -1863,6 +1863,14 @@ describe Sequel::Model, "#eager_graph" do
     proc{c.eager_graph(:genres)}.must_raise Sequel::Error
   end
 
+  it "should warn when using eager_graph with association with block" do
+    c = Class.new(GraphAlbum)
+    c.many_to_many :genres, :clone=>:genres, :join_table=>Sequel[:ag].as(:ga) do |ds| ds end
+    m = nil
+    c.dataset.with_extend{define_method(:warn){|msg| m = msg}}.eager_graph(:genres)
+    m.must_include 'eager_graph used for association when association given a block without graph options.  The block is ignored in this case.  This will result in an exception starting in Sequel 6'
+  end
+
   with_symbol_splitting "should correctly handle an aliased join table symbol in many_to_many and one_through_one" do
     c = Class.new(GraphAlbum)
     c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga

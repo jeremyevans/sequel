@@ -3387,8 +3387,15 @@ module Sequel
           local_opts = ds.opts[:eager_graph][:local]
           limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
 
-          if r[:conditions] && !Sequel.condition_specifier?(r[:conditions]) && !r[:orig_opts].has_key?(:graph_conditions) && !r[:orig_opts].has_key?(:graph_only_conditions) && !r.has_key?(:graph_block)
-            raise Error, "Cannot eager_graph association when :conditions specified and not a hash or an array of pairs.  Specify :graph_conditions, :graph_only_conditions, or :graph_block for the association.  Model: #{r[:model]}, association: #{r[:name]}"
+          # SEQUEL6: remove and integrate the auto_restrict_eager_graph plugin
+          if !r[:orig_opts].has_key?(:graph_conditions) && !r[:orig_opts].has_key?(:graph_only_conditions) && !r.has_key?(:graph_block) && !r[:allow_eager_graph]
+            if r[:conditions] && !Sequel.condition_specifier?(r[:conditions])
+              raise Error, "Cannot eager_graph association when :conditions specified and not a hash or an array of pairs.  Specify :graph_conditions, :graph_only_conditions, or :graph_block for the association.  Model: #{r[:model]}, association: #{r[:name]}"
+            end
+
+            if r[:block] && !r[:graph_use_association_block]
+              warn "eager_graph used for association when association given a block without graph options.  The block is ignored in this case.  This will result in an exception starting in Sequel 6.  Model: #{r[:model]}, association: #{r[:name]}"
+            end
           end
 
           ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>join_type || local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
