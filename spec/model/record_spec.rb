@@ -1425,7 +1425,7 @@ describe Sequel::Model, "#exists?" do
     DB.sqls.must_equal ['SELECT 1 AS one FROM items WHERE (id = 1) LIMIT 1']
   end
 
-  it "should return false when #this.count == 0" do
+  it "should return false when #this.empty?" do
     @model.load(:id=>2).exists?.must_equal false
     DB.sqls.must_equal ['SELECT 1 AS one FROM items WHERE (id = 2) LIMIT 1']
   end

@@ -1244,18 +1244,21 @@ module Sequel
         @errors ||= errors_class.new
       end 
 
+      EXISTS_SELECT_ = SQL::AliasedExpression.new(1, :one)
+      private_constant :EXISTS_SELECT_
+
       # Returns true when current instance exists, false otherwise.
       # Generally an object that isn't new will exist unless it has
       # been deleted.  Uses a database query to check for existence,
       # unless the model object is new, in which case this is always
       # false.
       #
-      #   Artist[1].exists? # SELECT 1 FROM artists WHERE (id = 1)
+      #   Artist[1].exists? # SELECT 1 AS one FROM artists WHERE (id = 1)
       #   # => true
       #   Artist.new.exists?
       #   # => false
       def exists?
-        new? ? false : !this.get(SQL::AliasedExpression.new(1, :one)).nil?
+        new? ? false : !this.get(EXISTS_SELECT_).nil?
       end
       
       # Ignore the model's setter method cache when this instances extends a module, as the
