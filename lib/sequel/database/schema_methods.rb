@@ -191,6 +191,12 @@ module Sequel
     #            The +any+ type is treated like a SQLite column in a non-strict table,
     #            allowing any type of data to be stored. This option is supported on
     #            SQLite 3.37.0+.
+    # :without_rowid :: Create a WITHOUT ROWID table. Every row in SQLite has a special
+    #                   'rowid' column, that uniquely identifies that row within the table.
+    #                   If this option is used, the 'rowid' column is omitted, which can
+    #                   sometimes provide some space and speed advantages. Note that you
+    #                   must then provide an explicit primary key when you create the table.
+    #                   This option is supported on SQLite 3.8.2+.
     #
     # See <tt>Schema::CreateTableGenerator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)

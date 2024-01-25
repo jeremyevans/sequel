@@ -145,6 +145,11 @@ module Sequel
         sqlite_version >= 30608
       end
 
+      # SQLite 3.8.2+ supports the without rowid table constraint
+      def support_without_rowid?
+        sqlite_version >= 30802
+      end
+
       # Override the default setting for whether to use timezones in timestamps.
       # It is set to +false+ by default, as SQLite's date/time methods do not
       # support timezones in timestamps.
@@ -344,9 +349,17 @@ module Sequel
         ps
       end
 
-      # Support creating STRICT tables via :strict option
+      # Support creating STRICT AND/OR WITHOUT ROWID tables via :strict and :without_rowid options
       def create_table_sql(name, generator, options)
-        "#{super}#{' STRICT' if options[:strict]}"
+        if options[:strict] && options[:without_rowid]
+          "#{super} STRICT, WITHOUT ROWID"
+        elsif options[:strict]
+          "#{super} STRICT"
+        elsif options[:without_rowid]
+          "#{super} WITHOUT ROWID"
+        else
+          super
+        end
       end
 
       # SQLite support creating temporary views.

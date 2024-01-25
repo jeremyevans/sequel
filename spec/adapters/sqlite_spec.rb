@@ -774,6 +774,61 @@ describe 'SQLite STRICT tables' do
   end
 end if DB.sqlite_version >= 33700
 
+describe 'SQLite WITHOUT ROWID tables' do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table?(:without_rowid_table)
+  end
+
+  it "supports creation via :without_rowid option" do
+    @db = DB
+    @db.create_table(:without_rowid_table, :without_rowid=>true) do
+      int :id
+      primary_key [:id]
+    end
+
+    ds = @db[:without_rowid_table]
+    ds.insert(:id=>1)
+    ds.all.must_equal [{:id=>1}]
+    proc{ds.select(:rowid).all}.must_raise Sequel::DatabaseError
+  end
+end if DB.sqlite_version >= 30802
+
+describe 'SQLite STRICT and WITHOUT ROWID tables' do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table?(:strict_without_rowid_table)
+  end
+
+  it "supports creation via both :strict and :without_rowid option" do
+    @db = DB
+    @db.create_table(:strict_without_rowid_table, :strict=>true, :without_rowid=>true) do
+      int :id
+      int :a
+      integer :b
+      real :c
+      text :d
+      blob :e
+      any :f
+
+      primary_key [:id]
+    end
+    ds = @db[:strict_without_rowid_table]
+    ds.insert(:id=>1, :a=>2, :b=>3, :c=>1.2, :d=>'foo', :e=>Sequel.blob("\0\1\2\3"), :f=>'f')
+    proc{ds.select(:rowid).all}.must_raise Sequel::DatabaseError
+    ds.all.must_equal [{:id=>1, :a=>2, :b=>3, :c=>1.2, :d=>'foo', :e=>Sequel.blob("\0\1\2\3"), :f=>'f'}]
+    proc{ds.insert(:a=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:b=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:c=>'a')}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:d=>Sequel.blob("\0\1\2\3"))}.must_raise Sequel::ConstraintViolation
+    proc{ds.insert(:e=>1)}.must_raise Sequel::ConstraintViolation
+  end
+end if DB.sqlite_version >= 33700
+
 describe 'SQLite Database' do
   it 'supports operations/functions with sqlite_json_ops' do
     Sequel.extension :sqlite_json_ops
