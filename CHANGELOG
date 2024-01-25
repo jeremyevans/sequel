@@ -1,5 +1,7 @@
 === master
 
+* Support create_table :without_rowid option on SQLite (loranger32) (#2126)
+
 * Warn by default if trying to eager_graph/association_join an association that uses a block, when the block would be ignored (jeremyevans)
 
 * Speed up validates_unique in validation_helpers plugin by using empty? instead of count == 0 (numbata) (#2122)

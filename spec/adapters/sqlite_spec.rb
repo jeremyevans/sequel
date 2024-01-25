@@ -861,43 +861,83 @@ describe 'SQLite Database' do
     @db.get(jo.type('$.a')).must_equal 'integer'
     @db.get(ja.typeof('$[2][1]')).must_equal 'text'
 
-    @db.from(jo.each).all.must_equal [
-      {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>nil, :fullkey=>"$.a", :path=>"$"},
-      {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>nil, :fullkey=>"$.b", :path=>"$"}]
-    @db.from(jo.each('$.b')).all.must_equal [
-      {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>nil, :fullkey=>"$.b.c", :path=>"$.b"},
-      {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>nil, :fullkey=>"$.b.d", :path=>"$.b"}]
-    @db.from(ja.each).all.must_equal [
-      {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
-      {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>2, :parent=>nil, :fullkey=>"$[1]", :path=>"$"},
-      {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>nil, :fullkey=>"$[2]", :path=>"$"}]
-    @db.from(ja.each('$[2]')).all.must_equal [
-      {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>nil, :fullkey=>"$[2][0]", :path=>"$[2]"},
-      {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>nil, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+    if @db.sqlite_version >= 34500
+      @db.from(jo.each).all.must_equal [
+        {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>nil, :fullkey=>"$.a", :path=>"$"},
+        {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>6, :parent=>nil, :fullkey=>"$.b", :path=>"$"}]
+      @db.from(jo.each('$.b')).order(:id).all.must_equal [
+        {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>9, :parent=>nil, :fullkey=>"$.b.c", :path=>"$.b"},
+        {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>13, :parent=>nil, :fullkey=>"$.b.d", :path=>"$.b"}]
+      @db.from(ja.each).all.must_equal [
+        {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
+        {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>3, :parent=>nil, :fullkey=>"$[1]", :path=>"$"},
+        {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>5, :parent=>nil, :fullkey=>"$[2]", :path=>"$"}]
+      @db.from(ja.each('$[2]')).all.must_equal [
+        {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>6, :parent=>nil, :fullkey=>"$[2][0]", :path=>"$[2]"},
+        {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>8, :parent=>nil, :fullkey=>"$[2][1]", :path=>"$[2]"}]
 
-    @db.from(jo.tree).all.must_equal [
-      {:key=>nil, :value=>"{\"a\":1,\"b\":{\"c\":2,\"d\":{\"e\":3}}}", :type=>"object", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
-      {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>0, :fullkey=>"$.a", :path=>"$"},
-      {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>0, :fullkey=>"$.b", :path=>"$"},
-      {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>4, :fullkey=>"$.b.c", :path=>"$.b"},
-      {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>4, :fullkey=>"$.b.d", :path=>"$.b"},
-      {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>10, :parent=>8, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
-    @db.from(jo.tree('$.b')).all.must_equal [
-      {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>nil, :fullkey=>"$.b", :path=>"$"},
-      {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>4, :fullkey=>"$.b.c", :path=>"$.b"},
-      {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>4, :fullkey=>"$.b.d", :path=>"$.b"},
-      {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>10, :parent=>8, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
-    @db.from(ja.tree).all.must_equal [
-      {:key=>nil, :value=>"[2,3,[\"a\",\"b\"]]", :type=>"array", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
-      {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>0, :fullkey=>"$[0]", :path=>"$"},
-      {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>2, :parent=>0, :fullkey=>"$[1]", :path=>"$"},
-      {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>0, :fullkey=>"$[2]", :path=>"$"},
-      {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>3, :fullkey=>"$[2][0]", :path=>"$[2]"},
-      {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>3, :fullkey=>"$[2][1]", :path=>"$[2]"}]
-    @db.from(ja.tree('$[2]')).all.must_equal [
-      {:key=>nil, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
-      {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>3, :fullkey=>"$[0][0]", :path=>"$[0]"},
-      {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>3, :fullkey=>"$[0][1]", :path=>"$[0]"}]
+      @db.from(jo.tree).all.must_equal [
+        {:key=>nil, :value=>"{\"a\":1,\"b\":{\"c\":2,\"d\":{\"e\":3}}}", :type=>"object", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
+        {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>0, :fullkey=>"$.a", :path=>"$"},
+        {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>6, :parent=>0, :fullkey=>"$.b", :path=>"$"},
+        {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>9, :parent=>6, :fullkey=>"$.b.c", :path=>"$.b"},
+        {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>13, :parent=>6, :fullkey=>"$.b.d", :path=>"$.b"},
+        {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>16, :parent=>13, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
+      @db.from(jo.tree('$.b')).all.must_equal [
+        {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>6, :parent=>nil, :fullkey=>"$.b", :path=>"$"},
+        {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>9, :parent=>6, :fullkey=>"$.b.c", :path=>"$.b"},
+        {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>13, :parent=>6, :fullkey=>"$.b.d", :path=>"$.b"},
+        {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>16, :parent=>13, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
+      @db.from(ja.tree).all.must_equal [
+        {:key=>nil, :value=>"[2,3,[\"a\",\"b\"]]", :type=>"array", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
+        {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>0, :fullkey=>"$[0]", :path=>"$"},
+        {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>3, :parent=>0, :fullkey=>"$[1]", :path=>"$"},
+        {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>5, :parent=>0, :fullkey=>"$[2]", :path=>"$"},
+        {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>6, :parent=>5, :fullkey=>"$[2][0]", :path=>"$[2]"},
+        {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>8, :parent=>5, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+      @db.from(ja.tree('$[2]')).order(:id).all.must_equal [
+        {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>5, :parent=>nil, :fullkey=>"$[2]", :path=>"$"},
+        {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>6, :parent=>5, :fullkey=>"$[2][0]", :path=>"$[2]"},
+        {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>8, :parent=>5, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+    else
+      @db.from(jo.each).all.must_equal [
+        {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>nil, :fullkey=>"$.a", :path=>"$"},
+        {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>nil, :fullkey=>"$.b", :path=>"$"}]
+      @db.from(jo.each('$.b')).all.must_equal [
+        {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>nil, :fullkey=>"$.b.c", :path=>"$.b"},
+        {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>nil, :fullkey=>"$.b.d", :path=>"$.b"}]
+      @db.from(ja.each).all.must_equal [
+        {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
+        {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>2, :parent=>nil, :fullkey=>"$[1]", :path=>"$"},
+        {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>nil, :fullkey=>"$[2]", :path=>"$"}]
+      @db.from(ja.each('$[2]')).all.must_equal [
+        {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>nil, :fullkey=>"$[2][0]", :path=>"$[2]"},
+        {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>nil, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+
+      @db.from(jo.tree).all.must_equal [
+        {:key=>nil, :value=>"{\"a\":1,\"b\":{\"c\":2,\"d\":{\"e\":3}}}", :type=>"object", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
+        {:key=>"a", :value=>1, :type=>"integer", :atom=>1, :id=>2, :parent=>0, :fullkey=>"$.a", :path=>"$"},
+        {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>0, :fullkey=>"$.b", :path=>"$"},
+        {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>4, :fullkey=>"$.b.c", :path=>"$.b"},
+        {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>4, :fullkey=>"$.b.d", :path=>"$.b"},
+        {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>10, :parent=>8, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
+      @db.from(jo.tree('$.b')).all.must_equal [
+        {:key=>"b", :value=>"{\"c\":2,\"d\":{\"e\":3}}", :type=>"object", :atom=>nil, :id=>4, :parent=>nil, :fullkey=>"$.b", :path=>"$"},
+        {:key=>"c", :value=>2, :type=>"integer", :atom=>2, :id=>6, :parent=>4, :fullkey=>"$.b.c", :path=>"$.b"},
+        {:key=>"d", :value=>"{\"e\":3}", :type=>"object", :atom=>nil, :id=>8, :parent=>4, :fullkey=>"$.b.d", :path=>"$.b"},
+        {:key=>"e", :value=>3, :type=>"integer", :atom=>3, :id=>10, :parent=>8, :fullkey=>"$.b.d.e", :path=>"$.b.d"}]
+      @db.from(ja.tree).all.must_equal [
+        {:key=>nil, :value=>"[2,3,[\"a\",\"b\"]]", :type=>"array", :atom=>nil, :id=>0, :parent=>nil, :fullkey=>"$", :path=>"$"},
+        {:key=>0, :value=>2, :type=>"integer", :atom=>2, :id=>1, :parent=>0, :fullkey=>"$[0]", :path=>"$"},
+        {:key=>1, :value=>3, :type=>"integer", :atom=>3, :id=>2, :parent=>0, :fullkey=>"$[1]", :path=>"$"},
+        {:key=>2, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>0, :fullkey=>"$[2]", :path=>"$"},
+        {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>3, :fullkey=>"$[2][0]", :path=>"$[2]"},
+        {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>3, :fullkey=>"$[2][1]", :path=>"$[2]"}]
+      @db.from(ja.tree('$[2]')).all.must_equal [
+        {:key=>nil, :value=>"[\"a\",\"b\"]", :type=>"array", :atom=>nil, :id=>3, :parent=>nil, :fullkey=>"$[0]", :path=>"$"},
+        {:key=>0, :value=>"a", :type=>"text", :atom=>"a", :id=>4, :parent=>3, :fullkey=>"$[0][0]", :path=>"$[0]"},
+        {:key=>1, :value=>"b", :type=>"text", :atom=>"b", :id=>5, :parent=>3, :fullkey=>"$[0][1]", :path=>"$[0]"}]
+    end
 
     @db.get(jo.json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
     @db.get(ja.minify).must_equal '[2,3,["a","b"]]'
