@@ -10,15 +10,16 @@ describe "transaction_connection_validator extension" do
       def disconnect_connection(conn)
         @sqls << 'disconnect'
       end
+      def connect(server)
+        @sqls << 'connect'
+        super
+      end
+      private
       define_method(:database_error_classes) do
         [database_error]
       end
       def disconnect_error?(e, opts)
         e.message.include? 'disconnect'
-      end
-      def connect(server)
-        @sqls << 'connect'
-        super
       end
       def log_connection_execute(conn, sql)
         res = super
