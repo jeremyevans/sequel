@@ -31,7 +31,7 @@ lib/sequel/extensions/duplicate_columns_handler.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-09-02 09:11:30 -0700</span>
+<span class='datetime'>2024-01-04 11:10:16 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -51,11 +51,11 @@ Last Update:
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)
 </pre>
 
-<p>A database option is introduced: :on_duplicate_columns. It accepts a <a href="../../../../classes/Symbol.html"><code>Symbol</code></a> or any object that responds to :call.</p>
+<p>If the Database option :on_duplicate_columns is set, it configures how this extension works. The value should be # or any object that responds to :call.</p>
 
-<pre>on_duplicate_columns: :raise
-on_duplicate_columns: :warn
-on_duplicate_columns: :ignore
+<pre>on_duplicate_columns: :raise # or &#39;raise&#39;
+on_duplicate_columns: :warn # or &#39;warn&#39;
+on_duplicate_columns: :ignore # or anything unrecognized
 on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</pre>
 
 <p>You may also configure duplicate columns handling for a specific dataset:</p>
@@ -67,7 +67,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>})
 </pre>
 
-<p>If :raise is specified, a <a href="../../../../classes/Sequel/DuplicateColumnError.html"><code>Sequel::DuplicateColumnError</code></a> is raised. If :warn is specified, you will receive a warning via <code>warn</code>. If a callable is specified, it will be called. If no on_duplicate_columns is specified, the default is :warn.</p>
+<p>If :raise or ‘raise’ is specified, a <a href="../../../../classes/Sequel/DuplicateColumnError.html"><code>Sequel::DuplicateColumnError</code></a> is raised. If :warn or ‘warn’ is specified, you will receive a warning via <code>warn</code>. If a callable is specified, it will be called. For other values, duplicate columns are ignored (Sequel’s default behavior) If no on_duplicate_columns is specified, the default is :warn.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/DuplicateColumnsHandler.html"><code>Sequel::DuplicateColumnsHandler</code></a></p>
 </div>

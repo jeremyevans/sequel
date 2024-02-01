@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.77.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.77.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.77.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-02-01 08:27:41 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A transaction_connection_validator extension has been added.  This extension allows for transparently switching to a new connection if a disconnect error is raised while trying to start a transaction, as long as a connection was not already checked out from the pool when the transaction method was called.  Transparent reconnection is safe in this case, since no user code is retried.</p>
+
+<p>This extension can have lower overhead than the connection_validator extension if that is configured to check for validity more often than the default of one hour.  However, it only handles cases where transactions are used.  It can detect disconnects that would not be detected by default with the connection_validator extension, since that extension defaults to only checking validity if the connection has not been used in the last hour.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports a create_table :without_rowid option on SQLite, to create a table WITHOUT ROWID, for better performance in some cases. Users are encouraged to read the SQLite documentation on WITHOUT ROWID before using this option.</p>
+</li><li>
+<p>The sqlite adapter now supports a :regexp_function_cache option, if the :setup_regexp_function option is set to :cached.  The :regexp_function_cache option should be a Proc (returning a cache object to use), or a class.  It’s possible to use ObjectSpace::WeakKeyMap as the value of the option on Ruby 3.3+ to avoid the memory leaks that are possible when using :setup_regexp_function option :cached value with dynamic regexps.</p>
+</li><li>
+<p>The duplicate_columns_handler extension now supports specifying the on_duplicate_columns option as a connection string parameter.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The list plugin now honors the :top option for the position when adding the first item to the list, instead of always using 1.</p>
+</li><li>
+<p>Regexp matches on SQLite are now faster on Ruby 2.4+, using Regexp#match?.</p>
+</li><li>
+<p>The uniqueness validation in the validation_helpers plugin now uses empty? instead of count == 0, for better performance.</p>
+</li><li>
+<p>On Ruby 3.4+, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses the timed_queue connection pool instead of the threaded connection pool by default.  This should make it so no existing applications are affected by the default switch. This should hopefully allow ample testing of the timed_queue connection pool.  At some point in the future, if no problems are repoted, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will likely switch to using the timed_queue connection pool by default on Ruby 3.2+.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now warns by default if using eager_graph/association_join with an association that uses a block, in the cases where the block would be ignored and there are no appropriate graph options set. In <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6, this warning will be turned into an exception. It is recommended that users use the auto_restrict_eager_graph plugin to turn this into an exception now, or use the :graph_use_association_block option so that the block is not ignored when graphing.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

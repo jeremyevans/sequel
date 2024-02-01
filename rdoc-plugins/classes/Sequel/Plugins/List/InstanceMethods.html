@@ -113,7 +113,7 @@ Sequel::Plugins::List::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Set the value of the position_field to the maximum value plus 1 unless the position field already has a value.</p>
+<p>Set the value of the position_field to the maximum value plus 1 unless the position field already has a value. If the list is empty, the position will be set to the model’s <code>top_of_list</code> value.</p>
 
 </div>
 <div class='source'>
@@ -121,12 +121,14 @@ Sequel::Plugins::List::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>
-<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
-<span class="line-num">190</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)
-<span class="line-num">191</span>     <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span><span class="ruby-value">+1</span>)
-<span class="line-num">192</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">193</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">190</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
+<span class="line-num">191</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)
+<span class="line-num">192</span>     <span class="ruby-identifier">current_max</span> = <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>)
+<span class="line-num">193</span>     <span class="ruby-identifier">value</span> = <span class="ruby-identifier">current_max</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">current_max</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
+<span class="line-num">194</span>     <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">value</span>)
+<span class="line-num">195</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">196</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-last_position'>

@@ -1,4 +1,4 @@
-Mon, 01 Jan 2024 08:59:59 -0800
+Thu, 01 Feb 2024 08:36:33 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -21,7 +21,7 @@ lib/sequel/extensions/dataset_source_alias.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/date_arithmetic.rb	Fri, 21 Oct 2022 08:19:04 -0700
 lib/sequel/extensions/date_parse_input_handler.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/extensions/datetime_parse_to_time.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/extensions/duplicate_columns_handler.rb	Fri, 02 Sep 2022 09:11:30 -0700
+lib/sequel/extensions/duplicate_columns_handler.rb	Thu, 04 Jan 2024 11:10:16 -0800
 lib/sequel/extensions/empty_array_consider_nulls.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/error_sql.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/extensions/escaped_like.rb	Fri, 25 May 2018 14:49:16 -0700
@@ -92,6 +92,7 @@ lib/sequel/extensions/symbol_as_refinement.rb	Thu, 09 Jul 2020 12:21:33 -0700
 lib/sequel/extensions/synchronize_sql.rb	Mon, 27 Nov 2017 08:19:40 -0800
 lib/sequel/extensions/thread_local_timezones.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/to_dot.rb	Thu, 09 Jul 2020 12:21:33 -0700
+lib/sequel/extensions/transaction_connection_validator.rb	Wed, 03 Jan 2024 16:27:02 -0800
 lib/sequel/extensions/virtual_row_method_block.rb	Wed, 05 Apr 2017 14:25:55 -0700
 lib/sequel/plugins/accessed_columns.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/active_model.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -142,7 +143,7 @@ lib/sequel/plugins/instance_specific_default.rb	Wed, 13 Apr 2022 08:45:21 -0700
 lib/sequel/plugins/inverted_subsets.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/json_serializer.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/plugins/lazy_attributes.rb	Mon, 01 Nov 2021 09:23:49 -0700
-lib/sequel/plugins/list.rb	Fri, 22 Jul 2022 11:48:42 -0700
+lib/sequel/plugins/list.rb	Fri, 05 Jan 2024 07:59:37 -0800
 lib/sequel/plugins/many_through_many.rb	Mon, 12 Dec 2022 21:25:25 -0800
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
@@ -189,7 +190,7 @@ lib/sequel/plugins/uuid.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/validate_associated.rb	Tue, 22 Nov 2022 13:41:23 -0800
 lib/sequel/plugins/validation_class_methods.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/plugins/validation_contexts.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/validation_helpers.rb	Mon, 24 Apr 2023 13:12:45 -0700
+lib/sequel/plugins/validation_helpers.rb	Fri, 19 Jan 2024 09:09:26 -0800
 lib/sequel/plugins/validation_helpers_generic_type_messages.rb	Mon, 24 Apr 2023 13:12:45 -0700
 lib/sequel/plugins/whitelist_security.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/xml_serializer.rb	Tue, 21 Sep 2021 14:24:30 -0700

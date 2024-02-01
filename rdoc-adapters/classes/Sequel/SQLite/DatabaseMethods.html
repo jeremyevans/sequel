@@ -50,6 +50,7 @@ Sequel::SQLite::DatabaseMethods
 <li><a href="#attribute-i-integer_booleans">integer_booleans</a></li>
 <li><a href="#method-i-set_integer_booleans">set_integer_booleans</a></li>
 <li><a href="#method-i-sqlite_version">sqlite_version</a></li>
+<li><a href="#method-i-support_without_rowid-3F">support_without_rowid?</a></li>
 <li><a href="#method-i-supports_create_table_if_not_exists-3F">supports_create_table_if_not_exists?</a></li>
 <li><a href="#method-i-supports_deferrable_foreign_key_constraints-3F">supports_deferrable_foreign_key_constraints?</a></li>
 <li><a href="#method-i-supports_partial_indexes-3F">supports_partial_indexes?</a></li>
@@ -337,6 +338,27 @@ nil => "BEGIN".freeze
 <span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-support_without_rowid-3F'>
+<a name='method-i-support_without_rowid-3F'></a>
+<div class='synopsis'>
+<span class='name'>support_without_rowid?</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../SQLite.html"><code>SQLite</code></a> 3.8.2+ supports the without rowid table constraint</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-support_without_rowid-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-support_without_rowid-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
+<span class="line-num">149</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">support_without_rowid?</span>
+<span class="line-num">150</span>   <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30802</span>
+<span class="line-num">151</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>
 <a name='method-i-supports_create_table_if_not_exists-3F'></a>
 <div class='synopsis'>
@@ -442,9 +464,9 @@ nil => "BEGIN".freeze
 [show source]
 </a>
 <pre id='method-i-tables-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">164</span>   <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;sqlite_sequence&#39;</span>) <span class="ruby-operator">&amp;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;table&#39;</span>}, <span class="ruby-identifier">opts</span>)
-<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">169</span>   <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;sqlite_sequence&#39;</span>) <span class="ruby-operator">&amp;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;table&#39;</span>}, <span class="ruby-identifier">opts</span>)
+<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-transaction_mode-3D'>
@@ -488,9 +510,9 @@ nil => "BEGIN".freeze
 [show source]
 </a>
 <pre id='method-i-use_timestamp_timezones-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">155</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use_timestamp_timezones?</span>
-<span class="line-num">156</span>   <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@use_timestamp_timezones</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@use_timestamp_timezones</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@use_timestamp_timezones</span> = <span class="ruby-keyword">false</span>)
-<span class="line-num">157</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">160</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use_timestamp_timezones?</span>
+<span class="line-num">161</span>   <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@use_timestamp_timezones</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@use_timestamp_timezones</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@use_timestamp_timezones</span> = <span class="ruby-keyword">false</span>)
+<span class="line-num">162</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-values'>
@@ -513,10 +535,10 @@ nil => "BEGIN".freeze
 [show source]
 </a>
 <pre id='method-i-values-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">172</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide an empty array for values&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">173</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
-<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">176</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">177</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide an empty array for values&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">178</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
+<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-views'>
@@ -540,9 +562,9 @@ nil => "BEGIN".freeze
 [show source]
 </a>
 <pre id='method-i-views-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>
-<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">181</span>   <span class="ruby-identifier">tables_and_views</span>({<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;view&#39;</span>}, <span class="ruby-identifier">opts</span>)
-<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">186</span>   <span class="ruby-identifier">tables_and_views</span>({<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&#39;view&#39;</span>}, <span class="ruby-identifier">opts</span>)
+<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

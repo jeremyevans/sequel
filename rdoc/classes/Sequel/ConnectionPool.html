@@ -167,13 +167,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
-<span class="line-num">111</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>) <span class="ruby-comment"># SEQUEL6: Remove second argument, always use db.opts</span>
-<span class="line-num">112</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
-<span class="line-num">113</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">114</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>] <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">115</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>] <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">116</span>   <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">117</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">113</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>) <span class="ruby-comment"># SEQUEL6: Remove second argument, always use db.opts</span>
+<span class="line-num">114</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
+<span class="line-num">115</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">116</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>] <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">117</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>] <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">118</span>   <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -193,10 +193,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-after_connect-3D-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
-<span class="line-num">92</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_connect=</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">93</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">94</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">94</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_connect=</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">95</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">96</span>   <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">97</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-connect_sqls-3D'>
@@ -215,10 +215,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-connect_sqls-3D-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
-<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect_sqls=</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># SEQUEL6: Remove</span>
-<span class="line-num">103</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">104</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">105</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">104</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect_sqls=</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># SEQUEL6: Remove</span>
+<span class="line-num">105</span>   <span class="ruby-ivar">@use_old_connect_api</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">106</span>   <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-servers'>
@@ -237,9 +237,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-servers-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>
-<span class="line-num">120</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>
-<span class="line-num">121</span>   [<span class="ruby-value">:default</span>]
-<span class="line-num">122</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">122</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>
+<span class="line-num">123</span>   [<span class="ruby-value">:default</span>]
+<span class="line-num">124</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

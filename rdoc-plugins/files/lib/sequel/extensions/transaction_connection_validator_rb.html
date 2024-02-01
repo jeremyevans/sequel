@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>transaction_connection_validator.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>transaction_connection_validator.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/transaction_connection_validator.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-01-03 16:27:02 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The transaction_connection_validator extension automatically retries a transaction on a connection if an disconnect error is raised when sending the statement to begin a new transaction, as long as the user has not already checked out a connection.  This is safe to do because no other queries have been issued on the connection, and no user-level code is run before retrying.</p>
+
+<p>This approach to connection validation can be significantly lower overhead than the connection_validator extension, though it does not handle all cases handled by the connection_validator extension.  However, it performs the validation checks on every new transaction, so it will automatically handle disconnected connections in some cases where the connection_validator extension will not by default (as the connection_validator extension only checks connections if they have not been used in the last hour by default).</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/TransactionConnectionValidator.html"><code>Sequel::TransactionConnectionValidator</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

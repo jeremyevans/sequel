@@ -520,7 +520,7 @@ Sequel::Plugins::ValidationHelpers::InstanceMethods
 <span class="line-num">295</span>       <span class="ruby-identifier">h</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">joined_dataset?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">qualified_pk_hash</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk_hash</span>
 <span class="line-num">296</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">h</span>)
 <span class="line-num">297</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">298</span>     <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">message</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+<span class="line-num">298</span>     <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">message</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">empty?</span>
 <span class="line-num">299</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">300</span> <span class="ruby-keyword">end</span></pre>
 </div>

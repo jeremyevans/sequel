@@ -70,11 +70,11 @@ Sequel::SQLite::Dataset::ArgumentMapper
 [show source]
 </a>
 <pre id='method-i-map_to_prepared_args-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
-<span class="line-num">344</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)
-<span class="line-num">345</span>   <span class="ruby-identifier">args</span> = {}
-<span class="line-num">346</span>   <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)] = <span class="ruby-identifier">v</span>}
-<span class="line-num">347</span>   <span class="ruby-identifier">args</span>
-<span class="line-num">348</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">362</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)
+<span class="line-num">363</span>   <span class="ruby-identifier">args</span> = {}
+<span class="line-num">364</span>   <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)] = <span class="ruby-identifier">v</span>}
+<span class="line-num">365</span>   <span class="ruby-identifier">args</span>
+<span class="line-num">366</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
