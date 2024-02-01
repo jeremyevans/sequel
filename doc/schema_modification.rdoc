@@ -81,8 +81,8 @@ appropriate 64-bit integer type for the database you are using.
 
 === Column options
 
-When using the type name as method, the third argument is an options hash, and when using the +column+
-method, the fourth argument is the options hash.  The following options are supported:
+When using the type name as method, the second argument is an options hash, and when using the +column+
+method, the third argument is the options hash.  The following options are supported:
 
 :default :: The default value for the column.
 :index :: Create an index on this column. If given a hash, use the hash as the
