@@ -1,4 +1,4 @@
-=== master
+=== 5.77.0 (2024-02-01)
 
 * Support create_table :without_rowid option on SQLite (loranger32) (#2126)
 
