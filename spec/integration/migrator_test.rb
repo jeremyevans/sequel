@@ -19,6 +19,18 @@ describe Sequel::Migrator do
     [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
     @db[:schema_info].get(:version).must_equal 0
   end
+
+  if DB.respond_to?(:with_advisory_lock)
+    it "should be able to migrate up and down all the way successfully with :use_advisory_lock option" do
+      @dir = 'spec/files/integer_migrations'
+      @m.run(@db, @dir, :use_advisory_lock=>true)
+      [:schema_info, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+      @db[:schema_info].get(:version).must_equal 3
+      @m.run(@db, @dir, :target=>0, :use_advisory_lock=>true)
+      [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+      @db[:schema_info].get(:version).must_equal 0
+    end
+  end
   
   it "should be able to migrate up and down to specific versions successfully" do
     @dir = 'spec/files/integer_migrations'

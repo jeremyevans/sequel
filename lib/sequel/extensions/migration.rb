@@ -403,6 +403,11 @@ module Sequel
       migrator_class(directory).new(db, directory, opts).is_current?
     end
 
+    # Lock ID to use for advisory locks when running migrations
+    # "sequel-migration".codepoints.reduce(:*) % (2**63)
+    MIGRATION_ADVISORY_LOCK_ID = 4966325471869609408
+    private_constant :MIGRATION_ADVISORY_LOCK_ID
+
     # Migrates the supplied database using the migration files in the specified directory. Options:
     # :allow_missing_migration_files :: Don't raise an error if there are missing migration files.
     #                                   It is very risky to use this option, since it can result in
@@ -416,6 +421,8 @@ module Sequel
     # :table :: The table containing the schema version (default: :schema_info for integer migrations and
     #           :schema_migrations for timestamped migrations).
     # :target :: The target version to which to migrate.  If not given, migrates to the maximum version.
+    # :use_advisory_lock :: Use advisory locks in migrations (only use this if Sequel supports advisory
+    #                       locks for the database).
     #
     # Examples: 
     #   Sequel::Migrator.run(DB, "migrations")
@@ -423,7 +430,11 @@ module Sequel
     #   Sequel::Migrator.run(DB, "app1/migrations", column: :app2_version)
     #   Sequel::Migrator.run(DB, "app2/migrations", column: :app2_version, table: :schema_info2)
     def self.run(db, directory, opts=OPTS)
-      migrator_class(directory).new(db, directory, opts).run
+      if opts[:use_advisory_lock]
+        db.with_advisory_lock(MIGRATION_ADVISORY_LOCK_ID){run(db, directory, opts.merge(:use_advisory_lock=>false))}
+      else
+        migrator_class(directory).new(db, directory, opts).run
+      end
     end
 
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator

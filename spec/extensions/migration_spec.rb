@@ -336,6 +336,27 @@ describe "Sequel::Migrator.migrator_class" do
   end
 end
 
+describe "Sequel::Migrator.run" do
+  before do
+    @db = Sequel.mock
+  end
+
+  it "should use with_advisory_lock on database if :use_advisory_lock option is given" do
+    @db.define_singleton_method(:with_advisory_lock){|lock_id, &block| execute("get-lock(#{lock_id})"); block.call; execute("release-lock(#{lock_id})")}
+    Sequel::Migrator.run(@db, "spec/files/integer_migrations", :use_advisory_lock=>true)
+    @db.sqls.values_at(0, 1, -2, -1).must_equal [
+      "get-lock(4966325471869609408)",
+      "SELECT NULL AS nil FROM schema_info LIMIT 1",
+      "UPDATE schema_info SET version = 3",
+      "release-lock(4966325471869609408)"
+    ]
+  end
+
+  it "should raise NoMethodError if with_advisory_lock is not supported on database and :use_advisory_lock option is given" do
+    proc{Sequel::Migrator.run(@db, "spec/files/integer_migrations", :use_advisory_lock=>true)}.must_raise NoMethodError
+  end
+end
+
 describe "Sequel::IntegerMigrator" do
   before do
     dbc = Class.new(Sequel::Mock::Database) do

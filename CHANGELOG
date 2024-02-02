@@ -1,5 +1,7 @@
 === master
 
+* Support :use_advisory_lock option to Migrator.run to use advisory locks when running migrations (jeremyevans) (#2089)
+
 * Support Database#with_advisory_lock on PostgreSQL, MySQL, and Microsoft SQL Server (jeremyevans) (#2089)
 
 === 5.77.0 (2024-02-01)
