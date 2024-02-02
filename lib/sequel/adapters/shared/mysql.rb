@@ -197,6 +197,41 @@ module Sequel
         renames.each{|from,| remove_cached_schema(from)}
       end
       
+      # Attempt to acquire an exclusive advisory lock with the given lock_id (which will be
+      # converted to a string).  If successful, yield to the block, then release the advisory lock
+      # when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.
+      #
+      #   DB.with_advisory_lock(1357){DB.get(1)}
+      #   # SELECT GET_LOCK('1357', 0) LIMIT 1
+      #   # SELECT 1 AS v LIMIT 1
+      #   # SELECT RELEASE_LOCK('1357') LIMIT 1
+      #
+      # Options:
+      # :wait :: Do not raise an error, instead, wait until the advisory lock can be acquired.
+      def with_advisory_lock(lock_id, opts=OPTS)
+        lock_id = lock_id.to_s
+        ds = dataset
+        if server = opts[:server]
+          ds = ds.server(server)
+        end
+
+        # MariaDB doesn't support negative values for infinite wait.  A wait of 34 years
+        # should be reasonably similar to infinity for this case.
+        timeout = opts[:wait] ? 1073741823 : 0
+      
+        synchronize(server) do |c|
+          begin
+            unless locked = ds.get{GET_LOCK(lock_id, timeout)} == 1
+              raise AdvisoryLockError, "unable to acquire advisory lock #{lock_id.inspect}"
+            end
+
+            yield
+          ensure
+            ds.get{RELEASE_LOCK(lock_id)} if locked
+          end
+        end
+      end
+
       private
       
       def alter_table_add_column_sql(table, op)

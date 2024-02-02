@@ -859,6 +859,41 @@ module Sequel
         pg_class_relname(relkind, opts)
       end
 
+      # Attempt to acquire an exclusive advisory lock with the given lock_id (which should be
+      # a 64-bit integer).  If successful, yield to the block, then release the advisory lock
+      # when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.
+      #
+      #   DB.with_advisory_lock(1347){DB.get(1)}
+      #   # SELECT pg_try_advisory_lock(1357) LIMIT 1
+      #   # SELECT 1 AS v LIMIT 1
+      #   # SELECT pg_advisory_unlock(1357) LIMIT 1
+      #
+      # Options:
+      # :wait :: Do not raise an error, instead, wait until the advisory lock can be acquired.
+      def with_advisory_lock(lock_id, opts=OPTS)
+        ds = dataset
+        if server = opts[:server]
+          ds = ds.server(server)
+        end
+      
+        synchronize(server) do |c|
+          begin
+            if opts[:wait]
+              ds.get{pg_advisory_lock(lock_id)}
+              locked = true
+            else
+              unless locked = ds.get{pg_try_advisory_lock(lock_id)}
+                raise AdvisoryLockError, "unable to acquire advisory lock #{lock_id.inspect}"
+              end
+            end
+
+            yield
+          ensure
+            ds.get{pg_advisory_unlock(lock_id)} if locked
+          end
+        end
+      end
+
       private
 
       # Dataset used to retrieve CHECK constraint information

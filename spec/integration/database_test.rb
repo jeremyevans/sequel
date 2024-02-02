@@ -20,6 +20,46 @@ describe Sequel::Database do
     @db.drop_table?(:items)
   end
 
+  if DB.respond_to?(:with_advisory_lock)
+    lock_id = 1357
+
+    it "#with_advisory_lock should raise if it cannot acquire a lock" do
+      e = nil
+      o = Object.new
+      DB.with_advisory_lock(lock_id) do
+        Thread.new do
+          begin
+            DB.with_advisory_lock(lock_id)
+          rescue Sequel::AdvisoryLockError => e
+          end
+        end.join
+        e.must_be_kind_of Sequel::AdvisoryLockError
+        o
+      end.must_equal o
+    end
+
+    it "#with_advisory_lock with :wait option should wait until an advisory lock is acquired" do
+      q = Queue.new
+      q2 = Queue.new
+      t = Thread.new do
+        q2.pop
+        q.push nil
+        DB.with_advisory_lock(lock_id, wait: true) do
+          q.push 1
+        end
+      end
+      DB.with_advisory_lock(lock_id) do
+        q2.push(nil)
+        q.pop
+        # Not guaranteed the wait: true call above is called before
+        # the block exits, but Thread.pass makes it more likely
+        Thread.pass
+      end
+      t.join
+      q.pop.must_equal 1
+    end
+  end
+
   it "should raise Sequel::DatabaseError on invalid SQL" do
     proc{@db << "S"}.must_raise(Sequel::DatabaseError)
   end

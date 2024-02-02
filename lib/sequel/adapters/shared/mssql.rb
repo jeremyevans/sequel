@@ -32,7 +32,7 @@ module Sequel
       #
       # Options:
       # :args :: Arguments to stored procedure.  For named arguments, this should be a
-      #          hash keyed by argument named.  For unnamed arguments, this should be an
+      #          hash keyed by argument name.  For unnamed arguments, this should be an
       #          array.  Output parameters to the function are specified using :output.
       #          You can also name output parameters and provide a type by using an
       #          array containing :output, the type name, and the parameter name.
@@ -246,6 +246,34 @@ module Sequel
         information_schema_tables('VIEW', opts)
       end
       
+      # Attempt to acquire an exclusive advisory lock with the given lock_id (which will
+      # be converted to a string). If successful, yield to the block, then release the advisory lock
+      # when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.
+      #
+      # Options:
+      # :wait :: Do not raise an error, instead, wait until the advisory lock can be acquired.
+      def with_advisory_lock(lock_id, opts=OPTS)
+        lock_id = lock_id.to_s
+        timeout = opts[:wait] ? -1 : 0
+        server = opts[:server]
+      
+        synchronize(server) do
+          begin
+            res = call_mssql_sproc(:sp_getapplock, :server=>server, :args=>{'Resource'=>lock_id, 'LockTimeout'=>timeout, 'LockMode'=>'Exclusive', 'LockOwner'=>'Session'})
+
+            unless locked = res[:result] >= 0
+                raise AdvisoryLockError, "unable to acquire advisory lock #{lock_id.inspect}"
+            end
+
+            yield
+          ensure
+            if locked
+              call_mssql_sproc(:sp_releaseapplock, :server=>server, :args=>{'Resource'=>lock_id, 'LockOwner'=>'Session'})
+            end
+          end
+        end
+      end
+
       private
       
       # Add CLUSTERED or NONCLUSTERED as needed

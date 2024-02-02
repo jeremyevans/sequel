@@ -18,6 +18,11 @@ module Sequel
       end
     end
   end  
+
+  (
+  # Error raised when there is a failed attempt to acquire an advisory lock.
+  AdvisoryLockError = Class.new(Error)
+  ).name
     
   (
   # Error raised when the adapter requested doesn't exist or can't be loaded.
