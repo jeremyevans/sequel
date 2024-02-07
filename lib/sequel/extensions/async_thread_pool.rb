@@ -176,6 +176,13 @@
 # +:preempt_async_thread+ Database option before loading the
 # async_thread_pool extension.
 #
+# Note that the async_thread_pool extension creates the thread pool
+# when it is loaded into the Database.  If you fork after loading
+# the extension, the extension will not work, as fork does not
+# copy the thread pools.  If you are using a forking webserver
+# (or any other system that forks worker processes), load this
+# extension in each child process, do not load it before forking.
+#
 # Related module: Sequel::Database::AsyncThreadPool::DatasetMethods
 
 
