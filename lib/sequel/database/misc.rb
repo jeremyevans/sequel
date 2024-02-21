@@ -149,6 +149,7 @@ module Sequel
       @schemas = {}
       @prepared_statements = {}
       @transactions = {}
+      @transactions.compare_by_identity
       @symbol_literal_cache = {}
 
       @timezone = nil
