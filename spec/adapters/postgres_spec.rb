@@ -950,6 +950,10 @@ describe "A PostgreSQL database" do
     @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
   end
 
+  it "should support compounds with VALUES" do
+    @db.values([[1, 2]]).union(@db.values([[3, 4]])).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
+  end
+
   it "#values should error if given an empty array" do
     proc{@db.values([])}.must_raise(Sequel::Error)
   end
