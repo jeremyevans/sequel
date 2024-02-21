@@ -424,6 +424,12 @@ describe "Sequel Mock Adapter" do
     db.sqls.must_equal ['BEGIN', 'BEGIN -- "test"', 'SELECT * FROM a', 'SELECT * FROM t -- "test"', 'COMMIT -- "test"', 'COMMIT']
   end
 
+  it "should correctly handle with_advisory_lock when sharding" do
+    db = Sequel.mock(:host=>'postgres', :servers=>{:test=>{}, 'test'=>{}}, :fetch=>{:v=>true})
+    db.with_advisory_lock(1234, server: :test){}
+    db.sqls.must_equal ['SELECT pg_try_advisory_lock(1234) LIMIT 1 -- test', 'SELECT pg_advisory_unlock(1234) LIMIT 1 -- test']
+  end
+
   it "should yield a mock connection object from synchronize" do
     c = Sequel.mock.synchronize{|conn| conn}
     c.must_be_kind_of(Sequel::Mock::Connection)
