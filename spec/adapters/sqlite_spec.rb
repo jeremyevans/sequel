@@ -971,6 +971,47 @@ describe 'SQLite Database' do
 
     @db.get(jo.valid).must_equal 1
     @db.get(ja.valid).must_equal 1
+
+    if @db.sqlite_version >= 34500
+      direct_jo = Sequel.sqlite_jsonb_op('{"a": 1 ,"b": {"c": 2, "d": {"e": 3}}}')
+      direct_ja = Sequel.sqlite_jsonb_op('[2, 3, ["a", "b"]]')
+
+      [[jo.jsonb, ja.jsonb], [direct_jo, direct_ja]].each do |jo, ja|
+        @db.get(jo.json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.jsonb.json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+
+        @db.get(jo.extract('$.a')).must_equal 1
+        @db.get(jo.extract('$.a', '$.b.c').sqlite_json_op.json).must_equal '[1,2]'
+        @db.get(jo.extract('$.a', '$.b.d.e').sqlite_json_op.json).must_equal '[1,3]'
+
+        @db.get(ja.insert('$[1]', 5).json).must_equal '[2,3,["a","b"]]'
+        @db.get(ja.replace('$[1]', 5).json).must_equal '[2,5,["a","b"]]'
+        @db.get(ja.set('$[1]', 5).json).must_equal '[2,5,["a","b"]]'
+        @db.get(ja.insert('$[3]', 5).json).must_equal '[2,3,["a","b"],5]'
+        @db.get(ja.replace('$[3]', 5).json).must_equal '[2,3,["a","b"]]'
+        @db.get(ja.set('$[3]', 5).json).must_equal '[2,3,["a","b"],5]'
+        @db.get(ja.insert('$[1]', 5, '$[3]', 6).json).must_equal '[2,3,["a","b"],6]'
+        @db.get(ja.replace('$[1]', 5, '$[3]', 6).json).must_equal '[2,5,["a","b"]]'
+        @db.get(ja.set('$[1]', 5, '$[3]', 6).json).must_equal '[2,5,["a","b"],6]'
+
+        @db.get(jo.insert('$.f', 4).json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}},"f":4}'
+        @db.get(jo.replace('$.f', 4).json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.set('$.f', 4).json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}},"f":4}'
+        @db.get(jo.insert('$.a', 4).json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.replace('$.a', 4).json).must_equal '{"a":4,"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.set('$.a', 4).json).must_equal '{"a":4,"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.insert('$.f', 4, '$.a', 5).json).must_equal '{"a":1,"b":{"c":2,"d":{"e":3}},"f":4}'
+        @db.get(jo.replace('$.f', 4, '$.a', 5).json).must_equal '{"a":5,"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.set('$.f', 4, '$.a', 5).json).must_equal '{"a":5,"b":{"c":2,"d":{"e":3}},"f":4}'
+
+        @db.get(jo.patch('{"e": 4, "b": 5, "a": null}').json).must_equal '{"b":5,"e":4}'
+
+        @db.get(ja.remove('$[1]').json).must_equal '[2,["a","b"]]'
+        @db.get(ja.remove('$[1]', '$[1]').json).must_equal '[2]'
+        @db.get(jo.remove('$.a').json).must_equal '{"b":{"c":2,"d":{"e":3}}}'
+        @db.get(jo.remove('$.a', '$.b.c').json).must_equal '{"b":{"d":{"e":3}}}'
+      end
+    end
   end
 end if DB.sqlite_version >= 33800
 

@@ -1,5 +1,7 @@
 === master
 
+* Support SQLite 3.45+ jsonb functions in the sqlite_json_ops extension (jeremyevans) (#2133)
+
 * Support compounds (e.g. UNION) in conjunction with Database#values on PostgreSQL (jeremyevans) (#2137)
 
 * Support :use_advisory_lock option to Migrator.run to use advisory locks when running migrations (jeremyevans) (#2089)

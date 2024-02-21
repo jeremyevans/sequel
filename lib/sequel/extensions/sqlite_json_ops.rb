@@ -2,27 +2,34 @@
 #
 # The sqlite_json_ops extension adds support to Sequel's DSL to make
 # it easier to call SQLite JSON functions and operators (added
-# first in SQLite 3.38.0).
+# first in SQLite 3.38.0).  It also supports the SQLite JSONB functions
+# added in SQLite 3.45.0.
 #
 # To load the extension:
 #
 #   Sequel.extension :sqlite_json_ops
 #
-# This extension works by calling methods on Sequel::SQLite::JSONOp objects,
-# which you can create via Sequel.sqlite_json_op:
+# This extension works by calling methods on Sequel::SQLite::JSONOp and
+# Sequel::SQLite::JSONBOp objects, which you can create using
+# Sequel.sqlite_json_op and Sequel.sqlite_jsonb_op:
 #
 #   j = Sequel.sqlite_json_op(:json_column)
+#   jb = Sequel.sqlite_jsonb_op(:jsonb_column)
 #
-# Also, on most Sequel expression objects, you can call the sqlite_json_op method
-# to create a Sequel::SQLite::JSONOp object:
+# Also, on most Sequel expression objects, you can call the sqlite_json_op or
+# sqlite_jsonb_op method to create a Sequel::SQLite::JSONOp or 
+# Sequel::SQLite::JSONBOp object:
 #
 #   j = Sequel[:json_column].sqlite_json_op
+#   jb = Sequel[:jsonb_column].sqlite_jsonb_op
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension
 # and have activated refinements for the file, you can also use Symbol#sqlite_json_op:
+# or Symbol#sqlite_jsonb_op:
 #
 #   j = :json_column.sqlite_json_op
+#   jb = :json_column.sqlite_jsonb_op
 #
 # The following methods are available for Sequel::SQLite::JSONOp instances:
 #
@@ -30,11 +37,13 @@
 #   j.get(1)                 # (json_column ->> 1)
 #   j.get_text(1)            # (json_column -> 1)
 #   j.extract('$.a')         # json_extract(json_column, '$.a')
+#   jb.extract('$.a')        # jsonb_extract(jsonb_column, '$.a')
 #
 #   j.array_length           # json_array_length(json_column)
 #   j.type                   # json_type(json_column)
 #   j.valid                  # json_valid(json_column)
-#   j.json                   # json(json_column)
+#   jb.json                  # json(jsonb_column)
+#   j.jsonb                  # jsonb(json_column)
 #
 #   j.insert('$.a', 1)       # json_insert(json_column, '$.a', 1)
 #   j.set('$.a', 1)          # json_set(json_column, '$.a', 1)
@@ -42,22 +51,30 @@
 #   j.remove('$.a')          # json_remove(json_column, '$.a')
 #   j.patch('{"a":2}')       # json_patch(json_column, '{"a":2}')
 #
+#   jb.insert('$.a', 1)      # jsonb_insert(jsonb_column, '$.a', 1)
+#   jb.set('$.a', 1)         # jsonb_set(jsonb_column, '$.a', 1)
+#   jb.replace('$.a', 1)     # jsonb_replace(jsonb_column, '$.a', 1)
+#   jb.remove('$.a')         # jsonb_remove(jsonb_column, '$.a')
+#   jb.patch('{"a":2}')      # jsonb_patch(jsonb_column, '{"a":2}')
+#
 #   j.each                   # json_each(json_column)
 #   j.tree                   # json_tree(json_column)
 #
-# Related modules: Sequel::SQLite::JSONOp
+# Related modules: Sequel::SQLite::JSONBaseOp, Sequel::SQLite::JSONOp,
+# Sequel::SQLite::JSONBOp
 
 #
 module Sequel
   module SQLite
-    # The JSONOp class is a simple container for a single object that
-    # defines methods that yield Sequel expression objects representing
-    # SQLite json operators and functions.
+    # JSONBaseOp is an abstract base wrapper class for a object that
+    # defines methods that return Sequel expression objects representing
+    # SQLite json operators and functions. It is subclassed by both
+    # JSONOp and JSONBOp for json and jsonb specific behavior.
     #
     # In the method documentation examples, assume that:
     #
     #   json_op = Sequel.sqlite_json_op(:json)
-    class JSONOp < Sequel::SQL::Wrapper
+    class JSONBaseOp < Sequel::SQL::Wrapper
       GET = ["(".freeze, " ->> ".freeze, ")".freeze].freeze
       private_constant :GET
 
@@ -82,7 +99,7 @@ module Sequel
       #   json_op.array_length         # json_array_length(json)
       #   json_op.array_length('$[1]') # json_array_length(json, '$[1]')
       def array_length(*args)
-        Sequel::SQL::NumericExpression.new(:NOOP, function(:array_length, *args))
+        Sequel::SQL::NumericExpression.new(:NOOP, SQL::Function.new(:json_array_length, self, *args))
       end
 
       # Returns an expression for a set of information extracted from the top-level
@@ -92,7 +109,7 @@ module Sequel
       #   json_op.each        # json_each(json)
       #   json_op.each('$.a') # json_each(json, '$.a')
       def each(*args)
-        function(:each, *args)
+        SQL::Function.new(:json_each, self, *args)
       end
 
       # Returns an expression for the JSON array element or object field at the specified
@@ -129,9 +146,16 @@ module Sequel
       #
       #   json_op.json   # json(json)
       def json
-        self.class.new(SQL::Function.new(:json, self))
+        JSONOp.new(SQL::Function.new(:json, self))
       end
       alias minify json
+
+      # Returns the JSONB format of the JSON.
+      #
+      #   json_op.jsonb   # jsonb(json)
+      def jsonb
+        JSONBOp.new(SQL::Function.new(:jsonb, self))
+      end
 
       # Returns an expression for updating the JSON object using the RFC 7396 MergePatch algorithm
       #
@@ -172,7 +196,7 @@ module Sequel
       #   json_op.tree        # json_tree(json)
       #   json_op.tree('$.a') # json_tree(json, '$.a')
       def tree(*args)
-        function(:tree, *args)
+        SQL::Function.new(:json_tree, self, *args)
       end
 
       # Returns an expression for the type of the JSON value or the JSON value at the given path.
@@ -180,13 +204,13 @@ module Sequel
       #   json_op.type         # json_type(json)
       #   json_op.type('$[1]') # json_type(json, '$[1]')
       def type(*args)
-        Sequel::SQL::StringExpression.new(:NOOP, function(:type, *args))
+        Sequel::SQL::StringExpression.new(:NOOP, SQL::Function.new(:json_type, self, *args))
       end
       alias typeof type
 
       # Returns a boolean expression for whether the JSON is valid or not.
       def valid
-        Sequel::SQL::BooleanExpression.new(:NOOP, function(:valid))
+        Sequel::SQL::BooleanExpression.new(:NOOP, SQL::Function.new(:json_valid, self))
       end
 
       private
@@ -198,7 +222,7 @@ module Sequel
 
       # Internals of the methods that return functions prefixed with +json_+.
       def function(name, *args)
-        SQL::Function.new("json_#{name}", self, *args)
+        SQL::Function.new("#{function_prefix}_#{name}", self, *args)
       end
 
       # Internals of the methods that return functions prefixed with +json_+, that
@@ -208,11 +232,35 @@ module Sequel
       end
     end
 
+    # JSONOp is used for SQLite json-specific functions and operators.
+    class JSONOp < JSONBaseOp
+      private
+
+      def function_prefix
+        "json"
+      end
+    end
+
+    # JSONOp is used for SQLite jsonb-specific functions and operators.
+    class JSONBOp < JSONBaseOp
+      private
+
+      def function_prefix
+        "jsonb"
+      end
+    end
+
     module JSONOpMethods
       # Wrap the receiver in an JSONOp so you can easily use the SQLite
       # json functions and operators with it.
       def sqlite_json_op
         JSONOp.new(self)
+      end
+
+      # Wrap the receiver in an JSONBOp so you can easily use the SQLite
+      # jsonb functions and operators with it.
+      def sqlite_jsonb_op
+        JSONBOp.new(self)
       end
     end
   end
@@ -225,6 +273,16 @@ module Sequel
         v
       else
         SQLite::JSONOp.new(v)
+      end
+    end
+
+    # Return the object wrapped in an SQLite::JSONBOp.
+    def sqlite_jsonb_op(v)
+      case v
+      when SQLite::JSONBOp
+        v
+      else
+        SQLite::JSONBOp.new(v)
       end
     end
   end
