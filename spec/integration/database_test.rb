@@ -20,7 +20,7 @@ describe Sequel::Database do
     @db.drop_table?(:items)
   end
 
-  if DB.respond_to?(:with_advisory_lock)
+  if DB.respond_to?(:with_advisory_lock) && DB.adapter_scheme != :ado
     lock_id = 1357
 
     it "#with_advisory_lock should raise if it cannot acquire a lock" do
