@@ -1,0 +1,482 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::SQLite::JSONBaseOp</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::SQLite::JSONBaseOp
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/sqlite_json_ops_rb.html">lib/sequel/extensions/sqlite_json_ops.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Sequel::SQL::Wrapper</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="JSONBaseOp.html"><code>JSONBaseOp</code></a> is an abstract base wrapper class for a object that defines methods that return <a href="../../Sequel.html"><code>Sequel</code></a> expression objects representing <a href="../SQLite.html"><code>SQLite</code></a> json operators and functions. It is subclassed by both <a href="JSONOp.html"><code>JSONOp</code></a> and <a href="JSONBOp.html"><code>JSONBOp</code></a> for json and jsonb specific behavior.</p>
+
+<p>In the method documentation examples, assume that:</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_json_op</span>(<span class="ruby-value">:json</span>)
+</pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-5B-5D">[]</a></li>
+<li><a href="#method-i-array_length">array_length</a></li>
+<li><a href="#method-i-each">each</a></li>
+<li><a href="#method-i-extract">extract</a></li>
+<li><a href="#method-i-get_json">get_json</a></li>
+<li><a href="#method-i-insert">insert</a></li>
+<li><a href="#method-i-json">json</a></li>
+<li><a href="#method-i-jsonb">jsonb</a></li>
+<li><a href="#method-i-patch">patch</a></li>
+<li><a href="#method-i-remove">remove</a></li>
+<li><a href="#method-i-replace">replace</a></li>
+<li><a href="#method-i-set">set</a></li>
+<li><a href="#method-i-tree">tree</a></li>
+<li><a href="#method-i-type">type</a></li>
+<li><a href="#method-i-valid">valid</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='aliases-list'>
+<h2>Public Instance Aliases</h2>
+<div class='name-list'>
+<table summary='Public Instance Aliases'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>get</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-5B-5D">[]</a></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>minify</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-json">json</a></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>typeof</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-type">type</a></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-5B-5D'>
+<a name='method-i-5B-5D'></a>
+<div class='synopsis'>
+<span class='name'>[]</span><span class='arguments'>(key)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for getting the JSON array element or object field at the specified path as a <a href="../SQLite.html"><code>SQLite</code></a> value.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>[<span class="ruby-value">1</span>]         <span class="ruby-comment"># (json -&gt;&gt; 1)</span>
+<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;a&#39;</span>]       <span class="ruby-comment"># (json -&gt;&gt; &#39;a&#39;)</span>
+<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;$.a.b&#39;</span>]   <span class="ruby-comment"># (json -&gt;&gt; &#39;$.a.b&#39;)</span>
+<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;$[1][2]&#39;</span>] <span class="ruby-comment"># (json -&gt;&gt; &#39;$[1][2]&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">91</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">92</span>   <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-array_length'>
+<a name='method-i-array_length'></a>
+<div class='synopsis'>
+<span class='name'>array_length</span><span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for the length of the JSON array, or the JSON array at the given path.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_length</span>         <span class="ruby-comment"># json_array_length(json)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">array_length</span>(<span class="ruby-string">&#39;$[1]&#39;</span>) <span class="ruby-comment"># json_array_length(json, &#39;$[1]&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-array_length-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-array_length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">102</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_array_length</span>, <span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))
+<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-each'>
+<a name='method-i-each'></a>
+<div class='synopsis'>
+<span class='name'>each</span><span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for a set of information extracted from the top-level members of the JSON array or object, or the top-level members of the JSON array or object at the given path.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">each</span>        <span class="ruby-comment"># json_each(json)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">each</span>(<span class="ruby-string">&#39;$.a&#39;</span>) <span class="ruby-comment"># json_each(json, &#39;$.a&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">111</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">112</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_each</span>, <span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">113</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-extract'>
+<a name='method-i-extract'></a>
+<div class='synopsis'>
+<span class='name'>extract</span><span class='arguments'>(*a)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for the JSON array element or object field at the specified path as a <a href="../SQLite.html"><code>SQLite</code></a> value, but only accept paths as arguments, and allow the use of multiple paths.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;$.a&#39;</span>)        <span class="ruby-comment"># json_extract(json, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-string">&#39;$.b&#39;</span>) <span class="ruby-comment"># json_extract(json, &#39;$.a&#39;, &#39;$.b&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-extract-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-extract-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">121</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">122</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-get_json'>
+<a name='method-i-get_json'></a>
+<div class='synopsis'>
+<span class='name'>get_json</span><span class='arguments'>(key)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for getting the JSON array element or object field at the specified path as a JSON value.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_json</span>(<span class="ruby-value">1</span>)         <span class="ruby-comment"># (json -&gt; 1)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_json</span>(<span class="ruby-string">&#39;a&#39;</span>)       <span class="ruby-comment"># (json -&gt; &#39;a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_json</span>(<span class="ruby-string">&#39;$.a.b&#39;</span>)   <span class="ruby-comment"># (json -&gt; &#39;$.a.b&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_json</span>(<span class="ruby-string">&#39;$[1][2]&#39;</span>) <span class="ruby-comment"># (json -&gt; &#39;$[1][2]&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_json-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-get_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_json</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">133</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_JSON</span>, <span class="ruby-identifier">key</span>))
+<span class="line-num">134</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-insert'>
+<a name='method-i-insert'></a>
+<div class='synopsis'>
+<span class='name'>insert</span><span class='arguments'>(path, value, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for creating new entries at the given paths in the JSON array or object, but not overwriting existing entries.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)           <span class="ruby-comment"># json_insert(json, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>, <span class="ruby-string">&#39;$.b&#39;</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># json_insert(json, &#39;$.a&#39;, 1, &#39;$.b&#39;, 2)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-insert-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">value</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">142</span>   <span class="ruby-identifier">wrapped_function</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">value</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">143</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-json'>
+<a name='method-i-json'></a>
+<div class='synopsis'>
+<span class='name'>json</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for a minified version of the JSON.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">json</span>   <span class="ruby-comment"># json(json)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-json-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">148</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">json</span>
+<span class="line-num">149</span>   <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json</span>, <span class="ruby-keyword">self</span>))
+<span class="line-num">150</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-jsonb'>
+<a name='method-i-jsonb'></a>
+<div class='synopsis'>
+<span class='name'>jsonb</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Returns the JSONB format of the JSON.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">jsonb</span>   <span class="ruby-comment"># jsonb(json)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-jsonb-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-jsonb-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">156</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">jsonb</span>
+<span class="line-num">157</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:jsonb</span>, <span class="ruby-keyword">self</span>))
+<span class="line-num">158</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-patch'>
+<a name='method-i-patch'></a>
+<div class='synopsis'>
+<span class='name'>patch</span><span class='arguments'>(json_patch)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for updating the JSON object using the RFC 7396 MergePatch algorithm</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">patch</span>(<span class="ruby-string">&#39;{&quot;a&quot;: 1, &quot;b&quot;: null}&#39;</span>) <span class="ruby-comment"># json_patch(json, &#39;{&quot;a&quot;: 1, &quot;b&quot;: null}&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-patch-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-patch-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">patch</span>(<span class="ruby-identifier">json_patch</span>)
+<span class="line-num">164</span>   <span class="ruby-identifier">wrapped_function</span>(<span class="ruby-value">:patch</span>, <span class="ruby-identifier">json_patch</span>)
+<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-remove'>
+<a name='method-i-remove'></a>
+<div class='synopsis'>
+<span class='name'>remove</span><span class='arguments'>(path, *paths)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for removing entries at the given paths from the JSON array or object.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-string">&#39;$.a&#39;</span>)        <span class="ruby-comment"># json_remove(json, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-string">&#39;$.b&#39;</span>) <span class="ruby-comment"># json_remove(json, &#39;$.a&#39;, &#39;$.b&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-remove-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-remove-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove</span>(<span class="ruby-identifier">path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">paths</span>)
+<span class="line-num">172</span>   <span class="ruby-identifier">wrapped_function</span>(<span class="ruby-value">:remove</span>, <span class="ruby-identifier">path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">paths</span>)
+<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-replace'>
+<a name='method-i-replace'></a>
+<div class='synopsis'>
+<span class='name'>replace</span><span class='arguments'>(path, value, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for replacing entries at the given paths in the JSON array or object, but not creating new entries.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)           <span class="ruby-comment"># json_replace(json, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>, <span class="ruby-string">&#39;$.b&#39;</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># json_replace(json, &#39;$.a&#39;, 1, &#39;$.b&#39;, 2)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-replace-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-replace-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">replace</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">value</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">181</span>   <span class="ruby-identifier">wrapped_function</span>(<span class="ruby-value">:replace</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">value</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-set'>
+<a name='method-i-set'></a>
+<div class='synopsis'>
+<span class='name'>set</span><span class='arguments'>(path, value, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for creating or replacing entries at the given paths in the JSON array or object.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">set</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)           <span class="ruby-comment"># json_set(json, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">set</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>, <span class="ruby-string">&#39;$.b&#39;</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># json_set(json, &#39;$.a&#39;, 1, &#39;$.b&#39;, 2)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">value</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">190</span>   <span class="ruby-identifier">wrapped_function</span>(<span class="ruby-value">:set</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">value</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-tree'>
+<a name='method-i-tree'></a>
+<div class='synopsis'>
+<span class='name'>tree</span><span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for a set of information extracted from the JSON array or object, or the JSON array or object at the given path.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">tree</span>        <span class="ruby-comment"># json_tree(json)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">tree</span>(<span class="ruby-string">&#39;$.a&#39;</span>) <span class="ruby-comment"># json_tree(json, &#39;$.a&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-tree-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-tree-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">198</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tree</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">199</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_tree</span>, <span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-type'>
+<a name='method-i-type'></a>
+<div class='synopsis'>
+<span class='name'>type</span><span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an expression for the type of the JSON value or the JSON value at the given path.</p>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">type</span>         <span class="ruby-comment"># json_type(json)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">type</span>(<span class="ruby-string">&#39;$[1]&#39;</span>) <span class="ruby-comment"># json_type(json, &#39;$[1]&#39;)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-type-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">206</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">207</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_type</span>, <span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))
+<span class="line-num">208</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-valid'>
+<a name='method-i-valid'></a>
+<div class='synopsis'>
+<span class='name'>valid</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Returns a boolean expression for whether the JSON is valid or not.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-valid-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-valid-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">212</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid</span>
+<span class="line-num">213</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:json_valid</span>, <span class="ruby-keyword">self</span>))
+<span class="line-num">214</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

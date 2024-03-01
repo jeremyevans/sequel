@@ -55,6 +55,7 @@ Sequel::MSSQL::DatabaseMethods
 <li><a href="#method-i-supports_transactional_ddl-3F">supports_transactional_ddl?</a></li>
 <li><a href="#method-i-tables">tables</a></li>
 <li><a href="#method-i-views">views</a></li>
+<li><a href="#method-i-with_advisory_lock">with_advisory_lock</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -133,7 +134,7 @@ Sequel::MSSQL::DatabaseMethods
 
 <p>Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:args </td><td>
-<p>Arguments to stored procedure.  For named arguments, this should be a hash keyed by argument named.  For unnamed arguments, this should be an array.  Output parameters to the function are specified using :output. You can also name output parameters and provide a type by using an array containing :output, the type name, and the parameter name.</p>
+<p>Arguments to stored procedure.  For named arguments, this should be a hash keyed by argument name.  For unnamed arguments, this should be an array.  Output parameters to the function are specified using :output. You can also name output parameters and provide a type by using an array containing :output, the type name, and the parameter name.</p>
 </td></tr><tr><td class='label'>:server </td><td>
 <p>The server/shard on which to execute the procedure.</p>
 </td></tr></tbody></table>
@@ -538,6 +539,50 @@ Sequel::MSSQL::DatabaseMethods
 <span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
 <span class="line-num">246</span>   <span class="ruby-identifier">information_schema_tables</span>(<span class="ruby-string">&#39;VIEW&#39;</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-with_advisory_lock'>
+<a name='method-i-with_advisory_lock'></a>
+<div class='synopsis'>
+<span class='name'>with_advisory_lock</span><span class='arguments'>(lock_id, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Attempt to acquire an exclusive advisory lock with the given lock_id (which will be converted to a string). If successful, yield to the block, then release the advisory lock when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:wait </td><td>
+<p>Do not raise an error, instead, wait until the advisory lock can be acquired.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_advisory_lock-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_advisory_lock-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
+<span class="line-num">255</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">256</span>   <span class="ruby-identifier">lock_id</span> = <span class="ruby-identifier">lock_id</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">257</span>   <span class="ruby-identifier">timeout</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:wait</span>] <span class="ruby-operator">?</span> <span class="ruby-value">-1</span> <span class="ruby-operator">:</span> <span class="ruby-value">0</span>
+<span class="line-num">258</span>   <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">259</span> 
+<span class="line-num">260</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">261</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">262</span>       <span class="ruby-identifier">res</span> = <span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:sp_getapplock</span>, <span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">server</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-string">&#39;Resource&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">lock_id</span>, <span class="ruby-string">&#39;LockTimeout&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">timeout</span>, <span class="ruby-string">&#39;LockMode&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Exclusive&#39;</span>, <span class="ruby-string">&#39;LockOwner&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Session&#39;</span>})
+<span class="line-num">263</span> 
+<span class="line-num">264</span>       <span class="ruby-keyword">unless</span> <span class="ruby-identifier">locked</span> = <span class="ruby-identifier">res</span>[<span class="ruby-value">:result</span>] <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0</span>
+<span class="line-num">265</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdvisoryLockError</span>, <span class="ruby-node">&quot;unable to acquire advisory lock #{lock_id.inspect}&quot;</span>
+<span class="line-num">266</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">267</span> 
+<span class="line-num">268</span>       <span class="ruby-keyword">yield</span>
+<span class="line-num">269</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">270</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">locked</span>
+<span class="line-num">271</span>         <span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:sp_releaseapplock</span>, <span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">server</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-string">&#39;Resource&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">lock_id</span>, <span class="ruby-string">&#39;LockOwner&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Session&#39;</span>})
+<span class="line-num">272</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">273</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">274</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">275</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

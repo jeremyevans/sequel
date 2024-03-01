@@ -290,18 +290,18 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-migrator_class-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">431</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migrator_class</span>(<span class="ruby-identifier">directory</span>)
-<span class="line-num">432</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">equal?</span>(<span class="ruby-constant">Migrator</span>)
-<span class="line-num">433</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must supply a valid migration path&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">directory</span>)
-<span class="line-num">434</span>     <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
-<span class="line-num">435</span>       <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-constant">MIGRATION_FILE_PATTERN</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">436</span>       <span class="ruby-keyword">return</span> <span class="ruby-constant">TimestampMigrator</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-value">2</span>).<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">20000101</span>
-<span class="line-num">437</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">438</span>     <span class="ruby-constant">IntegerMigrator</span>
-<span class="line-num">439</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">440</span>     <span class="ruby-keyword">self</span>
-<span class="line-num">441</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">442</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">442</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migrator_class</span>(<span class="ruby-identifier">directory</span>)
+<span class="line-num">443</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">equal?</span>(<span class="ruby-constant">Migrator</span>)
+<span class="line-num">444</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must supply a valid migration path&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">directory</span>)
+<span class="line-num">445</span>     <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+<span class="line-num">446</span>       <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-constant">MIGRATION_FILE_PATTERN</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">447</span>       <span class="ruby-keyword">return</span> <span class="ruby-constant">TimestampMigrator</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-value">2</span>).<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">20000101</span>
+<span class="line-num">448</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">449</span>     <span class="ruby-constant">IntegerMigrator</span>
+<span class="line-num">450</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">451</span>     <span class="ruby-keyword">self</span>
+<span class="line-num">452</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">453</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-new'>
@@ -320,18 +320,18 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">470</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">471</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must supply a valid migration path&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">directory</span>)
-<span class="line-num">472</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
-<span class="line-num">473</span>   <span class="ruby-ivar">@directory</span> = <span class="ruby-identifier">directory</span>
-<span class="line-num">474</span>   <span class="ruby-ivar">@allow_missing_migration_files</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_missing_migration_files</span>]
-<span class="line-num">475</span>   <span class="ruby-ivar">@files</span> = <span class="ruby-identifier">get_migration_files</span>
-<span class="line-num">476</span>   <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:schema_and_table</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_schema_table</span>)
-<span class="line-num">477</span>   <span class="ruby-ivar">@table</span> = <span class="ruby-identifier">schema</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">table</span>
-<span class="line-num">478</span>   <span class="ruby-ivar">@column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_schema_column</span>
-<span class="line-num">479</span>   <span class="ruby-ivar">@ds</span> = <span class="ruby-identifier">schema_dataset</span>
-<span class="line-num">480</span>   <span class="ruby-ivar">@use_transactions</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:use_transactions</span>]
-<span class="line-num">481</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">481</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">482</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must supply a valid migration path&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">directory</span>)
+<span class="line-num">483</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>
+<span class="line-num">484</span>   <span class="ruby-ivar">@directory</span> = <span class="ruby-identifier">directory</span>
+<span class="line-num">485</span>   <span class="ruby-ivar">@allow_missing_migration_files</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_missing_migration_files</span>]
+<span class="line-num">486</span>   <span class="ruby-ivar">@files</span> = <span class="ruby-identifier">get_migration_files</span>
+<span class="line-num">487</span>   <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:schema_and_table</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_schema_table</span>)
+<span class="line-num">488</span>   <span class="ruby-ivar">@table</span> = <span class="ruby-identifier">schema</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">table</span>
+<span class="line-num">489</span>   <span class="ruby-ivar">@column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_schema_column</span>
+<span class="line-num">490</span>   <span class="ruby-ivar">@ds</span> = <span class="ruby-identifier">schema_dataset</span>
+<span class="line-num">491</span>   <span class="ruby-ivar">@use_transactions</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:use_transactions</span>]
+<span class="line-num">492</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-run'>
@@ -355,6 +355,8 @@ Superclass:
 <p>The table containing the schema version (default: :schema_info for integer migrations and :schema_migrations for timestamped migrations).</p>
 </td></tr><tr><td class='label'>:target </td><td>
 <p>The target version to which to migrate.  If not given, migrates to the maximum version.</p>
+</td></tr><tr><td class='label'>:use_advisory_lock </td><td>
+<p>Use advisory locks in migrations (only use this if <a href="../Sequel.html"><code>Sequel</code></a> supports advisory locks for the database).</p>
 </td></tr></tbody></table>
 
 <p>Examples:</p>
@@ -371,9 +373,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-run-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">425</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">426</span>   <span class="ruby-identifier">migrator_class</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">run</span>
-<span class="line-num">427</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">432</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">433</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:use_advisory_lock</span>]
+<span class="line-num">434</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">with_advisory_lock</span>(<span class="ruby-constant">MIGRATION_ADVISORY_LOCK_ID</span>){<span class="ruby-identifier">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:use_advisory_lock</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>))}
+<span class="line-num">435</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">436</span>     <span class="ruby-identifier">migrator_class</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">run</span>
+<span class="line-num">437</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">438</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

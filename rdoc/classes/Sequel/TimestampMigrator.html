@@ -118,12 +118,12 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">689</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">690</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">691</span>   <span class="ruby-ivar">@target</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]
-<span class="line-num">692</span>   <span class="ruby-ivar">@applied_migrations</span> = <span class="ruby-identifier">get_applied_migrations</span>
-<span class="line-num">693</span>   <span class="ruby-ivar">@migration_tuples</span> = <span class="ruby-identifier">get_migration_tuples</span>
-<span class="line-num">694</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">700</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">701</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">702</span>   <span class="ruby-ivar">@target</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]
+<span class="line-num">703</span>   <span class="ruby-ivar">@applied_migrations</span> = <span class="ruby-identifier">get_applied_migrations</span>
+<span class="line-num">704</span>   <span class="ruby-ivar">@migration_tuples</span> = <span class="ruby-identifier">get_migration_tuples</span>
+<span class="line-num">705</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-run_single'>
@@ -142,9 +142,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-run_single-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">699</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">run_single</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">700</span>   <span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">run_single</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:direction</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:up</span>)
-<span class="line-num">701</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">710</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">run_single</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">711</span>   <span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">run_single</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:direction</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:up</span>)
+<span class="line-num">712</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -164,9 +164,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-is_current-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">705</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_current?</span>
-<span class="line-num">706</span>   <span class="ruby-identifier">migration_tuples</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">707</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">716</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_current?</span>
+<span class="line-num">717</span>   <span class="ruby-identifier">migration_tuples</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">718</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-run'>
@@ -185,12 +185,12 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-run-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">710</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>
-<span class="line-num">711</span>   <span class="ruby-identifier">migration_tuples</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">f</span>, <span class="ruby-identifier">direction</span><span class="ruby-operator">|</span>
-<span class="line-num">712</span>     <span class="ruby-identifier">apply_migration</span>(<span class="ruby-identifier">m</span>, <span class="ruby-identifier">f</span>, <span class="ruby-identifier">direction</span>)
-<span class="line-num">713</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">714</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">715</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">721</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>
+<span class="line-num">722</span>   <span class="ruby-identifier">migration_tuples</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">f</span>, <span class="ruby-identifier">direction</span><span class="ruby-operator">|</span>
+<span class="line-num">723</span>     <span class="ruby-identifier">apply_migration</span>(<span class="ruby-identifier">m</span>, <span class="ruby-identifier">f</span>, <span class="ruby-identifier">direction</span>)
+<span class="line-num">724</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">725</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">726</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-run_single'>
@@ -209,16 +209,16 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-run_single-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
-<span class="line-num">719</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run_single</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">direction</span>)
-<span class="line-num">720</span>   <span class="ruby-identifier">migration</span> = <span class="ruby-identifier">load_migration_file</span>(<span class="ruby-identifier">path</span>)
-<span class="line-num">721</span>   <span class="ruby-identifier">file_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">path</span>)
-<span class="line-num">722</span>   <span class="ruby-identifier">already_applied</span> = <span class="ruby-identifier">applied_migrations</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">file_name</span>.<span class="ruby-identifier">downcase</span>)
-<span class="line-num">723</span> 
-<span class="line-num">724</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">direction</span> <span class="ruby-operator">==</span> <span class="ruby-value">:up</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">already_applied</span> <span class="ruby-operator">:</span> <span class="ruby-operator">!</span><span class="ruby-identifier">already_applied</span>
-<span class="line-num">725</span> 
-<span class="line-num">726</span>   <span class="ruby-identifier">apply_migration</span>(<span class="ruby-identifier">migration</span>, <span class="ruby-identifier">file_name</span>, <span class="ruby-identifier">direction</span>)
-<span class="line-num">727</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">728</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">730</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run_single</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">direction</span>)
+<span class="line-num">731</span>   <span class="ruby-identifier">migration</span> = <span class="ruby-identifier">load_migration_file</span>(<span class="ruby-identifier">path</span>)
+<span class="line-num">732</span>   <span class="ruby-identifier">file_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">path</span>)
+<span class="line-num">733</span>   <span class="ruby-identifier">already_applied</span> = <span class="ruby-identifier">applied_migrations</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">file_name</span>.<span class="ruby-identifier">downcase</span>)
+<span class="line-num">734</span> 
+<span class="line-num">735</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">direction</span> <span class="ruby-operator">==</span> <span class="ruby-value">:up</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">already_applied</span> <span class="ruby-operator">:</span> <span class="ruby-operator">!</span><span class="ruby-identifier">already_applied</span>
+<span class="line-num">736</span> 
+<span class="line-num">737</span>   <span class="ruby-identifier">apply_migration</span>(<span class="ruby-identifier">migration</span>, <span class="ruby-identifier">file_name</span>, <span class="ruby-identifier">direction</span>)
+<span class="line-num">738</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">739</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

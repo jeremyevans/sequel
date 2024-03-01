@@ -31,7 +31,7 @@ lib/sequel/extensions/async_thread_pool.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-06-09 10:15:03 -0700</span>
+<span class='datetime'>2024-02-07 11:09:08 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -166,6 +166,8 @@ Last Update:
 </pre>
 
 <p>Whether you need the <code>baz_1</code> variable depends on the value of foos. If the async thread pool is busy, and by the time the <code>foos.length</code> call is made, the async thread pool has not started the processing to get the <code>foos</code> value, it can improve performance to start that processing in the current thread, since it is needed immediately to determine whether to schedule query to get the <code>baz_1</code> variable. The default is to not allow preemption, because if the current thread is used, it may have already checked out a connection that could be used, and that connection could be inside a transaction or have some other manner of connection-specific state applied to it. If you want to allow preemption, you can set the <code>:preempt_async_thread</code> Database option before loading the async_thread_pool extension.</p>
+
+<p>Note that the async_thread_pool extension creates the thread pool when it is loaded into the Database.  If you fork after loading the extension, the extension will not work, as fork does not copy the thread pools.  If you are using a forking webserver (or any other system that forks worker processes), load this extension in each child process, do not load it before forking.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Database/AsyncThreadPool/DatasetMethods.html"><code>Sequel::Database::AsyncThreadPool::DatasetMethods</code></a></p>
 </div>

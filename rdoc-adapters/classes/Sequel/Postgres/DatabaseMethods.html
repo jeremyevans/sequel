@@ -86,6 +86,7 @@ Sequel::Postgres::DatabaseMethods
 <li><a href="#method-i-type_supported-3F">type_supported?</a></li>
 <li><a href="#method-i-values">values</a></li>
 <li><a href="#method-i-views">views</a></li>
+<li><a href="#method-i-with_advisory_lock">with_advisory_lock</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -1602,6 +1603,58 @@ end_sql
 <span class="line-num">858</span>   <span class="ruby-identifier">relkind</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:materialized</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;m&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;v&#39;</span>
 <span class="line-num">859</span>   <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-identifier">relkind</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">860</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-with_advisory_lock'>
+<a name='method-i-with_advisory_lock'></a>
+<div class='synopsis'>
+<span class='name'>with_advisory_lock</span><span class='arguments'>(lock_id, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Attempt to acquire an exclusive advisory lock with the given lock_id (which should be a 64-bit integer).  If successful, yield to the block, then release the advisory lock when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_advisory_lock</span>(<span class="ruby-value">1347</span>){<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)}
+<span class="ruby-comment"># SELECT pg_try_advisory_lock(1357) LIMIT 1</span>
+<span class="ruby-comment"># SELECT 1 AS v LIMIT 1</span>
+<span class="ruby-comment"># SELECT pg_advisory_unlock(1357) LIMIT 1</span>
+</pre>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:wait </td><td>
+<p>Do not raise an error, instead, wait until the advisory lock can be acquired.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_advisory_lock-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_advisory_lock-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">873</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">874</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
+<span class="line-num">875</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">876</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">877</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">878</span> 
+<span class="line-num">879</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">880</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">881</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:wait</span>]
+<span class="line-num">882</span>         <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>)}
+<span class="line-num">883</span>         <span class="ruby-identifier">locked</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">884</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">885</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">locked</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_try_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>)}
+<span class="line-num">886</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdvisoryLockError</span>, <span class="ruby-node">&quot;unable to acquire advisory lock #{lock_id.inspect}&quot;</span>
+<span class="line-num">887</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">888</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">889</span> 
+<span class="line-num">890</span>       <span class="ruby-keyword">yield</span>
+<span class="line-num">891</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">892</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_advisory_unlock</span>(<span class="ruby-identifier">lock_id</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">locked</span>
+<span class="line-num">893</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">894</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">895</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -1,6 +1,6 @@
-Thu, 01 Feb 2024 08:35:27 -0800
+Fri, 01 Mar 2024 09:18:02 -0800
 README.rdoc	Tue, 19 Sep 2023 10:01:52 -0700
-CHANGELOG	Thu, 01 Feb 2024 08:27:41 -0800
+CHANGELOG	Fri, 01 Mar 2024 08:29:33 -0800
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -10,11 +10,11 @@ lib/sequel/core.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/database.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset.rb	Fri, 31 Mar 2023 14:57:15 -0700
 lib/sequel/deprecated.rb	Tue, 14 Jul 2020 12:33:56 -0700
-lib/sequel/exceptions.rb	Fri, 26 Jun 2020 14:43:12 -0700
+lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Thu, 01 Feb 2024 08:27:41 -0800
+lib/sequel/version.rb	Fri, 01 Mar 2024 08:29:33 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -26,7 +26,7 @@ lib/sequel/database/dataset.rb	Tue, 28 Mar 2023 14:16:05 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
-lib/sequel/database/misc.rb	Sun, 14 Jan 2024 10:47:27 -0800
+lib/sequel/database/misc.rb	Wed, 21 Feb 2024 09:59:48 -0800
 lib/sequel/database/query.rb	Wed, 21 Dec 2022 15:06:01 -0800
 lib/sequel/database/schema_generator.rb	Tue, 28 Mar 2023 07:40:44 -0700
 lib/sequel/database/schema_methods.rb	Thu, 25 Jan 2024 14:58:57 -0800
@@ -71,7 +71,7 @@ doc/postgresql.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Mon, 17 Oct 2022 09:39:14 -0700
 doc/reflection.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/schema_modification.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
+doc/schema_modification.rdoc	Thu, 01 Feb 2024 15:00:17 -0800
 doc/security.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/sharding.rdoc	Fri, 26 May 2023 07:47:08 -0700
 doc/sql.rdoc	Wed, 18 Jan 2023 15:13:59 -0800
@@ -273,6 +273,7 @@ doc/release_notes/5.74.0.txt	Wed, 01 Nov 2023 08:38:41 -0700
 doc/release_notes/5.75.0.txt	Fri, 01 Dec 2023 08:25:58 -0800
 doc/release_notes/5.76.0.txt	Mon, 01 Jan 2024 09:04:44 -0800
 doc/release_notes/5.77.0.txt	Thu, 01 Feb 2024 08:27:41 -0800
+doc/release_notes/5.78.0.txt	Fri, 01 Mar 2024 08:29:33 -0800
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
-lib/sequel/extensions/migration.rb	Mon, 13 Nov 2023 09:50:21 -0800
+lib/sequel/extensions/migration.rb	Fri, 02 Feb 2024 13:06:09 -0800

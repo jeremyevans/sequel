@@ -63,6 +63,7 @@ Sequel::MySQL::DatabaseMethods
 <li><a href="#method-i-supports_transaction_isolation_levels-3F">supports_transaction_isolation_levels?</a></li>
 <li><a href="#method-i-tables">tables</a></li>
 <li><a href="#method-i-views">views</a></li>
+<li><a href="#method-i-with_advisory_lock">with_advisory_lock</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -620,6 +621,58 @@ Sequel::MySQL::DatabaseMethods
 <span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
 <span class="line-num">188</span>   <span class="ruby-identifier">full_tables</span>(<span class="ruby-string">&#39;VIEW&#39;</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-with_advisory_lock'>
+<a name='method-i-with_advisory_lock'></a>
+<div class='synopsis'>
+<span class='name'>with_advisory_lock</span><span class='arguments'>(lock_id, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Attempt to acquire an exclusive advisory lock with the given lock_id (which will be converted to a string).  If successful, yield to the block, then release the advisory lock when the block exits.  If unsuccessful, raise a Sequel::AdvisoryLockError.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_advisory_lock</span>(<span class="ruby-value">1357</span>){<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)}
+<span class="ruby-comment"># SELECT GET_LOCK(&#39;1357&#39;, 0) LIMIT 1</span>
+<span class="ruby-comment"># SELECT 1 AS v LIMIT 1</span>
+<span class="ruby-comment"># SELECT RELEASE_LOCK(&#39;1357&#39;) LIMIT 1</span>
+</pre>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:wait </td><td>
+<p>Do not raise an error, instead, wait until the advisory lock can be acquired.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_advisory_lock-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_advisory_lock-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>
+<span class="line-num">211</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">212</span>   <span class="ruby-identifier">lock_id</span> = <span class="ruby-identifier">lock_id</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">213</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
+<span class="line-num">214</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">215</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">216</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">217</span> 
+<span class="line-num">218</span>   <span class="ruby-comment"># MariaDB doesn&#39;t support negative values for infinite wait.  A wait of 34 years</span>
+<span class="line-num">219</span>   <span class="ruby-comment"># should be reasonably similar to infinity for this case.</span>
+<span class="line-num">220</span>   <span class="ruby-identifier">timeout</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:wait</span>] <span class="ruby-operator">?</span> <span class="ruby-value">1073741823</span> <span class="ruby-operator">:</span> <span class="ruby-value">0</span>
+<span class="line-num">221</span> 
+<span class="line-num">222</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">223</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">224</span>       <span class="ruby-keyword">unless</span> <span class="ruby-identifier">locked</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-constant">GET_LOCK</span>(<span class="ruby-identifier">lock_id</span>, <span class="ruby-identifier">timeout</span>)} <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">225</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdvisoryLockError</span>, <span class="ruby-node">&quot;unable to acquire advisory lock #{lock_id.inspect}&quot;</span>
+<span class="line-num">226</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">227</span> 
+<span class="line-num">228</span>       <span class="ruby-keyword">yield</span>
+<span class="line-num">229</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">230</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-constant">RELEASE_LOCK</span>(<span class="ruby-identifier">lock_id</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">locked</span>
+<span class="line-num">231</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">232</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

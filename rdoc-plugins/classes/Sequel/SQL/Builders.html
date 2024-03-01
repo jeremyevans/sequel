@@ -112,6 +112,7 @@ Sequel::SQL::Builders
 <li><a href="#method-i-pg_row_op">pg_row_op</a></li>
 <li><a href="#method-i-skip_pg_auto_param">skip_pg_auto_param</a></li>
 <li><a href="#method-i-sqlite_json_op">sqlite_json_op</a></li>
+<li><a href="#method-i-sqlite_jsonb_op">sqlite_jsonb_op</a></li>
 <li><a href="#method-i-string_agg">string_agg</a></li>
 </ol>
 </div>
@@ -690,14 +691,40 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-sqlite_json_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
-<span class="line-num">222</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_json_op</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">223</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">224</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQLite</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>
-<span class="line-num">225</span>     <span class="ruby-identifier">v</span>
-<span class="line-num">226</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">227</span>     <span class="ruby-constant">SQLite</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">228</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">229</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">270</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_json_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">271</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">272</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQLite</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>
+<span class="line-num">273</span>     <span class="ruby-identifier">v</span>
+<span class="line-num">274</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">275</span>     <span class="ruby-constant">SQLite</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">276</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sqlite_jsonb_op'>
+<a name='method-i-sqlite_jsonb_op'></a>
+<div class='synopsis'>
+<span class='name'>sqlite_jsonb_op</span><span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Return the object wrapped in an <a href="../SQLite/JSONBOp.html"><code>SQLite::JSONBOp</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sqlite_jsonb_op-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sqlite_jsonb_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">280</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_jsonb_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">281</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">282</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQLite</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>
+<span class="line-num">283</span>     <span class="ruby-identifier">v</span>
+<span class="line-num">284</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">285</span>     <span class="ruby-constant">SQLite</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">286</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">287</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-string_agg'>

@@ -31,32 +31,35 @@ lib/sequel/extensions/sqlite_json_ops.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2022-04-15 14:39:58 -0700</span>
+<span class='datetime'>2024-02-21 09:59:48 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The sqlite_json_ops extension adds support to Sequel’s DSL to make it easier to call SQLite JSON functions and operators (added first in SQLite 3.38.0).</p>
+<p>The sqlite_json_ops extension adds support to Sequel’s DSL to make it easier to call SQLite JSON functions and operators (added first in SQLite 3.38.0).  It also supports the SQLite JSONB functions added in SQLite 3.45.0.</p>
 
 <p>To load the extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:sqlite_json_ops</span>
 </pre>
 
-<p>This extension works by calling methods on <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a> objects, which you can create via Sequel.sqlite_json_op:</p>
+<p>This extension works by calling methods on <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a> and <a href="../../../../classes/Sequel/SQLite/JSONBOp.html"><code>Sequel::SQLite::JSONBOp</code></a> objects, which you can create using Sequel.sqlite_json_op and Sequel.sqlite_jsonb_op:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_json_op</span>(<span class="ruby-value">:json_column</span>)
+<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)
 </pre>
 
-<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the sqlite_json_op method to create a <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a> object:</p>
+<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the sqlite_json_op or sqlite_jsonb_op method to create a <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a> or <a href="../../../../classes/Sequel/SQLite/JSONBOp.html"><code>Sequel::SQLite::JSONBOp</code></a> object:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:json_column</span>].<span class="ruby-identifier">sqlite_json_op</span>
+<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:jsonb_column</span>].<span class="ruby-identifier">sqlite_jsonb_op</span>
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/SQLite/JSONOpMethods.html#method-i-sqlite_json_op"><code>Symbol#sqlite_json_op</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/SQLite/JSONOpMethods.html#method-i-sqlite_json_op"><code>Symbol#sqlite_json_op</code></a>: or <a href="../../../../classes/Sequel/SQLite/JSONOpMethods.html#method-i-sqlite_jsonb_op"><code>Symbol#sqlite_jsonb_op</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-value">:json_column</span>.<span class="ruby-identifier">sqlite_json_op</span>
+<span class="ruby-identifier">jb</span> = <span class="ruby-value">:json_column</span>.<span class="ruby-identifier">sqlite_jsonb_op</span>
 </pre>
 
 <p>The following methods are available for <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a> instances:</p>
@@ -65,11 +68,13 @@ Last Update:
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)                 <span class="ruby-comment"># (json_column -&gt;&gt; 1)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>)            <span class="ruby-comment"># (json_column -&gt; 1)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;$.a&#39;</span>)         <span class="ruby-comment"># json_extract(json_column, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;$.a&#39;</span>)        <span class="ruby-comment"># jsonb_extract(jsonb_column, &#39;$.a&#39;)</span>
 
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_length</span>           <span class="ruby-comment"># json_array_length(json_column)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">type</span>                   <span class="ruby-comment"># json_type(json_column)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">valid</span>                  <span class="ruby-comment"># json_valid(json_column)</span>
-<span class="ruby-identifier">j</span>.<span class="ruby-identifier">json</span>                   <span class="ruby-comment"># json(json_column)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">json</span>                  <span class="ruby-comment"># json(jsonb_column)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">jsonb</span>                  <span class="ruby-comment"># jsonb(json_column)</span>
 
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)       <span class="ruby-comment"># json_insert(json_column, &#39;$.a&#39;, 1)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">set</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)          <span class="ruby-comment"># json_set(json_column, &#39;$.a&#39;, 1)</span>
@@ -77,11 +82,17 @@ Last Update:
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-string">&#39;$.a&#39;</span>)          <span class="ruby-comment"># json_remove(json_column, &#39;$.a&#39;)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">patch</span>(<span class="ruby-string">&#39;{&quot;a&quot;:2}&#39;</span>)       <span class="ruby-comment"># json_patch(json_column, &#39;{&quot;a&quot;:2}&#39;)</span>
 
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)      <span class="ruby-comment"># jsonb_insert(jsonb_column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">set</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)         <span class="ruby-comment"># jsonb_set(jsonb_column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)     <span class="ruby-comment"># jsonb_replace(jsonb_column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-string">&#39;$.a&#39;</span>)         <span class="ruby-comment"># jsonb_remove(jsonb_column, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">patch</span>(<span class="ruby-string">&#39;{&quot;a&quot;:2}&#39;</span>)      <span class="ruby-comment"># jsonb_patch(jsonb_column, &#39;{&quot;a&quot;:2}&#39;)</span>
+
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">each</span>                   <span class="ruby-comment"># json_each(json_column)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">tree</span>                   <span class="ruby-comment"># json_tree(json_column)</span>
 </pre>
 
-<p>Related modules: <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a></p>
+<p>Related modules: <a href="../../../../classes/Sequel/SQLite/JSONBaseOp.html"><code>Sequel::SQLite::JSONBaseOp</code></a>, <a href="../../../../classes/Sequel/SQLite/JSONOp.html"><code>Sequel::SQLite::JSONOp</code></a>, <a href="../../../../classes/Sequel/SQLite/JSONBOp.html"><code>Sequel::SQLite::JSONBOp</code></a></p>
 </div>
 <div id='context'>
 </div>

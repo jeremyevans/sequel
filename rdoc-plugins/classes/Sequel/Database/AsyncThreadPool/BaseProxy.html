@@ -76,10 +76,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">232</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must provide block for an async job&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block</span>
-<span class="line-num">233</span>   <span class="ruby-ivar">@block</span> = <span class="ruby-identifier">block</span>
-<span class="line-num">234</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">238</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">239</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must provide block for an async job&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block</span>
+<span class="line-num">240</span>   <span class="ruby-ivar">@block</span> = <span class="ruby-identifier">block</span>
+<span class="line-num">241</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -99,17 +99,17 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-__value-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">__value</span>
-<span class="line-num">261</span>   <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@value</span>)
-<span class="line-num">262</span>     <span class="ruby-identifier">__get_value</span>
-<span class="line-num">263</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">264</span> 
-<span class="line-num">265</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">WrappedException</span>)
-<span class="line-num">266</span>     <span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span> <span class="ruby-ivar">@value</span>
-<span class="line-num">267</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">268</span> 
-<span class="line-num">269</span>   <span class="ruby-ivar">@value</span>
-<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">267</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">__value</span>
+<span class="line-num">268</span>   <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@value</span>)
+<span class="line-num">269</span>     <span class="ruby-identifier">__get_value</span>
+<span class="line-num">270</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">271</span> 
+<span class="line-num">272</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">WrappedException</span>)
+<span class="line-num">273</span>     <span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span> <span class="ruby-ivar">@value</span>
+<span class="line-num">274</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">275</span> 
+<span class="line-num">276</span>   <span class="ruby-ivar">@value</span>
+<span class="line-num">277</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-method_missing'>
@@ -128,9 +128,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-method_missing-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">237</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">238</span>   <span class="ruby-identifier">__value</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">239</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">244</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">245</span>   <span class="ruby-identifier">__value</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">246</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-respond_to_missing-3F'>
@@ -149,9 +149,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-respond_to_missing-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">respond_to_missing?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">246</span>   <span class="ruby-identifier">__value</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">247</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">respond_to_missing?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">253</span>   <span class="ruby-identifier">__value</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">254</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

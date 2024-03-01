@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.78.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.78.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.78.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-03-01 08:29:33 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>SQLite 3.45+ jsonb functions are now supported in the sqlite_json_ops extension.  Similar to the postgres_json_ops extension, there are now separate methods for dealing with json and jsonb types:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_json_op</span>(<span class="ruby-value">:column</span>)  <span class="ruby-comment"># json</span>
+<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_jsonb_op</span>(<span class="ruby-value">:column</span>) <span class="ruby-comment"># jsonb</span>
+</pre>
+
+<p>Some methods that use json_* functions for json ops use jsonb_* functions for jsonb ops:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite_jsonb_op</span>(<span class="ruby-value">:column</span>)
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;$.a&#39;</span>)    <span class="ruby-comment"># jsonb_extract(column, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)  <span class="ruby-comment"># jsonb_insert(column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">set</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>)     <span class="ruby-comment"># jsonb_set(column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-string">&#39;$.a&#39;</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># jsonb_replace(column, &#39;$.a&#39;, 1)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">remove</span>(<span class="ruby-string">&#39;$.a&#39;</span>)     <span class="ruby-comment"># jsonb_remove(column, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">jb</span>.<span class="ruby-identifier">patch</span>(<span class="ruby-string">&#39;{&quot;a&quot;:2}&#39;</span>)  <span class="ruby-comment"># jsonb_patch(column, &#39;{&quot;a&quot;:2}&#39;)</span>
+</pre>
+
+<p>You can use the json and jsonb methods to convert jsonb to json and json to jsonb, respectively.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jb</span>.<span class="ruby-identifier">json</span>              <span class="ruby-comment"># json(column)</span>
+</pre>
+
+<p>Use of the json method on jsonb types is important, because if you want to be able to deal with the values in Ruby, you must convert the jsonb value to json in the database before the database returns the value.  Unlike PostgreSQL, SQLite will not convert the value from jsonb to json on retrieval, and direct use of SQLite’s jsonb format is unsupported by SQLite as it is subject to change.</p>
+</li><li>
+<p>Database#with_advisory_lock is now supported on PostgreSQL, MySQL, and Microsoft SQL Server. This supports advisory (explicit) locking, using the database-specific APIs.  To work on all three servers, lock ids should be integers in the signed 64-bit range.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_advisory_lock</span>(<span class="ruby-value">1234</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># do something</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>By default, an AdvisoryLockError is raised if the lock cannot be immediately acquired.  You can use the :wait option to wait until the lock can be acquired, instead of raising.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_advisory_lock</span>(<span class="ruby-value">1234</span>, <span class="ruby-value">wait:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># do something</span>
+<span class="ruby-keyword">end</span>
+</pre>
+</li><li>
+<p>Migrator.run now supports a :use_advisory_lock option to use advisory locks when running migrations, so that it does not attempt to run the same migration more than once in the case where multiple processes are running the migrator simultaneously. It’s probably best to avoid running the migrator in multiple processes simultaneously instead of relying on this option.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#values now supports chaining with compounds on PostgreSQL.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]).<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]))
+<span class="ruby-comment"># SELECT * FROM (VALUES (1, 2) UNION (VALUES (3, 4))) AS t1</span>
+</pre>
+</li><li>
+<p>The internal hash used to store transaction metadata now uses compare_by_identity, which is faster and avoids potential issues if a driver implements connection object equality.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

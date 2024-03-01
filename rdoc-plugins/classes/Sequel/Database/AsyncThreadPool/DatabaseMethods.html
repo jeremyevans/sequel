@@ -62,26 +62,26 @@ Sequel::Database::AsyncThreadPool::DatabaseMethods
 [show source]
 </a>
 <pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/async_thread_pool.rb</span>
-<span class="line-num">339</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
-<span class="line-num">340</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">341</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span>
-<span class="line-num">342</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:single</span>, <span class="ruby-value">:sharded_single</span>
-<span class="line-num">343</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot load async_thread_pool extension if using single or sharded_single connection pool&quot;</span>
-<span class="line-num">344</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">345</span> 
-<span class="line-num">346</span>     <span class="ruby-identifier">num_async_threads</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:num_async_threads</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:num_async_threads</span>]) <span class="ruby-operator">:</span> (<span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>))
-<span class="line-num">347</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must have positive number for num_async_threads&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">num_async_threads</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span>
-<span class="line-num">348</span> 
-<span class="line-num">349</span>     <span class="ruby-identifier">proxy_klass</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:preempt_async_thread</span>]) <span class="ruby-operator">?</span> <span class="ruby-constant">PreemptableProxy</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Proxy</span>
-<span class="line-num">350</span>     <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:async_job_class</span>){<span class="ruby-identifier">proxy_klass</span>}
-<span class="line-num">351</span> 
-<span class="line-num">352</span>     <span class="ruby-identifier">queue</span> = <span class="ruby-ivar">@async_thread_queue</span> = <span class="ruby-constant">Queue</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">353</span>     <span class="ruby-identifier">pool</span> = <span class="ruby-ivar">@async_thread_pool</span> = <span class="ruby-identifier">num_async_threads</span>.<span class="ruby-identifier">times</span>.<span class="ruby-identifier">map</span>{<span class="ruby-constant">JobProcessor</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">queue</span>)}
-<span class="line-num">354</span>     <span class="ruby-constant">ObjectSpace</span>.<span class="ruby-identifier">define_finalizer</span>(<span class="ruby-identifier">db</span>, <span class="ruby-constant">JobProcessor</span>.<span class="ruby-identifier">create_finalizer</span>(<span class="ruby-identifier">queue</span>, <span class="ruby-identifier">pool</span>))
+<span class="line-num">346</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">347</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">348</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span>
+<span class="line-num">349</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:single</span>, <span class="ruby-value">:sharded_single</span>
+<span class="line-num">350</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot load async_thread_pool extension if using single or sharded_single connection pool&quot;</span>
+<span class="line-num">351</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">352</span> 
+<span class="line-num">353</span>     <span class="ruby-identifier">num_async_threads</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:num_async_threads</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:num_async_threads</span>]) <span class="ruby-operator">:</span> (<span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>))
+<span class="line-num">354</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must have positive number for num_async_threads&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">num_async_threads</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span>
 <span class="line-num">355</span> 
-<span class="line-num">356</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)
-<span class="line-num">357</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">358</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">356</span>     <span class="ruby-identifier">proxy_klass</span> = <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:preempt_async_thread</span>]) <span class="ruby-operator">?</span> <span class="ruby-constant">PreemptableProxy</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Proxy</span>
+<span class="line-num">357</span>     <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:async_job_class</span>){<span class="ruby-identifier">proxy_klass</span>}
+<span class="line-num">358</span> 
+<span class="line-num">359</span>     <span class="ruby-identifier">queue</span> = <span class="ruby-ivar">@async_thread_queue</span> = <span class="ruby-constant">Queue</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">360</span>     <span class="ruby-identifier">pool</span> = <span class="ruby-ivar">@async_thread_pool</span> = <span class="ruby-identifier">num_async_threads</span>.<span class="ruby-identifier">times</span>.<span class="ruby-identifier">map</span>{<span class="ruby-constant">JobProcessor</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">queue</span>)}
+<span class="line-num">361</span>     <span class="ruby-constant">ObjectSpace</span>.<span class="ruby-identifier">define_finalizer</span>(<span class="ruby-identifier">db</span>, <span class="ruby-constant">JobProcessor</span>.<span class="ruby-identifier">create_finalizer</span>(<span class="ruby-identifier">queue</span>, <span class="ruby-identifier">pool</span>))
+<span class="line-num">362</span> 
+<span class="line-num">363</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)
+<span class="line-num">364</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">365</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

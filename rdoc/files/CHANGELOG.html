@@ -31,12 +31,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-02-01 08:27:41 -0800</span>
+<span class='datetime'>2024-03-01 08:29:33 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.78.0+-282024-03-01-29"><a href="doc/release_notes/5_78_0_txt.html">5.78.0</a> (2024-03-01)<span><a href="#label-5.78.0+-282024-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support SQLite 3.45+ jsonb functions in the sqlite_json_ops extension (jeremyevans) (#2133)</p>
+</li><li>
+<p>Support compounds (e.g. UNION) in conjunction with Database#values on PostgreSQL (jeremyevans) (#2137)</p>
+</li><li>
+<p>Support :use_advisory_lock option to Migrator.run to use advisory locks when running migrations (jeremyevans) (#2089)</p>
+</li><li>
+<p>Support Database#with_advisory_lock on PostgreSQL, MySQL, and Microsoft SQL Server (jeremyevans) (#2089)</p>
+</li></ul>
+
 <h3 id="label-5.77.0+-282024-02-01-29"><a href="doc/release_notes/5_77_0_txt.html">5.77.0</a> (2024-02-01)<span><a href="#label-5.77.0+-282024-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support create_table :without_rowid option on SQLite (loranger32) (#2126)</p>
@@ -55,7 +66,7 @@ Last Update:
 </li><li>
 <p>Support on_duplicate_columns={raise,warn} parameter in connection URL when using duplicate_columns_handler extension (jeremyevans)</p>
 </li><li>
-<p>Add transaction_connection_validator extension for retrying transactions on new connection if ther is a disconnect error when starting transaction (jeremyevans)</p>
+<p>Add transaction_connection_validator extension for retrying transactions on new connection if there is a disconnect error when starting transaction (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-5.76.0+-282024-01-01-29"><a href="doc/release_notes/5_76_0_txt.html">5.76.0</a> (2024-01-01)<span><a href="#label-5.76.0+-282024-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>

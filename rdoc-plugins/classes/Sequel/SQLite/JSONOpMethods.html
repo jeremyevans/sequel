@@ -41,6 +41,7 @@ Sequel::SQLite::JSONOpMethods
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-sqlite_json_op">sqlite_json_op</a></li>
+<li><a href="#method-i-sqlite_jsonb_op">sqlite_jsonb_op</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -64,9 +65,30 @@ Sequel::SQLite::JSONOpMethods
 [show source]
 </a>
 <pre id='method-i-sqlite_json_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
-<span class="line-num">214</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_json_op</span>
-<span class="line-num">215</span>   <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">216</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">256</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_json_op</span>
+<span class="line-num">257</span>   <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">258</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sqlite_jsonb_op'>
+<a name='method-i-sqlite_jsonb_op'></a>
+<div class='synopsis'>
+<span class='name'>sqlite_jsonb_op</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Wrap the receiver in an <a href="JSONBOp.html"><code>JSONBOp</code></a> so you can easily use the <a href="../SQLite.html"><code>SQLite</code></a> jsonb functions and operators with it.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sqlite_jsonb_op-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sqlite_jsonb_op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/sqlite_json_ops.rb</span>
+<span class="line-num">262</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sqlite_jsonb_op</span>
+<span class="line-num">263</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">264</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
