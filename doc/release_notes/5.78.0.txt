@@ -1,0 +1,67 @@
+= New Features
+
+* SQLite 3.45+ jsonb functions are now supported in the sqlite_json_ops
+  extension.  Similar to the postgres_json_ops extension, there are
+  now separate methods for dealing with json and jsonb types:
+
+    Sequel.sqlite_json_op(:column)  # json
+    Sequel.sqlite_jsonb_op(:column) # jsonb
+
+  Some methods that use json_* functions for json ops use jsonb_*
+  functions for jsonb ops:
+
+    jb = Sequel.sqlite_jsonb_op(:column)
+    jb.extract('$.a')    # jsonb_extract(column, '$.a')
+    jb.insert('$.a', 1)  # jsonb_insert(column, '$.a', 1)
+    jb.set('$.a', 1)     # jsonb_set(column, '$.a', 1)
+    jb.replace('$.a', 1) # jsonb_replace(column, '$.a', 1)
+    jb.remove('$.a')     # jsonb_remove(column, '$.a')
+    jb.patch('{"a":2}')  # jsonb_patch(column, '{"a":2}')
+
+  You can use the json and jsonb methods to convert jsonb to json
+  and json to jsonb, respectively.
+
+    jb.json              # json(column)
+
+  Use of the json method on jsonb types is important, because if you
+  want to be able to deal with the values in Ruby, you must convert
+  the jsonb value to json in the database before the database returns
+  the value.  Unlike PostgreSQL, SQLite will not convert the value
+  from jsonb to json on retrieval, and direct use of SQLite's jsonb
+  format is unsupported by SQLite as it is subject to change.
+
+* Database#with_advisory_lock is now supported on PostgreSQL, MySQL,
+  and Microsoft SQL Server. This supports advisory (explicit)
+  locking, using the database-specific APIs.  To work on all three
+  servers, lock ids should be integers in the signed 64-bit range.
+
+    DB.with_advisory_lock(1234) do
+      # do something
+    end
+
+  By default, an AdvisoryLockError is raised if the lock cannot be
+  immediately acquired.  You can use the :wait option to wait until
+  the lock can be acquired, instead of raising.
+
+    DB.with_advisory_lock(1234, wait: true) do
+      # do something
+    end
+
+* Migrator.run now supports a :use_advisory_lock option to use
+  advisory locks when running migrations, so that it does not
+  attempt to run the same migration more than once in the case
+  where multiple processes are running the migrator simultaneously.
+  It's probably best to avoid running the migrator in multiple
+  processes simultaneously instead of relying on this option.
+
+= Other Improvements
+
+* Database#values now supports chaining with compounds on
+  PostgreSQL.
+
+    DB.values([[1, 2]]).union(DB.values([[3, 4]]))
+    # SELECT * FROM (VALUES (1, 2) UNION (VALUES (3, 4))) AS t1
+
+* The internal hash used to store transaction metadata now uses
+  compare_by_identity, which is faster and avoids potential
+  issues if a driver implements connection object equality.
