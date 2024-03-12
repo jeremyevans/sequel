@@ -10,13 +10,12 @@ body:
           - need help
           - want to request a feature
           - want do anything else other than submit a bug report
-        then please use [GitHub Discussions](https://github.com/jeremyevans/sequel/discussions) or the [sequel-talk Google Group](https://groups.google.com/g/sequel-talk).
+        then please use [GitHub Discussions](https://github.com/jeremyevans/sequel/discussions)
 
         ## Check Before Submission
         Before you submit a bug report, please check our existing resources to see if it has already been discussed/reported:
         - [Reported bugs](https://github.com/jeremyevans/sequel/issues?q=is%3Aissue+is%3Aclosed)
         - [GitHub Discussions](https://github.com/jeremyevans/sequel/discussions/)
-        - [sequel-talk Google Group](https://groups.google.com/g/sequel-talk)                
   - type: textarea
     attributes:
       label: Complete Description of Issue
