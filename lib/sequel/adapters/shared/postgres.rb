@@ -1425,7 +1425,7 @@ module Sequel
         elsif options[:foreign]
           raise(Error, "can't provide both :foreign and :unlogged to create_table") if options[:unlogged]
           'FOREIGN '
-        elsif options[:unlogged]
+        elsif options.fetch(:unlogged){typecast_value_boolean(@opts[:unlogged_tables_default])}
           'UNLOGGED '
         end
 

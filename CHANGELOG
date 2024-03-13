@@ -1,5 +1,7 @@
 === master
 
+* Support :unlogged_tables_default Database option on Postgres for making created tables unlogged by default (jeremyevans) (#2134)
+
 * Add Dataset#select_prepend for prepending to the current selected columns (jeremyevans) (#2139)
 
 === 5.78.0 (2024-03-01)

@@ -529,6 +529,24 @@ describe "PostgreSQL support" do
     @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
   end
 
+  it "should respect :unlogged_tables_default Database option when creating a table" do
+    @db.opts[:unlogged_tables_default] = true
+    @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
+    @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+    @db.create_table(:unlogged_dolls){text :name}
+    @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+    @db.create_table(:unlogged_dolls, :unlogged => false){text :name}
+    @db.sqls.must_equal ['CREATE TABLE "unlogged_dolls" ("name" text)']
+
+    @db.opts[:unlogged_tables_default] = 't'
+    @db.create_table(:unlogged_dolls){text :name}
+    @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+
+    @db.opts[:unlogged_tables_default] = 'f'
+    @db.create_table(:unlogged_dolls){text :name}
+    @db.sqls.must_equal ['CREATE TABLE "unlogged_dolls" ("name" text)']
+  end
+
   it "should support spatial indexes" do
     @db.alter_table(:posts){add_spatial_index [:geom]}
     @db.sqls.must_equal ['CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")']
