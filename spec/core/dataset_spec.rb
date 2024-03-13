@@ -1472,7 +1472,7 @@ describe "Dataset#select_append" do
     @d.select(:blah).select_all.select_append(:a, :b).sql.must_equal 'SELECT *, a, b FROM test'
   end
 
-  it "should add to the currently selected columns" do
+  it "should append to the currently selected columns" do
     @d.select(:a).select_append(:b).sql.must_equal 'SELECT a, b FROM test'
     @d.select(Sequel::SQL::ColumnAll.new(:a)).select_append(Sequel::SQL::ColumnAll.new(:b)).sql.must_equal 'SELECT a.*, b.* FROM test'
   end
@@ -1488,6 +1488,35 @@ describe "Dataset#select_append" do
     @d.from(:test, :c).select_append(:b).sql.must_equal 'SELECT test.*, c.*, b FROM test, c'
     @d.cross_join(:c).select_append(:b).sql.must_equal 'SELECT test.*, c.*, b FROM test CROSS JOIN c'
     @d.cross_join(:c).cross_join(:d).select_append(:b).sql.must_equal 'SELECT test.*, c.*, d.*, b FROM test CROSS JOIN c CROSS JOIN d'
+  end
+end
+
+describe "Dataset#select_prepend" do
+  before do
+    @d = Sequel.mock.dataset.from(:test)
+  end
+  
+  it "should select * in addition to columns if no columns selected" do
+    @d.select_prepend(:a, :b).sql.must_equal 'SELECT a, b, test.* FROM test'
+    @d.select_all.select_prepend(:a, :b).sql.must_equal 'SELECT a, b, test.* FROM test'
+    @d.select(:blah).select_all.select_prepend(:a, :b).sql.must_equal 'SELECT a, b, test.* FROM test'
+  end
+
+  it "should prepend to the currently selected columns" do
+    @d.select(:a).select_prepend(:b).sql.must_equal 'SELECT b, a FROM test'
+    @d.select(Sequel::SQL::ColumnAll.new(:a)).select_prepend(Sequel::SQL::ColumnAll.new(:b)).sql.must_equal 'SELECT b.*, a.* FROM test'
+  end
+
+  it "should accept a block that yields a virtual row" do
+    @d.select(:a).select_prepend{|o| o.b}.sql.must_equal 'SELECT b, a FROM test'
+    @d.select(Sequel::SQL::ColumnAll.new(:a)).select_prepend(Sequel::SQL::ColumnAll.new(:b)){b(1)}.sql.must_equal 'SELECT b.*, b(1), a.* FROM test'
+  end
+
+  it "should select from all from and join tables" do
+    @d.select_prepend(:b).sql.must_equal 'SELECT b, test.* FROM test'
+    @d.from(:test, :c).select_prepend(:b).sql.must_equal 'SELECT b, test.*, c.* FROM test, c'
+    @d.cross_join(:c).select_prepend(:b).sql.must_equal 'SELECT b, test.*, c.* FROM test CROSS JOIN c'
+    @d.cross_join(:c).cross_join(:d).select_prepend(:b).sql.must_equal 'SELECT b, test.*, c.*, d.* FROM test CROSS JOIN c CROSS JOIN d'
   end
 end
 
@@ -1952,6 +1981,12 @@ describe "Dataset#with_extend custom methods" do
     @ds = @ds.with_extend{select_group :foo, :baz}
     @ds.foo.sql.must_equal 'SELECT baz FROM items GROUP BY baz'
     @ds.where(:bar).foo.sql.must_equal 'SELECT baz FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a select_prepend method" do
+    @ds = @ds.with_extend{select_prepend :foo, :baz}
+    @ds.foo.sql.must_equal 'SELECT baz, items.* FROM items'
+    @ds.where(:bar).foo.sql.must_equal 'SELECT baz, items.* FROM items WHERE bar'
   end
 
   it "should have dataset_module support a server method" do

@@ -624,10 +624,15 @@ Like +order+, +select+ replaces the existing selected columns:
   Artist.select(:id).select(:name)
   # SELECT name FROM artists
 
-To add to the existing selected columns, use +select_append+:
+To append to the existing selected columns, use +select_append+:
 
   Artist.select(:id).select_append(:name)
   # SELECT id, name FROM artists
+
+To prepend to the existing selected columns, use +select_prepend+:
+
+  Artist.select(:id).select_prepend(:name)
+  # SELECT name, id FROM artists
 
 To remove specifically selected columns, and default back to all
 columns, use +select_all+:

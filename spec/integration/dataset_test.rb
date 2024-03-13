@@ -190,6 +190,10 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>10}]
   end
 
+  it "should support select_prepend and select_append" do
+    @ds.select_prepend{number.as(:n)}.select_append{id.as(:i)}.first.to_a.must_equal [[:n, 10], [:id, 1], [:number, 10], [:i, 1]]
+  end
+
   it "should skip locked rows correctly" do
     skip if async? # async doesn't work with transactions
     @ds.insert(:number=>10)

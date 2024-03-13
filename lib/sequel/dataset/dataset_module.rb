@@ -21,7 +21,7 @@ module Sequel
         where exclude exclude_having having
         distinct grep group group_and_count group_append 
         limit offset order order_append order_prepend reverse 
-        select select_all select_append select_group server
+        select select_all select_append select_group select_prepend server
       METHS
 
       # Define a method in the module

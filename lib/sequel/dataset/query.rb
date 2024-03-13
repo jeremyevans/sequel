@@ -43,7 +43,7 @@ module Sequel
       add_graph_aliases distinct except exclude exclude_having
       filter for_update from from_self graph grep group group_and_count group_append group_by having intersect invert
       limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
-      reverse reverse_order select select_all select_append select_group select_more server
+      reverse reverse_order select select_all select_append select_group select_more select_prepend server
       set_graph_aliases unfiltered ungraphed ungrouped union
       unlimited unordered where with with_recursive with_sql
     METHS
@@ -944,14 +944,8 @@ module Sequel
     #   DB[:items].select(:a).select_append(:b) # SELECT a, b FROM items
     #   DB[:items].select_append(:b) # SELECT *, b FROM items
     def select_append(*columns, &block)
-      cur_sel = @opts[:select]
-      if !cur_sel || cur_sel.empty?
-        unless supports_select_all_and_column?
-          return select_all(*(Array(@opts[:from]) + Array(@opts[:join]))).select_append(*columns, &block)
-        end
-        cur_sel = [WILDCARD]
-      end
-      select(*(cur_sel + columns), &block)
+      virtual_row_columns(columns, block)
+      select(*(_current_select(true) + columns))
     end
 
     # Set both the select and group clauses with the given +columns+.
@@ -973,6 +967,18 @@ module Sequel
       select_append(*columns, &block)
     end
     
+    # Returns a copy of the dataset with the given columns added
+    # to the existing selected columns.  If no columns are currently selected,
+    # it will select the columns given in addition to *.
+    #
+    #   DB[:items].select(:a).select(:b) # SELECT b FROM items
+    #   DB[:items].select(:a).select_prepend(:b) # SELECT b, a FROM items
+    #   DB[:items].select_prepend(:b) # SELECT b, * FROM items
+    def select_prepend(*columns, &block)
+      virtual_row_columns(columns, block)
+      select(*(columns + _current_select(false)))
+    end
+
     # Set the server for this dataset to use.  Used to pick a specific database
     # shard to run a query against, or to override the default (where SELECT uses
     # :read_only database and all other queries use the :default database).  This
@@ -1352,6 +1358,22 @@ module Sequel
       end
     end
     # :nocov:
+
+    # A frozen array for the currently selected columns.
+    def _current_select(allow_plain_wildcard)
+      cur_sel = @opts[:select]
+
+      if !cur_sel || cur_sel.empty?
+        cur_sel = if allow_plain_wildcard && supports_select_all_and_column?
+          [WILDCARD].freeze
+        else
+          tables = Array(@opts[:from]) + Array(@opts[:join])
+          tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze
+        end
+      end
+
+      cur_sel
+    end
 
     # If invert is true, invert the condition.
     def _invert_filter(cond, invert)

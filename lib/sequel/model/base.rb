@@ -17,7 +17,7 @@ module Sequel
     #   natural_join, natural_left_join, natural_right_join, offset, order, order_append, order_by,
     #   order_more, order_prepend, paged_each, qualify, reverse, reverse_order, right_join,
     #   right_outer_join, select, select_all, select_append, select_group, select_hash,
-    #   select_hash_groups, select_map, select_more, select_order_map, server,
+    #   select_hash_groups, select_map, select_more, select_order_map, select_prepend, server,
     #   single_record, single_record!, single_value, single_value!, sum, to_hash, to_hash_groups,
     #   truncate, unfiltered, ungraphed, ungrouped, union, unlimited, unordered, where, where_all,
     #   where_each, where_single_value, with, with_recursive, with_sql

@@ -1,3 +1,7 @@
+=== master
+
+* Add Dataset#select_prepend for prepending to the current selected columns (jeremyevans) (#2139)
+
 === 5.78.0 (2024-03-01)
 
 * Support SQLite 3.45+ jsonb functions in the sqlite_json_ops extension (jeremyevans) (#2133)

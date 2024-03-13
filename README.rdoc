@@ -367,10 +367,12 @@ Like +order+, +select+ overrides an existing selection:
   posts.select(:stamp).select(:name)
   # SELECT name FROM posts
 
-As you might expect, there is an +order_append+ equivalent for +select+ called +select_append+:
+As you might expect, there are +order_append+ and +order_prepend+ equivalents for +select+ called +select_append+ and +select_prepend+:
 
   posts.select(:stamp).select_append(:name)
   # SELECT stamp, name FROM posts
+  posts.select(:stamp).select_prepend(:name)
+  # SELECT name, stamp FROM posts
   
 === Deleting Records
 
