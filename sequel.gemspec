@@ -24,6 +24,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables << 'sequel'
   s.add_dependency "bigdecimal"
+  s.add_dependency "csv"
   s.add_development_dependency "minitest", '>=5.7.0'
   s.add_development_dependency "minitest-hooks"
   s.add_development_dependency "minitest-global_expectations"
