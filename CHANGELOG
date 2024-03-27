@@ -1,5 +1,7 @@
 === master
 
+* Support create_or_replace_view with :materialized option on PostgreSQL (nashby) (#2144)
+
 * Support :unlogged_tables_default Database option on Postgres for making created tables unlogged by default (jeremyevans) (#2134)
 
 * Add Dataset#select_prepend for prepending to the current selected columns (jeremyevans) (#2139)
