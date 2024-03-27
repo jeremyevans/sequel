@@ -252,10 +252,10 @@ module Sequel
     # For databases where replacing a view is not natively supported, support
     # is emulated by dropping a view with the same name before creating the view.
     def create_or_replace_view(name, source, options = OPTS)
-      if supports_create_or_replace_view?
+      if supports_create_or_replace_view? && !options[:materialized]
         options = options.merge(:replace=>true)
       else
-        swallow_database_error{drop_view(name)}
+        swallow_database_error{drop_view(name, options)}
       end
 
       create_view(name, source, options)

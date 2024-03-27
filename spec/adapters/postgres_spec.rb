@@ -849,6 +849,15 @@ describe "PostgreSQL views" do
     @db.views(@opts).must_include :items_view
   end if DB.server_version >= 90300
 
+  it "should support replacing materialized views" do
+    @opts = {:materialized=>true}
+    @db[:items].insert(15)
+    @db.create_or_replace_view(:items_view, @db[:items].where{number > 10}, @opts)
+    @db[:items_view].select_order_map(:number).must_equal [15, 20]
+    @db.create_or_replace_view(:items_view, @db[:items].where{number > 15}, @opts)
+    @db[:items_view].select_order_map(:number).must_equal [20]
+  end if DB.server_version >= 90300
+
   it "should support refreshing materialized views concurrently" do
     @opts = {:materialized=>true}
     @db.create_view(:items_view, @db[:items].where{number >= 10}, @opts)
