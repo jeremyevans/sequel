@@ -1,0 +1,28 @@
+= New Features
+
+* Dataset#select_prepend has been added for prepending to the
+  currently selected columns:
+
+    DB[:table].select_prepend(:column)
+    # SELECT column, table.*
+
+  As not all databases support "SELECT column, *", select_prepend
+  qualifies wildcard selections to all tables referenced in the
+  query.
+
+  The only reason to use select_prepend is if you want the hashes
+  returned by Sequel to be in a specific order.  Otherwise, it is
+  better to use select_append.
+
+* On PostgreSQL, Sequel now supports an :unlogged_tables_default
+  Database option, which will default created tables to be UNLOGGED.
+  This can be useful to speedup testing in some cases, but it should
+  never be used in cases where data integrity is important.
+
+= Other Improvements
+
+* On PostgreSQL, Database#create_or_replace_view now supports the
+  :materialized option.  This allows for dropping an existing
+  materialized view and creating a new one with the same name
+  (PostgreSQL does not have native support for replacing materialized
+  views).

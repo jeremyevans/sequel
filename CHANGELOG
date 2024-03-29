@@ -1,4 +1,4 @@
-=== master
+=== 5.79.0 (2024-04-01)
 
 * Support create_or_replace_view with :materialized option on PostgreSQL (nashby) (#2144)
 
