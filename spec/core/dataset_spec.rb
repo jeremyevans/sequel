@@ -1507,6 +1507,11 @@ describe "Dataset#select_prepend" do
     @d.select(Sequel::SQL::ColumnAll.new(:a)).select_prepend(Sequel::SQL::ColumnAll.new(:b)).sql.must_equal 'SELECT b.*, a.* FROM test'
   end
 
+  it "should work with an explicit selection of *" do
+    @d.select_append(:a).select_prepend(:b).sql.must_equal 'SELECT b, test.*, a FROM test'
+    @d.from(:t1, :t2).natural_join(:t3).select_append(:a).select_prepend(:b).sql.must_equal 'SELECT b, t1.*, t2.*, t3.*, a FROM t1, t2 NATURAL JOIN t3'
+  end
+
   it "should accept a block that yields a virtual row" do
     @d.select(:a).select_prepend{|o| o.b}.sql.must_equal 'SELECT b, a FROM test'
     @d.select(Sequel::SQL::ColumnAll.new(:a)).select_prepend(Sequel::SQL::ColumnAll.new(:b)){b(1)}.sql.must_equal 'SELECT b.*, b(1), a.* FROM test'

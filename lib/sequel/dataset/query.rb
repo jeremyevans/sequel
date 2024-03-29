@@ -1367,12 +1367,26 @@ module Sequel
         cur_sel = if allow_plain_wildcard && supports_select_all_and_column?
           [WILDCARD].freeze
         else
-          tables = Array(@opts[:from]) + Array(@opts[:join])
-          tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze
+          _current_select_column_all
         end
+      elsif !allow_plain_wildcard && cur_sel.include?(WILDCARD)
+        cur_sel = cur_sel.dup
+        index = cur_sel.index(WILDCARD)
+        cur_sel.delete(WILDCARD)
+        _current_select_column_all.each_with_index do |ca, i|
+          cur_sel.insert(index+i, ca)
+        end
+        cur_sel.freeze
       end
 
       cur_sel
+    end
+
+    # An array of SQL::ColumnAll objects for all FROM and JOIN tables.  Used for select_append
+    # and select_prepend.
+    def _current_select_column_all
+      tables = Array(@opts[:from]) + Array(@opts[:join])
+      tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze
     end
 
     # If invert is true, invert the condition.
