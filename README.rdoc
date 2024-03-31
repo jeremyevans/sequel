@@ -22,6 +22,7 @@ RDoc Documentation :: https://sequel.jeremyevans.net/rdoc
 Source Code :: https://github.com/jeremyevans/sequel
 Bug tracking (GitHub Issues) :: https://github.com/jeremyevans/sequel/issues
 Discussion Forum (GitHub Discussions) :: https://github.com/jeremyevans/sequel/discussions
+Archived Discussion Forum (sequel-talk Google Group) :: https://www.mail-archive.com/sequel-talk@googlegroups.com/
 
 If you have questions about how to use Sequel, please ask on
 GitHub Discussions.

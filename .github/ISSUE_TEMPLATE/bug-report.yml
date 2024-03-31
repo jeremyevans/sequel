@@ -16,6 +16,8 @@ body:
         Before you submit a bug report, please check our existing resources to see if it has already been discussed/reported:
         - [Reported bugs](https://github.com/jeremyevans/sequel/issues?q=is%3Aissue+is%3Aclosed)
         - [GitHub Discussions](https://github.com/jeremyevans/sequel/discussions/)
+        - [Archived sequel-talk](https://www.mail-archive.com/sequel-talk@googlegroups.com/)
+           
   - type: textarea
     attributes:
       label: Complete Description of Issue
