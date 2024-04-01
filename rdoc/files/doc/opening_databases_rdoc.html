@@ -31,7 +31,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-12-27 10:10:07 -0800</span>
+<span class='datetime'>2024-03-13 16:18:36 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -354,6 +354,8 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>Specify the path to the root SSL certificate to use.</p>
 </td></tr><tr><td class='label'>:search_path </td><td>
 <p>Set to the schema search_path.  This can either be a single string containing the schemas separated by commas (for use via a URL: <code>postgres:///?search_path=schema1,schema2</code>), or it can be an array of strings (for use via an option: <code>Sequel.postgres(search_path: [&#39;schema1&#39;, &#39;schema2&#39;])</code>).</p>
+</td></tr><tr><td class='label'>:unlogged_tables_default </td><td>
+<p>Set to true to use UNLOGGED by default for created tables, for potentially better performance when data integrity is not important.</p>
 </td></tr><tr><td class='label'>:use_iso_date_format </td><td>
 <p>This can be set to false to not force the ISO date format.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> forces it by default to allow for an optimization.</p>
 </td></tr></tbody></table>

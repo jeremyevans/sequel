@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.79.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.79.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.79.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-04-01 09:04:21 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#select_prepend has been added for prepending to the currently selected columns:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select_prepend</span>(<span class="ruby-value">:column</span>)
+<span class="ruby-comment"># SELECT column, table.*</span>
+</pre>
+
+<p>As not all databases support “SELECT column, *”, select_prepend qualifies wildcard selections to all tables referenced in the query.</p>
+
+<p>The only reason to use select_prepend is if you want the hashes returned by <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to be in a specific order.  Otherwise, it is better to use select_append.</p>
+</li><li>
+<p>On PostgreSQL, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports an :unlogged_tables_default Database option, which will default created tables to be UNLOGGED. This can be useful to speedup testing in some cases, but it should never be used in cases where data integrity is important.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>On PostgreSQL, Database#create_or_replace_view now supports the :materialized option.  This allows for dropping an existing materialized view and creating a new one with the same name (PostgreSQL does not have native support for replacing materialized views).</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

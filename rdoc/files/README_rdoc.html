@@ -31,7 +31,7 @@ README.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-09-19 10:01:52 -0700</span>
+<span class='datetime'>2024-03-31 10:39:03 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -61,11 +61,11 @@ Last Update:
 <p><a target="_top" href="https://github.com/jeremyevans/sequel/issues">github.com/jeremyevans/sequel/issues</a></p>
 </td></tr><tr><td class='label'>Discussion Forum (GitHub Discussions) </td><td>
 <p><a target="_top" href="https://github.com/jeremyevans/sequel/discussions">github.com/jeremyevans/sequel/discussions</a></p>
-</td></tr><tr><td class='label'>Alternate Discussion Forum (sequel-talk Google Group) </td><td>
-<p><a target="_top" href="http://groups.google.com/group/sequel-talk">groups.google.com/group/sequel-talk</a></p>
+</td></tr><tr><td class='label'>Archived Discussion Forum (sequel-talk Google Group) </td><td>
+<p><a target="_top" href="https://www.mail-archive.com/sequel-talk@googlegroups.com">www.mail-archive.com/sequel-talk@googlegroups.com</a>/</p>
 </td></tr></tbody></table>
 
-<p>If you have questions about how to use <a href="../classes/Sequel.html"><code>Sequel</code></a>, please ask on GitHub Discussions or the sequel-talk Google Group. Only use the the bug tracker to report bugs in <a href="../classes/Sequel.html"><code>Sequel</code></a>, not to ask for help on using <a href="../classes/Sequel.html"><code>Sequel</code></a>.</p>
+<p>If you have questions about how to use <a href="../classes/Sequel.html"><code>Sequel</code></a>, please ask on GitHub Discussions. Only use the the bug tracker to report bugs in <a href="../classes/Sequel.html"><code>Sequel</code></a>, not to ask for help on using <a href="../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
 <p>To check out the source code:</p>
 
@@ -446,10 +446,12 @@ Last Update:
 <span class="ruby-comment"># SELECT name FROM posts</span>
 </pre>
 
-<p>As you might expect, there is an <code>order_append</code> equivalent for <code>select</code> called <code>select_append</code>:</p>
+<p>As you might expect, there are <code>order_append</code> and <code>order_prepend</code> equivalents for <code>select</code> called <code>select_append</code> and <code>select_prepend</code>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:stamp</span>).<span class="ruby-identifier">select_append</span>(<span class="ruby-value">:name</span>)
 <span class="ruby-comment"># SELECT stamp, name FROM posts</span>
+<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:stamp</span>).<span class="ruby-identifier">select_prepend</span>(<span class="ruby-value">:name</span>)
+<span class="ruby-comment"># SELECT name, stamp FROM posts</span>
 </pre>
 
 <h3 id="label-Deleting+Records">Deleting Records<span><a href="#label-Deleting+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
