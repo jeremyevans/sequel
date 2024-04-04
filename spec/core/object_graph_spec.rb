@@ -338,4 +338,8 @@ describe Sequel::Dataset do
     @db.fetch = {:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}
     @ds1.graph(@ds2, :x=>:id).ungraphed.all.must_equal [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}]
   end
+
+  it "#ungraphed should return the receiver if not graphed" do
+    @ds1.ungraphed.must_be_same_as @ds1
+  end
 end

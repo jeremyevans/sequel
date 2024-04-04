@@ -260,6 +260,11 @@ describe "A dataset with a limit" do
     @dataset.db.sqls.must_equal ['DELETE FROM a']
   end
   
+  it "should return receiver if already skipping limit check" do
+    ds = @dataset.skip_limit_check
+    ds.skip_limit_check.must_be_same_as ds
+  end
+
   it "should raise on #update" do
     proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
   end
@@ -1395,6 +1400,11 @@ describe "Dataset#select_all" do
     @d.select_all.sql.must_equal 'SELECT * FROM test'
   end
   
+  it "should return receiver if called without arguments and it already uses SELECT *" do
+    d = @d.select_all
+    d.select_all.must_be_same_as d
+  end
+
   it "should override the previous select option" do
     @d.select(:a, :b, :c).select_all.sql.must_equal 'SELECT * FROM test'
   end
@@ -1584,6 +1594,12 @@ describe "Dataset#unfiltered" do
       ds.unfiltered.sql.must_equal 'SELECT * FROM test'
     end
   end
+
+  it "should return receiver if it does not have a WHERE or HAVING clause" do
+    ds = Sequel.mock.dataset.from(:test).filter(:score=>1)
+    ds = ds.unfiltered
+    ds.unfiltered.must_be_same_as ds
+  end
 end
 
 describe "Dataset#unlimited" do
@@ -1592,6 +1608,12 @@ describe "Dataset#unlimited" do
     3.times do
       ds.unlimited.sql.must_equal 'SELECT * FROM test'
     end
+  end
+
+  it "should return receiver if it does not have a LIMIT or OFFSET" do
+    ds = Sequel.mock.dataset.from(:test).limit(1, 2)
+    ds = ds.unlimited
+    ds.unlimited.must_be_same_as ds
   end
 end
 
@@ -1602,6 +1624,12 @@ describe "Dataset#ungrouped" do
       ds.ungrouped.sql.must_equal 'SELECT * FROM test'
     end
   end
+
+  it "should return receiver if it does not have a WHERE or HAVING clause" do
+    ds = Sequel.mock.dataset.from(:test).group(:a).having(:b)
+    ds = ds.ungrouped
+    ds.ungrouped.must_be_same_as ds
+  end
 end
 
 describe "Dataset#unordered" do
@@ -1610,6 +1638,12 @@ describe "Dataset#unordered" do
     3.times do
       ds.unordered.sql.must_equal 'SELECT * FROM test'
     end
+  end
+
+  it "should return receiver if it does not have an ORDER clause" do
+    ds = Sequel.mock.dataset.from(:test).order(:name)
+    ds = ds.unordered
+    ds.unordered.must_be_same_as ds
   end
 end
 
@@ -2014,10 +2048,15 @@ describe "Dataset#with_row_proc" do
 end
 
 describe "Dataset#naked" do
-  it "should returned clone dataset without row_proc" do
+  it "should return clone dataset without row_proc" do
     d = Sequel.mock.dataset.with_row_proc(proc{|r| r})
     d.naked.row_proc.must_be_nil
     d.row_proc.wont_be_nil
+  end
+
+  it "should return receiver if it doesn't have a row_proc" do
+    d = Sequel.mock.dataset
+    d.naked.must_be_same_as d
   end
 end
 
@@ -2220,6 +2259,11 @@ describe "Dataset#distinct" do
     proc{@dataset.distinct(:a)}.must_raise(Sequel::InvalidOperation)
   end
   
+  it "should return receiver if already distinct" do
+    ds = @dataset.distinct
+    ds.distinct.must_be_same_as ds
+  end
+
   it "should use DISTINCT ON if columns are given and DISTINCT ON is supported" do
     @dataset = @dataset.with_extend{def supports_distinct_on?; true end}
     @dataset.distinct(:a, :b).sql.must_equal 'SELECT DISTINCT ON (a, b) name FROM test'
@@ -2520,6 +2564,13 @@ describe "Dataset#from_self" do
     end
     ds.from(:a).with(:a, ds.from(:b)).from_self.sql.must_equal 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
     ds.from(:a, :c).with(:a, ds.from(:b)).with(:c, ds.from(:d)).from_self.sql.must_equal 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a, c) AS t1'
+  end
+end
+
+describe "Dataset#lateral" do
+  it "should return receiver if already using LATERAL" do
+    ds = Sequel.mock.dataset.lateral
+    ds.lateral.must_be_same_as ds
   end
 end
 
@@ -5206,6 +5257,11 @@ describe "Dataset#lock_style and for_update" do
     end
   end
   
+  it "#for_update should return receiver if already using FOR UPDATE" do
+    ds = @ds.for_update
+    ds.for_update.must_be_same_as ds
+  end
+
   it "#lock_style should accept symbols" do
     @ds.lock_style(:update).sql.must_equal "SELECT * FROM t FOR UPDATE"
   end
@@ -5234,6 +5290,15 @@ describe "Dataset#nowait" do
       @ds.nowait.sql.must_equal "SELECT * FROM t FOR UPDATE NOWAIT"
     end
   end
+
+  it "should return receiver if it already uses NOWAIT" do
+    @ds = @ds.with_extend do
+      def supports_nowait?; true end
+      def select_lock_sql(sql) super; sql << " NOWAIT" if @opts[:nowait] end
+    end
+    ds = @ds.nowait
+    ds.nowait.must_be_same_as ds
+  end
 end
   
 describe "Dataset#skip_locked" do
@@ -5254,6 +5319,15 @@ describe "Dataset#skip_locked" do
     3.times do
       @ds.skip_locked.sql.must_equal "SELECT * FROM t FOR UPDATE SKIP LOCKED"
     end
+  end
+
+  it "should return receiver if it already uses SKIP LOCKED" do
+    @ds = @ds.with_extend do
+      def supports_skip_locked?; true end
+      def select_lock_sql(sql) super; sql << " SKIP LOCKED" if @opts[:skip_locked] end
+    end
+    ds = @ds.skip_locked
+    ds.skip_locked.must_be_same_as ds
   end
 end
   
@@ -5314,6 +5388,11 @@ describe "Dataset#returning" do
     @ds.delete_sql.must_equal "DELETE FROM t"
     @ds.insert_sql(1).must_equal "INSERT INTO t VALUES (1)"
     @ds.update_sql(:foo=>1).must_equal "UPDATE t SET foo = 1"
+  end
+
+  it "should return receiver if called without arguments and it already uses RETURNING *" do
+    ds = @ds.returning
+    ds.returning.must_be_same_as ds
   end
 
   it "should have insert, update, and delete yield to blocks if RETURNING is used" do

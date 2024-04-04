@@ -129,6 +129,7 @@ module Sequel
     def distinct(*args, &block)
       virtual_row_columns(args, block)
       if args.empty?
+        return self if opts[:distinct] == EMPTY_ARRAY
         cached_dataset(:_distinct_ds){clone(:distinct => EMPTY_ARRAY)}
       else
         raise(InvalidOperation, "DISTINCT ON not supported") unless supports_distinct_on?
@@ -230,6 +231,7 @@ module Sequel
     #
     #   DB[:table].for_update # SELECT * FROM table FOR UPDATE
     def for_update
+       return self if opts[:lock] == :update
       cached_dataset(:_for_update_ds){lock_style(:update)}
     end
 
@@ -641,6 +643,7 @@ module Sequel
     #   DB.from(:a, DB[:b].where(Sequel[:a][:c]=>Sequel[:b][:d]).lateral)
     #   # SELECT * FROM a, LATERAL (SELECT * FROM b WHERE (a.c = b.d))
     def lateral
+      return self if opts[:lateral]
       cached_dataset(:_lateral_ds){clone(:lateral=>true)}
     end
 
@@ -744,6 +747,7 @@ module Sequel
     #   ds.all # => [{2=>:id}]
     #   ds.naked.all # => [{:id=>2}]
     def naked
+      return self unless opts[:row_proc]
       cached_dataset(:_naked_ds){with_row_proc(nil)}
     end
 
@@ -753,6 +757,7 @@ module Sequel
     #   DB[:items].for_update.nowait
     #   # SELECT * FROM items FOR UPDATE NOWAIT
     def nowait
+      return self if opts[:nowait]
       cached_dataset(:_nowait_ds) do
         raise(Error, 'This dataset does not support raises errors instead of waiting for locked rows') unless supports_nowait?
         clone(:nowait=>true)
@@ -878,6 +883,7 @@ module Sequel
     #   end
     def returning(*values)
       if values.empty?
+        return self if opts[:returning] == EMPTY_ARRAY
         cached_dataset(:_returning_ds) do
           raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
           clone(:returning=>EMPTY_ARRAY)
@@ -930,6 +936,7 @@ module Sequel
     #   DB[:items].select_all(:items, :foo) # SELECT items.*, foo.* FROM items
     def select_all(*tables)
       if tables.empty?
+        return self unless opts[:select]
         cached_dataset(:_select_all_ds){clone(:select => nil)}
       else
         select(*tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze)
@@ -1005,6 +1012,7 @@ module Sequel
 
     # Specify that the check for limits/offsets when updating/deleting be skipped for the dataset.
     def skip_limit_check
+      return self if opts[:skip_limit_check]
       cached_dataset(:_skip_limit_check_ds) do
         clone(:skip_limit_check=>true)
       end
@@ -1012,6 +1020,7 @@ module Sequel
 
     # Skip locked rows when returning results from this dataset.
     def skip_locked
+      return self if opts[:skip_locked]
       cached_dataset(:_skip_locked_ds) do
         raise(Error, 'This dataset does not support skipping locked rows') unless supports_skip_locked?
         clone(:skip_locked=>true)
@@ -1023,6 +1032,7 @@ module Sequel
     #   DB[:items].group(:a).having(a: 1).where(:b).unfiltered
     #   # SELECT * FROM items GROUP BY a
     def unfiltered
+      return self unless opts[:where] || opts[:having]
       cached_dataset(:_unfiltered_ds){clone(:where => nil, :having => nil)}
     end
 
@@ -1031,6 +1041,7 @@ module Sequel
     #   DB[:items].group(:a).having(a: 1).where(:b).ungrouped
     #   # SELECT * FROM items WHERE b
     def ungrouped
+      return self unless opts[:group] || opts[:having]
       cached_dataset(:_ungrouped_ds){clone(:group => nil, :having => nil)}
     end
 
@@ -1058,6 +1069,7 @@ module Sequel
     # 
     #   DB[:items].limit(10, 20).unlimited # SELECT * FROM items
     def unlimited
+      return self unless opts[:limit] || opts[:offset]
       cached_dataset(:_unlimited_ds){clone(:limit=>nil, :offset=>nil)}
     end
 
@@ -1065,6 +1077,7 @@ module Sequel
     # 
     #   DB[:items].order(:a).unordered # SELECT * FROM items
     def unordered
+      return self unless opts[:order]
       cached_dataset(:_unordered_ds){clone(:order=>nil)}
     end
     
