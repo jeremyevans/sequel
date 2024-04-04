@@ -36,6 +36,7 @@ require 'rbconfig'
 module Sequel
   module CallerLogging
     SEQUEL_LIB_PATH = (File.expand_path('../../..', __FILE__) + '/').freeze
+    RUBY_STDLIB = RbConfig::CONFIG["rubylibdir"]
 
     # A regexp of caller lines to ignore, in addition to internal Sequel and Ruby code.
     attr_accessor :caller_logging_ignore
@@ -59,7 +60,7 @@ module Sequel
       ignore = caller_logging_ignore
       c = caller.find do |line|
         !(line.start_with?(SEQUEL_LIB_PATH) ||
-          line.start_with?(RbConfig::CONFIG["rubylibdir"]) ||
+          line.start_with?(RUBY_STDLIB) ||
           (ignore && line =~ ignore))
       end
 
