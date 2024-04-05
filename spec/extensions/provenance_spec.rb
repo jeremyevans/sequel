@@ -13,8 +13,10 @@ describe "provenance extension" do
       where(:c)
   end
 
-  if RUBY_ENGINE == 'jruby'
+  if RUBY_ENGINE == 'jruby' && RUBY_VERSION >= '3.1'
     line1 = line2 = line3 = line + 3
+  elsif RUBY_ENGINE == 'jruby' && RUBY_VERSION < '2.6'
+    line1 = line2 = line3 = line
   elsif RUBY_VERSION >= '2'
     line1 = line+1
     line2 = line+2
