@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#skip_locked on MariaDB 10.6+ (simi) (#2150)
+
 * Avoid allocating datasets in cases where the returned dataset would be the same as the receiver (jeremyevans)
 
 * Add provenance dataset extension, which includes comments in queries showing how and where the dataset was built (jeremyevans)
