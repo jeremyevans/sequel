@@ -926,9 +926,9 @@ module Sequel
         (type == :insert && db.mariadb? && db.adapter_scheme != :jdbc) ? (db.server_version >= 100500) : false
       end
 
-      # MySQL 8+ supports SKIP LOCKED.
+      # MySQL 8+ and MariaDB 10.6+ support SKIP LOCKED.
       def supports_skip_locked?
-        !db.mariadb? && db.server_version >= 80000
+        (!db.mariadb? && db.server_version >= 80000) || (db.mariadb? && db.server_version >= 100600)
       end
 
       # Check the database setting for whether fractional timestamps
