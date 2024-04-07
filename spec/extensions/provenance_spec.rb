@@ -5,25 +5,17 @@ describe "provenance extension" do
     @ds = Sequel.mock.dataset.extension(:provenance)
   end
 
-  line = __LINE__ + 2
+  line = __LINE__ + 1
   def ds
-    @ds.
-      from(:t).
-      select(:a).
-      where(:c)
+    ds = @ds.from(:t)
+    ds = ds.select(:a)
+    ds = ds.where(:c)
+    ds
   end
 
-  if RUBY_ENGINE == 'jruby' && RUBY_VERSION >= '3.1'
-    line1 = line2 = line3 = line + 3
-  elsif RUBY_ENGINE == 'jruby' && RUBY_VERSION < '2.6'
-    line1 = line2 = line3 = line
-  elsif RUBY_VERSION >= '2'
-    line1 = line+1
-    line2 = line+2
-    line3 = line+3
-  else
-    line1 = line2 = line3 = line
-  end
+  line1 = line+1
+  line2 = line+2
+  line3 = line+3
 
   it "should not include provenance comment if there is no comment" do
     @ds.sql.must_equal 'SELECT *'
