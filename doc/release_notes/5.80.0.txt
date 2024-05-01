@@ -1,0 +1,40 @@
+= New Features
+
+* A provenance dataset extension has been added. This extension makes
+  SQL queries include a comment describing how the dataset was built.
+  This can make debugging complex cases significantly easier. Here's
+  a simple example:
+
+    DB.extension :provenance
+
+    DB[:table].
+      select(:a).
+      where{b > 10}.
+      order(:c).
+      limit(10)
+      # SQL:
+      # SELECT a FROM table WHERE (b > 10) ORDER BY c LIMIT 10 --
+      #  -- Dataset Provenance
+      #  -- Keys:[:from] Source:(eval at bin/sequel:257):2:in `<main>'
+      #  -- Keys:[:select] Source:(eval at bin/sequel:257):3:in `<main>'
+      #  -- Keys:[:where] Source:(eval at bin/sequel:257):4:in `<main>'
+      #  -- Keys:[:order] Source:(eval at bin/sequel:257):5:in `<main>'
+      #  -- Keys:[:limit] Source:(eval at bin/sequel:257):6:in `<main>'
+
+  With the above example, it's obvious how the dataset is created, but
+  but in real applications, where datasets can be built from multiple
+  files, seeing where each dataset clone was made can be helpful.
+
+  The source listed will skip locations in the Ruby standard library
+  as well as Sequel itself.  Other locations can be skipped by
+  providing a Database :provenance_caller_ignore Regexp option:
+
+    DB.opts[:provenance_caller_ignore] = /\/gems\/library_name-/
+
+= Other Improvements
+
+* For dataset methods where Sequel can determine that the return
+  value would be equivalent to the receiver, Sequel now returns the
+  receiver.  This reduces the number of dataset allocations.
+
+* Sequel now supports Dataset#skip_locked on MariaDB 10.6+.
