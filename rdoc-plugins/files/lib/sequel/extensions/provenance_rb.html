@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>provenance.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>provenance.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/provenance.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-04-04 14:06:41 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The provenance dataset extension tracks the locations of all dataset clones that resulted in the current dataset, and includes the information as a comment in the dataset’s SQL.  This makes it possible to see how a query was built, which can aid debugging. Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].
+  <span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>).
+  <span class="ruby-identifier">where</span>{<span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>}.
+  <span class="ruby-identifier">order</span>(<span class="ruby-value">:c</span>).
+  <span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span>)
+<span class="ruby-comment"># SQL:</span>
+<span class="ruby-comment"># SELECT a FROM table WHERE (b &gt; 10) ORDER BY c LIMIT 10 --</span>
+<span class="ruby-comment">#  -- Dataset Provenance</span>
+<span class="ruby-comment">#  -- Keys:[:from] Source:(eval at bin/sequel:257):2:in `&lt;main&gt;&#39;</span>
+<span class="ruby-comment">#  -- Keys:[:select] Source:(eval at bin/sequel:257):3:in `&lt;main&gt;&#39;</span>
+<span class="ruby-comment">#  -- Keys:[:where] Source:(eval at bin/sequel:257):4:in `&lt;main&gt;&#39;</span>
+<span class="ruby-comment">#  -- Keys:[:order] Source:(eval at bin/sequel:257):5:in `&lt;main&gt;&#39;</span>
+<span class="ruby-comment">#  -- Keys:[:limit] Source:(eval at bin/sequel:257):6:in `&lt;main&gt;&#39;</span>
+</pre>
+
+<p>With the above example, the source is fairly obvious and not helpful, but in real applications, where datasets can be built from multiple files, seeing where each dataset clone was made can be helpful.</p>
+
+<p>The Source listed will skip locations in the Ruby standard library as well as <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> itself.  Other locations can be skipped by providing a Database :provenance_caller_ignore Regexp option:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:provenance_caller_ignore</span>] = <span class="ruby-regexp">/\/gems\/library_name-/</span>
+</pre>
+
+<p>Related module: <a href="../../../../classes/Sequel/Dataset/Provenance.html"><code>Sequel::Dataset::Provenance</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
