@@ -1058,3 +1058,29 @@ describe 'Regexp support' do
     db[:names].where(name: /^J/).select_order_map(:name).must_equal %w[Jane John]
   end if RUBY_VERSION >= '3.3'
 end if DB.adapter_scheme == :sqlite
+
+# Force a separate Database object for these tests, so temporarily_release_connection
+# extension is always tested if testing the sqlite adapter.
+describe 'temporarily_release_connection plugin' do
+  it "should temporarily release a connection" do
+    db = Sequel.sqlite
+    db.extension :temporarily_release_connection
+
+    db.create_table(:i){Integer :i}
+
+    db.transaction(:rollback=>:always) do |c|
+      db.temporarily_release_connection(c) do
+        4.times.map do |i|
+          Thread.new do
+            db.synchronize do |conn|
+              _(conn).must_be_same_as c
+            end
+            db[:i].insert(i)
+          end
+        end.map(&:join)
+      end
+      db[:i].count.must_equal 4
+    end
+    db[:i].count.must_equal 0
+  end
+end if DB.adapter_scheme == :sqlite

@@ -1,3 +1,7 @@
+=== master
+
+* Add temporarily_release_connection Database extension for multithreaded transactional testing (jeremyevans)
+
 === 5.80.0 (2024-05-01)
 
 * Support Dataset#skip_locked on MariaDB 10.6+ (simi) (#2150)
