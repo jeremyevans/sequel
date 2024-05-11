@@ -91,9 +91,11 @@ unsafe runtime modification of the configuration:
   model_classes.each(&:freeze)
   DB.freeze
 
-The `subclasses` plugin can be used to keep track of all model classes
-that have been setup in your application. Finalizing their associations
-and freezing them can easily be achieved through the plugin:
+`model_classes` is not a Sequel method, it indicates an array of model
+classes you defined. Instead of listing them manually, the `subclasses`
+plugin can be used to keep track of all model classes that have been
+setup in your application. Finalizing their associations and freezing
+them can easily be achieved through the plugin:
 
   # Register the plugin before setting up the models
   Sequel::Model.plugin :subclasses
