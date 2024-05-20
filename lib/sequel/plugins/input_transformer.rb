@@ -24,7 +24,7 @@ module Sequel
     #   # Make the Album class support input transformers 
     #   Album.plugin :input_transformer
     module InputTransformer
-      def self.apply(model, *)
+      def self.apply(model, *, &_)
         model.instance_exec do
           @input_transformers = {}
           @skip_input_transformer_columns = {}

@@ -586,7 +586,7 @@ module Sequel
         end
       end
 
-      def self.apply(model, opts=OPTS)
+      def self.apply(model, opts=OPTS, &_)
         model.plugin :serialization
       end
 
