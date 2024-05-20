@@ -109,7 +109,8 @@ describe "Model#before_save && Model#after_save" do
 
   it "#save should have a raised exception reference the model instance" do
     @c.send(:define_method, :before_save){cancel_action}
-    proc{@c.create(:x => 2233)}.must_raise(Sequel::HookFailed){|e| e.model.must_equal @c.load(:x=>2233)}
+    e = proc{@c.create(:x => 2233)}.must_raise(Sequel::HookFailed)
+    e.model.must_equal @c.load(:x=>2233)
     DB.sqls.must_equal []
   end
 end
