@@ -19,7 +19,7 @@ describe "caller_logging extension" do
     @log_stream.rewind
     lines = @log_stream.read.split("\n")
     lines.length.must_equal 1
-    lines[0].must_match(/ \(source: #{__FILE__}:#{exec_sql_line}:in `exec_sql'\) SELECT \* FROM items\z/)
+    lines[0].must_match(/ \(source: #{__FILE__}:#{exec_sql_line}:in [`']exec_sql'\) SELECT \* FROM items\z/)
   end
 
   it "should allow formatting of caller information" do
@@ -37,7 +37,7 @@ describe "caller_logging extension" do
     @log_stream.rewind
     lines = @log_stream.read.split("\n")
     lines.length.must_equal 1
-    lines[0].must_match(/ \(source: #{__FILE__}:#{line}:in `block.+\) SELECT \* FROM items\z/)
+    lines[0].must_match(/ \(source: #{__FILE__}:#{line}:in [`']block.+\) SELECT \* FROM items\z/)
   end
 
   it "should not log caller information if all callers lines are filtered" do
