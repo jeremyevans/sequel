@@ -38,6 +38,7 @@ module Sequel
     module Provenance
       SEQUEL_LIB_PATH = (File.expand_path('../../..', __FILE__) + '/').freeze
       RUBY_STDLIB = RbConfig::CONFIG["rubylibdir"]
+      INTERNAL = '<internal'
 
       if TRUE_FREEZE
         # Include provenance information when cloning datasets.
@@ -98,6 +99,7 @@ module Sequel
         caller.find do |line|
           !(line.start_with?(SEQUEL_LIB_PATH) ||
             line.start_with?(RUBY_STDLIB) ||
+            line.start_with?(INTERNAL) ||
             (ignore && line =~ ignore))
         end
       end

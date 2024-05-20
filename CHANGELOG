@@ -1,5 +1,7 @@
 === master
 
+* Skip Ruby internal caller locations when searching for caller locations in caller_logging and provenance extensions (jeremyevans) 
+
 * Add temporarily_release_connection Database extension for multithreaded transactional testing (jeremyevans)
 
 === 5.80.0 (2024-05-01)
