@@ -140,7 +140,8 @@ describe "pg_interval extension" do
 
     proc{@db.typecast_value(:interval, '1'*1000+' secs')}.must_raise(Sequel::InvalidValue)
     @db.check_string_typecast_bytesize = false
-    @db.typecast_value(:interval, '1'*1000+' secs').must_be_kind_of ActiveSupport::Duration
+    secs = '1'*1000
+    @db.typecast_value(:interval, secs+' secs').to_i.must_equal secs.to_i
   end
 
   it "should return correct results for Database#schema_type_class" do
