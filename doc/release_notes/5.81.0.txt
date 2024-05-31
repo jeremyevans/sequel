@@ -1,0 +1,31 @@
+= New Features
+
+* A temporarily_release_connection Database extension has been added,
+  designed for multithreaded transactional testing.
+
+  This allows one thread to start a transaction, and then release
+  the connection back for usage by the connection pool, so that
+  other threads can operate on the connection object safely inside
+  the transaction.  This requires the connection pool be limited
+  to a single connection, to ensure that the released connection
+  can be reacquired.  It's not perfect, because if the connection
+  is disconnected and removed from the pool while temporarily
+  released, there is no way to handle that situation correctly.
+  Example:
+
+    DB.transaction(rollback: :always, auto_savepoint: true) do |conn|
+      DB.temporarily_release_connection(conn) do
+        # Other threads can operate on connection safely inside
+        # the transaction
+        yield
+      end
+    end
+
+= Other Improvements
+
+* In the caller_logging and provenance extensions, Ruby internal
+  caller locations are skipped when trying to locate the appropriate
+  caller line to include.
+
+* A couple ignored block warnings in plugin apply methods have been
+  fixed on Ruby 3.4.
