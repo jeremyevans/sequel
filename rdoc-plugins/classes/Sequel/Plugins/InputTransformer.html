@@ -82,7 +82,7 @@ Sequel::Plugins::InputTransformer
 <div class='method public-class' id='method-method-c-apply'>
 <a name='method-c-apply'></a>
 <div class='synopsis'>
-<span class='name'>apply</span><span class='arguments'>(model, *)</span>
+<span class='name'>apply</span><span class='arguments'>(model, *, &_)</span>
 
 </div>
 <div class='description'>
@@ -93,7 +93,7 @@ Sequel::Plugins::InputTransformer
 [show source]
 </a>
 <pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb</span>
-<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span>)
+<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">_</span>)
 <span class="line-num">28</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
 <span class="line-num">29</span>     <span class="ruby-ivar">@input_transformers</span> = {}
 <span class="line-num">30</span>     <span class="ruby-ivar">@skip_input_transformer_columns</span> = {}

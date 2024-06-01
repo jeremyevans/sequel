@@ -1,11 +1,11 @@
-Wed, 01 May 2024 08:57:18 -0700
+Sat, 01 Jun 2024 08:47:44 -0700
 README.rdoc	Sun, 31 Mar 2024 10:39:03 -0700
-CHANGELOG	Wed, 01 May 2024 08:50:18 -0700
+CHANGELOG	Fri, 31 May 2024 11:59:44 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Fri, 02 Sep 2022 09:11:30 -0700
-lib/sequel/connection_pool.rb	Thu, 04 Jan 2024 11:17:56 -0800
+lib/sequel/connection_pool.rb	Fri, 17 May 2024 11:01:33 -0700
 lib/sequel/core.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/database.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset.rb	Fri, 31 Mar 2023 14:57:15 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Wed, 01 May 2024 08:50:18 -0700
+lib/sequel/version.rb	Fri, 31 May 2024 11:59:44 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -53,7 +53,7 @@ doc/advanced_associations.rdoc	Sun, 23 Apr 2023 09:38:27 -0700
 doc/association_basics.rdoc	Fri, 27 Jan 2023 07:36:40 -0800
 doc/bin_sequel.rdoc	Thu, 10 Aug 2017 09:06:47 -0700
 doc/cheat_sheet.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
-doc/code_order.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
+doc/code_order.rdoc	Sat, 11 May 2024 10:53:18 -0700
 doc/core_extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/dataset_basics.rdoc	Wed, 13 Mar 2024 15:32:20 -0700
 doc/dataset_filtering.rdoc	Tue, 14 Jul 2020 07:08:21 -0700
@@ -277,5 +277,6 @@ doc/release_notes/5.78.0.txt	Fri, 01 Mar 2024 08:29:33 -0800
 doc/release_notes/5.79.0.txt	Mon, 01 Apr 2024 09:04:21 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.80.0.txt	Wed, 01 May 2024 08:50:18 -0700
+doc/release_notes/5.81.0.txt	Fri, 31 May 2024 11:59:44 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
 lib/sequel/extensions/migration.rb	Fri, 02 Feb 2024 13:06:09 -0800

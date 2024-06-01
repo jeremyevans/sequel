@@ -288,7 +288,7 @@ Sequel::Plugins::ColumnEncryption
 <div class='method public-class' id='method-method-c-apply'>
 <a name='method-c-apply'></a>
 <div class='synopsis'>
-<span class='name'>apply</span><span class='arguments'>(model, opts=OPTS)</span>
+<span class='name'>apply</span><span class='arguments'>(model, opts=OPTS, &_)</span>
 
 </div>
 <div class='description'>
@@ -299,7 +299,7 @@ Sequel::Plugins::ColumnEncryption
 [show source]
 </a>
 <pre id='method-c-apply-source'>    <span class="ruby-comment"># File lib/sequel/plugins/column_encryption.rb</span>
-<span class="line-num">589</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">589</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">_</span>)
 <span class="line-num">590</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>
 <span class="line-num">591</span> <span class="ruby-keyword">end</span></pre>
 </div>

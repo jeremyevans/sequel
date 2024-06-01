@@ -51,6 +51,13 @@ Sequel::Dataset::Provenance
 <div class='name-list'>
 <table summary='Constants'>
 <tr class='top-aligned-row context-row'>
+<td class='context-item-name'>INTERNAL</td>
+<td>=</td>
+<td class='context-item-value'>'<internal'</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
 <td class='context-item-name'>RUBY_STDLIB</td>
 <td>=</td>
 <td class='context-item-value'>RbConfig::CONFIG["rubylibdir"]</td>
@@ -85,9 +92,9 @@ Sequel::Dataset::Provenance
 [show source]
 </a>
 <pre id='method-i-clone-source'>   <span class="ruby-comment"># File lib/sequel/extensions/provenance.rb</span>
-<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">clone</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-keyword">nil</span> <span class="ruby-operator">||</span> (<span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>))
-<span class="line-num">45</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">provenance_opts</span>(<span class="ruby-identifier">opts</span>))
-<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">clone</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-keyword">nil</span> <span class="ruby-operator">||</span> (<span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>))
+<span class="line-num">46</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">provenance_opts</span>(<span class="ruby-identifier">opts</span>))
+<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -31,7 +31,7 @@ doc/code_order.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-11-04 10:39:50 -0800</span>
+<span class='datetime'>2024-05-11 10:53:18 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -108,7 +108,7 @@ Last Update:
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">freeze</span>
 </pre>
 
-<p>The ‘subclasses` plugin can be used to keep track of all model classes that have been setup in your application. Finalizing their associations and freezing them can easily be achieved through the plugin:</p>
+<p>‘model_classes` is not a <a href="../../classes/Sequel.html"><code>Sequel</code></a> method, it indicates an array of model classes you defined. Instead of listing them manually, the `subclasses` plugin can be used to keep track of all model classes that have been setup in your application. Finalizing their associations and freezing them can easily be achieved through the plugin:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Register the plugin before setting up the models</span>
 <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>

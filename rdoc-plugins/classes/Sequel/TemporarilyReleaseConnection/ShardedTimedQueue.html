@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::TemporarilyReleaseConnection::ShardedTimedQueue</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::TemporarilyReleaseConnection::ShardedTimedQueue
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/temporarily_release_connection_rb.html">lib/sequel/extensions/temporarily_release_connection.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-temporarily_release_connection">temporarily_release_connection</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-temporarily_release_connection'>
+<a name='method-i-temporarily_release_connection'></a>
+<div class='synopsis'>
+<span class='name'>temporarily_release_connection</span><span class='arguments'>(conn, server)</span>
+
+</div>
+<div class='description'>
+
+<p>Normalize the server name for sharded connection pools</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-temporarily_release_connection-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-temporarily_release_connection-source'>    <span class="ruby-comment"># File lib/sequel/extensions/temporarily_release_connection.rb</span>
+<span class="line-num">109</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">temporarily_release_connection</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">server</span>)
+<span class="line-num">110</span>   <span class="ruby-identifier">server</span> = <span class="ruby-identifier">pick_server</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">111</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

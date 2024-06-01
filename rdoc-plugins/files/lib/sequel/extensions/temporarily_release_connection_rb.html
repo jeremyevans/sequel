@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>temporarily_release_connection.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>temporarily_release_connection.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/temporarily_release_connection.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-05-06 12:06:37 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The temporarily_release_connection extension adds support for temporarily releasing a checked out connection back to the connection pool.  It is designed for use in multithreaded transactional integration tests, allowing a connection to start a transaction in one thread, but be temporarily released back to the connection pool, so it can be operated on safely by multiple threads inside a block. For example, the main thread could be running tests that send web requests, and a separate thread running a web server that is responding to those requests, and the same connection and transaction would be used for both.</p>
+
+<p>To load the extension into the database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:temporarily_release_connection</span>
+</pre>
+
+<p>After the extension is loaded, call the <code>temporarily_release_connection</code> method with the connection object to temporarily release the connection back to the pool. Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">rollback:</span> <span class="ruby-value">:always</span>, <span class="ruby-value">auto_savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">temporarily_release_connection</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># Other threads can operate on connection safely inside the transaction</span>
+    <span class="ruby-keyword">yield</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>For sharded connection pools, the second argument to <code>temporarily_release_connection</code> is respected, and specifies the server on which to temporarily release the connection.</p>
+
+<p>The temporarily_release_connection extension is only supported with the threaded and timed_queue connection pools that ship with <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> (and the sharded versions of each).  To make sure that same connection object can be reacquired, it is only supported if the maximum connection pool size is 1, so set the Database :max_connections option to 1 if you plan to use this extension.</p>
+
+<p>If the <code>temporarily_release_connection</code> method cannot reacquire the same connection it released to the pool, it will raise a <a href="../../../../classes/Sequel/UnableToReacquireConnectionError.html"><code>Sequel::UnableToReacquireConnectionError</code></a> exception.  This should only happen if the connection has been disconnected while it was temporarily released.  If this error is raised, Database#transaction will not rollback the transaction, since the connection object is likely no longer valid, and on poorly written database drivers, that could cause the process to crash.</p>
+
+<p>Related modules: <a href="../../../../classes/Sequel/TemporarilyReleaseConnection.html"><code>Sequel::TemporarilyReleaseConnection</code></a>, <a href="../../../../classes/Sequel/UnableToReacquireConnectionError.html"><code>Sequel::UnableToReacquireConnectionError</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
