@@ -47,6 +47,20 @@ These run each test in its own transaction, the recommended way to test.
     end
   end
 
+== Transactional testing with multiple threads
+
+Some tests may require executing code across multiple threads. The most common example are browser tests with Capybara, where the web server is running in a separate thread. For transactional tests to work in this case, the main thread needs to allow other threads to use its database connection while the transaction is in progress. This can be achieved with the temporarily_release_connection extension:
+
+  DB.extension :temporarily_release_connection
+  DB.transaction(rollback: :always, auto_savepoint: true) do |conn|
+    DB.temporarily_release_connection(conn) do
+      # Other threads can operate on connection safely inside the transaction
+      yield
+    end
+  end
+
+This requires maximum connection pool size to be 1, so make sure to set the Database +:max_connections+ option to 1 in tests.
+
 == Transactional testing with multiple databases
 
 You can use the Sequel.transaction method to run a transaction on multiple databases, rolling all of them back.  Instead of:
