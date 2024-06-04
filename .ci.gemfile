@@ -8,7 +8,7 @@ gem 'minitest-global_expectations'
 # Plugin/Extension Dependencies
 gem 'tzinfo'
 
-if RUBY_VERSION >= '3.4'
+if RUBY_VERSION >= '3.3'
   gem 'csv'
 end
 
