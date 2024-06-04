@@ -8,6 +8,10 @@ gem 'minitest-global_expectations'
 # Plugin/Extension Dependencies
 gem 'tzinfo'
 
+if RUBY_VERSION >= '3.4'
+  gem 'csv'
+end
+
 if RUBY_VERSION < '2.1'
   gem 'nokogiri', '<1.7'
 elsif RUBY_VERSION < '2.3'
