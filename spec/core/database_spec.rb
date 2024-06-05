@@ -23,6 +23,21 @@ describe "A new Database" do
     Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.must_equal [4,3]
   end
 
+  it "should support :connect_opts_proc option to modify options passed when connecting" do
+    c = Class.new(Sequel::Database) do
+      alias connect server_opts
+    end
+    opts = {:a => 1, :connect_opts_proc=>lambda{|h| h[:a] += 2; h[:b] = 4}}
+    c.new(opts).synchronize do |c|
+      c[:a].must_equal 3
+      c[:b].must_equal 4
+    end
+    c.new(opts.merge(:servers=>{:default=>{:a=>5}})).synchronize do |c|
+      c[:a].must_equal 7
+      c[:b].must_equal 4
+    end
+  end
+
   it "should support :preconnect option to preconnect to database" do
     @db.pool.size.must_equal 0
     c = Class.new(Sequel::Database) do

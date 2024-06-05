@@ -335,6 +335,11 @@ module Sequel
       else
         @opts.dup
       end
+
+      if pr = opts[:connect_opts_proc]
+        pr.call(opts)
+      end
+
       opts.delete(:servers)
       opts
     end

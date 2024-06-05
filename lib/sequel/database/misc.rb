@@ -108,6 +108,9 @@ module Sequel
     # :cache_schema :: Whether schema should be cached for this Database instance
     # :check_string_typecast_bytesize :: Whether to check the bytesize of strings before typecasting.
     # :connect_sqls :: An array of sql strings to execute on each new connection, after :after_connect runs.
+    # :connect_opts_proc :: Callable object for modifying options hash used when connecting, designed for
+    #                       cases where the option values (e.g. password) are automatically rotated on
+    #                       a regular basis without involvement from the application using Sequel.
     # :default_string_column_size :: The default size of string columns, 255 by default.
     # :extensions :: Extensions to load into this Database instance.  Can be a symbol, array of symbols,
     #                or string with extensions separated by columns.  These extensions are loaded after
