@@ -270,28 +270,20 @@ module Sequel
       @single_threaded
     end
     
-    if RUBY_ENGINE == 'ruby' && RUBY_VERSION < '2.5'
-    # :nocov:
-      def synchronize(server=nil)
-        @pool.hold(server || :default){|conn| yield conn}
-      end
-    # :nocov:
-    else
-      # Acquires a database connection, yielding it to the passed block. This is
-      # useful if you want to make sure the same connection is used for all
-      # database queries in the block.  It is also useful if you want to gain
-      # direct access to the underlying connection object if you need to do
-      # something Sequel does not natively support.
-      #
-      # If a server option is given, acquires a connection for that specific
-      # server, instead of the :default server.
-      #
-      #   DB.synchronize do |conn|
-      #     # ...
-      #   end
-      def synchronize(server=nil, &block)
-        @pool.hold(server || :default, &block)
-      end
+    # Acquires a database connection, yielding it to the passed block. This is
+    # useful if you want to make sure the same connection is used for all
+    # database queries in the block.  It is also useful if you want to gain
+    # direct access to the underlying connection object if you need to do
+    # something Sequel does not natively support.
+    #
+    # If a server option is given, acquires a connection for that specific
+    # server, instead of the :default server.
+    #
+    #   DB.synchronize do |conn|
+    #     # ...
+    #   end
+    def synchronize(server=nil, &block)
+      @pool.hold(server || :default, &block)
     end
     
     # Attempts to acquire a database connection.  Returns true if successful.
