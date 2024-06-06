@@ -46,7 +46,9 @@ module Minitest::Spec::DSL
 end
 
 class Minitest::HooksSpec
+  # Not used by default, only for debugging
   def log
+    require 'logger'
     begin
       DB.loggers << Logger.new(STDOUT)
       yield
