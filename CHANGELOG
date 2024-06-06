@@ -1,5 +1,7 @@
 === master
 
+* Remove use of logger library in bin/sequel (jeremyevans)
+
 * Support :connect_opts_proc Database option for late binding options (jeremyevans) (#2164)
 
 === 5.81.0 (2024-06-01)
