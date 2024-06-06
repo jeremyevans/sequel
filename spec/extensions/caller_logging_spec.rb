@@ -1,11 +1,12 @@
 require_relative "spec_helper"
-require 'logger'
 
 describe "caller_logging extension" do
   before do
     @db = Sequel.mock(:extensions=>[:caller_logging])
-    @log_stream = StringIO.new
-    @db.loggers << Logger.new(@log_stream)
+    log_stream = @log_stream = StringIO.new
+    logger = Object.new
+    logger.define_singleton_method(:info){|s| log_stream.write(s); log_stream.write("\n");}
+    @db.loggers << logger
     @ds = @db[:items]
   end
 
