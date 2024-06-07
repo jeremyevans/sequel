@@ -53,7 +53,7 @@ module Sequel
         def validate_associated_object(reflection, obj)
           return if reflection[:validate] == false
           association = reflection[:name]
-          if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !(pk_val = obj.values[key])
+          if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !(obj.values[key])
             p_key = pk unless pk.is_a?(Array)
             if p_key
               obj.values[key] = p_key

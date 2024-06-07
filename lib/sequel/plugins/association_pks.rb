@@ -294,7 +294,7 @@ module Sequel
           sch = klass.db_schema
 
           if primary_key.is_a?(Array)
-            if (cols = sch.values_at(*klass.primary_key)).all? && (convs = cols.map{|c| c[:type] == :integer}).all?
+            if (cols = sch.values_at(*klass.primary_key)).all? && (cols.map{|c| c[:type] == :integer}).all?
               db = model.db
               pks.map do |cpk|
                 cpk.map do |pk|

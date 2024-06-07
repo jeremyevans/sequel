@@ -2097,7 +2097,7 @@ module Sequel
       # Support OVERRIDING USER|SYSTEM VALUE for MERGE INSERT.
       def merge_insert(*values, &block)
         h = {:type=>:insert, :values=>values}
-        if override = @opts[:override]
+        if @opts[:override]
           h[:override] = insert_override_sql(String.new)
         end
         _merge_when(h, &block)
