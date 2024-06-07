@@ -2058,6 +2058,16 @@ module Sequel
         nil
       end
 
+      # Support MERGE RETURNING on PostgreSQL 17+.
+      def merge(&block)
+        sql = merge_sql
+        if uses_returning?(:merge)
+          returning_fetch_rows(sql, &block)
+        else
+          execute_ddl(sql)
+        end
+      end
+
       # Return a dataset with a WHEN MATCHED THEN DO NOTHING clause added to the
       # MERGE statement.  If a block is passed, treat it as a virtual row and
       # use it as additional conditions for the match.
@@ -2170,9 +2180,14 @@ module Sequel
         true
       end
 
-      # Returning is always supported.
+      # MERGE RETURNING is supported on PostgreSQL 17+. Other RETURNING is supported
+      # on all supported PostgreSQL versions.
       def supports_returning?(type)
-        true
+        if type == :merge
+          server_version >= 170000
+        else
+          true
+        end
       end
 
       # PostgreSQL supports pattern matching via regular expressions
@@ -2294,6 +2309,12 @@ module Sequel
         sql << " THEN DO NOTHING"
       end
       alias _merge_not_matched_sql _merge_matched_sql
+
+      # Support MERGE RETURNING on PostgreSQL 17+.
+      def _merge_when_sql(sql)
+        super
+        insert_returning_sql(sql) if uses_returning?(:merge)
+      end
 
       # Format TRUNCATE statement with PostgreSQL specific options.
       def _truncate_sql(table)

@@ -5928,3 +5928,105 @@ describe "pg_xmin_optimistic_locking plugin" do
     end
   end
 end
+
+
+describe "MERGE RETURNING" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:m1){Integer :i1; Integer :a}
+    @db.create_table!(:m2){Integer :i2; Integer :b}
+    @m1 = @db[:m1].returning
+    @m2 = @db[:m2]
+  end
+  after do
+    @m1.delete
+    @m2.delete
+  end
+  after(:all) do
+    @db.drop_table?(:m1, :m2)
+  end
+
+  def merge(ds)
+    a = []
+    ds.merge{|h| a << h}
+    a
+  end
+
+  def check(ds)
+    @m2.insert(1, 2)
+
+    @m1.all.must_equal []
+
+    # INSERT
+    merge(ds).must_equal [{:i2=>1, :b=>2, :i1=>1, :a=>13}]
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    # UPDATE
+    merge(ds).must_equal [{:i2=>1, :b=>2, :i1=>12, :a=>35}]
+    @m1.all.must_equal [{:i1=>12, :a=>35}]
+
+    # UPDATE with specific RETURNING columns
+    @m1.update(:i1=>1, :a=>13)
+    merge(ds.returning(:b)).must_equal [{:b=>2}]
+    @m1.all.must_equal [{:i1=>12, :a=>35}]
+
+    # DELETE MATCHING current row, INSERT NOT MATCHED new row
+    @m2.insert(12, 3)
+    merge(ds).must_equal [{:i2=>1, :b=>2, :i1=>1, :a=>13}, {:i2=>12, :b=>3, :i1=>12, :a=>35}]
+    @m1.all.must_equal [{:i1=>1, :a=>13}]
+
+    # MATCHED DO NOTHING
+    @m2.where(:i2=>12).delete
+    @m1.update(:a=>51)
+    merge(ds).must_equal []
+    @m1.all.must_equal [{:i1=>1, :a=>51}]
+
+    # NOT MATCHED DO NOTHING
+    @m1.delete
+    @m2.update(:b=>51)
+    merge(ds).must_equal []
+    @m1.all.must_equal []
+  end
+  
+  it "should allow inserts, updates, and deletes based on conditions in a single MERGE statement" do
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_insert(:i1=>Sequel[:i2], :a=>Sequel[:b]+11){b <= 50}.
+      merge_delete{{:a => 30..50}}.
+      merge_update(:i1=>Sequel[:i1]+:i2+10, :a=>Sequel[:a]+:b+20){a <= 50}
+    check(ds)
+  end
+
+  it "should support WITH clauses" do
+    ds = @m1.
+      with(:m3, @db[:m2]).
+      merge_using(:m3, :i1=>:i2).
+      merge_insert(:i1=>Sequel[:i2], :a=>Sequel[:b]+11){b <= 50}.
+      merge_delete{{:a => 30..50}}.
+      merge_update(:i1=>Sequel[:i1]+:i2+10, :a=>Sequel[:a]+:b+20){a <= 50}
+    check(ds)
+  end if DB.dataset.supports_cte?
+
+  it "should support inserts with just columns" do
+    ds = @m1.
+      merge_using(:m2, :i1=>:i2).
+      merge_insert(Sequel[:i2], Sequel[:b]+11){b <= 50}.
+      merge_delete{{:a => 30..50}}.
+      merge_update(:i1=>Sequel[:i1]+:i2+10, :a=>Sequel[:a]+:b+20){a <= 50}
+    check(ds)
+  end
+
+  it "should calls inserts, updates, and deletes without conditions" do
+    @m2.insert(1, 2)
+    ds = @m1.merge_using(:m2, :i1=>:i2)
+    
+    merge(ds.merge_insert(:i2, :b)).must_equal [{:i2=>1, :b=>2, :i1=>1, :a=>2}]
+    @m1.all.must_equal [{:i1=>1, :a=>2}]
+
+    merge(ds.merge_update(:a=>Sequel[:a]+1)).must_equal [{:i2=>1, :b=>2, :i1=>1, :a=>3}]
+    @m1.all.must_equal [{:i1=>1, :a=>3}]
+
+    merge(ds.merge_delete).must_equal [{:i2=>1, :b=>2, :i1=>1, :a=>3}]
+    @m1.all.must_equal []
+  end
+end if DB.server_version >= 170000
