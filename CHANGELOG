@@ -1,5 +1,7 @@
 === master
 
+* Add :min_wait_timeout option to sharded_threaded connection pool and default to 0.1, fixes stalling observed on JRuby (jeremyevans)
+
 * Support MERGE RETURNING on PostgreSQL 17+ (jeremyevans)
 
 * Remove use of logger library in bin/sequel (jeremyevans)

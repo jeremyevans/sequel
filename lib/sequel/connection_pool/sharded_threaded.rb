@@ -15,6 +15,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   #                  Sequel uses Hash.new(:default).  You can use a hash with a default proc
   #                  that raises an error if you want to catch all cases where a nonexistent
   #                  server is used.
+  # :min_wait_timeout :: This sets a minimum timeout when waiting on a condition variable
+  #                      (default: 0.1).
   def initialize(db, opts = OPTS)
     super
     @available_connections = {}
@@ -25,6 +27,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     remove_instance_variable(:@allocated)
     @allocated = {}
     @waiters = {}
+    @min_wait_timeout = opts[:min_wait_timeout] || 0.1
 
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
@@ -197,27 +200,16 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     timeout = @timeout
     timer = Sequel.start_timer
 
-    sync do
-      @waiters[server].wait(@mutex, timeout)
-      if conn = next_available(server)
-        return(allocated(server)[thread] = conn)
-      end
-    end
-
     until conn = assign_connection(thread, server)
       elapsed = Sequel.elapsed_seconds_since(timer)
-      # :nocov:
       raise_pool_timeout(elapsed, server) if elapsed > timeout
 
-      # It's difficult to get to this point, it can only happen if there is a race condition
-      # where a connection cannot be acquired even after the thread is signalled by the condition variable
       sync do
-        @waiters[server].wait(@mutex, timeout - elapsed)
+        @waiters[server].wait(@mutex, condition_variable_wait_timeout(timeout - elapsed))
         if conn = next_available(server)
           return(allocated(server)[thread] = conn)
         end
       end
-      # :nocov:
     end
 
     conn
@@ -274,6 +266,14 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     available_connections(server) << conn
     @waiters[server].signal
     conn
+  end
+
+  # The amount of time to wait on the condition variable.  Uses the given
+  # timeout or the :min_wait_timeout option, whichever is less.  This mitigates
+  # the damage if a connection is not available immediately after the condition
+  # variable returns from #wait.
+  def condition_variable_wait_timeout(timeout)
+    timeout < @min_wait_timeout ? timeout : @min_wait_timeout
   end
 
   # Clear the array of available connections for the server, returning an array

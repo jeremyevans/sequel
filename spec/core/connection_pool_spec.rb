@@ -677,6 +677,15 @@ describe "Connection Pool" do
 
     include concurrent_connection_pool_specs
     include threaded_connection_pool_specs
+
+    it "should handle a :min_wait_timeout longer than a connection checkout" do
+       pool = get_pool(:min_wait_timeout=>0.01, :max_connections=>1)
+       conns = []
+       4.times.map do
+         Thread.new{pool.hold{|c| conns << c; sleep 0.02}}
+       end.map(&:join)
+       conns.must_equal [1, 1, 1, 1]
+    end
   end
 
   {timed_queue_connection_pool=>"Timed Queue", sharded_timed_queue_connection_pool=>"Sharded Timed Queue"}.each do |pc, desc|
