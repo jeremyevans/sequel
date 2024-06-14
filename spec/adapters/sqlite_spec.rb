@@ -159,6 +159,41 @@ describe "An SQLite database" do
     @db[:fk].select_order_map([:a, :b, :c, :d, :e]).must_equal [[100, 10, 211, 212, 213]]
     @db.schema(:fk).map{|_,v| v[:generated]}.must_equal [false, false, true, true, true]
   end if DB.sqlite_version >= 33100
+
+  it "should support dropping a unique column" do
+    @db.create_table!(:fk){Integer :a; Integer :b, :unique=>true}
+    @db[:fk].insert(:a=>1, :b=>2)
+    @db.alter_table(:fk){drop_column :b}
+    @db[:fk].all.must_equal [{:a=>1}]
+  end
+
+  it "should support dropping a column with scalar index" do
+    @db.create_table!(:fk){Integer :a; Integer :b, index: true}
+    @db[:fk].insert(:a=>1, :b=>2)
+    @db.alter_table(:fk){drop_column :b}
+    @db[:fk].all.must_equal [{:a=>1}]
+  end
+
+  it "should support dropping a column that is part of a composite index" do
+    @db.create_table!(:fk){Integer :a; Integer :b; index [:a, :b]}
+    @db[:fk].insert(:a=>1, :b=>2)
+    @db.alter_table(:fk){drop_column :b}
+    @db[:fk].all.must_equal [{:a=>1}]
+  end
+
+  it "should support dropping a column that is not part of an index" do
+    @db.create_table!(:fk){Integer :a, index: true; Integer :b}
+    @db[:fk].insert(:a=>1, :b=>2)
+    @db.alter_table(:fk){drop_column :b}
+    @db[:fk].all.must_equal [{:a=>1}]
+  end
+
+  it "should support dropping a column for a table without an index" do
+    @db.create_table!(:fk){Integer :a; Integer :b}
+    @db[:fk].insert(:a=>1, :b=>2)
+    @db.alter_table(:fk){drop_column :b}
+    @db[:fk].all.must_equal [{:a=>1}]
+  end
 end
 
 describe "SQLite temporary views" do

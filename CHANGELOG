@@ -1,5 +1,7 @@
 === master
 
+* Emulate dropping a unique column or a column that is part of an index on SQLite 3.35.0+ (jeremyevans) (#2176)
+
 * Add :min_wait_timeout option to sharded_threaded connection pool and default to 0.1, fixes stalling observed on JRuby (jeremyevans)
 
 * Support MERGE RETURNING on PostgreSQL 17+ (jeremyevans)

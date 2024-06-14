@@ -245,7 +245,7 @@ module Sequel
             super
           end
         when :drop_column
-          if sqlite_version >= 33500
+          if sqlite_version >= 33500 && !indexes(table).any?{|_, h| h[:columns].include?(op[:name])}
             super
           else
             ocp = lambda{|oc| oc.delete_if{|c| c.to_s == op[:name].to_s}}
