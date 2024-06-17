@@ -15,8 +15,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   #                  Sequel uses Hash.new(:default).  You can use a hash with a default proc
   #                  that raises an error if you want to catch all cases where a nonexistent
   #                  server is used.
-  # :min_wait_timeout :: This sets a minimum timeout when waiting on a condition variable
-  #                      (default: 0.1).
   def initialize(db, opts = OPTS)
     super
     @available_connections = {}
@@ -27,7 +25,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     remove_instance_variable(:@allocated)
     @allocated = {}
     @waiters = {}
-    @min_wait_timeout = opts[:min_wait_timeout] || 0.1
 
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
@@ -200,19 +197,42 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     timeout = @timeout
     timer = Sequel.start_timer
 
+    if conn = acquire_available(thread, server, timeout)
+      return conn
+    end
+
     until conn = assign_connection(thread, server)
       elapsed = Sequel.elapsed_seconds_since(timer)
+      # :nocov:
       raise_pool_timeout(elapsed, server) if elapsed > timeout
 
-      sync do
-        @waiters[server].wait(@mutex, condition_variable_wait_timeout(timeout - elapsed))
-        if conn = next_available(server)
-          return(allocated(server)[thread] = conn)
-        end
+      # It's difficult to get to this point, it can only happen if there is a race condition
+      # where a connection cannot be acquired even after the thread is signalled by the condition variable
+      if conn = acquire_available(thread, server, timeout - elapsed)
+        return conn
       end
+      # :nocov:
     end
 
     conn
+  end
+
+  # Acquire a connection if one is already available, or waiting until it becomes available.
+  def acquire_available(thread, server, timeout)
+    sync do
+      # Check if connection was checked in between when assign_connection failed and now.
+      if conn = next_available(server)
+        return(allocated(server)[thread] = conn)
+      end
+
+      @waiters[server].wait(@mutex, timeout)
+
+      # Connection still not available, could be because a connection was disconnected,
+      # may have to retry assign_connection to see if a new connection can be made.
+      if conn = next_available(server)
+        return(allocated(server)[thread] = conn)
+      end
+    end
   end
 
   # Assign a connection to the thread, or return nil if one cannot be assigned.
@@ -266,14 +286,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     available_connections(server) << conn
     @waiters[server].signal
     conn
-  end
-
-  # The amount of time to wait on the condition variable.  Uses the given
-  # timeout or the :min_wait_timeout option, whichever is less.  This mitigates
-  # the damage if a connection is not available immediately after the condition
-  # variable returns from #wait.
-  def condition_variable_wait_timeout(timeout)
-    timeout < @min_wait_timeout ? timeout : @min_wait_timeout
   end
 
   # Clear the array of available connections for the server, returning an array

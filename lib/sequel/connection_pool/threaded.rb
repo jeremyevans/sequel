@@ -143,11 +143,8 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     timeout = @timeout
     timer = Sequel.start_timer
 
-    sync do
-      @waiter.wait(@mutex, timeout)
-      if conn = next_available
-        return(@allocated[thread] = conn)
-      end
+    if conn = acquire_available(thread, timeout)
+      return conn
     end
 
     until conn = assign_connection(thread)
@@ -157,16 +154,31 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
 
       # It's difficult to get to this point, it can only happen if there is a race condition
       # where a connection cannot be acquired even after the thread is signalled by the condition variable
-      sync do
-        @waiter.wait(@mutex, timeout - elapsed)
-        if conn = next_available
-          return(@allocated[thread] = conn)
-        end
+      if conn = acquire_available(thread, timeout - elapsed)
+        return conn
       end
       # :nocov:
     end
 
     conn
+  end
+
+  # Acquire a connection if one is already available, or waiting until it becomes available.
+  def acquire_available(thread, timeout)
+    sync do
+      # Check if connection was checked in between when assign_connection failed and now.
+      if conn = next_available
+        return(@allocated[thread] = conn)
+      end
+
+      @waiter.wait(@mutex, timeout)
+
+      # Connection still not available, could be because a connection was disconnected,
+      # may have to retry assign_connection to see if a new connection can be made.
+      if conn = next_available
+        return(@allocated[thread] = conn)
+      end
+    end
   end
 
   # Assign a connection to the thread, or return nil if one cannot be assigned.
