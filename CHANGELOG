@@ -1,5 +1,7 @@
 === master
 
+* Limit tactically eager loading to objects that have the same association reflection (jeremyevans) (#2181)
+
 * Fix race condition in threaded/sharded_threaded connection pools that could cause stalls (jeremyevans)
 
 * Emulate dropping a unique column or a column that is part of an index on SQLite 3.35.0+ (jeremyevans) (#2176)

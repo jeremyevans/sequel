@@ -158,15 +158,19 @@ module Sequel
         end
 
         # Filter the objects used when tactical eager loading.
-        # By default, this removes frozen objects and objects that alreayd have the association loaded
+        # By default, this removes frozen objects and objects that alreayd have the association loaded,
+        # as well as objects where the reflection for the association is not the same as the receiver's
+        # reflection for the association.
         def _filter_tactical_eager_load_objects(opts)
           objects = defined?(super) ? super : retrieved_with.dup
+          name = opts[:name]
           if opts[:eager_reload]
             objects.reject!(&:frozen?)
           else
-            name = opts[:name]
             objects.reject!{|x| x.frozen? || x.associations.include?(name)}
           end
+          reflection = self.class.association_reflection(name)
+          objects.select!{|x| x.class.association_reflection(name).equal?(reflection)}
           objects
         end
       end
