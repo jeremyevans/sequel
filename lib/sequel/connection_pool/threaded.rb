@@ -167,9 +167,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   def acquire_available(thread, timeout)
     sync do
       # Check if connection was checked in between when assign_connection failed and now.
+      # This is very unlikely, but necessary to prevent a situation where the waiter
+      # will wait for a connection even though one has already been checked in.
+      # :nocov:
       if conn = next_available
         return(@allocated[thread] = conn)
       end
+      # :nocov:
 
       @waiter.wait(@mutex, timeout)
 
