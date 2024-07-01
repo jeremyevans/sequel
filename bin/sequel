@@ -18,21 +18,6 @@ load_dirs = []
 exclusive_options = []
 loggers = []
 
-logger_class = Class.new do
-  def initialize(device)
-    @device = device
-  end
-
-  def debug(msg)
-  end
-
-  [:info, :warn, :error].each do |meth|
-    define_method(meth) do |msg|
-      @device.puts("#{Time.now.strftime('%Y-%m-%d %T')} #{meth.to_s.upcase}: #{msg}")
-    end
-  end
-end
-
 options = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
   opts.define_head "Usage: sequel [options] <uri|path> [file]"
@@ -76,7 +61,7 @@ options = OptionParser.new do |opts|
   end
   
   opts.on("-E", "--echo", "echo SQL statements") do
-    loggers << logger_class.new($stdout)
+    loggers << $stdout
   end
   
   opts.on("-I", "--include dir", "specify $LOAD_PATH directory") do |v|
@@ -84,7 +69,9 @@ options = OptionParser.new do |opts|
   end
 
   opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
-    loggers << logger_class.new(File.open(v, 'a'))
+    file = File.open(v, 'a')
+    file.sync = true
+    loggers << file
   end
   
   opts.on("-L", "--load-dir DIR", "loads all *.rb under specifed directory") do |v|
@@ -166,6 +153,11 @@ begin
     unless db || code
       exit
     end
+  end
+
+  unless loggers.empty?
+    Sequel.extension :stdio_logger
+    loggers.map!{|io| Sequel::StdioLogger.new(io)}
   end
 
   DB = connect_proc[db]

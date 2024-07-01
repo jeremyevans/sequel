@@ -1,5 +1,7 @@
 === master
 
+* Add stdio_logger extension for a minimal logger that Sequel::Database can use (jeremyevans)
+
 * Simplify Database#inspect output to database_type, host, database, and user (jeremyevans)
 
 === 5.82.0 (2024-07-01)
