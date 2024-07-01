@@ -6030,3 +6030,48 @@ describe "MERGE RETURNING" do
     @m1.all.must_equal []
   end
 end if DB.server_version >= 170000
+
+describe "MERGE WHEN NOT MATCHED BY SOURCE" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:m1){Integer :i1; Integer :a}
+    @db.create_table!(:m2){Integer :i2}
+    @m1 = @db[:m1]
+  end
+  after do
+    @m1.delete
+  end
+  after(:all) do
+    @db.drop_table?(:m1, :m2)
+  end
+
+  it "should allow inserts, updates, do nothings, and deletes based on conditions in a single MERGE statement" do
+    ds = @m1.merge_using(:m2, :i1=>:i2)
+
+    @m1.insert(1, 2)
+    @m1.all.must_equal [{:i1=>1, :a=>2}]
+
+    ds.merge_do_nothing_when_not_matched_by_source.merge
+    @m1.all.must_equal [{:i1=>1, :a=>2}]
+
+    ds.merge_update_when_not_matched_by_source(:i1=>Sequel[:i1]+10, :a=>Sequel[:a]+20).merge
+    @m1.all.must_equal [{:i1=>11, :a=>22}]
+
+    ds.merge_delete_when_not_matched_by_source.merge
+    @m1.all.must_equal []
+
+    @m1.insert(1, 100)
+    @m1.insert(2, 40)
+    @m1.insert(3, 20)
+    @m1.insert(4, 5)
+
+    # conditions
+    ds.
+      merge_do_nothing_when_not_matched_by_source{a > 50}.
+      merge_delete_when_not_matched_by_source{a > 30}.
+      merge_update_when_not_matched_by_source(:a=>Sequel[:a]+20){a > 10}.
+      merge_update_when_not_matched_by_source(:a=>Sequel[:a]-20).
+      merge
+    @m1.order(:i1).all.must_equal [{:i1=>1, :a=>100}, {:i1=>3, :a=>40}, {:i1=>4, :a=>-15}]
+  end
+end if DB.server_version >= 170000

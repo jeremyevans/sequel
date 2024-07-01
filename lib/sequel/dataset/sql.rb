@@ -901,11 +901,23 @@ module Sequel
     MERGE_TYPE_SQL = {
       :insert => ' WHEN NOT MATCHED',
       :delete => ' WHEN MATCHED',
+      :delete_not_matched_by_source => ' WHEN NOT MATCHED BY SOURCE',
       :update => ' WHEN MATCHED',
+      :update_not_matched_by_source => ' WHEN NOT MATCHED BY SOURCE',
       :matched => ' WHEN MATCHED',
       :not_matched => ' WHEN NOT MATCHED',
+      :not_matched_by_source => ' WHEN NOT MATCHED BY SOURCE',
     }.freeze
     private_constant :MERGE_TYPE_SQL
+
+    MERGE_NORMALIZE_TYPE_MAP = {
+      :delete_not_matched_by_source => :delete,
+      :update_not_matched_by_source => :update,
+      :matched => :do_nothing,
+      :not_matched => :do_nothing,
+      :not_matched_by_source => :do_nothing,
+    }.freeze
+    private_constant :MERGE_NORMALIZE_TYPE_MAP
 
     # Add the WHEN clauses to the MERGE SQL
     def _merge_when_sql(sql)
@@ -913,6 +925,7 @@ module Sequel
       merge_when.each do |data|
         type = data[:type]
         sql << MERGE_TYPE_SQL[type]
+        type = MERGE_NORMALIZE_TYPE_MAP[type] || type
         _merge_when_conditions_sql(sql, data)
         send(:"_merge_#{type}_sql", sql, data)
       end

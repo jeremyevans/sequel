@@ -2068,6 +2068,19 @@ module Sequel
         end
       end
 
+      # Return a dataset with a WHEN NOT MATCHED BY SOURCE THEN DELETE clause added to the
+      # MERGE statement.  If a block is passed, treat it as a virtual row and
+      # use it as additional conditions for the match.
+      #
+      #   merge_delete_not_matched_by_source
+      #   # WHEN NOT MATCHED BY SOURCE THEN DELETE
+      #
+      #   merge_delete_not_matched_by_source{a > 30}
+      #   # WHEN NOT MATCHED BY SOURCE AND (a > 30) THEN DELETE
+      def merge_delete_when_not_matched_by_source(&block)
+        _merge_when(:type=>:delete_not_matched_by_source, &block)
+      end
+
       # Return a dataset with a WHEN MATCHED THEN DO NOTHING clause added to the
       # MERGE statement.  If a block is passed, treat it as a virtual row and
       # use it as additional conditions for the match.
@@ -2094,6 +2107,19 @@ module Sequel
         _merge_when(:type=>:not_matched, &block)
       end
 
+      # Return a dataset with a WHEN NOT MATCHED BY SOURCE THEN DO NOTHING clause added to the
+      # MERGE BY SOURCE statement.  If a block is passed, treat it as a virtual row and
+      # use it as additional conditions for the match.
+      #
+      #   merge_do_nothing_when_not_matched_by_source
+      #   # WHEN NOT MATCHED BY SOURCE THEN DO NOTHING
+      #
+      #   merge_do_nothing_when_not_matched_by_source{a > 30}
+      #   # WHEN NOT MATCHED BY SOURCE AND (a > 30) THEN DO NOTHING
+      def merge_do_nothing_when_not_matched_by_source(&block)
+        _merge_when(:type=>:not_matched_by_source, &block)
+      end
+
       # Support OVERRIDING USER|SYSTEM VALUE for MERGE INSERT.
       def merge_insert(*values, &block)
         h = {:type=>:insert, :values=>values}
@@ -2103,6 +2129,19 @@ module Sequel
         _merge_when(h, &block)
       end
     
+      # Return a dataset with a WHEN NOT MATCHED BY SOURCE THEN UPDATE clause added to the
+      # MERGE statement.  If a block is passed, treat it as a virtual row and
+      # use it as additional conditions for the match.
+      #
+      #   merge_update_not_matched_by_source(i1: Sequel[:i1]+:i2+10, a: Sequel[:a]+:b+20)
+      #   # WHEN NOT MATCHED BY SOURCE THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)
+      #
+      #   merge_update_not_matched_by_source(i1: :i2){a > 30}
+      #   # WHEN NOT MATCHED BY SOURCE AND (a > 30) THEN UPDATE SET i1 = i2
+      def merge_update_when_not_matched_by_source(values, &block)
+        _merge_when(:type=>:update_not_matched_by_source, :values=>values, &block)
+      end
+
       # Use OVERRIDING USER VALUE for INSERT statements, so that identity columns
       # always use the user supplied value, and an error is not raised for identity
       # columns that are GENERATED ALWAYS.
@@ -2305,10 +2344,9 @@ module Sequel
         _insert_values_sql(sql, values)
       end
 
-      def _merge_matched_sql(sql, data)
+      def _merge_do_nothing_sql(sql, data)
         sql << " THEN DO NOTHING"
       end
-      alias _merge_not_matched_sql _merge_matched_sql
 
       # Support MERGE RETURNING on PostgreSQL 17+.
       def _merge_when_sql(sql)
