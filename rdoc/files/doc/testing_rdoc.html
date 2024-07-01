@@ -31,7 +31,7 @@ doc/testing.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-01-03 16:27:02 -0800</span>
+<span class='datetime'>2024-06-01 18:43:24 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -93,6 +93,21 @@ Last Update:
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span>
 </pre>
+
+<h2 id="label-Transactional+testing+with+multiple+threads">Transactional testing with multiple threads<span><a href="#label-Transactional+testing+with+multiple+threads">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Some tests may require executing code across multiple threads. The most common example are browser tests with Capybara, where the web server is running in a separate thread. For transactional tests to work in this case, the main thread needs to allow other threads to use its database connection while the transaction is in progress. This can be achieved with the temporarily_release_connection extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:temporarily_release_connection</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">rollback:</span> <span class="ruby-value">:always</span>, <span class="ruby-value">auto_savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">temporarily_release_connection</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># Other threads can operate on connection safely inside the transaction</span>
+    <span class="ruby-keyword">yield</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This requires maximum connection pool size to be 1, so make sure to set the Database <code>:max_connections</code> option to 1 in tests.</p>
 
 <h2 id="label-Transactional+testing+with+multiple+databases">Transactional testing with multiple databases<span><a href="#label-Transactional+testing+with+multiple+databases">&para;</a> <a href="#top">&uarr;</a></span></h2>
 

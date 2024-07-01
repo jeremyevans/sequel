@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.82.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.82.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.82.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-07-01 08:14:55 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>MERGE RETURNING is now supported when using PostgreSQL 17+. For datasets supporting RETURNING, calling merge with a block will yield each returned row:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].
+  <span class="ruby-identifier">returning</span>.
+  <span class="ruby-identifier">merge_using</span>(<span class="ruby-value">:table2</span>, <span class="ruby-value">column1:</span> <span class="ruby-value">:column2</span>).
+  <span class="ruby-identifier">merge_insert</span>(<span class="ruby-value">column3:</span> <span class="ruby-value">:column4</span>).
+  <span class="ruby-identifier">merge</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
+    <span class="ruby-comment"># ...</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-comment"># MERGE INTO &quot;table1&quot; USING &quot;table2&quot;</span>
+<span class="ruby-comment"># ON (&quot;column1&quot; = &quot;column2&quot;)</span>
+<span class="ruby-comment"># WHEN NOT MATCHED THEN</span>
+<span class="ruby-comment"># INSERT (&quot;column3&quot;) VALUES (&quot;column3&quot;)</span>
+<span class="ruby-comment"># RETURNING *</span>
+</pre>
+</li><li>
+<p>A :connect_opts_proc Database option is now supported, to allow support for late-binding Database options.  If provided, this should be a callable object that is called with the options used for connecting, and can modify the options.  This makes it simple to support authentication schemes that rotate passwords automatically without user involvement:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user@host/database&#39;</span>,
+  <span class="ruby-value">connect_opts_proc:</span> <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opts</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>] = <span class="ruby-constant">SomeAuthLibrary</span>.<span class="ruby-identifier">get_current_password</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>])
+  <span class="ruby-keyword">end</span>)
+</pre>
+
+<p>Note that the jdbc adapter relies on URIs and not option hashes, so when using the jdbc adapter with this feature, you’ll generally need to set the :uri option.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A race condition in the threaded connection pools that could result in a delay or timeout error in checking out connections in low-traffic environments has been fixed.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports dropping a unique column or a column that is part of an index on SQLite <a href="3_35_0_txt.html">3.35.0</a>+, with the same emulation approach it uses in earlier SQLite versions.</p>
+</li><li>
+<p>The tactical_eager_loading plugin now handles cases where inheritance is used and the objects used include associations with the same name but different definitions.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now only eager load the association for objects that use the same association definition as the receiver.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>bin/sequel no longer requires logger if passed the -E or -l options. Instead, it uses a simple implementation that supports only debug/warn/info/error methods.  If you are using bin/sequel and depending on the log format produced by the logger library, or calling methods on the logger object other than debug/warn/info/error, you’ll need to update your code.  This change was made because logger is moving out of stdlib in a future Ruby version.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

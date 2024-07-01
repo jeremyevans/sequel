@@ -31,12 +31,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-05-31 11:59:44 -0700</span>
+<span class='datetime'>2024-07-01 08:14:55 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.82.0+-282024-07-01-29"><a href="doc/release_notes/5_82_0_txt.html">5.82.0</a> (2024-07-01)<span><a href="#label-5.82.0+-282024-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Limit tactically eager loading to objects that have the same association reflection (jeremyevans) (#2181)</p>
+</li><li>
+<p>Fix race condition in threaded/sharded_threaded connection pools that could cause stalls (jeremyevans)</p>
+</li><li>
+<p>Emulate dropping a unique column or a column that is part of an index on SQLite <a href="doc/release_notes/3_35_0_txt.html">3.35.0</a>+ (jeremyevans) (#2176)</p>
+</li><li>
+<p>Support MERGE RETURNING on PostgreSQL 17+ (jeremyevans)</p>
+</li><li>
+<p>Remove use of logger library in bin/sequel (jeremyevans)</p>
+</li><li>
+<p>Support :connect_opts_proc Database option for late binding options (jeremyevans) (#2164)</p>
+</li></ul>
+
 <h3 id="label-5.81.0+-282024-06-01-29"><a href="doc/release_notes/5_81_0_txt.html">5.81.0</a> (2024-06-01)<span><a href="#label-5.81.0+-282024-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Fix ignored block warnings in a couple plugin apply methods on Ruby 3.4 (jeremyevans)</p>
