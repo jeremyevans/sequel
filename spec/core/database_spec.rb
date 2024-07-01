@@ -2041,16 +2041,20 @@ describe "Database#[]" do
 end
 
 describe "Database#inspect" do
-  it "should include the class name and the connection url" do
-    Sequel.connect('mock://foo/bar').inspect.must_equal '#<Sequel::Mock::Database: "mock://foo/bar">'
+  it "should include the class name" do
+    Sequel::Database.new.inspect.must_equal '#<Sequel::Database>'
   end
 
-  it "should include the class name and the connection options if an options hash was given" do
-    Sequel.connect(:adapter=>:mock).inspect.must_equal '#<Sequel::Mock::Database: {:adapter=>:mock}>'
+  it "should include the host, database, and user if present" do
+    Sequel.connect('mock://baz:quux@foo/bar').inspect.must_equal '#<Sequel::Mock::Database host=foo database=bar user=baz>'
   end
 
-  it "should include the class name, uri, and connection options if uri and options hash was given" do
-    Sequel.connect('mock://foo', :database=>'bar').inspect.must_equal '#<Sequel::Mock::Database: "mock://foo" {:database=>"bar"}>'
+  it "should include the database type if present and different from adapter scheme" do
+    Sequel.connect('mock://postgres', :password=>'foo').inspect.must_equal '#<Sequel::Mock::Database database_type=postgres host=postgres>'
+  end
+
+  it "should parse the :uri option if available and other options are not present" do
+    Sequel.connect(:uri=>'mock:///?foo=bar&user=k&password=v&database=d&host=q', :adapter=>'mock').inspect.must_equal '#<Sequel::Mock::Database host=q database=d user=k>'
   end
 end
 

@@ -72,13 +72,16 @@ module Sequel
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object. 
     def self.uri_to_options(uri)
-      {
+      uri_options = {
         :user => uri.user,
         :password => uri.password,
         :port => uri.port,
         :host => uri.hostname,
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1])
       }
+      uri.query.split('&').map{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
+      uri_options.to_a.each{|k,v| uri_options[k] = URI::DEFAULT_PARSER.unescape(v) if v.is_a?(String)}
+      uri_options
     end
     private_class_method :uri_to_options
 
@@ -253,15 +256,27 @@ module Sequel
       Sequel.convert_output_timestamp(v, timezone)
     end
 
-    # Returns a string representation of the database object including the
-    # class name and connection URI and options used when connecting (if any).
+    # Returns a string representation of the Database object, including
+    # the database type, host, database, and user, if present.
     def inspect
-      a = []
-      a << uri.inspect if uri
-      if (oo = opts[:orig_opts]) && !oo.empty?
-        a << oo.inspect
+      s = String.new
+      s << "#<#{self.class.to_s}"
+      s << " database_type=#{database_type}" if database_type && database_type != adapter_scheme
+
+      keys = [:host, :database, :user]
+      opts = self.opts
+      if !keys.any?{|k| opts[k]} && opts[:uri]
+        opts = self.class.send(:uri_to_options, URI.parse(opts[:uri]))
       end
-      "#<#{self.class}: #{a.join(' ')}>"
+
+      keys.each do |key|
+        val = opts[key]
+        if val && val != ''
+          s << " #{key}=#{val}"
+        end
+      end
+
+      s << ">"
     end
 
     # Proxy the literal call to the dataset.

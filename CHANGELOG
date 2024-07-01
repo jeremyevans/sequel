@@ -1,3 +1,7 @@
+=== master
+
+* Simplify Database#inspect output to database_type, host, database, and user (jeremyevans)
+
 === 5.82.0 (2024-07-01)
 
 * Limit tactically eager loading to objects that have the same association reflection (jeremyevans) (#2181)
