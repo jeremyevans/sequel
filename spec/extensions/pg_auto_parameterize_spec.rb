@@ -42,7 +42,7 @@ describe "pg_auto_parameterize extension" do
       merge_update(:i1=>Sequel[:i1]+:i2+10, :a=>Sequel[:a]+:b+20).
       merge
     sqls = @db.sqls
-    sqls.must_equal ['MERGE INTO "table" USING "m2" ON ("i1" = "i2") WHEN NOT MATCHED AND ("b" > $1::int4) THEN DO NOTHING WHEN NOT MATCHED THEN INSERT  ("i1", "a") VALUES ("i2", ("b" + $2::int4)) WHEN MATCHED AND ("a" > $1::int4) THEN DO NOTHING WHEN MATCHED AND ("a" > $3::int4) THEN DELETE WHEN MATCHED THEN UPDATE SET "i1" = ("i1" + "i2" + $4::int4), "a" = ("a" + "b" + $5::int4)']
+    sqls.must_equal ['MERGE INTO "table" USING "m2" ON ("i1" = "i2") WHEN NOT MATCHED AND ("b" > $1::int4) THEN DO NOTHING WHEN NOT MATCHED THEN INSERT ("i1", "a") VALUES ("i2", ("b" + $2::int4)) WHEN MATCHED AND ("a" > $1::int4) THEN DO NOTHING WHEN MATCHED AND ("a" > $3::int4) THEN DELETE WHEN MATCHED THEN UPDATE SET "i1" = ("i1" + "i2" + $4::int4), "a" = ("a" + "b" + $5::int4)']
     sqls[0].args.must_equal [50, 11, 30, 10, 20]
   end
 

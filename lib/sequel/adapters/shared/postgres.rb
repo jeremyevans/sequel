@@ -2296,7 +2296,7 @@ module Sequel
 
       # Append the INSERT sql used in a MERGE
       def _merge_insert_sql(sql, data)
-        sql << " THEN INSERT "
+        sql << " THEN INSERT"
         columns, values = _parse_insert_sql_args(data[:values])
         _insert_columns_sql(sql, columns)
         if override = data[:override]
