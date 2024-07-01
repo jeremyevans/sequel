@@ -1,4 +1,4 @@
-=== master
+=== 5.82.0 (2024-07-01)
 
 * Limit tactically eager loading to objects that have the same association reflection (jeremyevans) (#2181)
 

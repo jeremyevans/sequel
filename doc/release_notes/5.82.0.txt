@@ -1,0 +1,61 @@
+= New Features
+
+* MERGE RETURNING is now supported when using PostgreSQL 17+. For
+  datasets supporting RETURNING, calling merge with a block
+  will yield each returned row:
+
+    DB[:table1].
+      returning.
+      merge_using(:table2, column1: :column2).
+      merge_insert(column3: :column4).
+      merge do |row|
+        # ...
+      end
+    # MERGE INTO "table1" USING "table2"
+    # ON ("column1" = "column2")
+    # WHEN NOT MATCHED THEN
+    # INSERT ("column3") VALUES ("column3")
+    # RETURNING *
+
+* A :connect_opts_proc Database option is now supported, to allow
+  support for late-binding Database options.  If provided, this
+  should be a callable object that is called with the options
+  used for connecting, and can modify the options.  This makes
+  it simple to support authentication schemes that rotate
+  passwords automatically without user involvement:
+
+    Sequel.connect('postgres://user@host/database',
+      connect_opts_proc: lambda do |opts|
+        opts[:password] = SomeAuthLibrary.get_current_password(opts[:user])
+      end)
+
+  Note that the jdbc adapter relies on URIs and not option hashes,
+  so when using the jdbc adapter with this feature, you'll generally
+  need to set the :uri option.
+
+= Other Improvements
+
+* A race condition in the threaded connection pools that could result
+  in a delay or timeout error in checking out connections in low-traffic
+  environments has been fixed.
+
+* Sequel now supports dropping a unique column or a column that is
+  part of an index on SQLite 3.35.0+, with the same emulation approach
+  it uses in earlier SQLite versions.
+
+* The tactical_eager_loading plugin now handles cases where inheritance
+  is used and the objects used include associations with the same name
+  but different definitions.  Sequel will now only eager load the
+  association for objects that use the same association definition as
+  the receiver.
+
+= Backwards Compatibility
+
+* bin/sequel no longer requires logger if passed the -E or -l options.
+  Instead, it uses a simple implementation that supports only
+  debug/warn/info/error methods.  If you are using bin/sequel and
+  depending on the log format produced by the logger library, or
+  calling methods on the logger object other than
+  debug/warn/info/error, you'll need to update your code.  This change
+  was made because logger is moving out of stdlib in a future Ruby
+  version.
