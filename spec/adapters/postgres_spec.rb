@@ -80,12 +80,16 @@ describe 'A PostgreSQL database' do
       t = []
       @db[:test].lock('ACCESS EXCLUSIVE') do
         Thread.new do
-          @db.run "SET lock_timeout = 1"
-          t << @db.table_exists?(:test)
+          @db.synchronize do
+            @db.run "SET lock_timeout = 1"
+            t << @db.table_exists?(:test)
+          end
          end.join
         Thread.new do
-          @db.run "SET statement_timeout = 1"
-          t << @db.table_exists?(:test)
+          @db.synchronize do
+            @db.run "SET statement_timeout = 1"
+            t << @db.table_exists?(:test)
+          end
          end.join
       end
       t.must_equal [true, true]
