@@ -379,9 +379,21 @@ module Sequel
       # a regular and temporary table, with temporary table names starting with
       # a #.
       def create_table_prefix_sql(name, options)
-        "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)}"
+        "CREATE TABLE #{create_table_table_name_sql(name, options)}"
       end
-      
+
+      # The SQL to use for the table name for a temporary table.
+      def create_table_temp_table_name_sql(name, _options)
+        case name
+        when String, Symbol
+          "##{name}"
+        when SQL::Identifier
+          "##{name.value}"
+        else
+          raise Error, "temporary table names must be strings, symbols, or Sequel::SQL::Identifier instances on Microsoft SQL Server"
+        end
+      end
+
       # MSSQL doesn't support CREATE TABLE AS, it only supports SELECT INTO.
       # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
       # is given as the argument, it can't work with a string, so raise an

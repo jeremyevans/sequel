@@ -198,7 +198,7 @@ module Sequel
       # http://www.ibm.com/developerworks/data/library/techarticle/dm-0912globaltemptable/
       def create_table_prefix_sql(name, options)
         if options[:temp]
-          "DECLARE GLOBAL TEMPORARY TABLE #{quote_identifier(name)}"
+          "DECLARE GLOBAL TEMPORARY TABLE #{create_table_table_name_sql(name, options)}"
         else
           super
         end

@@ -1429,7 +1429,7 @@ module Sequel
           'UNLOGGED '
         end
 
-        "CREATE #{prefix_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
+        "CREATE #{prefix_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{create_table_table_name_sql(name, options)}"
       end
 
       # SQL for creating a table with PostgreSQL specific options

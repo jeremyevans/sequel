@@ -775,7 +775,21 @@ module Sequel
 
     # SQL fragment for initial part of CREATE TABLE statement
     def create_table_prefix_sql(name, options)
-      "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{create_table_table_name_sql(name, options)}"
+    end
+
+    # The SQL to use for a table name when creating a table.
+    # Use of the :temp option can result in different SQL,
+    # because the rules for temp table naming can differ
+    # between databases, and temp tables should not use the
+    # default_schema.
+    def create_table_table_name_sql(name, options)
+      options[:temp] ? create_table_temp_table_name_sql(name, options) : quote_schema_table(name)
+    end
+
+    # The SQL to use for the table name for a temporary table.
+    def create_table_temp_table_name_sql(name, _options)
+      name.is_a?(String) ? quote_identifier(name) : literal(name)
     end
 
     # SQL fragment for initial part of CREATE VIEW statement

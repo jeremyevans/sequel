@@ -1445,6 +1445,17 @@ describe "Database#create_table" do
     @db.sqls.must_equal ['CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
       'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)']
   end
+  
+  it "should create a schema-qualified temporary table" do
+    @db.create_table Sequel[:sch][:test_tmp], :temp => true do
+      primary_key :id, :integer, :null => false
+      column :name, :text
+      index :name, :unique => true
+    end
+    
+    @db.sqls.must_equal ['CREATE TEMPORARY TABLE sch.test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX sch_test_tmp_name_index ON sch.test_tmp (name)']
+  end
 end
 
 describe "Database#alter_table" do

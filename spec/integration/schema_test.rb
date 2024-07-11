@@ -384,13 +384,32 @@ describe "Database foreign key parsing" do
 end if DB.supports_foreign_key_parsing?
 
 describe "Database" do
-  after do
+  before do
     DB.drop_table(:items_temp) rescue nil
   end
-
-  it "should create temporary tables without raising an exception" do
+  after(:all) do
     DB.disconnect
-    DB.create_table!(:items_temp, :temp=>true){Integer :number}
+  end
+
+  it "should allow creation and use of temporary tables" do
+    DB.synchronize do
+      DB.create_table!(:items_temp, :temp=>true){Integer :number}
+      table = case DB.database_type
+      when :mssql
+        Sequel.lit("#items_temp")
+      when :derby
+        Sequel[:session][:items_temp]
+      else
+        :items_temp
+      end
+      DB.from(table).all.must_equal []
+    end
+  end
+
+  it "should raise when trying to create a schema qualified temporary table" do
+    proc do
+      DB.create_table(Sequel[:invalid_temp_schema][:items_temp], :temp=>true){Integer :number}
+    end.must_raise(DB.database_type == :mssql ? Sequel::Error : Sequel::DatabaseError)
   end
 end
 
