@@ -33,6 +33,17 @@ def Sequel.guarded?(*checked)
 end
 
 module Minitest::Spec::DSL
+  # Check all entries in +checked+, and mark them pending if they match. +checked+ entries
+  # support the following types of matching:
+  #
+  # Symbol: checks database type
+  # [Symbol] : checks adapter scheme
+  # [Symbol, Symbol] : checks adapter scheme and database type
+  # [Proc, Symbol] : Checks proc and database type
+  # [Symbol, Proc] : Checks adapter scheme and proc
+  # [Symbol, Symbol, Proc]: Checks adapter scheme, database type, and proc
+  #
+  # If any +checked+ matching returns true, then the spec is marked as pending.
   def cspecify(message, *checked, &block)
     if pending = Sequel.guarded?(*checked)
       it(message) do
