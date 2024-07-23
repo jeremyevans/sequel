@@ -17,6 +17,7 @@ describe "string_agg extension" do
     @sa3 = Sequel.string_agg(:c, '-').order(:o)
     @sa4 = Sequel.string_agg(:c).order(:o).distinct
     @sa5 = Sequel.string_agg(:c).distinct.order(:o)
+    @sa6 = Sequel.string_agg(:c, '-').distinct.order(:o)
   end
 
   it "should use existing method" do
@@ -37,6 +38,16 @@ describe "string_agg extension" do
     ds.literal(@sa3).must_equal "string_agg(c, '-' ORDER BY o)"
     ds.literal(@sa4).must_equal "string_agg(DISTINCT c, ',' ORDER BY o)"
     ds.literal(@sa5).must_equal "string_agg(DISTINCT c, ',' ORDER BY o)"
+  end
+
+  it "should correctly literalize on SQLite" do
+    ds = dbf.call(:sqlite).dataset.with_quote_identifiers(false)
+    ds.literal(@sa1).must_equal "group_concat(c, ',')"
+    ds.literal(@sa2).must_equal "group_concat(c, '-')"
+    ds.literal(@sa3).must_equal "group_concat(c, '-' ORDER BY o)"
+    ds.literal(@sa4).must_equal "group_concat(DISTINCT c ORDER BY o)"
+    ds.literal(@sa5).must_equal "group_concat(DISTINCT c ORDER BY o)"
+    proc{ds.literal(@sa6)}.must_raise Sequel::Error
   end
 
   it "should correctly literalize on SQLAnywhere" do

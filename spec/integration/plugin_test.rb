@@ -2545,7 +2545,7 @@ describe "string_agg extension" do
     @db.drop_table?(:string_agg_test)
   end
 
-  cspecify "should have string_agg return aggregated concatenation", :mssql, :sqlite, :derby do
+  cspecify "should have string_agg return aggregated concatenation", :mssql, :derby do
     h = @ds.select_append(Sequel.string_agg(:s).as(:v)).to_hash(:id, :v)
     h[1].must_match(/\A[abc],[abc],[abc],[abc]\z/)
     h[2].must_match(/\A(aa|bb),(aa|bb)\z/)
@@ -2554,10 +2554,10 @@ describe "string_agg extension" do
     @ds.select_append(Sequel.string_agg(:s, '-').order(:o).as(:v)).map([:id, :v]).must_equal [[1, 'a-a-c-b'], [2, 'bb-aa']]
   end
 
-  cspecify "should have string_agg return aggregated concatenation for distinct values", :mssql, :sqlite, :oracle, :db2, :derby do
+  cspecify "should have string_agg return aggregated concatenation for distinct values", :mssql, :oracle, :db2, :derby do
     @ds.select_group(:id).select_append(Sequel.string_agg(:s).order(:s).distinct.as(:v)).map([:id, :v]).must_equal [[1, 'a,b,c'], [2, 'aa,bb']]
   end
-end if (DB.database_type != :postgres || DB.server_version >= 90000)
+end if (DB.database_type == :postgres && DB.server_version >= 90000) || (DB.database_type == :sqlite && DB.sqlite_version >= 3044000) || ![:postgres, :sqlite].include?(DB.database_type)
 
 describe "insert_conflict plugin" do
   before(:all) do

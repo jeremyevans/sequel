@@ -54,6 +54,7 @@
 # * MySQL
 # * HSQLDB
 # * H2
+# * SQLite 3.44+
 #
 # Related module: Sequel::SQL::StringAgg
 
@@ -94,6 +95,19 @@ module Sequel
           distinct = sa.is_distinct?
 
           case db_type = db.database_type
+          when :sqlite
+            raise Error, "string_agg(DISTINCT) is not supported with a non-comma separator on #{db.database_type}" if distinct && separator != ","
+
+            args = [expr]
+            args << separator unless distinct
+            f = Function.new(:group_concat, *args)
+            if order
+              f = f.order(*order)
+            end
+            if distinct
+              f = f.distinct
+            end
+            literal_append(sql, f)
           when :postgres, :sqlanywhere
             f = Function.new(db_type == :postgres ? :string_agg : :list, expr, separator)
             if order
@@ -151,7 +165,7 @@ module Sequel
         freeze
       end
 
-      # Whether the current expression uses distinct expressions 
+      # Whether the current expression uses distinct expressions
       def is_distinct?
         @distinct == true
       end
@@ -178,4 +192,3 @@ module Sequel
 
   Dataset.register_extension(:string_agg, SQL::StringAgg::DatasetMethods)
 end
-
