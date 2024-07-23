@@ -54,7 +54,7 @@
 # * MySQL
 # * HSQLDB
 # * H2
-# * SQLite 3.44+
+# * SQLite 3.44+ (distinct only works when separator is ',')
 #
 # Related module: Sequel::SQL::StringAgg
 
