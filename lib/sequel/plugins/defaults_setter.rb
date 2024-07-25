@@ -43,13 +43,13 @@ module Sequel
     #   album.values # => {}
     #   album.a
     #   album.values # => {:a => Date.today}
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances set defaults (called before loading subclasses)
     #   Sequel::Model.plugin :defaults_setter
     #
-    #   # Make the Album class set defaults 
+    #   # Make the Album class set defaults
     #   Album.plugin :defaults_setter
     module DefaultsSetter
       # Set the default values based on the model schema. Options:
@@ -76,7 +76,7 @@ module Sequel
         def cache_default_values?
           @cache_default_values
         end
-        
+
         # Freeze default values when freezing model class
         def freeze
           @default_values.freeze
@@ -133,7 +133,13 @@ module Sequel
         def [](k)
           if new? && !values.has_key?(k)
             v = model.default_values.fetch(k){return}
-            v = v.call if v.respond_to?(:call)
+            if v.respond_to?(:call)
+              if v.arity == 1
+                v = v.call(self)
+              else
+                v = v.call
+              end
+            end
             values[k] = v if model.cache_default_values?
             v
           else

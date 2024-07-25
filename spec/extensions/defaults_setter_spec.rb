@@ -9,11 +9,11 @@ describe "Sequel::Plugins::DefaultsSetter" do
     def db.schema(*) [] end
     db.singleton_class.send(:alias_method, :schema, :schema)
     @c = c = Class.new(Sequel::Model(db[:foo]))
-    @c.instance_variable_set(:@db_schema, {:a=>{}})
+    @c.instance_variable_set(:@db_schema, {:a=>{}, :b=>{}})
     @c.plugin :defaults_setter
-    @c.columns :a
+    @c.columns :a, :b
     @pr = proc do |x|
-      db.define_singleton_method(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}
+      db.define_singleton_method(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}], [:b, {:primary_key=>false}]]}
       db.singleton_class.send(:alias_method, :schema, :schema)
       c.dataset = c.dataset; c
     end
@@ -179,6 +179,12 @@ describe "Sequel::Plugins::DefaultsSetter" do
     c.default_values[:a] = proc{2}
     @c.new.a.must_equal 1
     c.new.a.must_equal 2
+  end
+
+  it "should allow proc default values that depend on other values" do
+    @pr.call(2)
+    @c.default_values[:a] = proc{ |instance| instance.b * 2 }
+    @c.new(b: 5).a.must_equal 10
   end
 
   it "should set default value upon initialization when plugin loaded without dataset" do
