@@ -181,6 +181,14 @@ describe "Sequel::Plugins::DefaultsSetter" do
     c.new.a.must_equal 2
   end
 
+  it "should support non-proc/non-method callables" do
+    @pr.call(2)
+    o = Object.new
+    def o.call; 3; end
+    @c.default_values[:a] = o
+    @c.new.a.must_equal 3
+  end
+
   it "should allow proc default values that depend on other values" do
     @pr.call(2)
     @c.default_values[:a] = proc{ |instance| instance.b * 2 }

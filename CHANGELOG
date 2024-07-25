@@ -1,5 +1,7 @@
 === master
 
+* Have defaults_setter plugin pass model instance to default_values callable if it has arity 1 (pedrocarmona) (#2195)
+
 * Support string_agg extension on SQLite 3.44+ (segiddins) (#2191)
 
 * Support schema-qualified table names when using create_table :temp with a Sequel::SQL::QualifiedIdentifier (jeremyevans) (#2185)

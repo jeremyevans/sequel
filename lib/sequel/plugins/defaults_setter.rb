@@ -26,6 +26,12 @@ module Sequel
     #   Album.default_values[:a] = lambda{Date.today}
     #   Album.new.a # => Date.today
     #
+    # If the proc accepts a single argument, it is passed the instance, allowing
+    # default values to depend on instance-specific state:
+    #
+    #   Album.default_values[:a] = lambda{|album| album.b + 1}
+    #   Album.new(b: 10).a # => 11
+    #
     # By default, default values returned are not cached:
     #
     #   Album.new.a.equal?(Album.new.a) # => false
@@ -134,10 +140,10 @@ module Sequel
           if new? && !values.has_key?(k)
             v = model.default_values.fetch(k){return}
             if v.respond_to?(:call)
-              if v.arity == 1
-                v = v.call(self)
+              v = if v.respond_to?(:arity) && v.arity == 1
+                v.call(self)
               else
-                v = v.call
+                v.call
               end
             end
             values[k] = v if model.cache_default_values?
