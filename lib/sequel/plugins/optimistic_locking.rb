@@ -45,6 +45,8 @@ module Sequel
           columns[lc] = lcv + 1
           super
           set_column_value("#{lc}=", lcv + 1)
+          changed_columns.delete(lc)
+          nil
         end
       end
     end

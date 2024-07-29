@@ -1,5 +1,7 @@
 === master
 
+* Make optimistic_locking plugin not keep lock column in changed_columns after updating instance (jeremyevans) (#2196)
+
 * Have defaults_setter plugin pass model instance to default_values callable if it has arity 1 (pedrocarmona) (#2195)
 
 * Support string_agg extension on SQLite 3.44+ (segiddins) (#2191)

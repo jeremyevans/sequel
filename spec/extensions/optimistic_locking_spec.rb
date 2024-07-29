@@ -124,4 +124,11 @@ describe "optimistic_locking plugin" do
     proc{p1.save_changes}.must_raise(RuntimeError)
     p1.lock_version.must_equal lv
   end
+
+  it "should not marked the lock column changed after saving" do
+    p1 = @c[1]
+    p1.modified!
+    p1.save_changes
+    p1.changed_columns.must_be_empty
+  end
 end
