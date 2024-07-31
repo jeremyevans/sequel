@@ -397,7 +397,7 @@ describe "Database" do
       table = case DB.database_type
       when :mssql
         Sequel.lit("#items_temp")
-      when :derby
+      when :derby, :db2
         Sequel[:session][:items_temp]
       else
         :items_temp
