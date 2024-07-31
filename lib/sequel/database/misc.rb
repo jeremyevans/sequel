@@ -260,7 +260,7 @@ module Sequel
     # the database type, host, database, and user, if present.
     def inspect
       s = String.new
-      s << "#<#{self.class.to_s}"
+      s << "#<#{self.class}"
       s << " database_type=#{database_type}" if database_type && database_type != adapter_scheme
 
       keys = [:host, :database, :user]
