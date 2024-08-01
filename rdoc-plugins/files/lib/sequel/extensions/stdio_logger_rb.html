@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>stdio_logger.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>stdio_logger.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/stdio_logger.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-07-01 16:32:10 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The stdio_logger extension exposes a <a href="../../../../classes/Sequel/StdioLogger.html"><code>Sequel::StdioLogger</code></a> class that can be used for logging with <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>, as a minimal alternative to the logger library.  It exposes debug/info/warn/error methods for the different warning levels.  The debug method is a no-op, so that setting the Database sql_log_level to debug will result in no output for normal queries. The info/warn/error methods log the current time, log level, and the given message.</p>
+
+<p>To use this extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:stdio_logger</span>
+</pre>
+
+<p>Then you you can use <a href="../../../../classes/Sequel/StdioLogger.html"><code>Sequel::StdioLogger</code></a> to wrap IO objects that you would like <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to log to:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loggers</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">StdioLogger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stdout</span>)
+
+<span class="ruby-identifier">log_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&quot;db_queries.log&quot;</span>, <span class="ruby-string">&#39;a&#39;</span>)
+<span class="ruby-identifier">log_file</span>.<span class="ruby-identifier">sync</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">loggers</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">StdioLogger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">log_file</span>)
+</pre>
+
+<p>This is implemented as a global extension instead of a Database extension because Database loggers must be set before Database extensions are loaded.</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/StdioLogger.html"><code>Sequel::StdioLogger</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

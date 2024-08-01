@@ -60,6 +60,12 @@ Sequel::Plugins::DefaultsSetter
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; Date.today</span>
 </pre>
 
+<p>If the proc accepts a single argument, it is passed the instance, allowing default values to depend on instance-specific state:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">default_values</span>[<span class="ruby-value">:a</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>}
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">b:</span> <span class="ruby-value">10</span>).<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 11</span>
+</pre>
+
 <p>By default, default values returned are not cached:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span>.<span class="ruby-identifier">equal?</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span>) <span class="ruby-comment"># =&gt; false</span>
@@ -127,12 +133,12 @@ Sequel::Plugins::DefaultsSetter
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb</span>
-<span class="line-num">57</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">58</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">59</span>     <span class="ruby-identifier">set_default_values</span>
-<span class="line-num">60</span>     <span class="ruby-ivar">@cache_default_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cache</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:cache</span>)
-<span class="line-num">61</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">63</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">64</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">65</span>     <span class="ruby-identifier">set_default_values</span>
+<span class="line-num">66</span>     <span class="ruby-ivar">@cache_default_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cache</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:cache</span>)
+<span class="line-num">67</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -31,12 +31,29 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-07-01 08:14:55 -0700</span>
+<span class='datetime'>2024-08-01 08:02:35 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.83.0+-282024-08-01-29"><a href="doc/release_notes/5_83_0_txt.html">5.83.0</a> (2024-08-01)<span><a href="#label-5.83.0+-282024-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make optimistic_locking plugin not keep lock column in changed_columns after updating instance (jeremyevans) (#2196)</p>
+</li><li>
+<p>Have defaults_setter plugin pass model instance to default_values callable if it has arity 1 (pedrocarmona) (#2195)</p>
+</li><li>
+<p>Support string_agg extension on SQLite 3.44+ (segiddins) (#2191)</p>
+</li><li>
+<p>Support schema-qualified table names when using create_table :temp with a <a href="../classes/Sequel/SQL/QualifiedIdentifier.html"><code>Sequel::SQL::QualifiedIdentifier</code></a> (jeremyevans) (#2185)</p>
+</li><li>
+<p>Support MERGE WHEN NOT MATCHED BY SOURCE on PostgreSQL 17+ (jeremyevans)</p>
+</li><li>
+<p>Add stdio_logger extension for a minimal logger that <a href="../classes/Sequel/Database.html"><code>Sequel::Database</code></a> can use (jeremyevans)</p>
+</li><li>
+<p>Simplify Database#inspect output to database_type, host, database, and user (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.82.0+-282024-07-01-29"><a href="doc/release_notes/5_82_0_txt.html">5.82.0</a> (2024-07-01)<span><a href="#label-5.82.0+-282024-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Limit tactically eager loading to objects that have the same association reflection (jeremyevans) (#2181)</p>

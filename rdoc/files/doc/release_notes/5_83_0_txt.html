@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.83.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.83.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.83.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-08-01 08:02:35 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>MERGE WHEN NOT MATCHED BY SOURCE is now supported when using PostgreSQL 17+.  You can use this SQL syntax via the following Dataset methods:</p>
+<ul><li>
+<p>merge_delete_when_not_matched_by_source</p>
+</li><li>
+<p>merge_update_when_not_matched_by_source</p>
+</li><li>
+<p>merge_do_nothing_when_not_matched_by_source</p>
+</li></ul>
+
+<p>These are similar to the existing merge_delete, merge_update, and merge_do_nothing_when_matched, except they use WHEN NOT MATCHED BY SOURCE instead of WHEN MATCHED.</p>
+</li><li>
+<p>An stdio_logger extension has been added.  This adds the Sequel::StdioLogger class, which is a minimal logger implementation that is compatible for usage with <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a>.  Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:stdio_logger</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">loggers</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">StdioLogger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stdout</span>)
+</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#inspect now only displays the database type, host, database name, and user.  In addition to being easier to read, this also prevents displaying the password, enhancing security.</p>
+</li><li>
+<p>The string_agg extension now supports SQLite 3.44+.</p>
+</li><li>
+<p>The defaults_setter plugin now passes the model instance to a default_values proc if the proc has arity 1.  This allows default values to depend on model instance state.</p>
+</li><li>
+<p>The optimistic_locking plugin no longer adds the lock column to changed_columns after updating the model instance.</p>
+</li><li>
+<p>Database#create_temp with :temp option and an SQL::QualifiedIdentifier table name will now attempt to create a schema qualified table.  Note that schema qualified temporary tables are not supported by many (any?) databases, but this change prevents the CREATE TABLE statement from succeeding with an unexpected table name.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The Database.uri_to_options private class method now handles conversion of URI parameters to options.  Previously, this was handled by callers of this method.</p>
+</li><li>
+<p>The _merge_matched_sql and _merge_not_matched_sql private Dataset methods in PostgreSQL have been replaced with _merge_do_nothing_sql.</p>
+</li><li>
+<p>An unnecessary space in submitted SQL has been removed when using MERGE INSERT on PostgreSQL.  This should only affect your code if you are explicitly checking the produced SQL.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

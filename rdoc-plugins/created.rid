@@ -1,4 +1,4 @@
-Mon, 01 Jul 2024 08:24:39 -0700
+Thu, 01 Aug 2024 08:13:07 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -84,7 +84,8 @@ lib/sequel/extensions/sql_comments.rb	Tue, 01 Feb 2022 08:07:06 -0800
 lib/sequel/extensions/sql_expr.rb	Fri, 14 Oct 2016 13:06:50 -0700
 lib/sequel/extensions/sql_log_normalizer.rb	Mon, 11 Oct 2021 08:09:16 -0700
 lib/sequel/extensions/sqlite_json_ops.rb	Wed, 21 Feb 2024 09:59:48 -0800
-lib/sequel/extensions/string_agg.rb	Tue, 21 Sep 2021 14:24:30 -0700
+lib/sequel/extensions/stdio_logger.rb	Mon, 01 Jul 2024 16:32:10 -0700
+lib/sequel/extensions/string_agg.rb	Tue, 23 Jul 2024 12:20:12 -0700
 lib/sequel/extensions/string_date_time.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/extensions/symbol_aref.rb	Fri, 12 Aug 2022 17:18:38 -0700
 lib/sequel/extensions/symbol_aref_refinement.rb	Thu, 09 Jul 2020 12:21:33 -0700
@@ -124,7 +125,7 @@ lib/sequel/plugins/constraint_validations.rb	Sun, 16 Apr 2023 10:41:52 -0700
 lib/sequel/plugins/csv_serializer.rb	Wed, 01 Jul 2020 11:28:34 -0700
 lib/sequel/plugins/dataset_associations.rb	Fri, 04 Dec 2020 13:44:07 -0800
 lib/sequel/plugins/def_dataset_method.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/defaults_setter.rb	Thu, 10 Aug 2023 13:20:49 -0700
+lib/sequel/plugins/defaults_setter.rb	Thu, 25 Jul 2024 10:41:27 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/dirty.rb	Fri, 21 Oct 2022 08:19:04 -0700
 lib/sequel/plugins/eager_each.rb	Fri, 16 Jun 2017 12:40:57 -0700
@@ -150,7 +151,7 @@ lib/sequel/plugins/many_through_many.rb	Mon, 12 Dec 2022 21:25:25 -0800
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
 lib/sequel/plugins/nested_attributes.rb	Wed, 28 Dec 2022 11:43:04 -0800
-lib/sequel/plugins/optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
+lib/sequel/plugins/optimistic_locking.rb	Mon, 29 Jul 2024 11:17:11 -0700
 lib/sequel/plugins/optimistic_locking_base.rb	Mon, 24 Jul 2023 12:06:10 -0700
 lib/sequel/plugins/paged_operations.rb	Thu, 28 Sep 2023 15:03:58 -0700
 lib/sequel/plugins/pg_array_associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
