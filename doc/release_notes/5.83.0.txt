@@ -1,0 +1,56 @@
+= New Features
+
+* MERGE WHEN NOT MATCHED BY SOURCE is now supported when using
+  PostgreSQL 17+.  You can use this SQL syntax via the following
+  Dataset methods:
+
+  * merge_delete_when_not_matched_by_source
+  * merge_update_when_not_matched_by_source
+  * merge_do_nothing_when_not_matched_by_source
+
+  These are similar to the existing merge_delete, merge_update,
+  and merge_do_nothing_when_matched, except they use
+  WHEN NOT MATCHED BY SOURCE instead of WHEN MATCHED.
+
+* An stdio_logger extension has been added.  This adds the
+  Sequel::StdioLogger class, which is a minimal logger implementation
+  that is compatible for usage with Sequel::Database.  Example:
+
+    Sequel.extension :stdio_logger
+    DB.loggers << Sequel::StdioLogger.new($stdout)
+
+= Other Improvements
+
+* Database#inspect now only displays the database type, host, database
+  name, and user.  In addition to being easier to read, this also
+  prevents displaying the password, enhancing security.
+
+* The string_agg extension now supports SQLite 3.44+.
+
+* The defaults_setter plugin now passes the model instance to a
+  default_values proc if the proc has arity 1.  This allows default
+  values to depend on model instance state.
+
+* The optimistic_locking plugin no longer adds the lock column to
+  changed_columns after updating the model instance.
+
+* Database#create_temp with :temp option and an
+  SQL::QualifiedIdentifier table name will now attempt to create a
+  schema qualified table.  Note that schema qualified temporary
+  tables are not supported by many (any?) databases, but this
+  change prevents the CREATE TABLE statement from succeeding with
+  an unexpected table name.
+
+= Backwards Compatibility
+
+* The Database.uri_to_options private class method now handles
+  conversion of URI parameters to options.  Previously, this was
+  handled by callers of this method.
+
+* The _merge_matched_sql and _merge_not_matched_sql private Dataset
+  methods in PostgreSQL have been replaced with
+  _merge_do_nothing_sql.
+
+* An unnecessary space in submitted SQL has been removed when using
+  MERGE INSERT on PostgreSQL.  This should only affect your code if
+  you are explicitly checking the produced SQL.
