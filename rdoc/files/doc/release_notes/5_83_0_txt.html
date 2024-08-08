@@ -31,7 +31,7 @@ doc/release_notes/5.83.0.txt
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-08-01 08:02:35 -0700</span>
+<span class='datetime'>2024-08-08 09:05:13 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -72,7 +72,7 @@ Last Update:
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The Database.uri_to_options private class method now handles conversion of URI parameters to options.  Previously, this was handled by callers of this method.</p>
+<p>The Database.uri_to_options private class method now handles conversion of URI parameters to options.  Previously, this was handled by callers of this method (change reverted in 5.83.1).</p>
 </li><li>
 <p>The _merge_matched_sql and _merge_not_matched_sql private Dataset methods in PostgreSQL have been replaced with _merge_do_nothing_sql.</p>
 </li><li>
