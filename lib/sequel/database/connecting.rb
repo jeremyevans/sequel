@@ -34,7 +34,7 @@ module Sequel
           uri = URI.parse(conn_string)
           scheme = uri.scheme
           c = adapter_class(scheme)
-          opts = c.send(:uri_to_options, uri).merge!(opts).merge!(:orig_opts=>opts.dup, :uri=>conn_string, :adapter=>scheme)
+          opts = c.send(:options_from_uri, uri).merge!(opts).merge!(:orig_opts=>opts.dup, :uri=>conn_string, :adapter=>scheme)
         end
       when Hash
         opts = conn_string.merge(opts)

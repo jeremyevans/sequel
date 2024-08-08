@@ -1,3 +1,7 @@
+=== 5.83.1 (2024-08-08)
+
+* Restore unescaping of database file paths in the sqlite and amalgalite adapters (jeremyevans) (#2201)
+
 === 5.83.0 (2024-08-01)
 
 * Make optimistic_locking plugin not keep lock column in changed_columns after updating instance (jeremyevans) (#2196)

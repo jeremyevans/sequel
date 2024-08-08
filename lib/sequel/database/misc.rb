@@ -72,18 +72,23 @@ module Sequel
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object. 
     def self.uri_to_options(uri)
-      uri_options = {
+      {
         :user => uri.user,
         :password => uri.password,
         :port => uri.port,
         :host => uri.hostname,
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1])
       }
+    end
+    private_class_method :uri_to_options
+
+    def self.options_from_uri(uri)
+      uri_options = uri_to_options(uri)
       uri.query.split('&').map{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
       uri_options.to_a.each{|k,v| uri_options[k] = URI::DEFAULT_PARSER.unescape(v) if v.is_a?(String)}
       uri_options
     end
-    private_class_method :uri_to_options
+    private_class_method :options_from_uri
 
     # The options hash for this database
     attr_reader :opts
@@ -266,7 +271,7 @@ module Sequel
       keys = [:host, :database, :user]
       opts = self.opts
       if !keys.any?{|k| opts[k]} && opts[:uri]
-        opts = self.class.send(:uri_to_options, URI.parse(opts[:uri]))
+        opts = self.class.send(:options_from_uri, URI.parse(opts[:uri]))
       end
 
       keys.each do |key|

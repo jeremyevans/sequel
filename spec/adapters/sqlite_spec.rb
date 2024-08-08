@@ -12,6 +12,10 @@ describe "An SQLite database" do
     Sequel.datetime_class = Time
   end
 
+  it "should unescape escaped paths in URI for database file" do
+    DB.class.send(:options_from_uri, URI("scheme://app%2Fdata%2Ftest.db"))[:database].must_equal 'app/data/test.db'
+  end if DB.adapter_scheme == :sqlite || DB.adapter_scheme == :amalgalite
+
   it "should support casting to Date by using the date function" do
     @db.get(Sequel.cast('2012-10-20 11:12:13', Date)).must_equal '2012-10-20'
   end

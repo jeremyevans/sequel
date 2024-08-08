@@ -45,7 +45,7 @@
 
 * The Database.uri_to_options private class method now handles
   conversion of URI parameters to options.  Previously, this was
-  handled by callers of this method.
+  handled by callers of this method (change reverted in 5.83.1).
 
 * The _merge_matched_sql and _merge_not_matched_sql private Dataset
   methods in PostgreSQL have been replaced with
