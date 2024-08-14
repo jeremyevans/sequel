@@ -1,3 +1,7 @@
+=== master
+
+* Remove documentation from the gem to reduce gem size by 25% (jeremyevans)
+
 === 5.83.1 (2024-08-08)
 
 * Restore unescaping of database file paths in the sqlite and amalgalite adapters (jeremyevans) (#2201)

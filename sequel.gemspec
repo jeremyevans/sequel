@@ -3,7 +3,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.name = 'sequel'
   s.version = Sequel.version
   s.platform = Gem::Platform::RUBY
-  s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "MIT-LICENSE"] + Dir["doc/*.rdoc"] + Dir['doc/release_notes/5.*.txt']
+  s.extra_rdoc_files = ["MIT-LICENSE"]
   s.rdoc_options += ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby', '--main', 'README.rdoc']
   s.summary = "The Database Toolkit for Ruby"
   s.description = s.summary
@@ -19,7 +19,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
     'source_code_uri'   => 'https://github.com/jeremyevans/sequel',
   }
   s.required_ruby_version = ">= 1.9.2"
-  s.files = %w(MIT-LICENSE CHANGELOG README.rdoc bin/sequel) + Dir["doc/*.rdoc"] + Dir["doc/release_notes/5.*.txt"] + Dir["lib/**/*.rb"]
+  s.files = %w(MIT-LICENSE bin/sequel) + Dir["lib/**/*.rb"]
   s.require_path = "lib"
   s.bindir = 'bin'
   s.executables << 'sequel'
