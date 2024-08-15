@@ -281,6 +281,119 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.concat([1, 2])].must_equal "(j || '[1,2]'::jsonb)"
   end
 
+  it "#exists should use the json_exists function" do
+    @l[@j.exists('$.a')].must_equal "json_exists(j, '$.a')"
+    @l[@jb.exists('$.a')].must_equal "json_exists(j, '$.a')"
+  end
+
+  it "#exists should support :passing option" do
+    @l[@jb.exists('$.a', passing: {})].must_equal "json_exists(j, '$.a')"
+    @l[@jb.exists('$.a', passing: {v: 1})].must_equal "json_exists(j, '$.a' PASSING 1 AS v)"
+    @l[@jb.exists('$.a', passing: {v: 1, k: 'a'})].must_equal "json_exists(j, '$.a' PASSING 1 AS v, 'a' AS k)"
+  end
+
+  it "#exists should support :on_error option" do
+    @l[@jb.exists('$.a', on_error: true)].must_equal "json_exists(j, '$.a' TRUE ON ERROR)"
+    @l[@jb.exists('$.a', on_error: false)].must_equal "json_exists(j, '$.a' FALSE ON ERROR)"
+    @l[@jb.exists('$.a', on_error: :null)].must_equal "json_exists(j, '$.a' UNKNOWN ON ERROR)"
+    @l[@jb.exists('$.a', on_error: :error)].must_equal "json_exists(j, '$.a' ERROR ON ERROR)"
+    proc{@l[@jb.exists('$.a', on_error: :bad)]}.must_raise KeyError
+  end
+
+  it "#exists should return a boolean expression" do
+    @l[@j.exists('$.a') & 1].must_equal "(json_exists(j, '$.a') AND 1)"
+  end
+
+  it "#exists should support AST transformations" do
+    @db.select(@jb.exists('$.a')).qualify(:t).sql.must_equal "SELECT json_exists(t.j, '$.a')"
+    @db.select(@jb.exists('$.a', passing: {v: 1, k: :a}, on_error: :error)).qualify(:t).sql.must_equal "SELECT json_exists(t.j, '$.a' PASSING 1 AS v, t.a AS k ERROR ON ERROR)"
+  end
+
+  it "#value should use the json_value function" do
+    @l[@j.value('$.a')].must_equal "json_value(j, '$.a')"
+    @l[@jb.value('$.a')].must_equal "json_value(j, '$.a')"
+  end
+
+  it "#value should support :passing option" do
+    @l[@jb.value('$.a', passing: {v: 1})].must_equal "json_value(j, '$.a' PASSING 1 AS v)"
+    @l[@jb.value('$.a', passing: {v: 1, k: 'a'})].must_equal "json_value(j, '$.a' PASSING 1 AS v, 'a' AS k)"
+  end
+
+  it "#value should support :returning option" do
+    @l[@jb.value('$.a', returning: String)].must_equal "json_value(j, '$.a' RETURNING text)"
+  end
+
+  it "#value should support :on_error option" do
+    @l[@jb.value('$.a', on_error: true)].must_equal "json_value(j, '$.a' DEFAULT true ON ERROR)"
+    @l[@jb.value('$.a', on_error: :null)].must_equal "json_value(j, '$.a' NULL ON ERROR)"
+    @l[@jb.value('$.a', on_error: :error)].must_equal "json_value(j, '$.a' ERROR ON ERROR)"
+  end
+
+  it "#value should support :on_empty option" do
+    @l[@jb.value('$.a', on_empty: true)].must_equal "json_value(j, '$.a' DEFAULT true ON EMPTY)"
+    @l[@jb.value('$.a', on_empty: :null)].must_equal "json_value(j, '$.a' NULL ON EMPTY)"
+    @l[@jb.value('$.a', on_empty: :error)].must_equal "json_value(j, '$.a' ERROR ON EMPTY)"
+  end
+
+  it "#value not parameterize :on_empty/:on_error default option when using pg_auto_parameterize" do
+    @db.extension :pg_auto_parameterize
+    @db.select(@jb.value('$.a', on_empty: 1, on_error: 2)).sql.must_equal 'SELECT json_value(j, $1 DEFAULT 1 ON EMPTY DEFAULT 2 ON ERROR)'
+  end
+
+  it "#value should return a string expression" do
+    @l[@j.value('$.a') + :a].must_equal "(json_value(j, '$.a') || a)"
+  end
+
+  it "#value should support AST transformations" do
+    @db.select(@jb.value('$.a', passing: {v: 1, k: :a}, returning: Integer, on_error: :foo, on_empty: :null)).qualify(:t).sql.must_equal "SELECT json_value(t.j, '$.a' PASSING 1 AS v, t.a AS k RETURNING integer NULL ON EMPTY DEFAULT t.foo ON ERROR)"
+    @db.select(@jb.value('$.a', passing: {v: 1, k: :a}, returning: Integer, on_error: :error, on_empty: :foo)).qualify(:t).sql.must_equal "SELECT json_value(t.j, '$.a' PASSING 1 AS v, t.a AS k RETURNING integer DEFAULT t.foo ON EMPTY ERROR ON ERROR)"
+  end
+
+  it "#query should use the json_query function" do
+    @l[@j.query('$.a')].must_equal "json_query(j, '$.a')"
+    @l[@jb.query('$.a')].must_equal "json_query(j, '$.a')"
+  end
+
+  it "#query should support :passing option" do
+    @l[@jb.query('$.a', passing: {v: 1})].must_equal "json_query(j, '$.a' PASSING 1 AS v)"
+    @l[@jb.query('$.a', passing: {v: 1, k: 'a'})].must_equal "json_query(j, '$.a' PASSING 1 AS v, 'a' AS k)"
+  end
+
+  it "#query should support :returning option" do
+    @l[@jb.query('$.a', returning: String)].must_equal "json_query(j, '$.a' RETURNING text)"
+  end
+
+  it "#query should support :wrapper option" do
+    @l[@jb.query('$.a', wrapper: true)].must_equal "json_query(j, '$.a' WITH WRAPPER)"
+    @l[@jb.query('$.a', wrapper: :unconditional)].must_equal "json_query(j, '$.a' WITH WRAPPER)"
+    @l[@jb.query('$.a', wrapper: :conditional)].must_equal "json_query(j, '$.a' WITH CONDITIONAL WRAPPER)"
+    @l[@jb.query('$.a', wrapper: :omit_quotes)].must_equal "json_query(j, '$.a' OMIT QUOTES)"
+  end
+
+  it "#query should support :on_error option" do
+    @l[@jb.query('$.a', on_error: true)].must_equal "json_query(j, '$.a' DEFAULT true ON ERROR)"
+    @l[@jb.query('$.a', on_error: :null)].must_equal "json_query(j, '$.a' NULL ON ERROR)"
+    @l[@jb.query('$.a', on_error: :error)].must_equal "json_query(j, '$.a' ERROR ON ERROR)"
+    @l[@jb.query('$.a', on_error: :empty_array)].must_equal "json_query(j, '$.a' EMPTY ARRAY ON ERROR)"
+    @l[@jb.query('$.a', on_error: :empty_object)].must_equal "json_query(j, '$.a' EMPTY OBJECT ON ERROR)"
+  end
+
+  it "#query should support :on_empty option" do
+    @l[@jb.query('$.a', on_empty: true)].must_equal "json_query(j, '$.a' DEFAULT true ON EMPTY)"
+    @l[@jb.query('$.a', on_empty: :null)].must_equal "json_query(j, '$.a' NULL ON EMPTY)"
+    @l[@jb.query('$.a', on_empty: :error)].must_equal "json_query(j, '$.a' ERROR ON EMPTY)"
+    @l[@jb.query('$.a', on_empty: :empty_array)].must_equal "json_query(j, '$.a' EMPTY ARRAY ON EMPTY)"
+    @l[@jb.query('$.a', on_empty: :empty_object)].must_equal "json_query(j, '$.a' EMPTY OBJECT ON EMPTY)"
+  end
+
+  it "#query should return a json expression" do
+    @l[@j.query('$.a').query('$.b')].must_equal "json_query(json_query(j, '$.a'), '$.b')"
+  end
+
+  it "#query should support AST transformations" do
+    @db.select(@jb.query('$.a', passing: {v: 1, k: :a}, returning: Integer, on_error: :foo, on_empty: :null, wrapper: :omit_quotes)).qualify(:t).sql.must_equal "SELECT json_query(t.j, '$.a' PASSING 1 AS v, t.a AS k RETURNING integer OMIT QUOTES NULL ON EMPTY DEFAULT t.foo ON ERROR)"
+  end
+
   it "#insert should use the jsonb_insert function" do
     @l[@jb.insert(:a, :h)].must_equal "jsonb_insert(j, a, h, false)"
     @l[@jb.insert(:a, :h, true)].must_equal "jsonb_insert(j, a, h, true)"

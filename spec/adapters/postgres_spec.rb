@@ -4263,7 +4263,7 @@ describe 'PostgreSQL' do
       @db[:items].all.must_equal [{:i=>{'a'=>{'b'=>2, 'c'=>3}, 'd'=>{'e'=>4}}}]
     end if DB.server_version >= 140000 && json_type == :jsonb
 
-    it "15 #{json_type} operations/functions with pg_json_ops" do
+    it "16 #{json_type} operations/functions with pg_json_ops" do
       meth = Sequel.method(:"pg_#{json_type}_op")
       @db.get(meth.call('{}').is_json).must_equal true
       @db.get(meth.call('null').is_json).must_equal true
@@ -4301,6 +4301,72 @@ describe 'PostgreSQL' do
       @db.get(meth.call('{"a": 1, "b": 2}').is_not_json(:unique=>true)).must_equal false
       @db.get(meth.call('[]').is_not_json(:unique=>true)).must_equal false
     end if DB.server_version >= 160000
+
+    it "17 #{json_type} operations/functions with pg_json_ops" do
+      j = Sequel.send(:"pg_#{json_type}_op", '{"a": 1, "c": [1, 2], "n": [[1, 2], [3]], "s": "t"}')
+      @db.get(j.exists('$.a')).must_equal true
+      @db.get(j.exists('$.b')).must_equal false
+      @db.get(j.exists('$.c')).must_equal true
+      @db.get(j.exists('$.c[1]')).must_equal true
+      @db.get(j.exists('$.c[3]')).must_equal false
+      @db.get(j.exists('$.c[$x]', passing: {x: 1})).must_equal true
+      @db.get(j.exists('$.c[$x]', passing: {x: 3})).must_equal false
+      @db.get(j.exists('strict $.c[3]')).must_equal false
+      @db.get(j.exists('strict $.c[3]', on_error: true)).must_equal true
+      @db.get(j.exists('strict $.c[3]', on_error: false)).must_equal false
+      @db.get(j.exists('strict $.c[3]', on_error: :null)).must_be_nil
+      proc{@db.get(j.exists('strict $.c[3]', on_error: :error))}.must_raise Sequel::DatabaseError
+
+      @db.get(j.value('$.a')).must_equal "1"
+      @db.get(j.value('$.b')).must_be_nil
+      @db.get(j.value('$.c')).must_be_nil
+      @db.get(j.value('$.c[1]')).must_equal "2"
+      @db.get(j.value('$.c[3]')).must_be_nil
+      @db.get(j.value('$.c[$x]', passing: {x: 1})).must_equal "2"
+      @db.get(j.value('$.c[$x]', passing: {x: 3})).must_be_nil
+      @db.get(j.value('strict $.c[3]')).must_be_nil
+      @db.get(j.value('strict $.c[3]', on_error: :null)).must_be_nil
+      proc{@db.get(j.value('strict $.c[3]', on_error: :error))}.must_raise Sequel::DatabaseError
+      @db.get(j.value('$.a', returning: Integer)).must_equal 1
+      @db.get(j.value('$.e')).must_be_nil
+      @db.get(j.value('$.a', on_empty: :null)).must_equal '1'
+      @db.get(j.value('$.e', on_empty: :null)).must_be_nil
+      @db.get(j.value('$.a', on_empty: 3)).must_equal '1'
+      @db.get(j.value('$.e', on_empty: 3)).must_equal '3'
+      @db.get(j.value('$.a', on_empty: :error)).must_equal '1'
+      proc{@db.get(j.value('$.e', on_empty: :error))}.must_raise Sequel::DatabaseError
+
+      @db.get(j.query('$.a')).must_equal 1
+      @db.get(j.query('$.b')).must_be_nil
+      @db.get(j.query('$.c')).must_equal [1, 2]
+      @db.get(j.query('$.c[1]')).must_equal 2
+      @db.get(j.query('$.c[3]')).must_be_nil
+      @db.get(j.query('$.c[$x]', passing: {x: 1})).must_equal 2
+      @db.get(j.query('$.c[$x]', passing: {x: 3})).must_be_nil
+      @db.get(j.query('strict $.c[3]')).must_be_nil
+      @db.get(j.query('strict $.c[3]', on_error: :null)).must_be_nil
+      @db.get(j.query('strict $.c[3]', on_error: :empty_array)).must_equal []
+      @db.get(j.query('strict $.c[3]', on_error: :empty_object)).must_equal({})
+      proc{@db.get(j.query('strict $.c[3]', on_error: :error))}.must_raise Sequel::DatabaseError
+      @db.get(j.query('$.a', returning: String)).must_equal '1'
+      @db.get(j.query('$.a', on_empty: :null)).must_equal 1
+      @db.get(j.query('$.e', on_empty: :null)).must_be_nil
+      @db.get(j.query('$.e', on_empty: :empty_array)).must_equal []
+      @db.get(j.query('$.e', on_empty: :empty_object)).must_equal({})
+      @db.get(j.query('$.a', on_empty: '3')).must_equal 1
+      @db.get(j.query('$.e', on_empty: '3')).must_equal 3
+      @db.get(j.query('$.a', on_empty: :error)).must_equal 1
+      proc{@db.get(j.query('$.e', on_empty: :error))}.must_raise Sequel::DatabaseError
+      @db.get(j.query('$.a', :wrapper=>true)).must_equal [1]
+      @db.get(j.query('$.c', :wrapper=>true)).must_equal [[1, 2]]
+      @db.get(j.query('$.c[*]', :wrapper=>true)).must_equal [1, 2]
+      @db.get(j.query('$.n[1]', :wrapper=>true)).must_equal [[3]]
+      @db.get(j.query('$.a', :wrapper=>:conditional)).must_equal [1]
+      @db.get(j.query('$.c[*]', :wrapper=>:conditional)).must_equal [1, 2]
+      @db.get(j.query('$.n[1]', :wrapper=>:conditional)).must_equal [3]
+      @db.get(j.query('$.s', returning: String)).must_equal '"t"'
+      @db.get(j.query('$.s', returning: String, :wrapper=>:omit_quotes)).must_equal "t"
+    end if DB.server_version >= 170000
   end
 end if DB.server_version >= 90200
 

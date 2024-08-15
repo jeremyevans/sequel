@@ -132,6 +132,17 @@
 #   j.is_not_json(type: :array)                # j IS NOT JSON ARRAY
 #   j.is_not_json(unique: true)                # j IS NOT JSON WITH UNIQUE
 #
+# On PostgreSQL 17+, the additional JSON functions are supported (see method documentation
+# for additional options):
+#
+#   j.exists('$.foo')     # json_exists(jsonb_column, '$.foo')
+#   j.value('$.foo')      # json_value(jsonb_column, '$.foo')
+#   j.query('$.foo')      # json_query(jsonb_column, '$.foo')
+#
+#   j.exists('$.foo', passing: {a: 1}) # json_exists(jsonb_column, '$.foo' PASSING 1 AS a)
+#   j.value('$.foo', returning: Time)  # json_value(jsonb_column, '$.foo' RETURNING timestamp)
+#   j.query('$.foo', wrapper: true)    # json_query(jsonb_column, '$.foo' WITH WRAPPER)
+#
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
 # JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
@@ -224,7 +235,25 @@ module Sequel
         function(:each_text)
       end
 
-      # Returns a json value for the object at the given path.
+      # Return whether the given JSON path yields any items in the receiver.
+      # Options:
+      #
+      # :on_error :: How to handle errors when evaluating the JSON path expression.
+      #              true :: Return true
+      #              false :: Return false (default behavior)
+      #              :null :: Return nil
+      #              :error :: raise a DatabaseError
+      # :passing :: Variables to pass to the JSON path expression.  Keys are variable
+      #             names, values are the values of the variable.
+      # 
+      #   json_op.exists("$.a") # json_exists(json, '$.a')
+      #   json_op.exists("$.a", passing: {a: 1}) # json_exists(json, '$.a' PASSING 1 AS a)
+      #   json_op.exists("$.a", on_error: :error) # json_exists(json, '$.a' ERROR ON ERROR)
+      def exists(path, opts=OPTS)
+        Sequel::SQL::BooleanExpression.new(:NOOP, JSONExistsOp.new(self, path, opts))
+      end
+
+      # Returns a JSON value for the object at the given path.
       #
       #   json_op.extract('a') # json_extract_path(json, 'a')
       #   json_op.extract('a', 'b') # json_extract_path(json, 'a', 'b')
@@ -299,6 +328,35 @@ module Sequel
         SQL::Function.new(function_name(:populate_recordset), arg, self)
       end
 
+      # Return the result of applying the JSON path expression to the receiver, by default
+      # returning results as jsonb.  Options:
+      #
+      # :on_empty :: How to handle case where path expression yields an empty set.
+      #              Uses same values as :on_error option.
+      # :on_error :: How to handle errors when evaluating the JSON path expression:
+      #              :null :: Return nil (default)
+      #              :empty_array :: Return an empty array
+      #              :empty_object :: Return an empty object
+      #              :error :: raise a DatabaseError
+      #              any other value :: used as default value
+      # :passing :: Variables to pass to the JSON path expression.  Keys are variable
+      #             names, values are the values of the variable.
+      # :returning :: The data type to return (jsonb by default)
+      # :wrapper :: How to wrap returned values:
+      #             true, :unconditional :: Always wrap returning values in an array
+      #             :conditional :: Only wrap multiple return values in an array
+      #             :omit_quotes :: Do not wrap scalar strings in quotes
+      # 
+      #   json_op.query("$.a") # json_query(json, '$.a')
+      #   json_op.query("$.a", passing: {a: 1}) # json_query(json, '$.a' PASSING 1 AS a)
+      #   json_op.query("$.a", on_error: :empty_array) # json_query(json, '$.a' EMPTY ARRAY ON ERROR)
+      #   json_op.query("$.a", returning: Time) # json_query(json, '$.a' RETURNING timestamp)
+      #   json_op.query("$.a", on_empty: 2) # json_query(json, '$.a' DEFAULT 2 ON EMPTY)
+      #   json_op.query("$.a", wrapper: true) # json_query(json, '$.a' WITH WRAPPER)
+      def query(path, opts=OPTS)
+        self.class.new(JSONQueryOp.new(self, path, opts))
+      end
+
       # Returns a json value stripped of all internal null values.
       #
       #   json_op.strip_nulls # json_strip_nulls(json)
@@ -327,6 +385,34 @@ module Sequel
       #   json_op.typeof # json_typeof(json)
       def typeof
         function(:typeof)
+      end
+
+      # If called without arguments, operates as SQL::Wrapper#value.  Otherwise, 
+      # return the result of applying the JSON path expression to the receiver, by default
+      # returning results as text.  Options:
+      #
+      # :on_empty :: How to handle case where path expression yields an empty set.
+      #              Uses same values as :on_error option.
+      # :on_error :: How to handle errors when evaluating the JSON path expression.
+      #              :null :: Return nil (default)
+      #              :error :: raise a DatabaseError
+      #              any other value :: used as default value
+      # :passing :: Variables to pass to the JSON path expression.  Keys are variable
+      #             names, values are the values of the variable.
+      # :returning :: The data type to return (text by default)
+      # 
+      #   json_op.value("$.a") # json_value(json, '$.a')
+      #   json_op.value("$.a", passing: {a: 1}) # json_value(json, '$.a' PASSING 1 AS a)
+      #   json_op.value("$.a", on_error: :error) # json_value(json, '$.a' ERROR ON ERROR)
+      #   json_op.value("$.a", returning: Time) # json_value(json, '$.a' RETURNING timestamp)
+      #   json_op.value("$.a", on_empty: 2) # json_value(json, '$.a' DEFAULT 2 ON EMPTY)
+      def value(path=(no_args_given = true), opts=OPTS)
+        if no_args_given
+          # Act as SQL::Wrapper#value
+          super()
+        else
+          Sequel::SQL::StringExpression.new(:NOOP, JSONValueOp.new(self, path, opts))
+        end
       end
 
       private
@@ -702,6 +788,247 @@ module Sequel
       # Support transforming of jsonb subscripts
       def sequel_ast_transform(transformer)
         self.class.new(transformer.call(@expression), transformer.call(@sub))
+      end
+    end
+
+    # Object representing json_exists calls
+    class JSONExistsOp < SQL::Expression
+      ON_ERROR_SQL = {
+        true => 'TRUE',
+        false => 'FALSE',
+        :null =>  'UNKNOWN',
+        :error => 'ERROR',
+      }.freeze
+      private_constant :ON_ERROR_SQL
+
+      # Expression (context_item in PostgreSQL terms), usually JSONBaseOp instance
+      attr_reader :expr
+
+      # JSON path expression to apply against the expression
+      attr_reader :path
+
+      # Variables to set in the JSON path expression
+      attr_reader :passing
+
+      # How to handle errors when evaluating the JSON path expression
+      attr_reader :on_error
+
+      # See JSONBaseOp#exists for documentation on the options.
+      def initialize(expr, path, opts=OPTS)
+        @expr = expr
+        @path = path
+        @passing = opts[:passing]
+        @on_error = opts[:on_error]
+        freeze
+      end
+
+      # Append the SQL function call expression to the SQL
+      def to_s_append(ds, sql)
+        to_s_append_function_name(ds, sql)
+        to_s_append_args_passing(ds, sql)
+        to_s_append_on_error(ds, sql)
+        sql << ')'
+      end
+
+      # Support transforming of function call expression
+      def sequel_ast_transform(transformer)
+        opts = {}
+        transform_opts(transformer, opts)
+        self.class.new(transformer.call(@expr), @path, opts)
+      end
+
+      private
+
+      # Set the :passing and :on_error options when doing an
+      # AST transform.
+      def transform_opts(transformer, opts)
+        if @passing
+          passing = opts[:passing] = {}
+          @passing.each do |k, v|
+            passing[k] = transformer.call(v)
+          end
+        end
+
+        opts[:on_error] = @on_error
+      end
+      
+      def to_s_append_function_name(ds, sql)
+        sql << 'json_exists('
+      end
+
+      # Append the expression, path, and optional PASSING fragments
+      def to_s_append_args_passing(ds, sql)
+        ds.literal_append(sql, @expr)
+        sql << ', '
+        ds.literal_append(sql, @path)
+
+        if (passing = @passing) && !passing.empty?
+          sql << ' PASSING '
+          comma = false
+          passing.each do |k, v|
+            if comma
+              sql << ', '
+            else
+              comma = true
+            end
+            ds.literal_append(sql, v)
+            sql << " AS " << k.to_s
+          end
+        end
+      end
+
+      # Append the optional ON ERROR fragments
+      def to_s_append_on_error(ds, sql)
+        unless @on_error.nil?
+          sql << " "
+          to_s_append_on_value(ds, sql, @on_error)
+          sql << " ON ERROR"
+        end
+      end
+
+      # Append the value to use for ON ERROR
+      def to_s_append_on_value(ds, sql, value)
+        sql << ON_ERROR_SQL.fetch(value)
+      end
+    end
+
+    # Object representing json_value calls
+    class JSONValueOp < JSONExistsOp
+      ON_SQL = {
+        :null =>  'NULL',
+        :error => 'ERROR',
+      }.freeze
+      private_constant :ON_SQL
+
+      # The database type to cast returned values to
+      attr_reader :returning
+
+      # How to handle cases where the JSON path expression evaluation yields
+      # an empty set.
+      attr_reader :on_empty
+
+      # See JSONBaseOp#value for documentation of the options.
+      def initialize(expr, path, opts=OPTS)
+        @returning = opts[:returning]
+        @on_empty = opts[:on_empty]
+        super
+      end
+
+      private
+
+      # Also handle transforming the returning and on_empty options.
+      def transform_opts(transformer, opts)
+        super
+        opts[:returning] = @returning
+        on_error = @on_error
+        on_error = transformer.call(on_error) unless on_sql_value(on_error)
+        opts[:on_error] = on_error
+        on_empty = @on_empty
+        on_empty = transformer.call(on_empty) unless on_sql_value(on_empty)
+        opts[:on_empty] = on_empty
+      end
+      
+      def to_s_append_function_name(ds, sql)
+        sql << 'json_value('
+      end
+
+      # Also append the optional RETURNING fragment
+      def to_s_append_args_passing(ds, sql)
+        super
+
+        if @returning
+          sql << ' RETURNING ' << ds.db.cast_type_literal(@returning).to_s
+        end
+      end
+
+      # Also append the optional ON EMPTY fragment
+      def to_s_append_on_error(ds, sql)
+        unless @on_empty.nil?
+          sql << " "
+          to_s_append_on_value(ds, sql, @on_empty)
+          sql << " ON EMPTY"
+        end
+
+        super
+      end
+
+      # Handle DEFAULT values in ON EMPTY/ON ERROR fragments
+      def to_s_append_on_value(ds, sql, value)
+        if v = on_sql_value(value)
+          sql << v
+        else
+          sql << 'DEFAULT '
+          default_literal_append(ds, sql, value)
+        end
+      end
+
+      # Do not auto paramterize default value, as PostgreSQL doesn't allow it.
+      def default_literal_append(ds, sql, v)
+        if sql.respond_to?(:skip_auto_param)
+          sql.skip_auto_param do
+            ds.literal_append(sql, v)
+          end
+        else
+          ds.literal_append(sql, v)
+        end
+      end
+
+      def on_sql_value(value)
+        ON_SQL[value]
+      end
+    end
+
+    # Object representing json_query calls
+    class JSONQueryOp < JSONValueOp
+      ON_SQL = {
+        :null =>  'NULL',
+        :error => 'ERROR',
+        :empty_array => 'EMPTY ARRAY',
+        :empty_object => 'EMPTY OBJECT',
+      }.freeze
+      private_constant :ON_SQL
+
+      WRAPPER = {
+        :conditional => ' WITH CONDITIONAL WRAPPER',
+        :unconditional => ' WITH WRAPPER',
+        :omit_quotes => ' OMIT QUOTES'
+      }
+      WRAPPER[true] = WRAPPER[:unconditional]
+      WRAPPER.freeze
+      private_constant :WRAPPER
+
+      # How to handle wrapping of results
+      attr_reader :wrapper
+
+      # See JSONBaseOp#query for documentation of the options.
+      def initialize(expr, path, opts=OPTS)
+        @wrapper = opts[:wrapper]
+        super
+      end
+
+      private
+      
+      # Also handle transforming the wrapper option
+      def transform_opts(transformer, opts)
+        super
+        opts[:wrapper] = @wrapper
+      end
+      
+      def to_s_append_function_name(ds, sql)
+        sql << 'json_query('
+      end
+
+      # Also append the optional WRAPPER/OMIT QUOTES fragment
+      def to_s_append_args_passing(ds, sql)
+        super
+
+        if @wrapper
+          sql << WRAPPER.fetch(@wrapper)
+        end
+      end
+
+      def on_sql_value(value)
+        ON_SQL[value]
       end
     end
 
