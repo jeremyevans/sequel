@@ -80,7 +80,7 @@ the following methods:
 * +alter_table+ (supporting the following methods in the +alter_table+ block):
   * +add_column+
   * +add_constraint+
-  * +add_foreign_key+ (with a symbol, not an array)
+  * +add_foreign_key+ (in most cases)
   * +add_primary_key+ (with a symbol, not an array)
   * +add_index+
   * +add_full_text_index+
@@ -89,6 +89,10 @@ the following methods:
   * +set_column_allow_null+
 
 If you use any other methods, you should create your own +down+ block.
+
+For +add_foreign_key+, it is reversible if passing a symbol, and reversible if passing an
+array if Sequel can determine the name of the foreign key constraint to drop (which it
+can for most databases).
 
 To revert a migration created with +change+, you can copy the migration to a new file, and
 replace +change+ with +revert+. For example, if you no longer need the artists table, you
