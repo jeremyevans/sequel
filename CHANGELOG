@@ -1,5 +1,7 @@
 === master
 
+* Support creating VIRTUAL tables on SQLite via the create_table :using option (jeremyevans)
+
 * Support json_{exists,value,query} on PostgreSQL 17+ in the pg_json_ops extension (jeremyevans)
 
 * Remove documentation from the gem to reduce gem size by 25% (jeremyevans)

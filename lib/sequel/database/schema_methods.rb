@@ -191,6 +191,8 @@ module Sequel
     #            The +any+ type is treated like a SQLite column in a non-strict table,
     #            allowing any type of data to be stored. This option is supported on
     #            SQLite 3.37.0+.
+    # :using :: Create a VIRTUAL table with the given USING clause. The value should be
+    #           a string, as it is used directly in the SQL query.
     # :without_rowid :: Create a WITHOUT ROWID table. Every row in SQLite has a special
     #                   'rowid' column, that uniquely identifies that row within the table.
     #                   If this option is used, the 'rowid' column is omitted, which can

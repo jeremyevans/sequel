@@ -349,7 +349,7 @@ module Sequel
         ps
       end
 
-      # Support creating STRICT AND/OR WITHOUT ROWID tables via :strict and :without_rowid options
+      # Support creating STRICT AND/OR WITHOUT ROWID tables via :strict and :without_rowid options, and VIRTUAL tables with :using option.
       def create_table_sql(name, generator, options)
         if options[:strict] && options[:without_rowid]
           "#{super} STRICT, WITHOUT ROWID"
@@ -357,6 +357,8 @@ module Sequel
           "#{super} STRICT"
         elsif options[:without_rowid]
           "#{super} WITHOUT ROWID"
+        elsif options[:using]
+          "CREATE VIRTUAL TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{create_table_table_name_sql(name, options)} USING #{options[:using]}"
         else
           super
         end

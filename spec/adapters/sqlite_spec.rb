@@ -29,6 +29,19 @@ describe "An SQLite database" do
     @db.sqlite_version.must_be_kind_of(Integer)
   end
   
+  it "should support creating virtual tables via the create_table :using option" do
+    if @db['PRAGMA compile_options'].map(:compile_options).include?('ENABLE_FTS5')
+      @db.create_table(:fk, using: 'fts5(c)')
+      @db[:fk].insert(:c=>'foo bar')
+      @db[:fk].where(fk: 'foo').get(:c).must_equal 'foo bar'
+      @db[:fk].where(fk: 'bar').get(:c).must_equal 'foo bar'
+      @db[:fk].where(fk: 'baz').must_be_empty
+
+      @db.create_table(:fk, using: 'fts5(c)', if_not_exists: true)
+      @db[:fk].where(fk: 'foo').get(:c).must_equal 'foo bar'
+    end
+  end
+  
   it "should support dropping noncomposite unique constraint" do
     @db.create_table(:fk) do
       primary_key :id
