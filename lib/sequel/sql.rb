@@ -153,12 +153,15 @@ module Sequel
     class ComplexExpression < Expression
       # A hash of the opposite for each operator symbol, used for inverting
       # objects.
-      OPERTATOR_INVERSIONS = {:AND => :OR, :OR => :AND, :< => :>=, :> => :<=,
+      OPERATOR_INVERSIONS = {:AND => :OR, :OR => :AND, :< => :>=, :> => :<=,
         :<= => :>, :>= => :<, :'=' => :'!=' , :'!=' => :'=', :LIKE => :'NOT LIKE',
         :'NOT LIKE' => :LIKE, :~ => :'!~', :'!~' => :~, :IN => :'NOT IN',
         :'NOT IN' => :IN, :IS => :'IS NOT', :'IS NOT' => :IS, :'~*' => :'!~*',
         :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT, :ILIKE => :'NOT ILIKE',
         :'NOT ILIKE'=>:ILIKE}.freeze
+
+      # SEQUEL6: Remove
+      OPERTATOR_INVERSIONS = OPERATOR_INVERSIONS
 
       # Standard mathematical operators used in +NumericMethods+
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*, :**].freeze
@@ -1142,9 +1145,9 @@ module Sequel
         when BooleanExpression
           case op = ce.op
           when :AND, :OR
-            BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.map{|a| BooleanExpression.invert(a)})
+            BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.map{|a| BooleanExpression.invert(a)})
           when :IN, :"NOT IN"
-            BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.dup)
+            BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.dup)
           else
             if ce.args.length == 2
               case ce.args[1]
@@ -1153,10 +1156,10 @@ module Sequel
                 # can result in incorrect behavior for ANY/SOME/ALL operators.
                 BooleanExpression.new(:NOT, ce)
               else
-                BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.dup)
+                BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.dup)
               end
             else
-              BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.dup)
+              BooleanExpression.new(OPERATOR_INVERSIONS[op], *ce.args.dup)
             end
           end
         when StringExpression, NumericExpression
