@@ -1,0 +1,33 @@
+= New Features
+
+* The pg_json_ops extension now supports the json_exists, json_value,
+  and json_query functions added in PostgreSQL 17:
+
+    Sequel.extension :pg_json_ops
+    j = Sequel.pg_json_op(:jsonb_column)
+    j.exists('$.foo')     # json_exists(jsonb_column, '$.foo')
+    j.value('$.foo')      # json_value(jsonb_column, '$.foo')
+    j.query('$.foo')      # json_query(jsonb_column, '$.foo')
+
+    j.exists('$.foo', passing: {a: 1}) # json_exists(jsonb_column, '$.foo' PASSING 1 AS a)
+    j.value('$.foo', returning: Time)  # json_value(jsonb_column, '$.foo' RETURNING timestamp)
+    j.query('$.foo', wrapper: true)    # json_query(jsonb_column, '$.foo' WITH WRAPPER)
+
+  All clauses supported by PostgreSQL 17 are supported via options
+  (supported options differ per method):
+
+  * :on_error : ON ERROR
+  * :on_empty : ON EMPTY
+  * :passing : PASSING
+  * :returning : RETURNING
+  * :wrapper : WITH WRAPPER | OMIT QUOTES
+
+* On SQLite, Database#create_table now supports a :using option to
+  create a virtual table:
+
+    DB.create_table(:t, using: 'fts5(email)')
+    # CREATE VIRTUAL TABLE t USING fts5(email)
+
+= Other Improvements
+
+* The gem size has been reduced 25% by removing documentation.
