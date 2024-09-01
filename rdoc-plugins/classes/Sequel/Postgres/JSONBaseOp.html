@@ -57,6 +57,7 @@ Superclass:
 <li><a href="#method-i-array_length">array_length</a></li>
 <li><a href="#method-i-each">each</a></li>
 <li><a href="#method-i-each_text">each_text</a></li>
+<li><a href="#method-i-exists">exists</a></li>
 <li><a href="#method-i-extract">extract</a></li>
 <li><a href="#method-i-extract_text">extract_text</a></li>
 <li><a href="#method-i-get_text">get_text</a></li>
@@ -65,10 +66,12 @@ Superclass:
 <li><a href="#method-i-keys">keys</a></li>
 <li><a href="#method-i-populate">populate</a></li>
 <li><a href="#method-i-populate_set">populate_set</a></li>
+<li><a href="#method-i-query">query</a></li>
 <li><a href="#method-i-strip_nulls">strip_nulls</a></li>
 <li><a href="#method-i-to_record">to_record</a></li>
 <li><a href="#method-i-to_recordset">to_recordset</a></li>
 <li><a href="#method-i-typeof">typeof</a></li>
+<li><a href="#method-i-value">value</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -185,13 +188,13 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">182</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">183</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
-<span class="line-num">184</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">185</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)
-<span class="line-num">186</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">193</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">194</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
+<span class="line-num">195</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">196</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">197</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">198</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_elements'>
@@ -213,9 +216,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-array_elements-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements</span>
-<span class="line-num">194</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements</span>)
-<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">204</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements</span>
+<span class="line-num">205</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements</span>)
+<span class="line-num">206</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_elements_text'>
@@ -237,9 +240,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-array_elements_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements_text</span>
-<span class="line-num">201</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements_text</span>)
-<span class="line-num">202</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">211</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_elements_text</span>
+<span class="line-num">212</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_elements_text</span>)
+<span class="line-num">213</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-array_length'>
@@ -261,9 +264,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-array_length-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">207</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>
-<span class="line-num">208</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>))
-<span class="line-num">209</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">218</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">array_length</span>
+<span class="line-num">219</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:array_length</span>))
+<span class="line-num">220</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -285,9 +288,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">215</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
-<span class="line-num">216</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)
-<span class="line-num">217</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">226</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
+<span class="line-num">227</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)
+<span class="line-num">228</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each_text'>
@@ -309,9 +312,49 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-each_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">223</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_text</span>
-<span class="line-num">224</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each_text</span>)
-<span class="line-num">225</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">234</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_text</span>
+<span class="line-num">235</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:each_text</span>)
+<span class="line-num">236</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-exists'>
+<a name='method-i-exists'></a>
+<div class='synopsis'>
+<span class='name'>exists</span><span class='arguments'>(path, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return whether the given JSON path yields any items in the receiver. Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:on_error </td><td>
+<p>How to handle errors when evaluating the JSON path expression.</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>true </td><td>
+<p>Return true</p>
+</td></tr><tr><td class='label'>false </td><td>
+<p>Return false (default behavior)</p>
+</td></tr><tr><td class='label'>:null </td><td>
+<p>Return nil</p>
+</td></tr><tr><td class='label'>:error </td><td>
+<p>raise a <a href="../DatabaseError.html"><code>DatabaseError</code></a></p>
+</td></tr></tbody></table>
+</td></tr><tr><td class='label'>:passing </td><td>
+<p>Variables to pass to the JSON path expression.  Keys are variable names, values are the values of the variable.</p>
+</td></tr></tbody></table>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">exists</span>(<span class="ruby-string">&quot;$.a&quot;</span>) <span class="ruby-comment"># json_exists(json, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">exists</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-comment"># json_exists(json, &#39;$.a&#39; PASSING 1 AS a)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">exists</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">on_error:</span> <span class="ruby-value">:error</span>) <span class="ruby-comment"># json_exists(json, &#39;$.a&#39; ERROR ON ERROR)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exists-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-exists-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">252</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exists</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">253</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-constant">JSONExistsOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>))
+<span class="line-num">254</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extract'>
@@ -322,7 +365,7 @@ nil => EMPTY_STRING,
 </div>
 <div class='description'>
 
-<p>Returns a json value for the object at the given path.</p>
+<p>Returns a JSON value for the object at the given path.</p>
 
 <pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># json_extract_path(json, &#39;a&#39;)</span>
 <span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path(json, &#39;a&#39;, &#39;b&#39;)</span>
@@ -334,9 +377,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-extract-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">232</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
-<span class="line-num">233</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">261</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
+<span class="line-num">262</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extract_text'>
@@ -359,9 +402,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-extract_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">239</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract_text</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">240</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path_text</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
-<span class="line-num">241</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">268</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extract_text</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">269</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:extract_path_text</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">a</span>))
+<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-get_text'>
@@ -385,13 +428,13 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-get_text-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">249</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_text</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">250</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
-<span class="line-num">251</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
-<span class="line-num">252</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">253</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)
-<span class="line-num">254</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">255</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">278</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_text</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">279</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_array?</span>(<span class="ruby-identifier">key</span>)
+<span class="line-num">280</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_PATH_TEXT</span>, <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">key</span>))
+<span class="line-num">281</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">282</span>     <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">GET_TEXT</span>, <span class="ruby-identifier">key</span>)
+<span class="line-num">283</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">284</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-is_json'>
@@ -422,9 +465,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-is_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">267</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_json</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">268</span>   <span class="ruby-identifier">_is_json</span>(<span class="ruby-constant">IS_JSON</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">269</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">296</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_json</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">297</span>   <span class="ruby-identifier">_is_json</span>(<span class="ruby-constant">IS_JSON</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">298</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-is_not_json'>
@@ -448,9 +491,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-is_not_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">277</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_not_json</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">278</span>   <span class="ruby-identifier">_is_json</span>(<span class="ruby-constant">IS_NOT_JSON</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">279</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">306</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_not_json</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">307</span>   <span class="ruby-identifier">_is_json</span>(<span class="ruby-constant">IS_NOT_JSON</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">308</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-keys'>
@@ -472,9 +515,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-keys-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">284</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
-<span class="line-num">285</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:object_keys</span>)
-<span class="line-num">286</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">313</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
+<span class="line-num">314</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:object_keys</span>)
+<span class="line-num">315</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-populate'>
@@ -496,9 +539,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-populate-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">292</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_record</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
-<span class="line-num">293</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">320</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">321</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_record</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">322</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-populate_set'>
@@ -520,9 +563,67 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-populate_set-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">298</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate_set</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">299</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_recordset</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
-<span class="line-num">300</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">327</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">populate_set</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">328</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function_name</span>(<span class="ruby-value">:populate_recordset</span>), <span class="ruby-identifier">arg</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">329</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-query'>
+<a name='method-i-query'></a>
+<div class='synopsis'>
+<span class='name'>query</span><span class='arguments'>(path, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return the result of applying the JSON path expression to the receiver, by default returning results as jsonb.  Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:on_empty </td><td>
+<p>How to handle case where path expression yields an empty set. Uses same values as :on_error option.</p>
+</td></tr><tr><td class='label'>:on_error </td><td>
+<p>How to handle errors when evaluating the JSON path expression:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:null </td><td>
+<p>Return nil (default)</p>
+</td></tr><tr><td class='label'>:empty_array </td><td>
+<p>Return an empty array</p>
+</td></tr><tr><td class='label'>:empty_object </td><td>
+<p>Return an empty object</p>
+</td></tr><tr><td class='label'>:error </td><td>
+<p>raise a <a href="../DatabaseError.html"><code>DatabaseError</code></a></p>
+</td></tr><tr><td class='label'>any other value </td><td>
+<p>used as default value</p>
+</td></tr></tbody></table>
+</td></tr><tr><td class='label'>:passing </td><td>
+<p>Variables to pass to the JSON path expression.  Keys are variable names, values are the values of the variable.</p>
+</td></tr><tr><td class='label'>:returning </td><td>
+<p>The data type to return (jsonb by default)</p>
+</td></tr><tr><td class='label'>:wrapper </td><td>
+<p>How to wrap returned values:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>true, :unconditional </td><td>
+<p>Always wrap returning values in an array</p>
+</td></tr><tr><td class='label'>:conditional </td><td>
+<p>Only wrap multiple return values in an array</p>
+</td></tr><tr><td class='label'>:omit_quotes </td><td>
+<p>Do not wrap scalar strings in quotes</p>
+</td></tr></tbody></table>
+</td></tr></tbody></table>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&quot;$.a&quot;</span>) <span class="ruby-comment"># json_query(json, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-comment"># json_query(json, &#39;$.a&#39; PASSING 1 AS a)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">on_error:</span> <span class="ruby-value">:empty_array</span>) <span class="ruby-comment"># json_query(json, &#39;$.a&#39; EMPTY ARRAY ON ERROR)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">returning:</span> <span class="ruby-constant">Time</span>) <span class="ruby-comment"># json_query(json, &#39;$.a&#39; RETURNING timestamp)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">on_empty:</span> <span class="ruby-value">2</span>) <span class="ruby-comment"># json_query(json, &#39;$.a&#39; DEFAULT 2 ON EMPTY)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">wrapper:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># json_query(json, &#39;$.a&#39; WITH WRAPPER)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-query-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-query-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">356</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">query</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">357</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">JSONQueryOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>))
+<span class="line-num">358</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-strip_nulls'>
@@ -544,9 +645,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-strip_nulls-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">305</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">strip_nulls</span>
-<span class="line-num">306</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:strip_nulls</span>))
-<span class="line-num">307</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">363</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">strip_nulls</span>
+<span class="line-num">364</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:strip_nulls</span>))
+<span class="line-num">365</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_record'>
@@ -568,9 +669,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-to_record-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">313</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_record</span>
-<span class="line-num">314</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_record</span>)
-<span class="line-num">315</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">371</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_record</span>
+<span class="line-num">372</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_record</span>)
+<span class="line-num">373</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_recordset'>
@@ -592,9 +693,9 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-to_recordset-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">321</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_recordset</span>
-<span class="line-num">322</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_recordset</span>)
-<span class="line-num">323</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">379</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_recordset</span>
+<span class="line-num">380</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:to_recordset</span>)
+<span class="line-num">381</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-typeof'>
@@ -616,9 +717,58 @@ nil => EMPTY_STRING,
 [show source]
 </a>
 <pre id='method-i-typeof-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">328</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typeof</span>
-<span class="line-num">329</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:typeof</span>)
-<span class="line-num">330</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">386</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typeof</span>
+<span class="line-num">387</span>   <span class="ruby-identifier">function</span>(<span class="ruby-value">:typeof</span>)
+<span class="line-num">388</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-value'>
+<a name='method-i-value'></a>
+<div class='synopsis'>
+<span class='name'>value</span><span class='arguments'>(path=(no_args_given = true), opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>If called without arguments, operates as SQL::Wrapper#value.  Otherwise, return the result of applying the JSON path expression to the receiver, by default returning results as text.  Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:on_empty </td><td>
+<p>How to handle case where path expression yields an empty set. Uses same values as :on_error option.</p>
+</td></tr><tr><td class='label'>:on_error </td><td>
+<p>How to handle errors when evaluating the JSON path expression.</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:null </td><td>
+<p>Return nil (default)</p>
+</td></tr><tr><td class='label'>:error </td><td>
+<p>raise a <a href="../DatabaseError.html"><code>DatabaseError</code></a></p>
+</td></tr><tr><td class='label'>any other value </td><td>
+<p>used as default value</p>
+</td></tr></tbody></table>
+</td></tr><tr><td class='label'>:passing </td><td>
+<p>Variables to pass to the JSON path expression.  Keys are variable names, values are the values of the variable.</p>
+</td></tr><tr><td class='label'>:returning </td><td>
+<p>The data type to return (text by default)</p>
+</td></tr></tbody></table>
+
+<pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&quot;$.a&quot;</span>) <span class="ruby-comment"># json_value(json, &#39;$.a&#39;)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-comment"># json_value(json, &#39;$.a&#39; PASSING 1 AS a)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">on_error:</span> <span class="ruby-value">:error</span>) <span class="ruby-comment"># json_value(json, &#39;$.a&#39; ERROR ON ERROR)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">returning:</span> <span class="ruby-constant">Time</span>) <span class="ruby-comment"># json_value(json, &#39;$.a&#39; RETURNING timestamp)</span>
+<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&quot;$.a&quot;</span>, <span class="ruby-value">on_empty:</span> <span class="ruby-value">2</span>) <span class="ruby-comment"># json_value(json, &#39;$.a&#39; DEFAULT 2 ON EMPTY)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-value-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-value-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">409</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">value</span>(<span class="ruby-identifier">path</span>=(<span class="ruby-identifier">no_args_given</span> = <span class="ruby-keyword">true</span>), <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">410</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">no_args_given</span>
+<span class="line-num">411</span>     <span class="ruby-comment"># Act as SQL::Wrapper#value</span>
+<span class="line-num">412</span>     <span class="ruby-keyword">super</span>()
+<span class="line-num">413</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">414</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-constant">JSONValueOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>))
+<span class="line-num">415</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">416</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

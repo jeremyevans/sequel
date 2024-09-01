@@ -78,16 +78,16 @@ Sequel::SQL::NumericMethods
 [show source]
 </a>
 <pre id='method-i-2B-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">800</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">+</span>(<span class="ruby-identifier">ce</span>)
-<span class="line-num">801</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">ce</span>
-<span class="line-num">802</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">LiteralString</span>
-<span class="line-num">803</span>     <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
-<span class="line-num">804</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">StringExpression</span>, <span class="ruby-constant">String</span>
-<span class="line-num">805</span>     <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;||&#39;</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
-<span class="line-num">806</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">807</span>     <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
-<span class="line-num">808</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">809</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">803</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">+</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">804</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">ce</span>
+<span class="line-num">805</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">LiteralString</span>
+<span class="line-num">806</span>     <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
+<span class="line-num">807</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">StringExpression</span>, <span class="ruby-constant">String</span>
+<span class="line-num">808</span>     <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;||&#39;</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
+<span class="line-num">809</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">810</span>     <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
+<span class="line-num">811</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">812</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-coerce'>
@@ -110,15 +110,15 @@ Sequel::SQL::NumericMethods
 [show source]
 </a>
 <pre id='method-i-coerce-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">788</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">coerce</span>(<span class="ruby-identifier">other</span>)
-<span class="line-num">789</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Numeric</span>)
-<span class="line-num">790</span>     [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">other</span>), <span class="ruby-keyword">self</span>]
-<span class="line-num">791</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">super</span>)
-<span class="line-num">792</span>     <span class="ruby-keyword">super</span> 
-<span class="line-num">793</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">794</span>     [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>]
-<span class="line-num">795</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">796</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">791</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">coerce</span>(<span class="ruby-identifier">other</span>)
+<span class="line-num">792</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Numeric</span>)
+<span class="line-num">793</span>     [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">other</span>), <span class="ruby-keyword">self</span>]
+<span class="line-num">794</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">super</span>)
+<span class="line-num">795</span>     <span class="ruby-keyword">super</span> 
+<span class="line-num">796</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">797</span>     [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>]
+<span class="line-num">798</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">799</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

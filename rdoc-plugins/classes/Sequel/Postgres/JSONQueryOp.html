@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
 <head>
-<title>Sequel::SQL::Cast</title>
+<title>Sequel::Postgres::JSONQueryOp</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
@@ -25,22 +25,22 @@
 <div class='class' id='wrapper'>
 <div class='header'>
 <h1 class='name'><span class='type'>class</span>
-Sequel::SQL::Cast
+Sequel::Postgres::JSONQueryOp
 </h1>
 <ol class='paths'>
 <li>
-<a href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+<a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
 </li>
 </ol>
 <div class='parent'>
 Superclass:
-<strong><a href="GenericExpression.html">GenericExpression</a></strong>
+<strong><a href="JSONValueOp.html">JSONValueOp</a></strong>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Represents a cast of an <a href="../SQL.html"><code>SQL</code></a> expression to a specific type.</p>
+<p><a href="../../Object.html"><code>Object</code></a> representing json_query calls</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -50,8 +50,7 @@ Superclass:
 </ol>
 <h3>Public Instance</h3>
 <ol>
-<li><a href="#attribute-i-expr">expr</a></li>
-<li><a href="#attribute-i-type">type</a></li>
+<li><a href="#attribute-i-wrapper">wrapper</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -63,20 +62,11 @@ Superclass:
 <table>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>
-<a name='attribute-i-expr'>expr</a>
+<a name='attribute-i-wrapper'>wrapper</a>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The expression to cast</p>
-</td>
-</tr>
-<tr class='top-aligned-row context-row'>
-<td class='context-item-name'>
-<a name='attribute-i-type'>type</a>
-</td>
-<td class='context-item-value'>[R]</td>
-<td class='context-item-desc'>
-<p>The type to which to cast the expression</p>
+<p>How to handle wrapping of results</p>
 </td>
 </tr>
 </table>
@@ -87,24 +77,23 @@ Superclass:
 <div class='method public-class' id='method-method-c-new'>
 <a name='method-c-new'></a>
 <div class='synopsis'>
-<span class='name'>new</span><span class='arguments'>(expr, type)</span>
+<span class='name'>new</span><span class='arguments'>(expr, path, opts=OPTS)</span>
 
 </div>
 <div class='description'>
 
-<p>Set the expression and type for the cast</p>
+<p>See <a href="JSONBaseOp.html#method-i-query"><code>JSONBaseOp#query</code></a> for documentation of the options.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1244</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)
-<span class="line-num">1245</span>   <span class="ruby-ivar">@expr</span> = <span class="ruby-identifier">expr</span>
-<span class="line-num">1246</span>   <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>
-<span class="line-num">1247</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">1248</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1004</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1005</span>   <span class="ruby-ivar">@wrapper</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:wrapper</span>]
+<span class="line-num">1006</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1007</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

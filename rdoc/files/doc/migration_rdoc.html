@@ -31,7 +31,7 @@ doc/migration.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-10-13 09:45:09 -0700</span>
+<span class='datetime'>2024-08-14 22:44:57 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -107,7 +107,7 @@ Last Update:
 </li><li>
 <p><code>add_constraint</code></p>
 </li><li>
-<p><code>add_foreign_key</code> (with a symbol, not an array)</p>
+<p><code>add_foreign_key</code> (in most cases)</p>
 </li><li>
 <p><code>add_primary_key</code> (with a symbol, not an array)</p>
 </li><li>
@@ -124,6 +124,8 @@ Last Update:
 </li></ul>
 
 <p>If you use any other methods, you should create your own <code>down</code> block.</p>
+
+<p>For <code>add_foreign_key</code>, it is reversible if passing a symbol, and reversible if passing an array if <a href="../../classes/Sequel.html"><code>Sequel</code></a> can determine the name of the foreign key constraint to drop (which it can for most databases).</p>
 
 <p>To revert a migration created with <code>change</code>, you can copy the migration to a new file, and replace <code>change</code> with <code>revert</code>. For example, if you no longer need the artists table, you can use the following migration.  This will drop the artists table when migrating up, and recreate it when migrating down:</p>
 

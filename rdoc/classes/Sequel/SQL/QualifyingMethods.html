@@ -71,13 +71,13 @@ Sequel::SQL::QualifyingMethods
 [show source]
 </a>
 <pre id='method-i-2A-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">921</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
-<span class="line-num">922</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
-<span class="line-num">923</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">924</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">925</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)
-<span class="line-num">926</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">927</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">924</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
+<span class="line-num">925</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
+<span class="line-num">926</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">927</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">928</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">929</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">930</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -101,9 +101,9 @@ Sequel::SQL::QualifyingMethods
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">943</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">identifier</span>)
-<span class="line-num">944</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">identifier</span>)
-<span class="line-num">945</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">946</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">identifier</span>)
+<span class="line-num">947</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">identifier</span>)
+<span class="line-num">948</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-qualify'>
@@ -127,9 +127,9 @@ Sequel::SQL::QualifyingMethods
 [show source]
 </a>
 <pre id='method-i-qualify-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">934</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualify</span>(<span class="ruby-identifier">qualifier</span>)
-<span class="line-num">935</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-keyword">self</span>)
-<span class="line-num">936</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">937</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualify</span>(<span class="ruby-identifier">qualifier</span>)
+<span class="line-num">938</span>   <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-keyword">self</span>)
+<span class="line-num">939</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

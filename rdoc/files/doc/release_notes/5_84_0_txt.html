@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.84.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.84.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.84.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-08-29 16:43:54 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The pg_json_ops extension now supports the json_exists, json_value, and json_query functions added in PostgreSQL 17:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json_ops</span>
+<span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_op</span>(<span class="ruby-value">:jsonb_column</span>)
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">exists</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)     <span class="ruby-comment"># json_exists(jsonb_column, &#39;$.foo&#39;)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)      <span class="ruby-comment"># json_value(jsonb_column, &#39;$.foo&#39;)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)      <span class="ruby-comment"># json_query(jsonb_column, &#39;$.foo&#39;)</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">exists</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-comment"># json_exists(jsonb_column, &#39;$.foo&#39; PASSING 1 AS a)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">returning:</span> <span class="ruby-constant">Time</span>)  <span class="ruby-comment"># json_value(jsonb_column, &#39;$.foo&#39; RETURNING timestamp)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">wrapper:</span> <span class="ruby-keyword">true</span>)    <span class="ruby-comment"># json_query(jsonb_column, &#39;$.foo&#39; WITH WRAPPER)</span>
+</pre>
+
+<p>All clauses supported by PostgreSQL 17 are supported via options (supported options differ per method):</p>
+<ul><li>
+<p>:on_error : ON ERROR</p>
+</li><li>
+<p>:on_empty : ON EMPTY</p>
+</li><li>
+<p>:passing : PASSING</p>
+</li><li>
+<p>:returning : RETURNING</p>
+</li><li>
+<p>:wrapper : WITH WRAPPER | OMIT QUOTES</p>
+</li></ul>
+</li><li>
+<p>On SQLite, Database#create_table now supports a :using option to create a virtual table:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:t</span>, <span class="ruby-value">using:</span> <span class="ruby-string">&#39;fts5(email)&#39;</span>)
+<span class="ruby-comment"># CREATE VIRTUAL TABLE t USING fts5(email)</span>
+</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The gem size has been reduced 25% by removing documentation.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

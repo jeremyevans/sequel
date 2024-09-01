@@ -1,6 +1,6 @@
-Thu, 08 Aug 2024 09:19:19 -0700
+Sun, 01 Sep 2024 09:22:34 -0700
 README.rdoc	Sun, 31 Mar 2024 10:39:03 -0700
-CHANGELOG	Thu, 08 Aug 2024 09:05:13 -0700
+CHANGELOG	Thu, 29 Aug 2024 16:43:54 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -12,9 +12,9 @@ lib/sequel/dataset.rb	Fri, 31 Mar 2023 14:57:15 -0700
 lib/sequel/deprecated.rb	Tue, 14 Jul 2020 12:33:56 -0700
 lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
-lib/sequel/sql.rb	Fri, 02 Sep 2022 09:11:30 -0700
+lib/sequel/sql.rb	Thu, 22 Aug 2024 11:50:35 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Thu, 08 Aug 2024 09:05:13 -0700
+lib/sequel/version.rb	Thu, 29 Aug 2024 16:43:54 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -29,7 +29,7 @@ lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
 lib/sequel/database/misc.rb	Thu, 08 Aug 2024 09:05:13 -0700
 lib/sequel/database/query.rb	Wed, 21 Dec 2022 15:06:01 -0800
 lib/sequel/database/schema_generator.rb	Tue, 28 Mar 2023 07:40:44 -0700
-lib/sequel/database/schema_methods.rb	Thu, 11 Jul 2024 11:09:22 -0700
+lib/sequel/database/schema_methods.rb	Thu, 22 Aug 2024 11:50:35 -0700
 lib/sequel/database/transactions.rb	Thu, 21 Sep 2023 15:53:42 -0700
 lib/sequel/dataset/actions.rb	Thu, 21 Sep 2023 15:53:42 -0700
 lib/sequel/dataset/dataset_module.rb	Wed, 13 Mar 2024 15:31:48 -0700
@@ -60,7 +60,7 @@ doc/dataset_filtering.rdoc	Tue, 14 Jul 2020 07:08:21 -0700
 doc/extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/fork_safety.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
 doc/mass_assignment.rdoc	Thu, 03 Aug 2023 09:06:34 -0700
-doc/migration.rdoc	Fri, 13 Oct 2023 09:45:09 -0700
+doc/migration.rdoc	Wed, 14 Aug 2024 22:44:57 -0700
 doc/model_dataset_method_design.rdoc	Wed, 01 Apr 2020 09:49:55 -0700
 doc/model_hooks.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
@@ -280,5 +280,6 @@ doc/release_notes/5.80.0.txt	Wed, 01 May 2024 08:50:18 -0700
 doc/release_notes/5.81.0.txt	Fri, 31 May 2024 11:59:44 -0700
 doc/release_notes/5.82.0.txt	Mon, 01 Jul 2024 08:14:55 -0700
 doc/release_notes/5.83.0.txt	Thu, 08 Aug 2024 09:05:13 -0700
+doc/release_notes/5.84.0.txt	Thu, 29 Aug 2024 16:43:54 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
 lib/sequel/extensions/migration.rb	Fri, 02 Feb 2024 13:06:09 -0800

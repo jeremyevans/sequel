@@ -130,12 +130,12 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1673</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span> = <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1674</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>
-<span class="line-num">1675</span>   <span class="ruby-ivar">@descending</span> = <span class="ruby-identifier">descending</span>
-<span class="line-num">1676</span>   <span class="ruby-ivar">@nulls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:nulls</span>]
-<span class="line-num">1677</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">1678</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1676</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span> = <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1677</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>
+<span class="line-num">1678</span>   <span class="ruby-ivar">@descending</span> = <span class="ruby-identifier">descending</span>
+<span class="line-num">1679</span>   <span class="ruby-ivar">@nulls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:nulls</span>]
+<span class="line-num">1680</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1681</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -155,9 +155,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-asc-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1681</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">asc</span>
-<span class="line-num">1682</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)
-<span class="line-num">1683</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1684</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">asc</span>
+<span class="line-num">1685</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)
+<span class="line-num">1686</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-desc'>
@@ -176,9 +176,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-desc-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1686</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">desc</span>
-<span class="line-num">1687</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)
-<span class="line-num">1688</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1689</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">desc</span>
+<span class="line-num">1690</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)
+<span class="line-num">1691</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-invert'>
@@ -197,9 +197,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-invert-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1691</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">invert</span>
-<span class="line-num">1692</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-operator">!</span><span class="ruby-ivar">@descending</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">INVERT_NULLS</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@nulls</span>, <span class="ruby-ivar">@nulls</span>))
-<span class="line-num">1693</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1694</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">invert</span>
+<span class="line-num">1695</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-operator">!</span><span class="ruby-ivar">@descending</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">INVERT_NULLS</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@nulls</span>, <span class="ruby-ivar">@nulls</span>))
+<span class="line-num">1696</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -1,4 +1,4 @@
-Thu, 08 Aug 2024 09:19:56 -0700
+Sun, 01 Sep 2024 09:23:11 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -57,7 +57,7 @@ lib/sequel/extensions/pg_inet.rb	Sun, 30 Oct 2022 19:13:54 -0700
 lib/sequel/extensions/pg_inet_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
 lib/sequel/extensions/pg_interval.rb	Sun, 30 Oct 2022 19:13:54 -0700
 lib/sequel/extensions/pg_json.rb	Sun, 30 Oct 2022 19:13:54 -0700
-lib/sequel/extensions/pg_json_ops.rb	Fri, 06 Oct 2023 16:04:02 -0700
+lib/sequel/extensions/pg_json_ops.rb	Thu, 15 Aug 2024 12:59:16 -0700
 lib/sequel/extensions/pg_loose_count.rb	Mon, 24 May 2021 12:25:38 -0700
 lib/sequel/extensions/pg_multirange.rb	Thu, 13 Apr 2023 12:51:52 -0700
 lib/sequel/extensions/pg_range.rb	Wed, 06 Dec 2023 16:41:40 -0800

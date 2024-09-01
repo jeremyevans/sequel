@@ -72,9 +72,9 @@ Sequel::SQL::CastMethods
 [show source]
 </a>
 <pre id='method-i-cast-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">692</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)
-<span class="line-num">693</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)
-<span class="line-num">694</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">695</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)
+<span class="line-num">696</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)
+<span class="line-num">697</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cast_numeric'>
@@ -97,9 +97,9 @@ Sequel::SQL::CastMethods
 [show source]
 </a>
 <pre id='method-i-cast_numeric-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">702</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)
-<span class="line-num">703</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>
-<span class="line-num">704</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">705</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)
+<span class="line-num">706</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>
+<span class="line-num">707</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cast_string'>
@@ -122,9 +122,9 @@ Sequel::SQL::CastMethods
 [show source]
 </a>
 <pre id='method-i-cast_string-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">712</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)
-<span class="line-num">713</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>
-<span class="line-num">714</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">715</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)
+<span class="line-num">716</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>
+<span class="line-num">717</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

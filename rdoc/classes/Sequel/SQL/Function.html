@@ -148,9 +148,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1376</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">1377</span>   <span class="ruby-identifier">_initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>, <span class="ruby-constant">OPTS</span>)
-<span class="line-num">1378</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1379</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">1380</span>   <span class="ruby-identifier">_initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>, <span class="ruby-constant">OPTS</span>)
+<span class="line-num">1381</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -173,14 +173,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-2A-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1388</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
-<span class="line-num">1389</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
-<span class="line-num">1390</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot apply * to functions with arguments&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">1391</span>     <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:&quot;*&quot;</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">1392</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1393</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)
-<span class="line-num">1394</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1395</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1391</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))
+<span class="line-num">1392</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
+<span class="line-num">1393</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot apply * to functions with arguments&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">1394</span>     <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:&quot;*&quot;</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">1395</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1396</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)
+<span class="line-num">1397</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1398</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-distinct'>
@@ -202,9 +202,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-distinct-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1400</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">distinct</span>
-<span class="line-num">1401</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:distinct</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">1402</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1403</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">distinct</span>
+<span class="line-num">1404</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:distinct</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">1405</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-filter'>
@@ -226,15 +226,15 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-filter-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1408</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1409</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
-<span class="line-num">1410</span>     <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>
-<span class="line-num">1411</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1412</span>     <span class="ruby-identifier">args</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1413</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1414</span> 
-<span class="line-num">1415</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:filter</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>, <span class="ruby-value">:filter_block</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1416</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1411</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1412</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">1413</span>     <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>
+<span class="line-num">1414</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1415</span>     <span class="ruby-identifier">args</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1416</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1417</span> 
+<span class="line-num">1418</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:filter</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>, <span class="ruby-value">:filter_block</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1419</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lateral'>
@@ -256,9 +256,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-lateral-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1421</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lateral</span>
-<span class="line-num">1422</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:lateral</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">1423</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1424</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lateral</span>
+<span class="line-num">1425</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:lateral</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">1426</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-order'>
@@ -280,9 +280,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-order-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1429</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">1430</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">freeze</span>)
-<span class="line-num">1431</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1432</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">1433</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">freeze</span>)
+<span class="line-num">1434</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-over'>
@@ -304,11 +304,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-over-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1437</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">over</span>(<span class="ruby-identifier">window</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1438</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;function already has a window applied to it&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:over</span>]
-<span class="line-num">1439</span>   <span class="ruby-identifier">window</span> = <span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">window</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">window</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Window</span>)
-<span class="line-num">1440</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:over</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">window</span>)
-<span class="line-num">1441</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1440</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">over</span>(<span class="ruby-identifier">window</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1441</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;function already has a window applied to it&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:over</span>]
+<span class="line-num">1442</span>   <span class="ruby-identifier">window</span> = <span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">window</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">window</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Window</span>)
+<span class="line-num">1443</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:over</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">window</span>)
+<span class="line-num">1444</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quoted'>
@@ -330,9 +330,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-quoted-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1447</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted</span>
-<span class="line-num">1448</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:quoted</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">1449</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1450</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted</span>
+<span class="line-num">1451</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:quoted</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">1452</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unquoted'>
@@ -354,9 +354,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-unquoted-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1455</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unquoted</span>
-<span class="line-num">1456</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:quoted</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
-<span class="line-num">1457</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1458</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unquoted</span>
+<span class="line-num">1459</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:quoted</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="line-num">1460</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_ordinality'>
@@ -378,9 +378,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-with_ordinality-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1463</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_ordinality</span>
-<span class="line-num">1464</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:with_ordinality</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">1465</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1466</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_ordinality</span>
+<span class="line-num">1467</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:with_ordinality</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">1468</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-within_group'>
@@ -403,9 +403,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-within_group-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1472</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">within_group</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">expressions</span>)
-<span class="line-num">1473</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:within_group</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">expressions</span>.<span class="ruby-identifier">freeze</span>)
-<span class="line-num">1474</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1475</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">within_group</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">expressions</span>)
+<span class="line-num">1476</span>   <span class="ruby-identifier">with_opts</span>(<span class="ruby-value">:within_group</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">expressions</span>.<span class="ruby-identifier">freeze</span>)
+<span class="line-num">1477</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

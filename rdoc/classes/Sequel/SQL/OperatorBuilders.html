@@ -78,9 +78,9 @@ Sequel::SQL::OperatorBuilders
 [show source]
 </a>
 <pre id='method-i-2A-2A-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">871</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">**</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)
-<span class="line-num">872</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:**</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)
-<span class="line-num">873</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">874</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">**</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)
+<span class="line-num">875</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:**</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)
+<span class="line-num">876</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-~'>
@@ -104,13 +104,13 @@ Sequel::SQL::OperatorBuilders
 [show source]
 </a>
 <pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">881</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">882</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">883</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value">:OR</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">884</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">885</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">arg</span>)
-<span class="line-num">886</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">887</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">884</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">885</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">886</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value">:OR</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">887</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">888</span>     <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">arg</span>)
+<span class="line-num">889</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">890</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

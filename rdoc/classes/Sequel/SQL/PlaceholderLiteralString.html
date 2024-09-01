@@ -111,12 +111,12 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1623</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">str</span>, <span class="ruby-identifier">args</span>, <span class="ruby-identifier">parens</span>=<span class="ruby-keyword">false</span>)
-<span class="line-num">1624</span>   <span class="ruby-ivar">@str</span> = <span class="ruby-identifier">str</span>
-<span class="line-num">1625</span>   <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>
-<span class="line-num">1626</span>   <span class="ruby-ivar">@parens</span> = <span class="ruby-identifier">parens</span>
-<span class="line-num">1627</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">1628</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1626</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">str</span>, <span class="ruby-identifier">args</span>, <span class="ruby-identifier">parens</span>=<span class="ruby-keyword">false</span>)
+<span class="line-num">1627</span>   <span class="ruby-ivar">@str</span> = <span class="ruby-identifier">str</span>
+<span class="line-num">1628</span>   <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>
+<span class="line-num">1629</span>   <span class="ruby-ivar">@parens</span> = <span class="ruby-identifier">parens</span>
+<span class="line-num">1630</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1631</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -136,9 +136,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-with_parens-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1631</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_parens</span>
-<span class="line-num">1632</span>   <span class="ruby-ivar">@parens</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@str</span>, <span class="ruby-ivar">@args</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">1633</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1634</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_parens</span>
+<span class="line-num">1635</span>   <span class="ruby-ivar">@parens</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@str</span>, <span class="ruby-ivar">@args</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">1636</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
