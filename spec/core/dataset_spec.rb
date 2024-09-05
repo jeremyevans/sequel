@@ -3035,6 +3035,12 @@ describe "Dataset #first and #last" do
     Sequel.mock[:t].first.must_be_nil
   end
   
+  it "should return first record in query when using raw SQL" do
+    db = Sequel.mock(:fetch=>{:v=>1})
+    db['SELECT 1'].first.must_equal(:v=>1)
+    db.sqls.must_equal ['SELECT 1']
+  end
+  
   it "#last should raise if no order is given" do
     proc {@d.last}.must_raise(Sequel::Error)
     proc {@d.last(2)}.must_raise(Sequel::Error)
@@ -3375,7 +3381,9 @@ describe "Dataset#get" do
     @d.with_sql('SELECT foo').get(:name).must_equal "SELECT foo"
     @d = @d.with_fetch(:name=>1, :abc=>2)
     @d.with_sql('SELECT foo').get{[name, n[abc]]}.must_equal [1, 2]
-    @d.db.sqls.must_equal ['SELECT foo'] * 2
+    @d = @d.with_fetch(:name=>1)
+    @d.with_sql('SELECT foo').get.must_equal 1
+    @d.db.sqls.must_equal ['SELECT foo'] * 3
   end
 
   it "should handle cases where no rows are returned" do

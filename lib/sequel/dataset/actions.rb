@@ -217,7 +217,7 @@ module Sequel
       case args.length
       when 0
         unless block
-          return single_record
+          return(@opts[:sql] ? single_record! : single_record)
         end
       when 1
         arg = args[0]
@@ -282,6 +282,12 @@ module Sequel
     #
     #   DB[:table].get{[sum(id).as(sum), name]} # SELECT sum(id) AS sum, name FROM table LIMIT 1
     #   # => [6, 'foo']
+    #
+    # If called on a dataset with raw SQL, returns the
+    # first value in the dataset without changing the selection or setting a limit:
+    #
+    #   DB["SELECT id FROM table"].get # SELECT id FROM table
+    #   # =>  3
     def get(column=(no_arg=true; nil), &block)
       ds = naked
       if block
@@ -289,6 +295,8 @@ module Sequel
         ds = ds.select(&block)
         column = ds.opts[:select]
         column = nil if column.is_a?(Array) && column.length < 2
+      elsif no_arg && opts[:sql]
+        return ds.single_value!
       else
         case column
         when Array

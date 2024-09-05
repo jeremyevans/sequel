@@ -1,5 +1,7 @@
 === master
 
+* Make Dataset#get and #first without argument not create intermediate datasets if receiver uses raw SQL (jeremyevans)
+
 * Add dataset_run extension, for building SQL using datasets, and running with Database#run (jeremyevans)
 
 * Switch default connection pool to timed_queue on Ruby 3.2+ (jeremyevans)
