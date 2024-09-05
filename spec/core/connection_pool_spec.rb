@@ -1271,12 +1271,12 @@ describe "Connection pool" do
     Sequel::ConnectionPool.send(:get_pool, db, :single_threaded=>true, :servers=>{}).pool_type.must_equal :sharded_single
   end
 
-  it "should default to :single without :single_threaded or :servers" do
-    Sequel::ConnectionPool.send(:get_pool, db, {}).pool_type.must_equal(RUBY_VERSION >= '3.4' ? :timed_queue : :threaded)
+  it "should default to :timed_queue/:threaded without :single_threaded or :servers" do
+    Sequel::ConnectionPool.send(:get_pool, db, {}).pool_type.must_equal(RUBY_VERSION >= '3.2' ? :timed_queue : :threaded)
   end
 
-  it "should default to :single without :single_threaded with :servers" do
-    Sequel::ConnectionPool.send(:get_pool, db, :servers=>{}).pool_type.must_equal(RUBY_VERSION >= '3.4' ? :sharded_timed_queue : :sharded_threaded)
+  it "should default to :sharded_timed_queue/:sharded_threaded without :single_threaded with :servers" do
+    Sequel::ConnectionPool.send(:get_pool, db, :servers=>{}).pool_type.must_equal(RUBY_VERSION >= '3.2' ? :sharded_timed_queue : :sharded_threaded)
   end
 end unless ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
 

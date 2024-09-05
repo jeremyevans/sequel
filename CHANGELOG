@@ -1,3 +1,7 @@
+=== master
+
+* Switch default connection pool to timed_queue on Ruby 3.2+ (jeremyevans)
+
 === 5.84.0 (2024-09-01)
 
 * Support creating VIRTUAL tables on SQLite via the create_table :using option (jeremyevans)

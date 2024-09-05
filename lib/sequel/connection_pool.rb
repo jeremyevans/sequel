@@ -70,13 +70,13 @@ class Sequel::ConnectionPool
       else
         pc = if opts[:single_threaded]
           opts[:servers] ? :sharded_single : :single
-        # :nocov:
-        elsif RUBY_VERSION >= '3.4' # SEQUEL6 or maybe earlier switch to 3.2
+        elsif RUBY_VERSION >= '3.2'
           opts[:servers] ? :sharded_timed_queue : :timed_queue
         # :nocov:
         else
           opts[:servers] ? :sharded_threaded : :threaded
         end
+        # :nocov:
 
         connection_pool_class(:pool_class=>pc)
       end
