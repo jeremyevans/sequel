@@ -1,5 +1,7 @@
 === master
 
+* Add dataset_run extension, for building SQL using datasets, and running with Database#run (jeremyevans)
+
 * Switch default connection pool to timed_queue on Ruby 3.2+ (jeremyevans)
 
 === 5.84.0 (2024-09-01)
