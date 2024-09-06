@@ -1015,6 +1015,28 @@ it's better to use Sequel's DSL, and use a literal string for the custom operato
 That way Sequel's method chaining still works, and it increases Sequel's ability to
 introspect the code.
 
+If you must work with datasets using custom SQL, and you don't want to use the
+implicit_subquery extension, it is recommended you limit yourself to calling
+the following methods on the dataset:
+
++get+ (without_arguments) or +single_value!+ :: returns first column value of first row
++first+ (without arguments) or  +single_record!+ :: returns first row
++each+ :: yields each row to block
++all+ :: returns all rows
++map+ :: returns array of values
++to_hash+ :: Returns hash mapping given value to row or other values
++to_hash_groups+ :: Returns hash mapping value to array of rows or other values
++insert+ :: For INSERT statements, run the statement (which may or may not return any
+            autoincremented primary key value, depending on adapter used).
++update+, +delete+ :: For UPDATE or DELETE statements, run the statement and return
+                      the number of rows updated or deleted.
++from_self+ :: Wrap the current dataset in a subquery, returning a dataset that can use
+               Sequel's full dataset API.
+
+Calling other methods, such as methods designed to return a dataset with modified SQL,
+may result in problems or confusion, since the custom SQL will override the SQL Sequel
+would normally generate.
+
 == Checking for Records
 
 If you just want to know whether the current dataset would return any rows, use <tt>empty?</tt>:
