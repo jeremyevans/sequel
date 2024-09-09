@@ -95,7 +95,7 @@ end
 
 describe "temporarily_release_connection extension" do
   it "should raise if pool uses connection_handling: :disconnect option" do
-    db = Sequel.mock(:connection_handling=>:disconnect)
+    db = Sequel.mock(:connection_handling=>:disconnect, :pool_class=>:threaded)
     proc do
       db.extension(:temporarily_release_connection)
     end.must_raise Sequel::Error
