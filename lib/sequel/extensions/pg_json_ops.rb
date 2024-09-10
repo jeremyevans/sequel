@@ -88,6 +88,12 @@
 #   j.path_query_array('$.foo') # jsonb_path_query_array(jsonb_column, '$.foo')
 #   j.path_query_first('$.foo') # jsonb_path_query_first(jsonb_column, '$.foo')
 #
+# For the PostgreSQL 12+ SQL/JSON path functions, one argument is required (+path+) and
+# two more arguments are optional (+vars+ and +silent+).  +path+ specifies the JSON path.
+# +vars+ specifies a hash or a string in JSON format of named variables to be
+# substituted in +path+. +silent+ specifies whether errors are suppressed. By default,
+# errors are not suppressed.
+#
 # On PostgreSQL 13+ timezone-aware SQL/JSON path functions and operators are supported:
 #
 #   j.path_exists_tz!('$.foo')     # jsonb_path_exists_tz(jsonb_column, '$.foo')
@@ -95,12 +101,6 @@
 #   j.path_query_tz('$.foo')       # jsonb_path_query_tz(jsonb_column, '$.foo')
 #   j.path_query_array_tz('$.foo') # jsonb_path_query_array_tz(jsonb_column, '$.foo')
 #   j.path_query_first_tz('$.foo') # jsonb_path_query_first_tz(jsonb_column, '$.foo')
-#
-# For the PostgreSQL 12+ SQL/JSON path functions, one argument is required (+path+) and
-# two more arguments are optional (+vars+ and +silent+).  +path+ specifies the JSON path.
-# +vars+ specifies a hash or a string in JSON format of named variables to be
-# substituted in +path+. +silent+ specifies whether errors are suppressed. By default,
-# errors are not suppressed.
 #
 # On PostgreSQL 14+, The JSONB <tt>[]</tt> method will use subscripts instead of being
 # the same as +get+, if the value being wrapped is an identifer:
@@ -129,8 +129,8 @@
 #   j.is_json(type: :object)               # j IS JSON OBJECT
 #   j.is_json(type: :object, unique: true) # j IS JSON OBJECT WITH UNIQUE
 #   j.is_not_json                          # j IS NOT JSON
-#   j.is_not_json(type: :array)                # j IS NOT JSON ARRAY
-#   j.is_not_json(unique: true)                # j IS NOT JSON WITH UNIQUE
+#   j.is_not_json(type: :array)            # j IS NOT JSON ARRAY
+#   j.is_not_json(unique: true)            # j IS NOT JSON WITH UNIQUE
 #
 # On PostgreSQL 17+, the additional JSON functions are supported (see method documentation
 # for additional options):
@@ -142,6 +142,29 @@
 #   j.exists('$.foo', passing: {a: 1}) # json_exists(jsonb_column, '$.foo' PASSING 1 AS a)
 #   j.value('$.foo', returning: Time)  # json_value(jsonb_column, '$.foo' RETURNING timestamp)
 #   j.query('$.foo', wrapper: true)    # json_query(jsonb_column, '$.foo' WITH WRAPPER)
+#
+#   j.table('$.foo') do
+#      String :bar
+#      Integer :baz
+#   end
+#   # json_table('$.foo' COLUMNS(bar text, baz integer))
+#
+#   j.table('$.foo', passing: {a: 1}) do
+#      ordinality :id
+#      String :bar, format: :json, on_error: :empty_object
+#      nested '$.baz' do
+#        Integer :q, path: '$.quux', on_empty: :error
+#      end
+#      exists :x, on_error: false
+#   end
+#   # json_table("j", '$.foo' PASSING 1 AS a COLUMNS(
+#   #   "id" FOR ORDINALITY,
+#   #   "bar" text FORMAT JSON EMPTY OBJECT ON ERROR,
+#   #   NESTED '$.baz' COLUMNS(
+#   #     "q" integer PATH '$.quux' ERROR ON EMPTY
+#   #   ),
+#   #   "d" date EXISTS FALSE ON ERROR
+#   # ))
 #
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
@@ -362,6 +385,72 @@ module Sequel
       #   json_op.strip_nulls # json_strip_nulls(json)
       def strip_nulls
         self.class.new(function(:strip_nulls))
+      end
+
+      # Returns json_table SQL function expression, querying JSON data and returning
+      # the results as a relational view, which can be accessed similarly to a regular
+      # SQL table. This accepts a block that is handled in a similar manner to
+      # Database#create_table, though it operates differently.
+      #
+      # Table level options:
+      #
+      # :on_error :: How to handle errors when evaluating the JSON path expression.
+      #              :empty_array :: Return an empty array/result set
+      #              :error :: raise a DatabaseError
+      # :passing :: Variables to pass to the JSON path expression.  Keys are variable
+      #             names, values are the values of the variable.
+      #
+      # Inside the block, the following methods can be used:
+      #
+      # ordinality(name) :: Include a FOR ORDINALITY column, which operates similar to an
+      #                     autoincrementing primary key.
+      # column(name, type, opts={}) :: Return a normal column that uses the given type.
+      # exists(name, type, opts={}) :: Return a boolean column for whether the JSON path yields any values.
+      # nested(path, &block) :: Extract nested data from the result set at the given path.
+      #                         This block is treated the same as a json_table block, and
+      #                         arbitrary levels of nesting are supported.
+      # 
+      # The +column+ method supports the following options:
+      # 
+      # :path :: JSON path to the object (the default is <tt>$.NAME</tt>, where +NAME+ is the
+      #          name of the column).
+      # :format :: Set to +:json+ to use FORMAT JSON, when you expect the value to be a
+      #            valid JSON object.
+      # :on_empty, :on_error :: How to handle case where JSON path evaluation is empty or
+      #                         results in an error. Values supported are:
+      #                         :empty_array :: Return empty array (requires <tt>format: :json</tt>)
+      #                         :empty_object :: Return empty object (requires <tt>format: :json</tt>)
+      #                         :error :: Raise a DatabaseError
+      #                         :null :: Return nil (NULL)
+      # :wrapper :: How to wrap returned values:
+      #             true, :unconditional :: Always wrap returning values in an array
+      #             :conditional :: Only wrap multiple return values in an array
+      #             :keep_quotes :: Wrap scalar strings in quotes
+      #             :omit_quotes :: Do not wrap scalar strings in quotes
+      #
+      # The +exists+ method supports the following options:
+      #
+      # :path :: JSON path to the object (same as +column+ option)
+      # :on_error :: How to handle case where JSON path evaluation results in an error.
+      #              Values supported are:
+      #              :error :: Raise a DatabaseError
+      #              true :: Return true
+      #              false :: Return false
+      #              :null :: Return nil (NULL)
+      #
+      # Inside the block, methods for Ruby class names are also supported, allowing you
+      # to use syntax such as:
+      #
+      #   json_op.table('$.a') do
+      #     String :b
+      #     Integer :c, path: '$.d'
+      #   end
+      #
+      # One difference between this method and Database#create_table is that method_missing
+      # is not supported inside the block.  Use the +column+ method for PostgreSQL types
+      # that are not mapped to Ruby classes.
+      def table(path, opts=OPTS, &block)
+        JSONTableOp.new(self, path, opts, &block)
       end
 
       # Builds arbitrary record from json object.  You need to define the
@@ -1029,6 +1118,223 @@ module Sequel
 
       def on_sql_value(value)
         ON_SQL[value]
+      end
+    end
+
+    # Object representing json_table calls
+    class JSONTableOp < SQL::Expression
+      TABLE_ON_ERROR_SQL = {
+        :error => ' ERROR ON ERROR',
+        :empty_array => ' EMPTY ARRAY ON ERROR',
+      }.freeze
+      private_constant :TABLE_ON_ERROR_SQL
+
+      COLUMN_ON_SQL = {
+        :null =>  ' NULL',
+        :error => ' ERROR',
+        :empty_array => ' EMPTY ARRAY',
+        :empty_object => ' EMPTY OBJECT',
+      }.freeze
+      private_constant :COLUMN_ON_SQL
+
+      EXISTS_ON_ERROR_SQL = {
+        :error => ' ERROR',
+        true => ' TRUE',
+        false => ' FALSE',
+        :null => ' UNKNOWN',
+      }.freeze
+      private_constant :EXISTS_ON_ERROR_SQL
+
+      WRAPPER = {
+        :conditional => ' WITH CONDITIONAL WRAPPER',
+        :unconditional => ' WITH WRAPPER',
+        :omit_quotes => ' OMIT QUOTES',
+        :keep_quotes => ' KEEP QUOTES',
+      }
+      WRAPPER[true] = WRAPPER[:unconditional]
+      WRAPPER.freeze
+      private_constant :WRAPPER
+
+      # Class used to evaluate json_table blocks and nested blocks
+      class ColumnDSL
+        # Return array of column information recorded for the instance
+        attr_reader :columns
+
+        def self.columns(&block)
+          new(&block).columns.freeze
+        end
+
+        def initialize(&block)
+          @columns = []
+          instance_exec(&block)
+        end
+
+        # Include a FOR ORDINALITY column
+        def ordinality(name)
+          @columns << [:ordinality, name].freeze
+        end
+
+        # Include a regular column with the given type
+        def column(name, type, opts=OPTS)
+          @columns << [:column, name, type, opts].freeze
+        end
+
+        # Include an EXISTS column with the given type
+        def exists(name, type, opts=OPTS)
+          @columns << [:exists, name, type, opts].freeze
+        end
+
+        # Include a nested set of columns at the given path.
+        def nested(path, &block)
+          @columns << [:nested, path, ColumnDSL.columns(&block)].freeze
+        end
+
+        # Include a bigint column
+        def Bignum(name, opts=OPTS)
+          @columns << [:column, name, :Bignum, opts].freeze
+        end
+
+        # Define methods for handling other generic types
+        %w'String Integer Float Numeric BigDecimal Date DateTime Time File TrueClass FalseClass'.each do |meth|
+          klass = Object.const_get(meth)
+          define_method(meth) do |name, opts=OPTS|
+            @columns << [:column, name, klass, opts].freeze
+          end
+        end
+      end
+      private_constant :ColumnDSL
+
+      # See JSONBaseOp#table for documentation on the options.
+      def initialize(expr, path, opts=OPTS, &block)
+        @expr = expr
+        @path = path
+        @passing = opts[:passing]
+        @on_error = opts[:on_error]
+        @columns = opts[:_columns] || ColumnDSL.columns(&block)
+        freeze
+      end
+
+      # Append the json_table function call expression to the SQL
+      def to_s_append(ds, sql)
+        sql << 'json_table('
+        ds.literal_append(sql, @expr)
+        sql << ', '
+        default_literal_append(ds, sql, @path)
+
+        if (passing = @passing) && !passing.empty?
+          sql << ' PASSING '
+          comma = false
+          passing.each do |k, v|
+            if comma
+              sql << ', '
+            else
+              comma = true
+            end
+            ds.literal_append(sql, v)
+            sql << " AS " << k.to_s
+          end
+        end
+
+        to_s_append_columns(ds, sql, @columns)
+        sql << TABLE_ON_ERROR_SQL.fetch(@on_error) if @on_error
+        sql << ')'
+      end
+
+      # Support transforming of json_table expression
+      def sequel_ast_transform(transformer)
+        opts = {:on_error=>@on_error, :_columns=>@columns}
+
+        if @passing
+          passing = opts[:passing] = {}
+          @passing.each do |k, v|
+            passing[k] = transformer.call(v)
+          end
+        end
+
+        self.class.new(transformer.call(@expr), @path, opts)
+      end
+
+      private
+
+      # Append the set of column information to the SQL.  Separated to handle
+      # nested sets of columns.
+      def to_s_append_columns(ds, sql, columns)
+        sql << ' COLUMNS('
+        comma = nil
+        columns.each do |column|
+          if comma
+            sql << comma
+          else
+            comma = ', '
+          end
+          to_s_append_column(ds, sql, column)
+        end
+        sql << ')'
+      end
+
+      # Append the column information to the SQL.  Handles the various
+      # types of json_table columns.
+      def to_s_append_column(ds, sql, column)
+        case column[0]
+        when :column
+          _, name, type, opts = column
+          ds.literal_append(sql, name)
+          sql << ' ' << ds.db.send(:type_literal, opts.merge(:type=>type)).to_s
+          sql << ' FORMAT JSON' if opts[:format] == :json
+          to_s_append_path(ds, sql, opts[:path])
+          sql << WRAPPER.fetch(opts[:wrapper]) if opts[:wrapper]
+          to_s_append_on_value(ds, sql, opts[:on_empty], " ON EMPTY")
+          to_s_append_on_value(ds, sql, opts[:on_error], " ON ERROR")
+        when :ordinality
+          ds.literal_append(sql, column[1])
+          sql << ' FOR ORDINALITY'
+        when :exists
+          _, name, type, opts = column
+          ds.literal_append(sql, name)
+          sql << ' ' << ds.db.send(:type_literal, opts.merge(:type=>type)).to_s
+          sql << ' EXISTS'
+          to_s_append_path(ds, sql, opts[:path])
+          unless (on_error = opts[:on_error]).nil?
+            sql << EXISTS_ON_ERROR_SQL.fetch(on_error) << " ON ERROR"
+          end
+        else # when :nested
+          _, path, columns = column
+          sql << 'NESTED '
+          default_literal_append(ds, sql, path)
+          to_s_append_columns(ds, sql, columns)
+        end
+      end
+
+      # Handle DEFAULT values in ON EMPTY/ON ERROR fragments
+      def to_s_append_on_value(ds, sql, value, cond)
+        if value
+          if v = COLUMN_ON_SQL[value]
+            sql << v
+          else
+            sql << ' DEFAULT '
+            default_literal_append(ds, sql, value)
+          end
+          sql << cond
+        end
+      end
+
+      # Append path caluse to the SQL
+      def to_s_append_path(ds, sql, path)
+        if path
+          sql << ' PATH '
+          default_literal_append(ds, sql, path)
+        end
+      end
+
+      # Do not auto paramterize default value or path value, as PostgreSQL doesn't allow it.
+      def default_literal_append(ds, sql, v)
+        if sql.respond_to?(:skip_auto_param)
+          sql.skip_auto_param do
+            ds.literal_append(sql, v)
+          end
+        else
+          ds.literal_append(sql, v)
+        end
       end
     end
 

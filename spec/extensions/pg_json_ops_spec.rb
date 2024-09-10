@@ -621,4 +621,116 @@ describe "Sequel::Postgres::JSONOp" do
   it "#path_query_first result should be a JSONBOp" do
     @l[@jb.path_query_first_tz('$').path_query_first_tz('$')].must_equal "jsonb_path_query_first_tz(jsonb_path_query_first_tz(j, '$'), '$')"
   end
+
+  it "#table should use the json_table function" do
+    @l[@j.table('$'){String :a}].must_equal "json_table(j, '$' COLUMNS(a text))"
+    @l[@j.table('$'){String :a; Integer :b}].must_equal "json_table(j, '$' COLUMNS(a text, b integer))"
+  end
+
+  it "#table should json_path_name via SQL::AliasedExpression" do
+    @l[@j.table(Sequel['$'].as(:foo)){String :a}].must_equal "json_table(j, '$' AS foo COLUMNS(a text))"
+  end
+
+  it "#table should support :passing option" do
+    @l[@j.table('$', :passing=>{}){String :a}].must_equal "json_table(j, '$' COLUMNS(a text))"
+    @l[@j.table('$', :passing=>{a: 1}){String :a}].must_equal "json_table(j, '$' PASSING 1 AS a COLUMNS(a text))"
+    @l[@j.table('$', :passing=>{a: 1, b: "2"}){String :a}].must_equal "json_table(j, '$' PASSING 1 AS a, '2' AS b COLUMNS(a text))"
+  end
+
+  it "#table should support :on_error option " do
+    @l[@j.table('$', :on_error=>:error){String :a}].must_equal "json_table(j, '$' COLUMNS(a text) ERROR ON ERROR)"
+    @l[@j.table('$', :on_error=>:empty_array){String :a}].must_equal "json_table(j, '$' COLUMNS(a text) EMPTY ARRAY ON ERROR)"
+  end
+
+  it "#table block should support #ordinality" do
+    @l[@j.table('$'){ordinality :a}].must_equal "json_table(j, '$' COLUMNS(a FOR ORDINALITY))"
+  end
+
+  it "#table block should support #exists" do
+    @l[@j.table('$'){exists :a, String}].must_equal "json_table(j, '$' COLUMNS(a text EXISTS))"
+  end
+
+  it "#table block #exists should support :path option" do
+    @l[@j.table('$'){exists :a, String, path: '$'}].must_equal "json_table(j, '$' COLUMNS(a text EXISTS PATH '$'))"
+  end
+
+  it "#table block #exists should support :on_error option" do
+    @l[@j.table('$'){exists :a, String, on_error: :error}].must_equal "json_table(j, '$' COLUMNS(a text EXISTS ERROR ON ERROR))"
+    @l[@j.table('$'){exists :a, String, on_error: true}].must_equal "json_table(j, '$' COLUMNS(a text EXISTS TRUE ON ERROR))"
+    @l[@j.table('$'){exists :a, String, on_error: false}].must_equal "json_table(j, '$' COLUMNS(a text EXISTS FALSE ON ERROR))"
+    @l[@j.table('$'){exists :a, String, on_error: :null}].must_equal "json_table(j, '$' COLUMNS(a text EXISTS UNKNOWN ON ERROR))"
+  end
+
+  it "#table block should support #column" do
+    @l[@j.table('$'){column :a, String}].must_equal "json_table(j, '$' COLUMNS(a text))"
+  end
+
+  it "#table block #column should support format: :json option" do
+    @l[@j.table('$'){column :a, String, format: :json}].must_equal "json_table(j, '$' COLUMNS(a text FORMAT JSON))"
+  end
+
+  it "#table block #column should support :path option" do
+    @l[@j.table('$'){column :a, String, path: '$'}].must_equal "json_table(j, '$' COLUMNS(a text PATH '$'))"
+  end
+
+  it "#table block #column should support :wrapper option" do
+    @l[@j.table('$'){column :a, String, :wrapper=>true}].must_equal "json_table(j, '$' COLUMNS(a text WITH WRAPPER))"
+    @l[@j.table('$'){column :a, String, :wrapper=>:conditional}].must_equal "json_table(j, '$' COLUMNS(a text WITH CONDITIONAL WRAPPER))"
+    @l[@j.table('$'){column :a, String, :wrapper=>:unconditional}].must_equal "json_table(j, '$' COLUMNS(a text WITH WRAPPER))"
+    @l[@j.table('$'){column :a, String, :wrapper=>:keep_quotes}].must_equal "json_table(j, '$' COLUMNS(a text KEEP QUOTES))"
+    @l[@j.table('$'){column :a, String, :wrapper=>:omit_quotes}].must_equal "json_table(j, '$' COLUMNS(a text OMIT QUOTES))"
+  end
+
+  it "#table block #column should support :on_empty option" do
+    @l[@j.table('$'){column :a, String, on_empty: :error}].must_equal "json_table(j, '$' COLUMNS(a text ERROR ON EMPTY))"
+    @l[@j.table('$'){column :a, String, on_empty: :null}].must_equal "json_table(j, '$' COLUMNS(a text NULL ON EMPTY))"
+    @l[@j.table('$'){column :a, String, on_empty: :empty_array, format: :json}].must_equal "json_table(j, '$' COLUMNS(a text FORMAT JSON EMPTY ARRAY ON EMPTY))"
+    @l[@j.table('$'){column :a, String, on_empty: :empty_object, format: :json}].must_equal "json_table(j, '$' COLUMNS(a text FORMAT JSON EMPTY OBJECT ON EMPTY))"
+    @l[@j.table('$'){column :a, String, on_empty: 42}].must_equal "json_table(j, '$' COLUMNS(a text DEFAULT 42 ON EMPTY))"
+  end
+
+  it "#table block #column should support :on_error option" do
+    @l[@j.table('$'){column :a, String, on_error: :error}].must_equal "json_table(j, '$' COLUMNS(a text ERROR ON ERROR))"
+    @l[@j.table('$'){column :a, String, on_error: :null}].must_equal "json_table(j, '$' COLUMNS(a text NULL ON ERROR))"
+    @l[@j.table('$'){column :a, String, on_error: :empty_array, format: :json}].must_equal "json_table(j, '$' COLUMNS(a text FORMAT JSON EMPTY ARRAY ON ERROR))"
+    @l[@j.table('$'){column :a, String, on_error: :empty_object, format: :json}].must_equal "json_table(j, '$' COLUMNS(a text FORMAT JSON EMPTY OBJECT ON ERROR))"
+    @l[@j.table('$'){column :a, String, on_error: 42}].must_equal "json_table(j, '$' COLUMNS(a text DEFAULT 42 ON ERROR))"
+  end
+
+  it "#table block should support #nested" do
+    @l[@j.table('$.a'){nested("$.b"){String :a}}].must_equal "json_table(j, '$.a' COLUMNS(NESTED '$.b' COLUMNS(a text)))"
+  end
+
+  it "#table block #nested should support json_path_name via SQL::AliasedExpression" do
+    @l[@j.table('$.a'){nested(Sequel["$.b"].as(:b)){String :a}}].must_equal "json_table(j, '$.a' COLUMNS(NESTED '$.b' AS b COLUMNS(a text)))"
+  end
+
+  it "#table block #nested should support arbitrary levels of nesting" do
+    @l[@j.table('$.a'){nested("$.b"){nested("$.c"){nested("$.d"){String :a}}}}].must_equal "json_table(j, '$.a' COLUMNS(NESTED '$.b' COLUMNS(NESTED '$.c' COLUMNS(NESTED '$.d' COLUMNS(a text)))))"
+  end
+
+  it "#table block should support Ruby class methods for generic types" do
+    @l[@j.table('$'){Bignum :a}].must_equal "json_table(j, '$' COLUMNS(a bigint))"
+    @l[@j.table('$'){Integer :a}].must_equal "json_table(j, '$' COLUMNS(a integer))"
+    @l[@j.table('$'){Float :a}].must_equal "json_table(j, '$' COLUMNS(a double precision))"
+    @l[@j.table('$'){Numeric :a}].must_equal "json_table(j, '$' COLUMNS(a numeric))"
+    @l[@j.table('$'){BigDecimal :a, :size=>[10, 2]}].must_equal "json_table(j, '$' COLUMNS(a numeric(10, 2)))"
+    @l[@j.table('$'){Date :a}].must_equal "json_table(j, '$' COLUMNS(a date))"
+    @l[@j.table('$'){DateTime :a}].must_equal "json_table(j, '$' COLUMNS(a timestamp))"
+    @l[@j.table('$'){Time :a}].must_equal "json_table(j, '$' COLUMNS(a timestamp))"
+    @l[@j.table('$'){Time :a, :only_time=>true}].must_equal "json_table(j, '$' COLUMNS(a time))"
+    @l[@j.table('$'){File :a}].must_equal "json_table(j, '$' COLUMNS(a bytea))"
+    @l[@j.table('$'){TrueClass :a}].must_equal "json_table(j, '$' COLUMNS(a boolean))"
+    @l[@j.table('$'){FalseClass :a}].must_equal "json_table(j, '$' COLUMNS(a boolean))"
+  end
+
+  it "#table should support AST transformations" do
+    @db.select(@j.table('$'){String :a}).qualify(:t).sql.must_equal "SELECT json_table(t.j, '$' COLUMNS(a text))"
+    @db.select(@j.table('$', :passing=>{a: :b}){String :a}).qualify(:t).sql.must_equal "SELECT json_table(t.j, '$' PASSING t.b AS a COLUMNS(a text))"
+  end
+
+  it "#table should not parameterize :on_empty/:on_error default option or any path options" do
+    @db.extension :pg_auto_parameterize
+    @db.select(@jb.table('$.a'){nested('$.b'){String :a, :path=>'$.c', on_empty: 1, on_error: 2}}).sql.must_equal "SELECT json_table(j, '$.a' COLUMNS(NESTED '$.b' COLUMNS(a text PATH '$.c' DEFAULT 1 ON EMPTY DEFAULT 2 ON ERROR)))"
+  end
 end

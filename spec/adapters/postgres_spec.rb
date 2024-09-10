@@ -4366,6 +4366,194 @@ describe 'PostgreSQL' do
       @db.get(j.query('$.n[1]', :wrapper=>:conditional)).must_equal [3]
       @db.get(j.query('$.s', returning: String)).must_equal '"t"'
       @db.get(j.query('$.s', returning: String, :wrapper=>:omit_quotes)).must_equal "t"
+
+      j = Sequel.send(:"pg_#{json_type}_op", (<<JSON).gsub(/\s+/, ' '))
+{ "favorites" : [
+   { "kind" : "comedy", "films" : [
+     { "title" : "Bananas",
+       "director" : "Woody Allen"},
+     { "title" : "The Dinner Game",
+       "director" : "Francis Veber" } ] },
+   { "kind" : "horror", "films" : [
+     { "title" : "Psycho",
+       "director" : "Alfred Hitchcock" } ] },
+   { "kind" : "thriller", "films" : [
+     { "title" : "Vertigo",
+       "director" : "Alfred Hitchcock" } ] },
+   { "kind" : "drama", "films" : [
+     { "title" : "Yojimbo",
+       "director" : "Akira Kurosawa" } ] }
+  ] }
+JSON
+
+      @db.from(j.table('$.favorites[*]') do
+        ordinality :id
+        String :kind
+        String :title, path: '$.films[*].title', :wrapper=>true
+        String :director, path: '$.films[*].director', :wrapper=>true
+      end).all.must_equal [
+        {:id=>1, :kind=>"comedy", :title=>'["Bananas", "The Dinner Game"]', :director=>'["Woody Allen", "Francis Veber"]'},
+        {:id=>2, :kind=>"horror", :title=>'["Psycho"]', :director=>'["Alfred Hitchcock"]'},
+        {:id=>3, :kind=>"thriller", :title=>'["Vertigo"]', :director=>'["Alfred Hitchcock"]'},
+        {:id=>4, :kind=>"drama", :title=>'["Yojimbo"]', :director=>'["Akira Kurosawa"]'}
+      ]
+
+      @db.from(j.table('$.favorites[*] ? (@.films[*].director == $filter)', :passing=>{:filter=>'Alfred Hitchcock'}) do
+        ordinality :id
+        String :kind, path: '$.kind'
+        String :title, path: '$.films[*].title', :wrapper=>:omit_quotes, :format=>:json
+        String :director, path: '$.films[*].director', :wrapper=>:keep_quotes
+      end).all.must_equal [
+        {:id=>1, :kind=>"horror", :title=>'Psycho', :director=>'"Alfred Hitchcock"'},
+        {:id=>2, :kind=>"thriller", :title=>'Vertigo', :director=>'"Alfred Hitchcock"'},
+      ]
+
+      @db.from(j.table('$.favorites[*] ? (@.films[*].director == $filter)', :passing=>{:filter=>'Alfred Hitchcock'}) do
+        ordinality :id
+        String :kind, path: '$.kind'
+        nested '$.films[*]' do
+          String :title, path: '$.title', :wrapper=>:omit_quotes, :format=>:json
+          String :director, path: '$.director', :wrapper=>:keep_quotes
+        end
+      end).all.must_equal [
+        {:id=>1, :kind=>"horror", :title=>'Psycho', :director=>'"Alfred Hitchcock"'},
+        {:id=>2, :kind=>"thriller", :title=>'Vertigo', :director=>'"Alfred Hitchcock"'},
+      ]
+
+      @db.from(j.table('$.favorites[*]') do
+        ordinality :id
+        String :kind, path: '$.kind'
+        nested '$.films[*]' do
+          String :title, path: '$.title', :wrapper=>:omit_quotes, :format=>:json
+          String :director, path: '$.director', :wrapper=>:keep_quotes
+        end
+      end).all.must_equal [
+        {:id=>1, :kind=>"comedy", :title=>'Bananas', :director=>'"Woody Allen"'},
+        {:id=>1, :kind=>"comedy", :title=>'The Dinner Game', :director=>'"Francis Veber"'},
+        {:id=>2, :kind=>"horror", :title=>'Psycho', :director=>'"Alfred Hitchcock"'},
+        {:id=>3, :kind=>"thriller", :title=>'Vertigo', :director=>'"Alfred Hitchcock"'},
+        {:id=>4, :kind=>"drama", :title=>'Yojimbo', :director=>'"Akira Kurosawa"'}
+      ]
+
+      j = Sequel.send(:"pg_#{json_type}_op", (<<JSON).gsub(/\s+/, ' '))
+{"favorites":
+    {"movies":
+      [{"name": "One", "director": "John Doe"},
+       {"name": "Two", "director": "Don Joe"}],
+     "books":
+      [{"name": "Mystery", "authors": [{"name": "Brown Dan"}]},
+       {"name": "Wonder", "authors": [{"name": "Jun Murakami"}, {"name":"Craig Doe"}]}]
+}}
+JSON
+      @db.from(j.table('$.favorites[*]') do
+        ordinality :user_id
+        nested '$.movies[*]' do
+          ordinality :movie_id
+          String :mname, path: '$.name'
+          String :director
+        end
+        nested '$.books[*]' do
+          ordinality :book_id
+          String :bname, path: '$.name'
+          nested '$.authors[*]' do
+            ordinality :author_id
+            String :author_name, path: '$.name'
+          end
+        end
+      end).all.must_equal [
+        {:user_id=>1, :movie_id=>1, :mname=>"One", :director=>"John Doe", :book_id=>nil, :bname=>nil, :author_id=>nil, :author_name=>nil},
+        {:user_id=>1, :movie_id=>2, :mname=>"Two", :director=>"Don Joe", :book_id=>nil, :bname=>nil, :author_id=>nil, :author_name=>nil},
+        {:user_id=>1, :movie_id=>nil, :mname=>nil, :director=>nil, :book_id=>1, :bname=>"Mystery", :author_id=>1, :author_name=>"Brown Dan"},
+        {:user_id=>1, :movie_id=>nil, :mname=>nil, :director=>nil, :book_id=>2, :bname=>"Wonder", :author_id=>1, :author_name=>"Jun Murakami"},
+        {:user_id=>1, :movie_id=>nil, :mname=>nil, :director=>nil, :book_id=>2, :bname=>"Wonder", :author_id=>2, :author_name=>"Craig Doe"}
+      ]
+
+      proc do
+        @db.from(j.table('strict $.x[0].y', :on_error=>:error) do
+          ordinality :id
+        end).all
+      end.must_raise Sequel::DatabaseError
+
+      @db.from(j.table('strict $.x[0].y', :on_error=>:empty_array) do
+        ordinality :id
+      end).all.must_equal []
+
+      @db.from(j.table('strict $.x[0].y') do
+        ordinality :id
+      end).all.must_equal []
+
+      proc do
+        @db.from(j.table('$.favorites[*]') do
+          String :foo, path: 'strict $.foo', :on_error=>:error
+        end).all.must_equal []
+      end.must_raise Sequel::DatabaseError
+
+      @db.from(j.table('$.favorites[*]') do
+        String :foo, path: 'strict $.foo', :on_error=>:null
+      end).all.must_equal [{:foo=>nil}]
+
+      @db.from(j.table('$.favorites[*]') do
+        column :foo, json_type, path: 'strict $.foo', :on_error=>:empty_object, :format=>:json, :wrapper=>:conditional
+      end).all.must_equal [{:foo=>{}}]
+
+      @db.from(j.table('$.favorites[*]') do
+        column :foo, json_type, path: 'strict $.foo', :on_error=>:empty_array, :format=>:json
+      end).all.must_equal [{:foo=>[]}]
+
+      @db.from(j.table('$.favorites[*]') do
+        Integer :foo, path: 'strict $.foo', :on_error=>42
+      end).all.must_equal [{:foo=>42}]
+
+      proc do
+        @db.from(j.table('$.favorites[*]') do
+          String :foo, path: '$.foo', :on_empty=>:error
+        end).all.must_equal []
+      end.must_raise Sequel::DatabaseError
+
+      @db.from(j.table('$.favorites[*]') do
+        String :foo, path: '$.foo', :on_empty=>:null
+      end).all.must_equal [{:foo=>nil}]
+
+      @db.from(j.table('$.favorites[*]') do
+        column :foo, json_type, path: '$.foo', :on_empty=>:empty_object, :format=>:json
+      end).all.must_equal [{:foo=>{}}]
+
+      @db.from(j.table('$.favorites[*]') do
+        column :foo, json_type, path: '$.foo', :on_empty=>:empty_array, :format=>:json
+      end).all.must_equal [{:foo=>[]}]
+
+      @db.from(j.table('$.favorites[*]') do
+        Integer :foo, path: '$.foo', :on_empty=>42
+      end).all.must_equal [{:foo=>42}]
+
+      @db.from(j.table('$.favorites[*]') do
+        exists :foo, TrueClass
+      end).all.must_equal [{:foo=>false}]
+
+      @db.from(j.table('$.favorites[*]') do
+        exists :foo, TrueClass, path: 'strict $.foo', :on_error=>true
+      end).all.must_equal [{:foo=>true}]
+
+      @db.from(j.table('$.favorites[*]') do
+        exists :foo, TrueClass, path: 'strict $.foo', :on_error=>false
+      end).all.must_equal [{:foo=>false}]
+
+      @db.from(j.table('$.favorites[*]') do
+        exists :foo, String, path: 'strict $.foo', :on_error=>:null
+      end).all.must_equal [{:foo=>nil}]
+
+      proc do
+        @db.from(j.table('$.favorites[*]') do
+          exists :foo, String, path: 'strict $.foo', :on_error=>:error
+        end).all.must_equal [{:foo=>true}]
+      end.must_raise Sequel::DatabaseError
+
+      j = Sequel.send(:"pg_#{json_type}_op", '{"a":{"n": [{"b": 3}]}}')
+      @db.from(j.table('$.a'){column :j, json_type, :path=>'$.n[0]', :format=>:json, :wrapper=>true}).all.must_equal [{:j=>[{"b"=>3}]}]
+      @db.from(j.table('$.a'){column :j, json_type, :path=>'$.n[0]', :format=>:json, :wrapper=>:conditional}).all.must_equal [{:j=>{"b"=>3}}]
+
+      @db.from(j.table(Sequel['$.a.n'].as(:foo)){Integer :b}).all.must_equal [{:b=>3}]
+      @db.from(j.table(Sequel['$.a'].as(:foo)){nested(Sequel['$.n'].as(:c)){Integer :b}}).all.must_equal [{:b=>3}]
     end if DB.server_version >= 170000
   end
 end if DB.server_version >= 90200

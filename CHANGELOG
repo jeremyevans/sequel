@@ -1,5 +1,7 @@
 === master
 
+* Support json_table on PostgreSQL 17+ in the pg_json_ops extension (jeremyevans)
+
 * Make Dataset#get and #first without argument not create intermediate datasets if receiver uses raw SQL (jeremyevans)
 
 * Add dataset_run extension, for building SQL using datasets, and running with Database#run (jeremyevans)
