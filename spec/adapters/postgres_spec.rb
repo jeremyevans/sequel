@@ -4361,7 +4361,7 @@ describe 'PostgreSQL' do
       @db.get(j.query('$.c', :wrapper=>true)).must_equal [[1, 2]]
       @db.get(j.query('$.c[*]', :wrapper=>true)).must_equal [1, 2]
       @db.get(j.query('$.n[1]', :wrapper=>true)).must_equal [[3]]
-      @db.get(j.query('$.a', :wrapper=>:conditional)).must_equal [1]
+      @db.get(j.query('$.a', :wrapper=>:conditional)).must_equal 1
       @db.get(j.query('$.c[*]', :wrapper=>:conditional)).must_equal [1, 2]
       @db.get(j.query('$.n[1]', :wrapper=>:conditional)).must_equal [3]
       @db.get(j.query('$.s', returning: String)).must_equal '"t"'
