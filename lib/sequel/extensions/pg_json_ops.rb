@@ -147,7 +147,7 @@
 #      String :bar
 #      Integer :baz
 #   end
-#   # json_table('$.foo' COLUMNS(bar text, baz integer))
+#   # json_table("jsonb_column", '$.foo' COLUMNS("bar" text, "baz" integer))
 #
 #   j.table('$.foo', passing: {a: 1}) do
 #      ordinality :id
@@ -155,9 +155,9 @@
 #      nested '$.baz' do
 #        Integer :q, path: '$.quux', on_empty: :error
 #      end
-#      exists :x, on_error: false
+#      exists :x, Date, on_error: false
 #   end
-#   # json_table("j", '$.foo' PASSING 1 AS a COLUMNS(
+#   # json_table(jsonb_column, '$.foo' PASSING 1 AS a COLUMNS(
 #   #   "id" FOR ORDINALITY,
 #   #   "bar" text FORMAT JSON EMPTY OBJECT ON ERROR,
 #   #   NESTED '$.baz' COLUMNS(
