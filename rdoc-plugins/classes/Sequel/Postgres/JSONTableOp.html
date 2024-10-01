@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::JSONTableOp</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::JSONTableOp
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../SQL/Expression.html">Expression</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="../../Object.html"><code>Object</code></a> representing json_table calls</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-sequel_ast_transform">sequel_ast_transform</a></li>
+<li><a href="#method-i-to_s_append">to_s_append</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="JSONTableOp/ColumnDSL.html">Sequel::Postgres::JSONTableOp::ColumnDSL</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(expr, path, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>See <a href="JSONBaseOp.html#method-i-table"><code>JSONBaseOp#table</code></a> for documentation on the options.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1209</span>   <span class="ruby-ivar">@expr</span> = <span class="ruby-identifier">expr</span>
+<span class="line-num">1210</span>   <span class="ruby-ivar">@path</span> = <span class="ruby-identifier">path</span>
+<span class="line-num">1211</span>   <span class="ruby-ivar">@passing</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:passing</span>]
+<span class="line-num">1212</span>   <span class="ruby-ivar">@on_error</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_error</span>]
+<span class="line-num">1213</span>   <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:_columns</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">ColumnDSL</span>.<span class="ruby-identifier">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1214</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1215</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-sequel_ast_transform'>
+<a name='method-i-sequel_ast_transform'></a>
+<div class='synopsis'>
+<span class='name'>sequel_ast_transform</span><span class='arguments'>(transformer)</span>
+
+</div>
+<div class='description'>
+
+<p>Support transforming of json_table expression</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sequel_ast_transform-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sequel_ast_transform-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1244</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_ast_transform</span>(<span class="ruby-identifier">transformer</span>)
+<span class="line-num">1245</span>   <span class="ruby-identifier">opts</span> = {<span class="ruby-value">:on_error</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@on_error</span>, <span class="ruby-value">:_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@columns</span>}
+<span class="line-num">1246</span> 
+<span class="line-num">1247</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@passing</span>
+<span class="line-num">1248</span>     <span class="ruby-identifier">passing</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:passing</span>] = {}
+<span class="line-num">1249</span>     <span class="ruby-ivar">@passing</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">1250</span>       <span class="ruby-identifier">passing</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">1251</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1252</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1253</span> 
+<span class="line-num">1254</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@expr</span>), <span class="ruby-ivar">@path</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1255</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-to_s_append'>
+<a name='method-i-to_s_append'></a>
+<div class='synopsis'>
+<span class='name'>to_s_append</span><span class='arguments'>(ds, sql)</span>
+
+</div>
+<div class='description'>
+
+<p>Append the json_table function call expression to the <a href="../SQL.html"><code>SQL</code></a></p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_s_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-to_s_append-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1218</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">1219</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;json_table(&#39;</span>
+<span class="line-num">1220</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@expr</span>)
+<span class="line-num">1221</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;, &#39;</span>
+<span class="line-num">1222</span>   <span class="ruby-identifier">default_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@path</span>)
+<span class="line-num">1223</span> 
+<span class="line-num">1224</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">passing</span> = <span class="ruby-ivar">@passing</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">passing</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">1225</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; PASSING &#39;</span>
+<span class="line-num">1226</span>     <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">false</span>
+<span class="line-num">1227</span>     <span class="ruby-identifier">passing</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">1228</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">comma</span>
+<span class="line-num">1229</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;, &#39;</span>
+<span class="line-num">1230</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">1231</span>         <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1232</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">1233</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">1234</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; AS &quot;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">1235</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1236</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1237</span> 
+<span class="line-num">1238</span>   <span class="ruby-identifier">to_s_append_columns</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@columns</span>)
+<span class="line-num">1239</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">TABLE_ON_ERROR_SQL</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@on_error</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@on_error</span>
+<span class="line-num">1240</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">1241</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

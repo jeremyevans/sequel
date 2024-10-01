@@ -31,7 +31,7 @@ doc/querying.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-03-13 15:34:19 -0700</span>
+<span class='datetime'>2024-09-06 09:53:34 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -985,6 +985,31 @@ Last Update:
 </pre>
 
 <p>That way Sequel’s method chaining still works, and it increases Sequel’s ability to introspect the code.</p>
+
+<p>If you must work with datasets using custom SQL, and you don’t want to use the implicit_subquery extension, it is recommended you limit yourself to calling the following methods on the dataset:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'><code>get</code> (without_arguments) or <code>single_value!</code> </td><td>
+<p>returns first column value of first row</p>
+</td></tr><tr><td class='label'><code>first</code> (without arguments) or  <code>single_record!</code> </td><td>
+<p>returns first row</p>
+</td></tr><tr><td class='label'><code>each</code> </td><td>
+<p>yields each row to block</p>
+</td></tr><tr><td class='label'><code>all</code> </td><td>
+<p>returns all rows</p>
+</td></tr><tr><td class='label'><code>map</code> </td><td>
+<p>returns array of values</p>
+</td></tr><tr><td class='label'><code>to_hash</code> </td><td>
+<p>Returns hash mapping given value to row or other values</p>
+</td></tr><tr><td class='label'><code>to_hash_groups</code> </td><td>
+<p>Returns hash mapping value to array of rows or other values</p>
+</td></tr><tr><td class='label'><code>insert</code> </td><td>
+<p>For INSERT statements, run the statement (which may or may not return any autoincremented primary key value, depending on adapter used).</p>
+</td></tr><tr><td class='label'><code>update</code>, <code>delete</code> </td><td>
+<p>For UPDATE or DELETE statements, run the statement and return the number of rows updated or deleted.</p>
+</td></tr><tr><td class='label'><code>from_self</code> </td><td>
+<p>Wrap the current dataset in a subquery, returning a dataset that can use Sequel’s full dataset API.</p>
+</td></tr></tbody></table>
+
+<p>Calling other methods, such as methods designed to return a dataset with modified SQL, may result in problems or confusion, since the custom SQL will override the SQL <a href="../../classes/Sequel.html"><code>Sequel</code></a> would normally generate.</p>
 
 <h2 id="label-Checking+for+Records">Checking for Records<span><a href="#label-Checking+for+Records">&para;</a> <a href="#top">&uarr;</a></span></h2>
 

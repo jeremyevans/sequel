@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::JSONTableOp::ColumnDSL</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::JSONTableOp::ColumnDSL
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../../../Object.html">Object</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Class used to evaluate json_table blocks and nested blocks</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-columns">columns</a></li>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-Bignum">Bignum</a></li>
+<li><a href="#method-i-column">column</a></li>
+<li><a href="#attribute-i-columns">columns</a></li>
+<li><a href="#method-i-exists">exists</a></li>
+<li><a href="#method-i-nested">nested</a></li>
+<li><a href="#method-i-ordinality">ordinality</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-columns'>columns</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>Return array of column information recorded for the instance</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-columns'>
+<a name='method-c-columns'></a>
+<div class='synopsis'>
+<span class='name'>columns</span><span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-columns-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-columns-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1163</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1164</span>   <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1165</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1167</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1168</span>   <span class="ruby-ivar">@columns</span> = []
+<span class="line-num">1169</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1170</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-Bignum'>
+<a name='method-i-Bignum'></a>
+<div class='synopsis'>
+<span class='name'>Bignum</span><span class='arguments'>(name, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Include a bigint column</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-Bignum-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-Bignum-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1193</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Bignum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1194</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:column</span>, <span class="ruby-identifier">name</span>, <span class="ruby-value">:Bignum</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1195</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-column'>
+<a name='method-i-column'></a>
+<div class='synopsis'>
+<span class='name'>column</span><span class='arguments'>(name, type, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Include a regular column with the given type</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-column-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-column-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1179</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:column</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1180</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-exists'>
+<a name='method-i-exists'></a>
+<div class='synopsis'>
+<span class='name'>exists</span><span class='arguments'>(name, type, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Include an EXISTS column with the given type</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exists-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-exists-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exists</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1184</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:exists</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1185</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-nested'>
+<a name='method-i-nested'></a>
+<div class='synopsis'>
+<span class='name'>nested</span><span class='arguments'>(path, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Include a nested set of columns at the given path.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-nested-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-nested-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nested</span>(<span class="ruby-identifier">path</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1189</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:nested</span>, <span class="ruby-identifier">path</span>, <span class="ruby-constant">ColumnDSL</span>.<span class="ruby-identifier">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1190</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-ordinality'>
+<a name='method-i-ordinality'></a>
+<div class='synopsis'>
+<span class='name'>ordinality</span><span class='arguments'>(name)</span>
+
+</div>
+<div class='description'>
+
+<p>Include a FOR ORDINALITY column</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-ordinality-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-ordinality-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
+<span class="line-num">1173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">ordinality</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">1174</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:ordinality</span>, <span class="ruby-identifier">name</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1175</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

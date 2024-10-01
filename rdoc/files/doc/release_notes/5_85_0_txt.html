@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.85.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.85.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.85.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-10-01 08:44:47 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The pg_json_ops extension now supports json_table on PostgreSQL 17+:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json_ops</span>
+<span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_op</span>(<span class="ruby-value">:json_column</span>)
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">table</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-keyword">do</span>
+   <span class="ruby-constant">String</span> <span class="ruby-value">:bar</span>
+   <span class="ruby-constant">Integer</span> <span class="ruby-value">:baz</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-comment"># json_table(&quot;json_column&quot;, &#39;$.foo&#39; COLUMNS(&quot;bar&quot; text, &quot;baz&quot; integer))</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">table</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-keyword">do</span>
+   <span class="ruby-identifier">ordinality</span> <span class="ruby-value">:id</span>
+   <span class="ruby-constant">String</span> <span class="ruby-value">:bar</span>, <span class="ruby-value">format:</span> <span class="ruby-value">:json</span>, <span class="ruby-value">on_error:</span> <span class="ruby-value">:empty_object</span>
+   <span class="ruby-identifier">nested</span> <span class="ruby-string">&#39;$.baz&#39;</span> <span class="ruby-keyword">do</span>
+     <span class="ruby-constant">Integer</span> <span class="ruby-value">:q</span>, <span class="ruby-value">path:</span> <span class="ruby-string">&#39;$.quux&#39;</span>, <span class="ruby-value">on_empty:</span> <span class="ruby-value">:error</span>
+   <span class="ruby-keyword">end</span>
+   <span class="ruby-identifier">exists</span> <span class="ruby-value">:x</span>, <span class="ruby-constant">Date</span>, <span class="ruby-value">on_error:</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-comment"># json_table(json_column, &#39;$.foo&#39; PASSING 1 AS a COLUMNS(</span>
+<span class="ruby-comment">#   &quot;id&quot; FOR ORDINALITY,</span>
+<span class="ruby-comment">#   &quot;bar&quot; text FORMAT JSON EMPTY OBJECT ON ERROR,</span>
+<span class="ruby-comment">#   NESTED &#39;$.baz&#39; COLUMNS(</span>
+<span class="ruby-comment">#     &quot;q&quot; integer PATH &#39;$.quux&#39; ERROR ON EMPTY</span>
+<span class="ruby-comment">#   ),</span>
+<span class="ruby-comment">#   &quot;d&quot; date EXISTS FALSE ON ERROR</span>
+<span class="ruby-comment"># ))</span>
+</pre>
+</li><li>
+<p>A dataset_run extension has been added.  This allows you to easily build SQL using dataset methods, but run the SQL using Database#run:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:dataset_run</span>)
+<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;GRANT SELECT ON ? TO ?&quot;</span>, <span class="ruby-value">:table</span>, <span class="ruby-value">:user</span>].<span class="ruby-identifier">run</span>
+</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The default connection pool on Ruby 3.2+ has switched from threaded to timed_queue.  The timed_queue connection pool has been shown to have sufficient advantages over the threaded connection pool to justify the minor backwards compatibility issues (which are documented below).  If you would like to continue using the the threaded connection pool, you can use the pool_class: :threaded Database option.</p>
+</li><li>
+<p>When calling Dataset#get and first without arguments or blocks, if the receiver already uses raw SQL, no intermediate datasets are created.  This improves performance, and fixes an issue with Dataset#get when using the implicit_subquery extension.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The default connection pool switch from threaded to timed_queue can break backwards compatibility if you are accessing the pool directly and using the available_connections or allocated accessor methods. If you are using those methods, or a library that uses them, you’ll need to stop using them, or force the use of the threaded connection pool as described above.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -31,7 +31,7 @@ lib/sequel/extensions/pg_json_ops.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-08-15 12:59:16 -0700</span>
+<span class='datetime'>2024-09-29 11:29:00 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -122,6 +122,8 @@ Last Update:
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_first</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-comment"># jsonb_path_query_first(jsonb_column, &#39;$.foo&#39;)</span>
 </pre>
 
+<p>For the PostgreSQL 12+ SQL/JSON path functions, one argument is required (<code>path</code>) and two more arguments are optional (<code>vars</code> and <code>silent</code>).  <code>path</code> specifies the JSON path. <code>vars</code> specifies a hash or a string in JSON format of named variables to be substituted in <code>path</code>. <code>silent</code> specifies whether errors are suppressed. By default, errors are not suppressed.</p>
+
 <p>On PostgreSQL 13+ timezone-aware SQL/JSON path functions and operators are supported:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_exists_tz!</span>(<span class="ruby-string">&#39;$.foo&#39;</span>)     <span class="ruby-comment"># jsonb_path_exists_tz(jsonb_column, &#39;$.foo&#39;)</span>
@@ -130,8 +132,6 @@ Last Update:
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_array_tz</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-comment"># jsonb_path_query_array_tz(jsonb_column, &#39;$.foo&#39;)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">path_query_first_tz</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-comment"># jsonb_path_query_first_tz(jsonb_column, &#39;$.foo&#39;)</span>
 </pre>
-
-<p>For the PostgreSQL 12+ SQL/JSON path functions, one argument is required (<code>path</code>) and two more arguments are optional (<code>vars</code> and <code>silent</code>).  <code>path</code> specifies the JSON path. <code>vars</code> specifies a hash or a string in JSON format of named variables to be substituted in <code>path</code>. <code>silent</code> specifies whether errors are suppressed. By default, errors are not suppressed.</p>
 
 <p>On PostgreSQL 14+, The JSONB <code>[]</code> method will use subscripts instead of being the same as <code>get</code>, if the value being wrapped is an identifer:</p>
 
@@ -159,8 +159,8 @@ Last Update:
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:object</span>)               <span class="ruby-comment"># j IS JSON OBJECT</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:object</span>, <span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># j IS JSON OBJECT WITH UNIQUE</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_not_json</span>                          <span class="ruby-comment"># j IS NOT JSON</span>
-<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_not_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:array</span>)                <span class="ruby-comment"># j IS NOT JSON ARRAY</span>
-<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_not_json</span>(<span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>)                <span class="ruby-comment"># j IS NOT JSON WITH UNIQUE</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_not_json</span>(<span class="ruby-value">type:</span> <span class="ruby-value">:array</span>)            <span class="ruby-comment"># j IS NOT JSON ARRAY</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">is_not_json</span>(<span class="ruby-value">unique:</span> <span class="ruby-keyword">true</span>)            <span class="ruby-comment"># j IS NOT JSON WITH UNIQUE</span>
 </pre>
 
 <p>On PostgreSQL 17+, the additional JSON functions are supported (see method documentation for additional options):</p>
@@ -172,6 +172,29 @@ Last Update:
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">exists</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-comment"># json_exists(jsonb_column, &#39;$.foo&#39; PASSING 1 AS a)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">value</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">returning:</span> <span class="ruby-constant">Time</span>)  <span class="ruby-comment"># json_value(jsonb_column, &#39;$.foo&#39; RETURNING timestamp)</span>
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">query</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">wrapper:</span> <span class="ruby-keyword">true</span>)    <span class="ruby-comment"># json_query(jsonb_column, &#39;$.foo&#39; WITH WRAPPER)</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">table</span>(<span class="ruby-string">&#39;$.foo&#39;</span>) <span class="ruby-keyword">do</span>
+   <span class="ruby-constant">String</span> <span class="ruby-value">:bar</span>
+   <span class="ruby-constant">Integer</span> <span class="ruby-value">:baz</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-comment"># json_table(&quot;jsonb_column&quot;, &#39;$.foo&#39; COLUMNS(&quot;bar&quot; text, &quot;baz&quot; integer))</span>
+
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">table</span>(<span class="ruby-string">&#39;$.foo&#39;</span>, <span class="ruby-value">passing:</span> {<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}) <span class="ruby-keyword">do</span>
+   <span class="ruby-identifier">ordinality</span> <span class="ruby-value">:id</span>
+   <span class="ruby-constant">String</span> <span class="ruby-value">:bar</span>, <span class="ruby-value">format:</span> <span class="ruby-value">:json</span>, <span class="ruby-value">on_error:</span> <span class="ruby-value">:empty_object</span>
+   <span class="ruby-identifier">nested</span> <span class="ruby-string">&#39;$.baz&#39;</span> <span class="ruby-keyword">do</span>
+     <span class="ruby-constant">Integer</span> <span class="ruby-value">:q</span>, <span class="ruby-value">path:</span> <span class="ruby-string">&#39;$.quux&#39;</span>, <span class="ruby-value">on_empty:</span> <span class="ruby-value">:error</span>
+   <span class="ruby-keyword">end</span>
+   <span class="ruby-identifier">exists</span> <span class="ruby-value">:x</span>, <span class="ruby-constant">Date</span>, <span class="ruby-value">on_error:</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-comment"># json_table(jsonb_column, &#39;$.foo&#39; PASSING 1 AS a COLUMNS(</span>
+<span class="ruby-comment">#   &quot;id&quot; FOR ORDINALITY,</span>
+<span class="ruby-comment">#   &quot;bar&quot; text FORMAT JSON EMPTY OBJECT ON ERROR,</span>
+<span class="ruby-comment">#   NESTED &#39;$.baz&#39; COLUMNS(</span>
+<span class="ruby-comment">#     &quot;q&quot; integer PATH &#39;$.quux&#39; ERROR ON EMPTY</span>
+<span class="ruby-comment">#   ),</span>
+<span class="ruby-comment">#   &quot;d&quot; date EXISTS FALSE ON ERROR</span>
+<span class="ruby-comment"># ))</span>
 </pre>
 
 <p>If you are also using the pg_json extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
