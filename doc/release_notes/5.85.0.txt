@@ -1,0 +1,59 @@
+= New Features
+
+* The pg_json_ops extension now supports json_table on PostgreSQL 17+:
+
+    Sequel.extension :pg_json_ops
+    j = Sequel.pg_json_op(:json_column)
+
+    j.table('$.foo') do
+       String :bar
+       Integer :baz
+    end
+    # json_table("json_column", '$.foo' COLUMNS("bar" text, "baz" integer))
+ 
+    j.table('$.foo', passing: {a: 1}) do
+       ordinality :id
+       String :bar, format: :json, on_error: :empty_object
+       nested '$.baz' do
+         Integer :q, path: '$.quux', on_empty: :error
+       end
+       exists :x, Date, on_error: false
+    end
+    # json_table(json_column, '$.foo' PASSING 1 AS a COLUMNS(
+    #   "id" FOR ORDINALITY,
+    #   "bar" text FORMAT JSON EMPTY OBJECT ON ERROR,
+    #   NESTED '$.baz' COLUMNS(
+    #     "q" integer PATH '$.quux' ERROR ON EMPTY
+    #   ),
+    #   "d" date EXISTS FALSE ON ERROR
+    # ))
+
+* A dataset_run extension has been added.  This allows you to easily
+  build SQL using dataset methods, but run the SQL using Database#run:
+
+    DB.extension(:dataset_run)
+    DB["GRANT SELECT ON ? TO ?", :table, :user].run
+
+= Other Improvements
+
+* The default connection pool on Ruby 3.2+ has switched from threaded 
+  to timed_queue.  The timed_queue connection pool has been shown to
+  have sufficient advantages over the threaded connection pool to
+  justify the minor backwards compatibility issues (which are
+  documented below).  If you would like to continue using the
+  the threaded connection pool, you can use the
+  pool_class: :threaded Database option.
+
+* When calling Dataset#get and #first without arguments or blocks,
+  if the receiver already uses raw SQL, no intermediate datasets are
+  created.  This improves performance, and fixes an issue with
+  Dataset#get when using the implicit_subquery extension.
+
+= Backwards Compatibility
+
+* The default connection pool switch from threaded to timed_queue can
+  break backwards compatibility if you are accessing the pool directly
+  and using the available_connections or allocated accessor methods.
+  If you are using those methods, or a library that uses them, you'll
+  need to stop using them, or force the use of the threaded connection
+  pool as described above.
