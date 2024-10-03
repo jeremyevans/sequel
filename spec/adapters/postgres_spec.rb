@@ -1806,6 +1806,22 @@ describe "Postgres::Dataset#import" do
   end
 end
 
+describe "Postgres::Dataset#import with delayed evaluation as source table" do
+  before do
+    @db = DB
+    @db.create_table!(:test){primary_key :x; Integer :y}
+    @ds = @db[Sequel::SQL::DelayedEvaluation.new(lambda{:test})]
+  end
+  after do
+    @db.drop_table?(:test)
+  end
+
+  it "#import should work correctly when returning primary keys" do
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).must_equal [1, 3]
+    @ds.all.must_equal [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  end
+end
+
 describe "Postgres::Dataset#insert" do
   before do
     @db = DB
