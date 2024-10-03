@@ -2430,6 +2430,9 @@ module Sequel
       # Return the primary key to use for RETURNING in an INSERT statement
       def insert_pk
         (f = opts[:from]) && !f.empty? && (t = f.first)
+
+        t = t.call(self) if t.is_a? Sequel::SQL::DelayedEvaluation
+
         case t
         when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
           if pk = db.primary_key(t)
