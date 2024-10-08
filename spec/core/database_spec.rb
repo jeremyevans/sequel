@@ -2263,7 +2263,7 @@ describe "Database#typecast_value" do
 
   it "should raise an InvalidValue when given an invalid value" do
     proc{@db.typecast_value(:integer, "13a")}.must_raise(Sequel::InvalidValue)
-    proc{@db.typecast_value(:float, "4.e2")}.must_raise(Sequel::InvalidValue)
+    proc{@db.typecast_value(:float, "4.e2a")}.must_raise(Sequel::InvalidValue)
     proc{@db.typecast_value(:decimal, :invalid_value)}.must_raise(Sequel::InvalidValue)
     proc{@db.typecast_value(:date, Object.new)}.must_raise(Sequel::InvalidValue)
     proc{@db.typecast_value(:date, 'a')}.must_raise(Sequel::InvalidValue)

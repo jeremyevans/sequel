@@ -171,15 +171,17 @@ END
       foreign_key :a, :a
       index :a
     end
+    size = RUBY_VERSION >= '3.4' ? 'size: 255' : ':size=>255'
+    ignore_index_errors = RUBY_VERSION >= '3.4' ? 'ignore_index_errors: true' : ':ignore_index_errors=>true'
     bin(:args=>'-d').must_equal <<END
 Sequel.migration do
   change do
     create_table(:a) do
       primary_key :a
-      String :name, :size=>255
+      String :name, #{size}
     end
     
-    create_table(:b, :ignore_index_errors=>true) do
+    create_table(:b, #{ignore_index_errors}) do
       foreign_key :a, :a
       
       index [:a]

@@ -27,6 +27,11 @@ Sequel.extension :eval_inspect
 
 module Sequel
   module SchemaDumper
+    # :nocov:
+    IGNORE_INDEX_ERRORS_KEY = RUBY_VERSION >= '3.4' ? 'ignore_index_errors: ' : ':ignore_index_errors=>'
+    # :nocov:
+    private_constant :IGNORE_INDEX_ERRORS_KEY
+
     # Convert the column schema information to a hash of column options, one of which must
     # be :type.  The other options added should modify that type (e.g. :size).  If a
     # database type is not recognized, return it as a String type.
@@ -161,7 +166,7 @@ END_MIG
     def dump_table_schema(table, options=OPTS)
       gen = dump_table_generator(table, options)
       commands = [gen.dump_columns, gen.dump_constraints, gen.dump_indexes].reject{|x| x == ''}.join("\n\n")
-      "create_table(#{table.inspect}#{', :ignore_index_errors=>true' if !options[:same_db] && options[:indexes] != false && !gen.indexes.empty?}) do\n#{commands.gsub(/^/, '  ')}\nend"
+      "create_table(#{table.inspect}#{", #{IGNORE_INDEX_ERRORS_KEY}true" if !options[:same_db] && options[:indexes] != false && !gen.indexes.empty?}) do\n#{commands.gsub(/^/, '  ')}\nend"
     end
 
     private
@@ -425,6 +430,13 @@ END_MIG
 
   module Schema
     class CreateTableGenerator
+      # :nocov:
+      DEFAULT_KEY = RUBY_VERSION >= '3.4' ? 'default: ' : ':default=>'
+      IGNORE_ERRORS_KEY = RUBY_VERSION >= '3.4' ? 'ignore_errors: ' : ':ignore_errors=>'
+      # :nocov:
+      private_constant :DEFAULT_KEY
+      private_constant :IGNORE_ERRORS_KEY
+
       # Dump this generator's columns to a string that could be evaled inside
       # another instance to represent the same columns
       def dump_columns
@@ -508,7 +520,7 @@ END_MIG
           c = c.dup
           cols = c.delete(:columns)
           if table = options[:add_index] || options[:drop_index]
-            "#{options[:drop_index] ? 'drop' : 'add'}_index #{table.inspect}, #{cols.inspect}#{', :ignore_errors=>true' if options[:ignore_errors]}#{opts_inspect(c)}"
+            "#{options[:drop_index] ? 'drop' : 'add'}_index #{table.inspect}, #{cols.inspect}#{", #{IGNORE_ERRORS_KEY}true" if options[:ignore_errors]}#{opts_inspect(c)}"
           else
             "index #{cols.inspect}#{opts_inspect(c)}"
           end
@@ -526,7 +538,7 @@ END_MIG
         if opts[:default]
           opts = opts.dup
           de = Sequel.eval_inspect(opts.delete(:default)) 
-          ", :default=>#{de}#{", #{opts.inspect[1...-1]}" if opts.length > 0}"
+          ", #{DEFAULT_KEY}#{de}#{", #{opts.inspect[1...-1]}" if opts.length > 0}"
         else
           ", #{opts.inspect[1...-1]}" if opts.length > 0
         end

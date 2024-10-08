@@ -1,5 +1,9 @@
 === master
 
+* Make schema_dumper extension format options similar to Hash#inspect on Ruby 3.4+ (jeremyevans)
+
+* Avoid deprecation warnings on Ruby 3.4.0-preview2 (jeremyevans)
+
 * Handle FROM tables that are SQL::DelayedEvaluation instances when trying to get primary key values after INSERT on PostgreSQL (tomasmiguez) (#2230, #2232)
 
 === 5.85.0 (2025-10-01)

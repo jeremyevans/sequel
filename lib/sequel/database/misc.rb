@@ -26,6 +26,11 @@ module Sequel
       :time=>Sequel::SQLTime, :boolean=>[TrueClass, FalseClass].freeze, :float=>Float, :decimal=>BigDecimal,
       :blob=>Sequel::SQL::Blob}.freeze
 
+    # :nocov:
+    URI_PARSER = defined?(::URI::RFC2396_PARSER) ? ::URI::RFC2396_PARSER : ::URI::DEFAULT_PARSER
+    # :nocov:
+    private_constant :URI_PARSER
+
     # Nested hook Proc; each new hook Proc just wraps the previous one.
     @initialize_hook = proc{|db| }
 
@@ -85,7 +90,7 @@ module Sequel
     def self.options_from_uri(uri)
       uri_options = uri_to_options(uri)
       uri.query.split('&').map{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
-      uri_options.to_a.each{|k,v| uri_options[k] = URI::DEFAULT_PARSER.unescape(v) if v.is_a?(String)}
+      uri_options.to_a.each{|k,v| uri_options[k] = URI_PARSER.unescape(v) if v.is_a?(String)}
       uri_options
     end
     private_class_method :options_from_uri

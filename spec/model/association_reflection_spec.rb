@@ -40,12 +40,21 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     ParParent.many_to_one :c
     ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c>"
     ParParent.many_to_one :c, :class=>ParParent
-    ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :class=>ParParent>"
+    [
+      "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :class=>ParParent>",
+      "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, class: ParParent>"
+     ].must_include(ParParent.association_reflection(:c).inspect)
     ParParent.many_to_one :c, :class=>ParParent, :key=>:c_id
-    ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :key=>:c_id, :class=>ParParent>"
+    [
+      "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :key=>:c_id, :class=>ParParent>",
+      "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, key: :c_id, class: ParParent>"
+     ].must_include(ParParent.association_reflection(:c).inspect)
 
     @c.one_to_many :foos do |ds| ds end
-    @c.association_reflection(:foos).inspect.must_equal "#<Sequel::Model::Associations::OneToManyAssociationReflection #{@c.to_s}.one_to_many :foos, :block=>#{@c.association_reflection(:foos)[:block].inspect}>"
+    [
+      "#<Sequel::Model::Associations::OneToManyAssociationReflection #{@c.to_s}.one_to_many :foos, :block=>#{@c.association_reflection(:foos)[:block].inspect}>",
+      "#<Sequel::Model::Associations::OneToManyAssociationReflection #{@c.to_s}.one_to_many :foos, block: #{@c.association_reflection(:foos)[:block].inspect}>"
+    ].must_include(@c.association_reflection(:foos).inspect)
   end
 
   it "should figure out the class if the :class value is not present" do

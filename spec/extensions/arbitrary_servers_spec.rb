@@ -103,7 +103,18 @@ describe "arbtirary servers" do
     @db[:t].all
     q1.push nil
     t.join
-    @db.sqls.must_equal ['SELECT * FROM t', 'SELECT * FROM t -- {:host=>"a"}', 'SELECT * FROM t', 'SELECT * FROM t -- {:host=>"c"}', 'SELECT * FROM t -- {:host=>"d"}',
-      'SELECT * FROM t -- {:host=>"b"}', 'SELECT * FROM t -- {:host=>"a"}', 'SELECT * FROM t', 'SELECT * FROM t -- {:host=>"c"}', 'SELECT * FROM t']
+    host = RUBY_VERSION >= '3.4' ? 'host: ' : ':host=>'
+    @db.sqls.must_equal [
+      'SELECT * FROM t',
+      "SELECT * FROM t -- {#{host}\"a\"}",
+      'SELECT * FROM t',
+      "SELECT * FROM t -- {#{host}\"c\"}",
+      "SELECT * FROM t -- {#{host}\"d\"}",
+      "SELECT * FROM t -- {#{host}\"b\"}",
+      "SELECT * FROM t -- {#{host}\"a\"}",
+      'SELECT * FROM t',
+      "SELECT * FROM t -- {#{host}\"c\"}",
+      'SELECT * FROM t',
+    ]
   end
 end

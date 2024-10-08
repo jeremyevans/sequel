@@ -787,7 +787,7 @@ end
 
 describe "Model#inspect" do
   it "should include the class name and the values" do
-    Sequel::Model.load(:x => 333).inspect.must_equal '#<Sequel::Model @values={:x=>333}>'
+    ['#<Sequel::Model @values={:x=>333}>', '#<Sequel::Model @values={x: 333}>'].must_include Sequel::Model.load(:x => 333).inspect
   end
 end
 
