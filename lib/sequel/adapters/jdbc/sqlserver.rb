@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('com.microsoft.sqlserver.jdbc.SQLServerDriver')
+Sequel::JDBC.load_driver('Java::ComMicrosoftSqlserverJdbc::SQLServerDriver')
 require_relative 'mssql'
 
 module Sequel
@@ -10,7 +10,7 @@ module Sequel
         db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
         db.extend_datasets Sequel::MSSQL::DatasetMethods
         db.send(:set_mssql_unicode_strings)
-        com.microsoft.sqlserver.jdbc.SQLServerDriver
+        Java::ComMicrosoftSqlserverJdbc::SQLServerDriver
       end
     end
 

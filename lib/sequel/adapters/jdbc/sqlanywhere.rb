@@ -6,12 +6,12 @@ require_relative 'transactions'
 module Sequel
   module JDBC
     drv = [
-      lambda{Java::sybase.jdbc4.sqlanywhere.IDriver},
-      lambda{Java::ianywhere.ml.jdbcodbc.jdbc4.IDriver},
-      lambda{Java::sybase.jdbc.sqlanywhere.IDriver},
-      lambda{Java::ianywhere.ml.jdbcodbc.jdbc.IDriver},
-      lambda{Java::com.sybase.jdbc4.jdbc.Sybdriver},
-      lambda{Java::com.sybase.jdbc3.jdbc.Sybdriver}
+      lambda{Java::SybaseJdbc4Sqlanywhere::IDriver},
+      lambda{Java::IanywhereMlJdbcodbcJdbc4::IDriver},
+      lambda{Java::SybaseJdbcSqlanywhere::IDriver},
+      lambda{Java::IanywhereMlJdbcodbcJdbc::IDriver},
+      lambda{Java::ComSybaseJdbc4Jdbc::Sybdriver},
+      lambda{Java::ComSybaseJdbc3Jdbc::Sybdriver}
     ].each do |class_proc|
       begin
         break class_proc.call

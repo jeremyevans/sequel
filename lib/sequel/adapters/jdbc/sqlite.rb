@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('org.sqlite.JDBC', :SQLite3)
+Sequel::JDBC.load_driver('Java::OrgSqlite::JDBC', :SQLite3)
 require_relative '../shared/sqlite'
 
 module Sequel
@@ -10,7 +10,7 @@ module Sequel
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
         db.extend_datasets Sequel::SQLite::DatasetMethods
         db.set_integer_booleans
-        org.sqlite.JDBC
+        Java::OrgSqlite::JDBC
       end
     end
 
