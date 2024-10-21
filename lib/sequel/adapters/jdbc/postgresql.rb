@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('org.postgresql.Driver', :Postgres)
+Sequel::JDBC.load_driver('Java::OrgPostgresql::Driver', :Postgres)
 require_relative '../shared/postgres'
 
 module Sequel
@@ -9,7 +9,7 @@ module Sequel
       DATABASE_SETUP[:postgresql] = proc do |db|
         db.dataset_class = Sequel::JDBC::Postgres::Dataset
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
-        org.postgresql.Driver
+        Java::OrgPostgresql::Driver
       end
     end
 
@@ -43,7 +43,7 @@ module Sequel
 
           synchronize(opts[:server]) do |conn|
             begin
-              copy_manager = org.postgresql.copy.CopyManager.new(conn)
+              copy_manager = Java::OrgPostgresqlCopy::CopyManager.new(conn)
               copier = copy_manager.copy_in(copy_into_sql(table, opts))
               if defined?(yield)
                 while buf = yield
@@ -74,7 +74,7 @@ module Sequel
         # See Sequel::Postgres::Adapter#copy_table
         def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
-            copy_manager = org.postgresql.copy.CopyManager.new(conn)
+            copy_manager = Java::OrgPostgresqlCopy::CopyManager.new(conn)
             copier = copy_manager.copy_out(copy_table_sql(table, opts))
             begin
               if defined?(yield)
@@ -148,7 +148,7 @@ module Sequel
         # and set that as the prepared statement argument.
         def set_ps_arg(cps, arg, i)
           if v = bound_variable_arg(arg, nil)
-            obj = org.postgresql.util.PGobject.new
+            obj = Java::OrgPostgresqlUtil::PGobject.new
             obj.setType("unknown")
             obj.setValue(v)
             cps.setObject(i, obj)

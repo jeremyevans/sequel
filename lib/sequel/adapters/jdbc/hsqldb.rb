@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('org.hsqldb.jdbcDriver', :HSQLDB)
+Sequel::JDBC.load_driver('Java::OrgHsqldb::jdbcDriver', :HSQLDB)
 require_relative 'transactions'
 require_relative '../../extensions/auto_cast_date_and_time'
 
@@ -10,7 +10,7 @@ module Sequel
       DATABASE_SETUP[:hsqldb] = proc do |db|
         db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
-        org.hsqldb.jdbcDriver
+        Java::OrgHsqldb::jdbcDriver
       end
     end
 

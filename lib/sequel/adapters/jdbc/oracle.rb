@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('Java::oracle.jdbc.driver.OracleDriver')
+Sequel::JDBC.load_driver('Java::OracleJdbcDriver::OracleDriver')
 require_relative '../shared/oracle'
 require_relative 'transactions'
 
@@ -10,12 +10,12 @@ module Sequel
       DATABASE_SETUP[:oracle] = proc do |db|
         db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Oracle::Dataset
-        Java::oracle.jdbc.driver.OracleDriver
+        Java::OracleJdbcDriver::OracleDriver
       end
     end
 
     module Oracle
-      JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
+      JAVA_BIG_DECIMAL_CONSTRUCTOR = Java::JavaMath::BigDecimal.java_class.constructor(Java::long).method(:new_instance)
       ORACLE_DECIMAL = Object.new
       def ORACLE_DECIMAL.call(r, i)
         if v = r.getBigDecimal(i)
@@ -76,7 +76,7 @@ module Sequel
                 rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
                 rs.next
                 rs.getLong(1)
-              rescue java.sql.SQLException
+              rescue Java::JavaSql::SQLException
                 nil
               end
             end
@@ -122,7 +122,7 @@ module Sequel
         NUMERIC_TYPE = Java::JavaSQL::Types::NUMERIC
         TIMESTAMP_TYPE = Java::JavaSQL::Types::TIMESTAMP
         CLOB_TYPE = Java::JavaSQL::Types::CLOB
-        TIMESTAMPTZ_TYPES = [Java::oracle.jdbc.OracleTypes::TIMESTAMPTZ, Java::oracle.jdbc.OracleTypes::TIMESTAMPLTZ].freeze
+        TIMESTAMPTZ_TYPES = [Java::OracleJdbc::OracleTypes::TIMESTAMPTZ, Java::OracleJdbc::OracleTypes::TIMESTAMPLTZ].freeze
 
         def type_convertor(map, meta, type, i)
           case type

@@ -2,7 +2,7 @@
 
 module Sequel
   module JDBC
-    driver = Sequel::JDBC.load_driver(%w'com.mysql.cj.jdbc.Driver com.mysql.jdbc.Driver', :MySQL)
+    driver = Sequel::JDBC.load_driver(%w'Java::ComMysqlCjJdbc::Driver Java::ComMysqlJdbc::Driver', :MySQL)
     require_relative '../shared/mysql'
 
     Sequel.synchronize do

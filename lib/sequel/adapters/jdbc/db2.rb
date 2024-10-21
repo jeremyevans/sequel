@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('com.ibm.db2.jcc.DB2Driver')
+Sequel::JDBC.load_driver('Java::ComIbmDb2Jcc::DB2Driver')
 require_relative '../shared/db2'
 require_relative 'transactions'
 
@@ -25,7 +25,7 @@ module Sequel
           end
         end
         db.extend_datasets Sequel::DB2::DatasetMethods
-        com.ibm.db2.jcc.DB2Driver
+        Java::ComIbmDb2Jcc::DB2Driver
       end
     end
 

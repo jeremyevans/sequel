@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('Java::net.sourceforge.jtds.jdbc.Driver', :JTDS)
+Sequel::JDBC.load_driver('Java::NetSourceforgeJtdsJdbc::Driver', :JTDS)
 require_relative 'mssql'
 
 module Sequel
@@ -10,7 +10,7 @@ module Sequel
         db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
         db.extend_datasets Sequel::MSSQL::DatasetMethods
         db.send(:set_mssql_unicode_strings)
-        Java::net.sourceforge.jtds.jdbc.Driver
+        Java::NetSourceforgeJtdsJdbc::Driver
       end
     end
 

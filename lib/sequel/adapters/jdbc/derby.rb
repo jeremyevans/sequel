@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('org.apache.derby.jdbc.EmbeddedDriver', :Derby)
+Sequel::JDBC.load_driver('Java::OrgApacheDerbyJdbc::EmbeddedDriver', :Derby)
 require_relative 'transactions'
 require_relative '../utils/columns_limit_1'
 
@@ -10,7 +10,7 @@ module Sequel
       DATABASE_SETUP[:derby] = proc do |db|
         db.extend(Sequel::JDBC::Derby::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Derby::Dataset
-        org.apache.derby.jdbc.EmbeddedDriver
+        Java::OrgApacheDerbyJdbc::EmbeddedDriver
       end
     end
 

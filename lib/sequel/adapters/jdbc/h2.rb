@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel::JDBC.load_driver('org.h2.Driver', :H2)
+Sequel::JDBC.load_driver('Java::OrgH2::Driver', :H2)
 require_relative '../../extensions/auto_cast_date_and_time'
 
 module Sequel
@@ -9,7 +9,7 @@ module Sequel
       DATABASE_SETUP[:h2] = proc do |db|
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::H2::Dataset
-        org.h2.Driver
+        Java::OrgH2::Driver
       end
     end
 

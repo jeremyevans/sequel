@@ -20,7 +20,7 @@ module Sequel
 
     # Create custom NativeException alias for nicer access, and also so that
     # JRuby 9.2+ so it doesn't use the deprecated ::NativeException
-    NativeException = java.lang.Exception
+    NativeException = Java::JavaLang::Exception
     
     # Default database error classes
     DATABASE_ERROR_CLASSES = [NativeException]
@@ -227,7 +227,7 @@ module Sequel
             raise e unless driver
             # If the DriverManager can't get the connection - use the connect
             # method of the driver. (This happens under Tomcat for instance)
-            props = java.util.Properties.new
+            props = Java::JavaUtil::Properties.new
             if opts && opts[:user] && opts[:password]
               props.setProperty("user", opts[:user])
               props.setProperty("password", opts[:password])
@@ -506,7 +506,7 @@ module Sequel
       # Gets the connection from JNDI.
       def get_connection_from_jndi
         jndi_name = JNDI_URI_REGEXP.match(uri)[1]
-        javax.naming.InitialContext.new.lookup(jndi_name).connection
+        Java::JavaxNaming::InitialContext.new.lookup(jndi_name).connection
       end
             
       # Gets the JDBC connection uri from the JNDI resource.
@@ -530,19 +530,19 @@ module Sequel
 
       # Support Date objects used in bound variables
       def java_sql_date(date)
-        java.sql.Date.new(Time.local(date.year, date.month, date.day).to_i * 1000)
+        Java::JavaSql::Date.new(Time.local(date.year, date.month, date.day).to_i * 1000)
       end
 
       # Support DateTime objects used in bound variables
       def java_sql_datetime(datetime)
-        ts = java.sql.Timestamp.new(Time.local(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec).to_i * 1000)
+        ts = Java::JavaSql::Timestamp.new(Time.local(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec).to_i * 1000)
         ts.setNanos((datetime.sec_fraction * 1000000000).to_i)
         ts
       end
 
       # Support fractional seconds for Time objects used in bound variables
       def java_sql_timestamp(time)
-        ts = java.sql.Timestamp.new(time.to_i * 1000)
+        ts = Java::JavaSql::Timestamp.new(time.to_i * 1000)
         ts.setNanos(time.nsec)
         ts
       end 
