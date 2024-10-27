@@ -1,5 +1,7 @@
 === master
 
+* Use Ruby module naming instead of Java package naming for access to Java libraries in the jdbc adapters (kalenp) (#2235, #2236) 
+
 * Make schema_dumper extension format options similar to Hash#inspect on Ruby 3.4+ (jeremyevans)
 
 * Avoid deprecation warnings on Ruby 3.4.0-preview2 (jeremyevans)
