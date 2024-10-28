@@ -1,5 +1,9 @@
 === master
 
+* Have the subset_conditions plugin support where_all and where_any methods to combine existing subsets with AND or OR (jeremyevans)
+
+* Have the subset_conditions plugin add *_conditions methods for exclude method calls in addition to where and subset (jeremyevans)
+
 * Use Ruby module naming instead of Java package naming for access to Java libraries in the jdbc adapters (kalenp) (#2235, #2236) 
 
 * Make schema_dumper extension format options similar to Hash#inspect on Ruby 3.4+ (jeremyevans)
