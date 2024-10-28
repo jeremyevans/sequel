@@ -29,6 +29,14 @@ describe "An SQLite database" do
     @db.sqlite_version.must_be_kind_of(Integer)
   end
   
+  it "should provide the SQLite version as an integer" do
+    db = Sequel.sqlite
+    db['SELECT "1" as a'].get.must_equal '1'
+
+    db = Sequel.connect('sqlite://?disable_dqs=t')
+    proc{db['SELECT "1" as a'].get}.must_raise Sequel::DatabaseError
+  end if defined?(SQLite3::VERSION) && SQLite3::VERSION >= '1.4.3' && DB.sqlite_version >= 32900
+  
   it "should support creating virtual tables via the create_table :using option" do
     if @db['PRAGMA compile_options'].map(:compile_options).include?('ENABLE_FTS5')
       @db.create_table(:fk, using: 'fts5(c)')

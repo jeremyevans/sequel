@@ -109,6 +109,8 @@ module Sequel
       # :database :: database name (filename or ':memory:' or file: URI)
       # :readonly :: open database in read-only mode; useful for reading
       #              static data that you do not want to modify
+      # :disable_dqs :: disable double quoted strings in DDL and DML statements
+      #                 (requires SQLite 3.29.0+ and sqlite3 gem version 1.4.3+).
       # :timeout :: how long to wait for the database to be available if it
       #             is locked, given in milliseconds (default is 5000)
       # :setup_regexp_function :: enable use of Regexp objects with SQL
@@ -128,6 +130,8 @@ module Sequel
         opts[:database] = ':memory:' if blank_object?(opts[:database])
         sqlite3_opts = {}
         sqlite3_opts[:readonly] = typecast_value_boolean(opts[:readonly]) if opts.has_key?(:readonly)
+        # SEQUEL6: Make strict: true the default behavior
+        sqlite3_opts[:strict] = typecast_value_boolean(opts[:disable_dqs]) if opts.has_key?(:disable_dqs)
         db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
         db.busy_timeout(typecast_value_integer(opts.fetch(:timeout, 5000)))
 

@@ -1,5 +1,7 @@
 === master
 
+* Support the :disable_dqs Database option in the sqlite adapter to disable treating double quoted values as strings (jeremyevans) (#2233)
+
 * Have the subset_conditions plugin support where_all and where_any methods to combine existing subsets with AND or OR (jeremyevans)
 
 * Have the subset_conditions plugin add *_conditions methods for exclude method calls in addition to where and subset (jeremyevans)

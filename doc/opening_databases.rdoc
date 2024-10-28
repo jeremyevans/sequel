@@ -390,6 +390,8 @@ Examples:
 
 The following additional options are supported:
 
+:disable_dqs :: Disable treating double quoted values as strings in DDL and DML statements
+                (requires SQLite 3.29.0+ and sqlite3 gem version 1.4.3+).
 :readonly :: open database in read-only mode
 :timeout :: the busy timeout to use in milliseconds (default: 5000).
 :setup_regexp_function :: Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so
