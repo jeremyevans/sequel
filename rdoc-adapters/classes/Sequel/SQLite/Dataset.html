@@ -103,26 +103,26 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-complex_expression_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
-<span class="line-num">381</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">382</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
-<span class="line-num">383</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:~</span>, <span class="ruby-value">:&#39;!~&#39;</span>, <span class="ruby-value">:&#39;~*&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>
-<span class="line-num">384</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_regexp?</span>
-<span class="line-num">385</span> 
-<span class="line-num">386</span>     <span class="ruby-identifier">case_insensitive</span> = [<span class="ruby-value">:&#39;~*&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)
-<span class="line-num">387</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;NOT &#39;</span> <span class="ruby-keyword">if</span> [<span class="ruby-value">:&#39;!~&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)
-<span class="line-num">388</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
-<span class="line-num">389</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;LOWER(&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">case_insensitive</span>
-<span class="line-num">390</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
-<span class="line-num">391</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">case_insensitive</span>
-<span class="line-num">392</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; REGEXP &#39;</span>
+<span class="line-num">385</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">386</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">387</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:~</span>, <span class="ruby-value">:&#39;!~&#39;</span>, <span class="ruby-value">:&#39;~*&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>
+<span class="line-num">388</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_regexp?</span>
+<span class="line-num">389</span> 
+<span class="line-num">390</span>     <span class="ruby-identifier">case_insensitive</span> = [<span class="ruby-value">:&#39;~*&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)
+<span class="line-num">391</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;NOT &#39;</span> <span class="ruby-keyword">if</span> [<span class="ruby-value">:&#39;!~&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)
+<span class="line-num">392</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
 <span class="line-num">393</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;LOWER(&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">case_insensitive</span>
-<span class="line-num">394</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+<span class="line-num">394</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
 <span class="line-num">395</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">case_insensitive</span>
-<span class="line-num">396</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">397</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">398</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">399</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">400</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">396</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; REGEXP &#39;</span>
+<span class="line-num">397</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;LOWER(&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">case_insensitive</span>
+<span class="line-num">398</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+<span class="line-num">399</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">case_insensitive</span>
+<span class="line-num">400</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">401</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">402</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">403</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">404</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -139,29 +139,29 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-fetch_rows-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
-<span class="line-num">402</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)
-<span class="line-num">403</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span>
-<span class="line-num">404</span>     <span class="ruby-identifier">cps</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">conversion_procs</span>
-<span class="line-num">405</span>     <span class="ruby-identifier">type_procs</span> = <span class="ruby-identifier">result</span>.<span class="ruby-identifier">types</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cps</span>[<span class="ruby-identifier">base_type_name</span>(<span class="ruby-identifier">t</span>)]}
-<span class="line-num">406</span>     <span class="ruby-identifier">j</span> = <span class="ruby-value">-1</span>
-<span class="line-num">407</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">result</span>.<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>), <span class="ruby-identifier">type_procs</span>[(<span class="ruby-identifier">j</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>)]]}
-<span class="line-num">408</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:first</span>)
-<span class="line-num">409</span>     <span class="ruby-identifier">max</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">length</span>
-<span class="line-num">410</span>     <span class="ruby-identifier">result</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">values</span><span class="ruby-operator">|</span>
-<span class="line-num">411</span>       <span class="ruby-identifier">row</span> = {}
-<span class="line-num">412</span>       <span class="ruby-identifier">i</span> = <span class="ruby-value">-1</span>
-<span class="line-num">413</span>       <span class="ruby-keyword">while</span> (<span class="ruby-identifier">i</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span>
-<span class="line-num">414</span>         <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type_proc</span> = <span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]
-<span class="line-num">415</span>         <span class="ruby-identifier">v</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">i</span>]
-<span class="line-num">416</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_proc</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">v</span>
-<span class="line-num">417</span>           <span class="ruby-identifier">v</span> = <span class="ruby-identifier">type_proc</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">418</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">419</span>         <span class="ruby-identifier">row</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">v</span>
-<span class="line-num">420</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">421</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
-<span class="line-num">422</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">423</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">424</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">406</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">407</span>   <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span>
+<span class="line-num">408</span>     <span class="ruby-identifier">cps</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">conversion_procs</span>
+<span class="line-num">409</span>     <span class="ruby-identifier">type_procs</span> = <span class="ruby-identifier">result</span>.<span class="ruby-identifier">types</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cps</span>[<span class="ruby-identifier">base_type_name</span>(<span class="ruby-identifier">t</span>)]}
+<span class="line-num">410</span>     <span class="ruby-identifier">j</span> = <span class="ruby-value">-1</span>
+<span class="line-num">411</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">result</span>.<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>), <span class="ruby-identifier">type_procs</span>[(<span class="ruby-identifier">j</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>)]]}
+<span class="line-num">412</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:first</span>)
+<span class="line-num">413</span>     <span class="ruby-identifier">max</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">414</span>     <span class="ruby-identifier">result</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">values</span><span class="ruby-operator">|</span>
+<span class="line-num">415</span>       <span class="ruby-identifier">row</span> = {}
+<span class="line-num">416</span>       <span class="ruby-identifier">i</span> = <span class="ruby-value">-1</span>
+<span class="line-num">417</span>       <span class="ruby-keyword">while</span> (<span class="ruby-identifier">i</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span>
+<span class="line-num">418</span>         <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type_proc</span> = <span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]
+<span class="line-num">419</span>         <span class="ruby-identifier">v</span> = <span class="ruby-identifier">values</span>[<span class="ruby-identifier">i</span>]
+<span class="line-num">420</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_proc</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">v</span>
+<span class="line-num">421</span>           <span class="ruby-identifier">v</span> = <span class="ruby-identifier">type_proc</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">422</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">423</span>         <span class="ruby-identifier">row</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">v</span>
+<span class="line-num">424</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">425</span>       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>
+<span class="line-num">426</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">427</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">428</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_regexp-3F'>
@@ -180,9 +180,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-supports_regexp-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb</span>
-<span class="line-num">427</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
-<span class="line-num">428</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">allow_regexp?</span>
-<span class="line-num">429</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">431</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
+<span class="line-num">432</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">allow_regexp?</span>
+<span class="line-num">433</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -36,27 +36,43 @@ Sequel::Plugins::SubsetConditions
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The subset_conditions plugin creates an additional *_conditions method for every subset created, which returns the filter conditions the subset uses.  This can be useful if you want to use the conditions for a separate filter or combine them with OR.</p>
+<p>The subset_conditions plugin creates an additional *_conditions method for every ‘subset`, `where`, and `exclude` method call in a dataset_module block. This method returns the filter conditions, which can be useful if you want to use the conditions for a separate filter or combine them with OR. It also supports where_all and where_any dataset_module methods for combining multiple dataset method filters with AND or OR.</p>
 
 <p>Usage:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Add subset_conditions in the Album class</span>
-<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subset_conditions</span>
+<pre># Add subset_conditions in the Album class
+Album.plugin :subset_conditions
 
-<span class="ruby-comment"># This will now create a published_conditions method</span>
-<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
-  <span class="ruby-identifier">subset</span> <span class="ruby-value">:published</span>, <span class="ruby-value">published:</span> <span class="ruby-keyword">true</span>
-<span class="ruby-keyword">end</span>
+Album.dataset_module do
+  # This will now create a published_conditions method
+  where :published, published: true
 
-<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published_conditions</span>).<span class="ruby-identifier">sql</span>
-<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS TRUE)</span>
+  # This will now create a not_bad_conditions method
+  exclude :not_bad, :bad
 
-<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published_conditions</span>).<span class="ruby-identifier">sql</span>
-<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS NOT TRUE)</span>
+  # This will create good_and_available and
+  # good_and_available_conditions methods
+  where_all :good_and_available, :published, :not_bad
 
-<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published_conditions</span> <span class="ruby-operator">|</span> {<span class="ruby-value">ready:</span> <span class="ruby-keyword">true</span>}).<span class="ruby-identifier">sql</span>
-<span class="ruby-comment"># SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))</span>
-</pre>
+  # This will create good_or_available and
+  # good_or_available_conditions methods
+  where_any :good_or_available, :published, :not_bad
+end
+
+Album.where(Album.published_conditions).sql
+# SELECT * FROM albums WHERE (published IS TRUE)
+
+Album.exclude(Album.published_conditions).sql
+# SELECT * FROM albums WHERE (published IS NOT TRUE)
+
+Album.where(Album.published_conditions | {ready: true}).sql
+# SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))
+
+Album.good_and_available.sql
+SELECT * FROM albums WHERE ((published IS TRUE) AND NOT bad)
+
+Album.good_or_available.sql
+SELECT * FROM albums WHERE ((published IS TRUE) OR NOT bad)</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -96,13 +112,13 @@ Sequel::Plugins::SubsetConditions
 [show source]
 </a>
 <pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
-<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">30</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">31</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">32</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>
-<span class="line-num">33</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">34</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">49</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">50</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">51</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>
+<span class="line-num">52</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">53</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">54</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

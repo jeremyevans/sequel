@@ -40,7 +40,10 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#method-i-exclude">exclude</a></li>
 <li><a href="#method-i-where">where</a></li>
+<li><a href="#method-i-where_all">where_all</a></li>
+<li><a href="#method-i-where_any">where_any</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -48,6 +51,30 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-exclude'>
+<a name='method-i-exclude'></a>
+<div class='synopsis'>
+<span class='name'>exclude</span><span class='arguments'>(name, *args, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Also create a method that returns the conditions the filter uses.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exclude-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-exclude-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
+<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">67</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">68</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">69</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">70</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))}
+<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-where'>
 <a name='method-i-where'></a>
 <div class='synopsis'>
@@ -64,12 +91,74 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 [show source]
 </a>
 <pre id='method-i-where-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
-<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">40</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">41</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
-<span class="line-num">42</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
-<span class="line-num">43</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">58</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">59</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">60</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">61</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">62</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-where_all'>
+<a name='method-i-where_all'></a>
+<div class='synopsis'>
+<span class='name'>where_all</span><span class='arguments'>(name, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Create a method that combines filters from already registered dataset methods, and filters for rows where all of the conditions are satisfied.</p>
+
+<pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">active:</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:started</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">:start_date</span>
+  <span class="ruby-identifier">where_all</span>(<span class="ruby-value">:active_and_started</span>, <span class="ruby-value">:active</span>, <span class="ruby-value">:started</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">active_and_started</span>.<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT * FROM employees WHERE ((active IS TRUE) AND (CURRENT_DATE &lt;= start_date))</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-where_all-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-where_all-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
+<span class="line-num">85</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_all</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">86</span>   <span class="ruby-identifier">_where_any_all</span>(<span class="ruby-value">:&amp;</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">87</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-where_any'>
+<a name='method-i-where_any'></a>
+<div class='synopsis'>
+<span class='name'>where_any</span><span class='arguments'>(name, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Create a method that combines filters from already registered dataset methods, and filters for rows where any of the conditions are satisfied.</p>
+
+<pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">active:</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-identifier">where</span> <span class="ruby-value">:started</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">:start_date</span>
+  <span class="ruby-identifier">where_any</span>(<span class="ruby-value">:active_or_started</span>, <span class="ruby-value">:active</span>, <span class="ruby-value">:started</span>)
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">active_or_started</span>.<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># SELECT * FROM employees WHERE ((active IS TRUE) OR (CURRENT_DATE &lt;= start_date))</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-where_any-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-where_any-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
+<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_any</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">102</span>   <span class="ruby-identifier">_where_any_all</span>(<span class="ruby-value">:|</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

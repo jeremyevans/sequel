@@ -31,13 +31,30 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-10-01 08:44:47 -0700</span>
+<span class='datetime'>2024-11-01 09:04:27 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h3 id="label-5.85.0+-282025-10-01-29"><a href="doc/release_notes/5_85_0_txt.html">5.85.0</a> (2025-10-01)<span><a href="#label-5.85.0+-282025-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.86.0+-282024-11-01-29"><a href="doc/release_notes/5_86_0_txt.html">5.86.0</a> (2024-11-01)<span><a href="#label-5.86.0+-282024-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support the :disable_dqs Database option in the sqlite adapter to disable treating double quoted values as strings (jeremyevans) (#2233)</p>
+</li><li>
+<p>Have the subset_conditions plugin support where_all and where_any methods to combine existing subsets with AND or OR (jeremyevans)</p>
+</li><li>
+<p>Have the subset_conditions plugin add *_conditions methods for exclude method calls in addition to where and subset (jeremyevans)</p>
+</li><li>
+<p>Use Ruby module naming instead of Java package naming for access to Java libraries in the jdbc adapters (kalenp) (#2235, #2236)</p>
+</li><li>
+<p>Make schema_dumper extension format options similar to Hash#inspect on Ruby 3.4+ (jeremyevans)</p>
+</li><li>
+<p>Avoid deprecation warnings on Ruby 3.4.0-preview2 (jeremyevans)</p>
+</li><li>
+<p>Handle FROM tables that are SQL::DelayedEvaluation instances when trying to get primary key values after INSERT on PostgreSQL (tomasmiguez) (#2230, #2232)</p>
+</li></ul>
+
+<h3 id="label-5.85.0+-282024-10-01-29"><a href="doc/release_notes/5_85_0_txt.html">5.85.0</a> (2024-10-01)<span><a href="#label-5.85.0+-282024-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support json_table on PostgreSQL 17+ in the pg_json_ops extension (jeremyevans)</p>
 </li><li>

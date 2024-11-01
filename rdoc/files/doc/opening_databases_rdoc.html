@@ -31,7 +31,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-06-05 15:25:02 -0700</span>
+<span class='datetime'>2024-10-27 20:44:24 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -399,7 +399,9 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </pre>
 
 <p>The following additional options are supported:</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:readonly </td><td>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:disable_dqs </td><td>
+<p>Disable treating double quoted values as strings in DDL and DML statements (requires SQLite <a href="release_notes/3_29_0_txt.html">3.29.0</a>+ and sqlite3 gem version 1.4.3+).</p>
+</td></tr><tr><td class='label'>:readonly </td><td>
 <p>open database in read-only mode</p>
 </td></tr><tr><td class='label'>:timeout </td><td>
 <p>the busy timeout to use in milliseconds (default: 5000).</p>
