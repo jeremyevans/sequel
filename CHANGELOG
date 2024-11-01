@@ -1,4 +1,4 @@
-=== master
+=== 5.86.0 (2024-11-01)
 
 * Support the :disable_dqs Database option in the sqlite adapter to disable treating double quoted values as strings (jeremyevans) (#2233)
 
@@ -14,7 +14,7 @@
 
 * Handle FROM tables that are SQL::DelayedEvaluation instances when trying to get primary key values after INSERT on PostgreSQL (tomasmiguez) (#2230, #2232)
 
-=== 5.85.0 (2025-10-01)
+=== 5.85.0 (2024-10-01)
 
 * Support json_table on PostgreSQL 17+ in the pg_json_ops extension (jeremyevans)
 

@@ -1,0 +1,62 @@
+= New Features
+
+* The subset_conditions plugin now supports where_all and where_any
+  methods for combining existing subsets.  It also adds
+  *_conditions methods for exclude method calls, in addition to
+  subset and where method calls:
+
+    class Album < Sequel::Model
+      plugin :subset_conditions
+
+      dataset_module do
+        where :released, Sequel::CURRENT_DATE <= :release_date
+        exclude :inactive, :active
+
+        where_all(:inactive_released, :released, :inactive)
+        where_any(:inactive_or_released, :released, :inactive)
+      end
+    end
+
+    Album.inactive_released.sql
+    # SELECT * FROM albums WHERE ((CURRENT_DATE <= release_date) AND NOT active)
+
+    Album.inactive_or_released.sql
+    # SELECT * FROM albums WHERE ((CURRENT_DATE <= release_date) OR NOT active)
+
+    Album.where(Album.inactive_conditions).sql
+    # => SELECT * FROM albums WHERE NOT active
+
+    Album.exclude(Album.inactive_or_released_conditions).sql
+    # SELECT * FROM albums WHERE ((CURRENT_DATE > release_date) AND active)
+
+  In addition to making code simpler, the where_all method improves
+  performance compared to defining a dataset method that uses a
+  method chain to call both methods, and the where_any method improves 
+  performances even more significantly as it allows caching where
+  the alternative approach would not allow for caching.
+
+* The sqlite adapter now supports the :disable_dqs Database option,
+  to disable treating double quoted values as strings. As described
+  by the SQLite documentation, treating double quoted values as
+  strings instead of identifiers is a misfeature. This support
+  requires SQLite 3.29.0+ and sqlite3 gem version 1.4.3+.
+
+= Other Improvements
+
+* On PostgreSQL, datasets using an SQL::DelayedEvaluation instance
+  as the table now support returning the primary key for inserts
+  and imports.
+
+* All jdbc adapters now use Ruby-style module naming instead of
+  Java-style package naming (e.g. Java::OrgPostgresqlUtil::PGobject
+  instead of org.postgresql.util.PGobject).  This supports loading
+  the Java packages in separate classloaders.
+
+* The schema_dumper extension now uses colons instead of hashrockets
+  when using Ruby 3.4+ (following the Hash#inspect change in Ruby
+  3.4.0-preview2).
+
+= Backwards Compatibility
+
+* The schema_dumper change can break backwards compatibility for
+  tests that expect the hashrocket format, but only on Ruby 3.4+.
