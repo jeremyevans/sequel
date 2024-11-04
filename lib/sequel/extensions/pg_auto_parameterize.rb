@@ -394,7 +394,7 @@ module Sequel
         # there can be more than one parameter per column, so this doesn't prevent going
         # over the limit, though it does make it less likely.
         def default_import_slice
-          40
+          @opts[:no_auto_parameterize] ? super : 40
         end
 
         # Handle parameterization of multi_insert_sql

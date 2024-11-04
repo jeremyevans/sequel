@@ -63,6 +63,14 @@ describe "pg_auto_parameterize extension" do
     sqls[1].must_equal 'INSERT INTO "table" ("a") VALUES ' + args[0...40].map{|i| "($#{i}::int4)"}.join(', ') + " -- args: #{args[40...80].inspect}"
   end
 
+  it "should not split inserts of multiple rows to 40 at a time with no_auto_parameterize" do
+    args = (1...81).to_a
+    @db[:table].no_auto_parameterize.import([:a], args)
+    sqls = @db.sqls
+    sqls.size.must_equal 1
+    sqls[0].must_equal 'INSERT INTO "table" ("a") VALUES ' + args.map{|i| "(#{i})"}.join(', ')
+  end
+
   it "should automatically parameterize queries strings, blobs, numerics, dates, and times" do
     ds = @db[:table]
     pr = proc do |sql, *args|
