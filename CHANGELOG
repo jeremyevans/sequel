@@ -1,3 +1,7 @@
+=== master
+
+* Do not limit imports to 40 rows at a time if using pg_auto_parameterize extension with the no_auto_parameterize method (davekaro) (#2242)
+
 === 5.86.0 (2024-11-01)
 
 * Support the :disable_dqs Database option in the sqlite adapter to disable treating double quoted values as strings (jeremyevans) (#2233)
