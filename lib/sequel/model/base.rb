@@ -87,7 +87,7 @@ module Sequel
       attr_reader :simple_pk
   
       # Should be the literal table name if this Model's dataset is a simple table (no select, order, join, etc.),
-      # or nil otherwise.  This and simple_pk are used for an optimization in Model.[].
+      # or nil otherwise.  This and simple_pk are used for an optimization in Model[].
       attr_reader :simple_table
   
       # Whether mass assigning via .create/.new/#set/#update should raise an error
@@ -398,7 +398,7 @@ module Sequel
       end
   
       # Finds a single record according to the supplied filter.
-      # You are encouraged to use Model.[] or Model.first instead of this method.
+      # You are encouraged to use Model[] or Model.first instead of this method.
       #
       #   Artist.find(name: 'Bob')
       #   # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
