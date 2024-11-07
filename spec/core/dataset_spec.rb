@@ -5454,6 +5454,18 @@ describe "Dataset feature defaults" do
   end
 end
 
+describe "Dataset extensions without files" do
+  after do
+    Sequel::Dataset::EXTENSIONS.delete(:foo)
+    Sequel::Dataset.const_get(:EXTENSION_MODULES).delete(:foo)
+  end
+
+  it "should work if they are already registered" do
+    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
+    Sequel.mock.dataset.extension(:foo).a.must_equal 1
+  end
+end
+
 describe "Dataset extensions" do
   before(:all) do
     class << Sequel

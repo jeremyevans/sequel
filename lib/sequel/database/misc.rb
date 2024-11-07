@@ -246,9 +246,13 @@ module Sequel
     # extension does not have specific support for Database objects, an Error will be raised.
     # Returns self.
     def extension(*exts)
-      Sequel.extension(*exts)
       exts.each do |ext|
-        if pr = Sequel.synchronize{EXTENSIONS[ext]}
+        unless pr = Sequel.synchronize{EXTENSIONS[ext]}
+          Sequel.extension(ext)
+          pr = Sequel.synchronize{EXTENSIONS[ext]}
+        end
+
+        if pr
           if Sequel.synchronize{@loaded_extensions.include?(ext) ? false : (@loaded_extensions << ext)}
             pr.call(self)
           end

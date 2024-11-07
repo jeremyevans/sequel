@@ -204,7 +204,7 @@ module Sequel
       # If no related extension file exists or the extension does not have
       # specific support for Dataset objects, an error will be raised.
       def extension(*exts)
-        Sequel.extension(*exts)
+        exts.each{|ext| Sequel.extension(ext) unless Sequel.synchronize{EXTENSIONS[ext]}}
         mods = exts.map{|ext| Sequel.synchronize{EXTENSION_MODULES[ext]}}
         if mods.all?
           with_extend(*mods)
@@ -1359,9 +1359,13 @@ module Sequel
     unless TRUE_FREEZE
       # Load the extensions into the receiver, without checking if the receiver is frozen.
       def _extension!(exts)
-        Sequel.extension(*exts)
         exts.each do |ext|
-          if pr = Sequel.synchronize{EXTENSIONS[ext]}
+          unless pr = Sequel.synchronize{EXTENSIONS[ext]}
+            Sequel.extension(ext)
+            pr = Sequel.synchronize{EXTENSIONS[ext]}
+          end
+
+          if pr
             pr.call(self)
           else
             raise(Error, "Extension #{ext} does not have specific support handling individual datasets (try: Sequel.extension #{ext.inspect})")

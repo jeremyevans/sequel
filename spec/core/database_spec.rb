@@ -3043,6 +3043,21 @@ describe "Database#column_schema_to_ruby_default" do
   end
 end
 
+describe "Database extensions without files" do
+  before do
+    @db = Sequel.mock
+    @_extensions = Sequel::Database::EXTENSIONS.dup
+  end
+  after do
+    Sequel::Database::EXTENSIONS.replace(@_extensions)
+  end
+
+  it "should work if they are already registered" do
+    Sequel::Database.register_extension(:foo, Module.new{def a; 1; end})
+    @db.extension(:foo).a.must_equal 1
+  end
+end
+
 describe "Database extensions" do
   before(:all) do
     class << Sequel
@@ -3057,8 +3072,10 @@ describe "Database extensions" do
   end
   before do
     @db = Sequel.mock
+    @_extensions = Sequel::Database::EXTENSIONS.dup
   end
   after do
+    Sequel::Database::EXTENSIONS.replace(@_extensions)
     Sequel::Database.instance_variable_set(:@initialize_hook, proc{|db| })
   end
 

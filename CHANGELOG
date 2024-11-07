@@ -1,5 +1,7 @@
 === master
 
+* Allow Data{base,set}#extension to not require files if the extension is already registered (jeremyevans) (#2246)
+
 * Do not limit imports to 40 rows at a time if using pg_auto_parameterize extension with the no_auto_parameterize method (davekaro) (#2242)
 
 === 5.86.0 (2024-11-01)
