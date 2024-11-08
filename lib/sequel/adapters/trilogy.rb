@@ -62,8 +62,7 @@ module Sequel
       private
 
       def database_specific_error_class(exception, opts)
-        case exception.message
-        when /1205 - Lock wait timeout exceeded; try restarting transaction\z/
+        if exception.error_code == 1205
           DatabaseLockTimeout
         else
           super
