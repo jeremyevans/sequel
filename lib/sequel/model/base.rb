@@ -1311,7 +1311,7 @@ module Sequel
       # Returns a string representation of the model instance including
       # the class name and values.
       def inspect
-        "#<#{model.name} @values=#{inspect_values}>"
+        "#<#{inspect_prefix} @values=#{inspect_values}>"
       end
   
       # Returns the keys in +values+.  May not include all column names.
@@ -1994,7 +1994,12 @@ module Sequel
         set(h) unless h.empty?
       end
 
-      # Default inspection output for the values hash, overwrite to change what #inspect displays.
+      # Default inspect output for the inspect, by default, just showing the class.
+      def inspect_prefix
+        model.name
+      end
+
+      # Default inspect output for the values hash, overwrite to change what #inspect displays.
       def inspect_values
         @values.inspect
       end

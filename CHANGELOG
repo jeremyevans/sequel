@@ -1,5 +1,7 @@
 === master
 
+* Add inspect_pk plugin to make it easier to retrieve model instance based on inspect output (jeremyevans)
+
 * Treat all Trilogy errors with error code 1205 as Sequel::DatabaseLockTimeout in the trilogy adapter (jeremyevans)
 
 * Allow Data{base,set}#extension to not require files if the extension is already registered (jeremyevans) (#2246)
