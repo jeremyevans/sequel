@@ -714,6 +714,12 @@ describe "PostgreSQL", '#create_table' do
     @db.schema(:tmp_dolls).map{|_,v| v[:generated]}.must_equal [false, false, true]
   end if DB.server_version >= 120000
 
+  it "should include :comment entry in schema for whether the column is commented" do
+    @db.create_table(:tmp_dolls){Integer :a; Integer :b}
+    @db.run("COMMENT ON COLUMN tmp_dolls.b IS 'blah'")
+    @db.schema(:tmp_dolls).map{|_,v| v[:comment]}.must_equal [nil, 'blah']
+  end
+
   it "should support deferred primary key and unique constraints on columns" do
     @db.create_table(:tmp_dolls){primary_key :id, :primary_key_deferrable=>true; Integer :i, :unique=>true, :unique_deferrable=>true}
     @db[:tmp_dolls].insert(:i=>10)

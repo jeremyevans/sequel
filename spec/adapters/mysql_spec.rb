@@ -42,6 +42,15 @@ describe "MySQL", '#create_table' do
     @db.schema(:dolls).map{|k, v| v[:db_type]}.must_equal %w"blob tinyblob mediumblob longblob blob"
   end
 
+  it "should returns the columns' comments" do
+    @db.create_table(:dolls) do
+      Integer :a
+      Integer :b
+    end
+    @db.run("ALTER TABLE dolls CHANGE b b INT COMMENT 'blah'")
+    @db.schema(:dolls).map{|k, v| v[:comment]}.must_equal [nil, 'blah']
+  end
+
   it "should include an :auto_increment schema attribute if auto incrementing" do
     @db.create_table(:dolls) do
       primary_key :n4
