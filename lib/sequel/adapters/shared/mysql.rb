@@ -567,7 +567,7 @@ module Sequel
         im = input_identifier_meth(opts[:dataset])
         table = SQL::Identifier.new(im.call(table_name))
         table = SQL::QualifiedIdentifier.new(im.call(opts[:schema]), table) if opts[:schema]
-        metadata_dataset.with_sql("DESCRIBE ?", table).map do |row|
+        metadata_dataset.with_sql("SHOW FULL COLUMNS FROM ?", table).map do |row|
           extra = row.delete(:Extra)
           if row[:primary_key] = row.delete(:Key) == 'PRI'
             row[:auto_increment] = !!(extra.to_s =~ /auto_increment/i)
@@ -577,10 +577,13 @@ module Sequel
             row[:generated] = !!(extra.to_s =~ /VIRTUAL|STORED|PERSISTENT/i)
           end
           row[:allow_null] = row.delete(:Null) == 'YES'
+          row[:comment] = row.delete(:Comment)
           row[:default] = row.delete(:Default)
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
           row[:extra] = extra
+          row.delete(:Collation)
+          row.delete(:Privileges)
           [m.call(row.delete(:Field)), row]
         end
       end

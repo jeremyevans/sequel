@@ -1075,6 +1075,7 @@ module Sequel
               pg_attribute[:attname].as(:name),
               SQL::Cast.new(pg_attribute[:atttypid], :integer).as(:oid),
               SQL::Cast.new(basetype[:oid], :integer).as(:base_oid),
+              SQL::Function.new(:col_description, pg_class[:oid], pg_attribute[:attnum]).as(:comment),
               SQL::Function.new(:format_type, basetype[:oid], pg_type[:typtypmod]).as(:db_base_type),
               SQL::Function.new(:format_type, pg_type[:oid], pg_attribute[:atttypmod]).as(:db_type),
               SQL::Function.new(:pg_get_expr, pg_attrdef[:adbin], pg_class[:oid]).as(:default),
