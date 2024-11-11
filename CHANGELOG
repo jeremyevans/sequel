@@ -1,5 +1,7 @@
 === master
 
+* Make Database#schema hashes include :comment field on MySQL and PostgreSQL (Bahanix) (#2248, #2249)
+
 * Add inspect_pk plugin to make it easier to retrieve model instance based on inspect output (jeremyevans)
 
 * Treat all Trilogy errors with error code 1205 as Sequel::DatabaseLockTimeout in the trilogy adapter (jeremyevans)
