@@ -578,6 +578,7 @@ module Sequel
           end
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:comment] = row.delete(:Comment)
+          row[:comment] = nil if row[:comment] == ""
           row[:default] = row.delete(:Default)
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])

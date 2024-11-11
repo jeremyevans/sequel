@@ -48,7 +48,7 @@ describe "MySQL", '#create_table' do
       Integer :b
     end
     @db.run("ALTER TABLE dolls CHANGE b b INT COMMENT 'blah'")
-    @db.schema(:dolls).map{|k, v| v[:comment]}.must_equal ["", 'blah']
+    @db.schema(:dolls).map{|k, v| v[:comment]}.must_equal [nil, 'blah']
   end
 
   it "should include an :auto_increment schema attribute if auto incrementing" do
