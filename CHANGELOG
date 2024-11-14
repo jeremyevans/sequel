@@ -1,5 +1,7 @@
 === master
 
+* Add pg_schema_caching extension, for reloading OIDs for custom types when loading cached schema (jeremyevans)
+
 * Make Database#schema hashes include :comment field on MySQL and PostgreSQL (Bahanix) (#2248, #2249)
 
 * Add inspect_pk plugin to make it easier to retrieve model instance based on inspect output (jeremyevans)

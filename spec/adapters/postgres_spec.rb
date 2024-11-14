@@ -6355,3 +6355,37 @@ describe "MERGE WHEN NOT MATCHED BY SOURCE" do
     @m1.order(:i1).all.must_equal [{:i1=>1, :a=>100}, {:i1=>3, :a=>40}, {:i1=>4, :a=>-15}]
   end
 end if DB.server_version >= 170000
+
+describe 'pg_schema_caching_extension' do
+  before do
+    @db = DB
+    @cache_file = "spec/files/pg_schema_caching-spec-#{$$}.cache"
+  end
+  after do
+    @db.drop_table?(:test_pg_schema_caching, :test_pg_schema_caching_type)
+    File.delete(@cache_file) if File.file?(@cache_file)
+  end
+
+  it "should encode custom type OIDs as :custom, and reload them" do
+    @db.create_table(:test_pg_schema_caching_type) do
+      Integer :id
+      String :name
+    end
+    @db.create_table(:test_pg_schema_caching) do
+      test_pg_schema_caching_type :t
+    end
+
+    oid = @db.schema(:test_pg_schema_caching)[0][1][:oid]
+    oid.must_be_kind_of Integer
+
+    @db.extension :pg_schema_caching
+    @db.dump_schema_cache(@cache_file)
+
+    @db.instance_variable_get(:@schemas).delete('"test_pg_schema_caching"')
+    cache = Marshal.load(File.binread(@cache_file))
+    cache['"test_pg_schema_caching"'][0][1][:oid].must_equal :custom
+
+    @db.load_schema_cache(@cache_file)
+    @db.schema(:test_pg_schema_caching)[0][1][:oid].must_equal oid
+  end
+end

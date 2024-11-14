@@ -51,14 +51,7 @@ module Sequel
   module SchemaCaching
     # Dump the cached schema to the filename given in Marshal format.
     def dump_schema_cache(file)
-      sch = {}
-      @schemas.sort.each do |k,v|
-        sch[k] = v.map do |c, h|
-          h = Hash[h]
-          h.delete(:callable_default)
-          [c, h]
-        end
-      end
+      sch = dumpable_schema_cache
       File.open(file, 'wb'){|f| f.write(Marshal.dump(sch))}
       nil
     end
@@ -72,7 +65,7 @@ module Sequel
     # Replace the schema cache with the data from the given file, which
     # should be in Marshal format.
     def load_schema_cache(file)
-      @schemas = Marshal.load(File.read(file))
+      @schemas = load_schema_cache_file(file)
       @schemas.each_value{|v| schema_post_process(v)}
       nil
     end
@@ -81,6 +74,28 @@ module Sequel
     # file exists.
     def load_schema_cache?(file)
       load_schema_cache(file) if File.exist?(file)
+    end
+
+    private
+
+    # Return the deserialized schema cache file.
+    def load_schema_cache_file(file)
+      Marshal.load(File.read(file))
+    end
+
+    # A dumpable version of the schema cache.
+    def dumpable_schema_cache
+      sch = {}
+
+      @schemas.sort.each do |k,v|
+        sch[k] = v.map do |c, h|
+          h = Hash[h]
+          h.delete(:callable_default)
+          [c, h]
+        end
+      end
+
+      sch
     end
   end
 
