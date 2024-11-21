@@ -35,7 +35,7 @@
 #
 #   j[1]                     # (json_column ->> 1)
 #   j.get(1)                 # (json_column ->> 1)
-#   j.get_text(1)            # (json_column -> 1)
+#   j.get_json(1)            # (json_column -> 1)
 #   j.extract('$.a')         # json_extract(json_column, '$.a')
 #   jb.extract('$.a')        # jsonb_extract(jsonb_column, '$.a')
 #
