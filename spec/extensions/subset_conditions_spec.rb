@@ -36,6 +36,9 @@ describe "subset_conditions plugin" do
     @c.dataset_module{subset(:active, p2)}
     @c.where(@c.active_conditions).sql.must_equal @c.active.sql
 
+    @c.dataset_module{exclude(:inactive){p2}}
+    @c.where(@c.inactive_conditions).sql.must_equal @c.inactive.sql
+
     @c.dataset_module{subset(:active_published, p2, &p1)}
     @c.where(@c.active_published_conditions).sql.must_equal @c.active_published.sql
     @c.where(Sequel.&(@c.active_conditions, @c.published_conditions)).sql.must_equal @c.active_published.sql
