@@ -40,6 +40,6 @@ describe "inspect_pk plugin" do
   end
 
   it "should use inspect_pk method to get inspect pk value" do
-    inspect{def inspect_pk; "2" end}.must_equal "#<M[\"2\"] @values={}>"
+    inspect{private; def inspect_pk; "2" end}.must_equal "#<M[\"2\"] @values={}>"
   end
 end
