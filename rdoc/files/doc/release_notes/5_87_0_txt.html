@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.87.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.87.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.87.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2024-12-01 09:13:44 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Column schema hashes on MySQL and PostgreSQL now include the comment on the column in the :comment entry.</p>
+</li><li>
+<p>An inspect_pk plugin has been added, which makes the inspect output include the primary key next to the class name, so that you can copy and paste the inspect output to return the model object:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">inspect</span>
+<span class="ruby-comment">#         default: #&lt;Album @values={...}&gt;</span>
+<span class="ruby-comment"># with inspect_pk: #&lt;Album[1] @values={...}&gt;</span>
+</pre>
+</li><li>
+<p>A pg_schema_caching extension has been added.  This builds on top of the schema_caching extension, and handles OIDs for custom types.</p>
+
+<p>Type OIDs are included in column schema hashes on PostgreSQL. The OIDs are static for built-in types, but dynamic for custom types. The pg_schema_caching extension will perform a query to get the type OIDs for the custom types after loading the cached schema.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#extension and Dataset#extension no longer attempt to require the extension file if the extension has already been registered.  This is how model plugins work, and makes it easier for applications to use custom extensions without messing with the load path.</p>
+</li><li>
+<p>When using the pg_auto_parameterize extension, and using Dataset#no_auto_parameterize, Dataset#import is no longer limited to inserting 40 rows at a time.</p>
+</li><li>
+<p>The trilogy adapter now treats all database errors with code 1205 as Sequel::DatabaseLockTimeout.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

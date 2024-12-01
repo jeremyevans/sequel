@@ -31,7 +31,7 @@ doc/reflection.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2024-11-11 14:55:11 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -110,6 +110,8 @@ Last Update:
 <p>Database#schema takes a table symbol and returns column information in an array with each element being an array with two elements.  The first elements of the subarray is a column symbol, and the second element is a hash of information about that column.  The hash should include the following keys:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_null </td><td>
 <p>Whether NULL/nil is an allowed value for this column. Used by the <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> typecasting code.</p>
+</td></tr><tr><td class='label'>:comment</td><td>
+<p>The comment on the column (MySQL and PostreSQL only).</p>
 </td></tr><tr><td class='label'>:db_type </td><td>
 <p>The type of column the database provided, as a string.  Used by the schema_dumper plugin for a more specific type translation.</p>
 </td></tr><tr><td class='label'>:default </td><td>

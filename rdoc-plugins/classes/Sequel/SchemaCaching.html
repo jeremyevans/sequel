@@ -68,17 +68,10 @@ Sequel::SchemaCaching
 </a>
 <pre id='method-i-dump_schema_cache-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>
 <span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">54</span>   <span class="ruby-identifier">sch</span> = {}
-<span class="line-num">55</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
-<span class="line-num">56</span>     <span class="ruby-identifier">sch</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span><span class="ruby-operator">|</span>
-<span class="line-num">57</span>       <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">h</span>]
-<span class="line-num">58</span>       <span class="ruby-identifier">h</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:callable_default</span>)
-<span class="line-num">59</span>       [<span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span>]
-<span class="line-num">60</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">61</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">62</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">sch</span>))}
-<span class="line-num">63</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">54</span>   <span class="ruby-identifier">sch</span> = <span class="ruby-identifier">dumpable_schema_cache</span>
+<span class="line-num">55</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">sch</span>))}
+<span class="line-num">56</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-dump_schema_cache-3F'>
@@ -97,9 +90,9 @@ Sequel::SchemaCaching
 [show source]
 </a>
 <pre id='method-i-dump_schema_cache-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>
-<span class="line-num">68</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache?</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">69</span>   <span class="ruby-identifier">dump_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">70</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache?</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">62</span>   <span class="ruby-identifier">dump_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-load_schema_cache'>
@@ -118,11 +111,11 @@ Sequel::SchemaCaching
 [show source]
 </a>
 <pre id='method-i-load_schema_cache-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>
-<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">75</span>   <span class="ruby-ivar">@schemas</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>))
-<span class="line-num">76</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">schema_post_process</span>(<span class="ruby-identifier">v</span>)}
-<span class="line-num">77</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">68</span>   <span class="ruby-ivar">@schemas</span> = <span class="ruby-identifier">load_schema_cache_file</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">69</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">schema_post_process</span>(<span class="ruby-identifier">v</span>)}
+<span class="line-num">70</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-load_schema_cache-3F'>
@@ -141,9 +134,9 @@ Sequel::SchemaCaching
 [show source]
 </a>
 <pre id='method-i-load_schema_cache-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>
-<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache?</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">83</span>   <span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)
-<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache?</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">76</span>   <span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

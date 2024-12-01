@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
 <head>
-<title>base.rb</title>
+<title>pg_schema_caching.rb</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
@@ -24,19 +24,25 @@
 <body class='page'>
 <div class='file' id='wrapper'>
 <div class='header'>
-<h1 class='name'>base.rb
+<h1 class='name'>pg_schema_caching.rb
 </h1>
 <div class='paths'>
-lib/sequel/model/base.rb
+lib/sequel/extensions/pg_schema_caching.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2024-11-08 13:09:48 -0800</span>
+<span class='datetime'>2024-11-14 15:28:58 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
-<div id='description'></div>
+<div id='description'>
+<p>The pg_schema_caching extension builds on top of the schema_caching extension, and allows it to handle custom PostgreSQL types. On PostgreSQL, column schema hashes include an :oid entry for the OID for the column’s type.  For custom types, this OID is dependent on the PostgreSQL database, so in most cases, test and development versions of the same database, created with the same migrations, will have different OIDs.</p>
+
+<p>To fix this case, the pg_schema_caching extension removes custom OIDs from the schema cache when dumping the schema, replacing them with a placeholder. When loading the cached schema, the Database object makes a single query to get the OIDs for all custom types used by the cached schema, and it updates all related column schema hashes to set the correct :oid entry for the current database.</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/SchemaCaching.html"><code>Sequel::Postgres::SchemaCaching</code></a></p>
+</div>
 <div id='context'>
 </div>
 

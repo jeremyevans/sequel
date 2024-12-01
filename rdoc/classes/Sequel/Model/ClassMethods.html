@@ -243,7 +243,7 @@ Sequel::Model::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>Should be the literal table name if this Model’s dataset is a simple table (no select, order, join, etc.), or nil otherwise.  This and <a href="ClassMethods.html#attribute-i-simple_pk"><code>simple_pk</code></a> are used for an optimization in Model.[].</p>
+<p>Should be the literal table name if this Model’s dataset is a simple table (no select, order, join, etc.), or nil otherwise.  This and <a href="ClassMethods.html#attribute-i-simple_pk"><code>simple_pk</code></a> are used for an optimization in Model[].</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -760,7 +760,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Finds a single record according to the supplied filter. You are encouraged to use Model.[] or Model.first instead of this method.</p>
+<p>Finds a single record according to the supplied filter. You are encouraged to use Model[] or Model.first instead of this method.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">find</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>)
 <span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;Bob&#39;) LIMIT 1</span>
