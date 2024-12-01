@@ -1,0 +1,35 @@
+= New Features
+
+* Column schema hashes on MySQL and PostgreSQL now include the
+  comment on the column in the :comment entry.
+
+* An inspect_pk plugin has been added, which makes the inspect output
+  include the primary key next to the class name, so that you can
+  copy and paste the inspect output to return the model object:
+
+    Album.with_pk(1).inspect
+    #         default: #<Album @values={...}>
+    # with inspect_pk: #<Album[1] @values={...}>
+
+* A pg_schema_caching extension has been added.  This builds on top
+  of the schema_caching extension, and handles OIDs for custom types.
+
+  Type OIDs are included in column schema hashes on PostgreSQL. The
+  OIDs are static for built-in types, but dynamic for custom types.
+  The pg_schema_caching extension will perform a query to get the
+  type OIDs for the custom types after loading the cached schema.
+
+= Other Improvements
+
+* Database#extension and Dataset#extension no longer attempt to
+  require the extension file if the extension has already been
+  registered.  This is how model plugins work, and makes it easier
+  for applications to use custom extensions without messing with the
+  load path.
+
+* When using the pg_auto_parameterize extension, and using
+  Dataset#no_auto_parameterize, Dataset#import is no longer limited to
+  inserting 40 rows at a time.
+
+* The trilogy adapter now treats all database errors with code 1205 as
+  Sequel::DatabaseLockTimeout.
