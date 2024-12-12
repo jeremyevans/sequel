@@ -37,7 +37,8 @@ module Sequel
     #
     #   # Register custom serializer/deserializer pair, if desired
     #   require 'sequel/plugins/serialization'
-    #   Sequel::Plugins::Serialization.register_format(:reverse, :reverse.to_proc, :reverse.to_proc)
+    #   require 'base64'
+    #   Sequel::Plugins::Serialization.register_format(:base64, Base64.method(:encode64), Base64.method(:decode64))
     #
     #   class User < Sequel::Model
     #     # Built-in format support when loading the plugin
@@ -48,10 +49,10 @@ module Sequel
     #     serialize_attributes :marshal, :permissions
     #
     #     # Use custom registered serialization format just like built-in format
-    #     serialize_attributes :reverse, :password
+    #     serialize_attributes :base64, :password
     #
     #     # Use a custom serializer/deserializer pair without registering
-    #     serialize_attributes [:reverse.to_proc, :reverse.to_proc], :password
+    #     serialize_attributes [ Base64.method(:encode64), Base64.method(:decode64)], :password
     #   end
     #   user = User.create
     #   user.permissions = {global: 'read-only'}
