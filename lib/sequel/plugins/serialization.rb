@@ -37,7 +37,8 @@ module Sequel
     #
     #   # Register custom serializer/deserializer pair, if desired
     #   require 'sequel/plugins/serialization'
-    #   Sequel::Plugins::Serialization.register_format(:reverse, :reverse.to_proc, :reverse.to_proc)
+    #   require 'base64'
+    #   Sequel::Plugins::Serialization.register_format(:base64, Base64.method(:encode64), Base64.method(:decode64))
     #
     #   class User < Sequel::Model
     #     # Built-in format support when loading the plugin
@@ -48,10 +49,10 @@ module Sequel
     #     serialize_attributes :marshal, :permissions
     #
     #     # Use custom registered serialization format just like built-in format
-    #     serialize_attributes :reverse, :password
+    #     serialize_attributes :base64, :password
     #
     #     # Use a custom serializer/deserializer pair without registering
-    #     serialize_attributes [:reverse.to_proc, :reverse.to_proc], :password
+    #     serialize_attributes [ Base64.method(:encode64), Base64.method(:decode64)], :password
     #   end
     #   user = User.create
     #   user.permissions = {global: 'read-only'}
@@ -123,7 +124,12 @@ module Sequel
         end
         
         # Create instance level reader that deserializes column values on request,
-        # and instance level writer that stores new deserialized values.
+        # and instance level writer that stores new deserialized values. If +format+
+        # is a symbol, it should correspond to a previously-registered format using +register_format+.
+        # Otherwise, +format+ ois expected to be a 2-element array of callables,
+        # with the first element being the serializer, used to store the column
+        # to the database, and the second element beig the deserialized,
+        # used to read the column from the database
         def serialize_attributes(format, *columns)
           if format.is_a?(Symbol)
             unless format = Sequel.synchronize{REGISTERED_FORMATS[format]}
