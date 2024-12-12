@@ -126,10 +126,10 @@ module Sequel
         # Create instance level reader that deserializes column values on request,
         # and instance level writer that stores new deserialized values. If +format+
         # is a symbol, it should correspond to a previously-registered format using +register_format+.
-        # Otherwise, +format+ ois expected to be a 2-element array of callables,
-        # with the first element being the serializer, used to store the column
-        # to the database, and the second element beig the deserialized,
-        # used to read the column from the database
+        # Otherwise, +format+ is expected to be a 2-element array of callables,
+        # with the first element being the serializer, used to convert the value used by the application
+        # to the value that will be stored in the database, and the second element being the deserializer,
+        # used to convert the value stored the database to the value used by the application.
         def serialize_attributes(format, *columns)
           if format.is_a?(Symbol)
             unless format = Sequel.synchronize{REGISTERED_FORMATS[format]}
