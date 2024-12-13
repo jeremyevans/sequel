@@ -173,7 +173,7 @@ module Sequel
       # Return a modified StringAgg that uses distinct expressions
       def distinct
         self.class.new(@expr, @separator) do |sa|
-          sa.instance_variable_set(:@order_expr, @order_expr) if @order_expr
+          sa.instance_variable_set(:@order_expr, @order_expr)
           sa.instance_variable_set(:@distinct, true)
         end
       end
@@ -181,8 +181,8 @@ module Sequel
       # Return a modified StringAgg with the given order
       def order(*o)
         self.class.new(@expr, @separator) do |sa|
-          sa.instance_variable_set(:@distinct, @distinct) if @distinct
           sa.instance_variable_set(:@order_expr, o.empty? ? nil : o.freeze)
+          sa.instance_variable_set(:@distinct, @distinct)
         end
       end
 
