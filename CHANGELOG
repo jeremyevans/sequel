@@ -1,5 +1,7 @@
 === master
 
+* Break ties in timestamp migrator version handling using lexicographic sort of rest of migration filename (jeremyevans)
+
 * Fix strict_unused_block warnings when running specs on Ruby 3.4 (jeremyevans)
 
 === 5.87.0 (2024-12-01)

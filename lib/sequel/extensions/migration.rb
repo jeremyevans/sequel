@@ -371,7 +371,7 @@ module Sequel
   #
   # Part of the +migration+ extension.
   class Migrator
-    MIGRATION_FILE_PATTERN = /\A(\d+)_.+\.rb\z/i.freeze
+    MIGRATION_FILE_PATTERN = /\A(\d+)_(.+)\.rb\z/i.freeze
 
     # Mutex used around migration file loading
     MUTEX = Mutex.new
@@ -791,7 +791,23 @@ module Sequel
         next unless MIGRATION_FILE_PATTERN.match(file)
         files << File.join(directory, file)
       end
-      files.sort_by{|f| MIGRATION_FILE_PATTERN.match(File.basename(f))[1].to_i}
+      files.sort! do |a, b|
+        a_ver, a_name = split_migration_filename(a)
+        b_ver, b_name = split_migration_filename(b)
+        x = a_ver <=> b_ver
+        if x.zero?
+          x = a_name <=> b_name
+        end
+        x
+      end
+      files
+    end
+
+    # Return an integer and name (without extension) for the given path.
+    def split_migration_filename(path)
+      version, name = MIGRATION_FILE_PATTERN.match(File.basename(path)).captures
+      version = version.to_i
+      [version, name]
     end
     
     # Returns tuples of migration, filename, and direction

@@ -828,6 +828,22 @@ describe "Sequel::TimestampMigrator" do
     @db[:schema_migrations].select_order_map(:filename).must_equal []
   end
 
+  it "should sort lexicographically by name for same timestamp" do
+    @dir = 'spec/files/duplicate_timestamped_migrations'
+    files = nil
+    migrator_class = Class.new(Sequel::TimestampMigrator) do
+      define_method(:get_migration_files) do
+        files = super()
+      end
+    end
+    @m = migrator_class.new(@db, @dir)
+    @m.run
+    files.map{|x| File.basename(x)}.must_equal %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
+
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
+  end
+
   it "should convert schema_info table to schema_migrations table" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir)
