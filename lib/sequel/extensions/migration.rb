@@ -223,7 +223,7 @@ module Sequel
       @actions << [:drop_join_table, *args]
     end
 
-    def create_table(name, opts=OPTS)
+    def create_table(name, opts=OPTS, &_)
       @actions << [:drop_table, name, opts]
     end
 

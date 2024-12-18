@@ -447,7 +447,7 @@ describe "Sequel::IntegerMigrator" do
 
   it "should add a column name if it doesn't already exist in the schema_info table" do
     @db.create_table(:schema_info){Integer :v}
-    def @db.alter_table(*); end
+    def @db.alter_table(*, &_); end
     Sequel::Migrator.apply(@db, @dirname)
   end
 

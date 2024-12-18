@@ -353,19 +353,19 @@ describe "Model around filters" do
     @c.raise_on_save_failure = false
 
     o = @c.load(:id => 1)
-    def o.around_save() end
+    def o.around_save(&_) end
     o.save.must_be_nil
 
     o = @c.load(:id => 1)
-    def o.around_update() end
+    def o.around_update(&_) end
     o.save.must_be_nil
 
     o = @c.new
-    def o.around_create() end
+    def o.around_create(&_) end
     o.save.must_be_nil
 
     o = @c.new
-    def o.around_validation() end
+    def o.around_validation(&_) end
     o.save.must_be_nil
   end
 end

@@ -63,12 +63,12 @@ module Sequel
       end
 
       # Return self without sending a database query, never yielding.
-      def each
+      def each(&_)
         self
       end
 
       # Return nil without sending a database query, never yielding.
-      def fetch_rows(sql)
+      def fetch_rows(sql, &_)
         nil
       end
 
