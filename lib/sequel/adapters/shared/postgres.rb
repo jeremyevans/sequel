@@ -2388,6 +2388,25 @@ module Sequel
         join_from_sql(:USING, sql)
       end
 
+      # Handle column aliases containing data types, useful for selecting from functions
+      # that return the record data type.
+      def derived_column_list_sql_append(sql, column_aliases)
+        c = false
+        comma = ', '
+        column_aliases.each do |a|
+          sql << comma if c
+          if a.is_a?(Array)
+            raise Error, "column aliases specified as arrays must have only 2 elements, the first is alias name and the second is data type" unless a.length == 2
+            a, type = a
+            identifier_append(sql, a)
+            sql << " " << db.cast_type_literal(type).to_s
+          else
+            identifier_append(sql, a)
+          end
+          c ||= true
+        end
+      end
+    
       # Add ON CONFLICT clause if it should be used
       def insert_conflict_sql(sql)
         if opts = @opts[:insert_conflict]

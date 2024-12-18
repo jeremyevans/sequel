@@ -1,5 +1,7 @@
 === master
 
+* Support column aliases with data types on PostgreSQL, useful for selecting from functions returning records (jeremyevans)
+
 * Break ties in timestamp migrator version handling using lexicographic sort of rest of migration filename (jeremyevans)
 
 * Fix strict_unused_block warnings when running specs on Ruby 3.4 (jeremyevans)

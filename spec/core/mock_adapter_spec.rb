@@ -913,6 +913,12 @@ describe "PostgreSQL support" do
     db.immediate_constraints(:server=>:test)
     db.sqls.must_equal ['SET CONSTRAINTS ALL IMMEDIATE -- test']
   end
+
+  it "should raise if an invalid number of elements is provided when using derived column lists with an array" do
+    @db.from{c.function.as(:d, [[:a, :b], [:e, :f]])}.sql.must_equal 'SELECT * FROM c() AS "d"("a" b, "e" f)'
+    proc{@db.from{c.function.as(:d, [[:a], [:e, :f]])}.sql}.must_raise Sequel::Error
+    proc{@db.from{c.function.as(:d, [[:a, :b, :c], [:e, :f]])}.sql}.must_raise Sequel::Error
+  end
 end
 
 describe "MySQL support" do

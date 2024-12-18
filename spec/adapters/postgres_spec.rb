@@ -4116,7 +4116,7 @@ describe 'PostgreSQL' do
       @db.get(ja.typeof).must_equal 'array'
       @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.must_equal ['2', '3', '["a","b"]']
       @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).must_equal [1]
-      @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).must_equal [1]
+      @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [[:a, Integer], [:b, Integer]])).select_map(:a).must_equal [1]
 
       if json_type == :jsonb
         @db.get(jo.has_key?('a')).must_equal true

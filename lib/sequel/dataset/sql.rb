@@ -1032,7 +1032,7 @@ module Sequel
       if column_aliases
         raise Error, "#{db.database_type} does not support derived column lists" unless supports_derived_column_lists?
         sql << '('
-        identifier_list_append(sql, column_aliases)
+        derived_column_list_sql_append(sql, column_aliases)
         sql << ')'
       end
     end
@@ -1165,6 +1165,11 @@ module Sequel
       end
     end
 
+    # Append the column aliases to the SQL.
+    def derived_column_list_sql_append(sql, column_aliases)
+      identifier_list_append(sql, column_aliases)
+    end
+    
     # Disable caching of SQL for the current dataset
     def disable_sql_caching!
       cache_set(:_no_cache_sql, true)
