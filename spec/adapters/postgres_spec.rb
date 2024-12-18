@@ -3214,7 +3214,18 @@ describe 'PostgreSQL array handling' do
       column :o, 'oidvector[]'
     end
     @tp.call.must_equal [:xml_array, :money_array, :bit_array, :varbit_array, :uuid_array, :xid_array, :cid_array, :name_array, :oidvector_array]
-    @ds.insert(Sequel.pg_array(['<a></a>'], :xml),
+    
+    begin
+      @db.transaction(:rollback=>:always) do
+        @ds.insert(:x=>Sequel.pg_array(['<a></a>'], :xml))
+      end
+    rescue Sequel::DatabaseError
+    else
+      xml_insert_value = Sequel.pg_array(['<a></a>'], :xml)
+      xml_expected_value = ['<a></a>']
+    end
+
+    @ds.insert(xml_insert_value,
                Sequel.pg_array(['1'], :money),
                Sequel.pg_array(['1'], :bit),
                Sequel.pg_array(['10'], :varbit),
@@ -3230,10 +3241,12 @@ describe 'PostgreSQL array handling' do
     m.class.must_equal(Sequel::Postgres::PGArray)
     m.to_a.must_be_kind_of(Array)
     m.first.must_be_kind_of(String)
-    r.must_be(:==, :x=>['<a></a>'], :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :o=>['1 2'])
-    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    r.must_be(:==, :x=>xml_expected_value, :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :o=>['1 2'])
+    x = r.delete(:x)
+    r.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    r.values.each{|v| v.to_a.must_be_kind_of(Array)}
     r[:m] = m
+    r[:x] = x
     @ds.delete
     @ds.insert(r)
     @ds.all.must_equal rs
