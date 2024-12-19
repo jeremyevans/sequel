@@ -762,22 +762,35 @@ module Sequel
           end
         end
       end
+
+      # Module that the class methods that call dataset methods are kept in.
+      # This allows the methods to be overridden and call super with the
+      # default behavior.
+      def dataset_methods_module
+        return @dataset_methods_module if defined?(@dataset_methods_module)
+        Sequel.synchronize{@dataset_methods_module ||= Module.new}
+        extend(@dataset_methods_module)
+        @dataset_methods_module
+      end
   
-      # Define a model method that calls the dataset method with the same name,
-      # only used for methods with names that can't be represented directly in
-      # ruby code.
+      # Define a model method that calls the dataset method with the same name.
       def def_model_dataset_method(meth)
         return if respond_to?(meth, true)
 
+        mod = dataset_methods_module
+
         if meth.to_s =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/
-          instance_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
+          mod.module_eval(<<END, __FILE__, __LINE__ + 1)
+def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end
+ruby2_keywords :#{meth} if respond_to?(:ruby2_keywords, true)
+END
         else
-          define_singleton_method(meth){|*args, &block| dataset.public_send(meth, *args, &block)}
+          mod.send(:define_method, meth){|*args, &block| dataset.public_send(meth, *args, &block)}
+          # :nocov:
+          mod.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
+          # :nocov:
         end
-        singleton_class.send(:alias_method, meth, meth)
-        # :nocov:
-        singleton_class.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
-        # :nocov:
+        mod.send(:alias_method, meth, meth)
       end
 
       # Get the schema from the database, fall back on checking the columns

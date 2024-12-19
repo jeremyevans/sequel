@@ -1,5 +1,7 @@
 === master
 
+* Allow class-level dataset methods to be overridable and call super to get the default behavior (jeremyevans)
+
 * Support column aliases with data types on PostgreSQL, useful for selecting from functions returning records (jeremyevans)
 
 * Break ties in timestamp migrator version handling using lexicographic sort of rest of migration filename (jeremyevans)

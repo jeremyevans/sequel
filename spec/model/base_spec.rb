@@ -200,6 +200,12 @@ describe Sequel::Model, ".dataset_module" do
     @c.return_3.must_equal 3
   end
 
+  it "should have methods defined on the class be overridable and allow calling super" do
+    @c.dataset_module{def return_3() 3 end}
+    @c.define_singleton_method(:return_3){super()}
+    @c.return_3.must_equal 3
+  end
+
   it "should add methods defined in the module outside the block to the class" do
     @c.dataset_module.module_eval{def return_3() 3 end}
     @c.return_3.must_equal 3
