@@ -13,7 +13,7 @@ describe "static_cache_cache plugin" do
     File.delete(@file) if File.file?(@file)
   end
 
-  it "should allow dumping and loading static cache rows from a cache file" do
+  it "should allow dumping and loading when using static_cache plugin" do
     @c.plugin :static_cache_cache, @file
     @db.sqls
     @c.plugin :static_cache
@@ -23,9 +23,9 @@ describe "static_cache_cache plugin" do
     @c.dump_static_cache_cache
 
     @db.fetch = []
-    c = Class.new(Sequel::Model(@db[:t]))
-    def c.name; 'Foo' end
-    c.columns :id, :name
+    @c = Class.new(Sequel::Model(@db[:t]))
+    def @c.name; 'Foo' end
+    @c.columns :id, :name
     @c.plugin :static_cache_cache, @file
     @db.sqls
     @c.plugin :static_cache
@@ -33,21 +33,60 @@ describe "static_cache_cache plugin" do
     @c.all.must_equal [@c.load(:id=>1, :name=>'A'), @c.load(:id=>2, :name=>'B')]
   end
 
-  it "should sort cache file by model name" do
+  it "should allow dumping and loading when using subset_static_cache plugin" do
+    file = @file
+    @db.sqls
+    setup_block = proc do
+      plugin :static_cache_cache, file
+      dataset_module do
+        where :a, :b
+        where :c, :d
+      end
+      plugin :subset_static_cache
+      cache_subset :c
+      cache_subset :a
+    end
+
+    @c.class_eval(&setup_block)
+    @db.sqls.must_equal ['SELECT * FROM t WHERE d', 'SELECT * FROM t WHERE b']
+    @c.c.all.must_equal [@c.load(:id=>1, :name=>'A'), @c.load(:id=>2, :name=>'B')]
+    @db.sqls.must_equal []
+
+    @c.dump_static_cache_cache
+
+    @db.fetch = []
+    @c = Class.new(Sequel::Model(@db[:t]))
+    def @c.name; 'Foo' end
+    @c.columns :id, :name
+    @db.sqls
+    @c.class_eval(&setup_block)
+    @db.sqls.must_be_empty
+    @c.c.all.must_equal [@c.load(:id=>1, :name=>'A'), @c.load(:id=>2, :name=>'B')]
+  end
+
+  it "should sort cache file by model name, and optionally method name" do
     @c.plugin :static_cache_cache, @file
     c1 = Class.new(@c)
     def c1.name; 'Foo' end
     c1.plugin :static_cache
-    c2 = Class.new(@c)
-    def c2.name; 'Bar' end
-    c2.plugin :static_cache
+    Class.new(@c) do
+      def self.name; 'Bar' end
+      plugin :static_cache
+      dataset_module do
+        where :a, :b
+        where :c, :d
+      end
+      plugin :subset_static_cache
+      cache_subset :c
+      cache_subset :a
+    end
 
-    @c.instance_variable_get(:@static_cache_cache).keys.must_equal %w'Foo Bar'
+    @c.instance_variable_get(:@static_cache_cache).keys.must_equal ['Foo', 'Bar', ['Bar', :c], ['Bar', :a]]
     @c.dump_static_cache_cache
-    @c.instance_variable_get(:@static_cache_cache).keys.must_equal %w'Foo Bar'
+    @c.instance_variable_get(:@static_cache_cache).keys.must_equal ['Foo', 'Bar', ['Bar', :c], ['Bar', :a]]
 
     c = Class.new(Sequel::Model)
     c.plugin :static_cache_cache, @file
-    c.instance_variable_get(:@static_cache_cache).keys.must_equal %w'Bar Foo'
+    c.instance_variable_get(:@static_cache_cache).keys.must_equal ['Bar', 'Foo', ['Bar', :a], ['Bar', :c]]
   end
 end

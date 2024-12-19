@@ -2035,6 +2035,104 @@ describe "Caching plugins" do
       @Artist.first{id =~ 1}.must_equal @Artist.load(:id=>1)
     end
   end
+
+  describe "subset_static_cache plugin" do
+    before do
+      @Album.plugin :subset_static_cache
+      @id = @db[:albums].insert
+      @album = @Album.call(:id=>@id, :artist_id=>nil)
+      @Album.class_exec do
+        dataset_module do
+          where :without_artist, :artist_id=>nil
+        end
+        cache_subset :without_artist
+      end
+    end
+    after do
+      @db[:albums].delete
+    end
+
+    it "#all should return all values" do 
+      @Album.without_artist.all.must_equal [@album]
+    end
+
+    it "#count without arguments should return number of cached values" do 
+      @Album.without_artist.count.must_equal 1
+    end
+
+    it "#first should retrieve correct values" do 
+      @Album.without_artist.first.must_equal @album
+      @Album.without_artist.first(1).must_equal [@album]
+      @Album.without_artist.first(:id=>@id).must_equal @album
+      is_id = @id
+      @Album.without_artist.first{id =~ is_id}.must_equal @album
+    end
+
+    it "#each should iterate over cached records" do 
+      a = []
+      @Album.without_artist.each{|x| a << x}
+      a.must_equal [@album]
+    end
+
+    it "#map should map over cached records" do 
+      a = @Album.without_artist.map{|x| x}
+      a.must_equal [@album]
+
+      a = @Album.without_artist.map(:id)
+      a.must_equal [@id]
+
+      a = @Album.without_artist.map([:id])
+      a.must_equal [[@id]]
+    end
+
+    it "#to_hash should return hash" do 
+      a = @Album.without_artist.to_hash
+      a.must_equal(@id=>@album)
+
+      a = @Album.without_artist.to_hash(:id)
+      a.must_equal(@id=>@album)
+
+      a = @Album.without_artist.to_hash(:id, :id)
+      a.must_equal(@id=>@id)
+
+      a = @Album.without_artist.to_hash([:id])
+      a.must_equal([@id]=>@album)
+
+      a = @Album.without_artist.to_hash([:id], :id)
+      a.must_equal([@id]=>@id)
+
+      a = @Album.without_artist.to_hash([:id], [:id])
+      a.must_equal([@id]=>[@id])
+
+      a = @Album.without_artist.to_hash(:id, [:id])
+      a.must_equal(@id=>[@id])
+    end
+
+    it "#to_hash_groups should return hash with matched groups" do 
+      a = @Album.without_artist.to_hash_groups(:id)
+      a.must_equal(@id=>[@album])
+
+      a = @Album.without_artist.to_hash_groups(:id, :id)
+      a.must_equal(@id=>[@id])
+
+      a = @Album.without_artist.to_hash_groups([:id])
+      a.must_equal([@id]=>[@album])
+
+      a = @Album.without_artist.to_hash_groups([:id], :id)
+      a.must_equal([@id]=>[@id])
+
+      a = @Album.without_artist.to_hash_groups([:id], [:id])
+      a.must_equal([@id]=>[[@id]])
+
+      a = @Album.without_artist.to_hash_groups(:id, [:id])
+      a.must_equal(@id=>[[@id]])
+    end
+
+    it "#with_pk should return record with pk" do 
+      @Album.without_artist.with_pk(@id).must_equal @album
+    end
+
+  end
 end
 
 describe "Sequel::Plugins::AutoValidations" do
