@@ -88,5 +88,9 @@ describe "static_cache_cache plugin" do
     c = Class.new(Sequel::Model)
     c.plugin :static_cache_cache, @file
     c.instance_variable_get(:@static_cache_cache).keys.must_equal ['Bar', 'Foo', ['Bar', :a], ['Bar', :c]]
+
+    c.send(:sort_static_cache_hash, {"Foo"=>[], ["Bar", "baz"]=>[]}).keys.must_equal ["Foo", ["Bar", "baz"]]
+    c.send(:sort_static_cache_hash, {["Bar", "baz"]=>[], "Foo"=>[]}).keys.must_equal ["Foo", ["Bar", "baz"]]
+    c.send(:sort_static_cache_hash, {["Foo", "baz"]=>[], ["Bar", "bar"]=>[]}).keys.must_equal [["Bar", "bar"], ["Foo", "baz"]]
   end
 end

@@ -26,8 +26,18 @@ module Sequel
       module ClassMethods
         # Dump the in-memory cached rows to the cache file.
         def dump_static_cache_cache
-          static_cache_cache = {}
-          @static_cache_cache.sort do |a, b|
+          File.open(@static_cache_cache_file, 'wb'){|f| f.write(Marshal.dump(sort_static_cache_hash(@static_cache_cache)))}
+          nil
+        end
+
+        Plugins.inherited_instance_variables(self, :@static_cache_cache_file=>nil, :@static_cache_cache=>nil)
+
+        private
+
+        # Sort the given static cache hash in a deterministic way, so that 
+        # the same static cache values will result in the same marshal file.
+        def sort_static_cache_hash(cache)
+          cache = cache.sort do |a, b|
             a, = a
             b, = b
             if a.is_a?(Array)
@@ -47,16 +57,9 @@ module Sequel
             else
               a <=> b
             end
-          end.each do |k, v|
-            static_cache_cache[k] = v
           end
-          File.open(@static_cache_cache_file, 'wb'){|f| f.write(Marshal.dump(static_cache_cache))}
-          nil
+          Hash[cache]
         end
-
-        Plugins.inherited_instance_variables(self, :@static_cache_cache_file=>nil, :@static_cache_cache=>nil)
-
-        private
 
         # Load the rows for the model from the cache if available.
         # If not available, load the rows from the database, and
