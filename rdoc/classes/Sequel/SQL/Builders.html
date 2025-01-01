@@ -135,7 +135,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return an <code>SQL::Blob</code> that holds the same data as this string. Blobs provide proper escaping of binary data.  If given a blob, returns it directly.</p>
+<p>Return an <a href="Blob.html"><code>SQL::Blob</code></a> that holds the same data as this string. Blobs provide proper escaping of binary data.  If given a blob, returns it directly.</p>
 
 </div>
 <div class='source'>
@@ -160,7 +160,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return an <code>SQL::CaseExpression</code> created with the given arguments. The first argument are the <code>WHEN</code>/<code>THEN</code> conditions, specified as an array or a hash.  The second argument is the <code>ELSE</code> default value.  The third optional argument is the <code>CASE</code> expression.</p>
+<p>Return an <a href="CaseExpression.html"><code>SQL::CaseExpression</code></a> created with the given arguments. The first argument are the <code>WHEN</code>/<code>THEN</code> conditions, specified as an array or a hash.  The second argument is the <code>ELSE</code> default value.  The third optional argument is the <code>CASE</code> expression.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}, <span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN a THEN 1 ELSE 0 END</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}, <span class="ruby-value">0</span>, <span class="ruby-value">:b</span>) <span class="ruby-comment"># SQL: CASE b WHEN a THEN 1 ELSE 0 END</span>
@@ -212,7 +212,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default Integer type if none given), and return the result as a <code>NumericExpression</code>, so you can use the bitwise operators on the result.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default Integer type if none given), and return the result as a <a href="NumericExpression.html"><code>NumericExpression</code></a>, so you can use the bitwise operators on the result.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># CAST(a AS integer)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(a AS double precision)</span>
@@ -237,7 +237,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default String type if none given), and return the result as a <code>StringExpression</code>, so you can use + directly on the result for <a href="../SQL.html"><code>SQL</code></a> string concatenation.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default String type if none given), and return the result as a <a href="StringExpression.html"><code>StringExpression</code></a>, so you can use + directly on the result for <a href="../SQL.html"><code>SQL</code></a> string concatenation.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># CAST(a AS varchar(255))</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:text</span>) <span class="ruby-comment"># CAST(a AS text)</span>
@@ -473,7 +473,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Returns a <code>Sequel::SQL::Function</code> with the function name and the given arguments.</p>
+<p>Returns a <a href="Function.html"><code>Sequel::SQL::Function</code></a> with the function name and the given arguments.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:now</span>) <span class="ruby-comment"># SQL: now()</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:substr</span>, <span class="ruby-value">:a</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># SQL: substr(a, 1)</span>
@@ -498,7 +498,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return the argument wrapped as an <code>SQL::Identifier</code>.</p>
+<p>Return the argument wrapped as an <a href="Identifier.html"><code>SQL::Identifier</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># &quot;a&quot;</span>
 </pre>
@@ -522,7 +522,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Create a <code>BooleanExpression</code> case insensitive (if the database supports it) pattern match of the receiver with the given patterns.  See <code>SQL::StringExpression.like</code>.</p>
+<p>Create a <a href="BooleanExpression.html"><code>BooleanExpression</code></a> case insensitive (if the database supports it) pattern match of the receiver with the given patterns.  See <a href="StringExpression.html#method-c-like"><code>SQL::StringExpression.like</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span>
 </pre>
@@ -546,7 +546,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::StringExpression</code> representing an <a href="../SQL.html"><code>SQL</code></a> string made up of the concatenation of the given array’s elements.  If an argument is passed, it is used in between each element of the array in the <a href="../SQL.html"><code>SQL</code></a> concatenation.</p>
+<p>Return a <a href="StringExpression.html"><code>Sequel::SQL::StringExpression</code></a> representing an <a href="../SQL.html"><code>SQL</code></a> string made up of the concatenation of the given array’s elements.  If an argument is passed, it is used in between each element of the array in the <a href="../SQL.html"><code>SQL</code></a> concatenation.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-value">:a</span>]) <span class="ruby-comment"># SQL: a</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>]) <span class="ruby-comment"># SQL: a || b</span>
@@ -589,7 +589,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Create a <code>SQL::BooleanExpression</code> case sensitive (if the database supports it) pattern match of the receiver with the given patterns.  See <code>SQL::StringExpression.like</code>.</p>
+<p>Create a <a href="BooleanExpression.html"><code>SQL::BooleanExpression</code></a> case sensitive (if the database supports it) pattern match of the receiver with the given patterns.  See <a href="StringExpression.html#method-c-like"><code>SQL::StringExpression.like</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span>
 </pre>
@@ -613,7 +613,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Converts a string into a <code>Sequel::LiteralString</code>, in order to override string literalization, e.g.:</p>
+<p>Converts a string into a <a href="../LiteralString.html"><code>Sequel::LiteralString</code></a>, in order to override string literalization, e.g.:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">abc:</span> <span class="ruby-string">&#39;def&#39;</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt;</span>
   <span class="ruby-string">&quot;SELECT * FROM items WHERE (abc = &#39;def&#39;)&quot;</span>
@@ -622,7 +622,7 @@ Sequel::SQL::Builders
   <span class="ruby-string">&quot;SELECT * FROM items WHERE (abc = def)&quot;</span>
 </pre>
 
-<p>You can also provide arguments, to create a <code>Sequel::SQL::PlaceholderLiteralString</code>:</p>
+<p>You can also provide arguments, to create a <a href="PlaceholderLiteralString.html"><code>Sequel::SQL::PlaceholderLiteralString</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;DISTINCT ?&#39;</span>, <span class="ruby-value">:a</span>))}.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt;</span>
   <span class="ruby-string">&quot;SELECT count(DISTINCT a) FROM items&quot;</span>
@@ -655,7 +655,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from the condition specifier, matching none of the conditions.</p>
+<p>Return a <a href="BooleanExpression.html"><code>Sequel::SQL::BooleanExpression</code></a> created from the condition specifier, matching none of the conditions.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-value">a:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># SQL: a IS NOT TRUE</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>([[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]]) <span class="ruby-comment"># SQL: a IS NOT TRUE</span>
@@ -685,7 +685,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from the condition specifier, matching any of the conditions.</p>
+<p>Return a <a href="BooleanExpression.html"><code>Sequel::SQL::BooleanExpression</code></a> created from the condition specifier, matching any of the conditions.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-value">a:</span> <span class="ruby-keyword">true</span>) <span class="ruby-comment"># SQL: a IS TRUE</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>([[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]]) <span class="ruby-comment"># SQL: a IS TRUE</span>
@@ -741,7 +741,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return an <code>SQL::Subscript</code> with the given arguments, representing an <a href="../SQL.html"><code>SQL</code></a> array access.</p>
+<p>Return an <a href="Subscript.html"><code>SQL::Subscript</code></a> with the given arguments, representing an <a href="../SQL.html"><code>SQL</code></a> array access.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:array</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># array[1]</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:array</span>, <span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array[1, 2]</span>
@@ -794,7 +794,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Return a <code>SQL::ValueList</code> created from the given array.  Used if the array contains all two element arrays and you want it treated as an <a href="../SQL.html"><code>SQL</code></a> value list (IN predicate) instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
+<p>Return a <a href="ValueList.html"><code>SQL::ValueList</code></a> created from the given array.  Used if the array contains all two element arrays and you want it treated as an <a href="../SQL.html"><code>SQL</code></a> value list (IN predicate) instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>]<span class="ruby-operator">=&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1, 2), (3, 4))</span>
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1 = 2) AND (3 = 4))</span>

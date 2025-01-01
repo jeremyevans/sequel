@@ -106,7 +106,7 @@ Sequel::Dataset::NullDataset
 <div class='method public-instance' id='method-method-i-each'>
 <a name='method-i-each'></a>
 <div class='synopsis'>
-<span class='name'>each</span><span class='arguments'>()</span>
+<span class='name'>each</span><span class='arguments'>(&_)</span>
 
 </div>
 <div class='description'>
@@ -119,7 +119,7 @@ Sequel::Dataset::NullDataset
 [show source]
 </a>
 <pre id='method-i-each-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
-<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>
+<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">_</span>)
 <span class="line-num">67</span>   <span class="ruby-keyword">self</span>
 <span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
@@ -127,7 +127,7 @@ Sequel::Dataset::NullDataset
 <div class='method public-instance' id='method-method-i-fetch_rows'>
 <a name='method-i-fetch_rows'></a>
 <div class='synopsis'>
-<span class='name'>fetch_rows</span><span class='arguments'>(sql)</span>
+<span class='name'>fetch_rows</span><span class='arguments'>(sql, &_)</span>
 
 </div>
 <div class='description'>
@@ -140,7 +140,7 @@ Sequel::Dataset::NullDataset
 [show source]
 </a>
 <pre id='method-i-fetch_rows-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>
-<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>)
+<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">_</span>)
 <span class="line-num">72</span>   <span class="ruby-keyword">nil</span>
 <span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>

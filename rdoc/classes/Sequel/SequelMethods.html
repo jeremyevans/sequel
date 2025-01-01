@@ -53,7 +53,7 @@ Sequel::SequelMethods
 
 <p>All three timezones have getter and setter methods. You can set all three timezones to the same value at once via <code>Sequel.default_timezone=</code>.</p>
 
-<p>The only timezone values that are supported by default are <code>:utc</code> (convert to UTC), <code>:local</code> (convert to local time), and <code>nil</code> (don’t convert).  If you need to convert to a specific timezone, or need the timezones being used to change based on the environment (e.g. current user), you need to use the <code>named_timezones</code> extension (and use <code>DateTime</code> as the <code>datetime_class</code>). <a href="../Sequel.html"><code>Sequel</code></a> also ships with a <code>thread_local_timezones</code> extensions which allows each thread to have its own timezone values for each of the timezones.</p>
+<p>The only timezone values that are supported by default are <code>:utc</code> (convert to UTC), <code>:local</code> (convert to local time), and <code>nil</code> (don’t convert).  If you need to convert to a specific timezone, or need the timezones being used to change based on the environment (e.g. current user), you need to use the <code>named_timezones</code> extension (and use <code>DateTime</code> as the <a href="SequelMethods.html#attribute-i-datetime_class"><code>datetime_class</code></a>). <a href="../Sequel.html"><code>Sequel</code></a> also ships with a <code>thread_local_timezones</code> extensions which allows each thread to have its own timezone values for each of the timezones.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -266,12 +266,12 @@ Sequel::SequelMethods
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-value">adapter:</span> <span class="ruby-string">&#39;sqlite&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;./blog.db&#39;</span>)
 </pre>
 
-<p>If a block is given, it is passed the opened <code>Database</code> object, which is closed when the block exits.  For example:</p>
+<p>If a block is given, it is passed the opened <a href="Database.html"><code>Database</code></a> object, which is closed when the block exits.  For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}
 </pre>
 
-<p>If a block is not given, a reference to this database will be held in <code>Sequel::DATABASES</code> until it is removed manually.  This is by design, and used by <code>Sequel::Model</code> to pick the default database.  It is recommended to pass a block if you do not want the resulting <a href="Database.html"><code>Database</code></a> object to remain in memory until the process terminates, or use the <code>keep_reference: false</code> <a href="Database.html"><code>Database</code></a> option.</p>
+<p>If a block is not given, a reference to this database will be held in <code>Sequel::DATABASES</code> until it is removed manually.  This is by design, and used by <a href="Model.html"><code>Sequel::Model</code></a> to pick the default database.  It is recommended to pass a block if you do not want the resulting <a href="Database.html"><code>Database</code></a> object to remain in memory until the process terminates, or use the <code>keep_reference: false</code> <a href="Database.html"><code>Database</code></a> option.</p>
 
 <p>For details, see the <a href="../../files/doc/opening_databases_rdoc.html">“Connecting to a Database” guide</a>. To set up a primary/replica or sharded database connection, see the <a href="../../files/doc/sharding_rdoc.html">“Primary/Replica Database Configurations and Sharding” guide</a>.</p>
 
@@ -294,7 +294,7 @@ Sequel::SequelMethods
 </div>
 <div class='description'>
 
-<p>Convert the <code>exception</code> to the given class.  The given class should be <code>Sequel::Error</code> or a subclass.  Returns an instance of <code>klass</code> with the message and backtrace of <code>exception</code>.</p>
+<p>Convert the <code>exception</code> to the given class.  The given class should be <a href="Error.html"><code>Sequel::Error</code></a> or a subclass.  Returns an instance of <code>klass</code> with the message and backtrace of <code>exception</code>.</p>
 
 </div>
 <div class='source'>
@@ -362,7 +362,7 @@ Sequel::SequelMethods
 </div>
 <div class='description'>
 
-<p>Converts the given object from the given input timezone to the <code>application_timezone</code> using <code>convert_input_timestamp</code> and <code>convert_output_timestamp</code>.</p>
+<p>Converts the given object from the given input timezone to the <a href="SequelMethods.html#attribute-i-application_timezone"><code>application_timezone</code></a> using <code>convert_input_timestamp</code> and <a href="SequelMethods.html#method-i-convert_output_timestamp"><code>convert_output_timestamp</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -438,7 +438,7 @@ Sequel::SequelMethods
 </div>
 <div class='description'>
 
-<p>Convert the given object into an object of <code>Sequel.datetime_class</code> in the <code>application_timezone</code>.  Used when converting datetime/timestamp columns returned by the database.</p>
+<p>Convert the given object into an object of <code>Sequel.datetime_class</code> in the <a href="SequelMethods.html#attribute-i-application_timezone"><code>application_timezone</code></a>.  Used when converting datetime/timestamp columns returned by the database.</p>
 
 </div>
 <div class='source'>
@@ -827,7 +827,7 @@ Sequel::SequelMethods
 </div>
 <div class='description'>
 
-<p>Converts the given <code>string</code> into a <code>Sequel::SQLTime</code> object.</p>
+<p>Converts the given <code>string</code> into a <a href="SQLTime.html"><code>Sequel::SQLTime</code></a> object.</p>
 
 <pre class="ruby"><span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-string">&#39;10:20:30&#39;</span>) <span class="ruby-comment"># Sequel::SQLTime.parse(&#39;10:20:30&#39;)</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># =&gt; &#39;10:20:30&#39;</span>
@@ -951,7 +951,7 @@ Sequel::SequelMethods
 </div>
 <div class='description'>
 
-<p>Convert the given object into an object of <code>Sequel.datetime_class</code> in the <code>application_timezone</code>.  Used when typecasting values when assigning them to model datetime attributes.</p>
+<p>Convert the given object into an object of <code>Sequel.datetime_class</code> in the <a href="SequelMethods.html#attribute-i-application_timezone"><code>application_timezone</code></a>.  Used when typecasting values when assigning them to model datetime attributes.</p>
 
 </div>
 <div class='source'>
@@ -972,7 +972,7 @@ Sequel::SequelMethods
 </div>
 <div class='description'>
 
-<p>If the supplied block takes a single argument, yield an <code>SQL::VirtualRow</code> instance to the block argument.  Otherwise, evaluate the block in the context of a <code>SQL::VirtualRow</code> instance.</p>
+<p>If the supplied block takes a single argument, yield an <a href="SQL/VirtualRow.html"><code>SQL::VirtualRow</code></a> instance to the block argument.  Otherwise, evaluate the block in the context of a <a href="SQL/VirtualRow.html"><code>SQL::VirtualRow</code></a> instance.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">a</span>} <span class="ruby-comment"># Sequel::SQL::Identifier.new(:a)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>} <span class="ruby-comment"># Sequel::SQL::Function.new(:a)</span>

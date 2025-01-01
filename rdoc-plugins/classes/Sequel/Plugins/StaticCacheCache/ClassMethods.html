@@ -65,13 +65,9 @@ Sequel::Plugins::StaticCacheCache::ClassMethods
 </a>
 <pre id='method-i-dump_static_cache_cache-source'>   <span class="ruby-comment"># File lib/sequel/plugins/static_cache_cache.rb</span>
 <span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_static_cache_cache</span>
-<span class="line-num">29</span>   <span class="ruby-identifier">static_cache_cache</span> = {}
-<span class="line-num">30</span>   <span class="ruby-ivar">@static_cache_cache</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
-<span class="line-num">31</span>     <span class="ruby-identifier">static_cache_cache</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>
-<span class="line-num">32</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">33</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-ivar">@static_cache_cache_file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">static_cache_cache</span>))}
-<span class="line-num">34</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">29</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-ivar">@static_cache_cache_file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">sort_static_cache_hash</span>(<span class="ruby-ivar">@static_cache_cache</span>)))}
+<span class="line-num">30</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">31</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

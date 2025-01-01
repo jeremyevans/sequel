@@ -51,7 +51,7 @@ Last Update:
 
 <pre>sequel -m path/to/migrations postgres://host/database</pre>
 
-<p>Migrations in <a href="../../classes/Sequel.html"><code>Sequel</code></a> use a DSL via the <code>Sequel.migration</code> method, and inside the DSL, use the <code>Sequel::Database</code> schema modification methods such as <code>create_table</code> and <code>alter_table</code>. See the <a href="schema_modification_rdoc.html">schema modification guide</a> for details on the schema modification methods you can use.</p>
+<p>Migrations in <a href="../../classes/Sequel.html"><code>Sequel</code></a> use a DSL via the <a href="../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> method, and inside the DSL, use the <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> schema modification methods such as <code>create_table</code> and <code>alter_table</code>. See the <a href="schema_modification_rdoc.html">schema modification guide</a> for details on the schema modification methods you can use.</p>
 
 <h2 id="label-A+Basic+Migration">A Basic Migration<span><a href="#label-A+Basic+Migration">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -157,7 +157,7 @@ Last Update:
 
 <p>This migration adds a <code>location</code> column to the <code>artists</code> table, and sets the <code>location</code> column to <code>&#39;Sacramento&#39;</code> for all existing artists.  It doesn’t use a default on the column, because future artists should not be assumed to come from Sacramento.  In the <code>down</code> block, it just drops the <code>location</code> column from the <code>artists</code> table, reversing the actions of the up block.</p>
 
-<p>Note that when updating the <code>artists</code> table in the update, a plain dataset is used, <code>from(:artists)</code>. This may look a little strange, but you need to be aware that inside an up or <code>down</code> block in a migration, self always refers to the <code>Sequel::Database</code> object that the migration is being applied to. Since <code>Database#from</code> creates datasets, using <code>from(:artists)</code> inside the <code>up</code> block creates a dataset on the database representing all columns in the <code>artists</code> table, and updates it to set the <code>location</code> column to <code>&#39;Sacramento&#39;</code>.  You should avoid referencing the <code>Sequel::Database</code> object directly in your migration, and always use self to reference it, otherwise you may run into problems.</p>
+<p>Note that when updating the <code>artists</code> table in the update, a plain dataset is used, <code>from(:artists)</code>. This may look a little strange, but you need to be aware that inside an up or <code>down</code> block in a migration, self always refers to the <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object that the migration is being applied to. Since <code>Database#from</code> creates datasets, using <code>from(:artists)</code> inside the <code>up</code> block creates a dataset on the database representing all columns in the <code>artists</code> table, and updates it to set the <code>location</code> column to <code>&#39;Sacramento&#39;</code>.  You should avoid referencing the <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object directly in your migration, and always use self to reference it, otherwise you may run into problems.</p>
 
 <h2 id="label-The+migration+extension">The <code>migration</code> extension<span><a href="#label-The+migration+extension">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -170,7 +170,7 @@ Last Update:
 
 <h2 id="label-Schema+methods">Schema methods<span><a href="#label-Schema+methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Migrations themselves do not contain any schema modification methods, but they make it easy to call any of the <code>Sequel::Database</code> modification methods, of which there are many.  The main ones are <code>create_table</code> and <code>alter_table</code>, but <a href="../../classes/Sequel.html"><code>Sequel</code></a> also comes with numerous other schema modification methods, most of which are shortcuts for <code>alter_table</code> (all of these methods are described in more detail in the <a href="schema_modification_rdoc.html">schema modification guide</a>):</p>
+<p>Migrations themselves do not contain any schema modification methods, but they make it easy to call any of the <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> modification methods, of which there are many.  The main ones are <code>create_table</code> and <code>alter_table</code>, but <a href="../../classes/Sequel.html"><code>Sequel</code></a> also comes with numerous other schema modification methods, most of which are shortcuts for <code>alter_table</code> (all of these methods are described in more detail in the <a href="schema_modification_rdoc.html">schema modification guide</a>):</p>
 <ul><li>
 <p>add_column</p>
 </li><li>
@@ -297,7 +297,7 @@ Last Update:
 <pre class="ruby"><span class="ruby-identifier">version_name</span>.<span class="ruby-identifier">rb</span>
 </pre>
 
-<p>where <code>version</code> is an integer and <code>name</code> is a string which should be a very brief description of what the migration does.  Each migration class should contain 1 and only 1 call to <code>Sequel.migration</code>.</p>
+<p>where <code>version</code> is an integer and <code>name</code> is a string which should be a very brief description of what the migration does.  Each migration class should contain 1 and only 1 call to <a href="../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a>.</p>
 
 <h3 id="label-IntegerMigrator+Filenames"><code>IntegerMigrator</code> Filenames<span><a href="#label-IntegerMigrator+Filenames">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
@@ -375,7 +375,7 @@ Last Update:
 
 <h2 id="label-Creating+a+migration">Creating a migration<span><a href="#label-Creating+a+migration">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> doesn’t come with generators that create migrations for you.  However, creating a migration is as simple as creating a file with the appropriate filename in your migrations directory that contains a <code>Sequel.migration</code> call.  The minimal do-nothing migration is:</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> doesn’t come with generators that create migrations for you.  However, creating a migration is as simple as creating a file with the appropriate filename in your migrations directory that contains a <a href="../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> call.  The minimal do-nothing migration is:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span>{}
 </pre>
@@ -431,7 +431,7 @@ Last Update:
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>Note that the operations performed in the <code>down</code> block are performed in the reverse order of how they are performed in the <code>up</code> block.  Also note how it isn’t always possible to reverse exactly what was done in the <code>up</code> block.  You should try to do so as much as possible, but if you can’t, you may want to have your <code>down</code> block raise a <code>Sequel::Error</code> exception saying why the migration cannot be reverted.</p>
+<p>Note that the operations performed in the <code>down</code> block are performed in the reverse order of how they are performed in the <code>up</code> block.  Also note how it isn’t always possible to reverse exactly what was done in the <code>up</code> block.  You should try to do so as much as possible, but if you can’t, you may want to have your <code>down</code> block raise a <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> exception saying why the migration cannot be reverted.</p>
 
 <h2 id="label-Running+migrations">Running migrations<span><a href="#label-Running+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -532,7 +532,7 @@ sequel -m db/migrations -M 20100510 postgres://host/database</pre>
 
 <h2 id="label-Old-style+migration+classes">Old-style migration classes<span><a href="#label-Old-style+migration+classes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Before the <code>Sequel.migration</code> DSL was introduced, <a href="../../classes/Sequel.html"><code>Sequel</code></a> used classes for Migrations:</p>
+<p>Before the <a href="../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> DSL was introduced, <a href="../../classes/Sequel.html"><code>Sequel</code></a> used classes for Migrations:</p>
 
 <pre class="ruby"><span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migration</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">up</span>
@@ -552,7 +552,7 @@ sequel -m db/migrations -M 20100510 postgres://host/database</pre>
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>This usage is discouraged in new code, but will continue to be supported indefinitely. It is not recommended to convert old-style migration classes to the <code>Sequel.migration</code> DSL, but it is recommended to use the <code>Sequel.migration</code> DSL for all new migrations.</p>
+<p>This usage is discouraged in new code, but will continue to be supported indefinitely. It is not recommended to convert old-style migration classes to the <a href="../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> DSL, but it is recommended to use the <a href="../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> DSL for all new migrations.</p>
 
 <h2 id="label-Database-specific+migrations">Database-specific migrations<span><a href="#label-Database-specific+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 

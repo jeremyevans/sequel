@@ -57,7 +57,7 @@ Sequel::SQL::StringMethods
 </div>
 <div class='description'>
 
-<p>Create a <code>EscapedLikeExpression</code> case insensitive pattern match of the receiver with the patterns, interpolated escaped values for each +?+ placeholder in the pattern.</p>
+<p>Create a <a href="EscapedLikeExpression.html"><code>EscapedLikeExpression</code></a> case insensitive pattern match of the receiver with the patterns, interpolated escaped values for each +?+ placeholder in the pattern.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">escaped_ilike</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-string">&#39;A&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span>
 <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">escaped_ilike</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-string">&#39;%A&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;\%A%&#39; ESCAPE &#39;\&#39;</span>
@@ -82,7 +82,7 @@ Sequel::SQL::StringMethods
 </div>
 <div class='description'>
 
-<p>Create a <code>EscapedLikeExpression</code> case sensitive pattern match of the receiver with the patterns, interpolated escaped values for each +?+ placeholder in the pattern.</p>
+<p>Create a <a href="EscapedLikeExpression.html"><code>EscapedLikeExpression</code></a> case sensitive pattern match of the receiver with the patterns, interpolated escaped values for each +?+ placeholder in the pattern.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-string">&#39;A&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span>
 <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-string">&#39;%A&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;\%A%&#39; ESCAPE &#39;\&#39;</span>

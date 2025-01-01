@@ -55,9 +55,9 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><code>Sequel::Model</code> is an object relational mapper built on top of <a href="../Sequel.html"><code>Sequel</code></a> core.  Each model class is backed by a dataset instance, and many dataset methods can be called directly on the class.  <a href="Model.html"><code>Model</code></a> datasets return rows as model instances, which are wrappers around the underlying hash that allow easily updating or deleting the individual row.</p>
+<p><a href="Model.html"><code>Sequel::Model</code></a> is an object relational mapper built on top of <a href="../Sequel.html"><code>Sequel</code></a> core.  Each model class is backed by a dataset instance, and many dataset methods can be called directly on the class.  <a href="Model.html"><code>Model</code></a> datasets return rows as model instances, which are wrappers around the underlying hash that allow easily updating or deleting the individual row.</p>
 
-<p><code>Sequel::Model</code> is built completely out of plugins.  <a href="Plugins.html"><code>Plugins</code></a> can override any class, instance, or dataset method defined by a previous plugin and call super to get the default behavior.  By default, <code>Sequel::Model</code> loads two plugins, <code>Sequel::Model</code> (which is itself a plugin) for the base support, and <code>Sequel::Model::Associations</code> for the associations support.</p>
+<p><a href="Model.html"><code>Sequel::Model</code></a> is built completely out of plugins.  <a href="Plugins.html"><code>Plugins</code></a> can override any class, instance, or dataset method defined by a previous plugin and call super to get the default behavior.  By default, <a href="Model.html"><code>Sequel::Model</code></a> loads two plugins, <a href="Model.html"><code>Sequel::Model</code></a> (which is itself a plugin) for the base support, and <a href="Model/Associations.html"><code>Sequel::Model::Associations</code></a> for the associations support.</p>
 
 <p>You can set the <code>SEQUEL_NO_ASSOCIATIONS</code> constant or environment variable to make <a href="../Sequel.html"><code>Sequel</code></a> not load the associations plugin by default.</p>
 </div>

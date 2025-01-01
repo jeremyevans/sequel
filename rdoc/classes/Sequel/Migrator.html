@@ -40,7 +40,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The <code>Migrator</code> class performs migrations based on migration files in a specified directory. The migration files should be named using the following pattern:</p>
+<p>The <a href="Migrator.html"><code>Migrator</code></a> class performs migrations based on migration files in a specified directory. The migration files should be named using the following pattern:</p>
 
 <pre>&lt;version&gt;_&lt;title&gt;.rb</pre>
 
@@ -54,9 +54,9 @@ Superclass:
 <pre>1273253850_create_sessions.rb
 1273257248_add_data_column.rb</pre>
 
-<p>If any migration filenames use timestamps as version numbers, <a href="../Sequel.html"><code>Sequel</code></a> uses the <code>TimestampMigrator</code> to migrate, otherwise it uses the <code>IntegerMigrator</code>. The <code>TimestampMigrator</code> can handle migrations that are run out of order as well as migrations with the same timestamp, while the <code>IntegerMigrator</code> is more strict and raises exceptions for missing or duplicate migration files.</p>
+<p>If any migration filenames use timestamps as version numbers, <a href="../Sequel.html"><code>Sequel</code></a> uses the <a href="TimestampMigrator.html"><code>TimestampMigrator</code></a> to migrate, otherwise it uses the <a href="IntegerMigrator.html"><code>IntegerMigrator</code></a>. The <a href="TimestampMigrator.html"><code>TimestampMigrator</code></a> can handle migrations that are run out of order as well as migrations with the same timestamp, while the <a href="IntegerMigrator.html"><code>IntegerMigrator</code></a> is more strict and raises exceptions for missing or duplicate migration files.</p>
 
-<p>The migration files should contain either one <code>Migration</code> subclass or one <code>Sequel.migration</code> call.</p>
+<p>The migration files should contain either one <a href="Migration.html"><code>Migration</code></a> subclass or one <a href="../Sequel.html#method-c-migration"><code>Sequel.migration</code></a> call.</p>
 
 <p>Migrations are generally run via the sequel command line tool, using the -m and -M switches.  The -m switch specifies the migration directory, and the -M switch specifies the version to which to migrate.</p>
 
@@ -123,7 +123,7 @@ Superclass:
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MIGRATION_FILE_PATTERN</td>
 <td>=</td>
-<td class='context-item-value'>/\A(\d+)_.+\.rb\z/i.freeze</td>
+<td class='context-item-value'>/\A(\d+)_(.+)\.rb\z/i.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>

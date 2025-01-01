@@ -47,7 +47,7 @@ Last Update:
 
 <h2 id="label-Basic+Usage">Basic Usage<span><a href="#label-Basic+Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p><code>Sequel::Model</code> uses instance methods for hooks.  To define a hook on a model, you just add an instance method to the model class:</p>
+<p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses instance methods for hooks.  To define a hook on a model, you just add an instance method to the model class:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_create</span>
@@ -208,7 +208,7 @@ Last Update:
 
 <h2 id="label-Canceling+Actions+in+Hooks">Canceling Actions in Hooks<span><a href="#label-Canceling+Actions+in+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Sometimes want to cancel an action in a before hook, so the action is not performed.  For example, you may want to not allow destroying or saving a record in certain cases.  In those cases, you can call <code>cancel_action</code> inside the <code>before_*</code> hook, which will stop processing the hook and will either raise a <code>Sequel::HookFailed</code> exception (the default), or return <code>nil</code> if <code>raise_on_save_failure</code> is <code>false</code>).  You can use this to implement validation-like behavior, that will run even if validations are skipped:</p>
+<p>Sometimes want to cancel an action in a before hook, so the action is not performed.  For example, you may want to not allow destroying or saving a record in certain cases.  In those cases, you can call <code>cancel_action</code> inside the <code>before_*</code> hook, which will stop processing the hook and will either raise a <a href="../../classes/Sequel/HookFailed.html"><code>Sequel::HookFailed</code></a> exception (the default), or return <code>nil</code> if <code>raise_on_save_failure</code> is <code>false</code>).  You can use this to implement validation-like behavior, that will run even if validations are skipped:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>
@@ -248,7 +248,7 @@ Last Update:
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>Just remember to call <code>super</code> whenever you override the method in a subclass.  Note that <code>super</code> is also used when overriding the hook in <code>Sequel::Model</code> itself.  This is important as if you add any plugins to <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself, if you override a hook in <code>Sequel::Model</code> and do not call <code>super</code>, the plugin may not work correctly.</p>
+<p>Just remember to call <code>super</code> whenever you override the method in a subclass.  Note that <code>super</code> is also used when overriding the hook in <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself.  This is important as if you add any plugins to <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself, if you override a hook in <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> and do not call <code>super</code>, the plugin may not work correctly.</p>
 
 <p>If you don’t want all classes to use the same hook, but want to reuse hooks in multiple classes, you should use a plugin or a simple module:</p>
 

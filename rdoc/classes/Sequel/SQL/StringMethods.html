@@ -36,7 +36,7 @@ Sequel::SQL::StringMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes the <code>like</code> and <code>ilike</code> methods used for pattern matching that are defined on objects that can be used in a string context in <a href="../SQL.html"><code>SQL</code></a> (<code>Symbol</code>, <code>LiteralString</code>, <code>SQL::GenericExpression</code>).</p>
+<p>This module includes the <code>like</code> and <code>ilike</code> methods used for pattern matching that are defined on objects that can be used in a string context in <a href="../SQL.html"><code>SQL</code></a> (<code>Symbol</code>, <a href="../LiteralString.html"><code>LiteralString</code></a>, <a href="GenericExpression.html"><code>SQL::GenericExpression</code></a>).</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -59,7 +59,7 @@ Sequel::SQL::StringMethods
 </div>
 <div class='description'>
 
-<p>Create a <code>BooleanExpression</code> case insensitive pattern match of the receiver with the given patterns.  See <code>StringExpression.like</code>.</p>
+<p>Create a <a href="BooleanExpression.html"><code>BooleanExpression</code></a> case insensitive pattern match of the receiver with the given patterns.  See <a href="StringExpression.html#method-c-like"><code>StringExpression.like</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">ilike</span>(<span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span>
 </pre>
@@ -83,7 +83,7 @@ Sequel::SQL::StringMethods
 </div>
 <div class='description'>
 
-<p>Create a <code>BooleanExpression</code> case sensitive (if the database supports it) pattern match of the receiver with the given patterns.  See <code>StringExpression.like</code>.</p>
+<p>Create a <a href="BooleanExpression.html"><code>BooleanExpression</code></a> case sensitive (if the database supports it) pattern match of the receiver with the given patterns.  See <a href="StringExpression.html#method-c-like"><code>StringExpression.like</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span>
 </pre>

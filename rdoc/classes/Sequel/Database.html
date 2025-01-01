@@ -414,7 +414,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Method that should be used when submitting any DDL (Data Definition Language) <a href="SQL.html"><code>SQL</code></a>, such as <code>create_table</code>.  By default, calls <code>execute_dui</code>. This method should not be called directly by user code.</p>
+<p>Method that should be used when submitting any DDL (Data Definition Language) <a href="SQL.html"><code>SQL</code></a>, such as <a href="Database.html#method-i-create_table"><code>create_table</code></a>.  By default, calls <a href="Database.html#method-i-execute_dui"><code>execute_dui</code></a>. This method should not be called directly by user code.</p>
 
 </div>
 <div class='source'>
@@ -734,7 +734,7 @@ Superclass:
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:items</span>, <span class="ruby-value">:category</span>, <span class="ruby-constant">String</span>, <span class="ruby-value">default:</span> <span class="ruby-string">&#39;ruby&#39;</span>
 </pre>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -768,7 +768,7 @@ Superclass:
 <p>Name to use for index instead of default</p>
 </td></tr></tbody></table>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -808,9 +808,9 @@ Superclass:
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>Note that <code>add_column</code> accepts all the options available for column definitions using <code>create_table</code>, and <code>add_index</code> accepts all the options available for index definition.</p>
+<p>Note that <a href="Database.html#method-i-add_column"><code>add_column</code></a> accepts all the options available for column definitions using <a href="Database.html#method-i-create_table"><code>create_table</code></a>, and <a href="Database.html#method-i-add_index"><code>add_index</code></a> accepts all the options available for index definition.</p>
 
-<p>See <code>Schema::AlterTableGenerator</code> and the <a href="../../files/doc/migration_rdoc.html">Migrations guide</a>.</p>
+<p>See <a href="Schema/AlterTableGenerator.html"><code>Schema::AlterTableGenerator</code></a> and the <a href="../../files/doc/migration_rdoc.html">Migrations guide</a>.</p>
 
 </div>
 <div class='source'>
@@ -1060,7 +1060,7 @@ Superclass:
 <p>Create a WITHOUT ROWID table. Every row in SQLite has a special ‘rowid’ column, that uniquely identifies that row within the table. If this option is used, the ‘rowid’ column is omitted, which can sometimes provide some space and speed advantages. Note that you must then provide an explicit primary key when you create the table. This option is supported on SQLite 3.8.2+.</p>
 </td></tr></tbody></table>
 
-<p>See <code>Schema::CreateTableGenerator</code> and the <a href="../../files/doc/schema_modification_rdoc.html">“Schema Modification” guide</a>.</p>
+<p>See <a href="Schema/CreateTableGenerator.html"><code>Schema::CreateTableGenerator</code></a> and the <a href="../../files/doc/schema_modification_rdoc.html">“Schema Modification” guide</a>.</p>
 
 </div>
 <div class='source'>
@@ -1240,7 +1240,7 @@ Superclass:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_column</span> <span class="ruby-value">:items</span>, <span class="ruby-value">:category</span>
 </pre>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -1267,7 +1267,7 @@ Superclass:
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_index</span> <span class="ruby-value">:posts</span>, [<span class="ruby-value">:author</span>, <span class="ruby-value">:title</span>]
 </pre>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -1430,7 +1430,7 @@ Superclass:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_column</span> <span class="ruby-value">:items</span>, <span class="ruby-value">:cntr</span>, <span class="ruby-value">:counter</span>
 </pre>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -1484,7 +1484,7 @@ Superclass:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">set_column_default</span> <span class="ruby-value">:items</span>, <span class="ruby-value">:category</span>, <span class="ruby-string">&#39;perl!&#39;</span>
 </pre>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -1510,7 +1510,7 @@ Superclass:
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:items</span>, <span class="ruby-value">:price</span>, <span class="ruby-value">:float</span>
 </pre>
 
-<p>See <code>alter_table</code>.</p>
+<p>See <a href="Database.html#method-i-alter_table"><code>alter_table</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -1933,7 +1933,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Returns the scheme symbol for this instance’s class, which reflects which adapter is being used.  In some cases, this can be the same as the <code>database_type</code> (for native adapters), in others (i.e. adapters with subadapters), it will be different.</p>
+<p>Returns the scheme symbol for this instance’s class, which reflects which adapter is being used.  In some cases, this can be the same as the <a href="Database.html#method-i-database_type"><code>database_type</code></a> (for native adapters), in others (i.e. adapters with subadapters), it will be different.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgres://...&#39;</span>).<span class="ruby-identifier">adapter_scheme</span>
 <span class="ruby-comment"># =&gt; :jdbc</span>

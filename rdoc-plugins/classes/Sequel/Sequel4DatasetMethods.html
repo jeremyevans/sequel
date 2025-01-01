@@ -137,7 +137,7 @@ Sequel::Sequel4DatasetMethods
 </div>
 <div class='description'>
 
-<p>Returns a <code>Range</code> instance made from the minimum and maximum values for the given column/expression.  Uses a virtual row block if no argument is given.</p>
+<p>Returns a <a href="../Range.html"><code>Range</code></a> instance made from the minimum and maximum values for the given column/expression.  Uses a virtual row block if no argument is given.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">range</span>(<span class="ruby-value">:id</span>) <span class="ruby-comment"># SELECT max(id) AS v1, min(id) AS v2 FROM table LIMIT 1</span>
 <span class="ruby-comment"># =&gt; 1..10</span>

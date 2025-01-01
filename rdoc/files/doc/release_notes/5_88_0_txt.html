@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.88.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.88.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.88.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2025-01-01 09:18:34 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A subset_static_cache plugin has been added, for statically caching subsets of a model class.  This is useful for cases where only a subset of the model class is static. For example, with this code:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">StatusType</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">where</span> <span class="ruby-value">:available</span>, <span class="ruby-value">hidden:</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">cache_subset</span> <span class="ruby-value">:available</span>
+ <span class="ruby-keyword">end</span>
+</pre>
+
+<p>The following methods will use the cache and not issue a database query:</p>
+<ul><li>
+<p>StatusType.available.with_pk</p>
+</li><li>
+<p>StatusType.available.all</p>
+</li><li>
+<p>StatusType.available.each</p>
+</li><li>
+<p>StatusType.available.first (without block, only supporting no arguments or single integer argument)</p>
+</li><li>
+<p>StatusType.available.count (without an argument or block)</p>
+</li><li>
+<p>StatusType.available.map</p>
+</li><li>
+<p>StatusType.available.as_hash</p>
+</li><li>
+<p>StatusType.available.to_hash</p>
+</li><li>
+<p>StatusType.available.to_hash_groups</p>
+</li></ul>
+
+<p>The static_cache_cache plugin has been updated to statically cache these subsets, avoiding a query to get the static values when cache_subset is called.</p>
+</li><li>
+<p>On PostgreSQL, column aliases now support data types, which is useful when selecting from functions returning records, such as the jsonb_to_record/jsonb_to_recordset function:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">jsonb_to_recordset</span>(<span class="ruby-value">:value</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:d</span>, [[<span class="ruby-value">:a</span>, <span class="ruby-constant">Integer</span>], [<span class="ruby-value">:e</span>, <span class="ruby-constant">String</span>]])}
+<span class="ruby-comment"># SELECT * FROM jsonb_to_recordset(&quot;value&quot;) AS &quot;d&quot;(&quot;a&quot; integer, &quot;e&quot; text)</span>
+</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> class-level methods that call dataset methods can now be overridden by defining singleton methods on the class, and using super to get the default behavior (similar to how column and association methods work).</p>
+</li><li>
+<p>The timestamp migrator now has deterministic behavior when multiple migrations have the same version, using a lexicographic sort of the rest of the migration filename to break ties.</p>
+</li><li>
+<p>Explicit block parameters are now used in some methods, allowing the test suite to run without warnings when using -W:strict_unused_block on Ruby 3.4.</p>
+</li><li>
+<p>A consistent instance variable setting order is now used in the string_agg extension to avoid shape-related performance warnings.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

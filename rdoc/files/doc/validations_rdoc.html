@@ -61,13 +61,13 @@ Last Update:
 
 <h2 id="label-Usage">Usage<span><a href="#label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Regardless of whether you are using validations for data integrity or just for error messages, the usage is the same.  Whenever you attempt to save a model instance, before sending the INSERT or UPDATE query to the database, <code>Sequel::Model</code> will attempt to validate the instance by calling <code>validate</code>.  If <code>validate</code> does not add any errors to the object, the object is considered valid, and <code>valid?</code> will return true.  If <code>validate</code> adds any errors to the object, <code>valid?</code> will return false, and the save will either raise a <code>Sequel::ValidationFailed</code> exception (the default), or return nil (if <code>raise_on_save_failure</code> is false).</p>
+<p>Regardless of whether you are using validations for data integrity or just for error messages, the usage is the same.  Whenever you attempt to save a model instance, before sending the INSERT or UPDATE query to the database, <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> will attempt to validate the instance by calling <code>validate</code>.  If <code>validate</code> does not add any errors to the object, the object is considered valid, and <code>valid?</code> will return true.  If <code>validate</code> adds any errors to the object, <code>valid?</code> will return false, and the save will either raise a <a href="../../classes/Sequel/ValidationFailed.html"><code>Sequel::ValidationFailed</code></a> exception (the default), or return nil (if <code>raise_on_save_failure</code> is false).</p>
 
 <p>By validating the object before sending the database query, <a href="../../classes/Sequel.html"><code>Sequel</code></a> attempts to ensure that invalid objects are not saved in the database.  However, if you are not enforcing the same validations in the database via constraints, it’s possible that invalid data can get added to the database via some other method. This leads to odd cases such as retrieving a model object from the database, not making any changes to it, attempting to save it, and having the save raise an error.</p>
 
 <h2 id="label-Skipping+Validations">Skipping Validations<span><a href="#label-Skipping+Validations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p><code>Sequel::Model</code> uses the <code>save</code> method to save model objects, and all saving of model objects passes through the <code>save</code> method.  This means that all saving of model objects goes through the validation process.</p>
+<p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses the <code>save</code> method to save model objects, and all saving of model objects passes through the <code>save</code> method.  This means that all saving of model objects goes through the validation process.</p>
 
 <p>The only way to skip validations when saving a model object is to pass the <code>validate: false</code> option to <code>save</code>. If you use that option, <code>save</code> will not attempt to validate the object before saving it.</p>
 
@@ -75,7 +75,7 @@ Last Update:
 
 <h2 id="label-valid-3F+and+validate"><code>valid?</code> and <code>validate</code><span><a href="#label-valid-3F+and+validate">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p><code>Sequel::Model</code> uses the <code>valid?</code> method to check whether or not a model instance is valid.  This method should not be overridden.  Instead, the <code>validate</code> method should be overridden to add validations to the model:</p>
+<p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses the <code>valid?</code> method to check whether or not a model instance is valid.  This method should not be overridden.  Instead, the <code>validate</code> method should be overridden to add validations to the model:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
@@ -89,7 +89,7 @@ Last Update:
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># true</span>
 </pre>
 
-<p>If the <code>valid?</code> method returns false, you can call the <code>errors</code> method to get an instance of <code>Sequel::Model::Errors</code> describing the errors on the model:</p>
+<p>If the <code>valid?</code> method returns false, you can call the <code>errors</code> method to get an instance of <a href="../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a> describing the errors on the model:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>
 <span class="ruby-comment"># =&gt; #&lt;Album @values={}&gt;</span>
@@ -99,7 +99,7 @@ Last Update:
 <span class="ruby-comment"># =&gt; {:name=&gt;[&quot;cannot be empty&quot;]}</span>
 </pre>
 
-<p>You may notice that the <code>errors</code> method appears to return a hash.  That’s because <code>Sequel::Model::Errors</code> is a subclass of Hash.</p>
+<p>You may notice that the <code>errors</code> method appears to return a hash.  That’s because <a href="../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a> is a subclass of Hash.</p>
 
 <p>Note that calling the <code>errors</code> method before the <code>valid?</code> method will result in an <code>errors</code> being empty:</p>
 
@@ -109,11 +109,11 @@ Last Update:
 
 <p>So just remember that you shouldn’t check <code>errors</code> until after you call <code>valid?</code>.</p>
 
-<p><code>Sequel::Model::Errors</code> has some helper methods that make it easy to get an array of all of the instance’s errors, or for checking for errors on a specific attribute.  These will be covered later in this guide.</p>
+<p><a href="../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a> has some helper methods that make it easy to get an array of all of the instance’s errors, or for checking for errors on a specific attribute.  These will be covered later in this guide.</p>
 
 <h2 id="label-validation_helpers"><code>validation_helpers</code><span><a href="#label-validation_helpers">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>While <code>Sequel::Model</code> does provide a validations framework, it does not define any built-in validation helper methods that you can call.  However, <a href="../../classes/Sequel.html"><code>Sequel</code></a> ships with a plugin called <code>validation_helpers</code> that handles most basic validation needs.  So instead of specifying validations like this:</p>
+<p>While <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> does provide a validations framework, it does not define any built-in validation helper methods that you can call.  However, <a href="../../classes/Sequel.html"><code>Sequel</code></a> ships with a plugin called <code>validation_helpers</code> that handles most basic validation needs.  So instead of specifying validations like this:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
@@ -492,7 +492,7 @@ Last Update:
 
 <h2 id="label-Setting+Validations+for+All+Models">Setting Validations for All Models<span><a href="#label-Setting+Validations+for+All+Models">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Let’s say you want to add some default validations that apply to all of your model classes.  It’s fairly easy to do by overriding the <code>validate</code> method in <code>Sequel::Model</code>, adding some validations to it, and if you override <code>validate</code> in your model classes, just make sure to call <code>super</code>.</p>
+<p>Let’s say you want to add some default validations that apply to all of your model classes.  It’s fairly easy to do by overriding the <code>validate</code> method in <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>, adding some validations to it, and if you override <code>validate</code> in your model classes, just make sure to call <code>super</code>.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_columns</span>
@@ -518,11 +518,11 @@ Last Update:
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>If you forget to call <code>super</code>, the validations that you defined in <code>Sequel::Model</code> will not be enforced.  It’s a good idea to call super whenever you override one of <code>Sequel::Model</code>‘s methods, unless you specifically do not want the default behavior.</p>
+<p>If you forget to call <code>super</code>, the validations that you defined in <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> will not be enforced.  It’s a good idea to call super whenever you override one of <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>‘s methods, unless you specifically do not want the default behavior.</p>
 
-<h2 id="label-Sequel-3A-3AModel-3A-3AErrors"><code>Sequel::Model::Errors</code><span><a href="#label-Sequel-3A-3AModel-3A-3AErrors">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sequel-3A-3AModel-3A-3AErrors"><a href="../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a><span><a href="#label-Sequel-3A-3AModel-3A-3AErrors">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>As mentioned earlier, <code>Sequel::Model::Errors</code> is a subclass of Hash with a few special methods, the most common of which are described here:</p>
+<p>As mentioned earlier, <a href="../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a> is a subclass of Hash with a few special methods, the most common of which are described here:</p>
 
 <h3 id="label-add"><code>add</code><span><a href="#label-add">&para;</a> <a href="#top">&uarr;</a></span></h3>
 

@@ -40,18 +40,18 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The purpose of the <code>VirtualRow</code> class is to allow the easy creation of <a href="../SQL.html"><code>SQL</code></a> identifiers and functions, in a way that leads to more compact code.</p>
+<p>The purpose of the <a href="VirtualRow.html"><code>VirtualRow</code></a> class is to allow the easy creation of <a href="../SQL.html"><code>SQL</code></a> identifiers and functions, in a way that leads to more compact code.</p>
 
-<p>An instance of this class is yielded to the block supplied to <code>Dataset#where</code>, <code>Dataset#order</code>, and <code>Dataset#select</code> (and the other methods that accept a block and pass it to one of those methods). If the block doesn’t take an argument, the block is instance_execed in the context of an instance of this class.</p>
+<p>An instance of this class is yielded to the block supplied to <a href="../Dataset.html#method-i-where"><code>Dataset#where</code></a>, <a href="../Dataset.html#method-i-order"><code>Dataset#order</code></a>, and <a href="../Dataset.html#method-i-select"><code>Dataset#select</code></a> (and the other methods that accept a block and pass it to one of those methods). If the block doesn’t take an argument, the block is instance_execed in the context of an instance of this class.</p>
 
-<p><code>VirtualRow</code> uses <code>method_missing</code> to return either an <code>Identifier</code>, <code>Function</code> depending on how it is called.</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'><code>Function</code> </td><td>
+<p><a href="VirtualRow.html"><code>VirtualRow</code></a> uses <a href="VirtualRow.html#method-i-method_missing"><code>method_missing</code></a> to return either an <a href="Identifier.html"><code>Identifier</code></a>, <a href="Function.html"><code>Function</code></a> depending on how it is called.</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="Function.html"><code>Function</code></a> </td><td>
 <p>Returned if any arguments are supplied, using the method name as the function name, and the arguments as the function arguments.</p>
-</td></tr><tr><td class='label'><code>Identifier</code> </td><td>
+</td></tr><tr><td class='label'><a href="Identifier.html"><code>Identifier</code></a> </td><td>
 <p>Returned otherwise, using the method name.</p>
 </td></tr></tbody></table>
 
-<p>If splitting symbols has been enabled (not the default), then method calls without arguments will return <code>QualifiedIdentifier</code> instances if the method call includes a double underscore.</p>
+<p>If splitting symbols has been enabled (not the default), then method calls without arguments will return <a href="QualifiedIdentifier.html"><code>QualifiedIdentifier</code></a> instances if the method call includes a double underscore.</p>
 
 <p>Examples:</p>
 
@@ -140,7 +140,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Return an <code>Identifier</code>, <code>QualifiedIdentifier</code>, or <code>Function</code>, depending on arguments and whether a block is provided.  Does not currently call the block. See the class level documentation.</p>
+<p>Return an <a href="Identifier.html"><code>Identifier</code></a>, <a href="QualifiedIdentifier.html"><code>QualifiedIdentifier</code></a>, or <a href="Function.html"><code>Function</code></a>, depending on arguments and whether a block is provided.  Does not currently call the block. See the class level documentation.</p>
 
 </div>
 <div class='source'>

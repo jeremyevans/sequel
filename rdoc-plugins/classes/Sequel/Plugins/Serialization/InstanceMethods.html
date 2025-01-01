@@ -66,10 +66,10 @@ Sequel::Plugins::Serialization::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>
-<span class="line-num">191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
-<span class="line-num">192</span>   <span class="ruby-identifier">serialize_deserialized_values</span>
-<span class="line-num">193</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">197</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>
+<span class="line-num">198</span>   <span class="ruby-identifier">serialize_deserialized_values</span>
+<span class="line-num">199</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-deserialized_values'>
@@ -88,9 +88,9 @@ Sequel::Plugins::Serialization::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-deserialized_values-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>
-<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">deserialized_values</span>
-<span class="line-num">179</span>   <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}
-<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">184</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">deserialized_values</span>
+<span class="line-num">185</span>   <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">186</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -109,12 +109,12 @@ Sequel::Plugins::Serialization::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/serialization.rb</span>
-<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">184</span>   <span class="ruby-identifier">deserialized_values</span>
-<span class="line-num">185</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">186</span>   <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">187</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">190</span>   <span class="ruby-identifier">deserialized_values</span>
+<span class="line-num">191</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">192</span>   <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">193</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -76,7 +76,7 @@ Last Update:
 
 <h4 id="label-Using+first">Using <code>first</code><span><a href="#label-Using+first">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>If you want the first record in the dataset, <code>Sequel::Dataset#first</code> is probably the most obvious method to use:</p>
+<p>If you want the first record in the dataset, <a href="../../classes/Sequel/Dataset.html#method-i-first"><code>Sequel::Dataset#first</code></a> is probably the most obvious method to use:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>
 <span class="ruby-comment"># SELECT * FROM artists LIMIT 1</span>
@@ -96,7 +96,7 @@ Last Update:
 
 <p>If there is no matching row, <code>first</code> will return nil.  If you want to raise an exception instead, use <code>first!</code>.</p>
 
-<p><code>Sequel::Dataset#[]</code> is basically an alias for <code>first</code>, except it requires an argument:</p>
+<p><a href="../../classes/Sequel/Dataset.html#method-i-5B-5D"><code>Sequel::Dataset#[]</code></a> is basically an alias for <code>first</code>, except it requires an argument:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:artists</span>][{<span class="ruby-value">name:</span> <span class="ruby-string">&#39;YJM&#39;</span>}]
 <span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>
@@ -107,7 +107,7 @@ Last Update:
 
 <h4 id="label-Using+last">Using <code>last</code><span><a href="#label-Using+last">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>If you want the last record in the dataset, <code>Sequel::Dataset#last</code> is an obvious method to use.  <code>last</code> requires the dataset be ordered, unless the dataset is a model dataset in which case <code>last</code> will do a reverse order by the primary key field:</p>
+<p>If you want the last record in the dataset, <a href="../../classes/Sequel/Dataset.html#method-i-last"><code>Sequel::Dataset#last</code></a> is an obvious method to use.  <code>last</code> requires the dataset be ordered, unless the dataset is a model dataset in which case <code>last</code> will do a reverse order by the primary key field:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">last</span>
 <span class="ruby-comment"># SELECT * FROM artists ORDER BY id DESC LIMIT 1</span>
@@ -125,7 +125,7 @@ Last Update:
 
 <h4 id="label-Retrieving+a+Single+Column+Value">Retrieving a Single Column Value<span><a href="#label-Retrieving+a+Single+Column+Value">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>Sometimes, instead of wanting an entire row, you only want the value of a specific column.  For this <code>Sequel::Dataset#get</code> is the method you want:</p>
+<p>Sometimes, instead of wanting an entire row, you only want the value of a specific column.  For this <a href="../../classes/Sequel/Dataset.html#method-i-get"><code>Sequel::Dataset#get</code></a> is the method you want:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:name</span>)
 <span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>
@@ -134,7 +134,7 @@ Last Update:
 
 <h4 id="label-Retrieving+a+Multiple+Column+Values">Retrieving a Multiple Column Values<span><a href="#label-Retrieving+a+Multiple+Column+Values">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>If you want the value for multiple columns, you can pass an array to <code>Sequel::Dataset#get</code>:</p>
+<p>If you want the value for multiple columns, you can pass an array to <a href="../../classes/Sequel/Dataset.html#method-i-get"><code>Sequel::Dataset#get</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist_id</span>, <span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>([<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>])
 <span class="ruby-comment"># SELECT id, name FROM artists LIMIT 1</span>
@@ -145,7 +145,7 @@ Last Update:
 
 <h4 id="label-As+an+Array+of+Hashes+or+Model+Objects">As an Array of Hashes or Model Objects<span><a href="#label-As+an+Array+of+Hashes+or+Model+Objects">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>In many cases, you want an array of all of the rows associated with the dataset, in which case <code>Sequel::Dataset#all</code> is the method you want to use:</p>
+<p>In many cases, you want an array of all of the rows associated with the dataset, in which case <a href="../../classes/Sequel/Dataset.html#method-i-all"><code>Sequel::Dataset#all</code></a> is the method you want to use:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">all</span>
 <span class="ruby-comment"># SELECT * FROM artists</span>
@@ -155,7 +155,7 @@ Last Update:
 
 <h4 id="label-Using+an+Enumerable+Interface">Using an Enumerable Interface<span><a href="#label-Using+an+Enumerable+Interface">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p><code>Sequel::Dataset</code> uses an Enumerable Interface, so it provides a method named each that yields hashes or model objects as they are retrieved from the database:</p>
+<p><a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> uses an Enumerable Interface, so it provides a method named each that yields hashes or model objects as they are retrieved from the database:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">name</span>}
 <span class="ruby-comment"># SELECT * FROM artists</span>
@@ -869,7 +869,7 @@ Last Update:
 
 <h4 id="label-Join+Blocks">Join Blocks<span><a href="#label-Join+Blocks">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
-<p>You can provide a block to any of the join methods that accept conditions.  This block should accept 3 arguments: the table alias for the table currently being joined, the table alias for the last table joined (or first table), and an array of previous <code>Sequel::SQL::JoinClause</code>s.</p>
+<p>You can provide a block to any of the join methods that accept conditions.  This block should accept 3 arguments: the table alias for the table currently being joined, the table alias for the last table joined (or first table), and an array of previous <a href="../../classes/Sequel/SQL/JoinClause.html"><code>Sequel::SQL::JoinClause</code></a>s.</p>
 
 <p>This allows you to qualify columns similar to how the implicit qualification works, without worrying about the specific aliases being used.  For example, let’s say you wanted to join the albums and artists tables, but only want albums where the artist’s name comes before the album’s name.</p>
 

@@ -42,7 +42,7 @@ Superclass:
 <div id='description'>
 <p>Represents a <a href="../SQL.html"><code>SQL</code></a> expression, with a given operator and one or more attributes (which may also be ComplexExpressions, forming a tree).  This class is the backbone of Sequel’s ruby expression DSL.</p>
 
-<p>This is an abstract class that is not that useful by itself.  The subclasses <code>BooleanExpression</code>, <code>NumericExpression</code>, and <code>StringExpression</code> define the behavior of the DSL via operators.</p>
+<p>This is an abstract class that is not that useful by itself.  The subclasses <a href="BooleanExpression.html"><code>BooleanExpression</code></a>, <a href="NumericExpression.html"><code>NumericExpression</code></a>, and <a href="StringExpression.html"><code>StringExpression</code></a> define the behavior of the DSL via operators.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -91,7 +91,7 @@ Superclass:
 <td class='context-item-value'>[:&, :|, :^, :<<, :>>, :%].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Bitwise mathematical operators used in <code>BitwiseMethods</code></p>
+<p>Bitwise mathematical operators used in <a href="BitwiseMethods.html"><code>BitwiseMethods</code></a></p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -100,7 +100,7 @@ Superclass:
 <td class='context-item-value'>{:& => :AND, :| =>:OR}.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Hash of ruby operator symbols to <a href="../SQL.html"><code>SQL</code></a> operators, used in <code>BooleanMethods</code></p>
+<p>Hash of ruby operator symbols to <a href="../SQL.html"><code>SQL</code></a> operators, used in <a href="BooleanMethods.html"><code>BooleanMethods</code></a></p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -137,7 +137,7 @@ Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}.freeze
 <td class='context-item-value'>[:<, :>, :<=, :>=].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Inequality operators used in <code>InequalityMethods</code></p>
+<p>Inequality operators used in <a href="InequalityMethods.html"><code>InequalityMethods</code></a></p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -173,7 +173,7 @@ Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}.freeze
 <td class='context-item-value'>[:+, :-, :/, :*, :**].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Standard mathematical operators used in <code>NumericMethods</code></p>
+<p>Standard mathematical operators used in <a href="NumericMethods.html"><code>NumericMethods</code></a></p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -273,7 +273,7 @@ Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}.freeze
 </div>
 <div class='description'>
 
-<p>Set the operator symbol and arguments for this object to the ones given. Convert all args that are hashes or arrays of two element arrays to <code>BooleanExpressions</code>, other than the second arg for an IN/NOT IN operator. Raise an <code>Error</code> if the operator doesn’t allow boolean input and a boolean argument is given. Raise an <code>Error</code> if the wrong number of arguments for a given operator is used.</p>
+<p>Set the operator symbol and arguments for this object to the ones given. Convert all args that are hashes or arrays of two element arrays to <code>BooleanExpressions</code>, other than the second arg for an IN/NOT IN operator. Raise an <a href="../Error.html"><code>Error</code></a> if the operator doesn’t allow boolean input and a boolean argument is given. Raise an <a href="../Error.html"><code>Error</code></a> if the wrong number of arguments for a given operator is used.</p>
 
 </div>
 <div class='source'>

@@ -52,12 +52,13 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="Sequel.html"><code>Sequel</code></a> extends <code>Array</code> to add methods to implement the SQL DSL. Most of these methods require that the array not be empty and that it must consist solely of other arrays that have exactly two elements.</p>
+<p><a href="Sequel.html"><code>Sequel</code></a> extends <a href="Array.html"><code>Array</code></a> to add methods to implement the SQL DSL. Most of these methods require that the array not be empty and that it must consist solely of other arrays that have exactly two elements.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#method-i-~">~</a></li>
 <li><a href="#method-i-case">case</a></li>
 <li><a href="#method-i-pg_array">pg_array</a></li>
 <li><a href="#method-i-pg_json">pg_json</a></li>
@@ -68,7 +69,6 @@ Superclass:
 <li><a href="#method-i-sql_or">sql_or</a></li>
 <li><a href="#method-i-sql_string_join">sql_string_join</a></li>
 <li><a href="#method-i-sql_value_list">sql_value_list</a></li>
-<li><a href="#method-i-~">~</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -76,6 +76,31 @@ Superclass:
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-~'>
+<a name='method-i-~'></a>
+<div class='synopsis'>
+<span class='name'>~</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this array, not matching all of the conditions.</p>
+
+<pre class="ruby"><span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]] <span class="ruby-comment"># SQL: (a IS NOT TRUE)</span>
+<span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]] <span class="ruby-comment"># SQL: ((a != 1) OR (b NOT IN (2, 3)))</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-~-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>
+<span class="line-num">26</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>
+<span class="line-num">27</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-case'>
 <a name='method-i-case'></a>
 <div class='synopsis'>
@@ -84,7 +109,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::CaseExpression</code> with this array as the conditions and the given default value and expression.</p>
+<p>Return a <a href="Sequel/SQL/CaseExpression.html"><code>Sequel::SQL::CaseExpression</code></a> with this array as the conditions and the given default value and expression.</p>
 
 <pre class="ruby">[[{<span class="ruby-value">a:</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}, <span class="ruby-value">1</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN (a IN (2, 3)) THEN 1 ELSE 0 END</span>
 [[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">:d</span>, <span class="ruby-value">:c</span>) <span class="ruby-comment"># SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END</span>
@@ -311,31 +336,6 @@ Superclass:
 <span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_value_list</span>
 <span class="line-num">49</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
 <span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-~'>
-<a name='method-i-~'></a>
-<div class='synopsis'>
-<span class='name'>~</span><span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this array, not matching all of the conditions.</p>
-
-<pre class="ruby"><span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]] <span class="ruby-comment"># SQL: (a IS NOT TRUE)</span>
-<span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]] <span class="ruby-comment"># SQL: ((a != 1) OR (b NOT IN (2, 3)))</span>
-</pre>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-~-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb</span>
-<span class="line-num">26</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>
-<span class="line-num">27</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

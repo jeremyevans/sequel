@@ -45,8 +45,8 @@ Sequel::Model::ClassMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
-<li><a href="#method-i-Model">Model</a></li>
 <li><a href="#method-i-5B-5D">[]</a></li>
+<li><a href="#method-i-Model">Model</a></li>
 <li><a href="#attribute-i-cache_anonymous_models">cache_anonymous_models</a></li>
 <li><a href="#method-i-call">call</a></li>
 <li><a href="#method-i-clear_setter_methods_cache">clear_setter_methods_cache</a></li>
@@ -287,6 +287,35 @@ Sequel::Model::ClassMethods
 </div>
 <div id='methods'>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-5B-5D'>
+<a name='method-i-5B-5D'></a>
+<div class='synopsis'>
+<span class='name'>[]</span><span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns the first record from the database matching the conditions. If a hash is given, it is used as the conditions.  If another object is given, it finds the first record whose primary key(s) match the given argument(s).  If no object is returned by the dataset, returns nil.</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># SELECT * FROM artists WHERE id = 1</span>
+<span class="ruby-comment"># =&gt; #&lt;Artist {:id=&gt;1, ...}&gt;</span>
+
+<span class="ruby-constant">Artist</span>[<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>] <span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;Bob&#39;) LIMIT 1</span>
+<span class="ruby-comment"># =&gt; #&lt;Artist {:name=&gt;&#39;Bob&#39;, ...}&gt;</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
+<span class="line-num">212</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">213</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">1</span>
+<span class="line-num">214</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">first</span>(<span class="ruby-identifier">args</span>) <span class="ruby-operator">:</span> (<span class="ruby-identifier">primary_key_lookup</span>(<span class="ruby-identifier">args</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">nil?</span>)
+<span class="line-num">215</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-Model'>
 <a name='method-i-Model'></a>
 <div class='synopsis'>
@@ -297,7 +326,7 @@ Sequel::Model::ClassMethods
 
 <p>Lets you create a <a href="../Model.html"><code>Model</code></a> subclass with its dataset already set. <code>source</code> should be an instance of one of the following classes:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="../Database.html"><code>Database</code></a> </td><td>
-<p>Sets the database for this model to <code>source</code>. Generally only useful when subclassing directly from the returned class, where the name of the subclass sets the table name (which is combined with the <code>Database</code> in <code>source</code> to create the dataset to use)</p>
+<p>Sets the database for this model to <code>source</code>. Generally only useful when subclassing directly from the returned class, where the name of the subclass sets the table name (which is combined with the <a href="../Database.html"><code>Database</code></a> in <code>source</code> to create the dataset to use)</p>
 </td></tr><tr><td class='label'><a href="../Dataset.html"><code>Dataset</code></a> </td><td>
 <p>Sets the dataset for this model to <code>source</code>.</p>
 </td></tr><tr><td class='label'>other </td><td>
@@ -354,35 +383,6 @@ Sequel::Model::ClassMethods
 <span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
-<div class='method public-instance' id='method-method-i-5B-5D'>
-<a name='method-i-5B-5D'></a>
-<div class='synopsis'>
-<span class='name'>[]</span><span class='arguments'>(*args)</span>
-
-</div>
-<div class='description'>
-
-<p>Returns the first record from the database matching the conditions. If a hash is given, it is used as the conditions.  If another object is given, it finds the first record whose primary key(s) match the given argument(s).  If no object is returned by the dataset, returns nil.</p>
-
-<pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># SELECT * FROM artists WHERE id = 1</span>
-<span class="ruby-comment"># =&gt; #&lt;Artist {:id=&gt;1, ...}&gt;</span>
-
-<span class="ruby-constant">Artist</span>[<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>] <span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;Bob&#39;) LIMIT 1</span>
-<span class="ruby-comment"># =&gt; #&lt;Artist {:name=&gt;&#39;Bob&#39;, ...}&gt;</span>
-</pre>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">212</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">213</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">1</span>
-<span class="line-num">214</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">first</span>(<span class="ruby-identifier">args</span>) <span class="ruby-operator">:</span> (<span class="ruby-identifier">primary_key_lookup</span>(<span class="ruby-identifier">args</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">nil?</span>)
-<span class="line-num">215</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
 <div class='method public-instance' id='method-method-i-call'>
 <a name='method-i-call'></a>
 <div class='synopsis'>
@@ -435,7 +435,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Returns the columns in the result set in their original order. Generally, this will use the columns determined via the database schema, but in certain cases (e.g. models that are based on a joined dataset) it will use <code>Dataset#columns</code> to find the columns.</p>
+<p>Returns the columns in the result set in their original order. Generally, this will use the columns determined via the database schema, but in certain cases (e.g. models that are based on a joined dataset) it will use <a href="../Dataset.html#method-i-columns"><code>Dataset#columns</code></a> to find the columns.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">columns</span>
 <span class="ruby-comment"># =&gt; [:id, :name]</span>
@@ -491,7 +491,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Returns the dataset associated with the <a href="../Model.html"><code>Model</code></a> class.  Raises an <code>Error</code> if there is no associated dataset for this class. In most cases, you don’t need to call this directly, as <a href="../Model.html"><code>Model</code></a> proxies many dataset methods to the underlying dataset.</p>
+<p>Returns the dataset associated with the <a href="../Model.html"><code>Model</code></a> class.  Raises an <a href="../Error.html"><code>Error</code></a> if there is no associated dataset for this class. In most cases, you don’t need to call this directly, as <a href="../Model.html"><code>Model</code></a> proxies many dataset methods to the underlying dataset.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># SELECT * FROM artists</span>
 </pre>
@@ -667,7 +667,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Returns the cached schema information if available or gets it from the database.  This is a hash where keys are column symbols and values are hashes of information related to the column.  See <code>Database#schema</code>.</p>
+<p>Returns the cached schema information if available or gets it from the database.  This is a hash where keys are column symbols and values are hashes of information related to the column.  See <a href="../Database.html#method-i-schema"><code>Database#schema</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db_schema</span>
 <span class="ruby-comment"># {:id=&gt;{:type=&gt;:integer, :primary_key=&gt;true, ...},</span>
@@ -1008,7 +1008,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Returns primary key attribute hash.  If using a composite primary key value such be an array with values for each primary key in the correct order.  For a standard primary key, value should be an object with a compatible type for the key.  If the model does not have a primary key, raises an <code>Error</code>.</p>
+<p>Returns primary key attribute hash.  If using a composite primary key value such be an array with values for each primary key in the correct order.  For a standard primary key, value should be an object with a compatible type for the key.  If the model does not have a primary key, raises an <a href="../Error.html"><code>Error</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">primary_key_hash</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># =&gt; {:id=&gt;1}</span>
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">primary_key_hash</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]) <span class="ruby-comment"># =&gt; {:id1=&gt;1, :id2=&gt;2}</span>
@@ -1076,7 +1076,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Restrict the setting of the primary key(s) when using mass assignment (e.g. <code>set</code>).  Because this is the default, this only make sense to use in a subclass where the parent class has used <code>unrestrict_primary_key</code>.</p>
+<p>Restrict the setting of the primary key(s) when using mass assignment (e.g. <code>set</code>).  Because this is the default, this only make sense to use in a subclass where the parent class has used <a href="ClassMethods.html#method-i-unrestrict_primary_key"><code>unrestrict_primary_key</code></a>.</p>
 
 </div>
 <div class='source'>
@@ -1119,7 +1119,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Sets the dataset associated with the <a href="../Model.html"><code>Model</code></a> class. <code>ds</code> can be a <code>Symbol</code>, <code>LiteralString</code>, <code>SQL::Identifier</code>, <code>SQL::QualifiedIdentifier</code>, <code>SQL::AliasedExpression</code> (all specifying a table name in the current database), or a <code>Dataset</code>. If a dataset is used, the model’s database is changed to the database of the given dataset.  If a dataset is not used, a dataset is created from the current database with the table name given. Other arguments raise an <code>Error</code>. Returns self.</p>
+<p>Sets the dataset associated with the <a href="../Model.html"><code>Model</code></a> class. <code>ds</code> can be a <code>Symbol</code>, <a href="../LiteralString.html"><code>LiteralString</code></a>, <a href="../SQL/Identifier.html"><code>SQL::Identifier</code></a>, <a href="../SQL/QualifiedIdentifier.html"><code>SQL::QualifiedIdentifier</code></a>, <a href="../SQL/AliasedExpression.html"><code>SQL::AliasedExpression</code></a> (all specifying a table name in the current database), or a <a href="../Dataset.html"><code>Dataset</code></a>. If a dataset is used, the model’s database is changed to the database of the given dataset.  If a dataset is not used, a dataset is created from the current database with the table name given. Other arguments raise an <a href="../Error.html"><code>Error</code></a>. Returns self.</p>
 
 <p>It also attempts to determine the database schema for the model, based on the given dataset.</p>
 
@@ -1169,7 +1169,7 @@ Sequel::Model::ClassMethods
 </div>
 <div class='description'>
 
-<p>Sets the primary key for this model. You can use either a regular or a composite primary key.  To not use a primary key, set to nil or use <code>no_primary_key</code>. On most adapters, <a href="../../Sequel.html"><code>Sequel</code></a> can automatically determine the primary key to use, so this method is not needed often.</p>
+<p>Sets the primary key for this model. You can use either a regular or a composite primary key.  To not use a primary key, set to nil or use <a href="ClassMethods.html#method-i-no_primary_key"><code>no_primary_key</code></a>. On most adapters, <a href="../../Sequel.html"><code>Sequel</code></a> can automatically determine the primary key to use, so this method is not needed often.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-comment"># regular key</span>

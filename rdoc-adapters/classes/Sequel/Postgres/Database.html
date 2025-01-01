@@ -274,7 +274,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p><code>copy_into</code> uses PostgreSQL’s +COPY FROM STDIN+ SQL statement to do very fast inserts into a table using input preformatting in either CSV or PostgreSQL text format. This method is only supported if pg 0.14.0+ is the underlying ruby driver. This method should only be called if you want results returned to the client.  If you are using +COPY FROM+ with a filename, you should just use <code>run</code> instead of this method.</p>
+<p><a href="Database.html#method-i-copy_into"><code>copy_into</code></a> uses PostgreSQL’s +COPY FROM STDIN+ SQL statement to do very fast inserts into a table using input preformatting in either CSV or PostgreSQL text format. This method is only supported if pg 0.14.0+ is the underlying ruby driver. This method should only be called if you want results returned to the client.  If you are using +COPY FROM+ with a filename, you should just use <code>run</code> instead of this method.</p>
 
 <p>The following options are respected:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:columns </td><td>
@@ -338,7 +338,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>:nocov: <code>copy_table</code> uses PostgreSQL’s +COPY TO STDOUT+ SQL statement to return formatted results directly to the caller.  This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want results returned to the client.  If you are using +COPY TO+ with a filename, you should just use <code>run</code> instead of this method.</p>
+<p>:nocov: <a href="Database.html#method-i-copy_table"><code>copy_table</code></a> uses PostgreSQL’s +COPY TO STDOUT+ SQL statement to return formatted results directly to the caller.  This method is only supported if pg is the underlying ruby driver.  This method should only be called if you want results returned to the client.  If you are using +COPY TO+ with a filename, you should just use <code>run</code> instead of this method.</p>
 
 <p>The table argument supports the following types:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>String </td><td>

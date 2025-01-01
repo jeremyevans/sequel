@@ -85,7 +85,7 @@ Sequel::SQL::CastMethods
 </div>
 <div class='description'>
 
-<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default Integer type if none given), and return the result as a <code>NumericExpression</code>, so you can use the bitwise operators on the result.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default Integer type if none given), and return the result as a <a href="NumericExpression.html"><code>NumericExpression</code></a>, so you can use the bitwise operators on the result.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_numeric</span> <span class="ruby-comment"># CAST(func() AS integer)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(func() AS double precision)</span>
@@ -110,7 +110,7 @@ Sequel::SQL::CastMethods
 </div>
 <div class='description'>
 
-<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default String type if none given), and return the result as a <code>StringExpression</code>, so you can use + directly on the result for <a href="../SQL.html"><code>SQL</code></a> string concatenation.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database’s default String type if none given), and return the result as a <a href="StringExpression.html"><code>StringExpression</code></a>, so you can use + directly on the result for <a href="../SQL.html"><code>SQL</code></a> string concatenation.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_string</span> <span class="ruby-comment"># CAST(func() AS varchar(255))</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_string</span>(<span class="ruby-value">:text</span>) <span class="ruby-comment"># CAST(func() AS text)</span>

@@ -36,7 +36,7 @@ Sequel::Plugins::StaticCacheCache
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The static_cache_cache plugin allows for caching the row content for subclasses that use the static cache plugin (or just the current class).  Using this plugin can avoid the need to query the database every time loading the plugin into a model, which can save time when you have a lot of models using the static_cache plugin.</p>
+<p>The static_cache_cache plugin allows for caching the row content for the current class and subclasses that use the static_cache or subset_static_cache plugins. Using this plugin can avoid the need to query the database every time loading the static_cache plugin into a model (static_cache plugin) or using the cache_subset method (subset_static_cache plugin).</p>
 
 <p>Usage:</p>
 

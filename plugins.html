@@ -45,7 +45,7 @@
     <div class="main__container">
       <section class="plugins">
 
-<h1 class="h1">Sequel::Model Plugins for v5.87.0</h1>
+<h1 class="h1">Sequel::Model Plugins for v5.88.0</h1>
 
 <div class="plugins__sidebar">
 <aside class="plugins__sidebar-aside">
@@ -258,7 +258,11 @@
 </li>
 <li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/StaticCacheCache.html">static_cache_cache </a>
-<span class="ul__span">Support caching rows for static_cache models to a file to avoid database queries during model initialization.</span>
+<span class="ul__span">Support caching rows for models using static_cache and subset_static_cache plugins to a file to avoid database queries during model initialization.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/SubsetStaticCache.html">subset_static_cache </a>
+<span class="ul__span">Caches all model instances for subsets of a model class.</span>
 </li>
 </ul>
 <h4 class="h4">Hooks</h4>
@@ -1169,6 +1173,10 @@
 <li class="ul__li ul__li--grid">
 <a class="a" href="http://github.com/jsvd/sequel_vectorized">sequel_vectorized </a>
 <span class="ul__span">Allows Sequel::Dataset to be exported as an Hash of Arrays and NArrays.</span>
+</li>
+<li class="ul__li ul__li--grid">
+<a class="a" href="https://github.com/eriklovmo/sequel_more_than">sequel_more_than </a>
+<span class="ul__span">Efficiently compare a Sequel::Dataset's row count against a given number.</span>
 </li>
 </ul>
 

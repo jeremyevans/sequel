@@ -275,7 +275,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Add a primary key.  See <a href="CreateTableGenerator.html#method-i-column"><code>CreateTableGenerator#column</code></a> for the available options.  Like <code>add_foreign_key</code>, if you specify the column name as an array, it just creates a constraint:</p>
+<p>Add a primary key.  See <a href="CreateTableGenerator.html#method-i-column"><code>CreateTableGenerator#column</code></a> for the available options.  Like <a href="AlterTableGenerator.html#method-i-add_foreign_key"><code>add_foreign_key</code></a>, if you specify the column name as an array, it just creates a constraint:</p>
 
 <pre class="ruby"><span class="ruby-identifier">add_primary_key</span>(<span class="ruby-value">:id</span>) <span class="ruby-comment"># ADD COLUMN id serial PRIMARY KEY</span>
 <span class="ruby-identifier">add_primary_key</span>([<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>]) <span class="ruby-comment"># ADD PRIMARY KEY (artist_id, name)</span>

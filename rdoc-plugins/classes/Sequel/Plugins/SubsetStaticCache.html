@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::SubsetStaticCache</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::SubsetStaticCache
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/subset_static_cache_rb.html">lib/sequel/plugins/subset_static_cache.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The subset_static_cache plugin is designed for model subsets that are not modified at all in production use cases, or at least where modifications to them would usually coincide with an application restart.  When caching a model subset, it retrieves all rows in the database and statically caches a ruby array and hash keyed on primary key containing all of the model instances.  All of these cached instances are frozen so they won’t be modified unexpectedly.</p>
+
+<p>With the following code:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">StatusType</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">where</span> <span class="ruby-value">:available</span>, <span class="ruby-value">hidden:</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">cache_subset</span> <span class="ruby-value">:available</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>The following methods will use the cache and not issue a database query:</p>
+<ul><li>
+<p>StatusType.available.with_pk</p>
+</li><li>
+<p>StatusType.available.all</p>
+</li><li>
+<p>StatusType.available.each</p>
+</li><li>
+<p>StatusType.available.first (without block, only supporting no arguments or single integer argument)</p>
+</li><li>
+<p>StatusType.available.count (without an argument or block)</p>
+</li><li>
+<p>StatusType.available.map</p>
+</li><li>
+<p>StatusType.available.as_hash</p>
+</li><li>
+<p>StatusType.available.to_hash</p>
+</li><li>
+<p>StatusType.available.to_hash_groups</p>
+</li></ul>
+
+<p>The cache is not used if you chain methods before or after calling the cached method, as doing so would not be safe:</p>
+
+<pre class="ruby"><span class="ruby-constant">StatusType</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}.<span class="ruby-identifier">available</span>.<span class="ruby-identifier">all</span> 
+<span class="ruby-constant">StatusType</span>.<span class="ruby-identifier">available</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}.<span class="ruby-identifier">all</span>
+</pre>
+
+<p>The cache is also not used if you change the class’s dataset after caching the subset, or in subclasses of the model.</p>
+
+<p>You should not modify any row that is statically cached when using this plugin, as otherwise you will get different results for cached and uncached method calls.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="SubsetStaticCache/CachedDatasetMethods.html">Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods</a></li>
+<li><a href="SubsetStaticCache/ClassMethods.html">Sequel::Plugins::SubsetStaticCache::ClassMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
+<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">47</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">class_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">48</span>     <span class="ruby-ivar">@subset_static_caches</span> <span class="ruby-operator">||=</span> ({}.<span class="ruby-identifier">compare_by_identity</span>)
+<span class="line-num">49</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

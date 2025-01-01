@@ -53,9 +53,9 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-2D">-</a></li>
+<li><a href="#method-i-~">~</a></li>
 <li><a href="#method-i-pg_inet">pg_inet</a></li>
 <li><a href="#method-i-set_masklen">set_masklen</a></li>
-<li><a href="#method-i-~">~</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -141,6 +141,27 @@ Superclass:
 <span class="line-num">135</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-~'>
+<a name='method-i-~'></a>
+<div class='synopsis'>
+<span class='name'>~</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return an expression for the bitwise NOT of the receiver</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>
+<span class="line-num">123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>
+<span class="line-num">124</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)
+<span class="line-num">125</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-pg_inet'>
 <a name='method-i-pg_inet'></a>
 <div class='synopsis'>
@@ -181,27 +202,6 @@ Superclass:
 <span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_masklen</span>(<span class="ruby-identifier">v</span>)
 <span class="line-num">139</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:set_masklen</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>))
 <span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-~'>
-<a name='method-i-~'></a>
-<div class='synopsis'>
-<span class='name'>~</span><span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Return an expression for the bitwise NOT of the receiver</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>
-<span class="line-num">123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>
-<span class="line-num">124</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)
-<span class="line-num">125</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

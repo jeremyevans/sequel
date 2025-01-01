@@ -36,7 +36,7 @@ Sequel::SQL::NumericMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes the standard mathematical methods (+, -, *, and /) that are defined on objects that can be used in a numeric context in <a href="../SQL.html"><code>SQL</code></a> (<code>Symbol</code>, <code>LiteralString</code>, and <code>SQL::GenericExpression</code>).</p>
+<p>This module includes the standard mathematical methods (+, -, *, and /) that are defined on objects that can be used in a numeric context in <a href="../SQL.html"><code>SQL</code></a> (<code>Symbol</code>, <a href="../LiteralString.html"><code>LiteralString</code></a>, and <a href="GenericExpression.html"><code>SQL::GenericExpression</code></a>).</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; + &quot;b&quot;</span>
 <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">-</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; - &quot;b&quot;</span>
@@ -44,7 +44,7 @@ Sequel::SQL::NumericMethods
 <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">/</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; / &quot;b&quot;</span>
 </pre>
 
-<p>One exception to this is if + is called with a <code>String</code> or <code>StringExpression</code>, in which case the || operator is used instead of the + operator:</p>
+<p>One exception to this is if + is called with a <code>String</code> or <a href="StringExpression.html"><code>StringExpression</code></a>, in which case the || operator is used instead of the + operator:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-string">&#39;b&#39;</span> <span class="ruby-comment"># &quot;a&quot; || &#39;b&#39;</span>
 </pre>

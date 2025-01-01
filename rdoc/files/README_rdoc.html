@@ -631,7 +631,7 @@ Last Update:
 
 <p>A model class wraps a dataset, and an instance of that class wraps a single record in the dataset.</p>
 
-<p>Model classes are defined as regular Ruby classes inheriting from <code>Sequel::Model</code>:</p>
+<p>Model classes are defined as regular Ruby classes inheriting from <a href="../classes/Sequel/Model.html"><code>Sequel::Model</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>)
 <span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
@@ -652,7 +652,7 @@ Last Update:
 <span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:my_posts</span>]); <span class="ruby-keyword">end</span>
 </pre>
 
-<p>If you pass a symbol to the <code>Sequel::Model</code> method, it assumes you are referring to the table with the same name.  You can also call it with a dataset, which will set the defaults for all retrievals for that model:</p>
+<p>If you pass a symbol to the <a href="../classes/Sequel/Model.html"><code>Sequel::Model</code></a> method, it assumes you are referring to the table with the same name.  You can also call it with a dataset, which will set the defaults for all retrievals for that model:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:my_posts</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>)); <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:my_posts</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:date</span>)); <span class="ruby-keyword">end</span>
@@ -795,7 +795,7 @@ Last Update:
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>Note the use of <code>super</code> if you define your own hook methods.  Almost all <code>Sequel::Model</code> class and instance methods (not just hook methods) can be overridden safely, but you have to make sure to call <code>super</code> when doing so, otherwise you risk breaking things.</p>
+<p>Note the use of <code>super</code> if you define your own hook methods.  Almost all <a href="../classes/Sequel/Model.html"><code>Sequel::Model</code></a> class and instance methods (not just hook methods) can be overridden safely, but you have to make sure to call <code>super</code> when doing so, otherwise you risk breaking things.</p>
 
 <p>For the example above, you should probably use a database trigger if you can.  Hooks can be used for data integrity, but they will only enforce that integrity when you are modifying the database through model instances, and even then they are often subject to race conditions.  It’s best to use database triggers and database constraints to enforce data integrity.</p>
 

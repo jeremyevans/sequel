@@ -96,7 +96,7 @@ Superclass:
 <span class="ruby-identifier">davids_old_posts</span> = <span class="ruby-identifier">davids_posts</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">stamp</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>}
 </pre>
 
-<p>Datasets are Enumerable objects, so they can be manipulated using many of the Enumerable methods, such as <code>map</code> and <code>inject</code>.  Note that there are some methods that <a href="Dataset.html"><code>Dataset</code></a> defines that override methods defined in Enumerable and result in different behavior, such as <code>select</code> and <code>group_by</code>.</p>
+<p>Datasets are Enumerable objects, so they can be manipulated using many of the Enumerable methods, such as <code>map</code> and <code>inject</code>.  Note that there are some methods that <a href="Dataset.html"><code>Dataset</code></a> defines that override methods defined in Enumerable and result in different behavior, such as <code>select</code> and <a href="Dataset.html#method-i-group_by"><code>group_by</code></a>.</p>
 
 <p>For more information, see the <a href="../../files/doc/dataset_basics_rdoc.html">“Dataset Basics” guide</a>.</p>
 </div>
@@ -3079,7 +3079,7 @@ SELECT table.* FROM table</pre>
 
 <p>Returns the columns in the result set in order as an array of symbols. If the columns are currently cached, returns the cached value. Otherwise, a SELECT query is performed to retrieve a single row in order to get the columns.</p>
 
-<p>If you are looking for all columns for a single table and maybe some information about each column (e.g. database type), see <code>Database#schema</code>.</p>
+<p>If you are looking for all columns for a single table and maybe some information about each column (e.g. database type), see <a href="Database.html#method-i-schema"><code>Database#schema</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">columns</span>
 <span class="ruby-comment"># =&gt; [:id, :name]</span>
@@ -3604,7 +3604,7 @@ SELECT table.* FROM table</pre>
 </div>
 <div class='description'>
 
-<p>Reverses the order and then runs <a href="Dataset.html#method-i-first"><code>first</code></a> with the given arguments and block.  Note that this will not necessarily give you the last record in the dataset, unless you have an unambiguous order.  If there is not currently an order for this dataset, raises an <code>Error</code>.</p>
+<p>Reverses the order and then runs <a href="Dataset.html#method-i-first"><code>first</code></a> with the given arguments and block.  Note that this will not necessarily give you the last record in the dataset, unless you have an unambiguous order.  If there is not currently an order for this dataset, raises an <a href="Error.html"><code>Error</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">order</span>(<span class="ruby-value">:id</span>).<span class="ruby-identifier">last</span> <span class="ruby-comment"># SELECT * FROM table ORDER BY id DESC LIMIT 1</span>
 <span class="ruby-comment"># =&gt; {:id=&gt;10}</span>
@@ -3633,7 +3633,7 @@ SELECT table.* FROM table</pre>
 </div>
 <div class='description'>
 
-<p>Maps column values for each record in the dataset (if an argument is given) or performs the stock mapping functionality of <code>Enumerable</code> otherwise. Raises an <code>Error</code> if both an argument and block are given.</p>
+<p>Maps column values for each record in the dataset (if an argument is given) or performs the stock mapping functionality of <code>Enumerable</code> otherwise. Raises an <a href="Error.html"><code>Error</code></a> if both an argument and block are given.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">map</span>(<span class="ruby-value">:id</span>) <span class="ruby-comment"># SELECT * FROM table</span>
 <span class="ruby-comment"># =&gt; [1, 2, 3, ...]</span>
@@ -3836,7 +3836,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 
 <p><a href="../Sequel.html"><code>Sequel</code></a> checks that the datasets using this method have an order, but it cannot ensure that the order is unambiguous.</p>
 
-<p>Note that this method is not safe to use on many adapters if you are running additional queries inside the provided block.  If you are running queries inside the block, use a separate thread or shard inside <code>paged_each</code>.</p>
+<p>Note that this method is not safe to use on many adapters if you are running additional queries inside the provided block.  If you are running queries inside the block, use a separate thread or shard inside <a href="Dataset.html#method-i-paged_each"><code>paged_each</code></a>.</p>
 
 <p>Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:rows_per_fetch </td><td>
@@ -4764,7 +4764,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 
 <p>Append a literal representation of a value to the given <a href="SQL.html"><code>SQL</code></a> string.</p>
 
-<p>If an unsupported object is given, an <code>Error</code> is raised.</p>
+<p>If an unsupported object is given, an <a href="Error.html"><code>Error</code></a> is raised.</p>
 
 </div>
 <div class='source'>
@@ -4914,7 +4914,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </div>
 <div class='description'>
 
-<p>Returns an array of insert statements for inserting multiple records. This method is used by <code>multi_insert</code> to format insert statements and expects a keys array and and an array of value arrays.</p>
+<p>Returns an array of insert statements for inserting multiple records. This method is used by <a href="Dataset.html#method-i-multi_insert"><code>multi_insert</code></a> to format insert statements and expects a keys array and and an array of value arrays.</p>
 
 </div>
 <div class='source'>
@@ -5018,7 +5018,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <span class="ruby-comment"># =&gt; &quot;UPDATE items SET price = 100, category = &#39;software&#39;</span>
 </pre>
 
-<p>Raises an <code>Error</code> if the dataset is grouped or includes more than one table.</p>
+<p>Raises an <a href="Error.html"><code>Error</code></a> if the dataset is grouped or includes more than one table.</p>
 
 </div>
 <div class='source'>
@@ -5890,7 +5890,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </div>
 <div class='description'>
 
-<p>Adds the given graph aliases to the list of graph aliases to use, unlike <code>set_graph_aliases</code>, which replaces the list (the equivalent of <code>select_append</code> when graphing).  See <code>set_graph_aliases</code>.</p>
+<p>Adds the given graph aliases to the list of graph aliases to use, unlike <a href="Dataset.html#method-i-set_graph_aliases"><code>set_graph_aliases</code></a>, which replaces the list (the equivalent of <a href="Dataset.html#method-i-select_append"><code>select_append</code></a> when graphing).  See <a href="Dataset.html#method-i-set_graph_aliases"><code>set_graph_aliases</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">add_graph_aliases</span>(<span class="ruby-value">some_alias:</span> [<span class="ruby-value">:table</span>, <span class="ruby-value">:column</span>])
 <span class="ruby-comment"># SELECT ..., table.column AS some_alias</span>
@@ -5926,9 +5926,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>dataset </td><td>
 <p>Can be a symbol (specifying a table), another dataset, or an <a href="SQL/Identifier.html"><code>SQL::Identifier</code></a>, <a href="SQL/QualifiedIdentifier.html"><code>SQL::QualifiedIdentifier</code></a>, or <a href="SQL/AliasedExpression.html"><code>SQL::AliasedExpression</code></a>.</p>
 </td></tr><tr><td class='label'>join_conditions </td><td>
-<p>Any condition(s) allowed by <code>join_table</code>.</p>
+<p>Any condition(s) allowed by <a href="Dataset.html#method-i-join_table"><code>join_table</code></a>.</p>
 </td></tr><tr><td class='label'>block </td><td>
-<p>A block that is passed to <code>join_table</code>.</p>
+<p>A block that is passed to <a href="Dataset.html#method-i-join_table"><code>join_table</code></a>.</p>
 </td></tr></tbody></table>
 
 <p>Options:</p>
@@ -5939,11 +5939,11 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </td></tr><tr><td class='label'>:join_only </td><td>
 <p>Only join the tables, do not change the selected columns.</p>
 </td></tr><tr><td class='label'>:join_type </td><td>
-<p>The type of join to use (passed to <code>join_table</code>).  Defaults to :left_outer.</p>
+<p>The type of join to use (passed to <a href="Dataset.html#method-i-join_table"><code>join_table</code></a>).  Defaults to :left_outer.</p>
 </td></tr><tr><td class='label'>:qualify</td><td>
 <p>The type of qualification to do, see <a href="Dataset.html#method-i-join_table"><code>join_table</code></a>.</p>
 </td></tr><tr><td class='label'>:select </td><td>
-<p>An array of columns to select.  When not used, selects all columns in the given dataset.  When set to false, selects no columns and is like simply joining the tables, though graph keeps some metadata about the join that makes it important to use <code>graph</code> instead of <code>join_table</code>.</p>
+<p>An array of columns to select.  When not used, selects all columns in the given dataset.  When set to false, selects no columns and is like simply joining the tables, though graph keeps some metadata about the join that makes it important to use <code>graph</code> instead of <a href="Dataset.html#method-i-join_table"><code>join_table</code></a>.</p>
 </td></tr><tr><td class='label'>:table_alias </td><td>
 <p>The alias to use for the table.  If not specified, doesn’t alias the table.  You will get an error if the alias (or table) name is used more than once.</p>
 </td></tr></tbody></table>
@@ -6390,7 +6390,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </div>
 <div class='description'>
 
-<p>Alias of <code>first_source_alias</code></p>
+<p>Alias of <a href="Dataset.html#method-i-first_source_alias"><code>first_source_alias</code></a></p>
 
 </div>
 <div class='source'>
@@ -6411,7 +6411,7 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 </div>
 <div class='description'>
 
-<p>The first source (primary table) for this dataset.  If the dataset doesn’t have a table, raises an <code>Error</code>.  If the table is aliased, returns the aliased name.</p>
+<p>The first source (primary table) for this dataset.  If the dataset doesn’t have a table, raises an <a href="Error.html"><code>Error</code></a>.  If the table is aliased, returns the aliased name.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first_source_alias</span>
 <span class="ruby-comment"># =&gt; :table</span>

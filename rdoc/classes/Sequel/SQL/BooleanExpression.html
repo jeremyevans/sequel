@@ -40,7 +40,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Subclass of <code>ComplexExpression</code> where the expression results in a boolean value in <a href="../SQL.html"><code>SQL</code></a>.</p>
+<p>Subclass of <a href="ComplexExpression.html"><code>ComplexExpression</code></a> where the expression results in a boolean value in <a href="../SQL.html"><code>SQL</code></a>.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -52,8 +52,8 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-26">&</a></li>
-<li><a href="#method-i-sql_boolean">sql_boolean</a></li>
 <li><a href="#method-i-7C">|</a></li>
+<li><a href="#method-i-sql_boolean">sql_boolean</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -75,7 +75,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Take pairs of values (e.g. a hash or array of two element arrays) and converts it to a <code>BooleanExpression</code>.  The operator and args used depends on the case of the right (2nd) argument:</p>
+<p>Take pairs of values (e.g. a hash or array of two element arrays) and converts it to a <a href="BooleanExpression.html"><code>BooleanExpression</code></a>.  The operator and args used depends on the case of the right (2nd) argument:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>0..10 </td><td>
 <p>left &gt;= 0 AND left &lt;= 10</p>
 </td></tr></tbody></table>
@@ -189,27 +189,6 @@ Superclass:
 <span class="line-num">1177</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
-<div class='method public-instance' id='method-method-i-sql_boolean'>
-<a name='method-i-sql_boolean'></a>
-<div class='synopsis'>
-<span class='name'>sql_boolean</span><span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Return self instead of creating a new object to save on memory.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_boolean-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-sql_boolean-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_boolean</span>
-<span class="line-num">1186</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1187</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
 <div class='method public-instance' id='method-method-i-7C'>
 <a name='method-i-7C'></a>
 <div class='synopsis'>
@@ -229,6 +208,27 @@ Superclass:
 <span class="line-num">1180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">ce</span>)
 <span class="line-num">1181</span>   <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)
 <span class="line-num">1182</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sql_boolean'>
+<a name='method-i-sql_boolean'></a>
+<div class='synopsis'>
+<span class='name'>sql_boolean</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return self instead of creating a new object to save on memory.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_boolean-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sql_boolean-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
+<span class="line-num">1185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_boolean</span>
+<span class="line-num">1186</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1187</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
