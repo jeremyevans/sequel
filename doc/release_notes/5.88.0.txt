@@ -1,0 +1,55 @@
+= New Features
+
+* A subset_static_cache plugin has been added, for statically caching
+  subsets of a model class.  This is useful for cases where only a
+  subset of the model class is static. For example, with this code:
+
+    class StatusType < Sequel::Model
+      dataset_module do
+        where :available, hidden: false
+      end
+      cache_subset :available
+     end
+
+  The following methods will use the cache and not issue a database
+  query:
+
+  * StatusType.available.with_pk
+  * StatusType.available.all
+  * StatusType.available.each
+  * StatusType.available.first (without block, only supporting no
+    arguments or single integer argument)
+  * StatusType.available.count (without an argument or block)
+  * StatusType.available.map
+  * StatusType.available.as_hash
+  * StatusType.available.to_hash
+  * StatusType.available.to_hash_groups
+
+  The static_cache_cache plugin has been updated to statically cache
+  these subsets, avoiding a query to get the static values when
+  cache_subset is called.
+
+* On PostgreSQL, column aliases now support data types, which is
+  useful when selecting from functions returning records, such as
+  the jsonb_to_record/jsonb_to_recordset function:
+
+    DB.from{jsonb_to_recordset(:value).as(:d, [[:a, Integer], [:e, String]])}
+    # SELECT * FROM jsonb_to_recordset("value") AS "d"("a" integer, "e" text)
+
+= Other Improvements
+
+* Sequel::Model class-level methods that call dataset methods can now
+  be overridden by defining singleton methods on the class, and using
+  super to get the default behavior (similar to how column and
+  association methods work).
+
+* The timestamp migrator now has deterministic behavior when multiple
+  migrations have the same version, using a lexicographic sort of the
+  rest of the migration filename to break ties.
+
+* Explicit block parameters are now used in some methods, allowing
+  the test suite to run without warnings when using
+  -W:strict_unused_block on Ruby 3.4.
+
+* A consistent instance variable setting order is now used in the
+  string_agg extension to avoid shape-related performance warnings.
