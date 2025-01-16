@@ -1238,9 +1238,9 @@ module Sequel
       # Note that like Object#extend, when multiple modules are provided
       # as arguments the subclass includes the modules in reverse order.
       def with_extend(*mods, &block)
-        c = Class.new(self.class)
+        c = Sequel.set_temp_name(Class.new(self.class)){"Sequel::Dataset::_Subclass"}
         c.include(*mods) unless mods.empty?
-        c.include(DatasetModule.new(&block)) if block
+        c.include(Sequel.set_temp_name(DatasetModule.new(&block)){"Sequel::Dataset::_DatasetModule(#{block.source_location.join(':')})"}) if block
         o = c.freeze.allocate
         o.instance_variable_set(:@db, @db)
         o.instance_variable_set(:@opts, @opts)

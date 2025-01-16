@@ -43,6 +43,10 @@ describe "Sequel::Plugins::LazyAttributes" do
     Object.send(:remove_const, :LazyAttributesModel)
   end
   
+  it "should give temporary name to name model-specific module" do
+    LazyAttributesModel.ancestors[1].name.must_equal "LazyAttributesModel::@lazy_attributes_module"
+  end if RUBY_VERSION >= '3.3'
+
   it "should allowing adding additional lazy attributes via plugin :lazy_attributes" do
     @c.set_dataset(@ds.select(:id, :blah))
     @c.dataset.sql.must_equal 'SELECT id, blah FROM la'

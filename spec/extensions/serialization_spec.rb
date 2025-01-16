@@ -12,6 +12,12 @@ describe "Serialization plugin" do
     DB.reset
   end
   
+  it "should give temporary name to name model-specific module" do
+    c = Sequel::Model(:items)
+    c.plugin :serialization, :yaml, :abc
+    c.ancestors[1].name.must_equal "Sequel::_Model(:items)::@serialization_module"
+  end if RUBY_VERSION >= '3.3'
+
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)

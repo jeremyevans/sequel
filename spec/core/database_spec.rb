@@ -510,6 +510,11 @@ describe "Database#dataset_class" do
     ds.db.must_be_same_as(@db)
   end
 
+  it "should give temporary name to implicitly created subclass" do
+    @db.extend_datasets{}
+    @db.dataset_class.name.must_equal "Sequel::Dataset::_Subclass"
+  end if RUBY_VERSION >= '3.3'
+
   it "should have getter return the class to use to create datasets" do
     [@db.dataset_class, @db.dataset_class.superclass].must_include(Sequel::Dataset)
     @db.dataset_class = @dsc
@@ -560,6 +565,12 @@ describe "Database#extend_datasets" do
     @db.extend_datasets{def foo() [5] + super end}
     @db.dataset.foo.must_equal [5, 3]
   end
+
+  it "should give temporary name to class and module" do
+    @db.extend_datasets{def foo() [5] + super end}
+    @db.dataset_class.ancestors[1].name.must_equal "Sequel::Dataset::_DatasetModule(#{__FILE__}:#{__LINE__-1})"
+    @db.dataset_class.name.must_equal "Sequel::Dataset::_Subclass"
+  end if RUBY_VERSION >= '3.3'
 
   it "should raise an error if both a module and a block are provided" do
     proc{@db.extend_datasets(@m2){def foo() [5] + super end}}.must_raise(Sequel::Error)

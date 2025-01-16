@@ -24,6 +24,16 @@ describe "subset_static_cache plugin" do
     @c2 = @c.load(:id=>2)
   end
 
+  it "should give temporary name to name model-specific module" do
+    c = Sequel::Model(:items)
+    c.class_eval do
+      dataset_module{where :foo, :bar}
+      plugin :subset_static_cache
+      cache_subset :foo
+    end
+    c.singleton_class.ancestors[1].name.must_equal "Sequel::_Model(:items)::@subset_static_cache_module"
+  end if RUBY_VERSION >= '3.3'
+
   it "should have .with_pk use the cache without a query" do
     @ds.with_pk(1)
     @ds.with_pk(1).must_equal @c1

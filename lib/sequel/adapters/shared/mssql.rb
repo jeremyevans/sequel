@@ -574,6 +574,7 @@ module Sequel
   
     module DatasetMethods
       include(Module.new do
+        Sequel.set_temp_name(self){"Sequel::MSSQL::DatasetMethods::_SQLMethods"}
         Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from lock join where group having compounds order')
       end)
       include EmulateOffsetWithRowNumber

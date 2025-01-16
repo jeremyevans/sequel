@@ -88,6 +88,7 @@ module Sequel
   
     module DatasetMethods
       include(Module.new do
+        Sequel.set_temp_name(self){"Sequel::Access::DatasetMethods::_SQLMethods"}
         Dataset.def_sql_method(self, :select, %w'select distinct limit columns into from join where group order having compounds')
       end)
       include EmulateOffsetWithReverseAndCount

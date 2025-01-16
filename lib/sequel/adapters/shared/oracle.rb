@@ -333,6 +333,7 @@ module Sequel
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
 
       include(Module.new do
+        Sequel.set_temp_name(self){"Sequel::Oracle::DatasetMethods::_SQLMethods"}
         Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order limit lock')
       end)
 

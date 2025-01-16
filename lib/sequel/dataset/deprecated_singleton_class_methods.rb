@@ -19,7 +19,7 @@ module Sequel
       def with_extend(*mods, &block)
         c = _clone(:freeze=>false)
         c.extend(*mods) unless mods.empty?
-        c.extend(DatasetModule.new(&block)) if block
+        c.extend(Sequel.set_temp_name(DatasetModule.new(&block)){"Sequel::Dataset::_DatasetModule(#{block.source_location.join(':')})"}) if block
         c.freeze
       end
 

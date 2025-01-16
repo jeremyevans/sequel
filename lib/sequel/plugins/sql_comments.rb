@@ -85,7 +85,7 @@ module Sequel
         # Use automatic SQL comments for the given dataset methods.
         def sql_comments_dataset_methods(*meths)
           unless @_sql_comments_dataset_module
-            dataset_module(@_sql_comments_dataset_module = Module.new)
+            dataset_module(@_sql_comments_dataset_module = Sequel.set_temp_name(Module.new){"#{name}::@_sql_comments_dataset_module"})
           end
           _sql_comments_methods(@_sql_comments_dataset_module, :dataset, meths)
         end

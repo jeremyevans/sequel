@@ -48,6 +48,7 @@ module Sequel
       def self.apply(model, &block)
         model.instance_exec do
           @dataset_module_class = Class.new(@dataset_module_class) do
+            Sequel.set_temp_name(self){"#{model.name}::@dataset_module_class(SubsetConditions)"}
             include DatasetModuleMethods
           end
         end

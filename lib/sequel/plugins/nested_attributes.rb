@@ -129,7 +129,7 @@ module Sequel
         #
         # If a block is provided, it is used to set the :reject_if option.
         def nested_attributes(*associations, &block)
-          include(@nested_attributes_module ||= Module.new) unless @nested_attributes_module
+          include(@nested_attributes_module ||= Sequel.set_temp_name(Module.new){"#{name}::@nested_attributes_module"}) unless @nested_attributes_module
           opts = associations.last.is_a?(Hash) ? associations.pop : OPTS
           reflections = associations.map{|a| association_reflection(a) || raise(Error, "no association named #{a} for #{self}")}
           reflections.each do |r|

@@ -16,6 +16,13 @@ describe Sequel::Model, "rcte_tree" do
     @db.sqls
   end
 
+  it "should give temporary name to name model-specific module" do
+    c = Sequel::Model(:items)
+    c.columns :id, :name, :parent_id, :i, :pi
+    c.plugin :rcte_tree
+    c.ancestors[1].name.must_equal "Sequel::_Model(:items)::_rcte_tree[:methods_module]"
+  end if RUBY_VERSION >= '3.3'
+
   it "should define the correct associations" do
     @c.plugin :rcte_tree
     @c.associations.sort_by{|x| x.to_s}.must_equal [:ancestors, :children, :descendants, :parent]

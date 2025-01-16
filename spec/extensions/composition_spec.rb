@@ -9,6 +9,12 @@ describe "Composition plugin" do
     DB.reset
   end
   
+  it "should give temporary name to name model-specific module" do
+    c = Sequel::Model(:items)
+    c.plugin :composition
+    c.ancestors[2].name.must_equal "Sequel::_Model(:items)::@composition_module"
+  end if RUBY_VERSION >= '3.3'
+
   it ".composition should add compositions" do
     @o.wont_respond_to(:date)
     @c.composition :date, :mapping=>[:year, :month, :day]

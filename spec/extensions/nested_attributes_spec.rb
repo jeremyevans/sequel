@@ -49,6 +49,14 @@ describe "NestedAttributes plugin" do
     @db.sqls
   end
   
+  it "should give temporary name to name model-specific module" do
+    c = Sequel::Model(:items)
+    c.plugin :nested_attributes
+    c.many_to_one :c, :class=>c
+    c.nested_attributes :c
+    c.ancestors[1].name.must_equal "Sequel::_Model(:items)::@nested_attributes_module"
+  end if RUBY_VERSION >= '3.3'
+
   it "should not modify options hash when loading plugin" do
     h = {}
     @Concert.nested_attributes :albums, h

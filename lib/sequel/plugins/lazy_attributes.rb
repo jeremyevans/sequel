@@ -64,7 +64,7 @@ module Sequel
         # :dataset :: The base dataset to use for the lazy attribute lookup
         # :table :: The table name to use to qualify the attribute and primary key columns.
         def define_lazy_attribute_getter(a, opts=OPTS)
-          include(@lazy_attributes_module ||= Module.new) unless @lazy_attributes_module
+          include(@lazy_attributes_module ||= Sequel.set_temp_name(Module.new){"#{name}::@lazy_attributes_module"}) unless @lazy_attributes_module
           @lazy_attributes_module.class_eval do
             define_method(a) do
               if !values.has_key?(a) && !new?

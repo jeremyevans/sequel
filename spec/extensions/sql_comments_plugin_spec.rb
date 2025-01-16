@@ -14,6 +14,15 @@ describe "sql_comments plugin " do
     @db.sqls
   end
   
+  it "should give temporary name to name model-specific dataset module" do
+    def @c.name; "Foo" end
+    @c.dataset_module{where :a, :a}
+    @c.sql_comments_dataset_methods :a
+    @c.dataset.class.ancestors[1].name.must_equal "Foo::@_sql_comments_dataset_module"
+    @c.a.all
+    @db.sqls.must_equal ["SELECT * FROM t WHERE a -- model:C,method_type:dataset,method:all\n"]
+  end if RUBY_VERSION >= '3.3'
+
   it "should include SQL comments for default class methods that issue queries" do
     @c.with_pk!(1)
     @db.sqls.must_equal ["SELECT * FROM t WHERE (id = 1) LIMIT 1 -- model:C,method_type:class,method:with_pk\n"]

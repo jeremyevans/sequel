@@ -164,6 +164,21 @@ module Sequel
       JSON::ParserError
     end
 
+    if RUBY_VERSION >= '3.3'
+      # Create a new module using the block, and set the temporary name
+      # on it using the given a containing module and name.
+      def set_temp_name(mod)
+        mod.set_temporary_name(yield)
+        mod
+      end
+    # :nocov:
+    else
+      def set_temp_name(mod)
+        mod
+      end
+    end
+    # :nocov:
+
     # Convert given object to json and return the result.
     # This can be overridden to use an alternative json implementation.
     def object_to_json(obj, *args, &block)

@@ -14,6 +14,7 @@ module Sequel
   module SQL
     class VirtualRow < BasicObject
       include(Module.new do
+        Sequel.set_temp_name(self){"Sequel::SQL:VirtualRow::_MethodBlockMethodMissing"}
         # Handle blocks passed to methods and change the behavior.
         def method_missing(m, *args, &block)
           if block

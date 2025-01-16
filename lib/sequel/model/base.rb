@@ -184,7 +184,7 @@ module Sequel
           end
         end
 
-        klass = Class.new(self)
+        klass = Sequel.set_temp_name(Class.new(self)){"Sequel::_Model(#{source.inspect})"}
 
         if source.is_a?(::Sequel::Database)
           klass.db = source
@@ -768,7 +768,7 @@ module Sequel
       # default behavior.
       def dataset_methods_module
         return @dataset_methods_module if defined?(@dataset_methods_module)
-        Sequel.synchronize{@dataset_methods_module ||= Module.new}
+        Sequel.synchronize{@dataset_methods_module ||= Sequel.set_temp_name(Module.new){"#{name}::@dataset_methods_module"}}
         extend(@dataset_methods_module)
         @dataset_methods_module
       end
@@ -956,7 +956,7 @@ END
       # Module that the class includes that holds methods the class adds for column accessors and
       # associations so that the methods can be overridden with +super+.
       def overridable_methods_module
-        include(@overridable_methods_module = Module.new) unless @overridable_methods_module
+        include(@overridable_methods_module = Sequel.set_temp_name(Module.new){"#{name}::@overridable_methods_module"}) unless @overridable_methods_module
         @overridable_methods_module
       end
       

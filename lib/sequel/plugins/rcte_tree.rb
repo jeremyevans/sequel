@@ -81,7 +81,7 @@ module Sequel
 
         opts = opts.dup
         opts[:class] = model
-        opts[:methods_module] = Module.new
+        opts[:methods_module] = Sequel.set_temp_name(Module.new){"#{model.name}::_rcte_tree[:methods_module]"}
         opts[:union_all] = opts[:union_all].nil? ? true : opts[:union_all]
         model.send(:include, opts[:methods_module])
         

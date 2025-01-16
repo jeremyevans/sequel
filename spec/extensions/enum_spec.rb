@@ -9,6 +9,13 @@ describe "Sequel enum plugin" do
     @album = @Album.load(:status_id=>3)
   end
 
+  it "should give temporary name to name model-specific module" do
+    c = Sequel::Model(:items)
+    c.plugin :enum
+    c.enum :status_id, :good=>3, :bad=>5
+    c.ancestors[1].name.must_equal "Sequel::_Model(:items)::@enum_methods"
+  end if RUBY_VERSION >= '3.3'
+
   it "should add enum_value! and enum_value? methods for setting/checking the enum values" do
     @album.good?.must_equal true
     @album.bad?.must_equal false

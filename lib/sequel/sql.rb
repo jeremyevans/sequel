@@ -1915,6 +1915,7 @@ module Sequel
       end
 
       m = Module.new do
+        Sequel.set_temp_name(Module.new){"Sequel::SQL::VirtualRow::_BaseMethodMissing"}
         # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
         # on arguments and whether a block is provided.  Does not currently call the block.
         # See the class level documentation.

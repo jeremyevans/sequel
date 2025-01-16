@@ -17,7 +17,7 @@ module Sequel
     # as the dataset class.
     def dataset_class=(c)
       unless @dataset_modules.empty?
-        c = Class.new(c)
+        c = Sequel.set_temp_name(Class.new(c)){"Sequel::Dataset::_Subclass"}
         @dataset_modules.each{|m| c.send(:include, m)}
       end
       @dataset_class = c
@@ -61,10 +61,10 @@ module Sequel
     #   # SELECT id, name FROM table WHERE active ORDER BY id
     def extend_datasets(mod=nil, &block)
       raise(Error, "must provide either mod or block, not both") if mod && block
-      mod = Dataset::DatasetModule.new(&block) if block
+      mod = Sequel.set_temp_name(Dataset::DatasetModule.new(&block)){"Sequel::Dataset::_DatasetModule(#{block.source_location.join(':')})"} if block
       if @dataset_modules.empty?
        @dataset_modules = [mod]
-       @dataset_class = Class.new(@dataset_class)
+       @dataset_class = Sequel.set_temp_name(Class.new(@dataset_class)){"Sequel::Dataset::_Subclass"}
       else
        @dataset_modules << mod
       end

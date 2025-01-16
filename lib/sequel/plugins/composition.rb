@@ -61,7 +61,7 @@ module Sequel
       def self.apply(model)
         model.instance_exec do
           @compositions = {}
-          include(@composition_module ||= Module.new)
+          include(@composition_module ||= Sequel.set_temp_name(Module.new){"#{name}::@composition_module"})
         end
       end
 

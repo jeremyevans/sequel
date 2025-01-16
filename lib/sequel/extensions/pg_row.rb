@@ -113,6 +113,7 @@ module Sequel
         # automatically casted to the database type when literalizing.
         def self.subclass(db_type)
           Class.new(self) do
+            Sequel.set_temp_name(self){"Sequel::Postgres::PGRow::ArrayRow::_Subclass(#{db_type})"}
             @db_type = db_type
           end
         end
@@ -170,6 +171,7 @@ module Sequel
         # type and columns.
         def self.subclass(db_type, columns)
           Class.new(self) do
+            Sequel.set_temp_name(self){"Sequel::Postgres::PGRow::HashRow::_Subclass(#{db_type})"}
             @db_type = db_type
             @columns = columns
           end
@@ -391,7 +393,7 @@ module Sequel
           db.instance_exec do
             @row_types = {}
             @row_schema_types = {}
-            extend(@row_type_method_module = Module.new)
+            extend(@row_type_method_module = Sequel.set_temp_name(Module.new){"Sequel::Postgres::PGRow::DatabaseMethods::_RowTypeMethodModule"})
             add_conversion_proc(2249, PGRow::Parser.new(:converter=>PGRow::ArrayRow))
             if respond_to?(:register_array_type)
               register_array_type('record', :oid=>2287, :scalar_oid=>2249)

@@ -7,6 +7,7 @@ module Sequel
 
   module IBMDB
     tt = Class.new do
+      Sequel.set_temp_name(self){"Sequel::IBMDB::_TypeTranslator"}
       def boolean(s) !s.to_i.zero? end
       def int(s) s.to_i end
     end.new

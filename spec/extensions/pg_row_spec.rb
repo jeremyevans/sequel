@@ -46,6 +46,7 @@ describe "pg_row extension" do
 
   it "should be able to register custom parsing of row types as array-like objects" do
     klass = @m::ArrayRow.subclass(:foo)
+    klass.name.must_equal "Sequel::Postgres::PGRow::ArrayRow::_Subclass(foo)" if RUBY_VERSION >= '3.3'
     parser = @m::Parser.new(:converter=>klass)
     a = parser.call("(a,b,c)")
     a.class.must_equal(klass)
@@ -197,6 +198,7 @@ describe "pg_row extension" do
     @db.send(:schema_composite_type, 'other').must_equal :composite
 
     c = p1.converter
+    c.name.must_equal "Sequel::Postgres::PGRow::HashRow::_Subclass(foo)" if RUBY_VERSION >= '3.3'
     c.superclass.must_equal @m::HashRow
     c.columns.must_equal [:bar, :baz]
     c.db_type.must_equal :foo

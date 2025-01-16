@@ -1907,6 +1907,12 @@ describe "Dataset#with_extend" do
   it "should work with just a block" do
     Sequel.mock.dataset.with_extend{def a; 1 end}.a.must_equal 1
   end
+
+  it "should give temporary name to class and module" do
+    ds = Sequel.mock.dataset.with_extend{def a; 1 end}
+    ds.class.ancestors[1].name.must_equal "Sequel::Dataset::_DatasetModule(#{__FILE__}:#{__LINE__-1})"
+    ds.class.name.must_equal "Sequel::Dataset::_Subclass"
+  end if RUBY_VERSION >= '3.3'
 end
 
 describe "Dataset#with_extend custom methods" do
@@ -4333,8 +4339,8 @@ describe "Dataset prepared statements and bound variables " do
   end
 
   it "#inspect should indicate it is a prepared statement with the prepared SQL" do
-    @ds.filter(:num=>:$n).prepare(:select, :sn).inspect.must_equal \
-      '<Sequel::Mock::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = $n)">'
+    @ds.filter(:num=>:$n).prepare(:select, :sn).inspect.must_match \
+      %r'\A<Sequel::.*/PreparedStatement "SELECT \* FROM items WHERE \(num = \$n\)">\z'
   end
     
   it "should handle literal strings" do
@@ -4423,7 +4429,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
   end
 
   it "#inspect should show the actual SQL submitted to the database" do
-    @ps.first.inspect.must_equal '<Sequel::Mock::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = ?)">'
+    @ps.first.inspect.must_match %r'\A<Sequel::.*/PreparedStatement "SELECT \* FROM items WHERE \(num = \?\)">\z'
   end
   
   it "should submit the SQL to the database with placeholders and bind variables" do

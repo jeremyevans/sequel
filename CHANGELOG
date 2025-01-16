@@ -1,3 +1,7 @@
+=== master
+
+* Add temporary names for internally defined anonymous classes and modules on Ruby 3.3+ (jeremyevans)
+
 === 5.88.0 (2025-01-01)
 
 * Add subset_static_cache plugin for statically caching subsets of a model class (jeremyevans)

@@ -80,7 +80,7 @@ module Sequel
           inverted = values.invert.freeze
 
           unless @enum_methods
-            @enum_methods = Module.new
+            @enum_methods = Sequel.set_temp_name(Module.new){"#{name}::@enum_methods"}
             include @enum_methods
           end
 

@@ -6,6 +6,12 @@ describe "subset_conditions plugin" do
     @c.plugin :subset_conditions
   end
 
+  it "should name generated dataset module class" do
+    c = Sequel::Model(:items)
+    c.plugin :subset_conditions
+    c.dataset_module_class.name.must_equal "Sequel::_Model(:items)::@dataset_module_class(SubsetConditions)"
+  end if RUBY_VERSION >= '3.3'
+
   it "should provide *_conditions method return the arguments passed" do
     @c.dataset_module{subset(:published, :published => true)}
     @c.where(@c.published_conditions).sql.must_equal @c.published.sql

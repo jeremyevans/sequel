@@ -20,7 +20,8 @@ module Sequel
     def self.prepared_statements_module(code, mods, meths=DEFAULT_PREPARED_STATEMENT_MODULE_METHODS, &block)
       code = PREPARED_STATEMENT_MODULE_CODE[code] || code
 
-      Module.new do
+      Module.new do 
+        Sequel.set_temp_name(self){"Sequel::Dataset::_PreparedStatementsModule(#{block.source_location.join(':') if block})"}
         Array(mods).each do |mod|
           include mod
         end

@@ -1,6 +1,12 @@
 require_relative "spec_helper"
 
 describe "Sequel::Plugins::InvertedSubsets" do
+  it "should name generated dataset module class" do
+    c = Sequel::Model(:items)
+    c.plugin :inverted_subsets
+    c.dataset_module_class.name.must_equal "Sequel::_Model(:items)::@dataset_module_class(InvertedSubsets)"
+  end if RUBY_VERSION >= '3.3'
+
   it "should add an inverted subset method which inverts the condition" do
     c = Class.new(Sequel::Model(:a))
     c.plugin :inverted_subsets
