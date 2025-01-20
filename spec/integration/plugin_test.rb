@@ -3239,7 +3239,7 @@ describe "query_blocker extension" do
     @db.drop_table?(:query_blocker_test)
   end
 
-  types = {
+  {
     "SELECT" => proc{@ds.all},
     "INSERT" => proc{@ds.insert(1)},
     "UPDATE" => proc{@ds.update(:i => 1)},

@@ -97,7 +97,14 @@ module Sequel
           synchronize(opts[:server]) do |conn|
             stmt, ps_sql = conn.prepared_statements[ps_name]
             unless ps_sql == sql
-              stmt.close if stmt
+              if stmt
+                begin
+                  stmt.close
+                rescue ::Mysql2::Error
+                  # probably Invalid statement handle, can happen from dropping
+                  # related table, ignore as we won't be using it again.
+                end
+              end
               stmt = log_connection_yield("Preparing #{ps_name}: #{sql}", conn){conn.prepare(sql)}
               conn.prepared_statements[ps_name] = [stmt, sql]
             end

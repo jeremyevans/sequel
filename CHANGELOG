@@ -1,5 +1,7 @@
 === master
 
+* Make mysql2 adapter handle invalid statement handles when closing prepared statements (jeremyevans)
+
 * Add query_blocker extension, for blocking queries inside a block (jeremyevans)
 
 * Support alter_table add_primary_key/add_unique_constraint :using_index option on PostgreSQL 9.1+ (jeremyevans)
