@@ -76,7 +76,7 @@ end
 
 if ENV['SEQUEL_FREEZE_DATABASE']
   raise "cannot freeze database when running specs for specific adapters" if adapter_test_type
-  DB.extension(:constraint_validations, :string_agg, :date_arithmetic)
+  DB.extension(:constraint_validations, :string_agg, :date_arithmetic, :query_blocker)
   DB.extension(:pg_array) if DB.database_type == :postgres
   DB.freeze
 end

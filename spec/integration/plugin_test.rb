@@ -3222,3 +3222,37 @@ describe "paged_operations plugin" do
     counts.must_equal [49]
   end
 end unless DB.database_type == :db2 && DB.offset_strategy == :emulate
+
+describe "query_blocker extension" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:query_blocker_test) do
+      Integer :i
+    end
+    @db.extension :query_blocker
+    @ds = @db[:query_blocker_test]
+  end
+  before do
+    @ds.delete
+  end
+  after(:all) do
+    @db.drop_table?(:query_blocker_test)
+  end
+
+  types = {
+    "SELECT" => proc{@ds.all},
+    "INSERT" => proc{@ds.insert(1)},
+    "UPDATE" => proc{@ds.update(:i => 1)},
+    "DELETE" => proc{@ds.delete},
+    "TRUNCATE" => proc{@ds.truncate},
+    "bound variable" => proc{@ds.call(:select)},
+    "prepared statement" => proc{@ds.prepare(:select, :select_query_blocker_test).call},
+    "arbitrary SQL" => proc{@db.run(@ds.select(1).sql)},
+  }.each do |type, block|
+    it "should block #{type} queries" do
+      @db.block_queries do
+        proc{instance_exec(&block)}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+    end
+  end
+end
