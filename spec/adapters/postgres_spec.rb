@@ -1953,7 +1953,29 @@ describe "A PostgreSQL database" do
     @db.rename_table(:posts1, :posts)
   end
 
-  it "should adding a primary key only if it does not already exists" do
+  it "should support :using_index option when adding a UNIQUE constraint" do
+    @db.create_table(:posts) do
+      Integer :i
+      index :i, :name=>:posts_i_uidx, :unique=>true
+    end
+
+    @db.alter_table(:posts) do
+      add_unique_constraint :i, :using_index=>:posts_i_uidx, :name=>"posts_ukey"
+    end
+  end if DB.server_version >= 90100
+
+  it "should support :using_index option when adding a PRIMARY KEY constraint" do
+    @db.create_table(:posts) do
+      Integer :i
+      index :i, :name=>:posts_i_uidx, :unique=>true
+    end
+
+    @db.alter_table(:posts) do
+      add_primary_key [:i], :using_index=>:posts_i_uidx
+    end
+  end if DB.server_version >= 90100
+
+  it "should adding a column only if it does not already exist" do
     @db.create_table(:posts){Integer :a}
     @db.alter_table(:posts){add_column :b, Integer}
     @db.alter_table(:posts){add_column :b, Integer, :if_not_exists=>true}

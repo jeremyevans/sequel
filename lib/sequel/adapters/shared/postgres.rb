@@ -1271,7 +1271,7 @@ module Sequel
 
       # Handle exclusion constraints.
       def constraint_definition_sql(constraint)
-        case constraint[:type]
+        case type = constraint[:type]
         when :exclude
           elements = constraint[:elements].map{|c, op| "#{literal(c)} WITH #{op}"}.join(', ')
           sql = String.new
@@ -1284,6 +1284,19 @@ module Sequel
             sql << " NOT VALID"
           end
           sql
+        when :primary_key, :unique
+          if using_index = constraint[:using_index]
+            sql = String.new
+            sql << "CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]
+            if type == :primary_key
+              sql << primary_key_constraint_sql_fragment(constraint)
+            else
+              sql << unique_constraint_sql_fragment(constraint)
+            end
+            sql << " USING INDEX " << quote_identifier(using_index)
+          else
+            super
+          end
         else
           super
         end

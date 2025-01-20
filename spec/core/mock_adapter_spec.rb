@@ -919,6 +919,32 @@ describe "PostgreSQL support" do
     proc{@db.from{c.function.as(:d, [[:a], [:e, :f]])}.sql}.must_raise Sequel::Error
     proc{@db.from{c.function.as(:d, [[:a, :b, :c], [:e, :f]])}.sql}.must_raise Sequel::Error
   end
+
+  it "should support :using_index option when adding a UNIQUE constraint" do
+    @db.create_table(:posts) do
+      Integer :i
+      index :i, :name=>:posts_i_uidx, :unique=>true
+    end
+
+    @db.sqls
+    @db.alter_table(:posts) do
+      add_unique_constraint :i, :using_index=>:posts_i_uidx
+    end
+    @db.sqls.must_equal ['ALTER TABLE "posts" ADD UNIQUE USING INDEX "posts_i_uidx"']
+  end
+
+  it "should support :using_index option when adding a PRIMARY KEY constraint" do
+    @db.create_table(:posts) do
+      Integer :i
+      index :i, :name=>:posts_i_uidx, :unique=>true
+    end
+
+    @db.sqls
+    @db.alter_table(:posts) do
+      add_primary_key [:i], :using_index=>:posts_i_uidx, :name=>"posts_pkey"
+    end
+    @db.sqls.must_equal ['ALTER TABLE "posts" ADD CONSTRAINT "posts_pkey" PRIMARY KEY USING INDEX "posts_i_uidx"']
+  end
 end
 
 describe "MySQL support" do

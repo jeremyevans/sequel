@@ -430,6 +430,10 @@ module Sequel
       #   add_unique_constraint(:name, name: :unique_name) # ADD CONSTRAINT unique_name UNIQUE (name)
       #
       # Supports the same :deferrable option as CreateTableGenerator#column.
+      #
+      # PostgreSQL specific options:
+      #
+      # :using_index :: Use the USING INDEX clause to specify an existing unique index
       def add_unique_constraint(columns, opts = OPTS)
         @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge!(opts)
         nil
@@ -483,6 +487,10 @@ module Sequel
       #
       #   add_primary_key(:id) # ADD COLUMN id serial PRIMARY KEY
       #   add_primary_key([:artist_id, :name]) # ADD PRIMARY KEY (artist_id, name)
+      #
+      # PostgreSQL specific options:
+      #
+      # :using_index :: Use the USING INDEX clause to specify an existing unique index
       def add_primary_key(name, opts = OPTS)
         return add_composite_primary_key(name, opts) if name.is_a?(Array)
         opts = @db.serial_primary_key_options.merge(opts)

@@ -1,5 +1,7 @@
 === master
 
+* Support alter_table add_primary_key/add_unique_constraint :using_index option on PostgreSQL 9.1+ (jeremyevans)
+
 * Add temporary names for internally defined anonymous classes and modules on Ruby 3.3+ (jeremyevans)
 
 === 5.88.0 (2025-01-01)
