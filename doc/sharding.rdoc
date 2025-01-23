@@ -221,7 +221,7 @@ to use, which can be useful if you are mixing sharding and primary/replica serve
     # this SELECT query uses the "a_read_only" shard
     if r = Rainbow.first(hash: /31337/)
       r.count += 1
-      # this UPDATE query also uses the "a" shard
+      # this UPDATE query uses the "a" shard
       r.save
     end
   end
