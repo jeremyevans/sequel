@@ -121,4 +121,95 @@ describe "query_blocker extension" do
     @db.block_queries{@db.block_queries?}.must_equal true
     @db.block_queries?.must_equal false
   end
+
+  it "#allow_queries should work outside a block_queries block" do
+    @ds.all.must_equal []
+    @db.allow_queries{@ds.all}.must_equal []
+  end
+
+  it "#allow_queries should allow_queries inside a block_queries block" do
+    @ds.all.must_equal []
+    @db.block_queries do
+      proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      @db.allow_queries do
+        @ds.all.must_equal []
+      end
+      proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+    end
+    @ds.all.must_equal []
+  end
+
+  it "scoping priority for #block_queries and #allow_queries should be fiber, thread, global, in that order" do
+    @db.block_queries do
+      @db.allow_queries(:scope=>:fiber) do
+        @ds.all.must_equal []
+      end
+      @db.allow_queries(:scope=>:thread) do
+        @ds.all.must_equal []
+      end
+      @db.allow_queries do
+        @ds.all.must_equal []
+      end
+    end
+
+    @db.block_queries(:scope=>:thread) do
+      @db.allow_queries(:scope=>:fiber) do
+        @ds.all.must_equal []
+      end
+      @db.allow_queries(:scope=>:thread) do
+        @ds.all.must_equal []
+      end
+      @db.allow_queries do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+    end
+
+    @db.block_queries(:scope=>:fiber) do
+      @db.allow_queries(:scope=>:fiber) do
+        @ds.all.must_equal []
+      end
+      @db.allow_queries(:scope=>:thread) do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+      @db.allow_queries do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+    end
+
+    @db.allow_queries do
+      @db.block_queries(:scope=>:fiber) do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+      @db.block_queries(:scope=>:thread) do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+      @db.block_queries do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+    end
+
+    @db.allow_queries(:scope=>:thread) do
+      @db.block_queries(:scope=>:fiber) do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+      @db.block_queries(:scope=>:thread) do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+      @db.block_queries do
+        @ds.all.must_equal []
+      end
+    end
+
+    @db.allow_queries(:scope=>:fiber) do
+      @db.block_queries(:scope=>:fiber) do
+        proc{@ds.all}.must_raise Sequel::QueryBlocker::BlockedQuery
+      end
+      @db.block_queries(:scope=>:thread) do
+        @ds.all.must_equal []
+      end
+      @db.block_queries do
+        @ds.all.must_equal []
+      end
+    end
+  end
 end

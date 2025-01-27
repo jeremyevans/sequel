@@ -9,7 +9,7 @@
 #   DB.block_queries do
 #     ds = DB[:table]          # No exception
 #     ds = ds.where(column: 1) # No exception
-#     ds.all                   # Attempts query, exception raised
+#     ds.all                   # Exception raised
 #   end
 #
 # To handle concurrency, you can pass a :scope option:
@@ -25,6 +25,25 @@
 #
 #   # Specific Fiber
 #   DB.block_queries(scope: Fiber.current){}
+#
+# Database#block_queries is useful for blocking queries inside
+# the block.  However, there may be cases where you want to
+# allow queries in specific places inside a block_queries block.
+# You can use Database#allow_queries for that:
+#
+#   DB.block_queries do
+#     DB.allow_queries do
+#       DB[:table].all           # Query allowed
+#     end
+#
+#     DB[:table].all           # Exception raised
+#   end
+#
+# When mixing block_queries and allow_queries with scopes, the
+# narrowest scope has priority.  So if you are blocking with
+# :thread scope, and allowing with :fiber scope, queries in the
+# current fiber will be allowed, but queries in different fibers of
+# the current thread will be blocked.
 #
 # Note that this should catch all queries executed through the
 # Database instance.  Whether it catches queries executed directly
@@ -64,7 +83,18 @@ module Sequel
     # Whether queries are currently blocked.
     def block_queries?
       b = @blocked_query_scopes
-      Sequel.synchronize{b[:global] || b[Thread.current] || b[Fiber.current]} || false
+      b.fetch(Fiber.current) do
+        b.fetch(Thread.current) do
+          b.fetch(:global, false)
+        end
+      end
+    end
+
+    # Allow queries inside the block.  Only useful if they are already blocked
+    # for the same scope. Useful for blocking queries generally, and only allowing
+    # them in specific places.  Takes the same :scope option as #block_queries.
+    def allow_queries(opts=OPTS, &block)
+      _allow_or_block_queries(false, opts, &block)
     end
 
     # Reject (raise an BlockedQuery exception) if there is an attempt to execute
@@ -77,44 +107,51 @@ module Sequel
     # :fiber :: Reject all queries in the current fiber.
     # Thread :: Reject all queries in the given thread.
     # Fiber :: Reject all queries in the given fiber.
-    def block_queries(opts=OPTS)
-      case scope = opts[:scope]
-      when nil
-        scope = :global
-      when :global
-        #  nothing
-      when :thread
-        scope = Thread.current
-      when :fiber
-        scope = Fiber.current
-      when Thread, Fiber
-        # nothing
-      else
-        raise Sequel::Error, "invalid scope given to block_queries: #{scope.inspect}"
-      end
+    def block_queries(opts=OPTS, &block)
+      _allow_or_block_queries(true, opts, &block)
+    end
+    
+    private
 
+    # Internals of block_queries and allow_queries.
+    def _allow_or_block_queries(value, opts)
+      scope = query_blocker_scope(opts)
       prev_value = nil
       scopes = @blocked_query_scopes
 
       begin
         Sequel.synchronize do
           prev_value = scopes[scope]
-          scopes[scope] = true
+          scopes[scope] = value
         end
 
         yield
       ensure
         Sequel.synchronize do
-          if prev_value
-            scopes[scope] = prev_value
-          else
+          if prev_value.nil?
             scopes.delete(scope)
+          else
+            scopes[scope] = prev_value
           end
         end
       end
     end
-    
-    private
+
+    # The scope for the query block, either :global, or a Thread or Fiber instance.
+    def query_blocker_scope(opts)
+      case scope = opts[:scope]
+      when nil
+        :global
+      when :global, Thread, Fiber
+        scope
+      when :thread
+        Thread.current
+      when :fiber
+        Fiber.current
+      else
+        raise Sequel::Error, "invalid scope given to block_queries: #{scope.inspect}"
+      end
+    end
 
     # Raise a BlockQuery exception if queries are currently blocked.
     def check_blocked_queries!
