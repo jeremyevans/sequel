@@ -1278,12 +1278,6 @@ module Sequel
           sql << "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
           constraint_deferrable_sql_append(sql, constraint[:deferrable])
           sql
-        when :foreign_key, :check
-          sql = super
-          if constraint[:not_valid]
-            sql << " NOT VALID"
-          end
-          sql
         when :primary_key, :unique
           if using_index = constraint[:using_index]
             sql = String.new
@@ -1297,8 +1291,12 @@ module Sequel
           else
             super
           end
-        else
-          super
+        else # when :foreign_key, :check
+          sql = super
+          if constraint[:not_valid]
+            sql << " NOT VALID"
+          end
+          sql
         end
       end
 
