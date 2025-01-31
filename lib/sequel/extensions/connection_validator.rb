@@ -105,18 +105,23 @@ module Sequel
       1.times do
         if (conn = super) &&
            (timer = sync{@connection_timestamps.delete(conn)}) &&
-           Sequel.elapsed_seconds_since(timer) > @connection_validation_timeout &&
-           !db.valid_connection?(conn)
+           Sequel.elapsed_seconds_since(timer) > @connection_validation_timeout
 
-          case pool_type
-          when :sharded_threaded, :sharded_timed_queue
-            sync{@allocated[a.last].delete(Sequel.current)}
-          else
-            sync{@allocated.delete(Sequel.current)}
+          begin
+            valid = db.valid_connection?(conn)
+          ensure
+            unless valid
+              case pool_type
+              when :sharded_threaded, :sharded_timed_queue
+                sync{@allocated[a.last].delete(Sequel.current)}
+              else
+                sync{@allocated.delete(Sequel.current)}
+              end
+
+              disconnect_connection(conn)
+              redo
+            end
           end
-
-          disconnect_connection(conn)
-          redo
         end
       end
 

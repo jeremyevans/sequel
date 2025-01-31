@@ -1,6 +1,8 @@
 === master
 
-* Support :avoid_connection_compare_by_identity Database option to work around bugs in other libraries or the ruby implementation (jeremyevans) 
+* Make connection_validator extension handle case where Database#valid_connection? raises an exception (jeremyevans)
+
+* Support :compare_connections_by_identity Database option to work around bugs in other libraries or the ruby implementation (jeremyevans) 
 
 * Make mysql2 adapter handle invalid statement handles when closing prepared statements (jeremyevans)
 

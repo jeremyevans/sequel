@@ -10,6 +10,7 @@ connection_validator_specs = Module.new do
       end
       def valid_connection?(conn)
         super
+        raise if conn.valid == :exception
         conn.valid
       end
       def connect(server)
@@ -48,6 +49,16 @@ connection_validator_specs = Module.new do
     c1 = @db.synchronize{|c| c}
     @db.sqls.must_equal []
     c1.valid = false
+    @db.pool.connection_validation_timeout = -1
+    c2 = @db.synchronize{|c| c}
+    @db.sqls.must_equal ['SELECT NULL', 'disconnect']
+    c2.wont_be_same_as(c1)
+  end
+
+  it "should assume that exceptions raised during valid_connection mean the connection is not valid" do
+    c1 = @db.synchronize{|c| c}
+    @db.sqls.must_equal []
+    c1.valid = :exception
     @db.pool.connection_validation_timeout = -1
     c2 = @db.synchronize{|c| c}
     @db.sqls.must_equal ['SELECT NULL', 'disconnect']
