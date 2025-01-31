@@ -70,6 +70,17 @@ module Sequel
       end
     end
 
+    # If checking a connection for validity, and a BlockedQuery exception is
+    # raised, treat it as a valid connection.  You cannot check whether the
+    # connection is valid without issuing a query, and if queries are blocked,
+    # you need to assume it is valid or assume it is not.  Since it most cases
+    # it will be valid, this assumes validity.
+    def valid_connection?(conn)
+      super
+    rescue BlockedQuery
+      true
+    end
+
     # Check whether queries are blocked before executing them.
     def log_connection_yield(sql, conn, args=nil)
       # All database adapters should be calling this method around

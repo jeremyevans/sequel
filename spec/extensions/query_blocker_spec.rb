@@ -212,4 +212,12 @@ describe "query_blocker extension" do
       end
     end
   end
+
+  it "#valid_connection should return true when blocking queries" do
+    @db.block_queries do
+      @db.synchronize do |c|
+        @db.valid_connection?(c).must_equal true
+      end
+    end
+  end
 end
