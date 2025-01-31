@@ -116,6 +116,10 @@ module Sequel
     # :after_connect :: A callable object called after each new connection is made, with the
     #                   connection object (and server argument if the callable accepts 2 arguments),
     #                   useful for customizations that you want to apply to all connections.
+    # :compare_connections_by_identity :: Whether to use compare_by_identity on hashes that use
+    #                                     connection objects as keys. Defaults to true. This should only
+    #                                     be set to false to work around bugs in libraries or
+    #                                     ruby implementations.
     # :before_preconnect :: Callable that runs after extensions from :preconnect_extensions are loaded,
     #                       but before any connections are created.
     # :cache_schema :: Whether schema should be cached for this Database instance
@@ -165,7 +169,7 @@ module Sequel
       @schemas = {}
       @prepared_statements = {}
       @transactions = {}
-      @transactions.compare_by_identity
+      @transactions.compare_by_identity if typecast_value_boolean(@opts.fetch(:compare_connections_by_identity, true))
       @symbol_literal_cache = {}
 
       @timezone = nil

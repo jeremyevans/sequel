@@ -173,6 +173,20 @@ describe "A new Database" do
     klass.must_be_same_as(Sequel::Database.adapter_class(klass))
   end
 
+  it 'should use compare_by_identity hash for transactions by default' do
+    Sequel.mock.instance_variable_get(:@transactions).compare_by_identity?.must_equal true
+  end
+
+  it 'should use compare_by_identity hash for transactions if :compare_connections_by_identity option is true' do
+    Sequel.mock(:compare_connections_by_identity=>true).instance_variable_get(:@transactions).compare_by_identity?.must_equal true
+    Sequel.mock(:compare_connections_by_identity=>'t').instance_variable_get(:@transactions).compare_by_identity?.must_equal true
+  end
+
+  it 'should not use compare_by_identity hash for transactions if :compare_connections_by_identity option is false' do
+    Sequel.mock(:compare_connections_by_identity=>false).instance_variable_get(:@transactions).compare_by_identity?.must_equal false
+    Sequel.mock(:compare_connections_by_identity=>'f').instance_variable_get(:@transactions).compare_by_identity?.must_equal false
+  end
+
   it 'should log exceptions without messages correctly' do
     logger = []
     def logger.error(x) self << x end
