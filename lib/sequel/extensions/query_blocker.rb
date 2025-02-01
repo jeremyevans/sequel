@@ -51,9 +51,7 @@
 #
 # Related module: Sequel::QueryBlocker
 
-# :nocov:
-require "fiber" if RUBY_VERSION <= "2.7"
-# :nocov:
+require "fiber"
 
 #
 module Sequel
