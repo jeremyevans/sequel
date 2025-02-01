@@ -1,0 +1,76 @@
+= New Features
+
+* A query_blocker extension has been added, for blocking queries
+  inside a block:
+
+    DB.extension :query_blocker
+    DB[:table].all # works
+    DB.block_queries do
+      DB[:table].all # raises
+    end
+
+  To handle concurrency, you can specify a scope for the block:
+
+    DB.block_queries(scope: :thread) do
+      # Block queries for current thread
+    end
+
+    DB.block_queries(scope: :fiber) do
+      # Block queries for current fiber
+    end
+
+  In some cases, you may want to block queries in general, and only
+  allow them in specific places.  The query blocker extension
+  supports this:
+
+    DB.block_queries do
+      # Queries blocked
+      DB.allow_queries do
+        # Queries allowed
+      end
+      # Queries blocked
+    end
+
+* The alter_table add_primary_key and add_unique_constraint methods
+  now support a :using_index option on PostgreSQL, to add the
+  constraint using an existing index, instead of building a new
+  unique index to enforce the constraint.
+
+* A :compare_connections_by_identity Database option is now
+  supported, which can be set to false to not use compare_by_identity
+  on hashes keyed by connections.  This should only be used to work
+  around bugs in other libraries or ruby implementations.
+
+= Other Improvements
+
+* All anonymous classes and modules created by Sequel now have
+  temporary names set when using Ruby 3.3+.  This makes debugging
+  and introspection easier.  Example:
+
+    class Foo < Sequel::Model(:foo)
+      def_column_alias :a, :a
+      puts ancestors[0..3]
+    end
+
+  Previous and when running on Ruby < 3.3 Output:
+
+    Foo
+    #<Module:0x00000846cf717aa0>
+    #<Class:0x00000846cf718040>
+    Sequel::Model
+
+  New output when running on Ruby 3.3+:
+
+    Foo
+    Foo::@overridable_methods_module
+    Sequel::_Model(:foo)
+    Sequel::Model
+
+* The connection_validator extension now handles exceptions
+  raised by Database#valid_connection?, which shouldn't happen, but
+  would result in the thread/fiber being assigned the connection
+  permanently in that case.
+
+* The mysql2 adapter now handles invalid statement handles when
+  closing prepared statements. This only affected cases where
+  you were changing the definition of already prepared statement.
