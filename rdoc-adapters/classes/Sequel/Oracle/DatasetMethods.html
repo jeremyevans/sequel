@@ -115,37 +115,37 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-complex_expression_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">339</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">340</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
-<span class="line-num">341</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>
-<span class="line-num">342</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>)
-<span class="line-num">343</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:|</span>
-<span class="line-num">344</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; - &quot;</span>, <span class="ruby-string">&quot; + &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-identifier">a</span>, <span class="ruby-identifier">complex_expression_arg_pairs</span>([<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>), <span class="ruby-identifier">b</span>)}
-<span class="line-num">345</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>
-<span class="line-num">346</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
-<span class="line-num">347</span>       <span class="ruby-identifier">s1</span> = <span class="ruby-identifier">complex_expression_arg_pairs</span>(<span class="ruby-identifier">x</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; - &quot;</span>, <span class="ruby-string">&quot; + &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-identifier">a</span>, <span class="ruby-identifier">complex_expression_arg_pairs</span>([<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>), <span class="ruby-identifier">b</span>)}
-<span class="line-num">348</span>       <span class="ruby-identifier">s2</span> = <span class="ruby-identifier">complex_expression_arg_pairs</span>(<span class="ruby-identifier">x</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>)
-<span class="line-num">349</span>       <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; - &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-identifier">s1</span>, <span class="ruby-identifier">s2</span>)
-<span class="line-num">350</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">351</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:~</span>, <span class="ruby-value">:&#39;!~&#39;</span>, <span class="ruby-value">:&#39;~*&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>
-<span class="line-num">352</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">InvalidOperation</span>, <span class="ruby-string">&quot;Pattern matching via regular expressions is not supported in this Oracle version&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_regexp?</span>
-<span class="line-num">353</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;!~&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;!~*&#39;</span>
-<span class="line-num">354</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;NOT &#39;</span>
-<span class="line-num">355</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">356</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;REGEXP_LIKE(&#39;</span>
-<span class="line-num">357</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
-<span class="line-num">358</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
-<span class="line-num">359</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
-<span class="line-num">360</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;~*&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;!~*&#39;</span>
-<span class="line-num">361</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;, &#39;i&#39;&quot;</span>
-<span class="line-num">362</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">363</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">364</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:%</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>, <span class="ruby-value">:&#39;B~&#39;</span>
-<span class="line-num">365</span>     <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">366</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">367</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">368</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">369</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">340</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">341</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">342</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>
+<span class="line-num">343</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>)
+<span class="line-num">344</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:|</span>
+<span class="line-num">345</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; - &quot;</span>, <span class="ruby-string">&quot; + &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-identifier">a</span>, <span class="ruby-identifier">complex_expression_arg_pairs</span>([<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>), <span class="ruby-identifier">b</span>)}
+<span class="line-num">346</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>
+<span class="line-num">347</span>     <span class="ruby-identifier">complex_expression_arg_pairs_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+<span class="line-num">348</span>       <span class="ruby-identifier">s1</span> = <span class="ruby-identifier">complex_expression_arg_pairs</span>(<span class="ruby-identifier">x</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; - &quot;</span>, <span class="ruby-string">&quot; + &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-identifier">a</span>, <span class="ruby-identifier">complex_expression_arg_pairs</span>([<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>), <span class="ruby-identifier">b</span>)}
+<span class="line-num">349</span>       <span class="ruby-identifier">s2</span> = <span class="ruby-identifier">complex_expression_arg_pairs</span>(<span class="ruby-identifier">x</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">BITAND_PROC</span>)
+<span class="line-num">350</span>       <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;(&quot;</span>, <span class="ruby-string">&quot; - &quot;</span>, <span class="ruby-string">&quot;)&quot;</span>], <span class="ruby-identifier">s1</span>, <span class="ruby-identifier">s2</span>)
+<span class="line-num">351</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">352</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:~</span>, <span class="ruby-value">:&#39;!~&#39;</span>, <span class="ruby-value">:&#39;~*&#39;</span>, <span class="ruby-value">:&#39;!~*&#39;</span>
+<span class="line-num">353</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">InvalidOperation</span>, <span class="ruby-string">&quot;Pattern matching via regular expressions is not supported in this Oracle version&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_regexp?</span>
+<span class="line-num">354</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;!~&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;!~*&#39;</span>
+<span class="line-num">355</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;NOT &#39;</span>
+<span class="line-num">356</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">357</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;REGEXP_LIKE(&#39;</span>
+<span class="line-num">358</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
+<span class="line-num">359</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
+<span class="line-num">360</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+<span class="line-num">361</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;~*&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:&#39;!~*&#39;</span>
+<span class="line-num">362</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;, &#39;i&#39;&quot;</span>
+<span class="line-num">363</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">364</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">365</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:%</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>, <span class="ruby-value">:&#39;B~&#39;</span>
+<span class="line-num">366</span>     <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">367</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">368</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">369</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">370</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-constant_sql_append'>
@@ -164,13 +164,13 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-constant_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">374</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constant_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>)
-<span class="line-num">375</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-value">:CURRENT_TIME</span>
-<span class="line-num">376</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-value">:CURRENT_TIMESTAMP</span>)
-<span class="line-num">377</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">378</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">379</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">380</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">375</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constant_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>)
+<span class="line-num">376</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span> <span class="ruby-operator">==</span> <span class="ruby-value">:CURRENT_TIME</span>
+<span class="line-num">377</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-value">:CURRENT_TIMESTAMP</span>)
+<span class="line-num">378</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">379</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">380</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">381</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-empty-3F'>
@@ -189,14 +189,14 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-empty-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">390</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty?</span>
-<span class="line-num">391</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>]
-<span class="line-num">392</span>     <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">each</span>{<span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>}
-<span class="line-num">393</span>     <span class="ruby-keyword">true</span>
-<span class="line-num">394</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">395</span>     <span class="ruby-identifier">db</span>[<span class="ruby-value">:dual</span>].<span class="ruby-identifier">where</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">exists</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">unordered</span>.<span class="ruby-identifier">exists</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">nil</span>
-<span class="line-num">396</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">397</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">391</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty?</span>
+<span class="line-num">392</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>]
+<span class="line-num">393</span>     <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">each</span>{<span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>}
+<span class="line-num">394</span>     <span class="ruby-keyword">true</span>
+<span class="line-num">395</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">396</span>     <span class="ruby-identifier">db</span>[<span class="ruby-value">:dual</span>].<span class="ruby-identifier">where</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">exists</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">unordered</span>.<span class="ruby-identifier">exists</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">nil</span>
+<span class="line-num">397</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">398</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-except'>
@@ -215,10 +215,10 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-except-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">383</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">except</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">384</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;EXCEPT ALL not supported&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:all</span>]
-<span class="line-num">385</span>   <span class="ruby-identifier">compound_clone</span>(<span class="ruby-value">:minus</span>, <span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">386</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">384</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">except</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">385</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;EXCEPT ALL not supported&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:all</span>]
+<span class="line-num">386</span>   <span class="ruby-identifier">compound_clone</span>(<span class="ruby-value">:minus</span>, <span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">387</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-recursive_cte_requires_column_aliases-3F'>
@@ -237,9 +237,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-recursive_cte_requires_column_aliases-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">447</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">recursive_cte_requires_column_aliases?</span>
-<span class="line-num">448</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">449</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">448</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">recursive_cte_requires_column_aliases?</span>
+<span class="line-num">449</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">450</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-requires_sql_standard_datetimes-3F'>
@@ -258,9 +258,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-requires_sql_standard_datetimes-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">400</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">requires_sql_standard_datetimes?</span>
-<span class="line-num">401</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">402</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">401</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">requires_sql_standard_datetimes?</span>
+<span class="line-num">402</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">403</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-select_sql'>
@@ -279,38 +279,38 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-select_sql-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">413</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_sql</span>
-<span class="line-num">414</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>]
-<span class="line-num">415</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">supports_fetch_next_rows?</span>
-<span class="line-num">416</span> 
-<span class="line-num">417</span>   <span class="ruby-identifier">o</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]
-<span class="line-num">418</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">o</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">o</span> <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>
-<span class="line-num">419</span>     <span class="ruby-identifier">columns</span> = <span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>, <span class="ruby-value">:placeholder_literal_null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">columns</span>
-<span class="line-num">420</span>     <span class="ruby-identifier">dsa1</span> = <span class="ruby-identifier">dataset_alias</span>(<span class="ruby-value">1</span>)
-<span class="line-num">421</span>     <span class="ruby-identifier">rn</span> = <span class="ruby-identifier">row_number_column</span>
-<span class="line-num">422</span>     <span class="ruby-identifier">limit</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]
-<span class="line-num">423</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">unlimited</span>.
-<span class="line-num">424</span>       <span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">dsa1</span>).
-<span class="line-num">425</span>       <span class="ruby-identifier">select_append</span>(<span class="ruby-constant">ROW_NUMBER_EXPRESSION</span>.<span class="ruby-identifier">as</span>(<span class="ruby-identifier">rn</span>)).
-<span class="line-num">426</span>       <span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">dsa1</span>).
-<span class="line-num">427</span>       <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>).
-<span class="line-num">428</span>       <span class="ruby-identifier">where</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">rn</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">o</span>)
-<span class="line-num">429</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">rn</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">+</span>(<span class="ruby-identifier">o</span>, <span class="ruby-identifier">limit</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">limit</span>
-<span class="line-num">430</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:append_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">431</span>     <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)
-<span class="line-num">432</span>     <span class="ruby-identifier">sql</span>
-<span class="line-num">433</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">limit</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]
-<span class="line-num">434</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">unlimited</span>
-<span class="line-num">435</span>     <span class="ruby-comment"># Lock doesn&#39;t work in subselects, so don&#39;t use a subselect when locking.</span>
-<span class="line-num">436</span>     <span class="ruby-comment"># Don&#39;t use a subselect if custom SQL is used, as it breaks somethings.</span>
-<span class="line-num">437</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from_self</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:lock</span>]
-<span class="line-num">438</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:append_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">439</span>     <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ComplexExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&lt;=</span>, <span class="ruby-constant">ROW_NUMBER_EXPRESSION</span>, <span class="ruby-identifier">limit</span>)))
-<span class="line-num">440</span>     <span class="ruby-identifier">sql</span>
-<span class="line-num">441</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">442</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">443</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">444</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">414</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_sql</span>
+<span class="line-num">415</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>]
+<span class="line-num">416</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">supports_fetch_next_rows?</span>
+<span class="line-num">417</span> 
+<span class="line-num">418</span>   <span class="ruby-identifier">o</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]
+<span class="line-num">419</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">o</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">o</span> <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>
+<span class="line-num">420</span>     <span class="ruby-identifier">columns</span> = <span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>, <span class="ruby-value">:placeholder_literal_null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">columns</span>
+<span class="line-num">421</span>     <span class="ruby-identifier">dsa1</span> = <span class="ruby-identifier">dataset_alias</span>(<span class="ruby-value">1</span>)
+<span class="line-num">422</span>     <span class="ruby-identifier">rn</span> = <span class="ruby-identifier">row_number_column</span>
+<span class="line-num">423</span>     <span class="ruby-identifier">limit</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]
+<span class="line-num">424</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">unlimited</span>.
+<span class="line-num">425</span>       <span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">dsa1</span>).
+<span class="line-num">426</span>       <span class="ruby-identifier">select_append</span>(<span class="ruby-constant">ROW_NUMBER_EXPRESSION</span>.<span class="ruby-identifier">as</span>(<span class="ruby-identifier">rn</span>)).
+<span class="line-num">427</span>       <span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">dsa1</span>).
+<span class="line-num">428</span>       <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>).
+<span class="line-num">429</span>       <span class="ruby-identifier">where</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">rn</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">o</span>)
+<span class="line-num">430</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">rn</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">+</span>(<span class="ruby-identifier">o</span>, <span class="ruby-identifier">limit</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">limit</span>
+<span class="line-num">431</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:append_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">432</span>     <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)
+<span class="line-num">433</span>     <span class="ruby-identifier">sql</span>
+<span class="line-num">434</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">limit</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]
+<span class="line-num">435</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">unlimited</span>
+<span class="line-num">436</span>     <span class="ruby-comment"># Lock doesn&#39;t work in subselects, so don&#39;t use a subselect when locking.</span>
+<span class="line-num">437</span>     <span class="ruby-comment"># Don&#39;t use a subselect if custom SQL is used, as it breaks somethings.</span>
+<span class="line-num">438</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from_self</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:lock</span>]
+<span class="line-num">439</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:append_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">440</span>     <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ComplexExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&lt;=</span>, <span class="ruby-constant">ROW_NUMBER_EXPRESSION</span>, <span class="ruby-identifier">limit</span>)))
+<span class="line-num">441</span>     <span class="ruby-identifier">sql</span>
+<span class="line-num">442</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">443</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">444</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">445</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sequence'>
@@ -329,9 +329,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-sequence-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">407</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequence</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">408</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:sequence</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">s</span>)
-<span class="line-num">409</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">408</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequence</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">409</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:sequence</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">s</span>)
+<span class="line-num">410</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-server_version'>
@@ -350,9 +350,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-server_version-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">537</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>
-<span class="line-num">538</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])
-<span class="line-num">539</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">538</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>
+<span class="line-num">539</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])
+<span class="line-num">540</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -369,9 +369,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_cte-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">451</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
-<span class="line-num">452</span>   <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>
-<span class="line-num">453</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">452</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)
+<span class="line-num">453</span>   <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>
+<span class="line-num">454</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_derived_column_lists-3F'>
@@ -390,9 +390,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_derived_column_lists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">456</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>
-<span class="line-num">457</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">458</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">457</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>
+<span class="line-num">458</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">459</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_fetch_next_rows-3F'>
@@ -411,9 +411,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_fetch_next_rows-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">462</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_fetch_next_rows?</span>
-<span class="line-num">463</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">12000000</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:lock</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:skip_locked</span>])
-<span class="line-num">464</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">463</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_fetch_next_rows?</span>
+<span class="line-num">464</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">12000000</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:lock</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:skip_locked</span>])
+<span class="line-num">465</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_cube-3F'>
@@ -432,9 +432,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_group_cube-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">467</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>
-<span class="line-num">468</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">469</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">468</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>
+<span class="line-num">469</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">470</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
@@ -453,9 +453,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_group_rollup-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">472</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>
-<span class="line-num">473</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">474</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">473</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>
+<span class="line-num">474</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">475</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_grouping_sets-3F'>
@@ -474,9 +474,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_grouping_sets-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">477</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>
-<span class="line-num">478</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">479</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">478</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>
+<span class="line-num">479</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">480</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_intersect_except_all-3F'>
@@ -495,9 +495,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_intersect_except_all-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">482</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except_all?</span>
-<span class="line-num">483</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">484</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">483</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except_all?</span>
+<span class="line-num">484</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">485</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -516,9 +516,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_is_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">487</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>
-<span class="line-num">488</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">489</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">488</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>
+<span class="line-num">489</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">490</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_limits_in_correlated_subqueries-3F'>
@@ -537,9 +537,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_limits_in_correlated_subqueries-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">492</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_limits_in_correlated_subqueries?</span>
-<span class="line-num">493</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">494</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">493</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_limits_in_correlated_subqueries?</span>
+<span class="line-num">494</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">495</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_merge-3F'>
@@ -558,9 +558,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_merge-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">497</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_merge?</span>
-<span class="line-num">498</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">499</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">498</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_merge?</span>
+<span class="line-num">499</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">500</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_nowait-3F'>
@@ -579,9 +579,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_nowait-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">502</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>
-<span class="line-num">503</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">504</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">503</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>
+<span class="line-num">504</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">505</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_offsets_in_correlated_subqueries-3F'>
@@ -600,9 +600,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_offsets_in_correlated_subqueries-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">507</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_offsets_in_correlated_subqueries?</span>
-<span class="line-num">508</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">509</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">508</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_offsets_in_correlated_subqueries?</span>
+<span class="line-num">509</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">510</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_regexp-3F'>
@@ -621,9 +621,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_regexp-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">542</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
-<span class="line-num">543</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10010002</span>
-<span class="line-num">544</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">543</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>
+<span class="line-num">544</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10010002</span>
+<span class="line-num">545</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_select_all_and_column-3F'>
@@ -642,9 +642,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_select_all_and_column-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">512</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_select_all_and_column?</span>
-<span class="line-num">513</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">514</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">513</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_select_all_and_column?</span>
+<span class="line-num">514</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">515</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_skip_locked-3F'>
@@ -663,9 +663,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_skip_locked-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">517</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
-<span class="line-num">518</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">519</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">518</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>
+<span class="line-num">519</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">520</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -684,9 +684,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_timestamp_timezones-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">522</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
-<span class="line-num">523</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">524</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">523</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>
+<span class="line-num">524</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">525</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -705,9 +705,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_where_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">527</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
-<span class="line-num">528</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">529</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">528</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>
+<span class="line-num">529</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">530</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -726,9 +726,9 @@ Sequel::Oracle::DatasetMethods
 [show source]
 </a>
 <pre id='method-i-supports_window_functions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/oracle.rb</span>
-<span class="line-num">532</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
-<span class="line-num">533</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">534</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">533</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>
+<span class="line-num">534</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">535</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

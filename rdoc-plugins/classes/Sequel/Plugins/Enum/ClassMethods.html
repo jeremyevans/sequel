@@ -82,7 +82,7 @@ Sequel::Plugins::Enum::ClassMethods
 <span class="line-num"> 80</span>   <span class="ruby-identifier">inverted</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">invert</span>.<span class="ruby-identifier">freeze</span>
 <span class="line-num"> 81</span> 
 <span class="line-num"> 82</span>   <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@enum_methods</span>
-<span class="line-num"> 83</span>     <span class="ruby-ivar">@enum_methods</span> = <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>
+<span class="line-num"> 83</span>     <span class="ruby-ivar">@enum_methods</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>){<span class="ruby-node">&quot;#{name}::@enum_methods&quot;</span>}
 <span class="line-num"> 84</span>     <span class="ruby-identifier">include</span> <span class="ruby-ivar">@enum_methods</span>
 <span class="line-num"> 85</span>   <span class="ruby-keyword">end</span>
 <span class="line-num"> 86</span> 

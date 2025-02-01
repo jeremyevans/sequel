@@ -31,7 +31,7 @@ doc/sharding.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-05-26 07:47:08 -0700</span>
+<span class='datetime'>2025-01-23 15:31:26 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -209,7 +209,7 @@ Last Update:
   <span class="ruby-comment"># this SELECT query uses the &quot;a_read_only&quot; shard</span>
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)
     <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
-    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>
+    <span class="ruby-comment"># this UPDATE query uses the &quot;a&quot; shard</span>
     <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span>

@@ -142,14 +142,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">304</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">h</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">305</span>   <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:columns</span>]
-<span class="line-num">306</span>   <span class="ruby-ivar">@column_converters</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_converters</span>]
-<span class="line-num">307</span>   <span class="ruby-ivar">@column_oids</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_oids</span>]
-<span class="line-num">308</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:converter</span>]
-<span class="line-num">309</span>   <span class="ruby-ivar">@typecaster</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:typecaster</span>]
-<span class="line-num">310</span>   <span class="ruby-ivar">@oid</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:oid</span>]
-<span class="line-num">311</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">306</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">h</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">307</span>   <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:columns</span>]
+<span class="line-num">308</span>   <span class="ruby-ivar">@column_converters</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_converters</span>]
+<span class="line-num">309</span>   <span class="ruby-ivar">@column_oids</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_oids</span>]
+<span class="line-num">310</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:converter</span>]
+<span class="line-num">311</span>   <span class="ruby-ivar">@typecaster</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:typecaster</span>]
+<span class="line-num">312</span>   <span class="ruby-ivar">@oid</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:oid</span>]
+<span class="line-num">313</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -169,9 +169,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-call-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">315</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">316</span>   <span class="ruby-identifier">convert</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">convert_columns</span>(<span class="ruby-constant">Splitter</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">parse</span>)))
-<span class="line-num">317</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">317</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">318</span>   <span class="ruby-identifier">convert</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">convert_columns</span>(<span class="ruby-constant">Splitter</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">parse</span>)))
+<span class="line-num">319</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-typecast'>
@@ -190,19 +190,19 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-typecast-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">323</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast</span>(<span class="ruby-identifier">obj</span>)
-<span class="line-num">324</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span> 
-<span class="line-num">325</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">326</span>     <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">obj</span>))
-<span class="line-num">327</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
-<span class="line-num">328</span>     <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@columns</span>
-<span class="line-num">329</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser without columns cannot typecast from a hash&#39;</span>
-<span class="line-num">330</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">331</span>     <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">obj</span>)
-<span class="line-num">332</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">333</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser can only typecast arrays and hashes&#39;</span>
-<span class="line-num">334</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">335</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">325</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast</span>(<span class="ruby-identifier">obj</span>)
+<span class="line-num">326</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span> 
+<span class="line-num">327</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">328</span>     <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">obj</span>))
+<span class="line-num">329</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
+<span class="line-num">330</span>     <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@columns</span>
+<span class="line-num">331</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser without columns cannot typecast from a hash&#39;</span>
+<span class="line-num">332</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">333</span>     <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">obj</span>)
+<span class="line-num">334</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">335</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser can only typecast arrays and hashes&#39;</span>
+<span class="line-num">336</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">337</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

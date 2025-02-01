@@ -89,7 +89,7 @@ Sequel::Plugins::SqlComments::ClassMethods
 <pre id='method-i-sql_comments_dataset_methods-source'>   <span class="ruby-comment"># File lib/sequel/plugins/sql_comments.rb</span>
 <span class="line-num">86</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_comments_dataset_methods</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">meths</span>)
 <span class="line-num">87</span>   <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@_sql_comments_dataset_module</span>
-<span class="line-num">88</span>     <span class="ruby-identifier">dataset_module</span>(<span class="ruby-ivar">@_sql_comments_dataset_module</span> = <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>)
+<span class="line-num">88</span>     <span class="ruby-identifier">dataset_module</span>(<span class="ruby-ivar">@_sql_comments_dataset_module</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>){<span class="ruby-node">&quot;#{name}::@_sql_comments_dataset_module&quot;</span>})
 <span class="line-num">89</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">90</span>   <span class="ruby-identifier">_sql_comments_methods</span>(<span class="ruby-ivar">@_sql_comments_dataset_module</span>, <span class="ruby-value">:dataset</span>, <span class="ruby-identifier">meths</span>)
 <span class="line-num">91</span> <span class="ruby-keyword">end</span></pre>

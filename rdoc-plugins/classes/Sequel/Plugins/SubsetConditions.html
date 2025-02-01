@@ -115,10 +115,11 @@ SELECT * FROM albums WHERE ((published IS TRUE) OR NOT bad)</pre>
 <span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
 <span class="line-num">49</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
 <span class="line-num">50</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">51</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>
-<span class="line-num">52</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">53</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">54</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">51</span>       <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-keyword">self</span>){<span class="ruby-node">&quot;#{model.name}::@dataset_module_class(SubsetConditions)&quot;</span>}
+<span class="line-num">52</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>
+<span class="line-num">53</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">54</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

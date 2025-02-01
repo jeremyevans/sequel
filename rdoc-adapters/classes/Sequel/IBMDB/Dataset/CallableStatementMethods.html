@@ -64,13 +64,13 @@ Sequel::IBMDB::Dataset::CallableStatementMethods
 [show source]
 </a>
 <pre id='method-i-subselect_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
-<span class="line-num">361</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)
-<span class="line-num">362</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-value">:select</span>).
-<span class="line-num">363</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">prepared_args</span>).
-<span class="line-num">364</span>     <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)
-<span class="line-num">365</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">bind</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]
-<span class="line-num">366</span>   <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>
-<span class="line-num">367</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">362</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)
+<span class="line-num">363</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-value">:select</span>).
+<span class="line-num">364</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">prepared_args</span>).
+<span class="line-num">365</span>     <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)
+<span class="line-num">366</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">bind</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]
+<span class="line-num">367</span>   <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>
+<span class="line-num">368</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

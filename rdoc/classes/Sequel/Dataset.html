@@ -2555,9 +2555,9 @@ Superclass:
 </a>
 <pre id='method-i-with_extend-source'>     <span class="ruby-comment"># File lib/sequel/dataset/query.rb</span>
 <span class="line-num">1240</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_extend</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">mods</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1241</span>   <span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>)
+<span class="line-num">1241</span>   <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>)){<span class="ruby-string">&quot;Sequel::Dataset::_Subclass&quot;</span>}
 <span class="line-num">1242</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">include</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">mods</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">mods</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">1243</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">include</span>(<span class="ruby-constant">DatasetModule</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">1243</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">include</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-constant">DatasetModule</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)){<span class="ruby-node">&quot;Sequel::Dataset::_DatasetModule(#{block.source_location.join(&#39;:&#39;)})&quot;</span>}) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
 <span class="line-num">1244</span>   <span class="ruby-identifier">o</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">allocate</span>
 <span class="line-num">1245</span>   <span class="ruby-identifier">o</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@db</span>, <span class="ruby-ivar">@db</span>)
 <span class="line-num">1246</span>   <span class="ruby-identifier">o</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@opts</span>, <span class="ruby-ivar">@opts</span>)
@@ -6920,19 +6920,19 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-bind-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">332</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bind</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">333</span>   <span class="ruby-identifier">bind_vars</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">bv</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]
-<span class="line-num">334</span>     <span class="ruby-identifier">bv</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">bind_vars</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">335</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">336</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">bind_vars</span>.<span class="ruby-identifier">frozen?</span>
-<span class="line-num">337</span>       <span class="ruby-identifier">bind_vars</span>
-<span class="line-num">338</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">339</span>       <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">bind_vars</span>]
-<span class="line-num">340</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">341</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">342</span> 
-<span class="line-num">343</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:bind_vars</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">bind_vars</span>)
-<span class="line-num">344</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">333</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bind</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">334</span>   <span class="ruby-identifier">bind_vars</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">bv</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]
+<span class="line-num">335</span>     <span class="ruby-identifier">bv</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">bind_vars</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">336</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">337</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">bind_vars</span>.<span class="ruby-identifier">frozen?</span>
+<span class="line-num">338</span>       <span class="ruby-identifier">bind_vars</span>
+<span class="line-num">339</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">340</span>       <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">bind_vars</span>]
+<span class="line-num">341</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">342</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">343</span> 
+<span class="line-num">344</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:bind_vars</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">bind_vars</span>)
+<span class="line-num">345</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-call'>
@@ -6956,9 +6956,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-call-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">353</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_variables</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">354</span>   <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">bound_variable_modules</span>).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_variables</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">355</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">354</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_variables</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">355</span>   <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">bound_variable_modules</span>).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_variables</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">356</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepare'>
@@ -6988,21 +6988,21 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-prepare-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">373</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
-<span class="line-num">374</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">prepared_statement_modules</span>, <span class="ruby-value">:no_delayed_evaluations</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
-<span class="line-num">375</span> 
-<span class="line-num">376</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:emulate_prepared_statements?</span>)
-<span class="line-num">377</span>     <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">EmulatePreparedStatementMethods</span>)
-<span class="line-num">378</span>     <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:emulated_prepared_statement</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">values</span>)
-<span class="line-num">379</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">380</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>
-<span class="line-num">381</span>     <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">382</span>     <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>)
-<span class="line-num">383</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">384</span> 
-<span class="line-num">385</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)
-<span class="line-num">386</span>   <span class="ruby-identifier">ps</span>
-<span class="line-num">387</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">374</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)
+<span class="line-num">375</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">prepared_statement_modules</span>, <span class="ruby-value">:no_delayed_evaluations</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)
+<span class="line-num">376</span> 
+<span class="line-num">377</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:emulate_prepared_statements?</span>)
+<span class="line-num">378</span>     <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">EmulatePreparedStatementMethods</span>)
+<span class="line-num">379</span>     <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:emulated_prepared_statement</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">values</span>)
+<span class="line-num">380</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">381</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>
+<span class="line-num">382</span>     <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">383</span>     <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>)
+<span class="line-num">384</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">385</span> 
+<span class="line-num">386</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)
+<span class="line-num">387</span>   <span class="ruby-identifier">ps</span>
+<span class="line-num">388</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -7022,14 +7022,14 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-to_prepared_statement-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">393</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">394</span>   <span class="ruby-identifier">mods</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>] <span class="ruby-operator">||</span> []
-<span class="line-num">395</span>   <span class="ruby-identifier">mods</span> <span class="ruby-operator">+=</span> [<span class="ruby-constant">PreparedStatementMethods</span>]
-<span class="line-num">396</span> 
-<span class="line-num">397</span>   <span class="ruby-identifier">bind</span>.
-<span class="line-num">398</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_statement_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:name</span>], <span class="ruby-value">:prepared_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>, <span class="ruby-value">:prepared_modify_values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>, <span class="ruby-value">:orig_dataset</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">self</span>, <span class="ruby-value">:no_cache_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:prepared_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_args</span>]<span class="ruby-operator">||</span>[], <span class="ruby-value">:no_delayed_evaluations</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:no_delayed_evaluations</span>]).
-<span class="line-num">399</span>     <span class="ruby-identifier">with_extend</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">mods</span>)
-<span class="line-num">400</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">394</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">395</span>   <span class="ruby-identifier">mods</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:extend</span>] <span class="ruby-operator">||</span> []
+<span class="line-num">396</span>   <span class="ruby-identifier">mods</span> <span class="ruby-operator">+=</span> [<span class="ruby-constant">PreparedStatementMethods</span>]
+<span class="line-num">397</span> 
+<span class="line-num">398</span>   <span class="ruby-identifier">bind</span>.
+<span class="line-num">399</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_statement_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:name</span>], <span class="ruby-value">:prepared_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>, <span class="ruby-value">:prepared_modify_values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">values</span>, <span class="ruby-value">:orig_dataset</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">self</span>, <span class="ruby-value">:no_cache_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:prepared_args</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_args</span>]<span class="ruby-operator">||</span>[], <span class="ruby-value">:no_delayed_evaluations</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:no_delayed_evaluations</span>]).
+<span class="line-num">400</span>     <span class="ruby-identifier">with_extend</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">mods</span>)
+<span class="line-num">401</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

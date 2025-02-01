@@ -69,9 +69,9 @@ Sequel::Dataset::ArgumentMapper
 [show source]
 </a>
 <pre id='method-i-bind_arguments-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bind_arguments</span>
-<span class="line-num">51</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>]
-<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bind_arguments</span>
+<span class="line-num">52</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>]
+<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-call'>
@@ -90,12 +90,12 @@ Sequel::Dataset::ArgumentMapper
 [show source]
 </a>
 <pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">56</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">prepared_sql</span>
-<span class="line-num">57</span>   <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">58</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>)
-<span class="line-num">59</span>   <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:bind_arguments</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ps</span>.<span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:bind_vars</span>]), <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">56</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">57</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">prepared_sql</span>
+<span class="line-num">58</span>   <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">59</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>)
+<span class="line-num">60</span>   <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:bind_arguments</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ps</span>.<span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:bind_vars</span>]), <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">61</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_sql'>
@@ -114,12 +114,12 @@ Sequel::Dataset::ArgumentMapper
 [show source]
 </a>
 <pre id='method-i-prepared_sql-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_sql</span>
-<span class="line-num">65</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_prepared_sql</span>)
-<span class="line-num">66</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">sql</span>
-<span class="line-num">67</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">68</span>   <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_prepared_sql</span>, <span class="ruby-keyword">super</span>)
-<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_sql</span>
+<span class="line-num">66</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_prepared_sql</span>)
+<span class="line-num">67</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">sql</span>
+<span class="line-num">68</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">69</span>   <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_prepared_sql</span>, <span class="ruby-keyword">super</span>)
+<span class="line-num">70</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_statement_name'>
@@ -138,9 +138,9 @@ Sequel::Dataset::ArgumentMapper
 [show source]
 </a>
 <pre id='method-i-prepared_statement_name-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement_name</span>
-<span class="line-num">46</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_statement_name</span>]
-<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement_name</span>
+<span class="line-num">47</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_statement_name</span>]
+<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

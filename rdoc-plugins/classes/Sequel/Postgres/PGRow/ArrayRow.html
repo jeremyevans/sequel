@@ -120,9 +120,10 @@ Superclass:
 <pre id='method-c-subclass-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
 <span class="line-num">114</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">subclass</span>(<span class="ruby-identifier">db_type</span>)
 <span class="line-num">115</span>   <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">116</span>     <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>
-<span class="line-num">117</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">118</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">116</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-keyword">self</span>){<span class="ruby-node">&quot;Sequel::Postgres::PGRow::ArrayRow::_Subclass(#{db_type})&quot;</span>}
+<span class="line-num">117</span>     <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>
+<span class="line-num">118</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -142,9 +143,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-db_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>
-<span class="line-num">127</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>
-<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">127</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>
+<span class="line-num">128</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>
+<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-op'>
@@ -184,13 +185,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">142</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">v</span>)}
-<span class="line-num">143</span>     <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;::&quot;</span>
-<span class="line-num">144</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db_type</span>)
-<span class="line-num">145</span>     <span class="ruby-identifier">s</span>
-<span class="line-num">146</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">147</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">143</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">v</span>)}
+<span class="line-num">144</span>     <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;::&quot;</span>
+<span class="line-num">145</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">146</span>     <span class="ruby-identifier">s</span>
+<span class="line-num">147</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -209,14 +210,14 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">132</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;ROW&#39;</span>
-<span class="line-num">133</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">to_a</span>)
-<span class="line-num">134</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>
-<span class="line-num">135</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span>
-<span class="line-num">136</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)
-<span class="line-num">137</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">133</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;ROW&#39;</span>
+<span class="line-num">134</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">to_a</span>)
+<span class="line-num">135</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>
+<span class="line-num">136</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span>
+<span class="line-num">137</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">138</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">139</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

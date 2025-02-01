@@ -67,12 +67,12 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 [show source]
 </a>
 <pre id='method-i-exclude-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
-<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">67</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">68</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
-<span class="line-num">69</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
-<span class="line-num">70</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))}
-<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">68</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">69</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">70</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">71</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))}
+<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where'>
@@ -91,12 +91,12 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 [show source]
 </a>
 <pre id='method-i-where-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
-<span class="line-num">58</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">59</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">60</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
-<span class="line-num">61</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
-<span class="line-num">62</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">60</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">61</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">62</span>   <span class="ruby-identifier">cond</span> = <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">first</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cond</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+<span class="line-num">63</span>   <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:&quot;#{name}_conditions&quot;</span>){<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where_all'>
@@ -125,9 +125,9 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 [show source]
 </a>
 <pre id='method-i-where_all-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
-<span class="line-num">85</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_all</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">86</span>   <span class="ruby-identifier">_where_any_all</span>(<span class="ruby-value">:&amp;</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">87</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">86</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_all</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">87</span>   <span class="ruby-identifier">_where_any_all</span>(<span class="ruby-value">:&amp;</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">88</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-where_any'>
@@ -156,9 +156,9 @@ Sequel::Plugins::SubsetConditions::DatasetModuleMethods
 [show source]
 </a>
 <pre id='method-i-where_any-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>
-<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_any</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">102</span>   <span class="ruby-identifier">_where_any_all</span>(<span class="ruby-value">:|</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">where_any</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">103</span>   <span class="ruby-identifier">_where_any_all</span>(<span class="ruby-value">:|</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">104</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

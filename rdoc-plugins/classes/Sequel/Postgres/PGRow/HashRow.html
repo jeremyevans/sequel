@@ -140,12 +140,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-subclass-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">subclass</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">columns</span>)
-<span class="line-num">172</span>   <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">173</span>     <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>
-<span class="line-num">174</span>     <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>
-<span class="line-num">175</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">176</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">subclass</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">columns</span>)
+<span class="line-num">173</span>   <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">174</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">set_temp_name</span>(<span class="ruby-keyword">self</span>){<span class="ruby-node">&quot;Sequel::Postgres::PGRow::HashRow::_Subclass(#{db_type})&quot;</span>}
+<span class="line-num">175</span>     <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>
+<span class="line-num">176</span>     <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>
+<span class="line-num">177</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -165,11 +166,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-check_columns-21-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">204</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_columns!</span>
-<span class="line-num">205</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">206</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot literalize HashRow without columns&#39;</span>
-<span class="line-num">207</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">208</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">206</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_columns!</span>
+<span class="line-num">207</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">208</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot literalize HashRow without columns&#39;</span>
+<span class="line-num">209</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">210</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-columns'>
@@ -188,9 +189,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-columns-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>
-<span class="line-num">192</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">columns</span>
-<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">193</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>
+<span class="line-num">194</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">columns</span>
+<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-db_type'>
@@ -209,9 +210,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-db_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">197</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>
-<span class="line-num">198</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>
-<span class="line-num">199</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">199</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">db_type</span>
+<span class="line-num">200</span>   <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>
+<span class="line-num">201</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-op'>
@@ -251,13 +252,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">222</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">223</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">v</span>)}
-<span class="line-num">224</span>     <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;::&quot;</span>
-<span class="line-num">225</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db_type</span>)
-<span class="line-num">226</span>     <span class="ruby-identifier">s</span>
-<span class="line-num">227</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">228</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">224</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">225</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">v</span>)}
+<span class="line-num">226</span>     <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;::&quot;</span>
+<span class="line-num">227</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">228</span>     <span class="ruby-identifier">s</span>
+<span class="line-num">229</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">230</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -276,15 +277,15 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>
-<span class="line-num">211</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">212</span>   <span class="ruby-identifier">check_columns!</span>
-<span class="line-num">213</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;ROW&#39;</span>
-<span class="line-num">214</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>))
-<span class="line-num">215</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>
-<span class="line-num">216</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span>
-<span class="line-num">217</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)
-<span class="line-num">218</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">213</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">214</span>   <span class="ruby-identifier">check_columns!</span>
+<span class="line-num">215</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;ROW&#39;</span>
+<span class="line-num">216</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>))
+<span class="line-num">217</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>
+<span class="line-num">218</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span>
+<span class="line-num">219</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">220</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">221</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

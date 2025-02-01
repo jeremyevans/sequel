@@ -81,9 +81,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-call-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">118</span>   <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">119</span>   <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-columns'>
@@ -102,9 +102,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-columns-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">130</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>
-<span class="line-num">131</span>   <span class="ruby-identifier">orig_dataset</span>.<span class="ruby-identifier">columns</span>
-<span class="line-num">132</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>
+<span class="line-num">132</span>   <span class="ruby-identifier">orig_dataset</span>.<span class="ruby-identifier">columns</span>
+<span class="line-num">133</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-delayed_evaluation_sql_append'>
@@ -123,10 +123,10 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-delayed_evaluation_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">135</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delayed_evaluation_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">delay</span>)
-<span class="line-num">136</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;delayed evaluations cannot be used in prepared statements&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:no_delayed_evaluations</span>]
-<span class="line-num">137</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">136</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delayed_evaluation_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">delay</span>)
+<span class="line-num">137</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;delayed evaluations cannot be used in prepared statements&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:no_delayed_evaluations</span>]
+<span class="line-num">138</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">139</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inspect'>
@@ -145,9 +145,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-inspect-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">176</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
-<span class="line-num">177</span>   <span class="ruby-node">&quot;&lt;#{visible_class_name}/PreparedStatement #{prepared_sql.inspect}&gt;&quot;</span>
-<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">177</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">178</span>   <span class="ruby-node">&quot;&lt;#{visible_class_name}/PreparedStatement #{prepared_sql.inspect}&gt;&quot;</span>
+<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-literal_symbol_append'>
@@ -166,13 +166,13 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-literal_symbol_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">165</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_symbol_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)
-<span class="line-num">166</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-regexp">/\A\$(.*)\z/</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">v</span>
-<span class="line-num">167</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">prepared_arg</span>(<span class="ruby-node">$1</span>.<span class="ruby-identifier">to_sym</span>))
-<span class="line-num">168</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">169</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">170</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">171</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">166</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_symbol_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">167</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-regexp">/\A\$(.*)\z/</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">v</span>
+<span class="line-num">168</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">prepared_arg</span>(<span class="ruby-node">$1</span>.<span class="ruby-identifier">to_sym</span>))
+<span class="line-num">169</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">170</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">171</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-log_sql'>
@@ -191,9 +191,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-log_sql-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">89</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">log_sql</span>
-<span class="line-num">90</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:log_sql</span>]
-<span class="line-num">91</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">90</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">log_sql</span>
+<span class="line-num">91</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:log_sql</span>]
+<span class="line-num">92</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-orig_dataset'>
@@ -212,9 +212,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-orig_dataset-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">105</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">orig_dataset</span>
-<span class="line-num">106</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:orig_dataset</span>]
-<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">106</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">orig_dataset</span>
+<span class="line-num">107</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:orig_dataset</span>]
+<span class="line-num">108</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepare'>
@@ -233,10 +233,10 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-prepare-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepare</span>(<span class="ruby-operator">*</span>)
-<span class="line-num">124</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot prepare an already prepared statement&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">allow_preparing_prepared_statements?</span>
-<span class="line-num">125</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepare</span>(<span class="ruby-operator">*</span>)
+<span class="line-num">125</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot prepare an already prepared statement&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">allow_preparing_prepared_statements?</span>
+<span class="line-num">126</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">127</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_args'>
@@ -255,9 +255,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-prepared_args-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">100</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_args</span>
-<span class="line-num">101</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_args</span>]
-<span class="line-num">102</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_args</span>
+<span class="line-num">102</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_args</span>]
+<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_modify_values'>
@@ -276,9 +276,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-prepared_modify_values-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">111</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_modify_values</span>
-<span class="line-num">112</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_modify_values</span>]
-<span class="line-num">113</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">112</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_modify_values</span>
+<span class="line-num">113</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_modify_values</span>]
+<span class="line-num">114</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_sql'>
@@ -297,25 +297,25 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-prepared_sql-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_sql</span>
-<span class="line-num">143</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">prepared_type</span>
-<span class="line-num">144</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>, <span class="ruby-value">:each</span>
-<span class="line-num">145</span>     <span class="ruby-comment"># Most common scenario, so listed first.</span>
-<span class="line-num">146</span>     <span class="ruby-identifier">select_sql</span>
-<span class="line-num">147</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>, <span class="ruby-value">:single_value</span>
-<span class="line-num">148</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">select_sql</span>
-<span class="line-num">149</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_select</span>
-<span class="line-num">150</span>     <span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
-<span class="line-num">151</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>, <span class="ruby-value">:insert_pk</span>
-<span class="line-num">152</span>     <span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
-<span class="line-num">153</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:update</span>
-<span class="line-num">154</span>     <span class="ruby-identifier">update_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
-<span class="line-num">155</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:delete</span>
-<span class="line-num">156</span>     <span class="ruby-identifier">delete_sql</span>
-<span class="line-num">157</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">158</span>     <span class="ruby-identifier">select_sql</span>
-<span class="line-num">159</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">143</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_sql</span>
+<span class="line-num">144</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">prepared_type</span>
+<span class="line-num">145</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>, <span class="ruby-value">:each</span>
+<span class="line-num">146</span>     <span class="ruby-comment"># Most common scenario, so listed first.</span>
+<span class="line-num">147</span>     <span class="ruby-identifier">select_sql</span>
+<span class="line-num">148</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>, <span class="ruby-value">:single_value</span>
+<span class="line-num">149</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:limit</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">select_sql</span>
+<span class="line-num">150</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_select</span>
+<span class="line-num">151</span>     <span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
+<span class="line-num">152</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>, <span class="ruby-value">:insert_pk</span>
+<span class="line-num">153</span>     <span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
+<span class="line-num">154</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:update</span>
+<span class="line-num">155</span>     <span class="ruby-identifier">update_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
+<span class="line-num">156</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:delete</span>
+<span class="line-num">157</span>     <span class="ruby-identifier">delete_sql</span>
+<span class="line-num">158</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">159</span>     <span class="ruby-identifier">select_sql</span>
+<span class="line-num">160</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_type'>
@@ -334,9 +334,9 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-prepared_type-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">95</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_type</span>
-<span class="line-num">96</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_type</span>]
-<span class="line-num">97</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">96</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_type</span>
+<span class="line-num">97</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_type</span>]
+<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -356,39 +356,39 @@ Sequel::Dataset::PreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-run-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">184</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">prepared_type</span>
-<span class="line-num">185</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>
-<span class="line-num">186</span>     <span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">187</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:each</span>
-<span class="line-num">188</span>     <span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">189</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_select</span>
-<span class="line-num">190</span>     <span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">prepared_sql</span>).<span class="ruby-identifier">first</span>
-<span class="line-num">191</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>
-<span class="line-num">192</span>     <span class="ruby-identifier">first</span>
-<span class="line-num">193</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>, <span class="ruby-value">:update</span>, <span class="ruby-value">:delete</span>
-<span class="line-num">194</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">supports_returning?</span>(<span class="ruby-identifier">prepared_type</span>)
-<span class="line-num">195</span>       <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">prepared_sql</span>)
-<span class="line-num">196</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">prepared_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:delete</span>
-<span class="line-num">197</span>       <span class="ruby-identifier">delete</span>
-<span class="line-num">198</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">199</span>       <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">prepared_type</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
-<span class="line-num">200</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">201</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_pk</span>
-<span class="line-num">202</span>     <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">prepared_sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}
-<span class="line-num">203</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">204</span>     <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">205</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">prepared_type</span>[<span class="ruby-value">0</span>]
-<span class="line-num">206</span>     <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">207</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:map</span>, <span class="ruby-value">:as_hash</span>, <span class="ruby-value">:to_hash</span>, <span class="ruby-value">:to_hash_groups</span>
-<span class="line-num">208</span>       <span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_type</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) 
-<span class="line-num">209</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">210</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:single_value</span>
-<span class="line-num">211</span>     <span class="ruby-identifier">single_value</span>
-<span class="line-num">212</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">213</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unsupported prepared statement type used: #{prepared_type.inspect}&quot;</span>
-<span class="line-num">214</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">215</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">184</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">185</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">prepared_type</span>
+<span class="line-num">186</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>
+<span class="line-num">187</span>     <span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">188</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:each</span>
+<span class="line-num">189</span>     <span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">190</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_select</span>
+<span class="line-num">191</span>     <span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">prepared_sql</span>).<span class="ruby-identifier">first</span>
+<span class="line-num">192</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>
+<span class="line-num">193</span>     <span class="ruby-identifier">first</span>
+<span class="line-num">194</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>, <span class="ruby-value">:update</span>, <span class="ruby-value">:delete</span>
+<span class="line-num">195</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">supports_returning?</span>(<span class="ruby-identifier">prepared_type</span>)
+<span class="line-num">196</span>       <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">prepared_sql</span>)
+<span class="line-num">197</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">prepared_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:delete</span>
+<span class="line-num">198</span>       <span class="ruby-identifier">delete</span>
+<span class="line-num">199</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">200</span>       <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">prepared_type</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">prepared_modify_values</span>)
+<span class="line-num">201</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">202</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:insert_pk</span>
+<span class="line-num">203</span>     <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">prepared_sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}
+<span class="line-num">204</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">205</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">206</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">prepared_type</span>[<span class="ruby-value">0</span>]
+<span class="line-num">207</span>     <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">208</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:map</span>, <span class="ruby-value">:as_hash</span>, <span class="ruby-value">:to_hash</span>, <span class="ruby-value">:to_hash_groups</span>
+<span class="line-num">209</span>       <span class="ruby-identifier">public_send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">prepared_type</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) 
+<span class="line-num">210</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">211</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:single_value</span>
+<span class="line-num">212</span>     <span class="ruby-identifier">single_value</span>
+<span class="line-num">213</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">214</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unsupported prepared statement type used: #{prepared_type.inspect}&quot;</span>
+<span class="line-num">215</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">216</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

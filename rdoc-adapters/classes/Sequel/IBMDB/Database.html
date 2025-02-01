@@ -105,25 +105,25 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-connect-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
-<span class="line-num">188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)
-<span class="line-num">189</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
-<span class="line-num">190</span> 
-<span class="line-num">191</span>   <span class="ruby-identifier">connection_params</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>]
-<span class="line-num">192</span>     <span class="ruby-comment"># use a cataloged connection</span>
-<span class="line-num">193</span>     <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-value">:database</span>, <span class="ruby-value">:user</span>, <span class="ruby-value">:password</span>)
-<span class="line-num">194</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">195</span>     <span class="ruby-comment"># use uncataloged connection so that host and port can be supported</span>
-<span class="line-num">196</span>     <span class="ruby-string">&#39;Driver={IBM DB2 ODBC DRIVER};&#39;</span> \
-<span class="line-num">197</span>     <span class="ruby-node">&quot;Database=#{opts[:database]};&quot;</span> \
-<span class="line-num">198</span>     <span class="ruby-node">&quot;Hostname=#{opts[:host]};&quot;</span> \
-<span class="line-num">199</span>     <span class="ruby-node">&quot;Port=#{opts[:port] || 50000};&quot;</span> \
-<span class="line-num">200</span>     <span class="ruby-string">&#39;Protocol=TCPIP;&#39;</span> \
-<span class="line-num">201</span>     <span class="ruby-node">&quot;Uid=#{opts[:user]};&quot;</span> \
-<span class="line-num">202</span>     <span class="ruby-node">&quot;Pwd=#{opts[:password]};&quot;</span> \
-<span class="line-num">203</span>   <span class="ruby-keyword">end</span> 
-<span class="line-num">204</span> 
-<span class="line-num">205</span>   <span class="ruby-constant">Connection</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">connection_params</span>)
-<span class="line-num">206</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">190</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">191</span> 
+<span class="line-num">192</span>   <span class="ruby-identifier">connection_params</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>]
+<span class="line-num">193</span>     <span class="ruby-comment"># use a cataloged connection</span>
+<span class="line-num">194</span>     <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-value">:database</span>, <span class="ruby-value">:user</span>, <span class="ruby-value">:password</span>)
+<span class="line-num">195</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">196</span>     <span class="ruby-comment"># use uncataloged connection so that host and port can be supported</span>
+<span class="line-num">197</span>     <span class="ruby-string">&#39;Driver={IBM DB2 ODBC DRIVER};&#39;</span> \
+<span class="line-num">198</span>     <span class="ruby-node">&quot;Database=#{opts[:database]};&quot;</span> \
+<span class="line-num">199</span>     <span class="ruby-node">&quot;Hostname=#{opts[:host]};&quot;</span> \
+<span class="line-num">200</span>     <span class="ruby-node">&quot;Port=#{opts[:port] || 50000};&quot;</span> \
+<span class="line-num">201</span>     <span class="ruby-string">&#39;Protocol=TCPIP;&#39;</span> \
+<span class="line-num">202</span>     <span class="ruby-node">&quot;Uid=#{opts[:user]};&quot;</span> \
+<span class="line-num">203</span>     <span class="ruby-node">&quot;Pwd=#{opts[:password]};&quot;</span> \
+<span class="line-num">204</span>   <span class="ruby-keyword">end</span> 
+<span class="line-num">205</span> 
+<span class="line-num">206</span>   <span class="ruby-constant">Connection</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">connection_params</span>)
+<span class="line-num">207</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute'>
@@ -140,15 +140,15 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-execute-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
-<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">209</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
-<span class="line-num">210</span>     <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">211</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">212</span>     <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
-<span class="line-num">213</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">214</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">215</span>   <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)
-<span class="line-num">216</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">209</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">210</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
+<span class="line-num">211</span>     <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">212</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">213</span>     <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}
+<span class="line-num">214</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">215</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">216</span>   <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)
+<span class="line-num">217</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_insert'>
@@ -165,18 +165,18 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-execute_insert-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
-<span class="line-num">218</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">219</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">220</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
-<span class="line-num">221</span>       <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">222</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">223</span>       <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">224</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">225</span>     <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-string">&quot;SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1&quot;</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">fetch_array</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_i</span>; <span class="ruby-identifier">i</span>}
-<span class="line-num">226</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">227</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
-<span class="line-num">228</span>   <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)
-<span class="line-num">229</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">219</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">220</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">221</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)
+<span class="line-num">222</span>       <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">223</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">224</span>       <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">225</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">226</span>     <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-string">&quot;SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1&quot;</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">fetch_array</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_i</span>; <span class="ruby-identifier">i</span>}
+<span class="line-num">227</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">228</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">229</span>   <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)
+<span class="line-num">230</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-execute_prepared_statement'>
@@ -195,33 +195,33 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-execute_prepared_statement-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
-<span class="line-num">232</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_prepared_statement</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">233</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:arguments</span>]
-<span class="line-num">234</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">prepared_statement</span>(<span class="ruby-identifier">ps_name</span>)
-<span class="line-num">235</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>
-<span class="line-num">236</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
-<span class="line-num">237</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">ps_name</span>, []).<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">sql</span>
-<span class="line-num">238</span>       <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-node">&quot;PREPARE #{ps_name}: #{sql}&quot;</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ps_name</span>)}
-<span class="line-num">239</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">240</span>     <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">prepared_statement_arg</span>(<span class="ruby-identifier">v</span>)}
-<span class="line-num">241</span>     <span class="ruby-identifier">log_sql</span> = <span class="ruby-node">&quot;EXECUTE #{ps_name}&quot;</span>
-<span class="line-num">242</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">log_sql</span>
-<span class="line-num">243</span>       <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">+=</span> <span class="ruby-string">&quot; (&quot;</span>
-<span class="line-num">244</span>       <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>
-<span class="line-num">245</span>       <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>
-<span class="line-num">246</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">247</span>     <span class="ruby-keyword">begin</span>
-<span class="line-num">248</span>       <span class="ruby-identifier">stmt</span> = <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">log_sql</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">args</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_prepared</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
-<span class="line-num">249</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
-<span class="line-num">250</span>         <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">stmt</span>)
-<span class="line-num">251</span>       <span class="ruby-keyword">else</span>  
-<span class="line-num">252</span>         <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">affected</span>
-<span class="line-num">253</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">254</span>     <span class="ruby-keyword">ensure</span>
-<span class="line-num">255</span>       <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">free_result</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span>
-<span class="line-num">256</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">257</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">258</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">233</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_prepared_statement</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">234</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:arguments</span>]
+<span class="line-num">235</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">prepared_statement</span>(<span class="ruby-identifier">ps_name</span>)
+<span class="line-num">236</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>
+<span class="line-num">237</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">238</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">ps_name</span>, []).<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">sql</span>
+<span class="line-num">239</span>       <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-node">&quot;PREPARE #{ps_name}: #{sql}&quot;</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ps_name</span>)}
+<span class="line-num">240</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">241</span>     <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">prepared_statement_arg</span>(<span class="ruby-identifier">v</span>)}
+<span class="line-num">242</span>     <span class="ruby-identifier">log_sql</span> = <span class="ruby-node">&quot;EXECUTE #{ps_name}&quot;</span>
+<span class="line-num">243</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">log_sql</span>
+<span class="line-num">244</span>       <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">+=</span> <span class="ruby-string">&quot; (&quot;</span>
+<span class="line-num">245</span>       <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>
+<span class="line-num">246</span>       <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>
+<span class="line-num">247</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">248</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">249</span>       <span class="ruby-identifier">stmt</span> = <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">log_sql</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">args</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_prepared</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}
+<span class="line-num">250</span>       <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">251</span>         <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">stmt</span>)
+<span class="line-num">252</span>       <span class="ruby-keyword">else</span>  
+<span class="line-num">253</span>         <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">affected</span>
+<span class="line-num">254</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">255</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">256</span>       <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">free_result</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span>
+<span class="line-num">257</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">258</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">259</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -238,10 +238,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>
-<span class="line-num">260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">261</span>   <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">262</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">263</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">261</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">262</span>   <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">263</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">264</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
