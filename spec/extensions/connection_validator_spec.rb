@@ -60,8 +60,9 @@ connection_validator_specs = Module.new do
     @db.sqls.must_equal []
     c1.valid = :exception
     @db.pool.connection_validation_timeout = -1
-    c2 = @db.synchronize{|c| c}
+    proc{@db.synchronize{}}.must_raise RuntimeError
     @db.sqls.must_equal ['SELECT NULL', 'disconnect']
+    c2 = @db.synchronize{|c| c}
     c2.wont_be_same_as(c1)
   end
 

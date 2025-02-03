@@ -1,5 +1,7 @@
 === master
 
+* Make connection_validator extension not swallow exceptions raised by Database#valid_connection? (jeremyevans)
+
 * Do not call Model.name while holding a mutex when setting temporary names for anonymous modules (jeremyevans) (#2273)
 
 === 5.89.0 (2025-02-01)

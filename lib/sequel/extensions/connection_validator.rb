@@ -119,7 +119,7 @@ module Sequel
               end
 
               disconnect_connection(conn)
-              redo
+              redo if valid == false
             end
           end
         end
