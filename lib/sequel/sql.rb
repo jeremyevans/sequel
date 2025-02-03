@@ -1127,7 +1127,13 @@ module Sequel
         when DelayedEvaluation
           Sequel.delay{|ds| from_value_pair(l, r.call(ds))}
         when Dataset::PlaceholderLiteralizer::Argument
-          r.transform{|v| from_value_pair(l, v)}
+          prev_transform = r.instance_variable_get(:@transformer)
+          r.transform do |v|
+            if prev_transform
+              v = prev_transform.call(v)
+            end
+            from_value_pair(l, v)
+          end
         else
           new(:'=', l, r)
         end

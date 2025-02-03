@@ -41,6 +41,13 @@ describe "Dataset::PlaceholderLiteralizer" do
     @db.sqls.must_equal ["SELECT s FROM items WHERE ((a = 1) AND (b = (c + 1)) AND (id = 1)) HAVING h", "SELECT s2 FROM items WHERE ((a = 2) AND (b = (d + 1)) AND (id = 2)) HAVING h2"]
   end
   
+  it "should not ignore transforms on arguments when using " do
+    loader = @c.loader(@ds){|pl, ds| ds.where(:a=>pl.arg.transform{|v| v * 2})}
+    loader.first(1).must_equal @h
+    loader.first(2).must_equal @h
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (a = 2)", "SELECT * FROM items WHERE (a = 4)"]
+  end
+  
   it "should handle calls with placeholders and delayed arguments that take dataset argument" do
     d = @ds.select(Sequel.delay{|ds| ds.first_source})
     loader = @c.loader(d){|pl, ds| ds.where(:a=>pl.arg).where(:b=>Sequel.+(pl.arg, 1)).where(pl.arg)}
