@@ -1,5 +1,7 @@
 === master
 
+* Support explicitly specifying :use_placeholder_loader association option (jeremyevans)
+
 * Make SQL::BooleanExpression.from_value_pairs handle Dataset::PlaceholderLiteralizer::Argument with existing transformer correctly (jeremyevans)
 
 * Make connection_validator extension not swallow exceptions raised by Database#valid_connection? (jeremyevans)

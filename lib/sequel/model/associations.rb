@@ -1769,6 +1769,9 @@ module Sequel
         #            Set to nil to not define a setter method for the association.
         # :subqueries_per_union :: The number of subqueries to use in each UNION query, for eager
         #                          loading limited associations using the default :union strategy.
+        # :use_placeholder_loader :: Whether to use a placeholder loader when eager loading the
+        #                            association.  Can be set to false to disable the use of a placeholder
+        #                            loader if one would be used by default.
         # :validate :: Set to false to not validate when implicitly saving any associated object.
         # === :many_to_one
         # :key :: foreign key in current model's table that references
@@ -1891,7 +1894,7 @@ module Sequel
             raise(Error, "cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})")
           end
 
-          opts[:use_placeholder_loader] = !opts[:instance_specific] && !opts[:eager_graph]
+          opts[:use_placeholder_loader] = !opts[:instance_specific] && !opts[:eager_graph] unless opts.include?(:use_placeholder_loader)
           opts[:eager_block] = opts[:block] unless opts.include?(:eager_block)
           opts[:graph_join_type] ||= :left_outer
           opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)
