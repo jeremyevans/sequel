@@ -446,6 +446,30 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should support using a :eager_loading_predicate_transform option when eager loading many_to_one associations" do
+    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loading_predicate_transform => proc{|vs, ref| vs.map{|v| v*(ref[:name] == :sband ? 3 : 2)} }
+    EagerAlbum.many_to_one :sband2, :clone=>:sband
+    EagerBand.dataset = EagerBand.dataset.with_fetch([[{:id=>2}]])
+    a = EagerAlbum.eager(:sband, :sband2).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (6))', 'SELECT * FROM bands WHERE (bands.id IN (4))']
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.sband.must_equal EagerBand.load(:id=>2)
+    a.first.sband2.must_be_nil
+    DB.sqls.must_equal []
+  end
+  
+  it "should support using a :eager_loading_predicate_transform option when eager loading many_to_one associations when not using a placeholder loader" do
+    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loading_predicate_transform => proc{|vs, ref| vs.map{|v| v*(ref[:name] == :sband ? 3 : 2)} }, :use_placeholder_loader=>false
+    EagerAlbum.many_to_one :sband2, :clone=>:sband
+    EagerBand.dataset = EagerBand.dataset.with_fetch([[{:id=>2}]])
+    a = EagerAlbum.eager(:sband, :sband2).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (6))', 'SELECT * FROM bands WHERE (bands.id IN (4))']
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.sband.must_equal EagerBand.load(:id=>2)
+    a.first.sband2.must_be_nil
+    DB.sqls.must_equal []
+  end
+  
   it "should support using a custom :primary_key option when eager loading one_to_many associations" do
     EagerBand.one_to_many :salbums, :clone=>:albums, :primary_key=>:id3, :eager=>nil, :reciprocal=>nil
     EagerBand.dataset = EagerBand.dataset.with_fetch(:id=>6)

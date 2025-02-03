@@ -1,5 +1,7 @@
 === master
 
+* Support :eager_loading_predicate_transform association option (jeremyevans)
+
 * Support explicitly specifying :use_placeholder_loader association option (jeremyevans)
 
 * Make SQL::BooleanExpression.from_value_pairs handle Dataset::PlaceholderLiteralizer::Argument with existing transformer correctly (jeremyevans)

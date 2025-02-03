@@ -693,6 +693,9 @@ module Sequel
 
         # The predicate condition to use for the eager_loader.
         def eager_loading_predicate_condition(keys)
+          if transform = self[:eager_loading_predicate_transform]
+            keys = transform.call(keys, self)
+          end
           {predicate_key=>keys}
         end
 
@@ -759,7 +762,15 @@ module Sequel
         def placeholder_eager_loader
           cached_fetch(:placeholder_eager_loader) do
             eager_loading_dataset.placeholder_literalizer_loader do |pl, ds|
-              apply_eager_limit_strategy(ds.where(predicate_key=>pl.arg), eager_limit_strategy)
+              arg = pl.arg
+
+              if transform = self[:eager_loading_predicate_transform]
+                arg = arg.transform do |v|
+                  transform.call(v, self)
+                end
+              end
+
+              apply_eager_limit_strategy(ds.where(predicate_key=>arg), eager_limit_strategy)
             end
           end
         end
@@ -1707,6 +1718,9 @@ module Sequel
         #                  record should be populated.
         # :eager_loader_key :: A symbol for the key column to use to populate the key_hash
         #                      for the eager loader.  Can be set to nil to not populate the key_hash.
+        # :eager_loading_predicate_transform :: A callable object with which to transform the predicate key values used
+        #                                       when eager loading. Called with two arguments, the array of predicate key
+        #                                       values, and a the reflection for the association being eager loaded.
         # :extend :: A module or array of modules to extend the dataset with.
         # :filter_limit_strategy :: Determines the strategy used for enforcing limits and offsets when filtering by
         #                           limited associations.  Possible options are :window_function, :distinct_on, or
