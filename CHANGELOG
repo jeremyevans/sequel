@@ -1,5 +1,7 @@
 === master
 
+* Add pg_eager_any_typed_array plugin, automatically transform eager loads to use = ANY(array_expr::type[]) instead of IN (value_list) (jeremyevans)
+
 * Support :eager_loading_predicate_transform association option (jeremyevans)
 
 * Support explicitly specifying :use_placeholder_loader association option (jeremyevans)

@@ -192,6 +192,7 @@ SEQUEL_MODEL_THROW_FAILURES :: Use the throw_failures plugin when running the sp
 SEQUEL_NO_CACHE_ASSOCIATIONS :: Don't cache association metadata when running the specs
 SEQUEL_NO_PENDING :: Don't skip any specs, try running all specs (note, can cause lockups for some adapters)
 SEQUEL_PG_AUTO_PARAMETERIZE :: Use the pg_auto_parameterize extension when running the postgres specs.  Value can be +in_array+ to test the pg_auto_parameterize_in_array extension, and +in_array_string+ to test the pg_auto_parameterize_in_array extension with the +:treat_in_string_list_as_text_array+ Database option set.
+SEQUEL_PG_EAGER_ANY_TYPED_ARRAY :: Use the pg_eager_any_typed_array extension when running the postgres specs.
 SEQUEL_PG_TIMESTAMPTZ :: Use the pg_timestamptz extension when running the postgres specs
 SEQUEL_PRIMARY_KEY_LOOKUP_CHECK_VALUES :: Use the primary_key_lookup_check_values extension when running the adapter or integration specs
 SEQUEL_QUERY_PER_ASSOCIATION_DB_0_URL :: Run query-per-association integration tests with multiple databases (all 4 must be set to run)

@@ -110,6 +110,10 @@
 <span class="ul__span">Adds associations types to handle the case where foreign keys are stored in a PostgreSQL array in one of the tables.</span>
 </li>
 <li class="ul__li ul__li--grid">
+<a class="a" href="rdoc-plugins/classes/Sequel/Plugins/PgEagerAnyTypedArray.html">pg_eager_any_typed_array</a>
+<span class="ul__span">Makes eager loading predicates use <code>key = ANY(array_expr::type[])</code> instead of <code>key IN (value_list)</code>.</span>
+</li>
+<li class="ul__li ul__li--grid">
 <a class="a" href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree </a>
 <span class="ul__span">Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</span>
 </li>
