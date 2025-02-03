@@ -99,7 +99,8 @@ module Sequel
           # it before calling creating this module.
           dataset_methods_module
 
-          Sequel.synchronize{@subset_static_cache_module ||= Sequel.set_temp_name(Module.new){"#{name}::@subset_static_cache_module"}}
+          mod_name = "#{name}::@subset_static_cache_module"
+          Sequel.synchronize{@subset_static_cache_module ||= Sequel.set_temp_name(Module.new){mod_name}}
           extend(@subset_static_cache_module)
           @subset_static_cache_module
         end

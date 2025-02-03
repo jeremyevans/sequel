@@ -12,6 +12,16 @@ describe "Sequel::Model()" do
     m.send(:overridable_methods_module).name.must_equal "Sequel::_Model(:blah)::@overridable_methods_module"
   end if RUBY_VERSION >= '3.3'
 
+  it "should provide correct temporary names when Model.name calls Sequel.synchronize" do
+    m = Sequel::Model(:blah)
+    m.name.must_equal "Sequel::_Model(:blah)"
+    def m.name
+      Sequel.synchronize{super}
+    end
+    m.send(:dataset_methods_module).name.must_equal "Sequel::_Model(:blah)::@dataset_methods_module"
+    m.send(:overridable_methods_module).name.must_equal "Sequel::_Model(:blah)::@overridable_methods_module"
+  end if RUBY_VERSION >= '3.3'
+
   it "should return a model subclass with the given dataset if given a dataset" do
     ds = @db[:blah]
     c = Sequel::Model(ds)
