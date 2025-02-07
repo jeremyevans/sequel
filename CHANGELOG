@@ -1,5 +1,7 @@
 === master
 
+* Support :pg_auto_parameterize_min_array_size Database option in pg_auto_parameterize_in_array extension to control minimum array size to handle (jeremyevans)
+
 * Add pg_eager_any_typed_array plugin, automatically transform eager loads to use = ANY(array_expr::type[]) instead of IN (value_list) (jeremyevans)
 
 * Support :eager_loading_predicate_transform association option (jeremyevans)

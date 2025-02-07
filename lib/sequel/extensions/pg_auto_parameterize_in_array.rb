@@ -27,9 +27,14 @@
 # treating strings as text can break programs, since the type for
 # literal strings in PostgreSQL is +unknown+, not +text+.
 #
-# The conversion is only done for single dimensional arrays that have more
-# than two elements, where all elements are of the same class (other than
-# nil values).
+# The conversion is only done for single dimensional arrays that have two or
+# more elements, where all elements are of the same class (other than
+# +nil+ values).  You can also do the conversion for arrays of 1 element by setting
+# <tt>pg_auto_parameterize_min_array_size: 1</tt> Database option.  This makes
+# finding cases that need special handling easier, but it doesn't match
+# how PostgreSQL internally converts the expression (PostgreSQL converts
+# <tt>IN (single_value)</tt> to <tt>= single_value</tt>, not
+# <tt>= ANY(ARRAY[single_value])</tt>).
 #
 # Related module: Sequel::Postgres::AutoParameterizeInArray
 
@@ -68,7 +73,7 @@ module Sequel
       # The bound variable type string to use for the bound variable array.
       # Returns nil if a bound variable should not be used for the array.
       def _bound_variable_type_for_array(r)
-        return unless Array === r && r.size > 1
+        return unless Array === r && r.size >= (db.typecast_value(:integer, db.opts[:pg_auto_parameterize_min_array_size]) || 2)
         classes = r.map(&:class)
         classes.uniq!
         classes.delete(NilClass)

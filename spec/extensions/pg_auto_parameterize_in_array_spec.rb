@@ -128,9 +128,20 @@ describe "pg_auto_parameterize_in_array extension" do
     sql.must_equal 'SELECT * FROM "table" WHERE ("a" IN ($1::numeric))'
     sql.args.must_equal [1]
 
-    sql = @db[:table].where(:a=>[1.0]).sql
-    sql.must_equal 'SELECT * FROM "table" WHERE ("a" IN ($1::numeric))'
+    sql = @db[:table].exclude(:a=>[1.0]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" NOT IN ($1::numeric))'
     sql.args.must_equal [1]
+  end
+
+  it "should convert single value expressions in pg_auto_parameterize_min_array_size: 1" do
+    @db.opts[:pg_auto_parameterize_min_array_size] = 1
+    sql = @db[:table].where(:a=>[1.0]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" = ANY($1::numeric[]))'
+    sql.args.must_equal [[1]]
+
+    sql = @db[:table].exclude(:a=>[1.0]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" != ALL($1::numeric[]))'
+    sql.args.must_equal [[1]]
   end
 
   it "should not convert expressions with mixed types" do
