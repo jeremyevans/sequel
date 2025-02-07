@@ -6424,3 +6424,82 @@ describe 'pg_schema_caching_extension' do
     @db.schema(:test_pg_schema_caching)[0][1][:oid].must_equal oid
   end
 end
+
+describe "pg_eager_any_typed_array extension" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:pg_eager_any_typed_array_test) do
+      uuid :id, :primary_key=>true
+      uuid :parent_id
+      column :parent_ids, "uuid[]"
+    end
+    @c = Class.new(Sequel::Model(@db[:pg_eager_any_typed_array_test])) do
+      plugin :pg_eager_any_typed_array
+      plugin :many_through_many
+      plugin :pg_array_associations
+      unrestrict_primary_key
+
+      many_to_one :parent, :class=>self
+      one_to_many :children, :class=>self, :key=>:parent_id
+      one_to_one :first_child, :class=>self, :key=>:parent_id
+      many_to_many :grandchildren, :class=>self, :join_table=>Sequel.as(:pg_eager_any_typed_array_test, :jt), :left_key=>:parent_id, :right_key=>:id, :right_primary_key=>:parent_id
+      one_through_one :first_grandchild, :class=>self, :join_table=>Sequel.as(:pg_eager_any_typed_array_test, :jt), :left_key=>:parent_id, :right_key=>:id, :right_primary_key=>:parent_id
+      many_through_many :great_grandchildren, [[:pg_eager_any_typed_array_test, :parent_id, :id]]*2, :class=>self, :right_primary_key=>:parent_id
+      one_through_many :first_great_grandchild, [[:pg_eager_any_typed_array_test, :parent_id, :id]]*2, :class=>self, :right_primary_key=>:parent_id
+      pg_array_to_many :parents, :class=>self
+      many_to_pg_array :array_children, :class=>self, :key=>:parent_ids
+    end
+    ids = 4.times.map{|i| "********-****-****-****-************".gsub(/\*/, i.to_s)}
+    @c1 = @c.create(id: ids[0], parent_id: ids[1], parent_ids: Sequel.pg_array([ids[2], ids[3]], :uuid))
+    @c2 = @c.create(id: ids[1], parent_id: ids[2])
+    @c3 = @c.create(id: ids[2], parent_id: ids[3])
+    @c4 = @c.create(id: ids[3])
+  end
+  after(:all) do
+    @db.drop_table?(:pg_eager_any_typed_array_test)
+  end
+
+  def check(assoc, recv, res)
+    cs = @c.where(:id=>recv.id).eager(assoc).all
+    cs.must_equal [recv]
+    cs[0].associations[assoc].must_equal res
+  end
+
+  it "should have correct eager loading of many_to_one association" do
+    check(:parent, @c1, @c2)
+  end
+
+  it "should have correct eager loading of one_to_many association" do
+    check(:children, @c2, [@c1])
+  end
+
+  it "should have correct eager loading of one_to_one association" do
+    check(:first_child, @c2, @c1)
+  end
+
+  it "should have correct eager loading of many_to_many association" do
+    check(:grandchildren, @c3, [@c1])
+  end
+
+  it "should have correct eager loading of one_through_one association" do
+    check(:first_grandchild, @c3, @c1)
+  end
+
+  it "should have correct eager loading of many_through_many association" do
+    check(:great_grandchildren, @c4, [@c1])
+  end
+
+  it "should have correct eager loading of one_through_many association" do
+    check(:first_great_grandchild, @c4, @c1)
+  end
+
+  it "should have correct eager loading of pg_array_to_many association" do
+    cs = @c.where(:id=>@c1.id).eager(:parents).all
+    cs.must_equal [@c1]
+    cs[0].associations[:parents].sort_by(&:id).must_equal [@c3, @c4]
+  end
+
+  it "should have correct eager loading of many_to_pg_array association" do
+    check(:array_children, @c3, [@c1])
+  end
+end

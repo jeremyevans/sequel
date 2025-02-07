@@ -16,7 +16,16 @@ module Sequel
     # when using foreign keys with non-text database types that are represented
     # by Ruby strings, such as enum and uuid types.
     #
-    # To avoid this behavior for particular associations, set the
+    # Most association types that ship with Sequel have their predicate
+    # expressions converted by this plugin.  Here are the exceptions:
+    #
+    # * associations using composite predicate keys
+    # * many_to_pg_array associations
+    # * many_to_many/one_through_one associations using :join_table_db option
+    # * many_through_many/one_through_many associations using
+    #   :separate_table_per_query option
+    #
+    # To avoid predicate conversion for particular associations, set the
     # :eager_loading_predicate_transform association option to nil/false.
     #
     # This plugin loads the pg_array extension into the model's Database.
@@ -36,7 +45,23 @@ module Sequel
               key = key.column
             end
 
-            if (sch = ref.associated_class.db_schema[key])
+            # many_to_pg_array association type does not need changes, as it
+            # already converts the values to a typed postgres array, it does
+            # not call the code that uses :eager_loading_predicate_transform
+            sch = case ref[:type]
+            when :many_to_one, :one_to_one, :one_to_many, :pg_array_to_many
+              ref.associated_class.db_schema
+            when :many_to_many, :one_through_one
+              unless ref[:join_table_db]
+                Hash[ref.associated_class.db.schema(ref.join_table_source)]
+              end
+            when :many_through_many, :one_through_many
+              unless ref[:separate_query_per_table]
+                Hash[ref.associated_class.db.schema(ref[:through][0][:table])]
+              end
+            end
+
+            if sch && (sch = sch[key])
               sch[:db_type]
             end
           end
@@ -48,9 +73,7 @@ module Sequel
           end
         end
 
-        # If the association does not use a composite predicate key,
-        # and does not already have the :eager_loading_predicate_transform
-        # option set, set the option so that eager loading
+        # Set the :eager_loading_predicate_transform option if not already set
         def associate(type, name, opts = OPTS, &block)
           res = super
 
