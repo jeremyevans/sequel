@@ -1,5 +1,7 @@
 === master
 
+* Automatically load the sql_comments Database extension when loading the sql_comments model plugin (jeremyevans) (#2276)
+
 * Support :pg_auto_parameterize_min_array_size Database option in pg_auto_parameterize_in_array extension to control minimum array size to handle (jeremyevans)
 
 * Add pg_eager_any_typed_array plugin, automatically transform eager loads to use = ANY(array_expr::type[]) instead of IN (value_list) (jeremyevans)

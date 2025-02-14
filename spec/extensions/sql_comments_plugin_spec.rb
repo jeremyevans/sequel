@@ -2,7 +2,7 @@ require_relative "spec_helper"
 
 describe "sql_comments plugin " do
   before do
-    @db = Sequel.mock(:fetch=>{:id=>1, :name=>'a'}).extension(:sql_comments)
+    @db = Sequel.mock(:fetch=>{:id=>1, :name=>'a'})
     @c = Class.new(Sequel::Model(@db[:t]))
     @c.columns :id, :name
     def @c.to_s; 'C' end

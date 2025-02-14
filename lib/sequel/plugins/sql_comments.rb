@@ -40,7 +40,8 @@ module Sequel
     #   Album.sql_comments_dataset_methods :to_csv # csv_serializer plugin
     #
     # In order for the sql_comments plugin to work, the sql_comments
-    # Database extension must be loaded into the model's database.
+    # Database extension must be loaded into the model's database, so
+    # loading the plugin does this automatically.
     #
     # Note that in order to make sure SQL comments are included, some
     # optimizations are disabled if this plugin is loaded.
@@ -65,6 +66,10 @@ module Sequel
         # :nocov:
         mod.send(:ruby2_keywords, meth) if mod.respond_to?(:ruby2_keywords, true)
         # :nocov:
+      end
+
+      def self.apply(model)
+        model.db.extension(:sql_comments)
       end
 
       def self.configure(model)
