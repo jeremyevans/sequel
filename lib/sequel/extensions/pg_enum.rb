@@ -149,12 +149,12 @@ module Sequel
             from(:pg_type).
             where(:oid=>enum_labels.keys).
             exclude(:typarray=>0).
-            select_map([:typname, Sequel.cast(:typarray, Integer).as(:v)])
+            select_map([:typname, Sequel.cast(:typarray, Integer).as(:v), Sequel.cast(:oid, Integer).as(:sv)])
 
           existing_oids = conversion_procs.keys
-          array_types.each do |name, oid|
+          array_types.each do |name, oid, scalar_oid|
             next if existing_oids.include?(oid)
-            register_array_type(name, :oid=>oid)
+            register_array_type(name, :oid=>oid, :scalar_oid=>scalar_oid)
           end
         end
 

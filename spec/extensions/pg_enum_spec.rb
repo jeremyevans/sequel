@@ -9,7 +9,7 @@ describe "pg_enum extension" do
       [[:a, {:oid=>1, :type=>:enum}], [:b, {:oid=>1234}]]
     end
     def _metadata_dataset
-      super.with_fetch([[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}], [{:typname=>'enum1', :v=>212389}]])
+      super.with_fetch([[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}], [{:typname=>'enum1', :v=>212389, :sv=>212388}]])
     end
   end
   before do
@@ -23,14 +23,14 @@ describe "pg_enum extension" do
   it "should parse enum labels respecting the sort order" do
     @db.send(:parse_enum_labels)
     @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
-      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
   end
 
   it "should parse enum labels without the sort order on PostgreSQL < 9.1" do
     def @db.server_version(_=nil); 90000; end
     @db.send(:parse_enum_labels)
     @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid",
-    "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+    "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
   end
 
   it "should add enum values to parsed schema columns" do
@@ -54,7 +54,16 @@ describe "pg_enum extension" do
     @db.extension(:pg_array, :pg_enum)
     @db.conversion_procs[212389].must_equal pr
     @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
-      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((oid IN (1)) AND (typarray != 0))"]
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((oid IN (1)) AND (typarray != 0))"]
+  end
+
+  it "should not make individual queries for each array type" do
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @db.extend(mod)
+    @db.extension(:pg_array, :pg_enum)
+    @db.sqls.must_equal ["SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((oid IN (1)) AND (typarray != 0))"]
   end
 
   it "should not add array parsers for enum values if pg_array extension is not used" do
@@ -134,10 +143,10 @@ describe "pg_enum extension" do
     m.apply(@db, :up)
     @db.sqls.must_equal ["CREATE TYPE type_name AS ENUM ('value1', 'value2', 'value3')",
       "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
-      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
     m.apply(@db, :down)
     @db.sqls.must_equal ["DROP TYPE type_name", "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
-      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
   end
 
   it "should reverse a rename_enum directive in a migration" do
@@ -145,10 +154,10 @@ describe "pg_enum extension" do
     m.apply(@db, :up)
     @db.sqls.must_equal ["ALTER TYPE old_type_name RENAME TO new_type_name",
       "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
-      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
     m.apply(@db, :down)
     @db.sqls.must_equal ["ALTER TYPE new_type_name RENAME TO old_type_name",
       "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
-      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+      "SELECT typname, CAST(typarray AS integer) AS v, CAST(oid AS integer) AS sv FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
   end
 end
