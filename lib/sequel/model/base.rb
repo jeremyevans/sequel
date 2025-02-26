@@ -1614,7 +1614,7 @@ END
         @skip_validation_on_next_save = true
       end
 
-      # Returns (naked) dataset that should return only this instance.
+      # Returns naked dataset that should return only the row related to this instance.
       #
       #   Artist[1].this
       #   # SELECT * FROM artists WHERE (id = 1) LIMIT 1
