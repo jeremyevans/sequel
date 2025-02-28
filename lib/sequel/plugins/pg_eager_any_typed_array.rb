@@ -45,20 +45,26 @@ module Sequel
               key = key.column
             end
 
+            # :nocov:
             # many_to_pg_array association type does not need changes, as it
             # already converts the values to a typed postgres array, it does
-            # not call the code that uses :eager_loading_predicate_transform
+            # not call the code that uses :eager_loading_predicate_transform.
+            #
+            # No association type that ships with Sequel can reach this code
+            # unless it is one of these types, but external association types
+            # could potentially reach it.
             sch = case ref[:type]
+            # :nocov:
             when :many_to_one, :one_to_one, :one_to_many, :pg_array_to_many
               ref.associated_class.db_schema
             when :many_to_many, :one_through_one
-              unless ref[:join_table_db]
-                Hash[ref.associated_class.db.schema(ref.join_table_source)]
-              end
+              # Not compatible with the :join_table_db option, but that option
+              # does not call into this code.
+              Hash[ref.associated_class.db.schema(ref.join_table_source)]
             when :many_through_many, :one_through_many
-              unless ref[:separate_query_per_table]
-                Hash[ref.associated_class.db.schema(ref[:through][0][:table])]
-              end
+              # Not compatible with the :separate_query_per_table option, but
+              # that option does not call into this code.
+              Hash[ref.associated_class.db.schema(ref[:through][0][:table])]
             end
 
             if sch && (sch = sch[key])

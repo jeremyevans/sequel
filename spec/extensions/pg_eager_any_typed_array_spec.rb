@@ -41,6 +41,14 @@ describe "pg_eager_any_typed_array plugin" do
       'SELECT * FROM "items" WHERE ("items"."c_id" = ANY(ARRAY[1,3]::int8[]))']
   end
 
+  it "should use column IN (value_list) if it cannot find the column type of from the schema" do
+    @c.db_schema.clear
+    @c.eager(:c, :cs).all
+    @db.sqls.must_equal ['SELECT * FROM "items"',
+      'SELECT * FROM "items" WHERE ("items"."id" IN (2, 4))',
+      'SELECT * FROM "items" WHERE ("items"."c_id" IN (1, 3))']
+  end
+
   it "should automatically use (column1, column2) IN (value_list) for eager loads using composite keys" do
     @c.eager(:cc).all
     @db.sqls.must_equal ['SELECT * FROM "items"', 'SELECT * FROM "items" WHERE (("items"."id", "items"."c_id") IN ((1, 2), (3, 4)))']
@@ -99,6 +107,14 @@ describe "pg_eager_any_typed_array plugin" do
     @c.eager(:pgacs).all
     @db.sqls.must_equal ['SELECT * FROM "items"',
       'SELECT * FROM "items" WHERE ("items"."id" = ANY(ARRAY[2,4]::items_id[]))']
+  end
+
+  it "should use array for many_to_pg_array association" do
+    @c.dataset = @c.dataset.with_fetch([[{:id=>1, :c_id=>[2]}, {:id=>3, :c_id=>[4]}]])
+    @c.many_to_pg_array :mtpgas, :class=>@c, :key=>:c_id
+    @c.eager(:mtpgas).all
+    @db.sqls.must_equal ['SELECT * FROM "items"',
+      'SELECT * FROM "items" WHERE ("items"."c_id" && ARRAY[1,3]::items_c_id[])']
   end
 
   it "should not use typed array for many_to_many association with :join_table_db option" do
