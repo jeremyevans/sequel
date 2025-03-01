@@ -31,7 +31,7 @@ lib/sequel/extensions/pg_auto_parameterize_in_array.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2023-08-08 15:45:53 -0700</span>
+<span class='datetime'>2025-02-06 22:46:01 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -64,7 +64,7 @@ Last Update:
 
 <p><a href="../../../../classes/String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the <code>:treat_string_list_as_text_array</code> Database option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
 
-<p>The conversion is only done for single dimensional arrays that have more than two elements, where all elements are of the same class (other than nil values).</p>
+<p>The conversion is only done for single dimensional arrays that have two or more elements, where all elements are of the same class (other than <code>nil</code> values).  You can also do the conversion for arrays of 1 element by setting <code>pg_auto_parameterize_min_array_size: 1</code> Database option.  This makes finding cases that need special handling easier, but it doesn’t match how PostgreSQL internally converts the expression (PostgreSQL converts <code>IN (single_value)</code> to <code>= single_value</code>, not <code>= ANY(ARRAY[single_value])</code>).</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/AutoParameterizeInArray.html"><code>Sequel::Postgres::AutoParameterizeInArray</code></a></p>
 </div>

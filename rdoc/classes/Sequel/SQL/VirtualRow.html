@@ -126,9 +126,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1913</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>
-<span class="line-num">1914</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">1915</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1919</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>
+<span class="line-num">1920</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1921</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -148,18 +148,18 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-method_missing-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1922</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">1923</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">1924</span>     <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols?</span>
-<span class="line-num">1925</span>       <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;__&#39;</span>, <span class="ruby-value">2</span>)
-<span class="line-num">1926</span>       <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)
-<span class="line-num">1927</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">1928</span>       <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)
-<span class="line-num">1929</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">1930</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1931</span>     <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">1932</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1933</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1928</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">1929</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">1930</span>     <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols?</span>
+<span class="line-num">1931</span>       <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;__&#39;</span>, <span class="ruby-value">2</span>)
+<span class="line-num">1932</span>       <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)
+<span class="line-num">1933</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">1934</span>       <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)
+<span class="line-num">1935</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1936</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1937</span>     <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">1938</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1939</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

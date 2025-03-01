@@ -111,11 +111,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1811</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)
-<span class="line-num">1812</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>
-<span class="line-num">1813</span>   <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>
-<span class="line-num">1814</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">1815</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1817</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)
+<span class="line-num">1818</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>
+<span class="line-num">1819</span>   <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>
+<span class="line-num">1820</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1821</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -139,9 +139,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1831</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">sub</span>)
-<span class="line-num">1832</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))
-<span class="line-num">1833</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1837</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">sub</span>)
+<span class="line-num">1838</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))
+<span class="line-num">1839</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-7C'>
@@ -164,9 +164,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-7C-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1822</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">sub</span>)
-<span class="line-num">1823</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))
-<span class="line-num">1824</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1828</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">sub</span>)
+<span class="line-num">1829</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))
+<span class="line-num">1830</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

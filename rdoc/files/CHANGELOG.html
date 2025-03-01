@@ -31,12 +31,33 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2025-02-01 09:09:06 -0800</span>
+<span class='datetime'>2025-03-01 09:27:26 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.90.0+-282025-03-01-29"><a href="doc/release_notes/5_90_0_txt.html">5.90.0</a> (2025-03-01)<span><a href="#label-5.90.0+-282025-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Avoid one query per enum when loading pg_enum extension when pg_array extension is already loaded (nick96) (#2278, #2279)</p>
+</li><li>
+<p>Automatically load the sql_comments Database extension when loading the sql_comments model plugin (jeremyevans) (#2276)</p>
+</li><li>
+<p>Support :pg_auto_parameterize_min_array_size Database option in pg_auto_parameterize_in_array extension to control minimum array size to handle (jeremyevans)</p>
+</li><li>
+<p>Add pg_eager_any_typed_array plugin, automatically transform eager loads to use = ANY(array_expr::type[]) instead of IN (value_list) (jeremyevans)</p>
+</li><li>
+<p>Support :eager_loading_predicate_transform association option (jeremyevans)</p>
+</li><li>
+<p>Support explicitly specifying :use_placeholder_loader association option (jeremyevans)</p>
+</li><li>
+<p>Make SQL::BooleanExpression.from_value_pairs handle Dataset::PlaceholderLiteralizer::Argument with existing transformer correctly (jeremyevans)</p>
+</li><li>
+<p>Make connection_validator extension not swallow exceptions raised by Database#valid_connection? (jeremyevans)</p>
+</li><li>
+<p>Do not call Model.name while holding a mutex when setting temporary names for anonymous modules (jeremyevans) (#2273)</p>
+</li></ul>
+
 <h3 id="label-5.89.0+-282025-02-01-29"><a href="doc/release_notes/5_89_0_txt.html">5.89.0</a> (2025-02-01)<span><a href="#label-5.89.0+-282025-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make connection_validator extension handle case where Database#valid_connection? raises an exception (jeremyevans)</p>

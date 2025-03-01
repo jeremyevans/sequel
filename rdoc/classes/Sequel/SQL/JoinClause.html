@@ -103,11 +103,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1542</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)
-<span class="line-num">1543</span>   <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>
-<span class="line-num">1544</span>   <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>
-<span class="line-num">1545</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">1546</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1548</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)
+<span class="line-num">1549</span>   <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>
+<span class="line-num">1550</span>   <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>
+<span class="line-num">1551</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">1552</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -127,11 +127,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-column_aliases-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1567</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column_aliases</span>
-<span class="line-num">1568</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)
-<span class="line-num">1569</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>
-<span class="line-num">1570</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1571</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1573</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column_aliases</span>
+<span class="line-num">1574</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)
+<span class="line-num">1575</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>
+<span class="line-num">1576</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1577</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-table'>
@@ -150,13 +150,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-table-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1549</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table</span>
-<span class="line-num">1550</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)
-<span class="line-num">1551</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>
-<span class="line-num">1552</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1553</span>     <span class="ruby-ivar">@table_expr</span>
-<span class="line-num">1554</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1555</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1555</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table</span>
+<span class="line-num">1556</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)
+<span class="line-num">1557</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>
+<span class="line-num">1558</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1559</span>     <span class="ruby-ivar">@table_expr</span>
+<span class="line-num">1560</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1561</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-table_alias'>
@@ -175,11 +175,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-table_alias-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">1559</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_alias</span>
-<span class="line-num">1560</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)
-<span class="line-num">1561</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>
-<span class="line-num">1562</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1563</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1565</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_alias</span>
+<span class="line-num">1566</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)
+<span class="line-num">1567</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>
+<span class="line-num">1568</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1569</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

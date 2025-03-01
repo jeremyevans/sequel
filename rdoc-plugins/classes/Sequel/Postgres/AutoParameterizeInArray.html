@@ -66,24 +66,24 @@ Sequel::Postgres::AutoParameterizeInArray
 [show source]
 </a>
 <pre id='method-i-complex_expression_sql_append-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize_in_array.rb</span>
-<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">48</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
-<span class="line-num">49</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
-<span class="line-num">50</span>     <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span> = <span class="ruby-identifier">args</span>
-<span class="line-num">51</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">auto_param?</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">type</span> = <span class="ruby-identifier">_bound_variable_type_for_array</span>(<span class="ruby-identifier">r</span>))
-<span class="line-num">52</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span> 
-<span class="line-num">53</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:&quot;=&quot;</span>
-<span class="line-num">54</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ANY</span>
-<span class="line-num">55</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">56</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:!=</span>
-<span class="line-num">57</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ALL</span>
-<span class="line-num">58</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">59</span>       <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">l</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">func</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">type</span>))]
-<span class="line-num">60</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">61</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">62</span> 
-<span class="line-num">63</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">53</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">54</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
+<span class="line-num">55</span>     <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">56</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">auto_param?</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">type</span> = <span class="ruby-identifier">_bound_variable_type_for_array</span>(<span class="ruby-identifier">r</span>))
+<span class="line-num">57</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span> 
+<span class="line-num">58</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:&quot;=&quot;</span>
+<span class="line-num">59</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ANY</span>
+<span class="line-num">60</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">61</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:!=</span>
+<span class="line-num">62</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ALL</span>
+<span class="line-num">63</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">64</span>       <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">l</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">func</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">type</span>))]
+<span class="line-num">65</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">66</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">67</span> 
+<span class="line-num">68</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

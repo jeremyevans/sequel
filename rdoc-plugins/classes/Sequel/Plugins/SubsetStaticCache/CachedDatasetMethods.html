@@ -72,13 +72,13 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-all-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">129</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">130</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
-<span class="line-num">131</span> 
-<span class="line-num">132</span>   <span class="ruby-identifier">array</span> = <span class="ruby-identifier">all</span>.<span class="ruby-identifier">dup</span>
-<span class="line-num">133</span>   <span class="ruby-identifier">array</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">134</span>   <span class="ruby-identifier">array</span>
-<span class="line-num">135</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">130</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">131</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
+<span class="line-num">132</span> 
+<span class="line-num">133</span>   <span class="ruby-identifier">array</span> = <span class="ruby-identifier">all</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">134</span>   <span class="ruby-identifier">array</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">135</span>   <span class="ruby-identifier">array</span>
+<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-as_hash'>
@@ -97,39 +97,39 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-as_hash-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">194</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">195</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
-<span class="line-num">196</span> 
-<span class="line-num">197</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">nil?</span>
-<span class="line-num">198</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>]
-<span class="line-num">199</span>       <span class="ruby-identifier">key_column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>
-<span class="line-num">200</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">201</span>       <span class="ruby-keyword">return</span> <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_map</span>]]
-<span class="line-num">202</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">203</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">204</span> 
-<span class="line-num">205</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
-<span class="line-num">206</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
-<span class="line-num">207</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">208</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">209</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">210</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">211</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">212</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">213</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">214</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">215</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">216</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">217</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">218</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">219</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">220</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">221</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>}
-<span class="line-num">222</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">223</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>}
-<span class="line-num">224</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">225</span>   <span class="ruby-identifier">h</span>
-<span class="line-num">226</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">196</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
+<span class="line-num">197</span> 
+<span class="line-num">198</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">nil?</span>
+<span class="line-num">199</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>]
+<span class="line-num">200</span>       <span class="ruby-identifier">key_column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>
+<span class="line-num">201</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">202</span>       <span class="ruby-keyword">return</span> <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_map</span>]]
+<span class="line-num">203</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">204</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">205</span> 
+<span class="line-num">206</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
+<span class="line-num">207</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
+<span class="line-num">208</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">209</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">210</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">211</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">212</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">213</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">214</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">215</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">216</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">217</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">218</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">219</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">220</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">221</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">222</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] = <span class="ruby-identifier">r</span>}
+<span class="line-num">223</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">224</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] = <span class="ruby-identifier">r</span>}
+<span class="line-num">225</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">226</span>   <span class="ruby-identifier">h</span>
+<span class="line-num">227</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-count'>
@@ -148,13 +148,13 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-count-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">139</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">140</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">block</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>])
-<span class="line-num">141</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">size</span>
-<span class="line-num">142</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">143</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">144</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">145</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">140</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">141</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">block</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>])
+<span class="line-num">142</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">size</span>
+<span class="line-num">143</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">144</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">145</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">146</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -173,10 +173,10 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">174</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
-<span class="line-num">175</span>   <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">176</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">174</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">175</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
+<span class="line-num">176</span>   <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">177</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-first'>
@@ -195,13 +195,13 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-first-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">153</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">154</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>])
-<span class="line-num">155</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">156</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">157</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">158</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">159</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">155</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>])
+<span class="line-num">156</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">157</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">158</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">159</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-map'>
@@ -220,19 +220,19 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-map-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">180</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
-<span class="line-num">181</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
-<span class="line-num">182</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both column and block to map&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">183</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">184</span>       <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">column</span>)}
-<span class="line-num">185</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">186</span>       <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">column</span>]}
-<span class="line-num">187</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">188</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">189</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">190</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">181</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
+<span class="line-num">182</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
+<span class="line-num">183</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both column and block to map&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
+<span class="line-num">184</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">185</span>       <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">column</span>)}
+<span class="line-num">186</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">187</span>       <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">column</span>]}
+<span class="line-num">188</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">189</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">190</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">191</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">192</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_hash'>
@@ -251,9 +251,9 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-to_hash-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">229</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">230</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
-<span class="line-num">231</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">230</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">231</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">232</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_hash_groups'>
@@ -272,31 +272,31 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-to_hash_groups-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">234</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">235</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
-<span class="line-num">236</span> 
-<span class="line-num">237</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
-<span class="line-num">238</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
-<span class="line-num">239</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">240</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">241</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">242</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">243</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
-<span class="line-num">244</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">245</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">246</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">247</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">248</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">249</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
-<span class="line-num">250</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">251</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">252</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">253</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
-<span class="line-num">254</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">255</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
-<span class="line-num">256</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">257</span>   <span class="ruby-identifier">h</span>
-<span class="line-num">258</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">235</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash_groups</span>(<span class="ruby-identifier">key_column</span>, <span class="ruby-identifier">value_column</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">236</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">all</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_all</span>]
+<span class="line-num">237</span> 
+<span class="line-num">238</span>   <span class="ruby-identifier">h</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">||</span> {}
+<span class="line-num">239</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>
+<span class="line-num">240</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">value_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">241</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">242</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">243</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">244</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">value_column</span>)}
+<span class="line-num">245</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">246</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">247</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">248</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">249</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">250</span>         <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>[<span class="ruby-identifier">value_column</span>]}
+<span class="line-num">251</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">252</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">253</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key_column</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">254</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_column</span>)] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
+<span class="line-num">255</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">256</span>     <span class="ruby-identifier">all</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">h</span>[<span class="ruby-identifier">r</span>[<span class="ruby-identifier">key_column</span>]] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">r</span>}
+<span class="line-num">257</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">258</span>   <span class="ruby-identifier">h</span>
+<span class="line-num">259</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_pk'>
@@ -315,13 +315,13 @@ Sequel::Plugins::SubsetStaticCache::CachedDatasetMethods
 [show source]
 </a>
 <pre id='method-i-with_pk-source'>    <span class="ruby-comment"># File lib/sequel/plugins/subset_static_cache.rb</span>
-<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">164</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_map</span>]
-<span class="line-num">165</span>     <span class="ruby-identifier">cache</span>[<span class="ruby-identifier">pk</span>]
-<span class="line-num">166</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">167</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">168</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">165</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache</span> = <span class="ruby-ivar">@cache</span>[<span class="ruby-value">:subset_static_cache_map</span>]
+<span class="line-num">166</span>     <span class="ruby-identifier">cache</span>[<span class="ruby-identifier">pk</span>]
+<span class="line-num">167</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">168</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">169</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

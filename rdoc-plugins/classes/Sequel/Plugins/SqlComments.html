@@ -67,7 +67,7 @@ Sequel::Plugins::SqlComments
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">sql_comments_dataset_methods</span> <span class="ruby-value">:to_csv</span> <span class="ruby-comment"># csv_serializer plugin</span>
 </pre>
 
-<p>In order for the sql_comments plugin to work, the sql_comments <a href="../../Database.html"><code>Database</code></a> extension must be loaded into the model’s database.</p>
+<p>In order for the sql_comments plugin to work, the sql_comments <a href="../../Database.html"><code>Database</code></a> extension must be loaded into the model’s database, so loading the plugin does this automatically.</p>
 
 <p>Note that in order to make sure <a href="../SQL.html"><code>SQL</code></a> comments are included, some optimizations are disabled if this plugin is loaded.</p>
 
@@ -85,6 +85,7 @@ Sequel::Plugins::SqlComments
 <h2>Methods</h2>
 <h3>Public Class</h3>
 <ol>
+<li><a href="#method-c-apply">apply</a></li>
 <li><a href="#method-c-configure">configure</a></li>
 <li><a href="#method-c-def_sql_commend_method">def_sql_commend_method</a></li>
 </ol>
@@ -102,6 +103,25 @@ Sequel::Plugins::SqlComments
 <div id='section'>
 <div id='methods'>
 <h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span><span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/sql_comments.rb</span>
+<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">72</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)
+<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-class' id='method-method-c-configure'>
 <a name='method-c-configure'></a>
 <div class='synopsis'>
@@ -116,9 +136,9 @@ Sequel::Plugins::SqlComments
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/sql_comments.rb</span>
-<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
-<span class="line-num">71</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:reset_fast_pk_lookup_sql</span>)
-<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">76</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:reset_fast_pk_lookup_sql</span>)
+<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-def_sql_commend_method'>
@@ -137,16 +157,16 @@ Sequel::Plugins::SqlComments
 [show source]
 </a>
 <pre id='method-c-def_sql_commend_method-source'>   <span class="ruby-comment"># File lib/sequel/plugins/sql_comments.rb</span>
-<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_sql_commend_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">model</span>, <span class="ruby-identifier">method_type</span>, <span class="ruby-identifier">meth</span>)
-<span class="line-num">60</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
-<span class="line-num">61</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">:model</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">model</span>, <span class="ruby-value">:method_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">method_type</span>, <span class="ruby-value">:method</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">62</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">63</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">64</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">65</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">66</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-keyword">true</span>)
-<span class="line-num">67</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_sql_commend_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">model</span>, <span class="ruby-identifier">method_type</span>, <span class="ruby-identifier">meth</span>)
+<span class="line-num">61</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>
+<span class="line-num">62</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">with_comments</span>(<span class="ruby-value">:model</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">model</span>, <span class="ruby-value">:method_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">method_type</span>, <span class="ruby-value">:method</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">63</span>       <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">64</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">65</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">66</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">67</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:ruby2_keywords</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">68</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
