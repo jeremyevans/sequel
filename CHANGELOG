@@ -1,4 +1,4 @@
-=== master
+=== 5.90.0 (2025-03-01)
 
 * Avoid one query per enum when loading pg_enum extension when pg_array extension is already loaded (nick96) (#2278, #2279)
 

@@ -1,0 +1,59 @@
+= New Features
+
+* A pg_eager_any_typed_array plugin has been added, which
+  automatically transform eager loads to use
+
+    column = ANY(array_expr::type[])
+
+  instead of
+
+    column IN (value_list)
+
+  When using the pg_auto_parameterize database extension, this
+  plugin is useful for ensuring that eager loading queries use
+  a fixed number of parameters, instead of a varying number of
+  parameters per eager load, which can allow for easier auditing
+  of queries.  It also can fix cases that break when using the 
+  pg_auto_parameterize_in_array extension with the
+  :treat_string_list_as_text_array option, if the column type
+  for the eager loading predicate key is not text.
+
+* The pg_auto_parameterize_in_array extension now supports a
+  :pg_auto_parameterize_min_array_size Database option to set
+  the minium array size to convert.  This defaults to 2, but it
+  can be set to 1 to convert all non-empty arrays where the type
+  is recognized.  These aren't converted by default, because
+  PostgreSQL uses a different query plan for them.  However, it
+  can be useful to set this value when testing, especially if your
+  tests only test cases with 1 value and not multiple values.
+
+* Associations now support the :eager_loading_predicate_transform
+  option, which can be used to set up automatic transformation
+  of predicate values during eager loading.
+
+* Associations can now explicitly set the :use_placeholder_loader
+  association option to false to disable the use of a placeholder
+  loader.  This is mostly useful for testing.
+
+= Other Improvements
+
+* Loading the pg_enum extension into a Database that already has
+  loaded the pg_array extension no longer issues a query for each 
+  enum type.
+
+* Sequel now avoids calling Model.name while holding a mutex when
+  setting temporary names for anonymous modules. This fixes cases
+  where Model.name was overridden and required holding the same mutex.
+
+* The sql_comments plugin now automatically loads the sql_comments
+  Database extension into the model's database.
+
+* The connection_validator extension no longer swallows exceptions
+  raised by Database#valid_connection?.  Database#valid_connection?
+  rescues database errors and returns true/false, so this only has
+  an affect if there is a bug in the adapter or one of the loaded
+  Database extensions.
+
+* SQL::BooleanExpression.from_value_pairs now correctly handles cases
+  where the value is a Dataset::PlaceholderLiteralizer::Argument with
+  an existing transformer.
