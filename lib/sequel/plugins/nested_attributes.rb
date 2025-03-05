@@ -190,9 +190,8 @@ module Sequel
         # it when the parent is validated, and save it when the object is saved.
         # Returns the object created.
         def nested_attributes_create(meta, attributes)
+          obj = nested_attributes_new(meta, attributes)
           reflection = meta[:reflection]
-          obj = reflection.associated_class.new
-          nested_attributes_set_attributes(meta, obj, attributes)
           delay_validate_associated_object(reflection, obj)
           if reflection.returns_array?
             public_send(reflection[:name]) << obj
@@ -254,7 +253,13 @@ module Sequel
           end
           obj
         end
-        
+
+        # Returns a new object with the given attributes set, without saving it.
+        def nested_attributes_new(meta, attributes)
+          obj = meta[:reflection].associated_class.new
+          nested_attributes_set_attributes(meta, obj, attributes)
+        end
+
         # Set the fields in the obj based on the association, only allowing
         # specific :fields if configured.
         def nested_attributes_set_attributes(meta, obj, attributes)
