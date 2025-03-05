@@ -1,11 +1,15 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_auto_parameterize_in_array extension" do
-  before do
+  def db(opts={:treat_string_list_as_text_array => "t"})
     @db = Sequel.connect('mock://postgres')
     @db.synchronize{|c| def c.escape_bytea(v) v*2 end}
-    @db.opts[:treat_string_list_as_text_array] = 't'
+    @db.opts.merge!(opts)
     @db.extension :pg_auto_parameterize_in_array
+  end
+
+  before do
+    @db = db
   end
 
   types = [
@@ -68,6 +72,34 @@ describe "pg_auto_parameterize_in_array extension" do
     end
   end
 
+  it "should automatically switch column IN/NOT IN to = ANY/!= ALL without array cast for strings if treat_string_list_as_untyped_array Database option is true" do
+    @db = db(:treat_string_list_as_untyped_array => 't')
+    v = %w[1 2]
+    nv = (v + [nil]).freeze
+
+    sql = @db[:table].where(:a=>v).sql
+    sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" = ANY($1))'
+    sql.args.must_equal [v]
+
+    sql = @db[:table].where(:a=>nv).sql
+    sql.must_equal %'SELECT * FROM "table" WHERE ("a" = ANY($1))'
+    sql.args.must_equal [nv]
+
+    sql = @db[:table].exclude(:a=>v).sql
+    sql.must_equal %'SELECT * FROM "table" WHERE ("a" != ALL($1))'
+    sql.args.must_equal [v]
+
+    sql = @db[:table].exclude(:a=>nv).sql
+    sql.must_equal %'SELECT * FROM "table" WHERE ("a" != ALL($1))'
+    sql.args.must_equal [nv]
+
+    # Check that other arrays are still typed
+    v = [1,2,3].map{|x| Date.new(2021, x)}
+    sql = @db[:table].where(:a=>v).sql
+    sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" = ANY($1::date[]))'
+    sql.args.must_equal [v]
+  end
+
   it "should automatically switch column IN/NOT IN to = ANY/!= ALL for infinite/NaN floats" do
     v = [1.0, 1.0/0.0, -1.0/0.0, 0.0/0.0]
     nv = (v + [nil]).freeze
@@ -91,7 +123,7 @@ describe "pg_auto_parameterize_in_array extension" do
   end
 
   it "should not automatically switch column IN/NOT IN to = ANY/!= ALL for strings by default" do
-    @db.opts.delete(:treat_string_list_as_text_array)
+    @db = db({})
     v = %w'1 2'
     sql = @db[:table].where([:a, :b]=>v).sql
     sql.must_equal 'SELECT * FROM "table" WHERE (("a", "b") IN ($1, $2))'
@@ -134,7 +166,7 @@ describe "pg_auto_parameterize_in_array extension" do
   end
 
   it "should convert single value expressions in pg_auto_parameterize_min_array_size: 1" do
-    @db.opts[:pg_auto_parameterize_min_array_size] = 1
+    @db = db(:pg_auto_parameterize_min_array_size => 1)
     sql = @db[:table].where(:a=>[1.0]).sql
     sql.must_equal 'SELECT * FROM "table" WHERE ("a" = ANY($1::numeric[]))'
     sql.args.must_equal [[1]]

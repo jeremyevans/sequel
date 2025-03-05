@@ -14,11 +14,15 @@ end
 DB.extension :pg_hstore if DB.type_supported?('hstore')
 DB.extension :pg_multirange if DB.server_version >= 140000
 
-if uses_pg && ENV['SEQUEL_PG_AUTO_PARAMETERIZE']
-  if ENV['SEQUEL_PG_AUTO_PARAMETERIZE'] = 'in_array_string'
-    DB.extension :pg_auto_parameterize_in_array
+if uses_pg && (auto_parameterize = ENV['SEQUEL_PG_AUTO_PARAMETERIZE'])
+  case auto_parameterize
+  when 'in_array_string'
     DB.opts[:treat_string_list_as_text_array] = 't'
-  elsif ENV['SEQUEL_PG_AUTO_PARAMETERIZE'] = 'in_array'
+    DB.extension :pg_auto_parameterize_in_array
+  when 'in_array'
+    DB.extension :pg_auto_parameterize_in_array
+  when 'in_array_string_untyped'
+    DB.opts[:treat_string_list_as_array] = 't'
     DB.extension :pg_auto_parameterize_in_array
   else
     DB.extension :pg_auto_parameterize

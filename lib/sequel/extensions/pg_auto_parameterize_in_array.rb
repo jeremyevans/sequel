@@ -21,11 +21,17 @@
 # DateTime :: timestamp (or timestamptz if pg_timestamptz extension is used)
 # Sequel::SQLTime :: time
 # Sequel::SQL::Blob :: bytea
+#
+# Arrays of string values are not automatically converted by default, because the Ruby
+# String class can represent a number of different database types.  To convert
+# arrays of Ruby strings to an untyped array (a query parameter with no explicit
+# type cast), set the +:treat_string_list_as_untyped_array+ Database option
+# before loading the extension.
 # 
-# String values are also supported using the +text+ type, but only if the 
-# +:treat_string_list_as_text_array+ Database option is used. This is because
-# treating strings as text can break programs, since the type for
-# literal strings in PostgreSQL is +unknown+, not +text+.
+# If you will only be using arrays of Ruby strings that represent the +text+ type,
+# you can use the +:treat_string_list_as_text_array+ Database option is used. This
+# can break programs, since the type for literal strings in PostgreSQL is +unknown+,
+# not +text+.
 #
 # The conversion is only done for single dimensional arrays that have two or
 # more elements, where all elements are of the same class (other than
@@ -42,6 +48,47 @@ module Sequel
   module Postgres
     # Enable automatically parameterizing queries.
     module AutoParameterizeInArray
+      module TreatStringListAsUntypedArray
+        # Sentinal value to use as an auto param type to use auto parameterization
+        # of a string array without an explicit type cast.
+        NO_EXPLICIT_CAST = Object.new.freeze
+
+        # Wrapper for untyped PGArray values that will be parameterized directly
+        # into the query.  This should only be used in cases where you know the
+        # value should be added as a query parameter.
+        class ParameterizedUntypedPGArray < SQL::Wrapper
+          def to_s_append(ds, sql)
+            sql.add_arg(@value)
+          end
+        end
+
+        private
+
+        # Recognize NO_EXPLICIT_CAST sentinal value and use wrapped
+        # PGArray that will be parameterized into the query.
+        def _convert_array_to_pg_array_with_type(r, type)
+          if NO_EXPLICIT_CAST.equal?(type)
+            ParameterizedUntypedPGArray.new(Sequel.pg_array(r))
+          else
+            super
+          end
+        end
+
+        # Use a query parameter with no type cast for string arrays.
+        def _bound_variable_type_for_string_array(r)
+          NO_EXPLICIT_CAST
+        end
+      end
+
+      module TreatStringListAsTextArray
+        private
+
+        # Assume all string arrays used on RHS of IN/NOT IN are for type text[]
+        def _bound_variable_type_for_string_array(r)
+          "text"
+        end
+      end
+
       # Transform column IN (...) expressions into column = ANY($)
       # and column NOT IN (...) expressions into column != ALL($)
       # using an array bound variable for the ANY/ALL argument,
@@ -61,7 +108,7 @@ module Sequel
               op = :!=
               func = :ALL
             end
-            args = [l, Sequel.function(func, Sequel.pg_array(r, type))]
+            args = [l, Sequel.function(func, _convert_array_to_pg_array_with_type(r, type))]
           end
         end
 
@@ -73,7 +120,7 @@ module Sequel
       # The bound variable type string to use for the bound variable array.
       # Returns nil if a bound variable should not be used for the array.
       def _bound_variable_type_for_array(r)
-        return unless Array === r && r.size >= (db.typecast_value(:integer, db.opts[:pg_auto_parameterize_min_array_size]) || 2)
+        return unless Array === r && r.size >= pg_auto_parameterize_min_array_size
         classes = r.map(&:class)
         classes.uniq!
         classes.delete(NilClass)
@@ -86,7 +133,7 @@ module Sequel
           # arrays natively (though the SQL used is different)
           "int8"
         elsif klass == String
-          "text" if db.typecast_value(:boolean, db.opts[:treat_string_list_as_text_array])
+          _bound_variable_type_for_string_array(r)
         elsif klass == BigDecimal
           "numeric"
         elsif klass == Date
@@ -105,11 +152,41 @@ module Sequel
           "bytea"
         end
       end
+
+      # Do not auto parameterize string arrays by default.
+      def _bound_variable_type_for_string_array(r)
+        nil
+      end
+
+      # The minimium size of array to auto parameterize.
+      def pg_auto_parameterize_min_array_size
+        2
+      end
+
+      # Convert RHS of IN/NOT IN operator to PGArray with given type.
+      def _convert_array_to_pg_array_with_type(r, type)
+        Sequel.pg_array(r, type)
+      end
     end
   end
 
   Database.register_extension(:pg_auto_parameterize_in_array) do |db|
     db.extension(:pg_array, :pg_auto_parameterize)
     db.extend_datasets(Postgres::AutoParameterizeInArray)
+
+    if db.typecast_value(:boolean, db.opts[:treat_string_list_as_text_array])
+      db.extend_datasets(Postgres::AutoParameterizeInArray::TreatStringListAsTextArray)
+    elsif db.typecast_value(:boolean, db.opts[:treat_string_list_as_untyped_array])
+      db.extend_datasets(Postgres::AutoParameterizeInArray::TreatStringListAsUntypedArray)
+    end
+
+    if min_array_size = db.opts[:pg_auto_parameterize_min_array_size]
+      min_array_size = db.typecast_value(:integer, min_array_size)
+      mod = Module.new do
+        define_method(:pg_auto_parameterize_min_array_size){min_array_size}
+      end
+      Sequel.set_temp_name(mod){"Sequel::Postgres::AutoParameterizeInArray::_MinArraySize#{min_array_size}"}
+      db.extend_datasets(mod)
+    end
   end
 end
