@@ -135,7 +135,12 @@ module Sequel
           raise Error, "No pg_auto_constraint_validations setup" unless file = @pg_auto_constraint_validations_cache_file
           pg_auto_constraint_validations_cache = {}
           @pg_auto_constraint_validations_cache.sort.each do |k, v|
-            pg_auto_constraint_validations_cache[k] = v
+            h = {}
+            v.each do |k, entry|
+              entry = Hash[entry.sort] if entry.is_a?(Hash)
+              h[k] = entry
+            end
+            pg_auto_constraint_validations_cache[k] = h
           end
           File.open(file, 'wb'){|f| f.write(Marshal.dump(pg_auto_constraint_validations_cache))}
           nil

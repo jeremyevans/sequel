@@ -17,7 +17,7 @@ describe "pg_auto_constraint_validations plugin" do
     @set_error = lambda{|ec, ei| @db.fetch = @db.autoid = @db.numrows = ec; info.merge!(ei)}
     @db.define_singleton_method(:error_info){|e| info}
     @metadata_results = [
-     [{:constraint=>'items_i_check', :column=>'i', :definition=>'CHECK i'}, {:constraint=>'items_i_id_check', :column=>'i', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_id_check', :column=>'id', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_foo_check', :column=>nil, :definition=>'CHECK foo() < 20'}],
+     [{:constraint=>'items_i_id_check', :column=>'i', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_id_check', :column=>'id', :definition=>'CHECK i + id < 20'}, {:constraint=>'items_i_foo_check', :column=>nil, :definition=>'CHECK foo() < 20'}, {:constraint=>'items_i_check', :column=>'i', :definition=>'CHECK i'}],
      [{:name=>'items_i_uidx', :unique=>true, :column=>'i', :deferrable=>false}, {:name=>'items_i2_idx', :unique=>false, :column=>'i', :deferrable=>false}],
      [{:name=>'items_i_fk', :column=>'i', :on_update=>'a', :on_delete=>'a', :table=>'items2', :refcolumn=>'id', :schema=>'public'}],
      [{:name=>'items2_i_fk', :column=>'id', :on_update=>'a', :on_delete=>'a', :table=>'items2', :refcolumn=>'i', :schema=>'public'}],
@@ -216,7 +216,7 @@ describe "pg_auto_constraint_validations plugin" do
     end
   end
 
-  it "should sort cache file by table name" do
+  it "should sort cache file by table name and subhashes by key" do
     cache_file = "spec/files/pgacv-spec-#{$$}.cache"
     begin
       c = Class.new(Sequel::Model)
@@ -240,12 +240,15 @@ describe "pg_auto_constraint_validations plugin" do
       @db.sqls.length.must_equal 5
 
       c.instance_variable_get(:@pg_auto_constraint_validations_cache).keys.must_equal %w["items" "bars"]
+      c.instance_variable_get(:@pg_auto_constraint_validations_cache)['"items"'][:check].keys.must_equal [:items_i_id_check, :items_i_check]
       c.dump_pg_auto_constraint_validations_cache
       c.instance_variable_get(:@pg_auto_constraint_validations_cache).keys.must_equal %w["items" "bars"]
+      c.instance_variable_get(:@pg_auto_constraint_validations_cache)['"items"'][:check].keys.must_equal [:items_i_id_check, :items_i_check]
 
       c3 = Class.new(Sequel::Model)
       c3.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
       c3.instance_variable_get(:@pg_auto_constraint_validations_cache).keys.must_equal %w["bars" "items"]
+      c3.instance_variable_get(:@pg_auto_constraint_validations_cache)['"items"'][:check].keys.must_equal [:items_i_check, :items_i_id_check]
     ensure
       File.delete(cache_file) if File.file?(cache_file)
     end
