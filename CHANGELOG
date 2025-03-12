@@ -1,5 +1,7 @@
 === master
 
+* Add pg_auto_validate_enums plugin for automatically validating enum values on PostgreSQL (jeremyevans)
+
 * Make pg_auto_constraint_validations cache file creation deterministic by sorting subhashes (jeremyevans)
 
 * Support treat_string_list_as_untyped_array Database option in pg_auto_parameterize_in_array extension (jeremyevans)

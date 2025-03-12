@@ -208,6 +208,26 @@ describe 'A PostgreSQL database' do
     end
   end
 
+  it "pg_auto_validate_enums plugin should validate enum values" do
+    begin
+      @db.drop_enum(:intro_type) rescue nil
+      @db.create_enum(:intro_type, %w(foo bar))
+      @db.create_table(:test){intro_type :baz}
+      c = Sequel::Model(@db[:test])
+      c.plugin :pg_auto_validate_enums
+      o = c.new
+      o.baz = "foo"
+      o.valid?.must_equal true
+      o.baz = "bar"
+      o.valid?.must_equal true
+      o.baz = "baz"
+      o.valid?.must_equal false
+      o.errors.must_equal(:baz => ['is not in range or set: ["foo", "bar"]'])
+    ensure
+      @db.drop_enum(:intro_type) rescue nil
+    end
+  end
+
   it "should not include :min_value or :max_value for arrays" do
     @db.create_table(:test){column :baz, 'integer[]'}
     sch = @db.schema(:test).first.last
@@ -6429,7 +6449,7 @@ describe 'pg_schema_caching_extension' do
   end
 end
 
-describe "pg_eager_any_typed_array extension" do
+describe "pg_eager_any_typed_array plugin" do
   before(:all) do
     @db = DB
     @db.create_table!(:pg_eager_any_typed_array_test) do
