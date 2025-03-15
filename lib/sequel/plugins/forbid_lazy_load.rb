@@ -39,6 +39,9 @@ module Sequel
     #
     #   Album.first.artist # no error
     #
+    # This behavior of enabling +forbid_lazy_load+ automatically from dataset
+    # methods can be disabled using the plugin's +:allow_by_default+ option:
+    #
     # You can allow lazy loading associations for an instance that it
     # was previously forbidden for:
     # 
@@ -98,7 +101,17 @@ module Sequel
     #
     #   # Make the Album class support forbidding lazy load
     #   Album.plugin :forbid_lazy_load
+    #
+    #   # Let lazy loading be forbidden by object, but not automatically for any
+    #   # object loaded via dataset.
+    #   Album.plugin :forbid_lazy_load, allow_by_default: true
     module ForbidLazyLoad
+      def self.apply(model, opts=OPTS)
+        unless opts[:allow_by_default]
+          model.send(:dataset_extend, ForbidByDefault, :create_class_methods=>false)
+        end
+      end
+
       # Error raised when attempting to lazy load an association when
       # lazy loading has been forbidden.
       class Error < StandardError
@@ -179,7 +192,7 @@ module Sequel
         end
       end
 
-      module DatasetMethods
+      module ForbidByDefault
         # Mark model instances retrieved in this call as forbidding lazy loading.
         def each
           if row_proc

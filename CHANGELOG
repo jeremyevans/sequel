@@ -6,6 +6,8 @@
 
 * Support treat_string_list_as_untyped_array Database option in pg_auto_parameterize_in_array extension (jeremyevans)
 
+* Support allow_by_default option in forbid_lazy_load extension (brandur) (#2288)
+
 === 5.90.0 (2025-03-01)
 
 * Avoid one query per enum when loading pg_enum extension when pg_array extension is already loaded (nick96) (#2278, #2279)
