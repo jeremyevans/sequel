@@ -40,7 +40,7 @@ module Sequel
     #   Album.first.artist # no error
     #
     # This behavior of enabling +forbid_lazy_load+ automatically from dataset
-    # methods can be disabled using the plugin's +:allow_by_default+ option:
+    # methods can be disabled using the plugin's +:allow_by_default+ option.
     #
     # You can allow lazy loading associations for an instance that it
     # was previously forbidden for:
