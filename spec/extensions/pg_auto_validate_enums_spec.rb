@@ -24,6 +24,12 @@ describe "pg_auto_validate_enums plugin" do
     @o.errors.must_equal({:c => ['is not in range or set: ["a", "b", "test"]']})
   end
 
+  it "validates underlying enum value, not method return value" do
+    @o.c = "a"
+    def @o.c; "invalid" end
+    @o.valid?.must_equal true
+  end
+
   it "treats plugin options as validates_includes options for validations" do
     @c.plugin :pg_auto_validate_enums, :message=>"is not valid"
     @o.c = "c"
@@ -61,8 +67,8 @@ describe "pg_auto_validate_enums plugin" do
   end
 
   it "exposes options in .pg_auto_validate_enums_opts" do
-    @c.pg_auto_validate_enums_opts.must_equal(:allow_nil => true)
+    @c.pg_auto_validate_enums_opts.must_equal(:allow_nil => true, :from => :values)
     @c.plugin :pg_auto_validate_enums, :message=>"is not valid"
-    @c.pg_auto_validate_enums_opts.must_equal(:allow_nil => true, :message => "is not valid")
+    @c.pg_auto_validate_enums_opts.must_equal(:allow_nil => true, :message => "is not valid", :from => :values)
   end
 end

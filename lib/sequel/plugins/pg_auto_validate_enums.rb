@@ -29,8 +29,9 @@ module Sequel
 
       # Load the pg_enum extension into the database, and reload the schema
       # if it is already loaded. The opts given are used for the validates_includes
-      # validations (with allow_nil: true enabled by default, to avoid issues with
-      # nullable enum columns).
+      # validations (with allow_nil: true and from: :values enabled by default,
+      # to avoid issues with nullable enum columns and cases where the column
+      # method has been overridden.
       def self.configure(model, opts=OPTS)
         model.instance_exec do
           db.extension(:pg_enum) unless @db.instance_variable_get(:@enum_labels)
@@ -38,7 +39,7 @@ module Sequel
             get_db_schema(true)
             _get_pg_pg_auto_validate_enums_metadata
           end
-          @pg_auto_validate_enums_opts = {allow_nil: true}.merge!(opts).freeze
+          @pg_auto_validate_enums_opts = {allow_nil: true, from: :values}.merge!(opts).freeze
         end
       end
 
