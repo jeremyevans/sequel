@@ -414,6 +414,12 @@ module Sequel
           false
         end
 
+        # Hash value for the association reflection.  This is precomputed to avoid
+        # concurrency issues at runtime.
+        def hash
+          self[:_hash]
+        end
+
         # Initialize the associations cache for the current association for the given objects.
         def initialize_association_cache(objects)
           name = self[:name]
@@ -1930,6 +1936,8 @@ module Sequel
           
           # Remove :class entry if it exists and is nil, to work with cached_fetch
           opts.delete(:class) unless opts[:class]
+
+          opts[:_hash] = [self, name].hash
 
           def_association(opts)
       
@@ -3608,7 +3616,7 @@ module Sequel
 
         # Prepare a hash loaders and eager options which will be used to implement the eager loading.
         def prepare_eager_load(a, reflections, eager_assoc)
-          eager_load_data = {}
+          eager_load_data = {}.compare_by_identity
 
           # Key is foreign/primary key name symbol.
           # Value is hash with keys being foreign/primary key values (generally integers)
