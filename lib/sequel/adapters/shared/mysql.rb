@@ -550,11 +550,11 @@ module Sequel
 
       def schema_column_type(db_type)
         case db_type
-        when /\Aset/io
+        when /\Aset/i
           :set
-        when /\Amediumint/io
+        when /\Amediumint/i
           :integer
-        when /\Amediumtext/io
+        when /\Amediumtext/i
           :string
         else
           super

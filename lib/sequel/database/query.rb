@@ -170,7 +170,7 @@ module Sequel
         c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type]) unless c.has_key?(:ruby_default)
         if c[:primary_key] && !auto_increment_set
           # If adapter didn't set it, assume that integer primary keys are auto incrementing
-          c[:auto_increment] = primary_keys == 1 && !!(c[:db_type] =~ /int/io)
+          c[:auto_increment] = primary_keys == 1 && !!(c[:db_type] =~ /int/i)
         end
         if !c[:max_length] && c[:type] == :string && (max_length = column_schema_max_length(c[:db_type]))
           c[:max_length] = max_length
@@ -390,25 +390,25 @@ module Sequel
     # such as :integer or :string.
     def schema_column_type(db_type)
       case db_type
-      when /\A(character( varying)?|n?(var)?char|n?text|string|clob)/io
+      when /\A(character( varying)?|n?(var)?char|n?text|string|clob)/i
         :string
-      when /\A(int(eger)?|(big|small|tiny)int)/io
+      when /\A(int(eger)?|(big|small|tiny)int)/i
         :integer
-      when /\Adate\z/io
+      when /\Adate\z/i
         :date
-      when /\A((small)?datetime(\(\d\))?|timestamp(\(\d\))?( with(out)? time zone)?)\z/io
+      when /\A((small)?datetime(\(\d\))?|timestamp(\(\d\))?( with(out)? time zone)?)\z/i
         :datetime
-      when /\Atime( with(out)? time zone)?\z/io
+      when /\Atime( with(out)? time zone)?\z/i
         :time
-      when /\A(bool(ean)?)\z/io
+      when /\A(bool(ean)?)\z/i
         :boolean
-      when /\A(real|float( unsigned)?|double( precision)?|double\(\d+,\d+\)( unsigned)?)\z/io
+      when /\A(real|float( unsigned)?|double( precision)?|double\(\d+,\d+\)( unsigned)?)\z/i
         :float
-      when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(-?\d+|false|true)\))?))\z/io
+      when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(-?\d+|false|true)\))?))\z/i
         $1 && ['0', 'false'].include?($1) ? :integer : :decimal
-      when /bytea|blob|image|(var)?binary/io
+      when /bytea|blob|image|(var)?binary/i
         :blob
-      when /\Aenum/io
+      when /\Aenum/i
         :enum
       end
     end

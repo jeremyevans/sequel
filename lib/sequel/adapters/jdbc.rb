@@ -636,11 +636,11 @@ module Sequel
       def schema_column_set_db_type(schema)
         case schema[:type]
         when :string
-          if schema[:db_type] =~ /\A(character( varying)?|n?(var)?char2?)\z/io && schema[:column_size] > 0
+          if schema[:db_type] =~ /\A(character( varying)?|n?(var)?char2?)\z/i && schema[:column_size] > 0
             schema[:db_type] += "(#{schema[:column_size]})"
           end
         when :decimal
-          if schema[:db_type] =~ /\A(decimal|numeric)\z/io && schema[:column_size] > 0 && schema[:scale] >= 0
+          if schema[:db_type] =~ /\A(decimal|numeric)\z/i && schema[:column_size] > 0 && schema[:scale] >= 0
             schema[:db_type] += "(#{schema[:column_size]}, #{schema[:scale]})"
           end
         end

@@ -179,7 +179,7 @@ module Sequel
       
       def adapter_initialize
         case @opts[:conn_string]
-        when /Microsoft\.(Jet|ACE)\.OLEDB/io
+        when /Microsoft\.(Jet|ACE)\.OLEDB/i
           require_relative 'ado/access'
           extend Sequel::ADO::Access::DatabaseMethods
           self.dataset_class = ADO::Access::Dataset

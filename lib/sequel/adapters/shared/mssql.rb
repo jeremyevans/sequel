@@ -480,11 +480,11 @@ module Sequel
       
       def schema_column_type(db_type)
         case db_type
-        when /\A(?:bit)\z/io
+        when /\A(?:bit)\z/i
           :boolean
-        when /\A(?:(?:small)?money)\z/io
+        when /\A(?:(?:small)?money)\z/i
           :decimal
-        when /\A(timestamp|rowversion)\z/io
+        when /\A(timestamp|rowversion)\z/i
           :blob
         else
           super

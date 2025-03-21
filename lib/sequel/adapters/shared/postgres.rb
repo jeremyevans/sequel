@@ -1663,9 +1663,9 @@ module Sequel
       # Handle interval and citext types.
       def schema_column_type(db_type)
         case db_type
-        when /\Ainterval\z/io
+        when /\Ainterval\z/i
           :interval
-        when /\Acitext\z/io
+        when /\Acitext\z/i
           :string
         else
           super
