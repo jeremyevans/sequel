@@ -1,5 +1,7 @@
 === master
 
+* Recognize datetime(N) types as :datetime again (broke in 5.32) (jeremyevans) (#2293)
+
 * Fix possible concurrency issue in eager loading due to Method#hash iterating over a hash that can be inserted into concurrently (jeremyevans) (#2292)
 
 * Add pg_auto_validate_enums plugin for automatically validating enum values on PostgreSQL (jeremyevans)
