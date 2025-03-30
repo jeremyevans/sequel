@@ -300,6 +300,8 @@ The :host and :port options are not respected. The following additional options 
 :db_type :: Can be specified as 'mssql', 'progress', or 'db2' to use SQL syntax specific to those databases.
 :drvconnect :: Can be given an ODBC connection string, and will use ODBC::Database#drvconnect to
                do the connection.  Typical usage would be: <tt>Sequel.odbc(drvconnect: 'driver={...};...')</tt>
+:use_odbc_utf8 :: When set to true, uses the ODBC_UTF8 module instead of the standard ODBC module.
+                  This enables proper handling of UTF-8 encoded data when communicating with the ODBC driver.
 
 === oracle 
 

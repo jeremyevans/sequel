@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
 require 'odbc'
+require 'odbc_utf8'
 
 module Sequel
   module ODBC
@@ -13,10 +14,11 @@ module Sequel
 
       def connect(server)
         opts = server_opts(server)
+        odbc_module = opts[:use_odbc_utf8] ? ::ODBC_UTF8 : ::ODBC
         conn = if opts.include?(:drvconnect)
-          ::ODBC::Database.new.drvconnect(opts[:drvconnect])
+          odbc_module::Database.new.drvconnect(opts[:drvconnect])
         elsif opts.include?(:driver)
-          drv = ::ODBC::Driver.new
+          drv = odbc_module::Driver.new
           drv.name = 'Sequel ODBC Driver130'
           opts.each do |param, value|
             if :driver == param && value !~ /\A\{.+\}\z/
@@ -24,9 +26,9 @@ module Sequel
             end
             drv.attrs[param.to_s.upcase] = value.to_s
           end
-          ::ODBC::Database.new.drvconnect(drv)
+          odbc_module::Database.new.drvconnect(drv)
         else
-          ::ODBC::connect(opts[:database], opts[:user], opts[:password])
+          odbc_module::connect(opts[:database], opts[:user], opts[:password])
         end
         conn.autocommit = true
         conn
@@ -41,7 +43,7 @@ module Sequel
           begin
             r = log_connection_yield(sql, conn){conn.run(sql)}
             yield(r) if defined?(yield)
-          rescue ::ODBC::Error, ArgumentError => e
+          rescue *database_error_classes, ArgumentError => e
             raise_error(e)
           ensure
             r.drop if r
@@ -54,7 +56,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             log_connection_yield(sql, conn){conn.do(sql)}
-          rescue ::ODBC::Error, ArgumentError => e
+          rescue *database_error_classes, ArgumentError => e
             raise_error(e)
           end
         end
@@ -73,7 +75,7 @@ module Sequel
       end
 
       def database_error_classes
-        [::ODBC::Error]
+        [::ODBC::Error, ::ODBC_UTF8::Error]
       end
 
       def dataset_class_default
@@ -81,7 +83,7 @@ module Sequel
       end
 
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::ODBC::Error) && /\A08S01/.match(e.message))
+        super || (database_error_classes.any? { |klass| e.is_a?(klass) } && /\A08S01/.match(e.message))
       end
     end
     
@@ -114,15 +116,16 @@ module Sequel
         #
         # The conversions below are consistent with the mappings in
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
+        odbc_module = db.opts[:use_odbc_utf8] ? ::ODBC_UTF8 : ::ODBC
         case v
-        when ::ODBC::TimeStamp
+        when odbc_module::TimeStamp
           db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second, v.fraction])
-        when ::ODBC::Time
+        when odbc_module::Time
           Sequel::SQLTime.create(v.hour, v.minute, v.second)
-        when ::ODBC::Date
+        when odbc_module::Date
           Date.new(v.year, v.month, v.day)
         else
-          if t == ::ODBC::SQL_BIT
+          if t == odbc_module::SQL_BIT
             v == 1
           else
             v
