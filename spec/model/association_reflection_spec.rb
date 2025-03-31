@@ -15,6 +15,12 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     @c.association_reflection(:c).associated_class.must_equal ParParent
   end
 
+  it "should cache result of hash method on initialization" do
+    @c.many_to_one :c, :class=>ParParent
+    stored = @c.association_reflection(:c)[:_hash]
+    @c.association_reflection(:c).hash.must_equal stored
+  end
+
   it "should use the :class value if present" do
     @c.many_to_one :c, :class=>@c
     @c.one_to_many :cs, :class=>@c
