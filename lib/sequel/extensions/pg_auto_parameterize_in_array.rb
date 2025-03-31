@@ -184,6 +184,7 @@ module Sequel
       min_array_size = db.typecast_value(:integer, min_array_size)
       mod = Module.new do
         define_method(:pg_auto_parameterize_min_array_size){min_array_size}
+        private :pg_auto_parameterize_min_array_size
       end
       Sequel.set_temp_name(mod){"Sequel::Postgres::AutoParameterizeInArray::_MinArraySize#{min_array_size}"}
       db.extend_datasets(mod)
