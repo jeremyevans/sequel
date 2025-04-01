@@ -31,7 +31,7 @@ doc/testing.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2025-02-03 16:03:27 -0800</span>
+<span class='datetime'>2025-03-05 15:15:59 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -257,7 +257,14 @@ Last Update:
 </td></tr><tr><td class='label'>SEQUEL_NO_PENDING </td><td>
 <p>Don’t skip any specs, try running all specs (note, can cause lockups for some adapters)</p>
 </td></tr><tr><td class='label'>SEQUEL_PG_AUTO_PARAMETERIZE </td><td>
-<p>Use the pg_auto_parameterize extension when running the postgres specs.  Value can be <code>in_array</code> to test the pg_auto_parameterize_in_array extension, and <code>in_array_string</code> to test the pg_auto_parameterize_in_array extension with the <code>:treat_in_string_list_as_text_array</code> Database option set.</p>
+<p>Use the pg_auto_parameterize extension when running the postgres specs.  Value can be:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'><code>in_array</code> </td><td>
+<p>also use the pg_auto_parameterize_in_array extension</p>
+</td></tr><tr><td class='label'><code>in_array_string</code> </td><td>
+<p>also use the pg_auto_parameterize_in_array extension with the <code>:treat_in_string_list_as_text_array</code> Database option set</p>
+</td></tr><tr><td class='label'><code>in_array_string_untyped</code> </td><td>
+<p>also use the pg_auto_parameterize_in_array extension with the <code>:treat_in_string_list_as_untyped_array</code> Database option set</p>
+</td></tr></tbody></table>
 </td></tr><tr><td class='label'>SEQUEL_PG_EAGER_ANY_TYPED_ARRAY </td><td>
 <p>Use the pg_eager_any_typed_array extension when running the postgres specs.</p>
 </td></tr><tr><td class='label'>SEQUEL_PG_TIMESTAMPTZ </td><td>

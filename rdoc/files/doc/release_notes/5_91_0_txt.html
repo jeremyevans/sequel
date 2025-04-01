@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.91.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.91.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.91.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2025-04-01 07:08:37 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A pg_auto_validate_enums plugin has been added, for automatically validating enum values on PostgreSQL:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-comment"># assume state enum column with allowed values active and inactive</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_auto_validate_enums</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">p</span> = <span class="ruby-constant">Person</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&quot;active&quot;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; true</span>
+<span class="ruby-identifier">p</span> = <span class="ruby-constant">Person</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&quot;inactive&quot;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; true</span>
+<span class="ruby-identifier">p</span> = <span class="ruby-constant">Person</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&quot;other&quot;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; false</span>
+</pre>
+</li><li>
+<p>The pg_auto_parameterize_in_array extension now supports a :treat_string_list_as_untyped_array Database option.  When using this option, the array is not casted to a specific type:</p>
+
+<pre>DB[:table].where(enum_column: [&quot;a&quot;, &quot;b&quot;])
+SELECT * FROM table WHERE enum_column = ANY($1)</pre>
+
+<p>The pg_auto_parameterize_in_array extension also now avoids Database#typecast_value calls at runtime, moving them to load time, which speeds up the extension.</p>
+</li><li>
+<p>The forbid_lazy_load plugin now supports an :allow_by_default plugin option, which does not automatically forbid lazy loading when retrieving multiple model instances. With this option, lazy loading can still be forbidding explicitly on a per-object basis. This can make it easier to gradually update code to support the plugin.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The pg_auto_constraint_validations plugin now sorts subhashes before saving the cache file, resulting in more deterministic behavior.</p>
+</li><li>
+<p>datetime(N) database types are once again recognized as :datetime. This was broken in <a href="5_32_0_txt.html">5.32.0</a>, when support for timestamp(N) with time zone was added.</p>
+</li><li>
+<p>AssociationReflection#hash has been added, to avoid the default behavior that iterated over the entire AssociationReflection.  This can prevent a potential concurrency issue at runtime, and it also makes the method faster.</p>
+</li><li>
+<p>It is now possible to override nested_attributes behavior for creating new objects by overriding Model#nested_attributes_new. You can use this to support nested attributes for models using the class_table_inheritance plugin.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database options to configure the pg_auto_parameterize_in_array extension must now be set before loading the extension.  Setting the options after loading the extension no longer has an effect.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

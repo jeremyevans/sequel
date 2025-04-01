@@ -67,6 +67,8 @@ Sequel::Plugins::ForbidLazyLoad
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artist</span> <span class="ruby-comment"># no error</span>
 </pre>
 
+<p>This behavior of enabling <code>forbid_lazy_load</code> automatically from dataset methods can be disabled using the plugin’s <code>:allow_by_default</code> option.</p>
+
 <p>You can allow lazy loading associations for an instance that it was previously forbidden for:</p>
 
 <pre class="ruby"><span class="ruby-identifier">obj</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">first</span>
@@ -119,7 +121,18 @@ Sequel::Plugins::ForbidLazyLoad
 
 <span class="ruby-comment"># Make the Album class support forbidding lazy load</span>
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:forbid_lazy_load</span>
+
+<span class="ruby-comment"># Let lazy loading be forbidden by object, but not automatically for any</span>
+<span class="ruby-comment"># object loaded via dataset.</span>
+<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:forbid_lazy_load</span>, <span class="ruby-value">allow_by_default:</span> <span class="ruby-keyword">true</span>
 </pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+</ol>
 </div>
 <div id='context'>
 </div>
@@ -127,12 +140,36 @@ Sequel::Plugins::ForbidLazyLoad
 <h2>Classes and Modules</h2>
 <ol>
 <li><a href="ForbidLazyLoad/ClassMethods.html">Sequel::Plugins::ForbidLazyLoad::ClassMethods</a></li>
-<li><a href="ForbidLazyLoad/DatasetMethods.html">Sequel::Plugins::ForbidLazyLoad::DatasetMethods</a></li>
+<li><a href="ForbidLazyLoad/ForbidByDefault.html">Sequel::Plugins::ForbidLazyLoad::ForbidByDefault</a></li>
 <li><a href="ForbidLazyLoad/InstanceMethods.html">Sequel::Plugins::ForbidLazyLoad::InstanceMethods</a></li>
 <li><a href="ForbidLazyLoad/Error.html">Sequel::Plugins::ForbidLazyLoad::Error</a></li>
 </ol>
 </div>
 <div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span><span class='arguments'>(model, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>
+<span class="line-num">109</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">110</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_by_default</span>]
+<span class="line-num">111</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:dataset_extend</span>, <span class="ruby-constant">ForbidByDefault</span>, <span class="ruby-value">:create_class_methods</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="line-num">112</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">113</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
 </div>
 
 </div>

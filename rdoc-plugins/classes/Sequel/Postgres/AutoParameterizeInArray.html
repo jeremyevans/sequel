@@ -47,6 +47,13 @@ Sequel::Postgres::AutoParameterizeInArray
 </div>
 <div id='context'>
 </div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="AutoParameterizeInArray/TreatStringListAsTextArray.html">Sequel::Postgres::AutoParameterizeInArray::TreatStringListAsTextArray</a></li>
+<li><a href="AutoParameterizeInArray/TreatStringListAsUntypedArray.html">Sequel::Postgres::AutoParameterizeInArray::TreatStringListAsUntypedArray</a></li>
+</ol>
+</div>
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
@@ -65,25 +72,25 @@ Sequel::Postgres::AutoParameterizeInArray
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-complex_expression_sql_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-complex_expression_sql_append-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize_in_array.rb</span>
-<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">53</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
-<span class="line-num">54</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
-<span class="line-num">55</span>     <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span> = <span class="ruby-identifier">args</span>
-<span class="line-num">56</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">auto_param?</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">type</span> = <span class="ruby-identifier">_bound_variable_type_for_array</span>(<span class="ruby-identifier">r</span>))
-<span class="line-num">57</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span> 
-<span class="line-num">58</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:&quot;=&quot;</span>
-<span class="line-num">59</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ANY</span>
-<span class="line-num">60</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">61</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:!=</span>
-<span class="line-num">62</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ALL</span>
-<span class="line-num">63</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">64</span>       <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">l</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">func</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">type</span>))]
-<span class="line-num">65</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">66</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">67</span> 
-<span class="line-num">68</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-complex_expression_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_auto_parameterize_in_array.rb</span>
+<span class="line-num"> 99</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">100</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">101</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
+<span class="line-num">102</span>     <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span> = <span class="ruby-identifier">args</span>
+<span class="line-num">103</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">auto_param?</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">type</span> = <span class="ruby-identifier">_bound_variable_type_for_array</span>(<span class="ruby-identifier">r</span>))
+<span class="line-num">104</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span> 
+<span class="line-num">105</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:&quot;=&quot;</span>
+<span class="line-num">106</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ANY</span>
+<span class="line-num">107</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">108</span>         <span class="ruby-identifier">op</span> = <span class="ruby-value">:!=</span>
+<span class="line-num">109</span>         <span class="ruby-identifier">func</span> = <span class="ruby-value">:ALL</span>
+<span class="line-num">110</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">111</span>       <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">l</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">func</span>, <span class="ruby-identifier">_convert_array_to_pg_array_with_type</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">type</span>))]
+<span class="line-num">112</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">113</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">114</span> 
+<span class="line-num">115</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">116</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

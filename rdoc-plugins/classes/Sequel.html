@@ -503,6 +503,9 @@ Sequel
 <a href="../files/lib/sequel/plugins/pg_auto_constraint_validations_rb.html">lib/sequel/plugins/pg_auto_constraint_validations.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/plugins/pg_auto_validate_enums_rb.html">lib/sequel/plugins/pg_auto_validate_enums.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/plugins/pg_eager_any_typed_array_rb.html">lib/sequel/plugins/pg_eager_any_typed_array.rb</a>
 </li>
 <li class='other'>
@@ -774,7 +777,9 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <p>bytea</p>
 </td></tr></tbody></table>
 
-<p><a href="String.html"><code>String</code></a> values are also supported using the <code>text</code> type, but only if the <code>:treat_string_list_as_text_array</code> <a href="Database.html"><code>Database</code></a> option is used. This is because treating strings as text can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
+<p>Arrays of string values are not automatically converted by default, because the Ruby <a href="String.html"><code>String</code></a> class can represent a number of different database types.  To convert arrays of Ruby strings to an untyped array (a query parameter with no explicit type cast), set the <code>:treat_string_list_as_untyped_array</code> <a href="Database.html"><code>Database</code></a> option before loading the extension.</p>
+
+<p>If you will only be using arrays of Ruby strings that represent the <code>text</code> type, you can use the <code>:treat_string_list_as_text_array</code> <a href="Database.html"><code>Database</code></a> option is used. This can break programs, since the type for literal strings in PostgreSQL is <code>unknown</code>, not <code>text</code>.</p>
 
 <p>The conversion is only done for single dimensional arrays that have two or more elements, where all elements are of the same class (other than <code>nil</code> values).  You can also do the conversion for arrays of 1 element by setting <code>pg_auto_parameterize_min_array_size: 1</code> <a href="Database.html"><code>Database</code></a> option.  This makes finding cases that need special handling easier, but it doesn’t match how PostgreSQL internally converts the expression (PostgreSQL converts <code>IN (single_value)</code> to <code>= single_value</code>, not <code>= ANY(ARRAY[single_value])</code>).</p>
 

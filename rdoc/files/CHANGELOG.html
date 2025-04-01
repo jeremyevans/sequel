@@ -31,12 +31,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2025-03-01 09:27:26 -0800</span>
+<span class='datetime'>2025-04-01 07:08:37 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.91.0+-282025-04-01-29"><a href="doc/release_notes/5_91_0_txt.html">5.91.0</a> (2025-04-01)<span><a href="#label-5.91.0+-282025-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize datetime(N) types as :datetime again (broke in 5.32) (jeremyevans) (#2293)</p>
+</li><li>
+<p>Fix possible concurrency issue in eager loading due to Method#hash iterating over a hash that can be inserted into concurrently (jeremyevans) (#2292)</p>
+</li><li>
+<p>Add pg_auto_validate_enums plugin for automatically validating enum values on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Make pg_auto_constraint_validations cache file creation deterministic by sorting subhashes (jeremyevans)</p>
+</li><li>
+<p>Support treat_string_list_as_untyped_array Database option in pg_auto_parameterize_in_array extension (jeremyevans)</p>
+</li><li>
+<p>Support allow_by_default option in forbid_lazy_load extension (brandur) (#2288)</p>
+</li></ul>
+
 <h3 id="label-5.90.0+-282025-03-01-29"><a href="doc/release_notes/5_90_0_txt.html">5.90.0</a> (2025-03-01)<span><a href="#label-5.90.0+-282025-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Avoid one query per enum when loading pg_enum extension when pg_array extension is already loaded (nick96) (#2278, #2279)</p>

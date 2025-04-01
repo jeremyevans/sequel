@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::PgAutoValidateEnums</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PgAutoValidateEnums
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/pg_auto_validate_enums_rb.html">lib/sequel/plugins/pg_auto_validate_enums.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_auto_validate_enums plugin implements automatic validations for enum columns, ensuring that enum columns have a valid value.  With this plugin, trying to save with an invalid enum value results in Sequel::ValidationFailed before saving, instead of <a href="../DatabaseError.html"><code>Sequel::DatabaseError</code></a> (wrapping PG::InvalidTextRepresentation or similar exception) during saving.</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
+  <span class="ruby-comment"># assume state enum column with allowed values active and inactive</span>
+  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_auto_validate_enums</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-identifier">p</span> = <span class="ruby-constant">Person</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&quot;active&quot;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; true</span>
+<span class="ruby-identifier">p</span> = <span class="ruby-constant">Person</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&quot;inactive&quot;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; true</span>
+<span class="ruby-identifier">p</span> = <span class="ruby-constant">Person</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&quot;other&quot;</span>).<span class="ruby-identifier">valid?</span> <span class="ruby-comment"># =&gt; false</span>
+</pre>
+
+<p>While you can load this into individual model classes, typical use would be to load it into <a href="../Model.html"><code>Sequel::Model</code></a> or the appropriate model base class, and have all models that inherit from that class automatically pick it up.</p>
+
+<p>This plugin depends on the validation_helpers plugin.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="PgAutoValidateEnums/ClassMethods.html">Sequel::Plugins::PgAutoValidateEnums::ClassMethods</a></li>
+<li><a href="PgAutoValidateEnums/InstanceMethods.html">Sequel::Plugins::PgAutoValidateEnums::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span><span class='arguments'>(model, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Load the validation_helpers plugin.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_validate_enums.rb</span>
+<span class="line-num">26</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">27</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:validation_helpers</span>)
+<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Load the pg_enum extension into the database, and reload the schema if it is already loaded. The opts given are used for the validates_includes validations (with allow_nil: true and from: :values enabled by default, to avoid issues with nullable enum columns and cases where the column method has been overridden.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_validate_enums.rb</span>
+<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">36</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">37</span>     <span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_enum</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@enum_labels</span>)
+<span class="line-num">38</span>     <span class="ruby-keyword">if</span> <span class="ruby-ivar">@db_schema</span>
+<span class="line-num">39</span>       <span class="ruby-identifier">get_db_schema</span>(<span class="ruby-keyword">true</span>)
+<span class="line-num">40</span>       <span class="ruby-identifier">_get_pg_pg_auto_validate_enums_metadata</span>
+<span class="line-num">41</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">42</span>     <span class="ruby-ivar">@pg_auto_validate_enums_opts</span> = {<span class="ruby-value">allow_nil:</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">from:</span> <span class="ruby-value">:values</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">43</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

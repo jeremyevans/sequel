@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::PgAutoValidateEnums::InstanceMethods</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PgAutoValidateEnums::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/pg_auto_validate_enums_rb.html">lib/sequel/plugins/pg_auto_validate_enums.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-validate">validate</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-validate'>
+<a name='method-i-validate'></a>
+<div class='synopsis'>
+<span class='name'>validate</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Validate that all of the model’s enum columns have valid values.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validate-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-validate-source'>   <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_validate_enums.rb</span>
+<span class="line-num">76</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+<span class="line-num">77</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">78</span> 
+<span class="line-num">79</span>   <span class="ruby-identifier">klass</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>
+<span class="line-num">80</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">pg_auto_validate_enums_opts</span>
+<span class="line-num">81</span>   <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">pg_auto_validate_enums_metadata</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span>, <span class="ruby-identifier">values</span><span class="ruby-operator">|</span>
+<span class="line-num">82</span>     <span class="ruby-identifier">validates_includes</span>(<span class="ruby-identifier">values</span>, <span class="ruby-identifier">column</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">83</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

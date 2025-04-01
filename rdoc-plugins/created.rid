@@ -1,4 +1,4 @@
-Sat, 01 Mar 2025 09:36:52 -0800
+Tue, 01 Apr 2025 07:18:29 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -48,7 +48,7 @@ lib/sequel/extensions/pagination.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/extensions/pg_array.rb	Wed, 06 Dec 2023 16:41:40 -0800
 lib/sequel/extensions/pg_array_ops.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/extensions/pg_auto_parameterize.rb	Mon, 04 Nov 2024 16:30:04 -0800
-lib/sequel/extensions/pg_auto_parameterize_in_array.rb	Thu, 06 Feb 2025 22:46:01 -0800
+lib/sequel/extensions/pg_auto_parameterize_in_array.rb	Mon, 31 Mar 2025 09:14:41 -0700
 lib/sequel/extensions/pg_enum.rb	Wed, 26 Feb 2025 08:45:59 -0800
 lib/sequel/extensions/pg_extended_date_support.rb	Wed, 06 Dec 2023 16:41:40 -0800
 lib/sequel/extensions/pg_extended_integer_support.rb	Sun, 30 Oct 2022 19:13:54 -0700
@@ -76,7 +76,7 @@ lib/sequel/extensions/round_timestamps.rb	Wed, 06 Dec 2023 16:41:40 -0800
 lib/sequel/extensions/run_transaction_hooks.rb	Wed, 01 Jul 2020 11:28:34 -0700
 lib/sequel/extensions/s.rb	Sat, 18 Dec 2021 12:49:34 -0800
 lib/sequel/extensions/schema_caching.rb	Thu, 14 Nov 2024 15:28:58 -0800
-lib/sequel/extensions/schema_dumper.rb	Tue, 08 Oct 2024 15:47:24 -0700
+lib/sequel/extensions/schema_dumper.rb	Fri, 21 Mar 2025 07:44:27 -0700
 lib/sequel/extensions/select_remove.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/extensions/sequel_4_dataset_methods.rb	Thu, 10 Jan 2019 07:53:39 -0800
 lib/sequel/extensions/server_block.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -137,7 +137,7 @@ lib/sequel/plugins/empty_failure_backtraces.rb	Wed, 08 Jan 2020 16:27:45 -0800
 lib/sequel/plugins/enum.rb	Thu, 16 Jan 2025 10:44:48 -0800
 lib/sequel/plugins/error_splitter.rb	Mon, 09 Apr 2018 12:34:09 -0700
 lib/sequel/plugins/finder.rb	Mon, 23 Jan 2023 11:36:37 -0800
-lib/sequel/plugins/forbid_lazy_load.rb	Thu, 09 Jul 2020 12:21:33 -0700
+lib/sequel/plugins/forbid_lazy_load.rb	Sun, 16 Mar 2025 08:30:35 -0700
 lib/sequel/plugins/force_encoding.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/hook_class_methods.rb	Tue, 23 Apr 2019 16:34:31 -0700
 lib/sequel/plugins/input_transformer.rb	Mon, 20 May 2024 16:45:35 -0700
@@ -154,12 +154,13 @@ lib/sequel/plugins/list.rb	Fri, 05 Jan 2024 07:59:37 -0800
 lib/sequel/plugins/many_through_many.rb	Mon, 12 Dec 2022 21:25:25 -0800
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
-lib/sequel/plugins/nested_attributes.rb	Thu, 16 Jan 2025 10:59:14 -0800
+lib/sequel/plugins/nested_attributes.rb	Wed, 05 Mar 2025 15:15:59 -0800
 lib/sequel/plugins/optimistic_locking.rb	Mon, 29 Jul 2024 11:17:11 -0700
 lib/sequel/plugins/optimistic_locking_base.rb	Mon, 24 Jul 2023 12:06:10 -0700
 lib/sequel/plugins/paged_operations.rb	Thu, 28 Sep 2023 15:03:58 -0700
 lib/sequel/plugins/pg_array_associations.rb	Fri, 11 Jun 2021 17:28:01 -0700
-lib/sequel/plugins/pg_auto_constraint_validations.rb	Thu, 17 Aug 2023 13:01:31 -0700
+lib/sequel/plugins/pg_auto_constraint_validations.rb	Wed, 05 Mar 2025 20:24:24 -0800
+lib/sequel/plugins/pg_auto_validate_enums.rb	Mon, 17 Mar 2025 07:40:53 -0700
 lib/sequel/plugins/pg_eager_any_typed_array.rb	Sat, 01 Mar 2025 09:27:26 -0800
 lib/sequel/plugins/pg_row.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/pg_xmin_optimistic_locking.rb	Mon, 24 Jul 2023 12:06:10 -0700
