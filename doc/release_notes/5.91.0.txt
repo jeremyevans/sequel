@@ -1,0 +1,55 @@
+= New Features
+
+* A pg_auto_validate_enums plugin has been added, for automatically
+  validating enum values on PostgreSQL:
+
+    class Person < Sequel::Model
+      # assume state enum column with allowed values active and inactive
+      plugin :pg_auto_validate_enums
+    end
+    p = Person.new(state: "active").valid? # => true
+    p = Person.new(state: "inactive").valid? # => true
+    p = Person.new(state: "other").valid? # => false
+
+* The pg_auto_parameterize_in_array extension now supports a
+  :treat_string_list_as_untyped_array Database option.  When using
+  this option, the array is not casted to a specific type:
+
+    DB[:table].where(enum_column: ["a", "b"])
+    SELECT * FROM table WHERE enum_column = ANY($1)
+
+  The pg_auto_parameterize_in_array extension also now avoids
+  Database#typecast_value calls at runtime, moving them to load time,
+  which speeds up the extension.
+
+* The forbid_lazy_load plugin now supports an :allow_by_default plugin
+  option, which does not automatically forbid lazy loading when
+  retrieving multiple model instances. With this option, lazy
+  loading can still be forbidding explicitly on a per-object basis.
+  This can make it easier to gradually update code to support the
+  plugin.
+
+= Other Improvements
+
+* The pg_auto_constraint_validations plugin now sorts subhashes before
+  saving the cache file, resulting in more deterministic behavior.
+
+* datetime(N) database types are once again recognized as :datetime.
+  This was broken in 5.32.0, when support for timestamp(N) with time
+  zone was added.
+
+* AssociationReflection#hash has been added, to avoid the default
+  behavior that iterated over the entire AssociationReflection.  This
+  can prevent a potential concurrency issue at runtime, and it also
+  makes the method faster.
+
+* It is now possible to override nested_attributes behavior for
+  creating new objects by overriding Model#nested_attributes_new. You
+  can use this to support nested attributes for models using the
+  class_table_inheritance plugin.
+
+= Backwards Compatibility
+
+* Database options to configure the pg_auto_parameterize_in_array
+  extension must now be set before loading the extension.  Setting
+  the options after loading the extension no longer has an effect.
