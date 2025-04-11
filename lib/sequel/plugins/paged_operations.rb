@@ -159,7 +159,7 @@ module Sequel
 
           case pk = model.primary_key
           when Symbol
-            Sequel.identifier(pk)
+            Sequel[model.table_name][pk]
           when Array
             raise Error, "cannot use #{meth} on a model with a composite primary key"
           else
