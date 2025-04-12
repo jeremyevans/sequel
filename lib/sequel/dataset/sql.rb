@@ -1430,16 +1430,18 @@ module Sequel
     # calls +sql_literal+ if object responds to it, otherwise raises an error.
     # If a database specific type is allowed, this should be overriden in a subclass.
     def literal_other_append(sql, v)
-      # We can't be sure if v will always literalize to the same SQL, so
-      # don't cache SQL for a dataset that uses this.
-      disable_sql_caching!
-
       if v.respond_to?(:sql_literal_append)
         v.sql_literal_append(self, sql)
       elsif v.respond_to?(:sql_literal)
         sql << v.sql_literal(self)
       else
         raise Error, "can't express #{v.inspect} as a SQL literal"
+      end
+
+      if !v.respond_to?(:sql_literal_allow_caching?) || !v.sql_literal_allow_caching?(self)
+        # We can't be sure if v will always literalize to the same SQL, so
+        # don't cache SQL for a dataset that uses this.
+        disable_sql_caching!
       end
     end
 

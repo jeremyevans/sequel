@@ -1061,6 +1061,70 @@ describe "Dataset#literal" do
     @dataset.literal(:"items__na#m$e").must_equal "items.na#m$e"
   end
 
+  it "should call sql_literal_append and sql_literal_allow_caching? on object with dataset if object responds to both, and allow caching if it returns true" do
+    @a = Class.new do
+      def sql_literal_append(ds, sql)
+        @a ||= String.new("a")
+        @a.succ!
+        sql << "append " << ds.blah << " " << @a
+      end
+      def sql_literal_allow_caching?(ds)
+        true
+      end
+    end
+    ds = @dataset.with_extend{def blah; "ds" end}.select(@a.new)
+    ds.sql.must_equal "SELECT append ds b FROM test"
+    ds.sql.must_equal "SELECT append ds b FROM test"
+  end
+  
+  it "should call sql_literal and sql_literal_allow_caching? on object with dataset if object responds to both, and allow caching if it returns true" do
+    @a = Class.new do
+      def sql_literal_allow_caching?(ds)
+        true
+      end
+      def sql_literal(ds)
+        @a ||= String.new("a")
+        @a.succ!
+        "literal #{ds.blah} #{@a}"
+      end
+    end
+    ds = @dataset.with_extend{def blah; "ds" end}.select(@a.new)
+    ds.sql.must_equal "SELECT literal ds b FROM test"
+    ds.sql.must_equal "SELECT literal ds b FROM test"
+  end
+  
+  it "should call sql_literal_append and sql_literal_allow_caching? on object with dataset if object responds to both, and not allow caching if it returns false" do
+    @a = Class.new do
+      def sql_literal_append(ds, sql)
+        @a ||= String.new("a")
+        @a.succ!
+        sql << "append " << ds.blah << " " << @a
+      end
+      def sql_literal_allow_caching?(ds)
+        false
+      end
+    end
+    ds = @dataset.with_extend{def blah; "ds" end}.select(@a.new)
+    ds.sql.must_equal "SELECT append ds b FROM test"
+    ds.sql.must_equal "SELECT append ds c FROM test"
+  end
+  
+  it "should call sql_literal and sql_literal_allow_caching? on object with dataset if object responds to both, and not allow caching if it returns false" do
+    @a = Class.new do
+      def sql_literal_allow_caching?(ds)
+        false
+      end
+      def sql_literal(ds)
+        @a ||= String.new("a")
+        @a.succ!
+        "literal #{ds.blah} #{@a}"
+      end
+    end
+    ds = @dataset.with_extend{def blah; "ds" end}.select(@a.new)
+    ds.sql.must_equal "SELECT literal ds b FROM test"
+    ds.sql.must_equal "SELECT literal ds c FROM test"
+  end
+  
   it "should call sql_literal_append with dataset and sql on type if not natively supported and the object responds to it" do
     @a = Class.new do
       def sql_literal_append(ds, sql)
