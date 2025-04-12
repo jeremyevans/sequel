@@ -1,3 +1,7 @@
+=== master
+
+* Support set_column_not_null as a reversible migration method (jeremyevans)
+
 === 5.91.0 (2025-04-01)
 
 * Recognize datetime(N) types as :datetime again (broke in 5.32) (jeremyevans) (#2293)

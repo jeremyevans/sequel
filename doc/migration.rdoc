@@ -87,6 +87,7 @@ the following methods:
   * +add_spatial_index+
   * +rename_column+
   * +set_column_allow_null+
+  * +set_column_not_null+
 
 If you use any other methods, you should create your own +down+ block.
 

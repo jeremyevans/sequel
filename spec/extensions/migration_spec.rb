@@ -148,6 +148,7 @@ describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
         set_column_allow_null :c
         set_column_allow_null :d, true
         set_column_allow_null :d, false
+        set_column_not_null :e
       end
       create_view(:c, 'SELECT * FROM b', :foo=>:bar)
       create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
@@ -176,7 +177,8 @@ describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
         [:rename_column, :e, :g],
         [:set_column_allow_null, :c],
         [:set_column_allow_null, :d, true],
-        [:set_column_allow_null, :d, false]]
+        [:set_column_allow_null, :d, false],
+        [:set_column_not_null, :e]]
       ],
       [:create_view, :c, "SELECT * FROM b", {:foo=>:bar}],
       [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
@@ -189,6 +191,7 @@ describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
       [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
       [:drop_view, :c, {:foo=>:bar}],
       [:alter_table, [
+        [:set_column_allow_null, :e],
         [:set_column_allow_null, :d, true],
         [:set_column_allow_null, :d, false],
         [:set_column_allow_null, :c, false],
@@ -281,7 +284,8 @@ describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
         [:rename_column, :e, :g],
         [:set_column_allow_null, :c],
         [:set_column_allow_null, :d, true],
-        [:set_column_allow_null, :d, false]]
+        [:set_column_allow_null, :d, false],
+        [:set_column_not_null, :e]]
       ],
       [:create_view, :c, "SELECT * FROM b", {:foo=>:bar}],
       [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
@@ -294,6 +298,7 @@ describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
       [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
       [:drop_view, :c, {:foo=>:bar}],
       [:alter_table, [
+        [:set_column_allow_null, :e],
         [:set_column_allow_null, :d, true],
         [:set_column_allow_null, :d, false],
         [:set_column_allow_null, :c, false],

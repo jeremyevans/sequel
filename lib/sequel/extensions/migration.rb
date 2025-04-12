@@ -287,6 +287,10 @@ module Sequel
     def set_column_allow_null(name, allow_null=true)
       @actions << [:set_column_allow_null, name, !allow_null]
     end
+
+    def set_column_not_null(name)
+      @actions << [:set_column_allow_null, name]
+    end
   end
 
   # The preferred method for writing Sequel migrations, using a DSL:
