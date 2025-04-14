@@ -548,6 +548,32 @@ describe "Model.qualified_primary_key_hash" do
   end
 end
 
+describe "Model.qualified_primary_key" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  it "should handle a single primary key" do
+    @c.qualified_primary_key.must_equal(Sequel.qualify(:items, :id))
+  end
+
+  it "should handle a composite primary key" do
+    @c.set_primary_key([:id1, :id2])
+    @c.qualified_primary_key.must_equal([Sequel.qualify(:items, :id1), Sequel.qualify(:items, :id2)])
+  end
+
+  it "should raise an error for no primary key" do
+    @c.no_primary_key
+    proc{@c.qualified_primary_key}.must_raise(Sequel::Error)
+  end
+
+  it "should allow specifying a different qualifier" do
+    @c.qualified_primary_key(:apple).must_equal(Sequel.qualify(:apple, :id))
+    @c.set_primary_key([:id1, :id2])
+    @c.qualified_primary_key(:bear).must_equal([Sequel.qualify(:bear, :id1), Sequel.qualify(:bear, :id2)])
+  end
+end
+
 describe "Model.db" do
   before do
     @db = Sequel.mock

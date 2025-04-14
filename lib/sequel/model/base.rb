@@ -533,10 +533,28 @@ module Sequel
         end
       end
 
+      # Return a qualified identifier or array of qualified identifiers for
+      # the model's primary key.  Uses the given qualifier if provided, or
+      # the table_name otherwise. If the model does not have a primary key,
+      # raises an +Error+.
+      #
+      #   Artist.order(Artist.qualified_primary_key)
+      #   # SELECT * FROM artists ORDER BY artists.id
+      def qualified_primary_key(qualifier=table_name)
+        case key = @primary_key
+        when Symbol
+          SQL::QualifiedIdentifier.new(qualifier, key)
+        when Array
+          key.map{|k| SQL::QualifiedIdentifier.new(qualifier, k)}
+        else
+          raise(Error, "#{self} does not have a primary key")
+        end
+      end
+
       # Return a hash where the keys are qualified column references.  Uses the given
       # qualifier if provided, or the table_name otherwise. This is useful if you
       # plan to join other tables to this table and you want the column references
-      # to be qualified.
+      # to be qualified. If the model does not have a primary key, raises an +Error+.
       #
       #   Artist.where(Artist.qualified_primary_key_hash(1))
       #   # SELECT * FROM artists WHERE (artists.id = 1)

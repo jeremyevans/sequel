@@ -1,5 +1,7 @@
 === master
 
+* Add Model.qualified_primary_key for returning a qualified version of the model's primary key (jeremyevans)
+
 * Support sql_literal_allow_caching? method on objects that respond to sql_literal_append/sql_literal (jeremyevans)
 
 * Support set_column_not_null as a reversible migration method (jeremyevans)
