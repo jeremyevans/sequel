@@ -157,13 +157,16 @@ module Sequel
             raise Error, "the paged_operations plugin is not supported on DB2 when using emulated offsets, set the :offset_strategy Database option to 'limit_offset' or 'offset_fetch'"
           end
 
-          case pk = model.primary_key
+          case pk = unambiguous_primary_key
           when Symbol
             Sequel.identifier(pk)
           when Array
             raise Error, "cannot use #{meth} on a model with a composite primary key"
-          else
+          when nil
             raise Error, "cannot use #{meth} on a model without a primary key"
+          else
+            # Likely SQL::QualifiedIdentifier, if the dataset is joined.
+            pk
           end
         end
 

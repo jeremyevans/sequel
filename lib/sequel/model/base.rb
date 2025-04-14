@@ -2278,7 +2278,7 @@ END
       # Return the dataset ordered by the model's primary key.  This should not
       # be used if the model does not have a primary key.
       def _force_primary_key_order
-        cached_dataset(:_pk_order_ds){order(*model.primary_key)}
+        cached_dataset(:_pk_order_ds){order(*unambiguous_primary_key)}
       end
 
       # If the dataset is not already ordered, and the model has a primary key,
@@ -2303,6 +2303,15 @@ END
           end
 
           where(cond).limit(1)
+        end
+      end
+
+      # The primary key for the dataset's model, qualified if the dataset is joined.
+      def unambiguous_primary_key
+        if joined_dataset?
+          model.qualified_primary_key
+        else
+          model.primary_key
         end
       end
 

@@ -1,5 +1,7 @@
 === master
 
+* Use a qualified primary key for Model.paged_each and for the paged_operations plugin when using joined datasets (jeremyevans, davekaro) (#2299, #2300)
+
 * Add Model.qualified_primary_key for returning a qualified version of the model's primary key (jeremyevans)
 
 * Support sql_literal_allow_caching? method on objects that respond to sql_literal_append/sql_literal (jeremyevans)

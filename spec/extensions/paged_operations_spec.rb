@@ -262,3 +262,58 @@ describe "paged_operations plugin" do
     ]
   end
 end
+
+describe "paged_operations plugin with joined dataset" do
+  before do
+    @db = Sequel.connect("mock://postgres")
+    @c = Class.new(Sequel::Model(@db[:albums]))
+    @c.plugin :paged_operations
+    @db.sqls
+    @db.fetch = [[{:id=>1002}], [{:id=>2002}]]
+    @db.numrows = [1000, 1000, 2]
+    @ds = @c.dataset.
+      qualify.
+      from(:albums, :artists).
+      where{albums[:id] =~ artists[:album_id]}.
+      with_quote_identifiers(false)
+  end
+
+  it "#paged_delete should use qualified columns when joining" do
+    @ds.paged_delete.must_equal 2002
+    @db.sqls.must_equal [
+      "SELECT albums.id FROM albums, artists WHERE (albums.id = artists.album_id) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "DELETE FROM albums USING artists WHERE ((albums.id = artists.album_id) AND (albums.id < 1002))",
+      "SELECT albums.id FROM albums, artists WHERE (albums.id = artists.album_id) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "DELETE FROM albums USING artists WHERE ((albums.id = artists.album_id) AND (albums.id < 2002))",
+      "SELECT albums.id FROM albums, artists WHERE (albums.id = artists.album_id) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "DELETE FROM albums USING artists WHERE (albums.id = artists.album_id)"
+    ]
+  end
+
+  it "#paged_update should update using multiple queries" do
+    @ds.paged_update({x: Sequel[:artists][:y]}).must_equal 2002
+    @db.sqls.must_equal [
+      "SELECT albums.id FROM albums, artists WHERE (albums.id = artists.album_id) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "UPDATE albums SET x = artists.y FROM artists WHERE ((albums.id = artists.album_id) AND (albums.id < 1002))",
+      "SELECT albums.id FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id >= 1002)) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "UPDATE albums SET x = artists.y FROM artists WHERE ((albums.id = artists.album_id) AND (albums.id < 2002) AND (albums.id >= 1002))",
+      "SELECT albums.id FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id >= 2002)) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "UPDATE albums SET x = artists.y FROM artists WHERE ((albums.id = artists.album_id) AND (albums.id >= 2002))"
+    ]
+  end
+
+  it "#paged_datasets should yield multiple datasets making up dataset" do
+    sqls = []
+    @ds.paged_datasets{|ds| sqls << ds.sql}
+    sqls.must_equal [
+      "SELECT albums.* FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id < 1002))",
+      "SELECT albums.* FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id < 2002) AND (albums.id >= 1002))",
+      "SELECT albums.* FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id >= 2002))"
+    ]
+    @db.sqls.must_equal [
+      "SELECT albums.id FROM albums, artists WHERE (albums.id = artists.album_id) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "SELECT albums.id FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id >= 1002)) ORDER BY albums.id LIMIT 1 OFFSET 1000",
+      "SELECT albums.id FROM albums, artists WHERE ((albums.id = artists.album_id) AND (albums.id >= 2002)) ORDER BY albums.id LIMIT 1 OFFSET 1000"
+    ]
+  end
+end

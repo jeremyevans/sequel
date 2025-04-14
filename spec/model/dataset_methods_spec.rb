@@ -122,6 +122,11 @@ describe Sequel::Model::DatasetMethods  do
     @c.db.sqls.must_equal ['BEGIN', 'SELECT * FROM items ORDER BY id LIMIT 5 OFFSET 0', 'COMMIT']
   end
 
+  it "#paged_each should order by qualified primary key if the dataset is joined" do
+    @c.join(:x, :a=>:b).paged_each{|r| r.must_be_kind_of(@c)}
+    @c.db.sqls.must_equal ['BEGIN', 'SELECT * FROM items INNER JOIN x ON (x.a = items.b) ORDER BY items.id LIMIT 1000 OFFSET 0', 'COMMIT']
+  end
+
   it "#paged_each should use existing order if there is one" do
     @c.order(:foo).paged_each{|r| r.must_be_kind_of(@c)}
     @c.db.sqls.must_equal ['BEGIN', 'SELECT * FROM items ORDER BY foo LIMIT 1000 OFFSET 0', 'COMMIT']
