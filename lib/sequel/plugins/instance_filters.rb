@@ -102,7 +102,10 @@ module Sequel
         
         # Apply the instance filters to the given dataset
         def apply_instance_filters(ds)
-          instance_filters.inject(ds){|ds1, i| ds1.where(*i[0], &i[1])}
+          instance_filters.inject(ds) do |ds1, i|
+            block = i[1]
+            ds1.where(*i[0], &block)
+          end
         end
         
         # Clear the instance filters.
