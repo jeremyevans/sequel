@@ -1240,7 +1240,7 @@ module Sequel
       def with_extend(*mods, &block)
         c = Sequel.set_temp_name(Class.new(self.class)){"Sequel::Dataset::_Subclass"}
         c.include(*mods) unless mods.empty?
-        c.include(Sequel.set_temp_name(DatasetModule.new(&block)){"Sequel::Dataset::_DatasetModule(#{block.source_location.join(':')})"}) if block
+        c.include(Sequel.set_temp_name(DatasetModule.new(&block)){"Sequel::Dataset::_DatasetModule(#{block.source_location[0,2].join(':')})"}) if block
         o = c.freeze.allocate
         o.instance_variable_set(:@db, @db)
         o.instance_variable_set(:@opts, @opts)
