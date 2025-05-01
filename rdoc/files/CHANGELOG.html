@@ -31,12 +31,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2025-04-01 07:08:37 -0700</span>
+<span class='datetime'>2025-05-01 07:47:33 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.92.0+-282025-05-01-29"><a href="doc/release_notes/5_92_0_txt.html">5.92.0</a> (2025-05-01)<span><a href="#label-5.92.0+-282025-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Use a qualified primary key for Model.paged_each and for the paged_operations plugin when using joined datasets (jeremyevans, davekaro) (#2299, #2300)</p>
+</li><li>
+<p>Add Model.qualified_primary_key for returning a qualified version of the model’s primary key (jeremyevans)</p>
+</li><li>
+<p>Support sql_literal_allow_caching? method on objects that respond to sql_literal_append/sql_literal (jeremyevans)</p>
+</li><li>
+<p>Support set_column_not_null as a reversible migration method (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.91.0+-282025-04-01-29"><a href="doc/release_notes/5_91_0_txt.html">5.91.0</a> (2025-04-01)<span><a href="#label-5.91.0+-282025-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Recognize datetime(N) types as :datetime again (broke in 5.32) (jeremyevans) (#2293)</p>

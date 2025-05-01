@@ -1,6 +1,6 @@
-Tue, 01 Apr 2025 07:17:49 -0700
+Thu, 01 May 2025 08:44:23 -0700
 README.rdoc	Sun, 31 Mar 2024 10:39:03 -0700
-CHANGELOG	Tue, 01 Apr 2025 07:08:37 -0700
+CHANGELOG	Thu, 01 May 2025 07:47:33 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Mon, 03 Feb 2025 16:03:27 -0800
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Tue, 01 Apr 2025 07:08:37 -0700
+lib/sequel/version.rb	Thu, 01 May 2025 07:47:33 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
@@ -23,7 +23,7 @@ lib/sequel/connection_pool/threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/timed_queue.rb	Mon, 12 Jun 2023 13:05:49 -0700
 lib/sequel/database/connecting.rb	Thu, 08 Aug 2024 09:05:13 -0700
 lib/sequel/database/dataset.rb	Tue, 28 Mar 2023 14:16:05 -0700
-lib/sequel/database/dataset_defaults.rb	Thu, 16 Jan 2025 11:40:23 -0800
+lib/sequel/database/dataset_defaults.rb	Tue, 22 Apr 2025 00:20:10 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
 lib/sequel/database/misc.rb	Fri, 31 Jan 2025 15:36:59 -0800
@@ -39,10 +39,10 @@ lib/sequel/dataset/graph.rb	Thu, 04 Apr 2024 14:06:41 -0700
 lib/sequel/dataset/misc.rb	Mon, 23 Jan 2023 11:36:37 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Mon, 23 Jan 2023 11:36:37 -0800
 lib/sequel/dataset/prepared_statements.rb	Thu, 16 Jan 2025 10:52:18 -0800
-lib/sequel/dataset/query.rb	Thu, 16 Jan 2025 11:39:27 -0800
-lib/sequel/dataset/sql.rb	Wed, 18 Dec 2024 11:43:49 -0800
+lib/sequel/dataset/query.rb	Tue, 22 Apr 2025 00:20:10 -0700
+lib/sequel/dataset/sql.rb	Mon, 14 Apr 2025 04:01:11 -0700
 lib/sequel/model/associations.rb	Wed, 19 Mar 2025 21:43:56 -0700
-lib/sequel/model/base.rb	Wed, 26 Feb 2025 09:01:56 -0800
+lib/sequel/model/base.rb	Mon, 14 Apr 2025 04:01:11 -0700
 lib/sequel/model/dataset_module.rb	Fri, 11 Oct 2024 15:23:15 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Mon, 09 Aug 2021 13:30:01 -0700
@@ -60,7 +60,7 @@ doc/dataset_filtering.rdoc	Tue, 14 Jul 2020 07:08:21 -0700
 doc/extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/fork_safety.rdoc	Wed, 04 Nov 2020 10:39:50 -0800
 doc/mass_assignment.rdoc	Thu, 03 Aug 2023 09:06:34 -0700
-doc/migration.rdoc	Wed, 14 Aug 2024 22:44:57 -0700
+doc/migration.rdoc	Mon, 14 Apr 2025 04:01:11 -0700
 doc/model_dataset_method_design.rdoc	Wed, 01 Apr 2020 09:49:55 -0700
 doc/model_hooks.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
@@ -289,4 +289,5 @@ doc/release_notes/5.89.0.txt	Sat, 01 Feb 2025 09:09:06 -0800
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
 doc/release_notes/5.90.0.txt	Sat, 01 Mar 2025 09:27:26 -0800
 doc/release_notes/5.91.0.txt	Tue, 01 Apr 2025 07:08:37 -0700
-lib/sequel/extensions/migration.rb	Wed, 18 Dec 2024 10:24:32 -0800
+doc/release_notes/5.92.0.txt	Thu, 01 May 2025 07:47:33 -0700
+lib/sequel/extensions/migration.rb	Mon, 14 Apr 2025 04:01:11 -0700

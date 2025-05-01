@@ -183,14 +183,14 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1116</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">values</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">1117</span>   <span class="ruby-ivar">@values</span> = {}
-<span class="line-num">1118</span>   <span class="ruby-ivar">@new</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">1119</span>   <span class="ruby-ivar">@modified</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">1120</span>   <span class="ruby-identifier">initialize_set</span>(<span class="ruby-identifier">values</span>)
-<span class="line-num">1121</span>   <span class="ruby-identifier">_clear_changed_columns</span>(<span class="ruby-value">:initialize</span>)
-<span class="line-num">1122</span>   <span class="ruby-keyword">yield</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
-<span class="line-num">1123</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1134</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">values</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">1135</span>   <span class="ruby-ivar">@values</span> = {}
+<span class="line-num">1136</span>   <span class="ruby-ivar">@new</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1137</span>   <span class="ruby-ivar">@modified</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1138</span>   <span class="ruby-identifier">initialize_set</span>(<span class="ruby-identifier">values</span>)
+<span class="line-num">1139</span>   <span class="ruby-identifier">_clear_changed_columns</span>(<span class="ruby-value">:initialize</span>)
+<span class="line-num">1140</span>   <span class="ruby-keyword">yield</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">1141</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -210,9 +210,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-3D-3D-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1153</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">==</span>(<span class="ruby-identifier">obj</span>)
-<span class="line-num">1154</span>   <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">obj</span>)
-<span class="line-num">1155</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">==</span>(<span class="ruby-identifier">obj</span>)
+<span class="line-num">1172</span>   <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">obj</span>)
+<span class="line-num">1173</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-3D-3D-3D'>
@@ -236,16 +236,16 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-3D-3D-3D-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">===</span>(<span class="ruby-identifier">obj</span>)
-<span class="line-num">1164</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">pkv</span> = <span class="ruby-identifier">pk</span>
-<span class="line-num">1165</span>   <span class="ruby-keyword">when</span> <span class="ruby-keyword">nil</span>
-<span class="line-num">1166</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
-<span class="line-num">1167</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">1168</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">pkv</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:nil?</span>)
-<span class="line-num">1169</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1170</span> 
-<span class="line-num">1171</span>   (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">model</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">pk</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">pkv</span>)
-<span class="line-num">1172</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">===</span>(<span class="ruby-identifier">obj</span>)
+<span class="line-num">1182</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">pkv</span> = <span class="ruby-identifier">pk</span>
+<span class="line-num">1183</span>   <span class="ruby-keyword">when</span> <span class="ruby-keyword">nil</span>
+<span class="line-num">1184</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+<span class="line-num">1185</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">1186</span>     <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">pkv</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:nil?</span>)
+<span class="line-num">1187</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1188</span> 
+<span class="line-num">1189</span>   (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">model</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">pk</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">pkv</span>)
+<span class="line-num">1190</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -267,9 +267,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-5B-5D-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1128</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">column</span>)
-<span class="line-num">1129</span>   <span class="ruby-ivar">@values</span>[<span class="ruby-identifier">column</span>]
-<span class="line-num">1130</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1146</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">column</span>)
+<span class="line-num">1147</span>   <span class="ruby-ivar">@values</span>[<span class="ruby-identifier">column</span>]
+<span class="line-num">1148</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-5B-5D-3D'>
@@ -293,17 +293,17 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-5B-5D-3D-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1140</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]=</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">value</span>)
-<span class="line-num">1141</span>   <span class="ruby-comment"># If it is new, it doesn&#39;t have a value yet, so we should</span>
-<span class="line-num">1142</span>   <span class="ruby-comment"># definitely set the new value.</span>
-<span class="line-num">1143</span>   <span class="ruby-comment"># If the column isn&#39;t in @values, we can&#39;t assume it is</span>
-<span class="line-num">1144</span>   <span class="ruby-comment"># NULL in the database, so assume it has changed.</span>
-<span class="line-num">1145</span>   <span class="ruby-identifier">v</span> = <span class="ruby-identifier">typecast_value</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">value</span>)
-<span class="line-num">1146</span>   <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>
-<span class="line-num">1147</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">vals</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> (<span class="ruby-identifier">c</span> = <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">column</span>]) <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">class</span>
-<span class="line-num">1148</span>     <span class="ruby-identifier">change_column_value</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">v</span>)
-<span class="line-num">1149</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1150</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]=</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">value</span>)
+<span class="line-num">1159</span>   <span class="ruby-comment"># If it is new, it doesn&#39;t have a value yet, so we should</span>
+<span class="line-num">1160</span>   <span class="ruby-comment"># definitely set the new value.</span>
+<span class="line-num">1161</span>   <span class="ruby-comment"># If the column isn&#39;t in @values, we can&#39;t assume it is</span>
+<span class="line-num">1162</span>   <span class="ruby-comment"># NULL in the database, so assume it has changed.</span>
+<span class="line-num">1163</span>   <span class="ruby-identifier">v</span> = <span class="ruby-identifier">typecast_value</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">value</span>)
+<span class="line-num">1164</span>   <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>
+<span class="line-num">1165</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">vals</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> (<span class="ruby-identifier">c</span> = <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">column</span>]) <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">class</span>
+<span class="line-num">1166</span>     <span class="ruby-identifier">change_column_value</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">v</span>)
+<span class="line-num">1167</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1168</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-autoincrementing_primary_key'>
@@ -322,9 +322,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-autoincrementing_primary_key-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">autoincrementing_primary_key</span>
-<span class="line-num">1196</span>   <span class="ruby-identifier">primary_key</span>
-<span class="line-num">1197</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1213</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">autoincrementing_primary_key</span>
+<span class="line-num">1214</span>   <span class="ruby-identifier">primary_key</span>
+<span class="line-num">1215</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cancel_action'>
@@ -343,9 +343,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-cancel_action-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1203</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cancel_action</span>(<span class="ruby-identifier">msg</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">1204</span>   <span class="ruby-identifier">raise_hook_failure</span>(<span class="ruby-identifier">msg</span>)
-<span class="line-num">1205</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1221</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cancel_action</span>(<span class="ruby-identifier">msg</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">1222</span>   <span class="ruby-identifier">raise_hook_failure</span>(<span class="ruby-identifier">msg</span>)
+<span class="line-num">1223</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-changed_columns'>
@@ -370,9 +370,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-changed_columns-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1214</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">changed_columns</span>
-<span class="line-num">1215</span>   <span class="ruby-identifier">_changed_columns</span>
-<span class="line-num">1216</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1232</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">changed_columns</span>
+<span class="line-num">1233</span>   <span class="ruby-identifier">_changed_columns</span>
+<span class="line-num">1234</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-delete'>
@@ -395,11 +395,11 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-delete-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1223</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>
-<span class="line-num">1224</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t delete frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
-<span class="line-num">1225</span>   <span class="ruby-identifier">_delete</span>
-<span class="line-num">1226</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1227</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1241</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete</span>
+<span class="line-num">1242</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t delete frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
+<span class="line-num">1243</span>   <span class="ruby-identifier">_delete</span>
+<span class="line-num">1244</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1245</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-destroy'>
@@ -422,10 +422,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-destroy-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1235</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">1236</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t destroy frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
-<span class="line-num">1237</span>   <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_destroy</span>(<span class="ruby-identifier">opts</span>)}}
-<span class="line-num">1238</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1253</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">1254</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t destroy frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
+<span class="line-num">1255</span>   <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_destroy</span>(<span class="ruby-identifier">opts</span>)}}
+<span class="line-num">1256</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -449,9 +449,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-each-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1246</span>   <span class="ruby-ivar">@values</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1247</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1263</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1264</span>   <span class="ruby-ivar">@values</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1265</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-eql-3F'>
@@ -475,9 +475,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-eql-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1254</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eql?</span>(<span class="ruby-identifier">obj</span>)
-<span class="line-num">1255</span>   (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">model</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">values</span> <span class="ruby-operator">==</span> <span class="ruby-ivar">@values</span>)
-<span class="line-num">1256</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1272</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eql?</span>(<span class="ruby-identifier">obj</span>)
+<span class="line-num">1273</span>   (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">model</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">values</span> <span class="ruby-operator">==</span> <span class="ruby-ivar">@values</span>)
+<span class="line-num">1274</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-errors'>
@@ -496,9 +496,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-errors-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1260</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">errors</span>
-<span class="line-num">1261</span>   <span class="ruby-ivar">@errors</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">errors_class</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">1262</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1278</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">errors</span>
+<span class="line-num">1279</span>   <span class="ruby-ivar">@errors</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">errors_class</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">1280</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-exists-3F'>
@@ -523,9 +523,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-exists-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1277</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exists?</span>
-<span class="line-num">1278</span>   <span class="ruby-identifier">new?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">:</span> <span class="ruby-operator">!</span><span class="ruby-identifier">this</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">EXISTS_SELECT_</span>).<span class="ruby-identifier">nil?</span>
-<span class="line-num">1279</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1295</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exists?</span>
+<span class="line-num">1296</span>   <span class="ruby-identifier">new?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">:</span> <span class="ruby-operator">!</span><span class="ruby-identifier">this</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">EXISTS_SELECT_</span>).<span class="ruby-identifier">nil?</span>
+<span class="line-num">1297</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-extend'>
@@ -544,10 +544,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-extend-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1283</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extend</span>(<span class="ruby-identifier">mod</span>)
-<span class="line-num">1284</span>   <span class="ruby-ivar">@singleton_setter_added</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">1285</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">1286</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1301</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extend</span>(<span class="ruby-identifier">mod</span>)
+<span class="line-num">1302</span>   <span class="ruby-ivar">@singleton_setter_added</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1303</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1304</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -566,16 +566,16 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-freeze-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1291</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">1292</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">frozen?</span>
-<span class="line-num">1293</span>     <span class="ruby-identifier">validate</span>
-<span class="line-num">1294</span>     <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1295</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1296</span>   <span class="ruby-identifier">values</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1297</span>   <span class="ruby-identifier">_changed_columns</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1298</span>   <span class="ruby-identifier">this</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>
-<span class="line-num">1299</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">1300</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1309</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">1310</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">frozen?</span>
+<span class="line-num">1311</span>     <span class="ruby-identifier">validate</span>
+<span class="line-num">1312</span>     <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1313</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1314</span>   <span class="ruby-identifier">values</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1315</span>   <span class="ruby-identifier">_changed_columns</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1316</span>   <span class="ruby-identifier">this</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>
+<span class="line-num">1317</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1318</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hash'>
@@ -600,16 +600,16 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1309</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash</span>
-<span class="line-num">1310</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">primary_key</span>
-<span class="line-num">1311</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
-<span class="line-num">1312</span>     [<span class="ruby-identifier">model</span>, <span class="ruby-operator">!</span><span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@values</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>].<span class="ruby-identifier">hash</span>
-<span class="line-num">1313</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
-<span class="line-num">1314</span>     [<span class="ruby-identifier">model</span>, <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@values</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>].<span class="ruby-identifier">hash</span>
-<span class="line-num">1315</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1316</span>     [<span class="ruby-identifier">model</span>, <span class="ruby-ivar">@values</span>].<span class="ruby-identifier">hash</span>
-<span class="line-num">1317</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1318</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1327</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash</span>
+<span class="line-num">1328</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">primary_key</span>
+<span class="line-num">1329</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
+<span class="line-num">1330</span>     [<span class="ruby-identifier">model</span>, <span class="ruby-operator">!</span><span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@values</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>].<span class="ruby-identifier">hash</span>
+<span class="line-num">1331</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
+<span class="line-num">1332</span>     [<span class="ruby-identifier">model</span>, <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@values</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>].<span class="ruby-identifier">hash</span>
+<span class="line-num">1333</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1334</span>     [<span class="ruby-identifier">model</span>, <span class="ruby-ivar">@values</span>].<span class="ruby-identifier">hash</span>
+<span class="line-num">1335</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1336</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-id'>
@@ -631,9 +631,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-id-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1324</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">id</span>
-<span class="line-num">1325</span>   <span class="ruby-ivar">@values</span>[<span class="ruby-value">:id</span>]
-<span class="line-num">1326</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1342</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">id</span>
+<span class="line-num">1343</span>   <span class="ruby-ivar">@values</span>[<span class="ruby-value">:id</span>]
+<span class="line-num">1344</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inspect'>
@@ -652,9 +652,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-inspect-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1330</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
-<span class="line-num">1331</span>   <span class="ruby-node">&quot;#&lt;#{inspect_prefix} @values=#{inspect_values}&gt;&quot;</span>
-<span class="line-num">1332</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1348</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">1349</span>   <span class="ruby-node">&quot;#&lt;#{inspect_prefix} @values=#{inspect_values}&gt;&quot;</span>
+<span class="line-num">1350</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-keys'>
@@ -678,9 +678,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-keys-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1339</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
-<span class="line-num">1340</span>   <span class="ruby-ivar">@values</span>.<span class="ruby-identifier">keys</span>
-<span class="line-num">1341</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1357</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
+<span class="line-num">1358</span>   <span class="ruby-ivar">@values</span>.<span class="ruby-identifier">keys</span>
+<span class="line-num">1359</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lock-21'>
@@ -716,10 +716,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-lock-21-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1366</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lock!</span>(<span class="ruby-identifier">style</span>=<span class="ruby-value">:update</span>)
-<span class="line-num">1367</span>   <span class="ruby-identifier">_refresh</span>(<span class="ruby-identifier">this</span>.<span class="ruby-identifier">lock_style</span>(<span class="ruby-identifier">style</span>)) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span>
-<span class="line-num">1368</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1369</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1384</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lock!</span>(<span class="ruby-identifier">style</span>=<span class="ruby-value">:update</span>)
+<span class="line-num">1385</span>   <span class="ruby-identifier">_refresh</span>(<span class="ruby-identifier">this</span>.<span class="ruby-identifier">lock_style</span>(<span class="ruby-identifier">style</span>)) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span>
+<span class="line-num">1386</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1387</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-marshallable-21'>
@@ -743,10 +743,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-marshallable-21-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1376</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">marshallable!</span>
-<span class="line-num">1377</span>   <span class="ruby-ivar">@this</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">1378</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1379</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1394</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">marshallable!</span>
+<span class="line-num">1395</span>   <span class="ruby-ivar">@this</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">1396</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1397</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-modified-21'>
@@ -777,10 +777,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-modified-21-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1396</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modified!</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">1397</span>   <span class="ruby-identifier">_add_changed_column</span>(<span class="ruby-identifier">column</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
-<span class="line-num">1398</span>   <span class="ruby-ivar">@modified</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">1399</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1414</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modified!</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">1415</span>   <span class="ruby-identifier">_add_changed_column</span>(<span class="ruby-identifier">column</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
+<span class="line-num">1416</span>   <span class="ruby-ivar">@modified</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1417</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-modified-3F'>
@@ -812,13 +812,13 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-modified-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1416</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modified?</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">1417</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
-<span class="line-num">1418</span>     <span class="ruby-identifier">changed_columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)
-<span class="line-num">1419</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1420</span>     <span class="ruby-ivar">@modified</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">changed_columns</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">1421</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1422</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1434</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modified?</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">1435</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>
+<span class="line-num">1436</span>     <span class="ruby-identifier">changed_columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)
+<span class="line-num">1437</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1438</span>     <span class="ruby-ivar">@modified</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">changed_columns</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">1439</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1440</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-new-3F'>
@@ -841,9 +841,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-new-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1428</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new?</span>
-<span class="line-num">1429</span>   <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@new</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@new</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@new</span> = <span class="ruby-keyword">false</span>)
-<span class="line-num">1430</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1446</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new?</span>
+<span class="line-num">1447</span>   <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@new</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@new</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@new</span> = <span class="ruby-keyword">false</span>)
+<span class="line-num">1448</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pk'>
@@ -866,15 +866,15 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-pk-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1438</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk</span>
-<span class="line-num">1439</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key is associated with this model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">key</span> = <span class="ruby-identifier">primary_key</span>
-<span class="line-num">1440</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">1441</span>     <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>
-<span class="line-num">1442</span>     <span class="ruby-identifier">key</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">k</span>]}
-<span class="line-num">1443</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1444</span>     <span class="ruby-ivar">@values</span>[<span class="ruby-identifier">key</span>]
-<span class="line-num">1445</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1446</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1456</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk</span>
+<span class="line-num">1457</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key is associated with this model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">key</span> = <span class="ruby-identifier">primary_key</span>
+<span class="line-num">1458</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">1459</span>     <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>
+<span class="line-num">1460</span>     <span class="ruby-identifier">key</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">k</span>]}
+<span class="line-num">1461</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1462</span>     <span class="ruby-ivar">@values</span>[<span class="ruby-identifier">key</span>]
+<span class="line-num">1463</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1464</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pk_hash'>
@@ -897,9 +897,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-pk_hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1452</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk_hash</span>
-<span class="line-num">1453</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key_hash</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">1454</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1470</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk_hash</span>
+<span class="line-num">1471</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key_hash</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">1472</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-qualified_pk_hash'>
@@ -924,9 +924,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-qualified_pk_hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1462</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualified_pk_hash</span>(<span class="ruby-identifier">qualifier</span>=<span class="ruby-identifier">model</span>.<span class="ruby-identifier">table_name</span>)
-<span class="line-num">1463</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">qualifier</span>)
-<span class="line-num">1464</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1480</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualified_pk_hash</span>(<span class="ruby-identifier">qualifier</span>=<span class="ruby-identifier">model</span>.<span class="ruby-identifier">table_name</span>)
+<span class="line-num">1481</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">qualifier</span>)
+<span class="line-num">1482</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-refresh'>
@@ -951,11 +951,11 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-refresh-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1474</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh</span>
-<span class="line-num">1475</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t refresh frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
-<span class="line-num">1476</span>   <span class="ruby-identifier">_refresh</span>(<span class="ruby-identifier">this</span>)
-<span class="line-num">1477</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1478</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1492</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh</span>
+<span class="line-num">1493</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t refresh frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
+<span class="line-num">1494</span>   <span class="ruby-identifier">_refresh</span>(<span class="ruby-identifier">this</span>)
+<span class="line-num">1495</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1496</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-reload'>
@@ -974,9 +974,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-reload-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1481</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reload</span>
-<span class="line-num">1482</span>   <span class="ruby-identifier">refresh</span>
-<span class="line-num">1483</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1499</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reload</span>
+<span class="line-num">1500</span>   <span class="ruby-identifier">refresh</span>
+<span class="line-num">1501</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-save'>
@@ -1023,15 +1023,15 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-save-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1510</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1511</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t save frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
-<span class="line-num">1512</span>   <span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] 
-<span class="line-num">1513</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">_save_valid?</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">1514</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-identifier">validation_failed_error</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">raise_on_failure?</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">1515</span>     <span class="ruby-keyword">return</span>
-<span class="line-num">1516</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1517</span>   <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_save</span>(<span class="ruby-identifier">opts</span>)}}
-<span class="line-num">1518</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1528</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1529</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t save frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>
+<span class="line-num">1530</span>   <span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] 
+<span class="line-num">1531</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">_save_valid?</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">1532</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-identifier">validation_failed_error</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">raise_on_failure?</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">1533</span>     <span class="ruby-keyword">return</span>
+<span class="line-num">1534</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1535</span>   <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_save</span>(<span class="ruby-identifier">opts</span>)}}
+<span class="line-num">1536</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-save_changes'>
@@ -1057,9 +1057,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-save_changes-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1529</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1530</span>   <span class="ruby-identifier">save</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:changed</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span> 
-<span class="line-num">1531</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1547</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1548</span>   <span class="ruby-identifier">save</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:changed</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span> 
+<span class="line-num">1549</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set'>
@@ -1082,9 +1082,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-set-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1540</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set</span>(<span class="ruby-identifier">hash</span>)
-<span class="line-num">1541</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:default</span>)
-<span class="line-num">1542</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1558</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set</span>(<span class="ruby-identifier">hash</span>)
+<span class="line-num">1559</span>   <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:default</span>)
+<span class="line-num">1560</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_fields'>
@@ -1126,30 +1126,30 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-set_fields-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1570</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">1571</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>
-<span class="line-num">1572</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">default_set_fields_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">1573</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1574</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">default_set_fields_options</span>
-<span class="line-num">1575</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1576</span> 
-<span class="line-num">1577</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">missing</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:missing</span>]
-<span class="line-num">1578</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:skip</span>, <span class="ruby-value">:raise</span>
-<span class="line-num">1579</span>     <span class="ruby-identifier">do_raise</span> = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">missing</span> <span class="ruby-operator">==</span> <span class="ruby-value">:raise</span>
-<span class="line-num">1580</span>     <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-<span class="line-num">1581</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">f</span>) 
-<span class="line-num">1582</span>         <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{f}=&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">f</span>])
-<span class="line-num">1583</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">sf</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">to_s</span>)
-<span class="line-num">1584</span>         <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{sf}=&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">sf</span>])
-<span class="line-num">1585</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">do_raise</span>
-<span class="line-num">1586</span>         <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;missing field in hash: #{f.inspect} not in #{hash.inspect}&quot;</span>)
-<span class="line-num">1587</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">1588</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">1589</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">1590</span>     <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{f}=&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">f</span>])}
-<span class="line-num">1591</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">1592</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1593</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1588</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">1589</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>
+<span class="line-num">1590</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">default_set_fields_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">1591</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1592</span>     <span class="ruby-identifier">model</span>.<span class="ruby-identifier">default_set_fields_options</span>
+<span class="line-num">1593</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1594</span> 
+<span class="line-num">1595</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">missing</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:missing</span>]
+<span class="line-num">1596</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:skip</span>, <span class="ruby-value">:raise</span>
+<span class="line-num">1597</span>     <span class="ruby-identifier">do_raise</span> = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">missing</span> <span class="ruby-operator">==</span> <span class="ruby-value">:raise</span>
+<span class="line-num">1598</span>     <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+<span class="line-num">1599</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">f</span>) 
+<span class="line-num">1600</span>         <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{f}=&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">f</span>])
+<span class="line-num">1601</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">sf</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">to_s</span>)
+<span class="line-num">1602</span>         <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{sf}=&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">sf</span>])
+<span class="line-num">1603</span>       <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">do_raise</span>
+<span class="line-num">1604</span>         <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;missing field in hash: #{f.inspect} not in #{hash.inspect}&quot;</span>)
+<span class="line-num">1605</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">1606</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1607</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1608</span>     <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{f}=&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">f</span>])}
+<span class="line-num">1609</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1610</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1611</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_server'>
@@ -1168,11 +1168,11 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-set_server-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1596</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_server</span>(<span class="ruby-identifier">s</span>)
-<span class="line-num">1597</span>   <span class="ruby-ivar">@server</span> = <span class="ruby-identifier">s</span>
-<span class="line-num">1598</span>   <span class="ruby-ivar">@this</span> = <span class="ruby-ivar">@this</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@this</span>
-<span class="line-num">1599</span>   <span class="ruby-keyword">self</span>
-<span class="line-num">1600</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1614</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_server</span>(<span class="ruby-identifier">s</span>)
+<span class="line-num">1615</span>   <span class="ruby-ivar">@server</span> = <span class="ruby-identifier">s</span>
+<span class="line-num">1616</span>   <span class="ruby-ivar">@this</span> = <span class="ruby-ivar">@this</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@this</span>
+<span class="line-num">1617</span>   <span class="ruby-keyword">self</span>
+<span class="line-num">1618</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-singleton_method_added'>
@@ -1191,10 +1191,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-singleton_method_added-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1603</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">singleton_method_added</span>(<span class="ruby-identifier">meth</span>)
-<span class="line-num">1604</span>   <span class="ruby-ivar">@singleton_setter_added</span> = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;=&#39;</span>)
-<span class="line-num">1605</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">1606</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1621</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">singleton_method_added</span>(<span class="ruby-identifier">meth</span>)
+<span class="line-num">1622</span>   <span class="ruby-ivar">@singleton_setter_added</span> = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;=&#39;</span>)
+<span class="line-num">1623</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1624</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-skip_validation_on_next_save-21'>
@@ -1213,9 +1213,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-skip_validation_on_next_save-21-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1613</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_validation_on_next_save!</span>
-<span class="line-num">1614</span>   <span class="ruby-ivar">@skip_validation_on_next_save</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">1615</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1631</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_validation_on_next_save!</span>
+<span class="line-num">1632</span>   <span class="ruby-ivar">@skip_validation_on_next_save</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1633</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-this'>
@@ -1238,11 +1238,11 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-this-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1621</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">this</span>
-<span class="line-num">1622</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@this</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@this</span>
-<span class="line-num">1623</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;No dataset for model #{model}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_dataset</span>
-<span class="line-num">1624</span>   <span class="ruby-ivar">@this</span> = <span class="ruby-identifier">use_server</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk_hash</span>))
-<span class="line-num">1625</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1639</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">this</span>
+<span class="line-num">1640</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@this</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@this</span>
+<span class="line-num">1641</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;No dataset for model #{model}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_dataset</span>
+<span class="line-num">1642</span>   <span class="ruby-ivar">@this</span> = <span class="ruby-identifier">use_server</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk_hash</span>))
+<span class="line-num">1643</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update'>
@@ -1264,9 +1264,9 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-update-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1630</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">hash</span>)
-<span class="line-num">1631</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:default</span>)
-<span class="line-num">1632</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1648</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">hash</span>)
+<span class="line-num">1649</span>   <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:default</span>)
+<span class="line-num">1650</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_fields'>
@@ -1292,10 +1292,10 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-update_fields-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1642</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">1643</span>   <span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">1644</span>   <span class="ruby-identifier">save_changes</span>
-<span class="line-num">1645</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1660</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">1661</span>   <span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1662</span>   <span class="ruby-identifier">save_changes</span>
+<span class="line-num">1663</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-valid-3F'>
@@ -1319,11 +1319,11 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-valid-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1661</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid?</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">1662</span>   <span class="ruby-identifier">_valid?</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">1663</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">HookFailed</span>
-<span class="line-num">1664</span>   <span class="ruby-keyword">false</span>
-<span class="line-num">1665</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1679</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid?</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
+<span class="line-num">1680</span>   <span class="ruby-identifier">_valid?</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">1681</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">HookFailed</span>
+<span class="line-num">1682</span>   <span class="ruby-keyword">false</span>
+<span class="line-num">1683</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-validate'>
@@ -1342,8 +1342,8 @@ Sequel::Model::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-validate-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>
-<span class="line-num">1653</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
-<span class="line-num">1654</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1671</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+<span class="line-num">1672</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
