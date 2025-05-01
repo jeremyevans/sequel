@@ -1,4 +1,4 @@
-=== master
+=== 5.92.0 (2025-05-01)
 
 * Use a qualified primary key for Model.paged_each and for the paged_operations plugin when using joined datasets (jeremyevans, davekaro) (#2299, #2300)
 

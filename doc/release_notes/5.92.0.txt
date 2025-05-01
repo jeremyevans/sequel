@@ -1,0 +1,26 @@
+= New Features
+
+* Objects that respond to sql_literal_append or sql_literal to
+  support custom literalization in Sequel datasets can now also
+  implement the sql_literal_allow_caching? method.  If the object
+  responds to the method and it returns true, then Sequel will
+  still allow caching of the Dataset's SQL (this is disabled by
+  default as Sequel cannot be sure that the literalization will
+  not change between calls).
+
+* Model.qualified_primary_key has been added, which returns an
+  SQL::QualifiedIdentifier with the model's primary key, or an
+  array of SQL::QualifiedIdentifier objects if the model uses a
+  composite primary key.
+
+* set_column_not_null is now a reversible method in migrations.
+
+= Other Improvements
+
+* The Model dataset paged_each method and the dataset methods in
+  the paged_operations plugin now automatically use a qualified
+  primary key instead of an unqualified primary key if the dataset
+  is joined.
+
+* Module temporary names when using Ruby 3.5 are now consistent
+  with Ruby 3.3 and 3.4.
