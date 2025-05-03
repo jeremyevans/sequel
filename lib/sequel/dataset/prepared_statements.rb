@@ -91,8 +91,14 @@ module Sequel
         @opts[:log_sql]
       end
       
-      # The type of prepared statement, should be one of :select, :first,
-      # :insert, :update, :delete, or :single_value
+      # The type of SQL to generate for the prepared statement.  Generally
+      # the same as #prepared_type, but can be different.
+      def prepared_sql_type
+        @opts[:prepared_sql_type] || prepared_type
+      end
+      
+      # The type of prepared statement, which controls how the prepared statement
+      # handles results from the database.
       def prepared_type
         @opts[:prepared_type]
       end
@@ -141,7 +147,7 @@ module Sequel
       # Returns the SQL for the prepared statement, depending on
       # the type of the statement and the prepared_modify_values.
       def prepared_sql
-        case prepared_type
+        case prepared_sql_type
         when :select, :all, :each
           # Most common scenario, so listed first.
           select_sql
@@ -182,40 +188,46 @@ module Sequel
       
       # Run the method based on the type of prepared statement.
       def run(&block)
-        case prepared_type
+        case type = prepared_type
         when :select, :all
-          all(&block)
+          with_sql_all(prepared_sql, &block)
         when :each
-          each(&block)
-        when :insert_select
-          with_sql(prepared_sql).first
-        when :first
-          first
+          with_sql_each(prepared_sql, &block)
+        when :insert_select, :first
+          with_sql_first(prepared_sql)
         when :insert, :update, :delete
           if opts[:returning] && supports_returning?(prepared_type)
             returning_fetch_rows(prepared_sql)
-          elsif prepared_type == :delete
-            delete
+          elsif type == :delete
+            with_sql_delete(prepared_sql)
           else
-            public_send(prepared_type, *prepared_modify_values)
+            force_prepared_sql.public_send(type, *prepared_modify_values)
           end
-        when :insert_pk
-          fetch_rows(prepared_sql){|r| return r.values.first}
+        when :insert_pk, :single_value
+          with_sql_single_value(prepared_sql)
         when Array
           # :nocov:
-          case prepared_type[0]
+          case type[0]
           # :nocov:
           when :map, :as_hash, :to_hash, :to_hash_groups
-            public_send(*prepared_type, &block) 
+            force_prepared_sql.public_send(*type, &block) 
           end
-        when :single_value
-          single_value
         else
           raise Error, "unsupported prepared statement type used: #{prepared_type.inspect}"
         end
       end
       
       private
+      
+      # If the prepared_sql_type does not match the prepared statement, return a clone that
+      # with the prepared SQL, to ensure the prepared_sql_type is respected.
+      def force_prepared_sql
+        if prepared_sql_type != prepared_type
+          with_sql(prepared_sql)
+        else
+          self
+        end
+      end
       
       # Returns the value of the prepared_args hash for the given key.
       def prepared_arg(k)
@@ -294,11 +306,12 @@ module Sequel
         prepared_sql, frags = Sequel::Dataset::PlaceholderLiteralizer::Recorder.new.send(:prepared_sql_and_frags, self, prepared_args) do |pl, ds|
           ds = ds.clone(:recorder=>pl)
 
-          case type
+          sql_type = prepared_sql_type || type
+          case sql_type
           when :first, :single_value
             ds.limit(1)
           when :update, :insert, :insert_select, :delete
-            ds.with_sql(:"#{type}_sql", *values)
+            ds.with_sql(:"#{sql_type}_sql", *values)
           when :insert_pk
             ds.with_sql(:insert_sql, *values)
           else
@@ -344,13 +357,23 @@ module Sequel
       clone(:bind_vars=>bind_vars)
     end
     
-    # For the given type (:select, :first, :insert, :insert_select, :update, :delete, or :single_value),
-    # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
-    # insert or update (if one of those types is used), which may contain placeholders.
+    # For the given type, run the sql with the bind variables specified in the hash.
+    # +values+ is a hash passed to insert or update (if one of those types is used),
+    # which may contain placeholders.
+    #
+    # The following types are supported:
+    # 
+    # * :select, :all, :each, :first, :single_value, :insert, :insert_select, :insert_pk, :update, :delete
+    # * Array where first element is :map, :as_hash, :to_hash, :to_hash_groups (remaining elements
+    #   are passed to the related method)
     #
     #   DB[:table].where(id: :$id).call(:first, id: 1)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
+    #
+    #   DB[:table].where(id: :$id).call(:update, {c: 1, id: 2}, col: :$c)
+    #   # UPDATE table WHERE id = ? SET col = ? -- (2, 1)
+    #   # => 1
     def call(type, bind_variables=OPTS, *values, &block)
       to_prepared_statement(type, values, :extend=>bound_variable_modules).call(bind_variables, &block)
     end
@@ -371,6 +394,14 @@ module Sequel
     #   # => {:id=>1, :name=>'Blah'}
     #
     #   DB.call(:select_by_name, name: 'Blah') # Same thing
+    #
+    # +values+ given are passed to +insert+ or +update+ if they are used:
+    #
+    #   ps = DB[:table].where(id: :$i).prepare(:update, :update_name, name: :$n)
+    #
+    #   ps.call(i: 1, n: 'Blah')
+    #   # UPDATE table WHERE id = ? SET name = ? -- (1, 'Blah')
+    #   # => 1
     def prepare(type, name, *values)
       ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules, :no_delayed_evaluations=>true)
 
@@ -387,6 +418,19 @@ module Sequel
       ps
     end
     
+    # Set the type of SQL to use for prepared statements based on this
+    # dataset.  Prepared statements default to using the same SQL type
+    # as the type that is passed to #prepare/#call, but there are cases
+    # where it is helpful to use a different SQL type.
+    #
+    # Available types are: :select, :first, :single_value, :update,
+    # :delete, :insert, :insert_select, :insert_pk
+    #
+    # Other types are treated as :select.
+    def prepare_sql_type(type)
+      clone(:prepared_sql_type => type)
+    end
+
     protected
     
     # Return a cloned copy of the current dataset extended with

@@ -4378,6 +4378,90 @@ describe "Dataset prepared statements and bound variables " do
     ]*2)
   end
 
+  it "Dataset#prepare_sql_type should set the SQL type to use when calling, for all call types" do
+    @db.fetch = [{:id => 1}]
+    @db.numrows = 2
+    @db.autoid = 3
+    ds = @ds.prepare_sql_type(:update)
+    ds.call(:select, {:c=>1}, :col=>:$c).must_equal([{:id=>1}])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:all, {:c=>1}, :col=>:$c).must_equal([{:id=>1}])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    a  = []
+    ds.call(:each, {:c=>1}, :col=>:$c){|v| a << v}
+    a.must_equal([{:id=>1}])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:first, {:c=>1}, :col=>:$c).must_equal(:id=>1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:single_value, {:c=>1}, :col=>:$c).must_equal(1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:insert, {:c=>1}, :col=>:$c).must_equal(3)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:insert_pk, {:c=>1}, :col=>:$c).must_equal(1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:insert_select, {:c=>1}, :col=>:$c).must_equal({:id=>1})
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:update, {:c=>1}, :col=>:$c).must_equal(2)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call(:delete, {:c=>1}, :col=>:$c).must_equal(2)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call([:map, :id], {:c=>1}, :col=>:$c).must_equal([1])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call([:as_hash, :id, :id], {:c=>1}, :col=>:$c).must_equal(1=>1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call([:to_hash, :id, [:id]], {:c=>1}, :col=>:$c).must_equal(1=>[1])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.call([:to_hash_groups, :id, :id], {:c=>1}, :col=>:$c).must_equal(1=>[1])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+  end
+
+  it "Dataset#prepare_sql_type should set the SQL type to use when calling, for all prepare types" do
+    @db.fetch = [{:id => 1}]
+    @db.numrows = 2
+    @db.autoid = 3
+    ds = @ds.prepare_sql_type(:update)
+    ds.prepare(:select, :s, :col=>:$c).call(:c=>1).must_equal([{:id=>1}])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:all, :s, :col=>:$c).call(:c=>1).must_equal([{:id=>1}])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    a  = []
+    ds.prepare(:each, :s, :col=>:$c).call(:c=>1){|v| a << v}
+    a.must_equal([{:id=>1}])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:first, :s, :col=>:$c).call(:c=>1).must_equal(:id=>1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:single_value, :s, :col=>:$c).call(:c=>1).must_equal(1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:insert, :s, :col=>:$c).call(:c=>1).must_equal(3)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:insert_pk, :s, :col=>:$c).call(:c=>1).must_equal(1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:insert_select, :s, :col=>:$c).call(:c=>1).must_equal({:id=>1})
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:update, :s, :col=>:$c).call(:c=>1).must_equal(2)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare(:delete, :s, :col=>:$c).call(:c=>1).must_equal(2)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare([:map, :id], :s, :col=>:$c).call(:c=>1).must_equal([1])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare([:as_hash, :id, :id], :s, :col=>:$c).call(:c=>1).must_equal(1=>1)
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare([:to_hash, :id, [:id]], :s, :col=>:$c).call(:c=>1).must_equal(1=>[1])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+    ds.prepare([:to_hash_groups, :id, :id], :s, :col=>:$c).call(:c=>1).must_equal(1=>[1])
+    @db.sqls.must_equal ["UPDATE items SET col = 1"]
+  end
+
+  it "Dataset#prepare_sql_type should set the SQL type to use with prepared statements" do
+    @ds.prepare_sql_type(:all).prepare(:first, :en).call
+    @db.sqls.must_equal ["SELECT * FROM items"]
+  end
+
+  it "Dataset#prepare_sql_type should work with prepared values with prepared statements" do
+    @ds.prepare_sql_type(:update).prepare(:first, :en, :foo => :$n).call(:n=>1)
+    @db.sqls.must_equal ["UPDATE items SET foo = 1"]
+  end
+
   it "Dataset#prepare with a delayed evaluation should raise an error" do
     proc{@ds.where(Sequel.delay{{:n=>1}}).prepare(:select, :select_n)}.must_raise Sequel::Error
   end

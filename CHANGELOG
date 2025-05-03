@@ -1,3 +1,7 @@
+=== master
+
+* Add Dataset#prepare_sql_type for setting the SQL type to use for prepare/call (jeremyevans)
+
 === 5.92.0 (2025-05-01)
 
 * Use a qualified primary key for Model.paged_each and for the paged_operations plugin when using joined datasets (jeremyevans, davekaro) (#2299, #2300)

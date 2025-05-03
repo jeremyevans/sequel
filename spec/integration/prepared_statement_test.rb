@@ -71,6 +71,31 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(Sequel.lit("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
   end
 
+  it "should support prepare_sql_type for setting SQL type to use with call for select statements" do
+    @ds.insert(:numb=>20)
+    @ds.order(:numb).prepare_sql_type(:first).call(:select).must_equal [{:id=>1, :numb=>10}]
+    @ds.order(:numb).prepare_sql_type(:single_value).call(:select).must_equal [{:id=>1, :numb=>10}]
+    a = []
+    @ds.order(:numb).prepare_sql_type(:single_value).call(:each){|v| a << v}
+    a.must_equal [{:id=>1, :numb=>10}]
+    @ds.order(:numb).prepare_sql_type(:select).call(:first).must_equal(:id=>1, :numb=>10)
+    @ds.order(:numb).select(:id).prepare_sql_type(:select).call(:single_value).must_equal(1)
+  end
+
+  it "should support prepare_sql_type for setting SQL type to use with insert statements" do
+    ds = @ds.returning(:numb)
+    ds.prepare_sql_type(:insert).call(:select, {:n=>20}, :numb=>:$n).must_equal [{:numb=>20}]
+    ds.prepare_sql_type(:insert).call(:first, {:n=>21}, :numb=>:$n).must_equal(:numb=>21)
+    ds.prepare_sql_type(:insert).call(:single_value, {:n=>22}, :numb=>:$n).must_equal 22
+    a = []
+    ds.prepare_sql_type(:insert).call(:each, {:n=>23}, :numb=>:$n){|v| a << v}
+    a.must_equal [{:numb=>23}]
+    ds.prepare_sql_type(:insert).call([:map, :numb], {:n=>24}, :numb=>:$n).must_equal [24]
+    ds.prepare_sql_type(:insert).call([:as_hash, :numb, :numb], {:n=>25}, :numb=>:$n).must_equal(25=>25)
+    ds.prepare_sql_type(:insert).call([:to_hash, :numb, [:numb]], {:n=>26}, :numb=>:$n).must_equal(26=>[26])
+    ds.prepare_sql_type(:insert).call([:to_hash_groups, [:numb], :numb], {:n=>27}, :numb=>:$n).must_equal([27]=>[27])
+  end if DB.dataset.supports_returning?(:insert)
+
   it "should support datasets with static sql and placeholders with call" do
     @db["SELECT * FROM items WHERE numb = ?", :$n].call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
   end
@@ -203,8 +228,38 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(Sequel.lit("numb = :n", :n=>:$n)).prepare(:select, :seq_select).call(:n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.insert(:numb=>20)
     @ds.insert(:numb=>30)
-    @ds.filter(Sequel.lit("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
+    @ds.filter(Sequel.lit("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1)).prepare(:select, :seq_select).call(:n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
   end
+
+  it "should support prepare_sql_type for setting SQL type to use with prepare" do
+    @ds.insert(:numb=>20)
+    @ds.order(:numb).prepare_sql_type(:first).prepare(:select, :seq_select).call.must_equal [{:id=>1, :numb=>10}]
+  end
+
+  it "should support prepare_sql_type for setting SQL type to use with call for select statements" do
+    @ds.insert(:numb=>20)
+    @ds.order(:numb).prepare_sql_type(:first).prepare(:select, :seq_select).call.must_equal [{:id=>1, :numb=>10}]
+    @ds.order(:numb).prepare_sql_type(:single_value).prepare(:select, :seq_select).call.must_equal [{:id=>1, :numb=>10}]
+    a = []
+    @ds.order(:numb).prepare_sql_type(:single_value).prepare(:each, :seq_select).call{|v| a << v}
+    a.must_equal [{:id=>1, :numb=>10}]
+    @ds.order(:numb).prepare_sql_type(:select).prepare(:first, :seq_select).call.must_equal(:id=>1, :numb=>10)
+    @ds.order(:numb).select(:id).prepare_sql_type(:select).prepare(:single_value, :seq_select).call.must_equal(1)
+  end
+
+  it "should support prepare_sql_type for setting SQL type to use with insert statements" do
+    ds = @ds.returning(:numb)
+    ds.prepare_sql_type(:insert).prepare(:select, :seq_select, :numb=>:$n).call(:n=>20).must_equal [{:numb=>20}]
+    ds.prepare_sql_type(:insert).prepare(:first, :seq_select, :numb=>:$n).call(:n=>21).must_equal(:numb=>21)
+    ds.prepare_sql_type(:insert).prepare(:single_value, :seq_select, :numb=>:$n).call(:n=>22).must_equal 22
+    a = []
+    ds.prepare_sql_type(:insert).prepare(:each, :seq_select, :numb=>:$n).call(:n=>23){|v| a << v}
+    a.must_equal [{:numb=>23}]
+    ds.prepare_sql_type(:insert).prepare([:map, :numb], :seq_select, :numb=>:$n).call(:n=>24).must_equal [24]
+    ds.prepare_sql_type(:insert).prepare([:as_hash, :numb, :numb], :seq_select, :numb=>:$n).call(:n=>25).must_equal(25=>25)
+    ds.prepare_sql_type(:insert).prepare([:to_hash, :numb, [:numb]], :seq_select, :numb=>:$n).call(:n=>26).must_equal(26=>[26])
+    ds.prepare_sql_type(:insert).prepare([:to_hash_groups, [:numb], :numb], :seq_select, :numb=>:$n).call(:n=>27).must_equal([27]=>[27])
+  end if DB.dataset.supports_returning?(:insert)
 
   it "should support datasets with static sql and placeholders with prepare" do
     @db["SELECT * FROM items WHERE numb = ?", :$n].prepare(:select, :seq_select).call(:n=>10).must_equal [{:id=>1, :numb=>10}]
