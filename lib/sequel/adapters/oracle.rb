@@ -353,6 +353,20 @@ module Sequel
           i = prepared_args.length
           LiteralString.new(":#{i}")
         end
+
+        # Avoid infinite recursion on Oracle <12 for datasets with limits
+        # (which are implemented via subqueries).  If the given dataset's
+        # prepared args are the same object as current dataset's, call the
+        # standard Sequel::Dataset#subselect_sql_append method, instead
+        # of calling super (which will call prepared_sql and result in
+        # infinite recursion).
+        def subselect_sql_append(sql, ds)
+          if !supports_fetch_next_rows? && ds.opts[:prepared_args].equal?(@opts[:prepared_args])
+            orig_subselect_sql_append(sql, ds)
+          else
+            super
+          end
+        end
       end
       
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
@@ -382,6 +396,8 @@ module Sequel
       end
 
       private
+
+      alias orig_subselect_sql_append subselect_sql_append
 
       def literal_other_append(sql, v)
         case v
