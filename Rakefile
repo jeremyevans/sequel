@@ -24,44 +24,62 @@ end
 
 ### RDoc
 
-RDOC_DEFAULT_OPTS = ["--line-numbers", '--title', 'Sequel: The Database Toolkit for Ruby']
+def self.rdoc_task(rdoc_dir, main, files)
+  rdoc_opts = ["--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
 
-begin
-  # Sequel uses hanna for the website RDoc.
-  gem 'hanna'
-  RDOC_DEFAULT_OPTS.concat(['-f', 'hanna'])
-rescue Gem::LoadError
+  begin
+    gem 'hanna'
+    rdoc_opts.concat(['-f', 'hanna'])
+  rescue Gem::LoadError
+  end
+
+  rdoc_opts.concat(['--main', main, "-o", rdoc_dir])
+
+  FileUtils.rm_rf(rdoc_dir)
+
+  require "rdoc"
+  RDoc::RDoc.new.document(rdoc_opts + files)
 end
 
-require "rdoc/task"
-
-RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
-
-RDoc::Task.new do |rdoc|
-  rdoc.rdoc_dir = "rdoc"
-  rdoc.options += RDOC_OPTS
-  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG MIT-LICENSE lib/**/*.rb doc/*.rdoc doc/release_notes/*.txt"
+desc "Generate rdoc"
+task :rdoc do
+  rdoc_task("rdoc", 'README.rdoc',
+    %w"README.rdoc CHANGELOG doc/CHANGELOG.old MIT-LICENSE" +
+    Dir["lib/**/*.rb"] +
+    Dir["doc/*.rdoc"] +
+    Dir['doc/release_notes/*.txt']
+  )
 end
 
-desc "Make rdoc for website"
+desc "Generate all rdoc for Sequel website"
 task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
 
-RDoc::Task.new(:website_rdoc_main) do |rdoc|
-  rdoc.rdoc_dir = "www/public/rdoc"
-  rdoc.options += RDOC_OPTS + %w'--no-ignore-invalid'
-  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG doc/CHANGELOG.old MIT-LICENSE lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb"
+desc "Generate rdoc for core/model for Sequel website"
+task :website_rdoc_main do
+  rdoc_task("www/public/rdoc", 'README.rdoc',
+    %w"README.rdoc CHANGELOG doc/CHANGELOG.old MIT-LICENSE" +
+    Dir["lib/*.rb"] +
+    Dir["lib/sequel/*.rb"] +
+    Dir["lib/sequel/{connection_pool,dataset,database,model}/*.rb"] +
+    ["lib/sequel/extensions/migration.rb"] +
+    Dir["doc/*.rdoc"] + 
+    Dir["doc/release_notes/*.txt"]
+  )
 end
 
-RDoc::Task.new(:website_rdoc_adapters) do |rdoc|
-  rdoc.rdoc_dir = "www/public/rdoc-adapters"
-  rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel --no-ignore-invalid'
-  rdoc.rdoc_files.add %w"lib/sequel/adapters/**/*.rb"
+desc "Generate rdoc for adapters for Sequel website"
+task :website_rdoc_adapters do
+  rdoc_task("www/public/rdoc-adapters", 'Sequel',
+    Dir["lib/sequel/adapters/**/*.rb"]
+  )
 end
 
-RDoc::Task.new(:website_rdoc_plugins) do |rdoc|
-  rdoc.rdoc_dir = "www/public/rdoc-plugins"
-  rdoc.options += RDOC_DEFAULT_OPTS + %w'--main Sequel --no-ignore-invalid'
-  rdoc.rdoc_files.add %w"lib/sequel/{extensions,plugins}/**/*.rb doc/core_*"
+desc "Generate rdoc for plugins/extensions for Sequel website"
+task :website_rdoc_plugins do
+  rdoc_task("www/public/rdoc-plugins", 'Sequel',
+    Dir["lib/sequel/{extensions,plugins}/**/*.rb"] +
+    Dir["doc/core_*"]
+  )
 end
 
 ### Specs
