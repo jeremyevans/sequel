@@ -1,5 +1,7 @@
 === master
 
+* Add Sequel::OLD and Sequel::NEW constants, for use in RETURNING statements on PostgreSQL 18+ (jeremyevans)
+
 * Fix SQL::QualifiedIdentifier handling of SQL::Identifier wrapping LiteralString values (jeremyevans)
 
 * Fix literalization of SQL::Identifier wrapping LiteralString values (jeremyevans)

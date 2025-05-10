@@ -2052,6 +2052,9 @@ module Sequel
     end
   end
   
+  SQL::Constants::OLD = SQL::Identifier.new(LiteralString.new("OLD").freeze)
+  SQL::Constants::NEW = SQL::Identifier.new(LiteralString.new("NEW").freeze)
+
   include SQL::Constants
   extend SQL::Builders
   extend SQL::OperatorBuilders

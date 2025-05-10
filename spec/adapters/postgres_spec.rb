@@ -173,6 +173,13 @@ describe 'A PostgreSQL database' do
     ds.exclude(2=>[2, 4, nil]).must_be_empty
   end
 
+  it "should support UPDATE RETURNING with OLD/NEW" do
+    @db.create_table(:test){Integer :id}
+    @db[:test].insert(1)
+    @db[:test].returning(Sequel::OLD[:id].as(:x), Sequel::NEW[:id].as(:y)).
+      update(:id=>2).must_equal([{:x=>1, :y=>2}])
+  end if DB.server_version >= 180000
+
   it "should provide a list of existing ordinary tables" do
     @db.create_table(:test){Integer :id}
     @db.tables.must_include :test

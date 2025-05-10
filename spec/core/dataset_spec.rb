@@ -4884,6 +4884,18 @@ describe Sequel::SQL::Constants do
     @db.literal(Sequel::SQL::Constants::SQLFALSE).must_equal "'f'"
     @db.literal(Sequel::SQLFALSE).must_equal "'f'"
   end
+
+  it "should have OLD" do
+    @db.literal(Sequel::SQL::Constants::OLD).must_equal 'OLD'
+    @db.literal(Sequel::OLD).must_equal 'OLD' 
+    @db.literal(Sequel::SQL::Constants::OLD[:id]).must_equal 'OLD."ID"'
+  end
+
+  it "should have NEW" do
+    @db.literal(Sequel::SQL::Constants::NEW).must_equal 'NEW'
+    @db.literal(Sequel::NEW).must_equal 'NEW' 
+    @db.literal(Sequel::SQL::Constants::NEW[:id]).must_equal 'NEW."ID"'
+  end
 end
 
 describe "Sequel timezone support" do
