@@ -1733,12 +1733,11 @@ module Sequel
 
       # Automatically convert SQL::Identifiers to strings
       def convert_identifier(identifier)
-        case identifier
-        when SQL::Identifier
-          identifier.value.to_s
-        else
-          identifier
+        if identifier.is_a?(SQL::Identifier)
+          identifier = identifier.value
+          identifier = identifier.to_s unless identifier.is_a?(LiteralString)
         end
+        identifier
       end
     end
     

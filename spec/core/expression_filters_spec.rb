@@ -1118,6 +1118,13 @@ describe "Sequel core extension replacements" do
     l(Sequel.identifier(Sequel.lit('t')), 't')
   end
 
+  it "Sequel::SQL::Identifier where tbale is Sequel::SQL::Identifier wrapping literal string should not quote table" do
+    @ds = @ds.with_quote_identifiers(true)
+    l(Sequel.identifier(:t)[:c], '"t"."c"')
+    l(Sequel.identifier('t')[:c], '"t"."c"')
+    l(Sequel.identifier(Sequel.lit('t'))[:c], 't."c"')
+  end
+
   it "Sequel::SQL::QualifiedIdentifier#[] should return a nested qualified identifier" do
     l(Sequel[:s][:t][:c], "s.t.c")
   end

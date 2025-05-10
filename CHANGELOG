@@ -1,5 +1,7 @@
 === master
 
+* Fix SQL::QualifiedIdentifier handling of SQL::Identifier wrapping LiteralString values (jeremyevans)
+
 * Fix literalization of SQL::Identifier wrapping LiteralString values (jeremyevans)
 
 * Add Dataset#prepare_sql_type for setting the SQL type to use for prepare/call (jeremyevans)
