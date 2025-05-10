@@ -1,5 +1,7 @@
 === master
 
+* Fix literalization of SQL::Identifier wrapping LiteralString values (jeremyevans)
+
 * Add Dataset#prepare_sql_type for setting the SQL type to use for prepare/call (jeremyevans)
 
 === 5.92.0 (2025-05-01)

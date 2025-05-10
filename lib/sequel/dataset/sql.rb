@@ -685,10 +685,10 @@ module Sequel
     # being quoted, returns name as a string.  If identifiers are being quoted
     # quote the name with quoted_identifier.
     def quote_identifier_append(sql, name)
+      name = name.value if name.is_a?(SQL::Identifier)
       if name.is_a?(LiteralString)
         sql << name
       else
-        name = name.value if name.is_a?(SQL::Identifier)
         name = input_identifier(name)
         if quote_identifiers?
           quoted_identifier_append(sql, name)
