@@ -25,6 +25,13 @@ jobs:
           MYSQL_DATABASE: sequel_test
         ports: ["3306:3306"]
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      mariadb:
+        image: mariadb:latest
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: sequel_test
+        ports: ["3307:3306"]
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
     strategy:
       fail-fast: false
       matrix:
@@ -46,8 +53,16 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - run: bundle exec rake spec_ci
+    - name: Run rake spec_ci
+      run: |
+        set -x -v
+        RUBY_VERSION="${{ matrix.ruby }}"
+        if [ $(( "${RUBY_VERSION##*.}" % 2 )) -eq 0 ]; then
+          export MYSQL_ROOT_PASSWORD=1
+        else
+          export MARIADB_ROOT_PASSWORD=1
+        fi
+        bundle exec rake spec_ci
       env:
         DEFAULT_DATABASE: 1
-        MYSQL_ROOT_PASSWORD: 1
       continue-on-error: ${{ startsWith(matrix.ruby, 'truffleruby') }}
