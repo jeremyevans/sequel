@@ -700,11 +700,14 @@ module Sequel
 
     # Append literalization of identifier or unqualified identifier to SQL string.
     def quote_schema_table_append(sql, table)
-      schema, table = schema_and_table(table)
-      if schema
-        quote_identifier_append(sql, schema)
+      qualifiers = split_qualifiers(table)
+      table = qualifiers.pop
+
+      qualifiers.each do |q|
+        quote_identifier_append(sql, q)
         sql << '.'
       end
+
       quote_identifier_append(sql, table)
     end
 

@@ -1,5 +1,7 @@
 === master
 
+* Support multilevel qualified identifiers in Database#create_table (jeremyevans)
+
 * Add Sequel::OLD and Sequel::NEW constants, for use in RETURNING statements on PostgreSQL 18+ (jeremyevans)
 
 * Fix SQL::QualifiedIdentifier handling of SQL::Identifier wrapping LiteralString values (jeremyevans)

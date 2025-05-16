@@ -10,6 +10,21 @@ describe "DB#create_table" do
     @db.sqls.must_equal ['CREATE TABLE cats ()']
   end
 
+  it "should accept an identifier table name" do
+    @db.create_table(Sequel[:cats]){}.must_be_nil
+    @db.sqls.must_equal ['CREATE TABLE cats ()']
+  end
+
+  it "should accept a qualified table name" do
+    @db.create_table(Sequel[:s][:cats]){}.must_be_nil
+    @db.sqls.must_equal ['CREATE TABLE s.cats ()']
+  end
+
+  it "should accept a multi-level qualified table name" do
+    @db.create_table(Sequel[:s][:t][:cats]){}.must_be_nil
+    @db.sqls.must_equal ['CREATE TABLE s.t.cats ()']
+  end
+
   with_symbol_splitting "should accept the table name with splittable symbols" do
     @db.create_table(:cats__cats) {}
     @db.sqls.must_equal ['CREATE TABLE cats.cats ()']
