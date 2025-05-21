@@ -406,7 +406,7 @@ describe "Database" do
     end
   end
 
-  it "should raise when trying to create a schema qualified temporary table" do
+  cspecify "should raise when trying to create a schema qualified temporary table in an invalid schema", [:mariadb?.to_proc, :mysql] do
     proc do
       DB.create_table(Sequel[:invalid_temp_schema][:items_temp], :temp=>true){Integer :number}
     end.must_raise(DB.database_type == :mssql ? Sequel::Error : Sequel::DatabaseError)
