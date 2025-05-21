@@ -101,7 +101,7 @@ module Sequel
 
     def self.mock_adapter_setup(db)
       db.instance_exec do
-        @server_version = 150000
+        @server_version = 170000
         initialize_postgres_adapter
         extend(MockAdapterDatabaseMethods)
       end
