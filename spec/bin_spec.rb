@@ -12,7 +12,7 @@ TMP_FILE = "spec/bin-sequel-tmp-#{$$}.rb"
 BIN_SPEC_DB = "spec/bin-sequel-spec-db-#{$$}.sqlite3"
 BIN_SPEC_DB2 = "spec/bin-sequel-spec-db2-#{$$}.sqlite3"
 
-if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+if RUBY_ENGINE == 'jruby'
   CONN_PREFIX = 'jdbc:sqlite:'
   CONN_HASH = {:adapter=>'jdbc', :uri=>"#{CONN_PREFIX}#{BIN_SPEC_DB}"}
 else
