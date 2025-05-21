@@ -155,36 +155,29 @@ task :spec_cov do
 end
 
 task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
-  mysql_host = "localhost"
-  pg_database = "sequel_test" unless ENV["DEFAULT_DATABASE"]
-  mysql_jdbc = "&allowPublicKeyRetrieval=true"
+  next if RUBY_VERSION < '2.4'
 
-  if ENV["MYSQL_ROOT_PASSWORD"]
-    mysql_password = "&password=root"
-    mysql_host= "127.0.0.1:3306"
-  end
-
-  if ENV["MARIADB_ROOT_PASSWORD"]
-    mysql_password = "&password=root"
-    mysql_host = "127.0.0.1:3307"
-    mysql_jdbc = ""
+  if RUBY_VERSION.split('.')[1].to_i.send(Time.now.yday.even? ? :even? : :odd?)
+    # MariaDB
+    mysql_port = ":3307"
+  else
+    # MySQL
+    mysql_jdbc = "&allowPublicKeyRetrieval=true"
   end
 
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
     ENV['SEQUEL_SQLITE_URL'] = "jdbc:sqlite::memory:"
-    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost/#{pg_database}?user=postgres&password=postgres"
-    ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://#{mysql_host}/sequel_test?user=root#{mysql_password}&useSSL=false#{mysql_jdbc}"
+    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost?user=postgres&password=postgres"
+    ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://127.0.0.1#{mysql_port}/sequel_test?user=root&password=root&useSSL=false#{mysql_jdbc}"
   else
     ENV['SEQUEL_SQLITE_URL'] = "sqlite:/"
-    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost/#{pg_database}?user=postgres&password=postgres"
-    ENV['SEQUEL_MYSQL_URL'] = "mysql2://#{mysql_host}/sequel_test?user=root#{mysql_password}&useSSL=false"
+    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost?user=postgres&password=postgres"
+    ENV['SEQUEL_MYSQL_URL'] = "mysql2://127.0.0.1#{mysql_port}/sequel_test?user=root&password=root&useSSL=false"
   end
 
-  if RUBY_VERSION >= '2.4'
-    Rake::Task['spec_postgres'].invoke
-    Rake::Task['spec_sqlite'].invoke
-    Rake::Task['spec_mysql'].invoke
-  end
+  Rake::Task['spec_postgres'].invoke
+  Rake::Task['spec_sqlite'].invoke
+  Rake::Task['spec_mysql'].invoke
 end
 
 desc "Print Sequel version"

@@ -53,16 +53,5 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Run rake spec_ci
-      run: |
-        set -x -v
-        RUBY_VERSION="${{ matrix.ruby }}"
-        if [ $(( "${RUBY_VERSION##*.}" % 2 )) -eq 0 ]; then
-          export MYSQL_ROOT_PASSWORD=1
-        else
-          export MARIADB_ROOT_PASSWORD=1
-        fi
-        bundle exec rake spec_ci
-      env:
-        DEFAULT_DATABASE: 1
+    - run: bundle exec rake spec_ci
       continue-on-error: ${{ startsWith(matrix.ruby, 'truffleruby') }}
