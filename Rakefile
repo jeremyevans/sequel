@@ -165,9 +165,9 @@ task :spec_ci=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
     mysql_jdbc = "&allowPublicKeyRetrieval=true"
   end
 
-  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+  if RUBY_ENGINE == 'jruby'
     ENV['SEQUEL_SQLITE_URL'] = "jdbc:sqlite::memory:"
-    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost?user=postgres&password=postgres"
+    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost/?user=postgres&password=postgres"
     ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://127.0.0.1#{mysql_port}/sequel_test?user=root&password=root&useSSL=false#{mysql_jdbc}"
   else
     ENV['SEQUEL_SQLITE_URL'] = "sqlite:/"
