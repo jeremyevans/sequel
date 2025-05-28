@@ -1890,7 +1890,7 @@ module Sequel
 
       # Return the results of an EXPLAIN query as a string
       def explain(opts=OPTS)
-        with_sql((opts[:analyze] ? 'EXPLAIN ANALYZE ' : 'EXPLAIN ') + select_sql).map(:'QUERY PLAN').join("\r\n")
+        clone(:append_sql=>explain_sql_string_origin(opts)).map(:'QUERY PLAN').join("\r\n")
       end
 
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
@@ -2418,6 +2418,11 @@ module Sequel
         end
       end
     
+      # A mutable string used as the prefix when explaining a query.
+      def explain_sql_string_origin(opts)
+        (opts[:analyze] ? 'EXPLAIN ANALYZE ' : 'EXPLAIN ').dup
+      end
+
       # Add ON CONFLICT clause if it should be used
       def insert_conflict_sql(sql)
         if opts = @opts[:insert_conflict]

@@ -463,6 +463,11 @@ module Sequel
           @opts[:no_auto_parameterize] ? super : QueryString.new
         end
 
+        # A mutable string used as the prefix when explaining a query.
+        def explain_sql_string_origin(opts)
+          @opts[:no_auto_parameterize] ? super : (QueryString.new << super)
+        end
+
         # If subquery uses with_sql with a method name symbol, get the dataset
         # with_sql was called on, and use that as the subquery, recording the
         # arguments to with_sql that will be used to calculate the sql.

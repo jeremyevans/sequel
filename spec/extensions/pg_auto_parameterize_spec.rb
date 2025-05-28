@@ -99,6 +99,16 @@ describe "pg_auto_parameterize extension" do
     pr.call('SELECT * FROM "table" WHERE ("a" = "b")', :b, :nil)
   end
 
+  it "should automatically parameterize when using explain or analyze" do
+    ds = @db[:table].where(:a => 1)
+    ds.explain
+    ds.analyze
+    @db.sqls.must_equal [
+      'EXPLAIN SELECT * FROM "table" WHERE ("a" = $1::int4) -- args: [1]',
+      'EXPLAIN ANALYZE SELECT * FROM "table" WHERE ("a" = $1::int4) -- args: [1]'
+    ]
+  end
+
   it "should automatically parameterize and not typecast Sequel::SQL::Cast values" do
     ds = @db[:table]
     pr = proc do |*args|

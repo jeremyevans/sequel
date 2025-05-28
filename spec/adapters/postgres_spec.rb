@@ -1819,6 +1819,10 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @d = DB[:test3]
     @d.explain
     @d.analyze
+
+    @d = DB[:test3].where{date > Date.today}
+    @d.explain
+    @d.analyze
   end
 
   it "#locks should be a dataset returning database locks " do
