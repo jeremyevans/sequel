@@ -1816,13 +1816,47 @@ describe "A PostgreSQL dataset with a timestamp field" do
   end
 
   it "explain and analyze should not raise errors" do
-    @d = DB[:test3]
-    @d.explain
-    @d.analyze
+    ds = @db[:test3]
+    ds.explain
+    ds.analyze
 
-    @d = DB[:test3].where{date > Date.today}
-    @d.explain
-    @d.analyze
+    ds = ds.where{date > Date.today}
+    ds.explain
+    ds.analyze
+
+    next if @db.server_version < 90000
+    ds.explain(:costs=>false)
+    require 'yaml'
+    res = YAML.load(ds.explain(:analyze=>true, :verbose=>true, :buffers=>true, :format=>:yaml))
+    res.must_be_kind_of Array
+    res[0].must_be_kind_of Hash
+    res.count.must_equal 1
+
+    next if @db.server_version < 92000
+    res = ds.explain(:analyze=>true, :timing=>true, format: :json)
+    res.must_be_kind_of Array
+    res[0].must_be_kind_of Hash
+    res.count.must_equal 1
+
+    next if @db.server_version < 100000
+    res = ds.explain(:analyze=>true, :summary=>true, format: :xml)
+    res.start_with?("<").must_equal true
+    res.end_with?(">").must_equal true
+
+    next if @db.server_version < 120000
+    ds.explain(:settings=>true)
+
+    next if @db.server_version < 160000
+    ds.explain(:generic_plan=>true)
+
+    next if @db.server_version < 170000
+    ds.explain(:generic_plan=>true, :costs=>false)
+    ds.explain(:verbose=>true, :settings=>true, :buffers=>true, :summary=>true, :memory=>true)
+    ds.explain(:analyze=>true, :serialize=>:text, :memory=>true, :wal=>true, :timing=>true, :format=>:text)
+    ds.explain(:analyze=>true, :serialize=>:binary)
+    ds.explain(:analyze=>true, :serialize=>:none)
+
+    proc{ds.explain(:format=>:bad)}.must_raise Sequel::Error
   end
 
   it "#locks should be a dataset returning database locks " do

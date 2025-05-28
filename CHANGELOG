@@ -1,5 +1,7 @@
 === master
 
+* Add support to Dataset#explain for all PostgreSQL EXPLAIN options (jeremyevans)
+
 * Make Dataset#{explain,analyze} work with the pg_auto_parameterize extension (jeremyevans)
 
 * Support multilevel qualified identifiers in Database#create_table (jeremyevans)

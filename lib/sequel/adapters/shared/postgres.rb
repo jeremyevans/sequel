@@ -1888,9 +1888,48 @@ module Sequel
         super
       end
 
-      # Return the results of an EXPLAIN query as a string
+      # Return the results of an EXPLAIN query.  Boolean options:
+      #
+      # :analyze :: Use the ANALYZE option.
+      # :buffers :: Use the BUFFERS option.
+      # :costs :: Use the COSTS option.
+      # :generic_plan :: Use the GENERIC_PLAN option.
+      # :memory :: Use the MEMORY option.
+      # :settings :: Use the SETTINGS option.
+      # :summary :: Use the SUMMARY option.
+      # :timing :: Use the TIMING option.
+      # :verbose :: Use the VERBOSE option.
+      # :wal :: Use the WAL option.
+      #
+      # Non boolean options:
+      #
+      # :format :: Use the FORMAT option to change the format of the
+      #            returned value.  Values can be :text, :xml, :json,
+      #            or :yaml.
+      # :serialize :: Use the SERIALIZE option to get timing on
+      #               serialization.  Values can be :none, :text, or
+      #               :binary.
+      #
+      # See the PostgreSQL EXPLAIN documentation for an explanation of
+      # what each option does.
+      #
+      # In most cases, the return value is a single string.  However,
+      # using the <tt>format: :json</tt> option can result in the return
+      # value being an array containing a hash.
       def explain(opts=OPTS)
-        clone(:append_sql=>explain_sql_string_origin(opts)).map(:'QUERY PLAN').join("\r\n")
+        rows = clone(:append_sql=>explain_sql_string_origin(opts)).map(:'QUERY PLAN')
+
+        if rows.length == 1
+          rows[0]
+        elsif rows.all?{|row| String === row}
+          rows.join("\r\n") 
+        # :nocov:
+        else
+          # This branch is unreachable in tests, but it seems better to just return
+          # all rows than throw in error if this case actually happens.
+          rows
+        # :nocov:
+        end
       end
 
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
@@ -2417,10 +2456,63 @@ module Sequel
           c ||= true
         end
       end
+
+      EXPLAIN_BOOLEAN_OPTIONS = {}
+      %w[analyze verbose costs settings generic_plan buffers wal timing summary memory].each do |str|
+        EXPLAIN_BOOLEAN_OPTIONS[str.to_sym] = str.upcase.freeze
+      end
+      EXPLAIN_BOOLEAN_OPTIONS.freeze
+
+      EXPLAIN_NONBOOLEAN_OPTIONS = {
+        :serialize => {:none=>"SERIALIZE NONE", :text=>"SERIALIZE TEXT", :binary=>"SERIALIZE BINARY"}.freeze,
+        :format => {:text=>"FORMAT TEXT", :xml=>"FORMAT XML", :json=>"FORMAT JSON", :yaml=>"FORMAT YAML"}.freeze
+      }.freeze
     
       # A mutable string used as the prefix when explaining a query.
       def explain_sql_string_origin(opts)
-        (opts[:analyze] ? 'EXPLAIN ANALYZE ' : 'EXPLAIN ').dup
+        origin = String.new
+        origin << 'EXPLAIN '
+
+        # :nocov:
+        if server_version < 90000
+          if opts[:analyze]
+            origin << 'ANALYZE '
+          end
+
+          return origin
+        end
+        # :nocov:
+
+        comma = nil
+        paren = "("
+
+        add_opt = lambda do |str, value|
+          origin << paren if paren
+          origin << comma if comma
+          origin << str
+          origin << " FALSE" unless value
+          comma ||= ', '
+          paren &&= nil
+        end
+
+        EXPLAIN_BOOLEAN_OPTIONS.each do |key, str|
+          unless (value = opts[key]).nil?
+            add_opt.call(str, value)
+          end
+        end
+
+        EXPLAIN_NONBOOLEAN_OPTIONS.each do |key, e_opts|
+          if value = opts[key]
+            if str = e_opts[value]
+              add_opt.call(str, true)
+            else
+              raise Sequel::Error, "unrecognized value for Dataset#explain #{key.inspect} option: #{value.inspect}"
+            end
+          end
+        end
+
+        origin << ') ' unless paren
+        origin
       end
 
       # Add ON CONFLICT clause if it should be used

@@ -105,7 +105,15 @@ describe "pg_auto_parameterize extension" do
     ds.analyze
     @db.sqls.must_equal [
       'EXPLAIN SELECT * FROM "table" WHERE ("a" = $1::int4) -- args: [1]',
-      'EXPLAIN ANALYZE SELECT * FROM "table" WHERE ("a" = $1::int4) -- args: [1]'
+      'EXPLAIN (ANALYZE) SELECT * FROM "table" WHERE ("a" = $1::int4) -- args: [1]'
+    ]
+
+    ds = ds.no_auto_parameterize
+    ds.explain
+    ds.analyze
+    @db.sqls.must_equal [
+      'EXPLAIN SELECT * FROM "table" WHERE ("a" = 1)',
+      'EXPLAIN (ANALYZE) SELECT * FROM "table" WHERE ("a" = 1)'
     ]
   end
 
