@@ -1840,8 +1840,10 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
     next if @db.server_version < 100000
     res = ds.explain(:analyze=>true, :summary=>true, format: :xml)
-    res.start_with?("<").must_equal true
-    res.end_with?(">").must_equal true
+    if res.is_a?(String) # could be Java::OrgPostgresqlJdbc::PgSQLXML when using jdbc adapter
+      res.start_with?("<").must_equal true
+      res.end_with?(">").must_equal true
+    end
 
     next if @db.server_version < 120000
     ds.explain(:settings=>true)
