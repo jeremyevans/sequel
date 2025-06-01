@@ -3,25 +3,25 @@
 * Dataset#explain on PostgreSQL now supports options for all EXPLAIN
   options supported by PostgreSQL. These boolean options are supported:
 
-    :analyze :: Use the ANALYZE option.
-    :buffers :: Use the BUFFERS option.
-    :costs :: Use the COSTS option.
-    :generic_plan :: Use the GENERIC_PLAN option.
-    :memory :: Use the MEMORY option.
-    :settings :: Use the SETTINGS option.
-    :summary :: Use the SUMMARY option.
-    :timing :: Use the TIMING option.
-    :verbose :: Use the VERBOSE option.
-    :wal :: Use the WAL option.
+  :analyze :: Use the ANALYZE option.
+  :buffers :: Use the BUFFERS option.
+  :costs :: Use the COSTS option.
+  :generic_plan :: Use the GENERIC_PLAN option.
+  :memory :: Use the MEMORY option.
+  :settings :: Use the SETTINGS option.
+  :summary :: Use the SUMMARY option.
+  :timing :: Use the TIMING option.
+  :verbose :: Use the VERBOSE option.
+  :wal :: Use the WAL option.
    
   These non-boolean options are supported:
    
-    :format :: Use the FORMAT option to change the format of the
-               returned value.  Values can be :text, :xml, :json,
-               or :yaml.
-    :serialize :: Use the SERIALIZE option to get timing on
-                  serialization.  Values can be :none, :text, or
-                  :binary.
+  :format :: Use the FORMAT option to change the format of the
+             returned value.  Values can be :text, :xml, :json,
+             or :yaml.
+  :serialize :: Use the SERIALIZE option to get timing on
+                serialization.  Values can be :none, :text, or
+                :binary.
 
 * Sequel::OLD and Sequel::NEW constants have been added, for use in
   returning statements on PostgreSQL 18+.
