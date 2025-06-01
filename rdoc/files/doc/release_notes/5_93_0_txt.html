@@ -31,7 +31,7 @@ doc/release_notes/5.93.0.txt
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2025-06-01 10:10:47 -0700</span>
+<span class='datetime'>2025-06-01 10:29:06 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -40,26 +40,34 @@ Last Update:
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p>Dataset#explain on PostgreSQL now supports options for all EXPLAIN options supported by PostgreSQL. These boolean options are supported:</p>
-
-<pre>:analyze :: Use the ANALYZE option.
-:buffers :: Use the BUFFERS option.
-:costs :: Use the COSTS option.
-:generic_plan :: Use the GENERIC_PLAN option.
-:memory :: Use the MEMORY option.
-:settings :: Use the SETTINGS option.
-:summary :: Use the SUMMARY option.
-:timing :: Use the TIMING option.
-:verbose :: Use the VERBOSE option.
-:wal :: Use the WAL option.</pre>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:analyze </td><td>
+<p>Use the ANALYZE option.</p>
+</td></tr><tr><td class='label'>:buffers </td><td>
+<p>Use the BUFFERS option.</p>
+</td></tr><tr><td class='label'>:costs </td><td>
+<p>Use the COSTS option.</p>
+</td></tr><tr><td class='label'>:generic_plan </td><td>
+<p>Use the GENERIC_PLAN option.</p>
+</td></tr><tr><td class='label'>:memory </td><td>
+<p>Use the MEMORY option.</p>
+</td></tr><tr><td class='label'>:settings </td><td>
+<p>Use the SETTINGS option.</p>
+</td></tr><tr><td class='label'>:summary </td><td>
+<p>Use the SUMMARY option.</p>
+</td></tr><tr><td class='label'>:timing </td><td>
+<p>Use the TIMING option.</p>
+</td></tr><tr><td class='label'>:verbose </td><td>
+<p>Use the VERBOSE option.</p>
+</td></tr><tr><td class='label'>:wal </td><td>
+<p>Use the WAL option.</p>
+</td></tr></tbody></table>
 
 <p>These non-boolean options are supported:</p>
-
-<pre>:format :: Use the FORMAT option to change the format of the
-           returned value.  Values can be :text, :xml, :json,
-           or :yaml.
-:serialize :: Use the SERIALIZE option to get timing on
-              serialization.  Values can be :none, :text, or
-              :binary.</pre>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:format </td><td>
+<p>Use the FORMAT option to change the format of the returned value.  Values can be :text, :xml, :json, or :yaml.</p>
+</td></tr><tr><td class='label'>:serialize </td><td>
+<p>Use the SERIALIZE option to get timing on serialization.  Values can be :none, :text, or :binary.</p>
+</td></tr></tbody></table>
 </li><li>
 <p>Sequel::OLD and Sequel::NEW constants have been added, for use in returning statements on PostgreSQL 18+.</p>
 
