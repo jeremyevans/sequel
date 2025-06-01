@@ -1,0 +1,79 @@
+= New Features
+
+* Dataset#explain on PostgreSQL now supports options for all EXPLAIN
+  options supported by PostgreSQL. These boolean options are supported:
+
+    :analyze :: Use the ANALYZE option.
+    :buffers :: Use the BUFFERS option.
+    :costs :: Use the COSTS option.
+    :generic_plan :: Use the GENERIC_PLAN option.
+    :memory :: Use the MEMORY option.
+    :settings :: Use the SETTINGS option.
+    :summary :: Use the SUMMARY option.
+    :timing :: Use the TIMING option.
+    :verbose :: Use the VERBOSE option.
+    :wal :: Use the WAL option.
+   
+  These non-boolean options are supported:
+   
+    :format :: Use the FORMAT option to change the format of the
+               returned value.  Values can be :text, :xml, :json,
+               or :yaml.
+    :serialize :: Use the SERIALIZE option to get timing on
+                  serialization.  Values can be :none, :text, or
+                  :binary.
+
+* Sequel::OLD and Sequel::NEW constants have been added, for use in
+  returning statements on PostgreSQL 18+.
+
+    DB[:table].
+      returning(Sequel::OLD[:c].as(:old), Sequel::NEW[:c].as(:new)).
+      update(c: 2)
+    # => [{old: 1, new: 2}]
+
+* Dataset#prepare_sql_type has been added for setting the SQL type
+  to use for the prepared statement separately from the return type.
+  This method is designed primarily for cases where you are using
+  INSERT/UPDATE/DELETE RETURNING, and want to be able use each,
+  single_value, first, map, to_hash, or to_hash_groups as the return
+  type.  For example, if you want to update multiple rows and return
+  the rows updated as an identity-keyed hash:
+    
+    ps = DB[:table].
+      where(name: :$name).
+      returning.
+      prepare_sql_type(:update).
+      prepare([:to_hash, :id], :update_table, value: :$value)
+
+= Other Improvements
+
+* Database#create_table and related methods now support multilevel
+  qualified identifiers:
+
+    DB.create_table(Sequel[:db][:sch][:table]){}
+    # CREATE TABLE db.sch.table ()
+
+  This is mostly useful on Microsoft SQL Server.
+
+* The pg_auto_parameterize extension now supports Database#explain.
+  and #analyze.  Both methods now use an append-only approach to
+  building the SQL string to explain.
+
+* Dataset#quote_identifier's handling of SQL::Identifier values
+  wrapping LiteralString values has been fixed.  Such identifiers are
+  no longer quoted:
+
+    DB.quote_identifier(Sequel.identifier(Sequel.lit("OLD")))
+    # Before: "OLD"
+    # After:  OLD
+
+* SQL::QualifiedIdentifier no longer converts SQL::Identifier values
+  wrapping LiteralString values into plain String values.  This fixes
+  unexpected quoting issues:
+
+    DB.literal(Sequel.identifier(Sequel.lit('OLD'))[:a])
+    # Before: "OLD"."a"
+    # After:  OLD."a"
+
+* The mock postgres adapter now emulates PostgreSQL 17 instead of
+  PostgreSQL 15 by default.
