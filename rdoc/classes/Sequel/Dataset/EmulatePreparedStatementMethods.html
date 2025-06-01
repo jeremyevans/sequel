@@ -70,14 +70,14 @@ Sequel::Dataset::EmulatePreparedStatementMethods
 [show source]
 </a>
 <pre id='method-i-run-source'>    <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>
-<span class="line-num">276</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">277</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql_frags</span>]
-<span class="line-num">278</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql_frags</span>], <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>], <span class="ruby-keyword">false</span>))
-<span class="line-num">279</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_sql_frags</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">280</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">281</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">282</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">283</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">288</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">289</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql_frags</span>]
+<span class="line-num">290</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql_frags</span>], <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>], <span class="ruby-keyword">false</span>))
+<span class="line-num">291</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_sql_frags</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">292</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">293</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">294</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">295</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

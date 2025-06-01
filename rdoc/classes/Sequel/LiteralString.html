@@ -85,9 +85,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-inspect-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">2040</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
-<span class="line-num">2041</span>   <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>
-<span class="line-num">2042</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2039</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">2040</span>   <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>
+<span class="line-num">2041</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
@@ -106,9 +106,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-lit-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">2046</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">2047</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">2048</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2045</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">2046</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">2047</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -127,9 +127,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_sequel_blob-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">2051</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>
-<span class="line-num">2052</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
-<span class="line-num">2053</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2050</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>
+<span class="line-num">2051</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)
+<span class="line-num">2052</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

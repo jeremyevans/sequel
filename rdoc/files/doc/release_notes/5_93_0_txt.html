@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.93.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.93.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.93.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2025-06-01 10:10:47 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#explain on PostgreSQL now supports options for all EXPLAIN options supported by PostgreSQL. These boolean options are supported:</p>
+
+<pre>:analyze :: Use the ANALYZE option.
+:buffers :: Use the BUFFERS option.
+:costs :: Use the COSTS option.
+:generic_plan :: Use the GENERIC_PLAN option.
+:memory :: Use the MEMORY option.
+:settings :: Use the SETTINGS option.
+:summary :: Use the SUMMARY option.
+:timing :: Use the TIMING option.
+:verbose :: Use the VERBOSE option.
+:wal :: Use the WAL option.</pre>
+
+<p>These non-boolean options are supported:</p>
+
+<pre>:format :: Use the FORMAT option to change the format of the
+           returned value.  Values can be :text, :xml, :json,
+           or :yaml.
+:serialize :: Use the SERIALIZE option to get timing on
+              serialization.  Values can be :none, :text, or
+              :binary.</pre>
+</li><li>
+<p>Sequel::OLD and Sequel::NEW constants have been added, for use in returning statements on PostgreSQL 18+.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].
+  <span class="ruby-identifier">returning</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">OLD</span>[<span class="ruby-value">:c</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:old</span>), <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NEW</span>[<span class="ruby-value">:c</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:new</span>)).
+  <span class="ruby-identifier">update</span>(<span class="ruby-value">c:</span> <span class="ruby-value">2</span>)
+<span class="ruby-comment"># =&gt; [{old: 1, new: 2}]</span>
+</pre>
+</li><li>
+<p>Dataset#prepare_sql_type has been added for setting the SQL type to use for the prepared statement separately from the return type. This method is designed primarily for cases where you are using INSERT/UPDATE/DELETE RETURNING, and want to be able use each, single_value, first, map, to_hash, or to_hash_groups as the return type.  For example, if you want to update multiple rows and return the rows updated as an identity-keyed hash:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ps</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].
+  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:$name</span>).
+  <span class="ruby-identifier">returning</span>.
+  <span class="ruby-identifier">prepare_sql_type</span>(<span class="ruby-value">:update</span>).
+  <span class="ruby-identifier">prepare</span>([<span class="ruby-value">:to_hash</span>, <span class="ruby-value">:id</span>], <span class="ruby-value">:update_table</span>, <span class="ruby-value">value:</span> <span class="ruby-value">:$value</span>)
+</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#create_table and related methods now support multilevel qualified identifiers:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:db</span>][<span class="ruby-value">:sch</span>][<span class="ruby-value">:table</span>]){}
+<span class="ruby-comment"># CREATE TABLE db.sch.table ()</span>
+</pre>
+
+<p>This is mostly useful on Microsoft SQL Server.</p>
+</li><li>
+<p>The pg_auto_parameterize extension now supports Database#explain. and analyze.  Both methods now use an append-only approach to building the SQL string to explain.</p>
+</li><li>
+<p>Dataset#quote_identifier’s handling of SQL::Identifier values wrapping LiteralString values has been fixed.  Such identifiers are no longer quoted:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifier</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;OLD&quot;</span>)))
+<span class="ruby-comment"># Before: &quot;OLD&quot;</span>
+<span class="ruby-comment"># After:  OLD</span>
+</pre>
+</li><li>
+<p>SQL::QualifiedIdentifier no longer converts SQL::Identifier values wrapping LiteralString values into plain String values.  This fixes unexpected quoting issues:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;OLD&#39;</span>))[<span class="ruby-value">:a</span>])
+<span class="ruby-comment"># Before: &quot;OLD&quot;.&quot;a&quot;</span>
+<span class="ruby-comment"># After:  OLD.&quot;a&quot;</span>
+</pre>
+</li><li>
+<p>The mock postgres adapter now emulates PostgreSQL 17 instead of PostgreSQL 15 by default.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
