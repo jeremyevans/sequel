@@ -136,7 +136,7 @@ module Sequel
       module DatabaseMethods
         def self.extended(db)
           db.instance_exec do
-            add_named_conversion_proc(:hstore, &HStore.method(:parse))
+            add_named_conversion_proc(:hstore){|v| HStore.parse(v)}
             @schema_type_classes[:hstore] = HStore
           end
         end
