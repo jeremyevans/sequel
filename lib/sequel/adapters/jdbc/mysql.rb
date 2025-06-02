@@ -26,7 +26,7 @@ module Sequel
 
         # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
         def disconnect_error?(exception, opts)
-          exception.message =~ /\ACommunications link failure/ || super
+          exception.message.start_with?("Communications link failure") || super
         end
 
         # Get the last inserted id using LAST_INSERT_ID().
@@ -64,7 +64,7 @@ module Sequel
 
         # Convert tinyint(1) type to boolean
         def schema_column_type(db_type)
-          db_type =~ /\Atinyint\(1\)/ ? :boolean : super
+          db_type.start_with?("tinyint(1)") ? :boolean : super
         end
       
         # Run the default connection setting SQL statements.

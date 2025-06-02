@@ -66,7 +66,7 @@ module Sequel
         # in the order they were defined.
         klass = self.class
         args = inspect_args.map do |arg|
-          if arg.is_a?(String) && arg =~ /\A\*/
+          if arg.is_a?(String) && arg.start_with?('*')
             # Special case string arguments starting with *, indicating that
             # they should return an array to be splatted as the remaining arguments.
             # Allow calling private methods to get inspect output.

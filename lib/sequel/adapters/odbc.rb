@@ -81,7 +81,7 @@ module Sequel
       end
 
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::ODBC::Error) && /\A08S01/.match(e.message))
+        super || (e.is_a?(::ODBC::Error) && e.message.start_with?("08S01"))
       end
     end
     

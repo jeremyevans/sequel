@@ -48,7 +48,7 @@ module Sequel
     TYPE_TRANSLATOR_DATE = date.freeze
     bytea = Object.new
     def bytea.call(str)
-      str = if str =~ /\A\\x/
+      str = if str.start_with?('\\x')
         # PostgreSQL 9.0+ bytea hex format
         str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
       else

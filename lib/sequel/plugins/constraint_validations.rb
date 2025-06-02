@@ -164,7 +164,7 @@ module Sequel
             arg = constraint_validation_int_range(arg)
             type = :includes
           when *OPERATOR_MAP.keys
-            arg = arg.to_i if type.to_s =~ /\Aint_/
+            arg = arg.to_i if type.to_s.start_with?('int_')
             operator = OPERATOR_MAP[type]
             type = :operator
           end

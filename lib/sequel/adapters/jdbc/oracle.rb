@@ -55,7 +55,7 @@ module Sequel
         end
 
         def disconnect_error?(exception, opts)
-          super || exception.message =~ /\AClosed Connection/
+          super || exception.message.start_with?("Closed Connection")
         end
 
         # Default the fetch size for statements to 100, similar to the oci8-based oracle adapter.

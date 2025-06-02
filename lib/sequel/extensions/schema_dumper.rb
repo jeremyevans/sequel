@@ -221,7 +221,7 @@ END_MIG
       else
         col_opts = if options[:same_db]
           h = {:type=>schema[:db_type]}
-          if database_type == :mysql && h[:type] =~ /\Atimestamp/
+          if database_type == :mysql && h[:type].start_with?("timestamp")
             h[:null] = true
           end
           if database_type == :mssql && schema[:max_length]

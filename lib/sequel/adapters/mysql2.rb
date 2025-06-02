@@ -221,13 +221,13 @@ module Sequel
         super ||
           ((conn = opts[:conn]) && !conn.ping) ||
           (e.is_a?(::Mysql2::Error) &&
-            (e.sql_state =~ /\A08/ ||
+            ((e.sql_state && e.sql_state.start_with?("08")) ||
              MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)))
       end
 
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
-        convert_tinyint_to_bool && db_type =~ /\Atinyint\(1\)/ ? :boolean : super
+        convert_tinyint_to_bool && db_type.start_with?("tinyint(1)") ? :boolean : super
       end
     end
 
