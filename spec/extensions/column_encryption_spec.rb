@@ -256,7 +256,7 @@ describe "column_encryption plugin" do
 
     need_reencrypt = lambda do
       sql = @model.needing_reencryption.sql
-      [@obj, obj].reject{|o| sql.include?("< '#{o[:enc][0, 4]}'") && sql.include?("> '#{o[:enc][0, 4]}B'") }.length
+      [@obj, obj].count{|o| !(sql.include?("< '#{o[:enc][0, 4]}'") && sql.include?("> '#{o[:enc][0, 4]}B'")) }
     end
 
     need_reencrypt.call.must_equal 0

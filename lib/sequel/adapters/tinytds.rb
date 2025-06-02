@@ -14,7 +14,7 @@ module Sequel
         opts = server_opts(server)
         opts[:username] = opts[:user]
         c = TinyTds::Client.new(opts)
-        c.query_options.merge!(:cache_rows=>false)
+        c.query_options[:cache_rows] = false
 
         # SEQUEL6: Default to ansi: true
         if opts[:ansi]

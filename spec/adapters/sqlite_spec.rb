@@ -1130,7 +1130,7 @@ describe 'temporarily_release_connection plugin' do
 
     db.transaction(:rollback=>:always) do |c|
       db.temporarily_release_connection(c) do
-        4.times.map do |i|
+        Array.new(4) do |i|
           Thread.new do
             db.synchronize do |conn|
               _(conn).must_be_same_as c

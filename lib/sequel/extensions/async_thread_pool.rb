@@ -357,7 +357,7 @@ module Sequel
           define_singleton_method(:async_job_class){proxy_klass}
 
           queue = @async_thread_queue = Queue.new
-          pool = @async_thread_pool = num_async_threads.times.map{JobProcessor.new(queue)}
+          pool = @async_thread_pool = Array.new(num_async_threads){JobProcessor.new(queue)}
           ObjectSpace.define_finalizer(db, JobProcessor.create_finalizer(queue, pool))
 
           extend_datasets(DatasetMethods)

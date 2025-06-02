@@ -567,7 +567,8 @@ describe "many_through_many eager loading methods" do
       if sql =~ /albums_artists.artist_id IN \(([18])\)/
         h[:x_foreign_key_x] = $1.to_i 
       elsif sql =~ /\(\(albums_artists.b1, albums_artists.b2\) IN \(\(1, 8\)\)\)/
-        h.merge!(:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>8)
+        h[:x_foreign_key_0_x] = 1
+        h[:x_foreign_key_1_x] = 8
       end
       h[:tag_id] = h.delete(:id) if sql =~ /albums_artists.artist_id IN \(8\)/
       h
@@ -1660,7 +1661,8 @@ describe "one_through_many eager loading methods" do
       if sql =~ /albums_artists.artist_id IN \(([18])\)/
         h[:x_foreign_key_x] = $1.to_i 
       elsif sql =~ /\(\(albums_artists.b1, albums_artists.b2\) IN \(\(1, 8\)\)\)/
-        h.merge!(:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>8)
+        h[:x_foreign_key_0_x] = 1
+        h[:x_foreign_key_1_x] = 8
       end
       h[:tag_id] = h.delete(:id) if sql =~ /albums_artists.artist_id IN \(8\)/
       h
@@ -2197,7 +2199,7 @@ end
 
 describe "many_through_many/one_through_many associations with :db option" do
   before do
-    @db1, @db2, @db3, @db4 = @dbs = 4.times.map{Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})}
+    @db1, @db2, @db3, @db4 = @dbs = Array.new(4){Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})}
     @c1 = Class.new(Sequel::Model(@db1[:attributes])) do
       unrestrict_primary_key
       attr_accessor :yyy

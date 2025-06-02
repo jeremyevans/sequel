@@ -2656,7 +2656,7 @@ end
 
 describe "Sequel::Model query per join table support" do
   before(:all) do
-    @dbs = 4.times.map do |i|
+    @dbs = Array.new(4) do |i|
       url = if DB.adapter_scheme == :sqlite
         'sqlite:/'
       else

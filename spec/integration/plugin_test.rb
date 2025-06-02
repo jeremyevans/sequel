@@ -3149,7 +3149,7 @@ describe "paged_operations plugin" do
   end unless (DB.database_type == :oracle && !DB.dataset.supports_fetch_next_rows?) || (DB.database_type == :mssql && !DB.dataset.send(:is_2012_or_later?))
 
   it "Model#paged_update should work on unfiltered dataset" do
-    expected = 100.times.map{|i| [i+1, i+200]}
+    expected = Array.new(100){|i| [i+1, i+200]}
     @sizes.each do |rows|
       @db.transaction(:rollback=>:always) do
         @model.paged_update({:o=>Sequel[:o] + 200}, :rows_per_page=>rows).must_equal 100
@@ -3191,9 +3191,9 @@ describe "paged_operations plugin" do
 
   it "Model#paged_update should work on filtered dataset" do
     ds = @model.where{id < 50}
-    ds_expected = 49.times.map{|i| [i+1, i+200]}
+    ds_expected = Array.new(49){|i| [i+1, i+200]}
     other = @model.exclude{id < 50}
-    other_expected = 51.times.map{|i| [i+50, i+49]}
+    other_expected = Array.new(51){|i| [i+50, i+49]}
     @sizes.each do |rows|
       @db.transaction(:rollback=>:always) do
         ds.paged_update({:o=>Sequel[:o] + 200}, :rows_per_page=>rows).must_equal 49

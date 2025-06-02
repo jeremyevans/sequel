@@ -161,7 +161,7 @@ describe "pg_hstore extension" do
 
   it "should handle #merge/#update with hashes that do not use strings" do
     v = Sequel.hstore('foo'=>'bar')
-    v.merge!(:bar=>1)
+    v[:bar] = 1
     v.class.must_equal(@c)
     v.must_equal('foo'=>'bar', 'bar'=>'1')
 

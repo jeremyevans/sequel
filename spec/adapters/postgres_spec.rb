@@ -6520,7 +6520,7 @@ describe "pg_eager_any_typed_array plugin" do
       pg_array_to_many :parents, :class=>self
       many_to_pg_array :array_children, :class=>self, :key=>:parent_ids
     end
-    ids = 4.times.map{|i| "********-****-****-****-************".gsub(/\*/, i.to_s)}
+    ids = Array.new(4){|i| "********-****-****-****-************".gsub(/\*/, i.to_s)}
     @c1 = @c.create(id: ids[0], parent_id: ids[1], parent_ids: Sequel.pg_array([ids[2], ids[3]], :uuid))
     @c2 = @c.create(id: ids[1], parent_id: ids[2])
     @c3 = @c.create(id: ids[2], parent_id: ids[3])

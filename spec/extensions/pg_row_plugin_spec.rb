@@ -73,7 +73,7 @@ describe "Sequel::Plugins::PgRow" do
 
     @c2 = Class.new(Sequel::Model(@db[:company]))
     @c2.columns :address
-    @c2.db_schema[:address].merge!(:type=>:pg_row_address)
+    @c2.db_schema[:address][:type] = :pg_row_address
     @c2.new.send(:schema_type_class, :address).must_equal @c
     @db.conversion_procs[1098].call('(123 Foo St,Bar City)').must_equal @c.load(:street=>'123 Foo St', :city=>'Bar City')
   end

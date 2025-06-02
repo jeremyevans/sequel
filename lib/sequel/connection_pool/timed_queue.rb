@@ -236,7 +236,7 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   def preconnect(concurrent = false)
     if concurrent
       if times = sync{@max_size > (size = @size[0]) ? @max_size - size : false}
-        times.times.map{Thread.new{if conn = try_make_new; @queue.push(conn) end}}.map(&:value)
+        Array.new(times){Thread.new{if conn = try_make_new; @queue.push(conn) end}}.map(&:value)
       end
     else
       while conn = try_make_new

@@ -59,9 +59,9 @@ describe Sequel::Model, ".plugin" do
   it "should not attempt to load a plugin twice" do
     @c.plugins.wont_include(@t)
     @c.plugin @t
-    @c.plugins.reject{|m| m != @t}.length.must_equal 1
+    @c.plugins.count{|m| !(m != @t)}.must_equal 1
     @c.plugin @t
-    @c.plugins.reject{|m| m != @t}.length.must_equal 1
+    @c.plugins.count{|m| !(m != @t)}.must_equal 1
   end
 
   deprecated "should warn if loading the plugin with an argument" do

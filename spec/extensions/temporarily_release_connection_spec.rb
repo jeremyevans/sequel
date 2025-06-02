@@ -17,7 +17,7 @@ pool_types.each do |pool_type|
       conns = []
       @db.transaction(:rollback=>:always) do |c|
         @db.temporarily_release_connection(c) do
-          4.times.map do |i|
+          Array.new(4) do |i|
             Thread.new do
               @db.synchronize do |conn|
                 conns << conn
@@ -42,7 +42,7 @@ pool_types.each do |pool_type|
         @db.temporarily_release_connection(c, :foo) do
           @db.transaction(:rollback=>:always, :server=>:bar) do |c2|
             @db.temporarily_release_connection(c2, :bar) do
-              4.times.map do |i|
+              Array.new(4) do |i|
                 Thread.new do
                   @db.synchronize(:foo) do |conn|
                     @db.synchronize(:bar) do |conn2|

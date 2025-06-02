@@ -12,7 +12,8 @@ describe "optimistic_locking plugin" do
         name, nlv = $1 == 'name' ? [$2, $3] : [$3, $2]
         m = h[$4.to_i]
         if m && m[:lock_version] == $5.to_i
-          m.merge!(:name=>name.delete("'"), :lock_version=>nlv.to_i)
+          m[:name] = name.delete("'")
+          m[:lock_version] = nlv.to_i
           1
         else
           0
@@ -20,7 +21,7 @@ describe "optimistic_locking plugin" do
       when /UPDATE people SET #{lv} = (\d+) WHERE \(\(id = (\d+)\) AND \(#{lv} = (\d+)\)\)/
         m = h[$2.to_i]
         if m && m[:lock_version] == $3.to_i
-          m.merge!(:lock_version=>$1.to_i)
+          m[:lock_version] = $1.to_i
           1
         else
           0

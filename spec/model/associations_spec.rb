@@ -3538,7 +3538,7 @@ end
 
 describe "many_to_many/one_through_one associations with :join_table_db" do
   before do
-    @db1, @db2, @db3 = @dbs = 3.times.map{Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})}
+    @db1, @db2, @db3 = @dbs = Array.new(3){Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})}
     @c1 = Class.new(Sequel::Model(@db1[:attributes])) do
       unrestrict_primary_key
       attr_accessor :yyy

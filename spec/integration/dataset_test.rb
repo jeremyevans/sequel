@@ -401,14 +401,14 @@ describe "Simple Dataset operations" do
   it "should support execution using an async thread pool" do
     q = Queue.new
     ds = @ds.async
-    vals = 3.times.map{ds.all{q.pop}}
+    vals = Array.new(3){ds.all{q.pop}}
     3.times{q.push nil}
     vals.each{|v| v[0][:number].must_equal(10)}
 
-    vals = 3.times.map{ds.first}
+    vals = Array.new(3){ds.first}
     vals.each{|v| v[:number].must_equal(10)}
 
-    vals = 3.times.map{ds.get(:number)}
+    vals = Array.new(3){ds.get(:number)}
     vals.each{|v| v.must_equal(10)}
 
     vals = [
@@ -1216,7 +1216,7 @@ describe "Sequel::Dataset#import and #multi_insert" do
   end
 
   it "should import many rows at once" do
-    @ids.import([:i], (1..1000).to_a.map{|x| [x]})
+    @ids.import([:i], (1..1000).to_a.zip)
     @ids.select_order_map(:i).must_equal((1..1000).to_a)
   end
 end
@@ -2158,7 +2158,7 @@ describe "Concurrent access" do
   end
 
   it "should support multiple threads" do
-    threads = 4.times.map do
+    threads = Array.new(4) do
       q = Queue.new
       q2 = Queue.new
       [q, q2, Thread.new{@ds.each{|r| q.push(r[:v]); q2.pop}}]
@@ -2172,14 +2172,14 @@ describe "Concurrent access" do
 
   if ENV["SEQUEL_FIBER_CONCURRENCY"]
     it "should support multiple enumerators" do
-      enums = 4.times.map{@ds.to_enum}
+      enums = Array.new(4){@ds.to_enum}
       enums.each{|e| e.next[:v].must_equal 1}
       enums.each{|e| e.next[:v].must_equal 2}
       enums.each{|e| proc{e.next}.must_raise StopIteration}
     end
 
     it "should support multiple fibers" do
-      fibers = 4.times.map{Fiber.new{@ds.each{|r| Fiber.yield r[:v]}; 3}}
+      fibers = Array.new(4){Fiber.new{@ds.each{|r| Fiber.yield r[:v]}; 3}}
       fibers.each{|f| f.resume.must_equal 1}
       fibers.each{|f| f.resume.must_equal 2}
       fibers.each{|f| f.resume.must_equal 3}
