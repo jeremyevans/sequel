@@ -845,7 +845,7 @@ module Sequel
         begin
           db.create_table(table){String c, :primary_key=>true}
         rescue Sequel::DatabaseError => e
-          if db.database_type == :mysql && e.message =~ /max key length/
+          if db.database_type == :mysql && e.message.include?('max key length')
             # Handle case where MySQL is used with utf8mb4 charset default, which
             # only allows a maximum length of about 190 characters for string
             # primary keys due to InnoDB limitations.

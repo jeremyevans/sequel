@@ -84,7 +84,7 @@ module Sequel
         end
 
         def disconnect_error?(exception, opts)
-          super || (exception.message =~ /connection is closed/)
+          super || (exception.message.include?('connection is closed'))
         end
       end
     end

@@ -234,7 +234,7 @@ module Sequel
       end
 
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::WIN32OLERuntimeError) && e.message =~ /Communication link failure/)
+        super || (e.is_a?(::WIN32OLERuntimeError) && e.message.include?('Communication link failure'))
       end
 
       def rollback_transaction(conn, opts=OPTS)

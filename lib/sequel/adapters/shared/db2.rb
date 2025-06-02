@@ -108,7 +108,7 @@ module Sequel
         from(name).first
         true
       rescue DatabaseError => e
-        if e.to_s =~ /Operation not allowed for reason code "7" on table/ && v == false
+        if e.to_s.include?('Operation not allowed for reason code "7" on table') && v == false
           # table probably needs reorg
           reorg(name)
           v = true

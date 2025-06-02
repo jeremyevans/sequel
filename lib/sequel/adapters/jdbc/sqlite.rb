@@ -98,7 +98,7 @@ module Sequel
 
         # Whether the given exception is due to a foreign key error.
         def foreign_key_error?(exception)
-          exception.message =~ /query does not return ResultSet/
+          exception.message.include?('query does not return ResultSet')
         end
 
         # Use getLong instead of getInt for converting integers on SQLite, since SQLite does not enforce a limit of 2**32.
