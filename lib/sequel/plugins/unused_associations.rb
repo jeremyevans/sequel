@@ -347,6 +347,8 @@ module Sequel
           coverage_data = options[:coverage_data] || Sequel.parse_json(File.binread(@unused_associations_coverage_file))
 
           unused_associations_data = {}
+          to_many_modification_methods = [:adder, :remover, :clearer]
+          modification_methods = [:setter, :adder, :remover, :clearer]
 
           ([self] + descendants).each do |sc|
             next unless cov_data = coverage_data[sc.name]
@@ -383,8 +385,8 @@ module Sequel
               if !info[:used]
                 (unused_associations_data[sc.name] ||= {})[assoc.to_s] = 'unused'
               elsif unused = info[:unused]
-                if unused.include?(:setter) || [:adder, :remover, :clearer].all?{|k| unused.include?(k)}
-                  [:setter, :adder, :remover, :clearer].each do |k|
+                if unused.include?(:setter) || to_many_modification_methods.all?{|k| unused.include?(k)}
+                  modification_methods.each do |k|
                     unused.delete(k)
                   end
                   unused << :read_only

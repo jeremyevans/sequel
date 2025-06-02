@@ -1369,7 +1369,8 @@ module Sequel
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts=OPTS)
         args = opts[:args]
-        if !opts[:args].is_a?(Array) || !opts[:args].any?{|a| Array(a).length == 3 and %w'OUT INOUT'.include?(a[2].to_s)}
+        in_out = %w'OUT INOUT'
+        if (!opts[:args].is_a?(Array) || !opts[:args].any?{|a| Array(a).length == 3 && in_out.include?(a[2].to_s)})
           returns = opts[:returns] || 'void'
         end
         language = opts[:language] || 'SQL'

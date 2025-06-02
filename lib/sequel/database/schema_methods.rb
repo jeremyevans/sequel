@@ -733,11 +733,12 @@ module Sequel
     def create_table_sql(name, generator, options)
       unless supports_named_column_constraints?
         # Split column constraints into table constraints if they have a name
+        fk_opt_keys = [:key, :on_delete, :on_update, :deferrable]
         generator.columns.each do |c|
           if (constraint_name = c.delete(:foreign_key_constraint_name)) && (table = c.delete(:table))
             opts = {}
             opts[:name] = constraint_name
-            [:key, :on_delete, :on_update, :deferrable].each{|k| opts[k] = c[k]}
+            fk_opt_keys.each{|k| opts[k] = c[k]}
             generator.foreign_key([c[:name]], table, opts)
           end
           if (constraint_name = c.delete(:unique_constraint_name)) && c.delete(:unique)
