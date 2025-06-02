@@ -1,3 +1,9 @@
+=== master
+
+* Consider all unique constraints when marking columns as non-NULL on DB2 (jeremyevans)
+
+* Numerous minor performance improvements, mostly from rubocop-performance (jeremyevans)
+
 === 5.93.0 (2025-06-01)
 
 * Add support to Dataset#explain for all PostgreSQL EXPLAIN options (jeremyevans)
