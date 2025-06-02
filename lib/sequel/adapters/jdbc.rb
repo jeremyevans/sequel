@@ -305,17 +305,31 @@ module Sequel
         m = output_identifier_meth
         schema, table = metadata_schema_and_table(table, opts)
         foreign_keys = {}
+
         metadata(:getImportedKeys, nil, schema, table) do |r|
-          if fk = foreign_keys[r[:fk_name]]
-            fk[:columns] << [r[:key_seq], m.call(r[:fkcolumn_name])]
-            fk[:key] << [r[:key_seq], m.call(r[:pkcolumn_name])]
-          elsif r[:fk_name]
-            foreign_keys[r[:fk_name]] = {:name=>m.call(r[:fk_name]), :columns=>[[r[:key_seq], m.call(r[:fkcolumn_name])]], :table=>m.call(r[:pktable_name]), :key=>[[r[:key_seq], m.call(r[:pkcolumn_name])]]}
+          next unless fk_name = r[:fk_name]
+
+          key_seq = r[:key_seq]
+          columns = [key_seq, m.call(r[:fkcolumn_name])]
+          key = [key_seq, m.call(r[:pkcolumn_name])]
+
+          if fk = foreign_keys[fk_name]
+            fk[:columns] << columns
+            fk[:key] << key
+          else
+            foreign_keys[fk_name] = {
+              :name=>m.call(fk_name),
+              :columns=>[columns],
+              :table=>m.call(r[:pktable_name]),
+              :key=>[key]
+            }
           end
         end
+
+        fk_keys = [:columns, :key]
         foreign_keys.values.each do |fk|
-          [:columns, :key].each do |k|
-            fk[k] = fk[k].sort.map{|_, v| v}
+          fk_keys.each do |k|
+            fk[k].sort!.map!{|_, v| v}
           end
         end
       end
