@@ -403,7 +403,7 @@ module Sequel
       when -1, 0
         vr.instance_exec(&block)
       else
-        block.call(vr)
+        yield(vr)
       end  
     end
 

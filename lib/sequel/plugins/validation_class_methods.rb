@@ -208,7 +208,7 @@ module Sequel
               next if an && Array(v).all?(&:nil?)
               next if ab && Array(v).all?(&blank_meth)
               next if am && Array(a).all?{|x| !o.values.has_key?(x)}
-              block.call(o,a,v)
+              yield(o, a, v)
             end
           else
             block

@@ -59,7 +59,7 @@ describe "Serialization plugin" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc
     @c.load({:id=>1}).set(:abc=>{}).save(:validate=>false)
-    DB.sqls.last.gsub("\n", '').must_equal "UPDATE items SET abc = '--- {}' WHERE (id = 1)"
+    DB.sqls.last.delete("\n").must_equal "UPDATE items SET abc = '--- {}' WHERE (id = 1)"
   end
 
   it "should allow serializing attributes to yaml" do

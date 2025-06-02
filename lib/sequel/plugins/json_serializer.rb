@@ -370,9 +370,9 @@ module Sequel
         end
 
         # Convert the receiver to a JSON data structure using the given arguments.
-        def to_json_data(*args, &block)
-          if block
-            to_json(*args){|x| return block.call(x)}
+        def to_json_data(*args)
+          if defined?(yield)
+            to_json(*args){|x| return yield(x)}
           else
             to_json(*args){|x| return x}
           end

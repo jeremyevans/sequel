@@ -60,9 +60,7 @@ module Sequel
     def external_caller_for_log
       ignore = caller_logging_ignore
       c = caller.find do |line|
-        !(line.start_with?(SEQUEL_LIB_PATH) ||
-          line.start_with?(RUBY_STDLIB) ||
-          line.start_with?(INTERNAL) ||
+        !(line.start_with?(SEQUEL_LIB_PATH, RUBY_STDLIB, INTERNAL) ||
           (ignore && line =~ ignore))
       end
 

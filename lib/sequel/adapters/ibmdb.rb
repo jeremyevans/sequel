@@ -324,7 +324,7 @@ module Sequel
         when Numeric
           v.to_s
         when Date, Time
-          literal(v).gsub("'", '')
+          literal(v).delete("'")
         else
           v
         end

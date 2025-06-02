@@ -281,7 +281,7 @@ module Sequel
           fetch_ado_schema(:columns, [nil,nil,table_name.to_s,nil]) do |row| 
             rows << AdoSchema::Column.new(row)
           end
-          rows.sort!{|a,b| a["ORDINAL_POSITION"] <=> b["ORDINAL_POSITION"]}
+          rows.sort_by! { |a| a["ORDINAL_POSITION"] }
         end
         
         def ado_schema_foreign_keys(table_name)
@@ -289,7 +289,7 @@ module Sequel
           fetch_ado_schema(:foreign_keys, [nil,nil,nil,nil,nil,table_name.to_s]) do |row| 
             rows << row
           end
-          rows.sort!{|a,b| a["ORDINAL"] <=> b["ORDINAL"]}
+          rows.sort_by! { |a| a["ORDINAL"] }
         end
         
         def fetch_ado_schema(type, criteria=[])

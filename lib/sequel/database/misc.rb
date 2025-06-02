@@ -36,13 +36,13 @@ module Sequel
 
     # Register a hook that will be run when a new Database is instantiated. It is
     # called with the new database handle.
-    def self.after_initialize(&block)
-      raise Error, "must provide block to after_initialize" unless block
+    def self.after_initialize
+      raise Error, "must provide block to after_initialize" unless defined?(yield)
       Sequel.synchronize do
         previous = @initialize_hook
         @initialize_hook = proc do |db|
           previous.call(db)
-          block.call(db)
+          yield(db)
         end
       end
     end

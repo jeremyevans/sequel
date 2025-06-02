@@ -4192,7 +4192,7 @@ describe 'PostgreSQL' do
       @db.get(jo.extract('b').extract('c')).must_equal 2
       @db.get(jo.extract('b', 'c')).must_equal 2
       @db.get(jo.extract('b', 'd', 'e')).must_equal 3
-      @db.get(jo.extract_text('b', 'd')).gsub(' ', '').must_equal '{"e":3}'
+      @db.get(jo.extract_text('b', 'd')).delete(' ').must_equal '{"e":3}'
       @db.get(jo.extract_text('b', 'd', 'e')).must_equal '3'
 
       @db.get(ja.array_length).must_equal 3
@@ -4202,7 +4202,7 @@ describe 'PostgreSQL' do
       @db.from(jo.each).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each).order(:key).select_map(:value).must_equal [1, {'c'=>2, 'd'=>{'e'=>3}}]
       @db.from(jo.each_text).select_order_map(:key).must_equal %w'a b'
-      @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').must_match(/\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/)
+      @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).delete(' ').must_match(/\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/)
 
       Sequel.extension :pg_row_ops
       @db.create_table!(:items) do
@@ -4220,7 +4220,7 @@ describe 'PostgreSQL' do
     it "9.4 #{json_type} operations/functions with pg_json_ops" do
       @db.get(jo.typeof).must_equal 'object'
       @db.get(ja.typeof).must_equal 'array'
-      @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.must_equal ['2', '3', '["a","b"]']
+      @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.delete(' ')}.must_equal ['2', '3', '["a","b"]']
       @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).must_equal [1]
       @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [[:a, Integer], [:b, Integer]])).select_map(:a).must_equal [1]
 

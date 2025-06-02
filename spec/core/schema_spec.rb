@@ -572,7 +572,7 @@ describe "DB#create_table" do
   end
 
   it "should ignore errors if the database raises an error on an index creation statement and the :ignore_index_errors option is used" do
-    @db.define_singleton_method(:execute_ddl){|*a| raise Sequel::DatabaseError if /blah/.match(a.first); super(*a)}
+    @db.define_singleton_method(:execute_ddl){|*a| raise Sequel::DatabaseError if /blah/ =~ a.first; super(*a)}
     lambda{@db.create_table(:cats){Integer :id; index :blah; index :id}}.must_raise(Sequel::DatabaseError)
     @db.sqls.must_equal ['CREATE TABLE cats (id integer)']
     @db.create_table(:cats, :ignore_index_errors=>true){Integer :id; index :blah; index :id}
@@ -580,14 +580,14 @@ describe "DB#create_table" do
   end
 
   it "should not use savepoints around index creation if running inside a transaction if :ignore_index_errors option is used" do
-    @db.define_singleton_method(:execute_ddl){|*a| super(*a); raise Sequel::DatabaseError if /blah/.match(a.first)}
+    @db.define_singleton_method(:execute_ddl){|*a| super(*a); raise Sequel::DatabaseError if /blah/ =~ a.first}
     @db.transaction{@db.create_table(:cats, :ignore_index_errors=>true){Integer :id; index :blah; index :id}}
     @db.sqls.must_equal ["BEGIN", "CREATE TABLE cats (id integer)", "CREATE INDEX cats_blah_index ON cats (blah)", "CREATE INDEX cats_id_index ON cats (id)", "COMMIT"]
   end
 
   it "should use savepoints around index creation if running inside a transaction if :ignore_index_errors option is used and transactional schema modifications are supported" do
     @db.define_singleton_method(:supports_transactional_ddl?){true}
-    @db.define_singleton_method(:execute_ddl){|*a| super(*a); raise Sequel::DatabaseError if /blah/.match(a.first)}
+    @db.define_singleton_method(:execute_ddl){|*a| super(*a); raise Sequel::DatabaseError if /blah/ =~ a.first}
     @db.transaction{@db.create_table(:cats, :ignore_index_errors=>true){Integer :id; index :blah; index :id}}
     @db.sqls.must_equal ["BEGIN", "CREATE TABLE cats (id integer)", "SAVEPOINT autopoint_1", "CREATE INDEX cats_blah_index ON cats (blah)", "ROLLBACK TO SAVEPOINT autopoint_1", "SAVEPOINT autopoint_1", "CREATE INDEX cats_id_index ON cats (id)", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
   end

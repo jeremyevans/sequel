@@ -302,7 +302,7 @@ module Sequel
 
       # A name to use for the backup table
       def backup_table_name(table, opts=OPTS)
-        table = table.gsub('`', '')
+        table = table.delete('`')
         (opts[:times]||1000).times do |i|
           table_name = "#{table}_backup#{i}"
           return table_name unless table_exists?(table_name)

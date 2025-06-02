@@ -97,9 +97,7 @@ module Sequel
       def provenance_source
         ignore = db.opts[:provenance_caller_ignore]
         caller.find do |line|
-          !(line.start_with?(SEQUEL_LIB_PATH) ||
-            line.start_with?(RUBY_STDLIB) ||
-            line.start_with?(INTERNAL) ||
+          !(line.start_with?(SEQUEL_LIB_PATH, RUBY_STDLIB, INTERNAL) ||
             (ignore && line =~ ignore))
         end
       end

@@ -1339,7 +1339,7 @@ module Sequel
     # SQL fragment specifying a JOIN type, converts underscores to
     # spaces and upcases.
     def join_type_sql(join_type)
-      "#{join_type.to_s.gsub('_', ' ').upcase} JOIN"
+      "#{join_type.to_s.tr('_', ' ').upcase} JOIN"
     end
 
     # Append USING clause for JOIN USING

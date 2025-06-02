@@ -12,7 +12,7 @@ describe "optimistic_locking plugin" do
         name, nlv = $1 == 'name' ? [$2, $3] : [$3, $2]
         m = h[$4.to_i]
         if m && m[:lock_version] == $5.to_i
-          m.merge!(:name=>name.gsub("'", ''), :lock_version=>nlv.to_i)
+          m.merge!(:name=>name.delete("'"), :lock_version=>nlv.to_i)
           1
         else
           0

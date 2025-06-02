@@ -269,7 +269,7 @@ module Sequel
     def column_schema_to_ruby_default(default, type)
       return default unless default.is_a?(String)
       if COLUMN_SCHEMA_DATETIME_TYPES.include?(type)
-        if /now|today|CURRENT|getdate|\ADate\(\)\z/i.match(default)
+        if /now|today|CURRENT|getdate|\ADate\(\)\z/i =~ default
           if type == :date
             return Sequel::CURRENT_DATE
           else
