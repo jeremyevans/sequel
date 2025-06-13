@@ -182,6 +182,7 @@ module Sequel
       # :deferrable :: Whether the CHECK constraint should be marked DEFERRABLE.
       #
       # PostgreSQL specific options:
+      # :not_enforced :: Whether the CHECK constraint should be marked NOT ENFORCED.
       # :not_valid :: Whether the CHECK constraint should be marked NOT VALID.
       def constraint(name, *args, &block)
         opts = name.is_a?(Hash) ? name : {:name=>name}
@@ -201,9 +202,18 @@ module Sequel
       #
       # :foreign_key_constraint_name :: The name to give the foreign key constraint
       #
+      # PostgreSQL specific options:
+      #
+      # :not_enforced :: Whether the foreign key constraint should be marked NOT ENFORCED.
+      #
       # If you want a foreign key constraint without adding a column (usually because it is a
-      # composite foreign key), you can provide an array of columns as the first argument, and
-      # you can provide the :name option to name the constraint:
+      # composite foreign key), you can provide an array of columns as the first argument.
+      # This changes the method to accept constraint options instead of column options.
+      # You can provide the :name option to name the constraint.
+      #
+      # PostgreSQL specific options:
+      #
+      # :not_enforced :: Whether the foreign key constraint should be marked NOT ENFORCED.
       #
       #   foreign_key([:artist_name, :artist_location], :artists, name: :artist_fk)
       #   # ADD CONSTRAINT artist_fk FOREIGN KEY (artist_name, artist_location) REFERENCES artists

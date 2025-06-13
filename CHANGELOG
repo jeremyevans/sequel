@@ -1,5 +1,7 @@
 === master
 
+* Support :not_enforced check and foreign key constraint option for NOT ENFORCED on PostgreSQL 18+ (jeremyevans)
+
 * Support :primary_key and :unique column options accepting hash value for constraint options (jeremyevans)
 
 * Consider all unique constraints when marking columns as non-NULL on DB2 (jeremyevans)

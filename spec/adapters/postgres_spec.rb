@@ -1350,6 +1350,22 @@ describe "A PostgreSQL dataset" do
     @db.alter_table(:atest){validate_constraint :atest_check}
   end if DB.server_version >= 90200
 
+  it "should support adding foreign key constraints that are not enforced" do
+    @db.create_table!(:atest){primary_key :id; Integer :fk}
+    @db[:atest].insert(1, 5)
+    @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_enforced=>true, :name=>:atest_fk}
+    @db[:atest].insert(3, 4)
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public}]
+  end if DB.server_version >= 180000
+
+  it "should support adding check constraints that are not enforced" do
+    @db.create_table!(:atest){Integer :a}
+    @db[:atest].insert(5)
+    @db.alter_table(:atest){add_constraint({:name=>:atest_check, :not_enforced=>true}){a >= 10}}
+    @db[:atest].insert(6)
+    @db.check_constraints(:atest).must_equal(atest_check: {definition: "CHECK ((a >= 10)) NOT ENFORCED", columns: [:a]}) 
+  end if DB.server_version >= 180000
+
   it "should support :using when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
     @db[:atest].insert(1262404000)

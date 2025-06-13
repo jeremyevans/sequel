@@ -1269,7 +1269,7 @@ module Sequel
         sqls
       end
 
-      # Handle exclusion constraints.
+      # Handle PostgreSQL-specific constraint features.
       def constraint_definition_sql(constraint)
         case type = constraint[:type]
         when :exclude
@@ -1293,10 +1293,20 @@ module Sequel
           end
         else # when :foreign_key, :check
           sql = super
+          if constraint[:not_enforced]
+            sql << " NOT ENFORCED"
+          end
           if constraint[:not_valid]
             sql << " NOT VALID"
           end
           sql
+        end
+      end
+
+      def column_definition_add_references_sql(sql, column)
+        super
+        if column[:not_enforced]
+          sql << " NOT ENFORCED"
         end
       end
 
