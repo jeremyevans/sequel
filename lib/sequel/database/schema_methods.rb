@@ -605,32 +605,41 @@ module Sequel
       end
     end
 
-    # Add primary key SQL fragment to column creation SQL.
+    # Add primary key SQL fragment to column creation SQL if column is a primary key.
     def column_definition_primary_key_sql(sql, column)
-      if column[:primary_key]
-        constraint = column_definition_constraint_hash(column, :primary_key)
-        append_named_constraint_prefix_sql(sql, constraint[:name])
-        sql << " " << primary_key_constraint_sql_fragment(constraint)
-        constraint_deferrable_sql_append(sql, constraint[:deferrable])
-      end
+      column_definition_add_primary_key_sql(sql, column) if column[:primary_key]
+    end
+
+    # Add primary key SQL fragment to column creation SQL (column should be a primary key).
+    def column_definition_add_primary_key_sql(sql, column)
+      constraint = column_definition_constraint_hash(column, :primary_key)
+      append_named_constraint_prefix_sql(sql, constraint[:name])
+      sql << " " << primary_key_constraint_sql_fragment(constraint)
+      constraint_deferrable_sql_append(sql, constraint[:deferrable])
     end
     
-    # Add foreign key reference SQL fragment to column creation SQL.
+    # Add foreign key reference SQL fragment to column creation SQL if column is a foreign key.
     def column_definition_references_sql(sql, column)
-      if column[:table]
-        append_named_constraint_prefix_sql(sql, column[:foreign_key_constraint_name])
-        sql << column_references_column_constraint_sql(column)
-      end
+      column_definition_add_references_sql(sql, column) if column[:table]
+    end
+
+    # Add foreign key reference SQL fragment to column creation SQL (column should be a foreign key).
+    def column_definition_add_references_sql(sql, column)
+      append_named_constraint_prefix_sql(sql, column[:foreign_key_constraint_name])
+      sql << column_references_column_constraint_sql(column)
     end
     
-    # Add unique constraint SQL fragment to column creation SQL.
+    # Add unique constraint SQL fragment to column creation SQL if column has a unique constraint.
     def column_definition_unique_sql(sql, column)
-      if column[:unique]
-        constraint = column_definition_constraint_hash(column, :unique)
-        append_named_constraint_prefix_sql(sql, constraint[:name])
-        sql << ' ' << unique_constraint_sql_fragment(constraint)
-        constraint_deferrable_sql_append(sql, constraint[:deferrable])
-      end
+      column_definition_add_unique_sql(sql, column) if column[:unique]
+    end
+
+    # Add unique constraint SQL fragment to column creation SQL (column should have unique constraint).
+    def column_definition_add_unique_sql(sql, column)
+      constraint = column_definition_constraint_hash(column, :unique)
+      append_named_constraint_prefix_sql(sql, constraint[:name])
+      sql << ' ' << unique_constraint_sql_fragment(constraint)
+      constraint_deferrable_sql_append(sql, constraint[:deferrable])
     end
 
     # Add the name of the constraint to the column creation SQL.
