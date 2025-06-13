@@ -608,20 +608,17 @@ module Sequel
     # Add primary key SQL fragment to column creation SQL.
     def column_definition_primary_key_sql(sql, column)
       if column[:primary_key]
-        if name = column[:primary_key_constraint_name]
-          sql << " CONSTRAINT #{quote_identifier(name)}"
-        end
-        sql << " " << primary_key_constraint_sql_fragment(column)
-        constraint_deferrable_sql_append(sql, column[:primary_key_deferrable])
+        constraint = column_definition_constraint_hash(column, :primary_key)
+        append_named_constraint_prefix_sql(sql, constraint[:name])
+        sql << " " << primary_key_constraint_sql_fragment(constraint)
+        constraint_deferrable_sql_append(sql, constraint[:deferrable])
       end
     end
     
     # Add foreign key reference SQL fragment to column creation SQL.
     def column_definition_references_sql(sql, column)
       if column[:table]
-        if name = column[:foreign_key_constraint_name]
-         sql << " CONSTRAINT #{quote_identifier(name)}"
-        end
+        append_named_constraint_prefix_sql(sql, column[:foreign_key_constraint_name])
         sql << column_references_column_constraint_sql(column)
       end
     end
@@ -629,12 +626,33 @@ module Sequel
     # Add unique constraint SQL fragment to column creation SQL.
     def column_definition_unique_sql(sql, column)
       if column[:unique]
-        if name = column[:unique_constraint_name]
-          sql << " CONSTRAINT #{quote_identifier(name)}"
-        end
-        sql << ' ' << unique_constraint_sql_fragment(column)
-        constraint_deferrable_sql_append(sql, column[:unique_deferrable])
+        constraint = column_definition_constraint_hash(column, :unique)
+        append_named_constraint_prefix_sql(sql, constraint[:name])
+        sql << ' ' << unique_constraint_sql_fragment(constraint)
+        constraint_deferrable_sql_append(sql, constraint[:deferrable])
       end
+    end
+
+    # Add the name of the constraint to the column creation SQL.
+    def append_named_constraint_prefix_sql(sql, name)
+      sql << " CONSTRAINT #{quote_identifier(name)}" if name
+    end
+
+    # Return a hash of constraint options for the primary key or column
+    # unique constraint.
+    def column_definition_constraint_hash(column, prefix)
+      constraint = column[prefix]
+      constraint = constraint.is_a?(Hash) ? constraint.dup : {}
+
+      if name = column[:"#{prefix}_constraint_name"]
+        constraint[:name] = name
+      end
+
+      if column.has_key?(:"#{prefix}_deferrable")
+        constraint[:deferrable] = column[:"#{prefix}_deferrable"]
+      end
+
+      constraint
     end
     
     # SQL for all given columns, used inside a CREATE TABLE block.
@@ -741,10 +759,16 @@ module Sequel
             fk_opt_keys.each{|k| opts[k] = c[k]}
             generator.foreign_key([c[:name]], table, opts)
           end
-          if (constraint_name = c.delete(:unique_constraint_name)) && c.delete(:unique)
+
+          if c[:unique].is_a?(Hash) && c[:unique][:name]
+            generator.unique(c[:name], c.delete(:unique))
+          elsif (constraint_name = c.delete(:unique_constraint_name)) && c.delete(:unique)
             generator.unique(c[:name], :name=>constraint_name)
           end
-          if (constraint_name = c.delete(:primary_key_constraint_name)) && c.delete(:primary_key)
+
+          if c[:primary_key].is_a?(Hash) && c[:primary_key][:name]
+            generator.primary_key([c[:name]], c.delete(:primary_key))
+          elsif (constraint_name = c.delete(:primary_key_constraint_name)) && c.delete(:primary_key)
             generator.primary_key([c[:name]], :name=>constraint_name)
           end
         end

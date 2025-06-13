@@ -456,7 +456,7 @@ module Sequel
               [pk]
             elsif !(pkc = generator.constraints.select{|con| con[:type] == :primary_key}).empty?
               pkc.first[:columns]
-            elsif !(pkc = generator.columns.select{|con| con[:primary_key] == true}).empty?
+            elsif !(pkc = generator.columns.select{|con| con[:primary_key]}).empty?
               pkc.map{|c| c[:name]}
             end
           else

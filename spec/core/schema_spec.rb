@@ -210,6 +210,15 @@ describe "DB#create_table" do
     @db.sqls.must_equal ['CREATE TABLE cats (id integer AUTOINCREMENT, cat_id integer, CONSTRAINT foo PRIMARY KEY (id), CONSTRAINT baz FOREIGN KEY (cat_id) REFERENCES cats(foo_id) ON DELETE CASCADE ON UPDATE RESTRICT DEFERRABLE INITIALLY DEFERRED, CONSTRAINT bar UNIQUE (cat_id))']
   end
 
+  it "should handling splitting named column constraints into table constraints if unsupported using :primary_key and :unique options with hash values" do
+    def @db.supports_named_column_constraints?; false end
+    @db.create_table(:cats) do
+      primary_key :id, :primary_key=>{:name=>:foo, :deferrable=>true}
+      foreign_key :cat_id, :cats, :unique=>{:name=>:bar, :deferrable=>true}, :foreign_key_constraint_name=>:baz, :deferrable=>true, :key=>:foo_id, :on_delete=>:cascade, :on_update=>:restrict
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (id integer AUTOINCREMENT, cat_id integer, CONSTRAINT foo PRIMARY KEY (id) DEFERRABLE INITIALLY DEFERRED, CONSTRAINT baz FOREIGN KEY (cat_id) REFERENCES cats(foo_id) ON DELETE CASCADE ON UPDATE RESTRICT DEFERRABLE INITIALLY DEFERRED, CONSTRAINT bar UNIQUE (cat_id) DEFERRABLE INITIALLY DEFERRED)']
+  end
+
   it "should accept and literalize default values" do
     @db.create_table(:cats) do
       integer :id, :default => 123
@@ -294,6 +303,26 @@ describe "DB#create_table" do
       integer :j, :primary_key=>true, :primary_key_deferrable=>false
     end
     @db.sqls.must_equal ["CREATE TABLE cats (id integer PRIMARY KEY DEFERRABLE INITIALLY DEFERRED, i integer PRIMARY KEY DEFERRABLE INITIALLY IMMEDIATE, j integer PRIMARY KEY NOT DEFERRABLE)"]
+  end
+  
+  it "should handle :unique option with hash value for options for unique constraint" do
+    @db.create_table(:cats) do
+      integer :id, :unique=>{:name=>:u1, :deferrable=>true}
+      integer :i, :unique=>{:name=>:u2, :deferrable=>:immediate}
+      integer :j, :unique=>{:deferrable=>false}
+      integer :k, :unique=>{:name=>:u3}
+    end
+    @db.sqls.must_equal ["CREATE TABLE cats (id integer CONSTRAINT u1 UNIQUE DEFERRABLE INITIALLY DEFERRED, i integer CONSTRAINT u2 UNIQUE DEFERRABLE INITIALLY IMMEDIATE, j integer UNIQUE NOT DEFERRABLE, k integer CONSTRAINT u3 UNIQUE)"]
+  end
+  
+  it "should handle :primary_key option with hash value for options for primary key constraint" do
+    @db.create_table(:cats) do
+      integer :id, :primary_key=>{:name=>:p1, :deferrable=>true}
+      integer :i, :primary_key=>{:name=>:p2, :deferrable=>:immediate}
+      integer :j, :primary_key=>{:deferrable=>false}
+      integer :k, :primary_key=>{:name=>:p3}
+    end
+    @db.sqls.must_equal ["CREATE TABLE cats (id integer CONSTRAINT p1 PRIMARY KEY DEFERRABLE INITIALLY DEFERRED, i integer CONSTRAINT p2 PRIMARY KEY DEFERRABLE INITIALLY IMMEDIATE, j integer PRIMARY KEY NOT DEFERRABLE, k integer CONSTRAINT p3 PRIMARY KEY)"]
   end
   
   it "should accept unsigned definition" do

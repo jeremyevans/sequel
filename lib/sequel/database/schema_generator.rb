@@ -126,17 +126,21 @@ module Sequel
       #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :primary_key :: Make the column as a single primary key column.  This should not
       #                 be used if you want a single autoincrementing primary key column
-      #                 (use the primary_key method in that case).
-      # :primary_key_constraint_name :: The name to give the primary key constraint
-      # :primary_key_deferrable :: Similar to :deferrable, but for the primary key constraint
-      #                            if :primary_key is used.
+      #                 (use the primary_key method in that case).  Can be a hash to provide
+      #                 options for the constraint:
+      #                 :name :: The name to give the primary key constraint.
+      #                 :deferrable :: Sets whether the primary key constraint is deferrable.
+      # :primary_key_constraint_name :: Older option to name primary key constraint.
+      # :primary_key_deferrable :: Older option to set primary key constraint as deferrable.
       # :type :: Overrides the type given as the argument.  Generally not used by column
       #          itself, but can be passed as an option to other methods that call column.
       # :unique :: Mark the column as unique, generally has the same effect as
-      #            creating a unique index on the column.
-      # :unique_constraint_name :: The name to give the unique key constraint
-      # :unique_deferrable :: Similar to :deferrable, but for the unique constraint if :unique
-      #                       is used.
+      #            creating a unique index on the column. Can be a hash to provide options for
+      #            the constraint:
+      #            :name :: The name to give the unique constraint.
+      #            :deferrable :: Sets whether the unique constraint is deferrable.
+      # :unique_constraint_name :: Older option to name unique constraint.
+      # :unique_deferrable :: Older option to set unique constraint as deferrable.
       #
       # PostgreSQL specific options:
       #

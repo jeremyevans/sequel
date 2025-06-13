@@ -611,6 +611,13 @@ describe "Database schema modifiers" do
     @db.alter_table(:items2){drop_constraint :foo_pk, :type=>:primary_key}
   end
 
+  it "should be able to specify constraint names for column constraints using :primary_key and :unique option hashes" do
+    @db.create_table!(:items2){primary_key :id, :primary_key=>{:name=>:foo_pk}}
+    @db.create_table!(:items){Integer :id, :unique=>{:name=>:foo_uk}, :null=>false}
+    @db.alter_table(:items){drop_constraint :foo_uk, :type=>:unique}
+    @db.alter_table(:items2){drop_constraint :foo_pk, :type=>:primary_key}
+  end
+
   it "should handle foreign keys correctly when creating tables" do
     @db.create_table!(:items) do 
       primary_key :id
