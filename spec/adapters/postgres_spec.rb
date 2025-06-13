@@ -1324,7 +1324,7 @@ describe "A PostgreSQL dataset" do
     @db[:atest].select_map(:a).must_equal [1]
   end if DB.server_version >= 90000
 
-  it "should support adding foreign key constarints that are not yet valid, and validating them later" do
+  it "should support adding foreign key constraints that are not yet valid, and validating them later" do
     @db.create_table!(:atest){primary_key :id; Integer :fk}
     @db[:atest].insert(1, 5)
     @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_valid=>true, :name=>:atest_fk}
@@ -1337,7 +1337,7 @@ describe "A PostgreSQL dataset" do
     @db.alter_table(:atest){validate_constraint :atest_fk}
   end if DB.server_version >= 90200
 
-  it "should support adding check constarints that are not yet valid, and validating them later" do
+  it "should support adding check constraints that are not yet valid, and validating them later" do
     @db.create_table!(:atest){Integer :a}
     @db[:atest].insert(5)
     @db.alter_table(:atest){add_constraint({:name=>:atest_check, :not_valid=>true}){a >= 10}}
