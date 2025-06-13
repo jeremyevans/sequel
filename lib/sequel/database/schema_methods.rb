@@ -704,7 +704,7 @@ module Sequel
         check = constraint[:check]
         check = check.first if check.is_a?(Array) && check.length == 1
         check = filter_expr(check)
-        check = "(#{check})" unless check[0..0] == '(' && check[-1..-1] == ')'
+        check = "(#{check})" unless check.start_with?('(') && check.end_with?(')')
         sql << "CHECK #{check}"
       when :primary_key
         sql << "#{primary_key_constraint_sql_fragment(constraint)} #{literal(constraint[:columns])}"
