@@ -335,7 +335,7 @@ module Sequel
         hash = {}
         _check_constraints_ds.where_each(:conrelid=>regclass_oid(table)) do |row|
           constraint = m.call(row[:constraint])
-          entry = hash[constraint] ||= {:definition=>row[:definition], :columns=>[]}
+          entry = hash[constraint] ||= {:definition=>row[:definition], :columns=>[], :validated=>row[:validated], :enforced=>row[:enforced]}
           entry[:columns] << m.call(row[:column]) if row[:column]
         end
         
@@ -900,11 +900,15 @@ module Sequel
 
       # Dataset used to retrieve CHECK constraint information
       def _check_constraints_ds
-        @_check_constraints_ds ||= metadata_dataset.
-          from{pg_constraint.as(:co)}.
-          left_join(Sequel[:pg_attribute].as(:att), :attrelid=>:conrelid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
-          where(:contype=>'c').
-          select{[co[:conname].as(:constraint), att[:attname].as(:column), pg_get_constraintdef(co[:oid]).as(:definition)]}
+        @_check_constraints_ds ||= begin
+          ds = metadata_dataset.
+            from{pg_constraint.as(:co)}.
+            left_join(Sequel[:pg_attribute].as(:att), :attrelid=>:conrelid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+            where(:contype=>'c').
+            select{[co[:conname].as(:constraint), att[:attname].as(:column), pg_get_constraintdef(co[:oid]).as(:definition)]}
+
+          _add_validated_enforced_constraint_columns(ds)
+        end
       end
 
       # Dataset used to retrieve foreign keys referenced by a table
@@ -970,6 +974,10 @@ module Sequel
           ds = ds.order_append(Sequel[:nsp][:nspname], Sequel[:cl2][:relname])
         end
 
+        _add_validated_enforced_constraint_columns(ds)
+      end
+
+      def _add_validated_enforced_constraint_columns(ds)
         validated_cond = if server_version >= 90100
           Sequel[:convalidated]
         else

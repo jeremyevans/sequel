@@ -587,7 +587,7 @@ describe "PostgreSQL", '#create_table' do
       constraint(:jc, Sequel[:j] > 2)
       constraint(:ijc, Sequel[:i] - Sequel[:j] > 2)
     end
-    @db.check_constraints(:tmp_dolls).must_equal(:ic=>{:definition=>"CHECK ((i > 2))", :columns=>[:i]}, :jc=>{:definition=>"CHECK ((j > 2))", :columns=>[:j]}, :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j]})
+    @db.check_constraints(:tmp_dolls).must_equal(:ic=>{:definition=>"CHECK ((i > 2))", :columns=>[:i], validated: true, enforced: true}, :jc=>{:definition=>"CHECK ((j > 2))", :columns=>[:j], validated: true, enforced: true}, :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j], validated: true, enforced: true})
   end
 
   it "should have #check_constraints return check constraints where columns are unknown" do
@@ -601,7 +601,7 @@ describe "PostgreSQL", '#create_table' do
         add_constraint(:valid_tmp_dolls, Sequel.function(:valid_tmp_dolls, :tmp_dolls))
       end
 
-      @db.check_constraints(:tmp_dolls).must_equal(:valid_tmp_dolls=>{:definition=>"CHECK (valid_tmp_dolls(tmp_dolls.*))", :columns=>[]})
+      @db.check_constraints(:tmp_dolls).must_equal(:valid_tmp_dolls=>{:definition=>"CHECK (valid_tmp_dolls(tmp_dolls.*))", :columns=>[], validated: true, enforced: true})
     ensure
       @db.run "ALTER TABLE tmp_dolls DROP CONSTRAINT IF EXISTS valid_tmp_dolls"
       @db.run "DROP FUNCTION IF EXISTS valid_tmp_dolls(tmp_dolls)"
@@ -1365,7 +1365,7 @@ describe "A PostgreSQL dataset" do
     @db[:atest].insert(5)
     @db.alter_table(:atest){add_constraint({:name=>:atest_check, :not_enforced=>true}){a >= 10}}
     @db[:atest].insert(6)
-    @db.check_constraints(:atest).must_equal(atest_check: {definition: "CHECK ((a >= 10)) NOT ENFORCED", columns: [:a]}) 
+    @db.check_constraints(:atest).must_equal(atest_check: {definition: "CHECK ((a >= 10)) NOT ENFORCED", columns: [:a], validated: false, enforced: false}) 
   end if DB.server_version >= 180000
 
   it "should support :using when altering a column's type" do

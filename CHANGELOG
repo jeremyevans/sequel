@@ -1,5 +1,7 @@
 === master
 
+* Include :validated and :enforced entries for Database#check_constraints on PostgreSQL (jeremyevans)
+
 * Include :validated and :enforced entries for Database#{,reversed_}foreign_key_list on PostgreSQL (jeremyevans)
 
 * Support :not_enforced check and foreign key constraint option for NOT ENFORCED on PostgreSQL 18+ (jeremyevans)
