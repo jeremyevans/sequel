@@ -601,6 +601,8 @@ module Sequel
               :on_update=>fklod_map[row[:on_update]],
               :on_delete=>fklod_map[row[:on_delete]],
               :deferrable=>row[:deferrable],
+              :validated=>row[:validated],
+              :enforced=>row[:enforced],
               :table=>schema ? SQL::QualifiedIdentifier.new(m.call(row[:schema]), m.call(row[:table])) : m.call(row[:table]),
             }
 
@@ -967,6 +969,20 @@ module Sequel
         if reverse
           ds = ds.order_append(Sequel[:nsp][:nspname], Sequel[:cl2][:relname])
         end
+
+        validated_cond = if server_version >= 90100
+          Sequel[:convalidated]
+        else
+          Sequel.cast(true, TrueClass)
+        end
+        ds = ds.select_append(validated_cond.as(:validated))
+
+        enforced_cond = if server_version >= 180000
+          Sequel[:conenforced]
+        else
+          Sequel.cast(true, TrueClass)
+        end
+        ds = ds.select_append(enforced_cond.as(:enforced))
 
         ds
       end

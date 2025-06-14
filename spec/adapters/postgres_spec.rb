@@ -1123,8 +1123,8 @@ describe "A PostgreSQL database" do
   end
 
   it "should parse foreign keys for tables in a schema" do
-    @db.foreign_key_list(Sequel[:public][:testfk]).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
-    @db.foreign_key_list(Sequel[:public][:testfk], :schema=>false).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>:testfk, :name=>:testfk_i_fkey, :schema=>:public}]
+    @db.foreign_key_list(Sequel[:public][:testfk]).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey, validated: true, enforced: true}]
+    @db.foreign_key_list(Sequel[:public][:testfk], :schema=>false).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>:testfk, :name=>:testfk_i_fkey, :schema=>:public, validated: true, enforced: true}]
   end
 
   it "should return uuid fields as strings" do
@@ -1171,9 +1171,9 @@ describe "A PostgreSQL database " do
       foreign_key [:c, :d], :a, :key=>[:j, :i], :name=>:a_c_d
     end
     DB.foreign_key_list(:a, :reverse=>true).must_equal [
-      {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :schema=>:public},
-      {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public},
-      {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public}]
+      {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :schema=>:public, validated: true, enforced: true},
+      {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public, validated: true, enforced: true},
+      {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public, validated: true, enforced: true}]
   end
 end
 
@@ -1330,11 +1330,13 @@ describe "A PostgreSQL dataset" do
     @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_valid=>true, :name=>:atest_fk}
     @db[:atest].insert(2, 1)
     proc{@db[:atest].insert(3, 4)}.must_raise(Sequel::ForeignKeyConstraintViolation)
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: false, enforced: true}]
 
     proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.must_raise(Sequel::ForeignKeyConstraintViolation)
     @db[:atest].where(:id=>1).update(:fk=>2)
     @db.alter_table(:atest){validate_constraint :atest_fk}
     @db.alter_table(:atest){validate_constraint :atest_fk}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: true, enforced: true}]
   end if DB.server_version >= 90200
 
   it "should support adding check constraints that are not yet valid, and validating them later" do
@@ -1355,7 +1357,7 @@ describe "A PostgreSQL dataset" do
     @db[:atest].insert(1, 5)
     @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_enforced=>true, :name=>:atest_fk}
     @db[:atest].insert(3, 4)
-    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public}]
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: false, enforced: false}]
   end if DB.server_version >= 180000
 
   it "should support adding check constraints that are not enforced" do
@@ -2382,7 +2384,7 @@ describe "Postgres::Database schema qualified tables" do
       h.last.first.must_equal :j
 
       @db.indexes(:schema_test).must_equal(:public_test_sti=>{:unique=>false, :columns=>[:j], :deferrable=>nil})
-      @db.foreign_key_list(:schema_test).must_equal [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey, :schema=>:public}]
+      @db.foreign_key_list(:schema_test).must_equal [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey, :schema=>:public, validated: true, enforced: true}]
     ensure
       @db.drop_table?(Sequel[:public][:schema_test])
     end
