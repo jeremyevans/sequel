@@ -231,8 +231,7 @@ module Sequel
     #
     #   DB[:table].for_update # SELECT * FROM table FOR UPDATE
     def for_update
-       return self if opts[:lock] == :update
-      cached_dataset(:_for_update_ds){lock_style(:update)}
+      cached_lock_style_dataset(:_for_update_ds, :update)
     end
 
     # Returns a copy of the dataset with the source changed. If no
@@ -1460,6 +1459,15 @@ module Sequel
 
         clone(clause => cond)
       end
+    end
+
+    # Internals of for_update and adapter-specific lock methods.
+    # Returns receiver if it already uses this lock style, and a cached
+    # dataset using the given key otherwise. The key could be derived from
+    # the style, but doing so would require allocation, so pass it in as
+    # an argument.
+    def cached_lock_style_dataset(key, style)
+      opts[:lock] == style ? self : cached_dataset(key){lock_style(style)}
     end
 
     # The default :qualify option to use for join tables if one is not specified.
