@@ -1969,7 +1969,8 @@ module Sequel
 
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
       def for_share
-        lock_style(:share)
+        return self if opts[:lock] == :share
+        cached_dataset(:_for_share_ds){lock_style(:share)}
       end
 
       # Run a full text search on PostgreSQL.  By default, searching for the inclusion

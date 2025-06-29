@@ -1543,7 +1543,7 @@ describe "Dataset#distinct" do
 end
 
 if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
-  describe "Dataset#for_update support" do
+  describe "Dataset lock style support" do
     before do
       @db = DB.create_table!(:items) do
         primary_key :id
@@ -1580,14 +1580,16 @@ if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
     end
 
     it "should handle FOR SHARE" do
+      for_share = @ds.for_share
+      for_share.for_share.must_be_same_as for_share
       @ds.insert(:number=>20)
       c, t = nil
       q = Queue.new
       DB.transaction do
-        @ds.for_share.first(:id=>1)
+        for_share.first(:id=>1)
         t = Thread.new do
           DB.transaction do
-            c = @ds.for_share.filter(:id=>1).first
+            c = for_share.filter(:id=>1).first
             q.push nil
           end
         end

@@ -1,5 +1,7 @@
 === master
 
+* Cache Dataset#for_share on PostgreSQL (jeremyevans)
+
 * Include :validated and :enforced entries for Database#check_constraints on PostgreSQL (jeremyevans)
 
 * Include :validated and :enforced entries for Database#{,reversed_}foreign_key_list on PostgreSQL (jeremyevans)
