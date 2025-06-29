@@ -991,15 +991,19 @@ module Sequel
       def _add_validated_enforced_constraint_columns(ds)
         validated_cond = if server_version >= 90100
           Sequel[:convalidated]
+        # :nocov:
         else
           Sequel.cast(true, TrueClass)
+        # :nocov:
         end
         ds = ds.select_append(validated_cond.as(:validated))
 
         enforced_cond = if server_version >= 180000
           Sequel[:conenforced]
+        # :nocov:
         else
           Sequel.cast(true, TrueClass)
+        # :nocov:
         end
         ds = ds.select_append(enforced_cond.as(:enforced))
 
