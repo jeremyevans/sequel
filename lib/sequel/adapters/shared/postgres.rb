@@ -1967,6 +1967,19 @@ module Sequel
         end
       end
 
+      # Return a cloned dataset which will use FOR KEY SHARE to lock returned rows.
+      # Supported on PostgreSQL 9.3+.
+      def for_key_share
+        cached_lock_style_dataset(:_for_key_share_ds, :key_share)
+      end
+
+      # Return a cloned dataset which will use FOR NO KEY UPDATE to lock returned rows.
+      # This is generally a better choice than using for_update on PostgreSQL, unless
+      # you will be deleting the row or modifying a key column. Supported on PostgreSQL 9.3+.
+      def for_no_key_update
+        cached_lock_style_dataset(:_for_no_key_update_ds, :no_key_update)
+      end
+
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
       def for_share
         cached_lock_style_dataset(:_for_share_ds, :share)
@@ -2745,8 +2758,13 @@ module Sequel
       # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
         lock = @opts[:lock]
-        if lock == :share
+        case lock
+        when :share
           sql << ' FOR SHARE'
+        when :no_key_update
+          sql << ' FOR NO KEY UPDATE'
+        when :key_share
+          sql << ' FOR KEY SHARE'
         else
           super
         end

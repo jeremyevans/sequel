@@ -1,5 +1,7 @@
 === master
 
+* Add Dataset#for_no_key_update and #for_key_share on PostgreSQL (jeremyevans)
+
 * Cache Dataset#nolock on Microsoft SQL Server (jeremyevans)
 
 * Cache Dataset#for_share on PostgreSQL and MySQL (jeremyevans)

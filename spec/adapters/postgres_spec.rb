@@ -1543,7 +1543,15 @@ describe "Dataset#distinct" do
 end
 
 if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
-  describe "Dataset lock style support" do
+  update_meths = [:for_update]
+  share_meths = [:for_share]
+
+  if DB.server_version >= 90300
+    update_meths << :for_no_key_update
+    share_meths << :for_key_share
+  end
+
+  describe "Dataset locking support" do
     before do
       @db = DB.create_table!(:items) do
         primary_key :id
@@ -1557,47 +1565,53 @@ if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
       DB.disconnect
     end
 
-    it "should handle FOR UPDATE" do
-      @ds.insert(:number=>20)
-      c, t = nil, nil
-      q = Queue.new
-      DB.transaction do
-        @ds.for_update.first(:id=>1)
-        t = Thread.new do
-          DB.transaction do
-            q.push nil
-            @ds.filter(:id=>1).update(:name=>'Jim')
-            c = @ds.first(:id=>1)
-            q.push nil
+    update_meths.each do |meth|
+      it "##{meth} should lock rows for updating" do
+        ds = @ds.send(meth)
+        ds.send(meth).must_be_same_as ds
+        @ds.insert(:number=>20)
+        c, t = nil, nil
+        q = Queue.new
+        DB.transaction do
+          ds.first(:id=>1)
+          t = Thread.new do
+            DB.transaction do
+              q.push nil
+              @ds.filter(:id=>1).update(:name=>'Jim')
+              c = @ds.first(:id=>1)
+              q.push nil
+            end
           end
+          q.pop
+          @ds.filter(:id=>1).update(:number=>30)
         end
         q.pop
-        @ds.filter(:id=>1).update(:number=>30)
+        t.join
+        c.must_equal(:id=>1, :number=>30, :name=>'Jim')
       end
-      q.pop
-      t.join
-      c.must_equal(:id=>1, :number=>30, :name=>'Jim')
     end
 
-    it "should handle FOR SHARE" do
-      for_share = @ds.for_share
-      for_share.for_share.must_be_same_as for_share
-      @ds.insert(:number=>20)
-      c, t = nil
-      q = Queue.new
-      DB.transaction do
-        for_share.first(:id=>1)
-        t = Thread.new do
-          DB.transaction do
-            c = for_share.filter(:id=>1).first
-            q.push nil
+    share_meths.each do |meth|
+      it "##{meth} should not lock rows for updating" do
+        ds = @ds.send(meth)
+        ds.send(meth).must_be_same_as ds
+        @ds.insert(:number=>20)
+        c, t = nil
+        q = Queue.new
+        DB.transaction do
+          ds.first(:id=>1)
+          t = Thread.new do
+            DB.transaction do
+              c = ds.filter(:id=>1).first
+              q.push nil
+            end
           end
+          q.pop
+          @ds.filter(:id=>1).update(:name=>'Jim')
+          c.must_equal(:id=>1, :number=>20, :name=>nil)
         end
-        q.pop
-        @ds.filter(:id=>1).update(:name=>'Jim')
-        c.must_equal(:id=>1, :number=>20, :name=>nil)
+        t.join
       end
-      t.join
     end
   end
 end
