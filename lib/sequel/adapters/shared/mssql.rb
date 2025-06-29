@@ -705,7 +705,7 @@ module Sequel
 
       # Allows you to do a dirty read of uncommitted data using WITH (NOLOCK).
       def nolock
-        lock_style(:dirty)
+        cached_lock_style_dataset(:_nolock_ds, :dirty)
       end
 
       # Uses OUTER APPLY to join the given table into the current dataset.

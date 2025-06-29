@@ -787,7 +787,7 @@ module Sequel
 
       # Return a cloned dataset which will use LOCK IN SHARE MODE to lock returned rows.
       def for_share
-        lock_style(:share)
+        cached_lock_style_dataset(:_for_share_ds, :share)
       end
 
       # Adds full text filter

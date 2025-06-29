@@ -1,6 +1,8 @@
 === master
 
-* Cache Dataset#for_share on PostgreSQL (jeremyevans)
+* Cache Dataset#nolock on Microsoft SQL Server (jeremyevans)
+
+* Cache Dataset#for_share on PostgreSQL and MySQL (jeremyevans)
 
 * Include :validated and :enforced entries for Database#check_constraints on PostgreSQL (jeremyevans)
 
