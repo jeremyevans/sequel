@@ -1360,12 +1360,45 @@ describe "A PostgreSQL dataset" do
     @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: false, enforced: false}]
   end if DB.server_version >= 180000
 
+  it "should support altering enforcement of foreign key constraints" do
+    @db.create_table!(:atest){primary_key :id; Integer :fk}
+    @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_enforced=>true, :name=>:atest_fk}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: false, enforced: false}]
+    @db.alter_table(:atest){alter_constraint(:atest_fk, :enforced=>true)}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: true, enforced: true}]
+    @db.alter_table(:atest){alter_constraint(:atest_fk, :enforced=>false)}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: false, enforced: false}]
+  end if DB.server_version >= 180000
+
+  it "should support altering deferrability of foreign key constraints" do
+    @db.create_table!(:atest){primary_key :id; Integer :fk}
+    @db.alter_table(:atest){add_foreign_key [:fk], :atest, :name=>:atest_fk}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: true, enforced: true}]
+    @db.alter_table(:atest){alter_constraint(:atest_fk, :deferrable=>true)}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: true, table: :atest, schema: :public, validated: true, enforced: true}]
+    @db.alter_table(:atest){alter_constraint(:atest_fk, :deferrable=>false)}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: true, enforced: true}]
+
+    # Deferrable constraints that are initialially immediate are reported as not deferrable,
+    # because they are not deferred unless SET CONSTRAINTS is used. If this actually 
+    # causes an issue, we can add an :initially_immediate key so the information can be
+    # tracked separately.
+    @db.alter_table(:atest){alter_constraint(:atest_fk, :deferrable=>:immediate)}
+    @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: true, enforced: true}]
+  end if DB.server_version >= 90400
+
   it "should support adding check constraints that are not enforced" do
     @db.create_table!(:atest){Integer :a}
     @db[:atest].insert(5)
     @db.alter_table(:atest){add_constraint({:name=>:atest_check, :not_enforced=>true}){a >= 10}}
     @db[:atest].insert(6)
     @db.check_constraints(:atest).must_equal(atest_check: {definition: "CHECK ((a >= 10)) NOT ENFORCED", columns: [:a], validated: false, enforced: false}) 
+  end if DB.server_version >= 180000
+
+  it "should support altering inheritability of NOT NULL constraints" do
+    @db.run "CREATE TABLE atest (fk INTEGER CONSTRAINT atest_nn NOT NULL)"
+    @db.alter_table(:atest){alter_constraint(:atest_nn, :inherit=>true)}
+    @db.alter_table(:atest){alter_constraint(:atest_nn, :inherit=>false)}
   end if DB.server_version >= 180000
 
   it "should support :using when altering a column's type" do

@@ -141,6 +141,17 @@ module Sequel
         @operations << {:op => :add_constraint, :type => :exclude, :elements => elements}.merge!(opts)
       end
 
+      # Alter an existing constraint.  Options:
+      # :deferrable :: Modify deferrable setting for constraint (PostgreSQL 9.4+):
+      #                true :: DEFERRABLE INITIALLY DEFERRED
+      #                false :: NOT DEFERRABLE
+      #                :immediate :: DEFERRABLE INITIALLY IMMEDIATE
+      # :enforced :: Set true to use ENFORCED, or false to use NOT ENFORCED (PostgreSQL 18+)
+      # :inherit :: Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)
+      def alter_constraint(name, opts=OPTS)
+        @operations << {:op => :alter_constraint, :name => name}.merge!(opts)
+      end
+
       # Validate the constraint with the given name, which should have
       # been added previously with NOT VALID.
       def validate_constraint(name)
@@ -1164,6 +1175,31 @@ module Sequel
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
       end
 
+      def alter_table_alter_constraint_sql(table, op)
+        sql = String.new
+        sql << "ALTER CONSTRAINT #{quote_identifier(op[:name])}"
+        
+        constraint_deferrable_sql_append(sql, op[:deferrable])
+
+        case op[:enforced]
+        when nil
+        when false
+          sql << " NOT ENFORCED"
+        else
+          sql << " ENFORCED"
+        end
+
+        case op[:inherit]
+        when nil
+        when false
+          sql << " NO INHERIT"
+        else
+          sql << " INHERIT"
+        end
+
+        sql
+      end
+
       def alter_table_generator_class
         Postgres::AlterTableGenerator
       end
@@ -1257,9 +1293,9 @@ module Sequel
       end
 
       # PostgreSQL can't combine rename_column operations, and it can combine
-      # the custom validate_constraint operation.
+      # validate_constraint and alter_constraint operations.
       def combinable_alter_table_op?(op)
-        (super || op[:op] == :validate_constraint) && op[:op] != :rename_column
+        (super || op[:op] == :validate_constraint || op[:op] == :alter_constraint) && op[:op] != :rename_column
       end
 
       VALID_CLIENT_MIN_MESSAGES = %w'DEBUG5 DEBUG4 DEBUG3 DEBUG2 DEBUG1 LOG NOTICE WARNING ERROR FATAL PANIC'.freeze.each(&:freeze)

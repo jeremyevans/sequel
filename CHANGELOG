@@ -1,5 +1,7 @@
 === master
 
+* Support ALTER TABLE ALTER CONSTRAINT on PostgreSQL using alter_table alter_constraint method (jeremyevans)
+
 * Add Dataset#for_no_key_update and #for_key_share on PostgreSQL (jeremyevans)
 
 * Cache Dataset#nolock on Microsoft SQL Server (jeremyevans)
