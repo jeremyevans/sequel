@@ -1,93 +1,93 @@
 SEQUEL_ADAPTER_TEST = :postgres
 
-require_relative 'spec_helper'
+                 'spec_helper'
 
-uses_pg = Sequel::Postgres::USES_PG if DB.adapter_scheme == :postgres
+uses_pg = Sequel::Postgres::USES_PG    DB.adapter_scheme == :postgres
 uses_pg_or_jdbc = uses_pg || DB.adapter_scheme == :jdbc
 
 Sequel.extension :pg_extended_date_support
 DB.extension :pg_array, :pg_range, :pg_row, :pg_inet, :pg_json, :pg_enum
-begin
+
   DB.extension :pg_interval
-rescue LoadError
-end
+       LoadError
+
 DB.extension :pg_hstore if DB.type_supported?('hstore')
 DB.extension :pg_multirange if DB.server_version >= 140000
 
-if uses_pg && (auto_parameterize = ENV['SEQUEL_PG_AUTO_PARAMETERIZE'])
-  case auto_parameterize
-  when 'in_array_string'
+   uses_pg && (auto_parameterize = ENV['SEQUEL_PG_AUTO_PARAMETERIZE'])
+       auto_parameterize
+       'in_array_string'
     DB.opts[:treat_string_list_as_text_array] = 't'
     DB.extension :pg_auto_parameterize_in_array
-  when 'in_array'
+       'in_array'
     DB.extension :pg_auto_parameterize_in_array
-  when 'in_array_string_untyped'
+      'in_array_string_untyped'
     DB.opts[:treat_string_list_as_array] = 't'
     DB.extension :pg_auto_parameterize_in_array
-  else
+  
     DB.extension :pg_auto_parameterize
-  end
-end
 
-describe 'PostgreSQL adapter' do
-  before do
+
+
+describe 'PostgreSQL adapter' 
+  before 
     @db = DB
     @db.disconnect
-  end
-  after do
+  
+  after 
     @db.disconnect
-  end
+  
 
-  it "should handle case where status raises PGError" do
-    proc do
-      @db.synchronize do |c|
-        def c.status; raise Sequel::Postgres::PGError end
-        def c.execute_query(*); raise Sequel::Postgres::PGError end
+  it "should handle case where status raises PGError" 
+    
+      @db.synchronize    |c|
+            c.status;       Sequel::Postgres::PGError 
+            c.execute_query(*);      Sequel::Postgres::PGError 
         c.execute('SELECT 1')
-      end
-    end.must_raise Sequel::DatabaseDisconnectError
-  end
+      
+       .must_raise Sequel::DatabaseDisconnectError
+  
 
-  it "should handle case where execute_query returns nil" do
-    @db.synchronize do |c|
-      def c.execute_query(*); super; nil end
+  it "should handle case where execute_query returns nil" 
+    @db.synchronize    |c|
+          c.execute_query(*);     ; 
       c.execute('SELECT 1 AS v'){|v| v.must_be_nil}
-    end
-  end
+    
+  
 
   it "should handle prepared statement case where exec_prepared returns nil" do
-    @db.synchronize do |c|
-      def c.exec_prepared(*); super; nil end
+    @db.synchronize     |c|
+          c.exec_prepared(*);      ; 
       @db['SELECT 1 AS v'].prepare(:all, :test_prepared)
       @db.execute(:test_prepared){|v| v.must_be_nil}
-    end
-  end
+    
+  
 
   it "should handle prepared statement case where same variable is used more than once" do
     @db['SELECT (?::integer + ?::integer) AS v', :$v, :$v].prepare(:single_value, :test_prepared).call(:v=>2).must_equal 4
-  end
-end if uses_pg
+  
+       uses_pg
 
 describe 'A PostgreSQL database' do
-  before do
+  before 
     @db = DB
-  end
-  after do
+  
+  after 
     @db.drop_table?(:test)
-    @db.timezone = nil
+    @db.timezone = 
     Sequel.datetime_class = Time
-  end
+  
 
   it "should return true for table_exists? if table exists but is locked" do
-    begin
+    
       @db.create_table(:test){Integer :id}
       t = []
       @db[:test].lock('ACCESS EXCLUSIVE') do
-        Thread.new do
-          @db.synchronize do
+        Thread.new 
+          @db.synchronize 
             @db.run "SET lock_timeout = 1"
             t << @db.table_exists?(:test)
-          end
+          
          end.join
         Thread.new do
           @db.synchronize do
