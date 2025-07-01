@@ -104,9 +104,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">156</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">157</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">158</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">167</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">168</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -126,9 +126,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-default-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default</span>
-<span class="line-num">202</span>   <span class="ruby-ivar">@default</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">212</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default</span>
+<span class="line-num">213</span>   <span class="ruby-ivar">@default</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">214</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-from'>
@@ -147,9 +147,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-from-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">174</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
-<span class="line-num">175</span>   <span class="ruby-ivar">@from</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">176</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
+<span class="line-num">186</span>   <span class="ruby-ivar">@from</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hash_values'>
@@ -168,9 +168,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-hash_values-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">216</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash_values</span>
-<span class="line-num">217</span>   [<span class="ruby-ivar">@modulus</span>, <span class="ruby-ivar">@remainder</span>]
-<span class="line-num">218</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">227</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash_values</span>
+<span class="line-num">228</span>   [<span class="ruby-ivar">@modulus</span>, <span class="ruby-ivar">@remainder</span>]
+<span class="line-num">229</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-list'>
@@ -189,9 +189,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-list-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">211</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">list</span>
-<span class="line-num">212</span>   <span class="ruby-ivar">@in</span>
-<span class="line-num">213</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">222</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">list</span>
+<span class="line-num">223</span>   <span class="ruby-ivar">@in</span>
+<span class="line-num">224</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-maxvalue'>
@@ -210,9 +210,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-maxvalue-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">maxvalue</span>
-<span class="line-num">169</span>   <span class="ruby-constant">MAXVALUE</span>
-<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">maxvalue</span>
+<span class="line-num">180</span>   <span class="ruby-constant">MAXVALUE</span>
+<span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-minvalue'>
@@ -231,9 +231,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-minvalue-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">162</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">minvalue</span>
-<span class="line-num">163</span>   <span class="ruby-constant">MINVALUE</span>
-<span class="line-num">164</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">minvalue</span>
+<span class="line-num">174</span>   <span class="ruby-constant">MINVALUE</span>
+<span class="line-num">175</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-modulus'>
@@ -252,9 +252,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-modulus-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">190</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modulus</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">191</span>   <span class="ruby-ivar">@modulus</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">192</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modulus</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">202</span>   <span class="ruby-ivar">@modulus</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-partition_type'>
@@ -273,23 +273,23 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-partition_type-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">222</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">partition_type</span>
-<span class="line-num">223</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Unable to determine partition type, multiple different partitioning methods called&quot;</span> <span class="ruby-keyword">if</span> [<span class="ruby-ivar">@from</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@to</span>, <span class="ruby-ivar">@list</span>, <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@remainder</span>, <span class="ruby-ivar">@default</span>].<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
-<span class="line-num">224</span> 
-<span class="line-num">225</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@from</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@to</span>
-<span class="line-num">226</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must call both from and to when creating a partition of a table if calling either&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@from</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@to</span>
-<span class="line-num">227</span>     <span class="ruby-value">:range</span>
-<span class="line-num">228</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@in</span>
-<span class="line-num">229</span>     <span class="ruby-value">:list</span>
-<span class="line-num">230</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@remainder</span>
-<span class="line-num">231</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must call both modulus and remainder when creating a partition of a table if calling either&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@remainder</span>
-<span class="line-num">232</span>     <span class="ruby-value">:hash</span>
-<span class="line-num">233</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@default</span>
-<span class="line-num">234</span>     <span class="ruby-value">:default</span>
-<span class="line-num">235</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">236</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;unable to determine partition type, no partitioning methods called&quot;</span>
-<span class="line-num">237</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">238</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">233</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">partition_type</span>
+<span class="line-num">234</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Unable to determine partition type, multiple different partitioning methods called&quot;</span> <span class="ruby-keyword">if</span> [<span class="ruby-ivar">@from</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@to</span>, <span class="ruby-ivar">@list</span>, <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@remainder</span>, <span class="ruby-ivar">@default</span>].<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+<span class="line-num">235</span> 
+<span class="line-num">236</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@from</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@to</span>
+<span class="line-num">237</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must call both from and to when creating a partition of a table if calling either&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@from</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@to</span>
+<span class="line-num">238</span>     <span class="ruby-value">:range</span>
+<span class="line-num">239</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@in</span>
+<span class="line-num">240</span>     <span class="ruby-value">:list</span>
+<span class="line-num">241</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@remainder</span>
+<span class="line-num">242</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must call both modulus and remainder when creating a partition of a table if calling either&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@remainder</span>
+<span class="line-num">243</span>     <span class="ruby-value">:hash</span>
+<span class="line-num">244</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@default</span>
+<span class="line-num">245</span>     <span class="ruby-value">:default</span>
+<span class="line-num">246</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">247</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;unable to determine partition type, no partitioning methods called&quot;</span>
+<span class="line-num">248</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">249</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-range'>
@@ -308,9 +308,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-range-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">206</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">range</span>
-<span class="line-num">207</span>   [<span class="ruby-ivar">@from</span>, <span class="ruby-ivar">@to</span>]
-<span class="line-num">208</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">217</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">range</span>
+<span class="line-num">218</span>   [<span class="ruby-ivar">@from</span>, <span class="ruby-ivar">@to</span>]
+<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-remainder'>
@@ -329,9 +329,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-remainder-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remainder</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">196</span>   <span class="ruby-ivar">@remainder</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">206</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remainder</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">207</span>   <span class="ruby-ivar">@remainder</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">208</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to'>
@@ -350,9 +350,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
-<span class="line-num">181</span>   <span class="ruby-ivar">@to</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
+<span class="line-num">192</span>   <span class="ruby-ivar">@to</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-values_in'>
@@ -371,9 +371,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-values_in-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
-<span class="line-num">186</span>   <span class="ruby-ivar">@in</span> = <span class="ruby-identifier">v</span>
-<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
+<span class="line-num">197</span>   <span class="ruby-ivar">@in</span> = <span class="ruby-identifier">v</span>
+<span class="line-num">198</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

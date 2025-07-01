@@ -68,7 +68,7 @@ Sequel::Postgres::HStore::DatabaseMethods
 <pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb</span>
 <span class="line-num">137</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)
 <span class="line-num">138</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">139</span>     <span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:parse</span>))
+<span class="line-num">139</span>     <span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:hstore</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-constant">HStore</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">v</span>)}
 <span class="line-num">140</span>     <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:hstore</span>] = <span class="ruby-constant">HStore</span>
 <span class="line-num">141</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">142</span> <span class="ruby-keyword">end</span></pre>

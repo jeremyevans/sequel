@@ -2644,7 +2644,7 @@ Superclass:
 <div class='method public-class' id='method-method-c-after_initialize'>
 <a name='method-c-after_initialize'></a>
 <div class='synopsis'>
-<span class='name'>after_initialize</span><span class='arguments'>(&block)</span>
+<span class='name'>after_initialize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -2657,13 +2657,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-after_initialize-source'>   <span class="ruby-comment"># File lib/sequel/database/misc.rb</span>
-<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">after_initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">40</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must provide block to after_initialize&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block</span>
+<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">after_initialize</span>
+<span class="line-num">40</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must provide block to after_initialize&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
 <span class="line-num">41</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
 <span class="line-num">42</span>     <span class="ruby-identifier">previous</span> = <span class="ruby-ivar">@initialize_hook</span>
 <span class="line-num">43</span>     <span class="ruby-ivar">@initialize_hook</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>
 <span class="line-num">44</span>       <span class="ruby-identifier">previous</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">db</span>)
-<span class="line-num">45</span>       <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">db</span>)
+<span class="line-num">45</span>       <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">db</span>)
 <span class="line-num">46</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">47</span>   <span class="ruby-keyword">end</span>
 <span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>

@@ -45,6 +45,7 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-add_exclusion_constraint">add_exclusion_constraint</a></li>
+<li><a href="#method-i-alter_constraint">alter_constraint</a></li>
 <li><a href="#method-i-validate_constraint">validate_constraint</a></li>
 </ol>
 </div>
@@ -74,6 +75,41 @@ Superclass:
 <span class="line-num">142</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-alter_constraint'>
+<a name='method-i-alter_constraint'></a>
+<div class='synopsis'>
+<span class='name'>alter_constraint</span><span class='arguments'>(name, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Alter an existing constraint.  Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:deferrable </td><td>
+<p>Modify deferrable setting for constraint (PostgreSQL 9.4+):</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>true </td><td>
+<p>DEFERRABLE INITIALLY DEFERRED</p>
+</td></tr><tr><td class='label'>false </td><td>
+<p>NOT DEFERRABLE</p>
+</td></tr><tr><td class='label'>:immediate </td><td>
+<p>DEFERRABLE INITIALLY IMMEDIATE</p>
+</td></tr></tbody></table>
+</td></tr><tr><td class='label'>:enforced </td><td>
+<p>Set true to use ENFORCED, or false to use NOT ENFORCED (PostgreSQL 18+)</p>
+</td></tr><tr><td class='label'>:inherit </td><td>
+<p>Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-alter_constraint-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-alter_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">151</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_constraint</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">152</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:alter_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-validate_constraint'>
 <a name='method-i-validate_constraint'></a>
 <div class='synopsis'>
@@ -90,9 +126,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-validate_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">146</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">147</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}
-<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">157</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">158</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}
+<span class="line-num">159</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

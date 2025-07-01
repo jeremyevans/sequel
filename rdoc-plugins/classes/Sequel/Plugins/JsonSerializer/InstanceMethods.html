@@ -260,7 +260,7 @@ Sequel::Plugins::JsonSerializer::InstanceMethods
 <div class='method public-instance' id='method-method-i-to_json_data'>
 <a name='method-i-to_json_data'></a>
 <div class='synopsis'>
-<span class='name'>to_json_data</span><span class='arguments'>(*args, &block)</span>
+<span class='name'>to_json_data</span><span class='arguments'>(*args)</span>
 
 </div>
 <div class='description'>
@@ -273,9 +273,9 @@ Sequel::Plugins::JsonSerializer::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-to_json_data-source'>    <span class="ruby-comment"># File lib/sequel/plugins/json_serializer.rb</span>
-<span class="line-num">373</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_json_data</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">374</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>
-<span class="line-num">375</span>     <span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">x</span>)}
+<span class="line-num">373</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_json_data</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">374</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>)
+<span class="line-num">375</span>     <span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">x</span>)}
 <span class="line-num">376</span>   <span class="ruby-keyword">else</span>
 <span class="line-num">377</span>     <span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">x</span>}
 <span class="line-num">378</span>   <span class="ruby-keyword">end</span>

@@ -312,7 +312,7 @@ Sequel::MySQL::DatasetMethods
 </a>
 <pre id='method-i-for_share-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>
 <span class="line-num">789</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">for_share</span>
-<span class="line-num">790</span>   <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:share</span>)
+<span class="line-num">790</span>   <span class="ruby-identifier">cached_lock_style_dataset</span>(<span class="ruby-value">:_for_share_ds</span>, <span class="ruby-value">:share</span>)
 <span class="line-num">791</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

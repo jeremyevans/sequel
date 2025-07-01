@@ -82,7 +82,7 @@ Superclass:
 <span class="line-num">14</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)
 <span class="line-num">15</span>   <span class="ruby-identifier">opts</span>[<span class="ruby-value">:username</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>]
 <span class="line-num">16</span>   <span class="ruby-identifier">c</span> = <span class="ruby-constant">TinyTds</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">17</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:cache_rows</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)
+<span class="line-num">17</span>   <span class="ruby-identifier">c</span>.<span class="ruby-identifier">query_options</span>[<span class="ruby-value">:cache_rows</span>] = <span class="ruby-keyword">false</span>
 <span class="line-num">18</span> 
 <span class="line-num">19</span>   <span class="ruby-comment"># SEQUEL6: Default to ansi: true</span>
 <span class="line-num">20</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ansi</span>]

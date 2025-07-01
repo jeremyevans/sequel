@@ -291,7 +291,7 @@ Superclass:
 </a>
 <pre id='method-i-dasherize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
 <span class="line-num">161</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dasherize</span>
-<span class="line-num">162</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&#39;-&#39;</span>)
+<span class="line-num">162</span>   <span class="ruby-identifier">tr</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&#39;-&#39;</span>)
 <span class="line-num">163</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -373,7 +373,7 @@ Superclass:
 </a>
 <pre id='method-i-humanize-source'>    <span class="ruby-comment"># File lib/sequel/extensions/inflector.rb</span>
 <span class="line-num">191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">humanize</span>
-<span class="line-num">192</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/_id$/</span>, <span class="ruby-string">&quot;&quot;</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&quot; &quot;</span>).<span class="ruby-identifier">capitalize</span>
+<span class="line-num">192</span>   <span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/_id$/</span>, <span class="ruby-string">&quot;&quot;</span>).<span class="ruby-identifier">tr</span>(<span class="ruby-string">&#39;_&#39;</span>, <span class="ruby-string">&quot; &quot;</span>).<span class="ruby-identifier">capitalize</span>
 <span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

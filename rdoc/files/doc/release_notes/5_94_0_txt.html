@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.94.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.94.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.94.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2025-07-01 08:25:16 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#for_no_key_update and for_key_share have been added on PostgreSQL.  If you are not deleting a row or modifying a key column in a row, it is recommended to switch existing for_update calls to for_no_key_update, so they don’t take stronger locks than necessary (for_update will block concurrent INSERTs that reference a locked row).</p>
+</li><li>
+<p>Check and foreign key constraints now support a :not_enforced option on PostgreSQL 18+, for using NOT ENFORCED. Constraints that are not enforced serve mostly documentation purposes, but they can be enforced later by altering the constraint.</p>
+</li><li>
+<p>On PostgreSQL, alter_table blocks now support an alter_constraint method, which accepts the following options for altering the constraint:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:deferrable </td><td>
+<p>Modify deferrable setting for constraint (PostgreSQL 9.4+):</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>true </td><td>
+<p>DEFERRABLE INITIALLY DEFERRED</p>
+</td></tr><tr><td class='label'>false </td><td>
+<p>NOT DEFERRABLE</p>
+</td></tr><tr><td class='label'>:immediate </td><td>
+<p>DEFERRABLE INITIALLY IMMEDIATE</p>
+</td></tr></tbody></table>
+</td></tr><tr><td class='label'>:enforced </td><td>
+<p>Set true to use ENFORCED, or false to use NOT ENFORCED (PostgreSQL 18+)</p>
+</td></tr><tr><td class='label'>:inherit </td><td>
+<p>Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)</p>
+</td></tr></tbody></table>
+</li><li>
+<p>Entries in Database#foreign_key_list, reverse_foreign_key_list, and check_constraint arrays on PostgreSQL now include :validated and :enforced entries to indicate whether the constraint is validated and enforced, respectively.</p>
+</li><li>
+<p>:primary_key and :unique column options now support hash values in the schema generators.  Using a hash value allows you to provide column constraint-specific options in the hash.  This currently supports the :name and :deferrable options for both constraint types. Additional options will be supported in the future.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#for_share on PostgreSQL and MySQL now caches the returned dataset, similar to the caching done by for_update.</p>
+</li><li>
+<p>Dataset#nolock on Microsoft SQL Server now caches the returned dataset, similar to the caching done by for_update.</p>
+</li><li>
+<p>Many minor performance improvements have been applied, mostly fixed and/or flagged by rubocop-performance:</p>
+<ul><li>
+<p>sort_by! instead of sort!</p>
+</li><li>
+<p>delete/tr instead of gsub</p>
+</li><li>
+<p>yield instead of block.call</p>
+</li><li>
+<p>start_with? accepts multiple arguments</p>
+</li><li>
+<p>Hash#[]= instead of merge!</p>
+</li><li>
+<p>Array.new instead of Integer#times.map</p>
+</li><li>
+<p>Hoist literal arrays inside loops to before the loop</p>
+</li><li>
+<p>Use block instead of Method#to_proc</p>
+</li><li>
+<p>Use start_with instead of regexp with A</p>
+</li><li>
+<p>Use String#include? instead of =~</p>
+</li></ul>
+</li><li>
+<p>In the jdbc adapter, Database#foreign_key_list has been optimized, reducing the number of allocations.</p>
+</li><li>
+<p>On DB2, multiple UNIQUE constraints on the same table are now handled when automatically marking columns as NOT NULL.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

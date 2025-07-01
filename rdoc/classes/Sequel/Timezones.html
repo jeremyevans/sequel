@@ -1013,7 +1013,7 @@ Sequel::Timezones
 <span class="line-num">403</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">-1</span>, <span class="ruby-value">0</span>
 <span class="line-num">404</span>     <span class="ruby-identifier">vr</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
 <span class="line-num">405</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">406</span>     <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">vr</span>)
+<span class="line-num">406</span>     <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">vr</span>)
 <span class="line-num">407</span>   <span class="ruby-keyword">end</span>  
 <span class="line-num">408</span> <span class="ruby-keyword">end</span></pre>
 </div>

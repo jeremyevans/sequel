@@ -434,7 +434,7 @@ Sequel::MSSQL::DatasetMethods
 </a>
 <pre id='method-i-nolock-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
 <span class="line-num">707</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nolock</span>
-<span class="line-num">708</span>   <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:dirty</span>)
+<span class="line-num">708</span>   <span class="ruby-identifier">cached_lock_style_dataset</span>(<span class="ruby-value">:_nolock_ds</span>, <span class="ruby-value">:dirty</span>)
 <span class="line-num">709</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

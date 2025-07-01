@@ -31,12 +31,35 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2025-06-01 10:10:47 -0700</span>
+<span class='datetime'>2025-07-01 08:25:16 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.94.0+-282025-07-01-29"><a href="doc/release_notes/5_94_0_txt.html">5.94.0</a> (2025-07-01)<span><a href="#label-5.94.0+-282025-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support ALTER TABLE ALTER CONSTRAINT on PostgreSQL using alter_table alter_constraint method (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#for_no_key_update and for_key_share on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#nolock on Microsoft SQL Server (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#for_share on PostgreSQL and MySQL (jeremyevans)</p>
+</li><li>
+<p>Include :validated and :enforced entries for Database#check_constraints on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Include :validated and :enforced entries for Database#{,reversed_}foreign_key_list on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Support :not_enforced check and foreign key constraint option for NOT ENFORCED on PostgreSQL 18+ (jeremyevans)</p>
+</li><li>
+<p>Support :primary_key and :unique column options accepting hash value for constraint options (jeremyevans)</p>
+</li><li>
+<p>Consider all unique constraints when marking columns as non-NULL on DB2 (jeremyevans)</p>
+</li><li>
+<p>Numerous minor performance improvements, mostly from rubocop-performance (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.93.0+-282025-06-01-29"><a href="doc/release_notes/5_93_0_txt.html">5.93.0</a> (2025-06-01)<span><a href="#label-5.93.0+-282025-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Add support to Dataset#explain for all PostgreSQL EXPLAIN options (jeremyevans)</p>
