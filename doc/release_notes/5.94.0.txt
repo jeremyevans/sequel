@@ -1,0 +1,66 @@
+= New Features
+
+* Dataset#for_no_key_update and #for_key_share have been added on
+  PostgreSQL.  If you are not deleting a row or modifying a key
+  column in a row, it is recommended to switch existing #for_update
+  calls to #for_no_key_update, so they don't take stronger locks than
+  necessary (#for_update will block concurrent INSERTs that reference
+  a locked row).
+
+* Check and foreign key constraints now support a :not_enforced option
+  on PostgreSQL 18+, for using NOT ENFORCED. Constraints that are not
+  enforced serve mostly documentation purposes, but they can be
+  enforced later by altering the constraint.
+
+* On PostgreSQL, alter_table blocks now support an alter_constraint
+  method, which accepts the following options for altering the
+  constraint:
+
+  :deferrable :: Modify deferrable setting for constraint
+                 (PostgreSQL 9.4+):
+                 true :: DEFERRABLE INITIALLY DEFERRED
+                 false :: NOT DEFERRABLE
+                 :immediate :: DEFERRABLE INITIALLY IMMEDIATE
+  :enforced :: Set true to use ENFORCED, or false to use NOT ENFORCED
+               (PostgreSQL 18+)
+  :inherit :: Set true to use INHERIT, or false to use NO INHERIT
+              (PostgreSQL 18+)
+
+* Entries in Database#foreign_key_list, #reverse_foreign_key_list,
+  and #check_constraint arrays on PostgreSQL now include :validated
+  and :enforced entries to indicate whether the constraint is
+  validated and enforced, respectively.
+
+* :primary_key and :unique column options now support hash values in
+  the schema generators.  Using a hash value allows you to provide
+  column constraint-specific options in the hash.  This currently
+  supports the :name and :deferrable options for both constraint
+  types. Additional options will be supported in the future.
+
+= Other Improvements
+
+* Dataset#for_share on PostgreSQL and MySQL now caches the returned
+  dataset, similar to the caching done by #for_update.
+
+* Dataset#nolock on Microsoft SQL Server now caches the returned
+  dataset, similar to the caching done by #for_update.
+
+* Many minor performance improvements have been applied, mostly
+  fixed and/or flagged by rubocop-performance:
+
+  * sort_by! instead of sort!
+  * delete/tr instead of gsub
+  * yield instead of block.call
+  * start_with? accepts multiple arguments
+  * Hash#[]= instead of merge!
+  * Array.new instead of Integer#times.map
+  * Hoist literal arrays inside loops to before the loop
+  * Use block instead of Method#to_proc
+  * Use start_with instead of regexp with \A
+  * Use String#include? instead of =~
+
+* In the jdbc adapter, Database#foreign_key_list has been optimized,
+  reducing the number of allocations.
+
+* On DB2, multiple UNIQUE constraints on the same table are now
+  handled when automatically marking columns as NOT NULL.

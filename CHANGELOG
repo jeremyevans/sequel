@@ -1,4 +1,4 @@
-=== master
+=== 5.94.0 (2025-07-01)
 
 * Support ALTER TABLE ALTER CONSTRAINT on PostgreSQL using alter_table alter_constraint method (jeremyevans)
 
