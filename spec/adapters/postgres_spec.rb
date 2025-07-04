@@ -1264,6 +1264,28 @@ describe "A PostgreSQL dataset" do
     proc{@d.lock('BAD'){}}.must_raise Sequel::Error
   end
 
+  it 'supports creating tables with UNIQUE NULLS NOT DISTINCT column constraint' do
+    @db.create_table!(:atest){Integer :id, unique: {nulls_not_distinct: true}}
+    @db[:atest].insert
+    @db[:atest].insert(1)
+    proc{@db[:atest].insert}.must_raise Sequel::UniqueConstraintViolation
+  end if DB.server_version >= 150000
+
+  it 'supports creating tables with UNIQUE NULLS NOT DISTINCT table constraint' do
+    @db.create_table!(:atest){Integer :id; unique :id, nulls_not_distinct: true}
+    @db[:atest].insert
+    @db[:atest].insert(1)
+    proc{@db[:atest].insert}.must_raise Sequel::UniqueConstraintViolation
+  end if DB.server_version >= 150000
+
+  it 'supports adding UNIQUE NULLS NOT DISTINCT to table' do
+    @db.create_table!(:atest){Integer :id}
+    @db.alter_table(:atest){add_unique_constraint :id, nulls_not_distinct: true}
+    @db[:atest].insert
+    @db[:atest].insert(1)
+    proc{@db[:atest].insert}.must_raise Sequel::UniqueConstraintViolation
+  end if DB.server_version >= 150000
+
   it 'supports creating tables with PRIMARY KEY WITHOUT OVERLAPS' do
     @db.create_table!(:atest){int4range :id; int4range :t; primary_key [:id, :t], without_overlaps: true}
     @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(1..5))

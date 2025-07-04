@@ -1,5 +1,7 @@
 === master
 
+* Support :nulls_not_distinct unique option for NULLS NOT DISTINCT on PostgreSQL 15+ (jeremyevans)
+
 * Support :without_overlaps primary_key and unique option for WITHOUT OVERLAPS on PostgreSQL 18+ (jeremyevans)
 
 === 5.94.0 (2025-07-01)

@@ -1897,6 +1897,15 @@ module Sequel
         end
       end
 
+      # Support :nulls_not_distinct option.
+      def unique_constraint_sql_fragment(constraint)
+        if constraint[:nulls_not_distinct]
+          'UNIQUE NULLS NOT DISTINCT'
+        else
+          'UNIQUE'
+        end
+      end
+    
       # PostgreSQL 9.4+ supports views with check option.
       def view_with_check_option_support
         # :nocov:

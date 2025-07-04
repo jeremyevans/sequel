@@ -139,6 +139,8 @@ module Sequel
       #            the constraint:
       #            :name :: The name to give the unique constraint.
       #            :deferrable :: Sets whether the unique constraint is deferrable.
+      #            :nulls_not_distinct :: Use NULLS NOT DISTINCT to setup a constraint where NULL
+      #                                   entries are considered distinct (PostgreSQL 15+)
       # :unique_constraint_name :: Older option to name unique constraint.
       # :unique_deferrable :: Older option to set unique constraint as deferrable.
       #
@@ -368,6 +370,8 @@ module Sequel
       #
       # PostgreSQL specific options:
       #
+      # :nulls_not_distinct :: Use NULLS NOT DISTINCT to setup a constraint where NULL
+      #                        entries are considered distinct (PostgreSQL 15+)
       # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
       #                      on the final column (PostgreSQL 18+, composite unique only).
       def unique(columns, opts = OPTS)
@@ -457,6 +461,8 @@ module Sequel
       #
       # PostgreSQL specific options:
       #
+      # :nulls_not_distinct :: Use NULLS NOT DISTINCT to setup a constraint where NULL
+      #                        entries are considered distinct (PostgreSQL 15+)
       # :using_index :: Use the USING INDEX clause to specify an existing unique index
       # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
       #                      on the final column (PostgreSQL 18+, composite unique constraints only).
