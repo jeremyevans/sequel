@@ -686,11 +686,15 @@ module Sequel
     def column_references_sql(column)
       sql = String.new
       sql << " REFERENCES #{quote_schema_table(column[:table])}"
-      sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(', ')})" if column[:key]
+      column_references_append_key_sql(sql, column) if column[:key]
       sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
       sql << " ON UPDATE #{on_update_clause(column[:on_update])}" if column[:on_update]
       constraint_deferrable_sql_append(sql, column[:deferrable])
       sql
+    end
+
+    def column_references_append_key_sql(sql, column)
+      sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(', ')})"
     end
   
     # SQL fragment for table foreign key references (table constraints)

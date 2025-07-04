@@ -220,6 +220,9 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :not_enforced :: Whether the foreign key constraint should be marked NOT ENFORCED.
+      # :period :: Use PERIOD to setup a constraint where the final column is a range
+      #            or multirange column, and the range or multirange is covered by
+      #            existing ranges in the referenced table (which can be in separate rows).
       #
       #   foreign_key([:artist_name, :artist_location], :artists, name: :artist_fk)
       #   # ADD CONSTRAINT artist_fk FOREIGN KEY (artist_name, artist_location) REFERENCES artists

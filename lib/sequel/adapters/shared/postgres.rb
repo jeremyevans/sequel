@@ -1377,7 +1377,7 @@ module Sequel
             sql << " USING INDEX " << quote_identifier(using_index)
           else
             cols = literal(constraint[:columns])
-            cols = "#{cols[0...-1]} WITHOUT OVERLAPS)" if constraint[:without_overlaps]
+            cols.insert(-2, " WITHOUT OVERLAPS") if constraint[:without_overlaps]
             sql << " " << cols
 
             if include_cols = constraint[:include]
@@ -1405,6 +1405,27 @@ module Sequel
         end
       end
 
+      # Handle :period option
+      def column_references_table_constraint_sql(constraint)
+        sql = String.new
+        sql << "FOREIGN KEY "
+        cols = constraint[:columns]
+        cols = column_references_add_period(cols) if constraint[:period]
+        sql << literal(cols) << column_references_sql(constraint)
+      end
+
+      def column_references_append_key_sql(sql, column)
+        cols = column[:key]
+        cols = column_references_add_period(cols) if column[:period]
+        sql << "(#{cols.map{|x| quote_identifier(x)}.join(', ')})"
+      end
+
+      def column_references_add_period(cols)
+        cols= cols.dup
+        cols[-1] = Sequel.lit("PERIOD #{quote_identifier(cols[-1])}")
+        cols
+      end
+  
       def database_specific_error_class_from_sqlstate(sqlstate)
         if sqlstate == '23P01'
           ExclusionConstraintViolation

@@ -1316,6 +1316,22 @@ describe "A PostgreSQL dataset" do
     proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(9..11))}.must_raise Sequel::Postgres::ExclusionConstraintViolation
   end if DB.server_version >= 180000
 
+  it 'supports using PERIOD in composite foreign key constraints' do
+    @db.create_table!(:atest) do
+      int4range :id
+      int4range :t
+      int4range :id2
+      int4range :t2
+      primary_key [:id, :t], without_overlaps: true
+      foreign_key [:id2, :t2], :atest, period: true, name: "fk1"
+      foreign_key [:id2, :t2], :atest, period: true, name: "fk2", key: [:id, :t]
+    end
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(1..5))
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(6..10))
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(16..20), Sequel.pg_range(1..1), Sequel.pg_range(3..8))
+    proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(21..25), Sequel.pg_range(1..1), Sequel.pg_range(9..12))}.must_raise Sequel::ForeignKeyConstraintViolation
+  end if DB.server_version >= 180000
+
   it "should support exclusion constraints when creating or altering tables" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
     @db[:atest].insert(1)

@@ -1,5 +1,7 @@
 === master
 
+* Support :period foreign_key option for PERIOD on PostgreSQL 18+ (jeremyevans)
+
 * Support :include unique/primary_key/exclude option for INCLUDE on PostgreSQL 11+ (jeremyevans)
 
 * Support :nulls_not_distinct unique option for NULLS NOT DISTINCT on PostgreSQL 15+ (jeremyevans)
