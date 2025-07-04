@@ -736,6 +736,32 @@ describe "PostgreSQL support" do
     @db.sqls.must_equal ["ALTER TABLE \"t\" DROP COLUMN IF EXISTS \"x\" CASCADE"]
   end
 
+  it "should support :include option for unique and primary key constraints" do
+    @db.create_table(:t){Integer :x, :primary_key => {:include => :y}; Integer :y}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("x" integer PRIMARY KEY INCLUDE ("y"), "y" integer)']
+
+    @db.create_table(:t){Integer :x, :unique => {:include => :y}; Integer :y}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("x" integer UNIQUE INCLUDE ("y"), "y" integer)']
+
+    @db.create_table(:t){Integer :x; primary_key [:x], :include => :y; Integer :y}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("x" integer, "y" integer, PRIMARY KEY ("x") INCLUDE ("y"))']
+
+    @db.create_table(:t){Integer :x; unique [:x], {:include => :y}; Integer :y}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("x" integer, "y" integer, UNIQUE ("x") INCLUDE ("y"))']
+
+    @db.alter_table(:t){add_primary_key [:x], :include => :y}
+    @db.sqls.must_equal ['ALTER TABLE "t" ADD PRIMARY KEY ("x") INCLUDE ("y")']
+
+    @db.alter_table(:t){add_unique_constraint [:x], :include => :y}
+    @db.sqls.must_equal ['ALTER TABLE "t" ADD UNIQUE ("x") INCLUDE ("y")']
+
+    @db.create_table(:t){Integer :x; exclude [[Sequel.desc(:x, :nulls=>:last), '=']], :using=>:btree, :where=>proc{x > 0}, :include => [:y]}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("x" integer, EXCLUDE USING btree ("x" DESC NULLS LAST WITH =) INCLUDE ("y") WHERE ("x" > 0))']
+
+    @db.alter_table(:t){add_exclusion_constraint [[Sequel.desc(:x, :nulls=>:last), '=']], :using=>:btree, :where=>proc{x > 0}, :include => [:y], name: "c"}
+    @db.sqls.must_equal ['ALTER TABLE "t" ADD CONSTRAINT "c" EXCLUDE USING btree ("x" DESC NULLS LAST WITH =) INCLUDE ("y") WHERE ("x" > 0)']
+  end
+
   it "should support transaction isolation levels" do
     @db.supports_transaction_isolation_levels?.must_equal true
   end

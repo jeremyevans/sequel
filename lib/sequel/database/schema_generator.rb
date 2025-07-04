@@ -130,6 +130,8 @@ module Sequel
       #                 options for the constraint:
       #                 :name :: The name to give the primary key constraint.
       #                 :deferrable :: Sets whether the primary key constraint is deferrable.
+      #                 :include :: Include additional columns in the underlying index, to
+      #                             allow for index-only scans in more cases (PostgreSQL 11+).
       # :primary_key_constraint_name :: Older option to name primary key constraint.
       # :primary_key_deferrable :: Older option to set primary key constraint as deferrable.
       # :type :: Overrides the type given as the argument.  Generally not used by column
@@ -139,6 +141,8 @@ module Sequel
       #            the constraint:
       #            :name :: The name to give the unique constraint.
       #            :deferrable :: Sets whether the unique constraint is deferrable.
+      #            :include :: Include additional columns in the underlying index, to
+      #                        allow for index-only scans in more cases (PostgreSQL 11+).
       #            :nulls_not_distinct :: Use NULLS NOT DISTINCT to setup a constraint where NULL
       #                                   entries are considered distinct (PostgreSQL 15+)
       # :unique_constraint_name :: Older option to name unique constraint.
@@ -322,6 +326,8 @@ module Sequel
       #
       # PostgreSQL specific options:
       #
+      # :include :: Include additional columns in the underlying index, to
+      #             allow for index-only scans in more cases (PostgreSQL 11+).
       # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
       #                      on the final column (PostgreSQL 18+, composite primary keys only).
       # 
@@ -370,6 +376,8 @@ module Sequel
       #
       # PostgreSQL specific options:
       #
+      # :include :: Include additional columns in the underlying index, to
+      #             allow for index-only scans in more cases (PostgreSQL 11+).
       # :nulls_not_distinct :: Use NULLS NOT DISTINCT to setup a constraint where NULL
       #                        entries are considered distinct (PostgreSQL 15+)
       # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
@@ -461,6 +469,8 @@ module Sequel
       #
       # PostgreSQL specific options:
       #
+      # :include :: Include additional columns in the underlying index, to
+      #             allow for index-only scans in more cases (PostgreSQL 11+).
       # :nulls_not_distinct :: Use NULLS NOT DISTINCT to setup a constraint where NULL
       #                        entries are considered distinct (PostgreSQL 15+)
       # :using_index :: Use the USING INDEX clause to specify an existing unique index
@@ -522,6 +532,8 @@ module Sequel
       #
       # PostgreSQL specific options:
       #
+      # :include :: Include additional columns in the underlying index, to
+      #             allow for index-only scans in more cases (PostgreSQL 11+).
       # :using_index :: Use the USING INDEX clause to specify an existing unique index
       # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
       #                      on the final column (PostgreSQL 18+, composite primary keys only).

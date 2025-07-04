@@ -614,8 +614,12 @@ module Sequel
     def column_definition_add_primary_key_sql(sql, column)
       constraint = column_definition_constraint_hash(column, :primary_key)
       append_named_constraint_prefix_sql(sql, constraint[:name])
-      sql << " " << primary_key_constraint_sql_fragment(constraint)
+      column_definition_append_primary_key_sql(sql, constraint)
       constraint_deferrable_sql_append(sql, constraint[:deferrable])
+    end
+
+    def column_definition_append_primary_key_sql(sql, constraint)
+      sql << " " << primary_key_constraint_sql_fragment(constraint)
     end
     
     # Add foreign key reference SQL fragment to column creation SQL if column is a foreign key.
@@ -638,8 +642,12 @@ module Sequel
     def column_definition_add_unique_sql(sql, column)
       constraint = column_definition_constraint_hash(column, :unique)
       append_named_constraint_prefix_sql(sql, constraint[:name])
-      sql << ' ' << unique_constraint_sql_fragment(constraint)
+      column_definition_append_unique_sql(sql, constraint)
       constraint_deferrable_sql_append(sql, constraint[:deferrable])
+    end
+
+    def column_definition_append_unique_sql(sql, constraint)
+      sql << ' ' << unique_constraint_sql_fragment(constraint)
     end
 
     # Add the name of the constraint to the column creation SQL.

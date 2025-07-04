@@ -124,6 +124,8 @@ module Sequel
       #
       # Options supported:
       #
+      # :include :: Include additional columns in the underlying index, to
+      #             allow for index-only scans in more cases (PostgreSQL 11+).
       # :name :: Name the constraint with the given name (useful if you may
       #          need to drop the constraint later)
       # :using :: Override the index_method for the exclusion constraint (defaults to gist).
@@ -1254,6 +1256,22 @@ module Sequel
         end
       end
 
+      def column_definition_append_include_sql(sql, constraint)
+        if include_cols = constraint[:include]
+          sql << " INCLUDE " << literal(Array(include_cols))
+        end
+      end
+    
+      def column_definition_append_primary_key_sql(sql, constraint)
+        super
+        column_definition_append_include_sql(sql, constraint)
+      end
+
+      def column_definition_append_unique_sql(sql, constraint)
+        super
+        column_definition_append_include_sql(sql, constraint)
+      end
+
       # Literalize non-String collate options. This is because unquoted collatations
       # are folded to lowercase, and PostgreSQL used mixed case or capitalized collations.
       def column_definition_collate_sql(sql, column)
@@ -1339,7 +1357,10 @@ module Sequel
         when :exclude
           elements = constraint[:elements].map{|c, op| "#{literal(c)} WITH #{op}"}.join(', ')
           sql = String.new
-          sql << "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
+          sql << "CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]
+          sql << "EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})"
+          column_definition_append_include_sql(sql, constraint)
+          sql << " WHERE #{filter_expr(constraint[:where])}" if constraint[:where]
           constraint_deferrable_sql_append(sql, constraint[:deferrable])
           sql
         when :primary_key, :unique
@@ -1358,6 +1379,10 @@ module Sequel
             cols = literal(constraint[:columns])
             cols = "#{cols[0...-1]} WITHOUT OVERLAPS)" if constraint[:without_overlaps]
             sql << " " << cols
+
+            if include_cols = constraint[:include]
+              sql << " INCLUDE " << literal(Array(include_cols))
+            end
           end
 
           sql
