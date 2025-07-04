@@ -317,6 +317,11 @@ module Sequel
       # :keep_order :: For non-composite primary keys, respects the existing order of
       #                columns, overriding the default behavior of making the primary
       #                key the first column.
+      #
+      # PostgreSQL specific options:
+      #
+      # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
+      #                      on the final column (PostgreSQL 18+, composite primary keys only).
       # 
       # Examples:
       #   primary_key(:id)
@@ -360,6 +365,11 @@ module Sequel
       #
       # Supports the same :deferrable option as #column. The :name option can be used
       # to name the constraint.
+      #
+      # PostgreSQL specific options:
+      #
+      # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
+      #                      on the final column (PostgreSQL 18+, composite unique only).
       def unique(columns, opts = OPTS)
         constraints << {:type => :unique, :columns => Array(columns)}.merge!(opts)
         nil
@@ -448,6 +458,8 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :using_index :: Use the USING INDEX clause to specify an existing unique index
+      # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
+      #                      on the final column (PostgreSQL 18+, composite unique constraints only).
       def add_unique_constraint(columns, opts = OPTS)
         @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge!(opts)
         nil
@@ -505,6 +517,8 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :using_index :: Use the USING INDEX clause to specify an existing unique index
+      # :without_overlaps :: Use WITHOUT OVERLAPS clause to specify an exclusion constraint
+      #                      on the final column (PostgreSQL 18+, composite primary keys only).
       def add_primary_key(name, opts = OPTS)
         return add_composite_primary_key(name, opts) if name.is_a?(Array)
         opts = @db.serial_primary_key_options.merge(opts)

@@ -1343,18 +1343,24 @@ module Sequel
           constraint_deferrable_sql_append(sql, constraint[:deferrable])
           sql
         when :primary_key, :unique
+          sql = String.new
+          sql << "CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]
+
+          if type == :primary_key
+            sql << primary_key_constraint_sql_fragment(constraint)
+          else
+            sql << unique_constraint_sql_fragment(constraint)
+          end
+
           if using_index = constraint[:using_index]
-            sql = String.new
-            sql << "CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]
-            if type == :primary_key
-              sql << primary_key_constraint_sql_fragment(constraint)
-            else
-              sql << unique_constraint_sql_fragment(constraint)
-            end
             sql << " USING INDEX " << quote_identifier(using_index)
           else
-            super
+            cols = literal(constraint[:columns])
+            cols = "#{cols[0...-1]} WITHOUT OVERLAPS)" if constraint[:without_overlaps]
+            sql << " " << cols
           end
+
+          sql
         else # when :foreign_key, :check
           sql = super
           if constraint[:not_enforced]

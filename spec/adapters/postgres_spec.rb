@@ -1264,6 +1264,36 @@ describe "A PostgreSQL dataset" do
     proc{@d.lock('BAD'){}}.must_raise Sequel::Error
   end
 
+  it 'supports creating tables with PRIMARY KEY WITHOUT OVERLAPS' do
+    @db.create_table!(:atest){int4range :id; int4range :t; primary_key [:id, :t], without_overlaps: true}
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(1..5))
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(6..10))
+    proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(9..11))}.must_raise Sequel::Postgres::ExclusionConstraintViolation
+  end if DB.server_version >= 180000
+
+  it 'supports creating tables with UNIQUE WITHOUT OVERLAPS' do
+    @db.create_table!(:atest){int4range :id; int4range :t; unique [:id, :t], without_overlaps: true}
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(1..5))
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(6..10))
+    proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(9..11))}.must_raise Sequel::Postgres::ExclusionConstraintViolation
+  end if DB.server_version >= 180000
+
+  it 'supports adding PRIMARY KEY WITHOUT OVERLAPS to existing tables' do
+    @db.create_table!(:atest){int4range :id; int4range :t}
+    @db.alter_table(:atest){add_primary_key [:id, :t], without_overlaps: true}
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(1..5))
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(6..10))
+    proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(9..11))}.must_raise Sequel::Postgres::ExclusionConstraintViolation
+  end if DB.server_version >= 180000
+
+  it 'supports adding UNIQUE WITHOUT OVERLAPS to existing tables' do
+    @db.create_table!(:atest){int4range :id; int4range :t}
+    @db.alter_table(:atest){add_unique_constraint [:id, :t], without_overlaps: true}
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(1..5))
+    @db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(6..10))
+    proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(9..11))}.must_raise Sequel::Postgres::ExclusionConstraintViolation
+  end if DB.server_version >= 180000
+
   it "should support exclusion constraints when creating or altering tables" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
     @db[:atest].insert(1)
