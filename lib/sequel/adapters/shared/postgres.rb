@@ -1405,6 +1405,13 @@ module Sequel
         end
       end
 
+      def column_definition_null_sql(sql, column)
+        if column[:not_null].is_a?(Hash) && (name = column[:not_null][:name])
+          sql << " CONSTRAINT #{quote_identifier(name)}"
+        end
+        super
+      end
+
       # Handle :period option
       def column_references_table_constraint_sql(constraint)
         sql = String.new

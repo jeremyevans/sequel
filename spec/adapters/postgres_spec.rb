@@ -1316,6 +1316,14 @@ describe "A PostgreSQL dataset" do
     proc{@db[:atest].insert(Sequel.pg_range(1..1), Sequel.pg_range(9..11))}.must_raise Sequel::Postgres::ExclusionConstraintViolation
   end if DB.server_version >= 180000
 
+  it 'supports :not_null column option with hash value to name constraint' do
+    @db.create_table(:atest){Integer :a, :not_null => {name: :atest_a_nn}}
+    proc{@db[:atest].insert}.must_raise Sequel::NotNullConstraintViolation
+    @db.alter_table(:atest){drop_constraint(:atest_a_nn)}
+    @db[:atest].insert
+    @db[:atest].select_map(:a).must_equal [nil]
+  end if DB.server_version >= 180000
+
   it 'supports using PERIOD in composite foreign key constraints' do
     @db.create_table!(:atest) do
       int4range :id
@@ -1471,7 +1479,7 @@ describe "A PostgreSQL dataset" do
   end if DB.server_version >= 180000
 
   it "should support altering inheritability of NOT NULL constraints" do
-    @db.run "CREATE TABLE atest (fk INTEGER CONSTRAINT atest_nn NOT NULL)"
+    @db.create_table(:atest){Integer :fk, :not_null => {:name => :atest_nn}}
     @db.alter_table(:atest){alter_constraint(:atest_nn, :inherit=>true)}
     @db.alter_table(:atest){alter_constraint(:atest_nn, :inherit=>false)}
   end if DB.server_version >= 180000

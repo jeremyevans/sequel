@@ -118,6 +118,9 @@ module Sequel
       #         that this column references.  Unnecessary if this column
       #         references the primary key of the associated table, except if you are
       #         using MySQL.
+      # :not_null :: Similar to setting <tt>null: false</tt>, but you can provide a hash value
+      #              to specify options for the NOT NULL constraint on PostgreSQL 18+:
+      #              :name :: The name of the NOT NULL constraint
       # :null :: Mark the column as allowing NULL values (if true),
       #          or not allowing NULL values (if false).  The default is to allow NULL values.
       # :on_delete :: Specify the behavior of this column when being deleted

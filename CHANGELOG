@@ -1,5 +1,7 @@
 === master
 
+* Support not_null: {name: "constaint_name"} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)
+
 * Support :period foreign_key option for PERIOD on PostgreSQL 18+ (jeremyevans)
 
 * Support :include unique/primary_key/exclude option for INCLUDE on PostgreSQL 11+ (jeremyevans)
