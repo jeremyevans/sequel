@@ -121,6 +121,8 @@ module Sequel
       # :not_null :: Similar to setting <tt>null: false</tt>, but you can provide a hash value
       #              to specify options for the NOT NULL constraint on PostgreSQL 18+:
       #              :name :: The name of the NOT NULL constraint
+      #              :no_inherit :: Set NO INHERIT on the constraint, so it will not propogate to
+      #                             child tables.
       # :null :: Mark the column as allowing NULL values (if true),
       #          or not allowing NULL values (if false).  The default is to allow NULL values.
       # :on_delete :: Specify the behavior of this column when being deleted
@@ -191,6 +193,8 @@ module Sequel
       # :deferrable :: Whether the CHECK constraint should be marked DEFERRABLE.
       #
       # PostgreSQL specific options:
+      # :no_inherit :: Set NO INHERIT on the constraint, so it will not propogate to
+      #                child tables.
       # :not_enforced :: Whether the CHECK constraint should be marked NOT ENFORCED.
       # :not_valid :: Whether the CHECK constraint should be marked NOT VALID.
       def constraint(name, *args, &block)

@@ -1,5 +1,9 @@
 === master
 
+* Support :no_inherit option for CHECK constraints on PostgreSQL 9.2+ (jeremyevans)
+
+* Support :no_inherit option for NOT NULL constraints on PostgreSQL 18+ (jeremyevans)
+
 * Support not_null: {name: "constaint_name"} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)
 
 * Support :period foreign_key option for PERIOD on PostgreSQL 18+ (jeremyevans)

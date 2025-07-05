@@ -1388,6 +1388,9 @@ module Sequel
           sql
         else # when :foreign_key, :check
           sql = super
+          if constraint[:no_inherit]
+            sql << " NO INHERIT"
+          end
           if constraint[:not_enforced]
             sql << " NOT ENFORCED"
           end
@@ -1406,10 +1409,15 @@ module Sequel
       end
 
       def column_definition_null_sql(sql, column)
-        if column[:not_null].is_a?(Hash) && (name = column[:not_null][:name])
+        constraint = column[:not_null]
+        constraint = nil unless constraint.is_a?(Hash)
+        if constraint && (name = constraint[:name])
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
         super
+        if constraint && constraint[:no_inherit]
+          sql << " NO INHERIT"
+        end
       end
 
       # Handle :period option

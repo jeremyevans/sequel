@@ -1324,6 +1324,30 @@ describe "A PostgreSQL dataset" do
     @db[:atest].select_map(:a).must_equal [nil]
   end if DB.server_version >= 180000
 
+  it 'supports :not_null column option with :no_inherit option' do
+    begin
+      @db.create_table(:atest){Integer :a, :not_null => {:no_inherit => true}}
+      proc{@db[:atest].insert}.must_raise Sequel::NotNullConstraintViolation
+      @db.create_table(:atest2, :inherits=>:atest)
+      @db[:atest2].insert
+      @db[:atest2].select_map(:a).must_equal [nil]
+    ensure
+      @db.drop_table?(:atest2)
+    end
+  end if DB.server_version >= 180000
+
+  it 'supports check constraint :no_inherit option' do
+    begin
+      @db.create_table(:atest){Integer :a; constraint(:no_inherit => true){a > 10}}
+      proc{@db[:atest].insert(9)}.must_raise Sequel::CheckConstraintViolation
+      @db.create_table(:atest2, :inherits=>:atest)
+      @db[:atest2].insert(9)
+      @db[:atest2].select_map(:a).must_equal [9]
+    ensure
+      @db.drop_table?(:atest2)
+    end
+  end if DB.server_version >= 90200
+
   it 'supports using PERIOD in composite foreign key constraints' do
     @db.create_table!(:atest) do
       int4range :id
