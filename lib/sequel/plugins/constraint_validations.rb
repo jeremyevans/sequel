@@ -121,14 +121,7 @@ module Sequel
             Sequel.synchronize{db.constraint_validations = hash}
           end
 
-          if @dataset
-            ds = @dataset.with_quote_identifiers(false)
-            table_name = ds.literal(ds.first_source_table)
-            reflections = {}
-            allow_missing_columns = db_schema.select{|col, sch| sch[:allow_null] == false && nil != sch[:default]}.map(&:first)
-            @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections, allow_missing_columns)}
-            @constraint_validation_reflections = reflections
-          end
+          parse_constraint_validations_dataset
         end
 
         # Given a specific database constraint validation metadata row hash, transform
@@ -236,6 +229,21 @@ module Sequel
             Regexp.new(arg)
           end
         end
+
+        # If this model has associated dataset, use the model's table name
+        # to get the validations for just this model.
+        def parse_constraint_validations_dataset
+          return unless @dataset
+
+          ds = @dataset.with_quote_identifiers(false)
+          table_name = ds.literal(ds.first_source_table)
+          reflections = {}
+          allow_missing_columns = db_schema.select{|col, sch| sch[:allow_null] == false && nil != sch[:default]}.map(&:first)
+          hash = Sequel.synchronize{db.constraint_validations}
+          @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections, allow_missing_columns)}
+          @constraint_validation_reflections = reflections
+        end
+
       end
 
       module InstanceMethods

@@ -3256,3 +3256,74 @@ describe "query_blocker extension" do
     end
   end
 end
+
+describe "ClassTableInheritanceConstraintValidations Plugin" do
+  before(:all) do
+    @db = DB
+    @db.instance_variable_get(:@schemas).clear
+
+    @db.extension(:constraint_validations) unless @db.frozen?
+    @db.drop_table?(:class_table_inheritance_constraint_validations)
+    @db.constraint_validations_table = :class_table_inheritance_constraint_validations
+    @db.create_constraint_validations_table
+
+    @db.drop_table?(:cv_managers, :cv_employees)
+    @db.create_table(:cv_employees) do
+      primary_key :id
+      String :kind
+      String :status
+
+      validate do
+        includes %w( active terminated ), :status, allow_nil: false, name: :statuses
+      end
+    end
+    @db.create_table(:cv_managers) do
+      foreign_key :id, :cv_employees, :primary_key=>true
+      String :level
+      validate do
+        includes %w( junior senior ), :level, allow_nil: true, name: :levels
+      end
+    end
+  end
+
+  before do
+    [:cv_managers, :cv_employees].each{|t| @db[t].delete}
+
+    class ::CvEmployee < Sequel::Model(@db)
+      plugin :class_table_inheritance, :key=>:kind
+      plugin :constraint_validations, constraint_validations_table: :class_table_inheritance_constraint_validations
+      plugin :class_table_inheritance_constraint_validations
+    end
+    class ::CvManager < CvEmployee
+    end
+  end
+
+  after do
+    [:CvManager, :CvEmployee].each { |s| Object.send(:remove_const, s) }
+    @db.constraint_validations = nil
+  end
+
+  after(:all) do
+    @db.drop_table?(:cv_managers, :cv_employees)
+    @db.drop_constraint_validations_table
+    @db.constraint_validations_table = :sequel_constraint_validations
+  end
+
+  it "should set up automatic validations from the parent table inside the parent class" do
+    skip if @db.frozen?
+
+    CvEmployee.new(status: "bad_status" ).wont_be :valid?
+    CvEmployee.new(status: "active" ).must_be :valid?
+  end
+
+  it "should set up automatic validations from the parent table inside the sub class" do
+    skip if @db.frozen?
+
+    CvManager.new(level: "bad_level", status: "active" ).wont_be :valid?
+    CvManager.new(level: "junior", status: "bad_status" ).wont_be :valid?
+
+    # not nil  works
+    CvManager.new(status: "active", level: nil).must_be :valid?
+    CvManager.new(status: "active", level: "senior").must_be :valid?
+  end
+end
