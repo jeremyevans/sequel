@@ -140,6 +140,12 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
     end
   end
 
+  # The number of threads waiting to check out a connection for the given
+  # server.
+  def num_waiting(server=:default)
+    @queues[pick_server(server)].num_waiting
+  end
+
   # The total number of connections in the pool. Using a non-existant server will return nil.
   def size(server=:default)
     sync{@sizes[server]}

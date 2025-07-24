@@ -102,6 +102,11 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
     end
   end
 
+  # The number of threads waiting to check out a connection.
+  def num_waiting(_server=:default)
+    @queue.num_waiting
+  end
+
   def pool_type
     :timed_queue
   end

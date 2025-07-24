@@ -709,6 +709,28 @@ describe "Connection Pool" do
         def @pool.acquire(_,_=nil) raise Sequel::DatabaseDisconnectError; end
         proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
       end
+
+      it "should support num_waiting for the number of threads waiting to check out a connection" do
+        @pool.num_waiting.must_equal 0
+
+        q = Queue.new
+        q2 = Queue.new
+        extra = 2
+        threads = Array.new(@pool.max_size + extra) do
+          Thread.new do
+            @pool.hold do
+              q.push true
+              q2.pop
+            end
+          end
+        end
+
+        @pool.max_size.times{q.pop}
+        Thread.new{sleep 0.01 until @pool.num_waiting == extra}.join(1)
+        @pool.num_waiting.must_equal extra
+        q2.close
+        threads.each{|t| t.join(1) }
+      end
     end
   end if RUBY_VERSION >= '3.2'
 end
@@ -1076,6 +1098,45 @@ sharded_pool_classes.each do |pool_class, desc|
       dc.must_equal [c1]
       pool.remove_servers([:server1])
       pool.size(:server1).must_be_nil
+    end if pool_class == sharded_timed_queue_connection_pool
+
+    it "should respect server argument to num_waiting" do
+      pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| dc << c}){|c| c}, :pool_class=>pool_class, :servers=>{:server1=>{}})
+      pool.num_waiting(:default).must_equal 0
+      pool.num_waiting(:server1).must_equal 0
+
+      q = Queue.new
+      q2 = Queue.new
+      q3 = Queue.new
+      default_extra = 2
+      server1_extra = 3
+      threads = Array.new(pool.max_size + default_extra) do
+        Thread.new do
+          pool.hold(:default) do
+            q.push true
+            q3.pop
+          end
+        end
+      end
+      threads += Array.new(pool.max_size + server1_extra) do
+        Thread.new do
+          pool.hold(:server1) do
+            q2.push true
+            q3.pop
+          end
+        end
+      end
+
+      pool.max_size.times{q.pop; q2.pop}
+      Thread.new do
+        until pool.num_waiting(:foo) == default_extra && pool.num_waiting(:server1) == server1_extra
+          sleep 0.01
+        end
+      end.join(1)
+      pool.num_waiting.must_equal default_extra
+      pool.num_waiting(:server1).must_equal server1_extra
+      q3.close
+      threads.each{|t| t.join(1) }
     end if pool_class == sharded_timed_queue_connection_pool
   end
 end

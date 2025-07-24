@@ -1,5 +1,7 @@
 === master
 
+* Support num_waiting for the timed_queue and shared_timed_queue connection pools (jeremyevans)
+
 * Add class_table_inheritance_constraint_validations plugin, supporting constraint validations for all of the model's tables (sterlzbd, jeremyevans) (#2316, #2319)
 
 * Support :no_inherit option for CHECK constraints on PostgreSQL 9.2+ (jeremyevans)
