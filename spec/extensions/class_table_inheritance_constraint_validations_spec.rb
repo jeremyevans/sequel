@@ -137,4 +137,17 @@ describe "Sequel::Plugins::ClassTableInheritanceConstraintValidations" do
       {:allow_nil=>true, :from=>:values}
     ])
   end
+
+  it "raises if attempting to load plugin into model without plugins it depends on" do
+    c = Class.new(Sequel::Model)
+    proc{c.plugin :class_table_inheritance_constraint_validations}.must_raise Sequel::Error
+
+    c = Class.new(Sequel::Model)
+    c.plugin :constraint_validations
+    proc{c.plugin :class_table_inheritance_constraint_validations}.must_raise Sequel::Error
+
+    c = Class.new(Sequel::Model(:parents))
+    c.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Child=>:children, :Grandchild=>:grandchildren, :Sibling=>:siblings}
+    proc{c.plugin :class_table_inheritance_constraint_validations}.must_raise Sequel::Error
+  end
 end

@@ -1,5 +1,7 @@
 === master
 
+* Add class_table_inheritance_constraint_validations plugin, supporting constraint validations for all of the model's tables (sterlzbd, jeremyevans) (#2316, #2319)
+
 * Support :no_inherit option for CHECK constraints on PostgreSQL 9.2+ (jeremyevans)
 
 * Support :no_inherit option for NOT NULL constraints on PostgreSQL 18+ (jeremyevans)

@@ -113,7 +113,7 @@ module Sequel
         def parse_constraint_validations
           db.extension(:_model_constraint_validations)
 
-          unless hash = Sequel.synchronize{db.constraint_validations}
+          unless Sequel.synchronize{db.constraint_validations}
             hash = {}
             db.from(constraint_validations_table).each do |r|
               (hash[r[:table]] ||= []) << r
@@ -121,7 +121,7 @@ module Sequel
             Sequel.synchronize{db.constraint_validations = hash}
           end
 
-          parse_constraint_validations_dataset
+          parse_constraint_validations_dataset if @dataset
         end
 
         # Given a specific database constraint validation metadata row hash, transform
@@ -233,8 +233,6 @@ module Sequel
         # If this model has associated dataset, use the model's table name
         # to get the validations for just this model.
         def parse_constraint_validations_dataset
-          return unless @dataset
-
           ds = @dataset.with_quote_identifiers(false)
           table_name = ds.literal(ds.first_source_table)
           reflections = {}
@@ -243,7 +241,6 @@ module Sequel
           @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections, allow_missing_columns)}
           @constraint_validation_reflections = reflections
         end
-
       end
 
       module InstanceMethods
