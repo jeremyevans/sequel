@@ -630,6 +630,16 @@ describe "Database schema modifiers" do
     @ds.columns!.must_equal [:id, :item_id]
   end
 
+  it "should handle foreign keys with explicit :key option with symbol value" do
+    @db.create_table!(:items) do 
+      primary_key :id
+      foreign_key :item_id, :items, :key=>:id
+    end
+    @db.table_exists?(:items).must_equal true
+    @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id, :item_id]
+    @ds.columns!.must_equal [:id, :item_id]
+  end
+
   it "should add columns to tables correctly" do
     @db.create_table!(:items){Integer :number}
     @ds.insert(:number=>10)

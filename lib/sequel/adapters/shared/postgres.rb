@@ -1430,7 +1430,7 @@ module Sequel
       end
 
       def column_references_append_key_sql(sql, column)
-        cols = column[:key]
+        cols = Array(column[:key])
         cols = column_references_add_period(cols) if column[:period]
         sql << "(#{cols.map{|x| quote_identifier(x)}.join(', ')})"
       end

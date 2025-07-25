@@ -971,6 +971,14 @@ describe "PostgreSQL support" do
     end
     @db.sqls.must_equal ['ALTER TABLE "posts" ADD CONSTRAINT "posts_pkey" PRIMARY KEY USING INDEX "posts_i_uidx"']
   end
+
+  it "should handle :key as a symbol when setting up a foreign key constraint" do
+    @db.create_table(:a){foreign_key :x, :t, :key => :y}
+    @db.sqls.must_equal ['CREATE TABLE "a" ("x" integer REFERENCES "t"("y"))']
+
+    @db.create_table(:a){foreign_key [:x], :t, :key => :y}
+    @db.sqls.must_equal ['CREATE TABLE "a" (FOREIGN KEY ("x") REFERENCES "t"("y"))']
+  end
 end
 
 describe "MySQL support" do
