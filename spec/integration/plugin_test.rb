@@ -3262,9 +3262,9 @@ describe "ClassTableInheritanceConstraintValidations Plugin" do
     @db = DB
     @db.instance_variable_get(:@schemas).clear
 
-    @db.extension(:constraint_validations) unless @db.frozen?
-    @db.drop_table?(:class_table_inheritance_constraint_validations)
-    @db.constraint_validations_table = :class_table_inheritance_constraint_validations
+    @db.extension(:constraint_validations)
+    @db.drop_table?(:cti_constraint_validations)
+    @db.constraint_validations_table = :cti_constraint_validations
     @db.create_constraint_validations_table
 
     @db.drop_table?(:cv_managers, :cv_employees)
@@ -3291,7 +3291,7 @@ describe "ClassTableInheritanceConstraintValidations Plugin" do
 
     class ::CvEmployee < Sequel::Model(@db)
       plugin :class_table_inheritance, :key=>:kind
-      plugin :constraint_validations, constraint_validations_table: :class_table_inheritance_constraint_validations
+      plugin :constraint_validations, constraint_validations_table: :cti_constraint_validations
       plugin :class_table_inheritance_constraint_validations
     end
     class ::CvManager < CvEmployee
@@ -3310,15 +3310,11 @@ describe "ClassTableInheritanceConstraintValidations Plugin" do
   end
 
   it "should set up automatic validations from the parent table inside the parent class" do
-    skip if @db.frozen?
-
     CvEmployee.new(status: "bad_status" ).wont_be :valid?
     CvEmployee.new(status: "active" ).must_be :valid?
   end
 
   it "should set up automatic validations from the parent table inside the sub class" do
-    skip if @db.frozen?
-
     CvManager.new(level: "bad_level", status: "active" ).wont_be :valid?
     CvManager.new(level: "junior", status: "bad_status" ).wont_be :valid?
 
@@ -3326,4 +3322,4 @@ describe "ClassTableInheritanceConstraintValidations Plugin" do
     CvManager.new(status: "active", level: nil).must_be :valid?
     CvManager.new(status: "active", level: "senior").must_be :valid?
   end
-end
+end unless DB.frozen?
