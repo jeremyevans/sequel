@@ -64,13 +64,13 @@ Sequel::Plugins::ConstraintValidations::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-validate-source'>    <span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb</span>
-<span class="line-num">244</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
-<span class="line-num">245</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">246</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">constraint_validations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
-<span class="line-num">247</span>     <span class="ruby-comment"># Allow calling private validation methods</span>
-<span class="line-num">248</span>     <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
-<span class="line-num">249</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">250</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">249</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>
+<span class="line-num">250</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">251</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">constraint_validations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+<span class="line-num">252</span>     <span class="ruby-comment"># Allow calling private validation methods</span>
+<span class="line-num">253</span>     <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)
+<span class="line-num">254</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">255</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

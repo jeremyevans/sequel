@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::ClassTableInheritanceConstraintValidations</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::ClassTableInheritanceConstraintValidations
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/class_table_inheritance_constraint_validations_rb.html">lib/sequel/plugins/class_table_inheritance_constraint_validations.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="module-Sequel::Plugins::ClassTableInheritanceConstraintValidations-label-Overview">Overview<span><a href="#module-Sequel::Plugins::ClassTableInheritanceConstraintValidations-label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>The class_table_inheritance_constraint_validations plugin extends the constraint_validations plugin to work correctly with the class_table_inheritance plugin. It ensures that constraint_validations are loaded from all tables in the class table inheritance hierarchy, not just the base table.</p>
+
+<h1 id="module-Sequel::Plugins::ClassTableInheritanceConstraintValidations-label-Example">Example<span><a href="#module-Sequel::Plugins::ClassTableInheritanceConstraintValidations-label-Example">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>For example, with this hierarchy, where each model has its own table with constraint validations:</p>
+
+<pre>    Employee
+   /        \
+Staff     Manager
+             |
+         Executive
+
+# Loads constraint_validations from the employees table
+class Employee &lt; Sequel::Model
+  plugin :class_table_inheritance
+  plugin :constraint_validations
+  plugin :class_table_inheritance_constraint_validations
+end
+
+# Loads constraint_validations from managers and employees tables
+class Manager &lt; Employee
+end
+
+# Loads constraint_validations from executives, managers, and
+# employees tables
+class Executive &lt; Manager
+end
+
+# Loads constraint_validations from staff and employees tables
+class Staff &lt; Employee
+end</pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="ClassTableInheritanceConstraintValidations/ClassMethods.html">Sequel::Plugins::ClassTableInheritanceConstraintValidations::ClassMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span><span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance_constraint_validations.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">48</span>   <span class="ruby-keyword">unless</span> <span class="ruby-constant">ConstraintValidations</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">ClassTableInheritance</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">model</span>
+<span class="line-num">49</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;must load the constraint_validations and class_table_inheritance plugins into #{model} before loading class_table_inheritance_constraint_validations plugin&quot;</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

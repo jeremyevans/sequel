@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.95.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.95.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.95.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The timed_queue and sharded_timed_queue connection pools (the default on Ruby 3.2+) now implement a num_waiting method, which will return now many threads or fibers are waiting to checkout a connection. This can be used for metrics on how loaded the connection pool is, which can help provide information on whether the connection pool max size should be modified.</p>
+</li><li>
+<p>A class_table_inheritance_constraint_validations plugin has been added, which will allow subclasses using the class_table_inheritance plugin to respect constraint validations for all of the class’s tables.</p>
+</li><li>
+<p>On PostgreSQL 18+, primary key and unique constraints now support a :without_overlaps option to use WITHOUT OVERLAPS, turning the constraint into an exclusion constraint on the last column.</p>
+</li><li>
+<p>On PostgreSQL 18+, foriegn keys now support a :period option to use PERIOD, which makes it so the final column in the constraint must be covered in the referenced table (potentially covered by a combination of rows).</p>
+</li><li>
+<p>On PostgreSQL 15+, unique constraints now support a :nulls_not_distinct option, to use NULLS NOT DISTINCT, which will treat NULL values as separate values when determining uniqueness.</p>
+</li><li>
+<p>On PostgreSQL 11+, primary key, unique, and exclude constraints now support an :include option to used INCLUDE, which includes additional columns in the related index, to increase opportunities for index-only scans.</p>
+</li><li>
+<p>On PostgreSQL 9.2+, check constraints now support a :no_inherit option to prevent inheritance of the constraint.</p>
+</li><li>
+<p>In addition to null: false to specify NOT NULL for columns, you can now specify not_null: true, and you can use a hash value for the :not_null option to provide constraint-specific options. On PostgreSQL 18+, you can provide a :name option inside the hash to name the related NOT NULL constraint, which allows for altering the constraint and dropping the constraint by name. You can also provide the :no_inherit option in the hash to prevent inheritance of the constraint.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

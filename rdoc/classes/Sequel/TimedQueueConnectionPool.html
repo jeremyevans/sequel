@@ -54,6 +54,7 @@ Superclass:
 <li><a href="#method-i-disconnect">disconnect</a></li>
 <li><a href="#method-i-hold">hold</a></li>
 <li><a href="#attribute-i-max_size">max_size</a></li>
+<li><a href="#method-i-num_waiting">num_waiting</a></li>
 <li><a href="#method-i-pool_type">pool_type</a></li>
 <li><a href="#method-i-size">size</a></li>
 </ol>
@@ -227,6 +228,27 @@ Superclass:
 <span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-num_waiting'>
+<a name='method-i-num_waiting'></a>
+<div class='synopsis'>
+<span class='name'>num_waiting</span><span class='arguments'>(_server=:default)</span>
+
+</div>
+<div class='description'>
+
+<p>The number of threads waiting to check out a connection.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-num_waiting-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-num_waiting-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/timed_queue.rb</span>
+<span class="line-num">106</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">num_waiting</span>(<span class="ruby-identifier">_server</span>=<span class="ruby-value">:default</span>)
+<span class="line-num">107</span>   <span class="ruby-ivar">@queue</span>.<span class="ruby-identifier">num_waiting</span>
+<span class="line-num">108</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-pool_type'>
 <a name='method-i-pool_type'></a>
 <div class='synopsis'>
@@ -241,9 +263,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-pool_type-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/timed_queue.rb</span>
-<span class="line-num">105</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>
-<span class="line-num">106</span>   <span class="ruby-value">:timed_queue</span>
-<span class="line-num">107</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>
+<span class="line-num">111</span>   <span class="ruby-value">:timed_queue</span>
+<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-size'>
@@ -262,9 +284,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-size-source'>    <span class="ruby-comment"># File lib/sequel/connection_pool/timed_queue.rb</span>
-<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>
-<span class="line-num">111</span>   <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@size</span>[<span class="ruby-value">0</span>]}
-<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">115</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>
+<span class="line-num">116</span>   <span class="ruby-identifier">sync</span>{<span class="ruby-ivar">@size</span>[<span class="ruby-value">0</span>]}
+<span class="line-num">117</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

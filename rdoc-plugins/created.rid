@@ -1,4 +1,4 @@
-Tue, 01 Jul 2025 08:36:07 -0700
+Fri, 01 Aug 2025 08:41:34 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -118,13 +118,14 @@ lib/sequel/plugins/boolean_readers.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_subsets.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/plugins/caching.rb	Fri, 25 Oct 2019 08:54:59 -0700
 lib/sequel/plugins/class_table_inheritance.rb	Fri, 21 Oct 2022 08:19:04 -0700
+lib/sequel/plugins/class_table_inheritance_constraint_validations.rb	Wed, 23 Jul 2025 17:38:57 -0700
 lib/sequel/plugins/column_conflicts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/column_encryption.rb	Mon, 20 May 2024 16:45:35 -0700
 lib/sequel/plugins/column_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/columns_updated.rb	Tue, 28 Mar 2017 16:44:29 -0700
 lib/sequel/plugins/composition.rb	Thu, 16 Jan 2025 10:44:13 -0800
 lib/sequel/plugins/concurrent_eager_loading.rb	Fri, 21 Oct 2022 08:19:04 -0700
-lib/sequel/plugins/constraint_validations.rb	Tue, 03 Jun 2025 09:09:55 -0700
+lib/sequel/plugins/constraint_validations.rb	Wed, 23 Jul 2025 17:38:57 -0700
 lib/sequel/plugins/csv_serializer.rb	Wed, 01 Jul 2020 11:28:34 -0700
 lib/sequel/plugins/dataset_associations.rb	Fri, 04 Dec 2020 13:44:07 -0800
 lib/sequel/plugins/def_dataset_method.rb	Tue, 01 Aug 2017 08:12:01 -0700

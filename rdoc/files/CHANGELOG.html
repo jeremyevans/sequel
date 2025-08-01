@@ -29,14 +29,31 @@
 <div class='paths'>
 CHANGELOG
 </div>
-<div class='last-update'>
-Last Update:
-<span class='datetime'>2025-07-01 08:25:16 -0700</span>
-</div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.95.0+-282025-08-01-29"><a href="doc/release_notes/5_95_0_txt.html">5.95.0</a> (2025-08-01)<span><a href="#label-5.95.0+-282025-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support num_waiting for the timed_queue and shared_timed_queue connection pools (jeremyevans)</p>
+</li><li>
+<p>Add class_table_inheritance_constraint_validations plugin, supporting constraint validations for all of the model’s tables (sterlzbd, jeremyevans) (#2316, #2319)</p>
+</li><li>
+<p>Support :no_inherit option for CHECK constraints on PostgreSQL 9.2+ (jeremyevans)</p>
+</li><li>
+<p>Support :no_inherit option for NOT NULL constraints on PostgreSQL 18+ (jeremyevans)</p>
+</li><li>
+<p>Support not_null: {name: “constaint_name”} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)</p>
+</li><li>
+<p>Support :period foreign_key option for PERIOD on PostgreSQL 18+ (jeremyevans)</p>
+</li><li>
+<p>Support :include unique/primary_key/exclude option for INCLUDE on PostgreSQL 11+ (jeremyevans)</p>
+</li><li>
+<p>Support :nulls_not_distinct unique option for NULLS NOT DISTINCT on PostgreSQL 15+ (jeremyevans)</p>
+</li><li>
+<p>Support :without_overlaps primary_key and unique option for WITHOUT OVERLAPS on PostgreSQL 18+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.94.0+-282025-07-01-29"><a href="doc/release_notes/5_94_0_txt.html">5.94.0</a> (2025-07-01)<span><a href="#label-5.94.0+-282025-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support ALTER TABLE ALTER CONSTRAINT on PostgreSQL using alter_table alter_constraint method (jeremyevans)</p>

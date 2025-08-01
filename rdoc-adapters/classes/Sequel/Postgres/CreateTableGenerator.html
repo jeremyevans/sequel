@@ -73,7 +73,9 @@ Superclass:
 </pre>
 
 <p>Options supported:</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:include </td><td>
+<p>Include additional columns in the underlying index, to allow for index-only scans in more cases (PostgreSQL 11+).</p>
+</td></tr><tr><td class='label'>:name </td><td>
 <p>Name the constraint with the given name (useful if you may need to drop the constraint later)</p>
 </td></tr><tr><td class='label'>:using </td><td>
 <p>Override the index_method for the exclusion constraint (defaults to gist).</p>
@@ -87,9 +89,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-exclude-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">133</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">134</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">134</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">135</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
