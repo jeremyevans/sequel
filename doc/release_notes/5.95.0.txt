@@ -16,7 +16,7 @@
   :without_overlaps option to use WITHOUT OVERLAPS, turning the
   constraint into an exclusion constraint on the last column.
 
-* On PostgreSQL 18+, foriegn keys now support a :period option to use
+* On PostgreSQL 18+, foreign keys now support a :period option to use
   PERIOD, which makes it so the final column in the constraint must be
   covered in the referenced table (potentially covered by a
   combination of rows).
