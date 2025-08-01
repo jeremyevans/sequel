@@ -1,4 +1,4 @@
-=== master
+=== 5.95.0 (2025-08-01)
 
 * Support num_waiting for the timed_queue and shared_timed_queue connection pools (jeremyevans)
 

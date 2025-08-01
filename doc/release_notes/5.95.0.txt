@@ -1,0 +1,43 @@
+= New Features
+
+* The timed_queue and sharded_timed_queue connection pools (the
+  default on Ruby 3.2+) now implement a num_waiting method, which will
+  return now many threads or fibers are waiting to checkout a
+  connection. This can be used for metrics on how loaded the
+  connection pool is, which can help provide information on whether
+  the connection pool max size should be modified.
+
+* A class_table_inheritance_constraint_validations plugin has been
+  added, which will allow subclasses using the class_table_inheritance
+  plugin to respect constraint validations for all of the class's
+  tables.
+
+* On PostgreSQL 18+, primary key and unique constraints now support a
+  :without_overlaps option to use WITHOUT OVERLAPS, turning the
+  constraint into an exclusion constraint on the last column.
+
+* On PostgreSQL 18+, foriegn keys now support a :period option to use
+  PERIOD, which makes it so the final column in the constraint must be
+  covered in the referenced table (potentially covered by a
+  combination of rows).
+
+* On PostgreSQL 15+, unique constraints now support a
+  :nulls_not_distinct option, to use NULLS NOT DISTINCT, which will
+  treat NULL values as separate values when determining uniqueness.
+
+* On PostgreSQL 11+, primary key, unique, and exclude constraints now
+  support an :include option to used INCLUDE, which includes
+  additional columns in the related index, to increase opportunities
+  for index-only scans.
+
+* On PostgreSQL 9.2+, check constraints now support a :no_inherit
+  option to prevent inheritance of the constraint.
+
+* In addition to null: false to specify NOT NULL for columns, you can
+  now specify not_null: true, and you can use a hash value for the
+  :not_null option to provide constraint-specific options. On
+  PostgreSQL 18+, you can provide a :name option inside the hash to
+  name the related NOT NULL constraint, which allows for altering the
+  constraint and dropping the constraint by name. You can also provide
+  the :no_inherit option in the hash to prevent inheritance of the
+  constraint.
