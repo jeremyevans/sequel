@@ -547,6 +547,17 @@ describe "PostgreSQL support" do
     @db.sqls.must_equal ['CREATE TABLE "unlogged_dolls" ("name" text)']
   end
 
+  it "should respect :deferrable when creating unique constraints" do
+    @db.create_table(:t){unique :x, deferrable: true}
+    @db.sqls.must_equal ['CREATE TABLE "t" (UNIQUE ("x") DEFERRABLE INITIALLY DEFERRED)']
+
+    @db.alter_table(:t){add_unique_constraint :x, deferrable: true}
+    @db.sqls.must_equal ['ALTER TABLE "t" ADD UNIQUE ("x") DEFERRABLE INITIALLY DEFERRED']
+
+    @db.create_table(:t){Integer :x, unique: {deferrable: true}}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("x" integer UNIQUE DEFERRABLE INITIALLY DEFERRED)']
+  end
+
   it "should support spatial indexes" do
     @db.alter_table(:posts){add_spatial_index [:geom]}
     @db.sqls.must_equal ['CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")']

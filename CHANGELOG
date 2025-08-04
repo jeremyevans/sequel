@@ -1,3 +1,7 @@
+=== master
+
+* Fix regression in 5.95.0 where :deferred would be ignored for unique and primary key constraints on PostgreSQL (jeremyevans) (#2321)
+
 === 5.95.0 (2025-08-01)
 
 * Support num_waiting for the timed_queue and shared_timed_queue connection pools (jeremyevans)

@@ -1385,6 +1385,7 @@ module Sequel
             end
           end
 
+          constraint_deferrable_sql_append(sql, constraint[:deferrable])
           sql
         else # when :foreign_key, :check
           sql = super
