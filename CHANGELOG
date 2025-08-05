@@ -1,4 +1,4 @@
-=== master
+=== 5.95.1 (2025-08-05)
 
 * Fix regression in 5.95.0 where :deferred would be ignored for unique and primary key constraints on PostgreSQL (jeremyevans) (#2321)
 
