@@ -1,6 +1,6 @@
-Fri, 01 Aug 2025 08:43:31 -0700
+Tue, 05 Aug 2025 08:25:59 -0700
 README.rdoc	Sun, 31 Mar 2024 10:39:03 -0700
-CHANGELOG	Fri, 01 Aug 2025 08:31:06 -0700
+CHANGELOG	Tue, 05 Aug 2025 08:16:05 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Sat, 10 May 2025 16:59:46 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Fri, 01 Aug 2025 08:31:06 -0700
+lib/sequel/version.rb	Tue, 05 Aug 2025 08:16:05 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Thu, 24 Jul 2025 11:17:44 -0700
