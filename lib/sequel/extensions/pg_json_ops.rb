@@ -166,6 +166,11 @@
 #   #   "d" date EXISTS FALSE ON ERROR
 #   # ))
 #
+# On PostgreSQL 18+, strip_nulls can take an argument for whether to strip in arrays
+#
+#   j.strip_nulls(true)   # json_strip_nulls(json_column, true)
+#   j.strip_nulls(false)  # json_strip_nulls(json_column, false)
+#
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
 # JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
@@ -380,11 +385,22 @@ module Sequel
         self.class.new(JSONQueryOp.new(self, path, opts))
       end
 
-      # Returns a json value stripped of all internal null values.
+      # Returns a json value stripped of all internal null values. Options:
       #
-      #   json_op.strip_nulls # json_strip_nulls(json)
-      def strip_nulls
-        self.class.new(function(:strip_nulls))
+      # :in_arrays :: Whether to strip null values in JSON arrays
+      #
+      #   json_op.strip_nulls                   # json_strip_nulls(json)
+      #   json_op.strip_nulls(in_arrays: true)  # json_strip_nulls(json, true)
+      #   json_op.strip_nulls(in_arrays: false) # json_strip_nulls(json, false)
+      def strip_nulls(opts=OPTS)
+        in_arrays = opts[:in_arrays]
+        f = if in_arrays.nil?
+          function(:strip_nulls)
+        else
+          function(:strip_nulls, in_arrays)
+        end
+
+        self.class.new(f)
       end
 
       # Returns json_table SQL function expression, querying JSON data and returning

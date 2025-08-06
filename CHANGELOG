@@ -1,5 +1,7 @@
 === master
 
+* Support :in_arrays option for Postgres::JSON{,B}#strip_nulls in pg_json_ops extension on PostgreSQL 18+ (jeremyevans)
+
 * Support VIRTUAL generated columns on PostgreSQL 18+ using :virtual option (jeremyevans)
 
 === 5.95.1 (2025-08-05)

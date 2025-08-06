@@ -204,6 +204,11 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.strip_nulls].must_equal "jsonb_strip_nulls(j)"
   end
 
+  it "should have #strip_nulls respect the in_arrays option" do
+    @l[@j.strip_nulls(in_arrays: true)].must_equal "json_strip_nulls(j, true)"
+    @l[@jb.strip_nulls(in_arrays: false)].must_equal "jsonb_strip_nulls(j, false)"
+  end
+
   it "should have #typeof use the json_typeof function" do
     @l[@j.typeof].must_equal "json_typeof(j)"
     @l[@jb.typeof].must_equal "jsonb_typeof(j)"

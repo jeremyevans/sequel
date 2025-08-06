@@ -4863,6 +4863,11 @@ JSON
       @db.from(j.table(Sequel['$.a.n'].as(:foo)){Integer :b}).all.must_equal [{:b=>3}]
       @db.from(j.table(Sequel['$.a'].as(:foo)){nested(Sequel['$.n'].as(:c)){Integer :b}}).all.must_equal [{:b=>3}]
     end if DB.server_version >= 170000
+
+    it '18+ jsonb strip_nulls in_arrays option with pg_json_ops' do
+      @db.get(pg_json.call([nil, 2, 3]).op.strip_nulls(in_arrays: false)[1]).must_equal 2
+      @db.get(pg_json.call([nil, 2, 3]).op.strip_nulls(in_arrays: true)[1]).must_equal 3
+    end if DB.server_version >= 180000
   end
 end if DB.server_version >= 90200
 
