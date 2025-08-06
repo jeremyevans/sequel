@@ -740,6 +740,12 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].select_order_map([:a, :b, :c]).must_equal [[100, 10, 211]]
   end if DB.server_version >= 120000
 
+  it "should support creating generated virtual columns" do
+    @db.create_table(:tmp_dolls){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1, :virtual=>true}
+    @db[:tmp_dolls].insert(:a=>100, :b=>10)
+    @db[:tmp_dolls].select_order_map([:a, :b, :c]).must_equal [[100, 10, 211]]
+  end if DB.server_version >= 180000
+
   it "should include :generated entry in schema for whether the column is generated" do
     @db.create_table(:tmp_dolls){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1}
     @db.schema(:tmp_dolls).map{|_,v| v[:generated]}.must_equal [false, false, true]

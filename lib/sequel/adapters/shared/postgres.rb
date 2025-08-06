@@ -1291,7 +1291,7 @@ module Sequel
             sql << (identity == :always ? "ALWAYS" : "BY DEFAULT")
             sql << " AS IDENTITY"
           elsif (generated = column[:generated_always_as])
-            sql << " GENERATED ALWAYS AS (#{literal(generated)}) STORED"
+            sql << " GENERATED ALWAYS AS (#{literal(generated)}) #{column[:virtual] ? 'VIRTUAL' : 'STORED'}"
           end
         end
       end

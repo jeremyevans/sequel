@@ -156,6 +156,9 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :identity :: Create an identity column.
+      # :virtual :: When using :generated_always_as, create a VIRTUAL column instead of a STORED
+      #             column (PostgreSQL 18+). VIRTUAL is the default if not specified on
+      #             PostgreSQL 18+, but for backwards compatibility, Sequel's default is STORED.
       #
       # MySQL specific options:
       #

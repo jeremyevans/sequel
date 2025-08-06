@@ -886,6 +886,16 @@ describe "PostgreSQL support" do
     ]
   end
 
+  it "should default generated columns to STORED" do
+    @db.create_table(:t){Integer :c, :generated_always_as=>Sequel[:t] + 1}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("c" integer GENERATED ALWAYS AS (("t" + 1)) STORED)']
+  end
+
+  it "should create VIRTUAL generated columns if given :virtual option" do
+    @db.create_table(:t){Integer :c, :generated_always_as=>Sequel[:t] + 1, :virtual=>true}
+    @db.sqls.must_equal ['CREATE TABLE "t" ("c" integer GENERATED ALWAYS AS (("t" + 1)) VIRTUAL)']
+  end
+
   it "should not support converting serial columns to identity on PostgreSQL <10.2" do
     def @db.server_version; 100000; end
     proc{@db.convert_serial_to_identity(:table)}.must_raise Sequel::Error
