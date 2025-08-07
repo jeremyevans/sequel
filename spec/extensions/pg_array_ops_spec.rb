@@ -60,6 +60,30 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(@a.replace(1, 2)[3]).must_equal "(array_replace(a, 1, 2))[3]"
   end
 
+  it "#reverse should call the array_reverse function" do
+    @db.literal(@a.reverse).must_equal "array_reverse(a)"
+  end
+
+  it "#sort should call the array_sort function" do
+    @db.literal(@a.sort).must_equal "array_sort(a)"
+  end
+
+  it "#sort should respect the :desc option" do
+    @db.literal(@a.sort(desc: true)).must_equal "array_sort(a, true)"
+  end
+
+  it "#sort should respect the nulls: :first option" do
+    @db.literal(@a.sort(nulls: :first)).must_equal "array_sort(a, false, true)"
+  end
+
+  it "#sort should respect the desc: true, nulls: :last options" do
+    @db.literal(@a.sort(desc: true, nulls: :last)).must_equal "array_sort(a, true, false)"
+  end
+
+  it "#sort should call the array_sort function" do
+    @db.literal(@a.sort).must_equal "array_sort(a)"
+  end
+
   it "#unshift should use the || operator in prepend mode" do
     @db.literal(@a.unshift(:b)).must_equal "(b || a)"
   end

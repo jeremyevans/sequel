@@ -56,6 +56,13 @@
 #   ia.join(':', ' ')  # array_to_string(int_array_column, ':', ' ')
 #   ia.unnest          # unnest(int_array_column)
 #   ia.unnest(:b)      # unnest(int_array_column, b)
+#
+# On PostgreSQL 18+, the following are supported:
+#
+#   ia.sort                # array_sort(int_array_column)
+#   ia.sort(desc: true)    # array_sort(int_array_column, true)
+#   ia.sort(nulls: :first) # array_sort(int_array_column, false, true)
+#   ia.reverse             # array_reverse(int_array_column)
 # 
 # See the PostgreSQL array function and operator documentation for more
 # details on what these functions and operators do.
@@ -217,6 +224,40 @@ module Sequel
         ArrayOp.new(function(:array_replace, element, replacement))
       end
 
+      # Call the array_reverse method:
+      #
+      #   array_op.reverse # array_reverse(array)
+      def reverse
+        function(:array_reverse)
+      end
+      
+      # Call the array_sort method. Options:
+      #
+      # :desc :: Sort in descending order instead of ascending order.
+      # :nulls :: If sorting in ascending order and value is :first, include NULL
+      #           values before non-NULL values. If sorting in descending order and
+      #           value is :last, include non-NULL values before NULL values.
+      #
+      #   array_op.sort                           # array_sort(array)
+      #   array_op.sort(desc: true)               # array_sort(array, true)
+      #   array_op.sort(nulls: :first)            # array_sort(array, false, true)
+      #   array_op.sort(desc: true, nulls: :last) # array_sort(array, true, false)
+      def sort(opts=OPTS)
+        desc = opts[:desc]
+        nulls = opts[:nulls]
+        if desc
+          if nulls == :last
+            function(:array_sort, true, false)
+          else
+            function(:array_sort, true)
+          end
+        elsif nulls == :first
+          function(:array_sort, false, true)
+        else
+          function(:array_sort)
+        end
+      end
+      
       # Call the array_to_string method:
       #
       #   array_op.join           # array_to_string(array, '')

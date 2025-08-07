@@ -3789,6 +3789,18 @@ describe 'PostgreSQL array handling' do
 
       @ds.from{Sequel.pg_array([1,2,3]).op.unnest([4,5,6], [7,8]).as(:t1, [:a, :b, :c])}.select_order_map([:a, :b, :c]).must_equal [[1, 4, 7], [2, 5, 8], [3, 6, nil]]
     end
+    if @db.server_version >= 180000
+      @ds.get(Sequel.pg_array(:i5).sort).must_equal [1, 5, nil]
+      @ds.get(Sequel.pg_array(:i5).sort(:desc => false)).must_equal [1, 5, nil]
+      @ds.get(Sequel.pg_array(:i5).sort(:desc => true)).must_equal [nil, 5, 1]
+      @ds.get(Sequel.pg_array(:i5).sort(:nulls => :first)).must_equal [nil, 1, 5]
+      @ds.get(Sequel.pg_array(:i5).sort(:nulls => :last)).must_equal [1, 5, nil]
+      @ds.get(Sequel.pg_array(:i5).sort(:desc => false, :nulls => :first)).must_equal [nil, 1, 5]
+      @ds.get(Sequel.pg_array(:i5).sort(:desc => false, :nulls => :last)).must_equal [1, 5, nil]
+      @ds.get(Sequel.pg_array(:i5).sort(:desc => true, :nulls => :first)).must_equal [nil, 5, 1]
+      @ds.get(Sequel.pg_array(:i5).sort(:desc => true, :nulls => :last)).must_equal [5, 1, nil]
+      @ds.get(Sequel.pg_array(:i5).reverse).must_equal [5, nil, 1]
+    end
 
     @ds.get(Sequel.pg_array(:i).push(4)).must_equal [1, 2, 3, 4]
     @ds.get(Sequel.pg_array(:i).unshift(4)).must_equal [4, 1, 2, 3]
