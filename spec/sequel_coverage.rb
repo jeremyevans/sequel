@@ -4,7 +4,7 @@ def SimpleCov.sequel_coverage(opts = {})
   start do
     enable_coverage :branch
     command_name SEQUEL_COVERAGE unless SEQUEL_COVERAGE == "1"
-    add_filter "/spec/"
+    add_filter{|f| f.filename.match(%r{\A#{Regexp.escape(File.dirname(__FILE__))}/})}
 
     if ENV['SEQUEL_MERGE_COVERAGE']
       filter = %r{bin/sequel\z|lib/sequel/(\w+\.rb|(dataset|database|model|connection_pool|extensions|plugins)/\w+\.rb|adapters/(mock|(shared/)?postgres)\.rb)\z}
