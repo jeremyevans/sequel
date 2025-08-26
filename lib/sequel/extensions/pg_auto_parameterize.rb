@@ -348,6 +348,8 @@ module Sequel
         # automatically parameterized.
         def auto_param_type(v)
           case v
+          when Symbol
+            false
           when String
             case v
             when LiteralString

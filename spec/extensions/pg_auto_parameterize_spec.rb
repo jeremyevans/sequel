@@ -97,6 +97,7 @@ describe "pg_auto_parameterize extension" do
     pr.call('SELECT * FROM "table" WHERE ("a" = $1::timestamp)', Time.utc(2012, 1, 2, 3, 4, 5))
     pr.call('SELECT * FROM "table" WHERE ("a" = 1)', Sequel.lit('1'), :nil)
     pr.call('SELECT * FROM "table" WHERE ("a" = "b")', :b, :nil)
+    pr.call('SELECT * FROM "table" WHERE ("a" = "b")', Sequel.identifier(:b), :nil)
   end
 
   it "should automatically parameterize when using explain or analyze" do
