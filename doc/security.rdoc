@@ -183,6 +183,13 @@ window function :frame option, which will be treated as a literal string:
 You should make sure the frame argument is not derived from user input,
 or switch to using a hash as the :frame option value.
 
+==== ComplexExpression#extract field
+
+Sequel converts the field to extract to a string and uses it directly.
+
+  DB[:table].select(Sequel[:column].extract(params[:field])) # SQL injection!
+  DB[:table].select(Sequel.extract(params[:field], :column)) # SQL injection!
+
 ==== auto_literal_strings extension
 
 If the auto_literal_strings extension is used for backwards compatibility,
