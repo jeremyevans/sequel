@@ -1358,17 +1358,16 @@ END
         @values.keys
       end
       
-      # Refresh this record using +for_update+ (by default, or the specified style when given)
+      # Refresh this record using +:update+ lock style (by default, or the specified style when given),
       # unless this is a new record.  Returns self. This can be used to make sure no other
-      # process is updating the record at the same time.
+      # process can modify the record during the transaction containing this call.  Using
+      # this method only makes sense inside transactions.
       #
       # If style is a string, it will be used directly. You should never pass a string
       # to this method that is derived from user input, as that can lead to
       # SQL injection.
       #
-      # A symbol may be used for database independent locking behavior, but
-      # all supported symbols have separate methods (e.g. for_update).
-      #
+      # A symbol may be used if the adapter supports that lock style.
       #
       #   a = Artist[1]
       #   Artist.db.transaction do
@@ -1378,7 +1377,7 @@ END
       #
       #   a = Artist[2]
       #   Artist.db.transaction do
-      #     a.lock!('FOR NO KEY UPDATE')
+      #     a.lock!(:no_key_update)
       #     a.update(name: 'B')
       #   end
       def lock!(style=:update)
