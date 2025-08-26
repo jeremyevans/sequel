@@ -339,7 +339,7 @@ module Sequel
 
       # Allow automatic parameterization.
       def sequel_auto_param_type(ds)
-        "::#{db_type}"
+        "::#{db_type}" if all?{|range| range.is_a?(Range) || ds.send(:auto_param_type, range)}
       end
     end
   end

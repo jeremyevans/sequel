@@ -5190,6 +5190,14 @@ describe 'PostgreSQL range types' do
     @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, 1, :exclude_begin=>true, :db_type=>"int4range")
   end if RUBY_VERSION >= '2.7'
 
+  it 'handle ranges with expressions' do
+    @db.create_table!(:items){Integer :b; Integer :e}
+    Sequel.extension :pg_range_ops
+    @db[:items].insert(1, 3)
+    @db[:items].get(Sequel::Postgres::PGRange.new(:b, :e, :db_type => :int4range).op.contains(2)).must_equal true
+    @db[:items].get(Sequel::Postgres::PGRange.new(:b, :e, :db_type => :int4range).op.contains(4)).must_equal false
+  end
+
   it 'parse default values for schema' do
     @db.create_table!(:items) do
       Integer :j
@@ -5401,6 +5409,14 @@ describe 'PostgreSQL multirange types' do
     v = c.create(@pgra).values
     v.delete(:id)
     v.each{|k,v1| v1.must_be :==, @pgra[k].to_a}
+  end
+
+  it 'handle multiranges containing ranges with expressions' do
+    @db.create_table!(:items){Integer :b; Integer :e}
+    Sequel.extension :pg_range_ops
+    @db[:items].insert(1, 3)
+    @db[:items].get(Sequel.pg_multirange([Sequel::Postgres::PGRange.new(:b, :e, :db_type => :int4range)], :int4multirange).op.contains(2)).must_equal true
+    @db[:items].get(Sequel.pg_multirange([Sequel::Postgres::PGRange.new(:b, :e, :db_type => :int4range)], :int4multirange).op.contains(4)).must_equal false
   end
 
   it 'operations/functions with pg_range_ops' do

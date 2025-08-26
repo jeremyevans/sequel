@@ -1,5 +1,7 @@
 === master
 
+* Do not auto parameterize PostgreSQL range and multirange types containing expressions (jeremyevans)
+
 * Support sort and reverse methods in pg_array_ops extension on PostgreSQL 18+ (jeremyevans)
 
 * Support :in_arrays option for Postgres::JSON{,B}#strip_nulls in pg_json_ops extension on PostgreSQL 18+ (jeremyevans)

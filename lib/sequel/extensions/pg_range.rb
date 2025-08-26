@@ -481,9 +481,9 @@ module Sequel
         end
       end
 
-      # Allow automatic parameterization for ranges with types.
+      # Allow automatic parameterization for ranges with types, if both start .
       def sequel_auto_param_type(ds)
-        "::#{db_type}" if db_type
+        "::#{db_type}" if db_type && (!@begin || ds.send(:auto_param_type, @begin)) && (!@end || ds.send(:auto_param_type, @end))
       end
 
       private

@@ -378,16 +378,25 @@ describe "pg_auto_parameterize extension" do
     sql.args.must_equal [v]
   end
 
-  it "should automatically parameterize pg_multirange values" do
+  it "should automatically parameterize pg_multirange values if they are parameterizable" do
     @db.extension :pg_multirange
     v = Sequel.pg_multirange([1..2, 5..6], :int4multirange)
     sql = @db[:table].insert_sql(v)
     sql.must_equal 'INSERT INTO "table" VALUES ($1::int4multirange)'
-    sql.args.length.must_equal 1
     sql.args.must_equal [v]
+
+    v = Sequel.pg_multirange([Sequel::Postgres::PGRange.new(1, nil, :db_type => :int4range)], :int4multirange)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES ($1::int4multirange)'
+    sql.args.must_equal [v]
+
+    v = Sequel.pg_multirange([Sequel::Postgres::PGRange.new(1, :en, :db_type => :int4range)], :int4multirange)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES (int4multirange(int4range($1::int4,"en",$2)))'
+    sql.args.must_equal [1, "[]"]
   end
 
-  it "should automatically parameterize pg_range values" do
+  it "should automatically parameterize pg_range values if they are parameterizable" do
     @db.extension :pg_range
     v = Sequel.pg_range(1..2, :int4range)
     sql = @db[:table].insert_sql(v)
@@ -398,6 +407,36 @@ describe "pg_auto_parameterize extension" do
     sql = @db[:table].insert_sql(v)
     sql.must_equal 'INSERT INTO "table" VALUES ($1)'
     sql.args.must_equal ['[1,2]']
+
+    v = Sequel::Postgres::PGRange.new(1, nil, :db_type => :int4range)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES ($1::int4range)'
+    sql.args.must_equal [v]
+
+    v = Sequel::Postgres::PGRange.new(1, nil)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES ($1)'
+    sql.args.must_equal ['[1,]']
+
+    v = Sequel::Postgres::PGRange.new(nil, 2, :db_type => :int4range)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES ($1::int4range)'
+    sql.args.must_equal [v]
+
+    v = Sequel::Postgres::PGRange.new(nil, 2, :exclude_begin => true, :exclude_end => true)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES ($1)'
+    sql.args.must_equal ['(,2)']
+
+    v = Sequel::Postgres::PGRange.new(:st, 2, :db_type => :int4range)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES (int4range("st",$1::int4,$2))'
+    sql.args.must_equal [2, '[]']
+
+    v = Sequel::Postgres::PGRange.new(1, :en, :exclude_begin => true, :exclude_end=> true, :db_type => :int4range)
+    sql = @db[:table].insert_sql(v)
+    sql.must_equal 'INSERT INTO "table" VALUES (int4range($1::int4,"en",$2))'
+    sql.args.must_equal [1, '()']
   end
 
   it "should automatically parameterize pg_row values if parts are automatically parameterizable" do
