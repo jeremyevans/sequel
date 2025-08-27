@@ -1,5 +1,7 @@
 === master
 
+* Support alter_table rename_constraint on PostgreSQL 9.2+ (jeremyevans) (#2274)
+
 * Do not auto parameterize PostgreSQL range and multirange types containing expressions (jeremyevans)
 
 * Support sort and reverse methods in pg_array_ops extension on PostgreSQL 18+ (jeremyevans)

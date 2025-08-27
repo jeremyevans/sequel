@@ -154,6 +154,11 @@ module Sequel
         @operations << {:op => :alter_constraint, :name => name}.merge!(opts)
       end
 
+      # :inherit :: Set true to use INHERIT, or false to use NO INHERIT (PostgreSQL 18+)
+      def rename_constraint(name, new_name)
+        @operations << {:op => :rename_constraint, :name => name, :new_name => new_name}
+      end
+
       # Validate the constraint with the given name, which should have
       # been added previously with NOT VALID.
       def validate_constraint(name)
@@ -1210,6 +1215,10 @@ module Sequel
         Postgres::AlterTableGenerator
       end
     
+      def alter_table_rename_constraint_sql(table, op)
+        "RENAME CONSTRAINT #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name])}"
+      end
+
       def alter_table_set_column_type_sql(table, op)
         s = super
         if using = op[:using]

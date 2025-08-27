@@ -1514,6 +1514,13 @@ describe "A PostgreSQL dataset" do
     @db.alter_table(:atest){alter_constraint(:atest_nn, :inherit=>false)}
   end if DB.server_version >= 180000
 
+  it "should support renaming constraints" do
+    @db.create_table!(:atest){Integer :i; constraint(:foo){i > 0}}
+    @db.check_constraints(:atest).keys.must_equal [:foo]
+    @db.alter_table(:atest){rename_constraint(:foo, :bar)}
+    @db.check_constraints(:atest).keys.must_equal [:bar]
+  end if DB.server_version >= 90200
+
   it "should support :using when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
     @db[:atest].insert(1262404000)
