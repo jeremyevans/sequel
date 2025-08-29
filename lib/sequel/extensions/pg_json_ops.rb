@@ -168,8 +168,8 @@
 #
 # On PostgreSQL 18+, strip_nulls can take an argument for whether to strip in arrays
 #
-#   j.strip_nulls(true)   # json_strip_nulls(json_column, true)
-#   j.strip_nulls(false)  # json_strip_nulls(json_column, false)
+#   j.strip_nulls(in_arrays: true)   # json_strip_nulls(json_column, true)
+#   j.strip_nulls(in_arrays: false)  # json_strip_nulls(json_column, false)
 #
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
