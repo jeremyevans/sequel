@@ -225,6 +225,14 @@ doc/security.rdoc
 
 <p>You should make sure the frame argument is not derived from user input, or switch to using a hash as the :frame option value.</p>
 
+<h4 id="label-ComplexExpression-23extract+field">ComplexExpression#extract field<span><a href="#label-ComplexExpression-23extract+field">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> converts the field to extract to a string and uses it directly.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">extract</span>(<span class="ruby-identifier">params</span>[<span class="ruby-value">:field</span>])) <span class="ruby-comment"># SQL injection!</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-identifier">params</span>[<span class="ruby-value">:field</span>], <span class="ruby-value">:column</span>)) <span class="ruby-comment"># SQL injection!</span>
+</pre>
+
 <h4 id="label-auto_literal_strings+extension">auto_literal_strings extension<span><a href="#label-auto_literal_strings+extension">&para;</a> <a href="#top">&uarr;</a></span></h4>
 
 <p>If the auto_literal_strings extension is used for backwards compatibility, then <a href="../../classes/Sequel.html"><code>Sequel</code></a> will treat plain strings as literal strings if they are used as the first argument to a filtering method.  This can lead to SQL injection:</p>

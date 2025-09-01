@@ -242,7 +242,7 @@ Superclass:
 </a>
 <pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_multirange.rb</span>
 <span class="line-num">341</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">342</span>   <span class="ruby-node">&quot;::#{db_type}&quot;</span>
+<span class="line-num">342</span>   <span class="ruby-node">&quot;::#{db_type}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">range</span><span class="ruby-operator">|</span> <span class="ruby-identifier">range</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Range</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-identifier">range</span>)}
 <span class="line-num">343</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

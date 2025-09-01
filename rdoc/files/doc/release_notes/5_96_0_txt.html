@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.96.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.96.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.96.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>On PostgreSQL 9.2+, alter_table now supports a rename_constraint method, to rename an existing constraint:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">rename_constraint</span>(<span class="ruby-value">:old_name</span>, <span class="ruby-value">:new_name</span>)
+<span class="ruby-keyword">end</span>
+</pre>
+</li><li>
+<p>Virtual generated columns are now supported on PostgreSQL 18+, using the :generated_always_as and :virtual options. For backwards compatibility, the default without the :virtual option still creates a stored generated column. This is unfortunately different from the PostgreSQL 18+ default, where VIRTUAL is assumed if neither VIRTUAL nor STORED is specified.</p>
+</li><li>
+<p>The strip_nulls method in the pg_json_ops extension now supports an :in_arrays option on PostgreSQL 18+, for stripping nulls in json arrays.</p>
+</li><li>
+<p>The pg_array_ops extension now supports sort and reverse methods, for the array_sort and array_reverse database functions added in PostgreSQL 18.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When using the pg_range and/or pg_multirange extensions in conjunction with the the pg_auto_parameterize extension, PostgreSQL range and multirange types containing non-value expressions will no longer be automatically parameterized. Note that in order for <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to generate appropriate SQL for range types with a non-value expressions, the range must have an explicit type, as PostgreSQL does not offer a function to create an untyped range.</p>
+</li><li>
+<p>A regression in <a href="5_95_0_txt.html">5.95.0</a> where the :deferred option would be ignored for unique and primary key constraints on PostgreSQL has been fixed (fix originally included in 5.95.1).</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

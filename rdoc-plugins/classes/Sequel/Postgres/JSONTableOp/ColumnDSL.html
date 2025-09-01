@@ -94,9 +94,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-columns-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1163</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1164</span>   <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">1165</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1179</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1180</span>   <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1181</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-new'>
@@ -113,10 +113,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1167</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1168</span>   <span class="ruby-ivar">@columns</span> = []
-<span class="line-num">1169</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1170</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1184</span>   <span class="ruby-ivar">@columns</span> = []
+<span class="line-num">1185</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1186</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -136,9 +136,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-Bignum-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1193</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Bignum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1194</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:column</span>, <span class="ruby-identifier">name</span>, <span class="ruby-value">:Bignum</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
-<span class="line-num">1195</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1209</span> <span class="ruby-keyword">def</span> <span class="ruby-constant">Bignum</span>(<span class="ruby-identifier ruby-title">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1210</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:column</span>, <span class="ruby-identifier">name</span>, <span class="ruby-value">:Bignum</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1211</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-column'>
@@ -157,9 +157,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-column-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1179</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:column</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
-<span class="line-num">1180</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1194</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1195</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:column</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1196</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-exists'>
@@ -178,9 +178,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-exists-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exists</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">1184</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:exists</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
-<span class="line-num">1185</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1199</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exists</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1200</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:exists</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1201</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-nested'>
@@ -199,9 +199,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-nested-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nested</span>(<span class="ruby-identifier">path</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">1189</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:nested</span>, <span class="ruby-identifier">path</span>, <span class="ruby-constant">ColumnDSL</span>.<span class="ruby-identifier">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)].<span class="ruby-identifier">freeze</span>
-<span class="line-num">1190</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1204</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nested</span>(<span class="ruby-identifier">path</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1205</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:nested</span>, <span class="ruby-identifier">path</span>, <span class="ruby-constant">ColumnDSL</span>.<span class="ruby-identifier">columns</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1206</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-ordinality'>
@@ -220,9 +220,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-ordinality-source'>     <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">1173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">ordinality</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">1174</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:ordinality</span>, <span class="ruby-identifier">name</span>].<span class="ruby-identifier">freeze</span>
-<span class="line-num">1175</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">1189</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">ordinality</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">1190</span>   <span class="ruby-ivar">@columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-value">:ordinality</span>, <span class="ruby-identifier">name</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">1191</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

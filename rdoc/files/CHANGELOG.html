@@ -33,6 +33,19 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.96.0+-282025-09-01-29"><a href="doc/release_notes/5_96_0_txt.html">5.96.0</a> (2025-09-01)<span><a href="#label-5.96.0+-282025-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support alter_table rename_constraint on PostgreSQL 9.2+ (jeremyevans) (#2274)</p>
+</li><li>
+<p>Do not auto parameterize PostgreSQL range and multirange types containing expressions (jeremyevans)</p>
+</li><li>
+<p>Support sort and reverse methods in pg_array_ops extension on PostgreSQL 18+ (jeremyevans)</p>
+</li><li>
+<p>Support :in_arrays option for Postgres::JSON{,B}#strip_nulls in pg_json_ops extension on PostgreSQL 18+ (jeremyevans)</p>
+</li><li>
+<p>Support VIRTUAL generated columns on PostgreSQL 18+ using :virtual option (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.95.1+-282025-08-05-29">5.95.1 (2025-08-05)<span><a href="#label-5.95.1+-282025-08-05-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Fix regression in <a href="doc/release_notes/5_95_0_txt.html">5.95.0</a> where :deferred would be ignored for unique and primary key constraints on PostgreSQL (jeremyevans) (#2321)</p>

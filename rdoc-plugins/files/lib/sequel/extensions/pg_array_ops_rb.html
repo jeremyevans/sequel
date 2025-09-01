@@ -90,6 +90,14 @@ lib/sequel/extensions/pg_array_ops.rb
 <span class="ruby-identifier">ia</span>.<span class="ruby-identifier">unnest</span>(<span class="ruby-value">:b</span>)      <span class="ruby-comment"># unnest(int_array_column, b)</span>
 </pre>
 
+<p>On PostgreSQL 18+, the following are supported:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ia</span>.<span class="ruby-identifier">sort</span>                <span class="ruby-comment"># array_sort(int_array_column)</span>
+<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">sort</span>(<span class="ruby-value">desc:</span> <span class="ruby-keyword">true</span>)    <span class="ruby-comment"># array_sort(int_array_column, true)</span>
+<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">sort</span>(<span class="ruby-value">nulls:</span> <span class="ruby-value">:first</span>) <span class="ruby-comment"># array_sort(int_array_column, false, true)</span>
+<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">reverse</span>             <span class="ruby-comment"># array_reverse(int_array_column)</span>
+</pre>
+
 <p>See the PostgreSQL array function and operator documentation for more details on what these functions and operators do.</p>
 
 <p>If you are also using the pg_array extension, you should load it before loading this extension.  Doing so will allow you to use PGArray#op to get an ArrayOp, allowing you to perform array operations on array literals.</p>

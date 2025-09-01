@@ -460,7 +460,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Allow automatic parameterization for ranges with types.</p>
+<p>Allow automatic parameterization for ranges with types, if both start .</p>
 
 </div>
 <div class='source'>
@@ -469,7 +469,7 @@ Superclass:
 </a>
 <pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
 <span class="line-num">485</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">486</span>   <span class="ruby-node">&quot;::#{db_type}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>
+<span class="line-num">486</span>   <span class="ruby-node">&quot;::#{db_type}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-operator">!</span><span class="ruby-ivar">@begin</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-ivar">@begin</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-operator">!</span><span class="ruby-ivar">@end</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-ivar">@end</span>))
 <span class="line-num">487</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

@@ -193,6 +193,12 @@ lib/sequel/extensions/pg_json_ops.rb
 <span class="ruby-comment"># ))</span>
 </pre>
 
+<p>On PostgreSQL 18+, strip_nulls can take an argument for whether to strip in arrays</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span>.<span class="ruby-identifier">strip_nulls</span>(<span class="ruby-value">in_arrays:</span> <span class="ruby-keyword">true</span>)   <span class="ruby-comment"># json_strip_nulls(json_column, true)</span>
+<span class="ruby-identifier">j</span>.<span class="ruby-identifier">strip_nulls</span>(<span class="ruby-value">in_arrays:</span> <span class="ruby-keyword">false</span>)  <span class="ruby-comment"># json_strip_nulls(json_column, false)</span>
+</pre>
+
 <p>If you are also using the pg_json extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
 
 <p>In order to get the automatic conversion from a ruby array to a PostgreSQL array (as shown in the [] and get_text examples above), you need to load the pg_array extension.</p>
