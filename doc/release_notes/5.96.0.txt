@@ -32,6 +32,6 @@
   expressions, the range must have an explicit type, as PostgreSQL
   does not offer a function to create an untyped range.
 
-* A regression in 5.95 where the :deferred option would be ignored
+* A regression in 5.95.0 where the :deferred option would be ignored
   for unique and primary key constraints on PostgreSQL has been
   fixed (fix originally included in 5.95.1).
