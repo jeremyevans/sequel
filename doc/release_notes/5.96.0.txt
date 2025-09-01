@@ -1,0 +1,37 @@
+= New Features
+
+* On PostgreSQL 9.2+, alter_table now supports a rename_constraint
+  method, to rename an existing constraint:
+
+    DB.alter_table(:table) do
+      rename_constraint(:old_name, :new_name)
+    end
+
+* Virtual generated columns are now supported on PostgreSQL 18+,
+  using the :generated_always_as and :virtual options. For backwards
+  compatibility, the default without the :virtual option still
+  creates a stored generated column. This is unfortunately different
+  from the PostgreSQL 18+ default, where VIRTUAL is assumed if neither
+  VIRTUAL nor STORED is specified.
+
+* The strip_nulls method in the pg_json_ops extension now supports an
+  :in_arrays option on PostgreSQL 18+, for stripping nulls in json
+  arrays.
+
+* The pg_array_ops extension now supports sort and reverse methods,
+  for the array_sort and array_reverse database functions added in
+  PostgreSQL 18.
+
+= Other Improvements
+
+* When using the pg_range and/or pg_multirange extensions in
+  conjunction with the the pg_auto_parameterize extension, PostgreSQL
+  range and multirange types containing non-value expressions will no
+  longer be automatically parameterized. Note that in order for Sequel
+  to generate appropriate SQL for range types with a non-value
+  expressions, the range must have an explicit type, as PostgreSQL
+  does not offer a function to create an untyped range.
+
+* A regression in 5.95 where the :deferred option would be ignored
+  for unique and primary key constraints on PostgreSQL has been
+  fixed (fix originally included in 5.95.1).
