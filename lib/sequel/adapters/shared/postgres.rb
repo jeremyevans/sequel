@@ -726,6 +726,14 @@ module Sequel
         Sequel.synchronize{@primary_key_sequences[quoted_table] = value} if value
       end
 
+      # Rename a schema in the database. Arguments:
+      # name :: Current name of the schema
+      # opts :: New name for the schema
+      def rename_schema(name, new_name)
+        self << rename_schema_sql(name, new_name)
+        remove_all_cached_schemas
+      end
+
       # Refresh the materialized view with the given name.
       # 
       #   DB.refresh_view(:items_view)
@@ -1804,6 +1812,18 @@ module Sequel
           @primary_key_sequences.delete(tab)
         end
         super
+      end
+
+      # Clear all cached schema information
+      def remove_all_cached_schemas
+        @primary_keys.clear
+        @primary_key_sequences.clear
+        @schemas.clear
+      end
+
+      # SQL for renaming a schema.
+      def rename_schema_sql(name, new_name)
+        "ALTER SCHEMA #{quote_identifier(name)} RENAME TO #{quote_identifier(new_name)}"
       end
 
       # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in

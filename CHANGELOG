@@ -1,3 +1,7 @@
+=== master
+
+* Add Database#rename_schema on PostgreSQL (jeremyevans)
+
 === 5.96.0 (2025-09-01)
 
 * Support alter_table rename_constraint on PostgreSQL 9.2+ (jeremyevans) (#2274)

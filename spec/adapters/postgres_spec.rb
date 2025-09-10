@@ -2833,6 +2833,22 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
   end
 
+  it "#rename_schema should rename schema" do
+    begin
+      @d.create_schema(:s)
+      @d.create_table(Sequel[:s][:test]){Integer :a}
+      @d.schema(Sequel[:s][:test]).map(&:first).must_equal [:a]
+      @d.rename_schema(:s, :sequel)
+      proc{@d.schema(Sequel[:s][:test])}.must_raise Sequel::DatabaseError
+      @d.schema(Sequel[:sequel][:test]).map(&:first).must_equal [:a]
+      @d.tables(:schema=>:sequel).must_equal [:test]
+      @d.tables(:schema=>'sequel').must_equal [:test]
+      @d.tables(:schema=>Sequel[:sequel]).must_equal [:test]
+    ensure
+      @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
+    end
+  end
+
   it "#create_trigger and #drop_trigger should create and drop triggers" do
     @d.create_language(:plpgsql) if @d.server_version < 90000
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
