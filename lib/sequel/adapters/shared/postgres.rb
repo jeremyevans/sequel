@@ -571,6 +571,7 @@ module Sequel
       #         :if_exists :: Don't raise an error if the schema doesn't exist.
       def drop_schema(name, opts=OPTS)
         self << drop_schema_sql(name, opts)
+        remove_all_cached_schemas
       end
 
       # Drops a trigger from the database.  Arguments:

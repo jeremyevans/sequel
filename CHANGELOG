@@ -1,5 +1,7 @@
 === master
 
+* Clear all cached schema information when using Database#drop_schema on PostgreSQL (jeremyevans)
+
 * Add Database#rename_schema on PostgreSQL (jeremyevans)
 
 === 5.96.0 (2025-09-01)
