@@ -1,5 +1,7 @@
 === master
 
+* Add deprecated_associations plugin, for warning/raising for deprecated association access (jeremyevans)
+
 * Clear all cached schema information when using Database#drop_schema on PostgreSQL (jeremyevans)
 
 * Add Database#rename_schema on PostgreSQL (jeremyevans)
