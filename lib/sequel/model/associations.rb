@@ -3063,7 +3063,7 @@ module Sequel
           if (((op == :'=' || op == :'!=') && r.is_a?(Sequel::Model)) ||
               (multiple = ((op == :IN || op == :'NOT IN') && ((is_ds = r.is_a?(Sequel::Dataset)) || (r.respond_to?(:all?) && r.all?{|x| x.is_a?(Sequel::Model)})))))
             l = args[0]
-            if ar = model.association_reflections[l]
+            if ar = model.association_reflection(l)
               raise Error, "filtering by associations is not allowed for #{ar.inspect}" if ar[:allow_filtering_by] == false
 
               if multiple
