@@ -24,6 +24,13 @@ describe "pg_range extension" do
   endless_range_support = RUBY_VERSION >= '2.6'
   startless_range_support = RUBY_VERSION >= '2.7'
 
+  it "should have friendly #inspect output" do
+    @R.new(1,2).inspect.must_equal "#<Sequel::Postgres::PGRange [1,2]>"
+    @R.new(1,2, :exclude_begin=>true, :exclude_end=>true, :db_type=>'int4range').inspect.must_equal "#<Sequel::Postgres::PGRange (1,2)::int4range>"
+    @R.new(nil, nil, :empty=>true).inspect.must_equal "#<Sequel::Postgres::PGRange empty>"
+    @R.new(nil, nil, :empty=>true, :db_type=>'int4range').inspect.must_equal "#<Sequel::Postgres::PGRange empty::int4range>"
+  end
+
   it "should set up conversion procs correctly" do
     cp = @db.conversion_procs
     cp[3904].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int4range')

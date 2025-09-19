@@ -421,6 +421,17 @@ module Sequel
         @exclude_end
       end
 
+      # Support a friendly output
+      def inspect
+        range = if empty?
+          "empty"
+        else
+          "#{@exclude_begin ? "(" : "["}#{@begin},#{@end}#{@exclude_end ? ")" : "]"}"
+        end
+
+        "#<#{self.class.name} #{range}#{"::#{@db_type}" if @db_type}>"
+      end
+
       # Append a literalize version of the receiver to the sql.
       def sql_literal_append(ds, sql)
         if (s = @db_type) && !empty?
