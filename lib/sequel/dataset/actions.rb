@@ -1256,8 +1256,6 @@ module Sequel
     # receiver's current order. This yields the row and the array of order expressions
     # to the block, which should return an array of values to use.
     def ignore_values_preceding(row)
-      @opts[:order].map{|v| v.is_a?(SQL::OrderedExpression) ? v.expression : v}
-
       order_exprs = @opts[:order].map do |v|
         if v.is_a?(SQL::OrderedExpression)
           descending = v.descending
