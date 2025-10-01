@@ -1,4 +1,4 @@
-Mon, 01 Sep 2025 07:58:15 -0700
+Wed, 01 Oct 2025 09:31:22 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -38,7 +38,7 @@ lib/sequel/extensions/index_caching.rb	Thu, 17 Aug 2023 13:01:31 -0700
 lib/sequel/extensions/inflector.rb	Tue, 03 Jun 2025 09:09:55 -0700
 lib/sequel/extensions/integer64.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/extensions/is_distinct_from.rb	Tue, 02 Aug 2022 16:36:07 -0700
-lib/sequel/extensions/looser_typecasting.rb	Thu, 22 Sep 2022 15:08:16 -0700
+lib/sequel/extensions/looser_typecasting.rb	Fri, 26 Sep 2025 23:42:00 -0700
 lib/sequel/extensions/migration.rb	Tue, 03 Jun 2025 09:09:55 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Wed, 06 Dec 2023 16:41:40 -0800
@@ -61,7 +61,7 @@ lib/sequel/extensions/pg_json.rb	Thu, 16 Jan 2025 10:18:06 -0800
 lib/sequel/extensions/pg_json_ops.rb	Fri, 29 Aug 2025 10:46:38 -0700
 lib/sequel/extensions/pg_loose_count.rb	Mon, 24 May 2021 12:25:38 -0700
 lib/sequel/extensions/pg_multirange.rb	Tue, 26 Aug 2025 15:04:09 -0700
-lib/sequel/extensions/pg_range.rb	Tue, 26 Aug 2025 15:04:09 -0700
+lib/sequel/extensions/pg_range.rb	Fri, 19 Sep 2025 11:46:00 -0700
 lib/sequel/extensions/pg_range_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
 lib/sequel/extensions/pg_row.rb	Thu, 16 Jan 2025 11:55:52 -0800
 lib/sequel/extensions/pg_row_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
@@ -131,6 +131,7 @@ lib/sequel/plugins/dataset_associations.rb	Fri, 04 Dec 2020 13:44:07 -0800
 lib/sequel/plugins/def_dataset_method.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/defaults_setter.rb	Thu, 25 Jul 2024 10:41:27 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/deprecated_associations.rb	Wed, 01 Oct 2025 09:18:52 -0700
 lib/sequel/plugins/dirty.rb	Fri, 21 Oct 2022 08:19:04 -0700
 lib/sequel/plugins/eager_each.rb	Fri, 16 Jun 2017 12:40:57 -0700
 lib/sequel/plugins/eager_graph_eager.rb	Mon, 06 Aug 2018 08:40:06 -0700
