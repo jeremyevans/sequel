@@ -11,10 +11,14 @@ module Sequel
     #   Album.many_to_one :artist, deprecated: true
     #   album = Album[1]
     #
-    #   Album.association_reflection(:artist) # warning
-    #   album.artist # warning
-    #   album.artist_dataset # warning
-    #   album.artist = Artist[2] # warning
+    #   # Warnings for all of the following calls
+    #   album.artist
+    #   album.artist_dataset
+    #   album.artist = Artist[2]
+    #   Album.association_reflection(:artist)
+    #   Album.eager(:artist)
+    #   Album.eager_graph(:artist)
+    #   Album.where(artist: Artist[1]).all
     #
     # By default, the plugin issues a single warning per
     # association method or association reflection. See
