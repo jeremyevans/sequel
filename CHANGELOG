@@ -1,4 +1,4 @@
-=== master
+=== 5.97.0 (2025-10-01)
 
 * Simplify Postgres::PGRange#inspect output (jeremyevans)
 

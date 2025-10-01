@@ -1,0 +1,38 @@
+= New Features
+
+* A deprecated_associations plugin has been added, which supports
+  warning if a deprecated association is used:
+
+    Album.plugin :deprecated_associations
+    Album.many_to_one :artist, deprecated: true
+    album = Album[1]
+
+    # Warnings for all of the following calls
+    album.artist
+    album.artist_dataset
+    album.artist = Artist[2]
+    Album.association_reflection(:artist)
+    Album.eager(:artist)
+    Album.eager_graph(:artist)
+    Album.where(artist: Artist[1]).all
+
+  You can customize the behavior using the :raise, :deduplicate,
+  and :backtrace plugin options.
+
+* Database#rename_schema has been added on PostgreSQL to support
+  renaming schemas.
+
+= Other Improvements
+
+* Database#drop_schema on PostgreSQL now clears all cached schema
+  information.
+
+* Postgres::PGRange#inspect in the pg_range extension now provides
+  more friendly output:
+
+    Sequel::Postgres::PGRange.from_range(1...3, :int4).inspect
+    # => "#<Sequel::Postgres::PGRange [1,3)::int4>"
+
+* BigDecimal typcasting when using the looser_typecasting extension
+  now works as expected when using newer bigdecimal gem with
+  Ruby < 2.4.
