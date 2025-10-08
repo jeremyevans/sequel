@@ -62,10 +62,25 @@ module Sequel
       
       # Mimic the file:// uri, by having 2 preceding slashes specify a relative
       # path, and 3 preceding slashes specify an absolute path.
+      # Also support no preceding slashes to specify a relative path.
       def self.uri_to_options(uri) # :nodoc:
-        { :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}" }
+        database = if uri.host.nil?
+          case uri.path
+          when '/'
+            nil
+          when nil
+            uri.opaque
+          else
+            uri.path
+          end
+        else
+          "#{uri.host}#{uri.path}"
+        end
+
+        { :database => database }
       end
       private_class_method :uri_to_options
+      
       
       # Connect to the database.  Since SQLite is a file based database,
       # the only options available are :database (to specify the database

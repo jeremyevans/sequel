@@ -16,6 +16,17 @@ describe "An SQLite database" do
     DB.class.send(:options_from_uri, URI("scheme://app%2Fdata%2Ftest.db"))[:database].must_equal 'app/data/test.db'
   end if DB.adapter_scheme == :sqlite || DB.adapter_scheme == :amalgalite
 
+  it "should unescape escaped paths in URI for database file" do
+    filename = "spec/sqlite-test-#{$$}.rb"
+    begin
+      File.file?(filename).must_equal false
+      Sequel.connect("#{DB.adapter_scheme}:#{filename}")
+      File.file?(filename).must_equal true
+    ensure
+      File.delete(filename) if File.file?(filename)
+    end
+  end if DB.adapter_scheme == :sqlite || DB.adapter_scheme == :amalgalite
+
   it "should support casting to Date by using the date function" do
     @db.get(Sequel.cast('2012-10-20 11:12:13', Date)).must_equal '2012-10-20'
   end

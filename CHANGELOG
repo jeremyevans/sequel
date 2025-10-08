@@ -1,3 +1,7 @@
+=== master
+
+* Recognize sqlite:filename and amalgalite:filename connection URLs (jeremyevans) (#2334)
+
 === 5.97.0 (2025-10-01)
 
 * Simplify Postgres::PGRange#inspect output (jeremyevans)
