@@ -24,6 +24,9 @@ if uses_pg && (auto_parameterize = ENV['SEQUEL_PG_AUTO_PARAMETERIZE'])
   when 'in_array_string_untyped'
     DB.opts[:treat_string_list_as_array] = 't'
     DB.extension :pg_auto_parameterize_in_array
+  when 'duplicate_query_detection'
+    run_duplicate_query_detection_specs = true
+    DB.extension :pg_auto_parameterize_duplicate_query_detection
   else
     DB.extension :pg_auto_parameterize
   end
@@ -6815,3 +6818,65 @@ describe "pg_eager_any_typed_array plugin" do
     check(:array_children, @c3, [@c1])
   end
 end
+
+describe "pg_auto_parameterize_duplicate_query_detection extension" do
+  before(:all) do
+    @db = DB
+  end
+
+  it "should raise for multiple identical queries at same location" do
+    e = proc do
+      @db.detect_duplicate_queries do
+        3.times do
+          @db["SELECT 1"].all
+        end
+      end
+    end.must_raise Sequel::Postgres::AutoParameterizeDuplicateQueryDetection::DuplicateQueries
+    e.queries.keys.map(&:first).must_equal ["SELECT 1"]
+    e.queries.values.must_equal [3]
+  end
+
+  it "should raise for multiple queries with same SQL and different bound variables at same location" do
+    e = proc do
+      @db.detect_duplicate_queries do
+        3.times do |i|
+          @db["SELECT ?", i].all
+        end
+        2.times do |i|
+          @db["SELECT 1 + ?", i].all
+        end
+      end
+    end.must_raise Sequel::Postgres::AutoParameterizeDuplicateQueryDetection::DuplicateQueries
+    e.queries.keys.map(&:first).sort.must_equal ["SELECT $1::int4", "SELECT 1 + $1::int4"]
+    e.queries.values.sort.must_equal [2, 3]
+  end
+
+  it "should raise for multiple prepared statement executions at same location" do
+    e = proc do
+      ps = @db["SELECT ?", :$n].prepare(:select, :select1)
+      @db.detect_duplicate_queries do
+        3.times do |i|
+          ps.call(:n => i)
+        end
+      end
+    end.must_raise Sequel::Postgres::AutoParameterizeDuplicateQueryDetection::DuplicateQueries
+    e.queries.keys.map(&:first).must_equal [:select1]
+    e.queries.values.must_equal [3]
+  end
+
+  it "should not raise for multiple identical queries at different locations" do
+    @db.detect_duplicate_queries do
+      @db["SELECT 1"].all
+      @db["SELECT 1"].all
+      @db["SELECT 1"].all
+    end
+  end
+
+  it "should not raise for multiple different queries at same location" do
+    @db.detect_duplicate_queries do
+      3.times do |i|
+        @db["SELECT #{i}"].all
+      end
+    end
+  end
+end if run_duplicate_query_detection_specs

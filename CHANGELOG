@@ -1,5 +1,7 @@
 === master
 
+* Add pg_auto_parameterize_duplicate_query_detection extension for N+1 query detection (jeremyevans)
+
 * Recognize sqlite:filename and amalgalite:filename connection URLs (jeremyevans) (#2334)
 
 === 5.97.0 (2025-10-01)
