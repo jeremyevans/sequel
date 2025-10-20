@@ -54,6 +54,16 @@ module Sequel
           end
         end
 
+        # Remove the key from noncolumn values if it is present there. If it is not
+        # present there, then use the default behavior of removing it from values.
+        def remove_key!(key)
+          if @noncolumn_values && @noncolumn_values.key?(key)
+            @noncolumn_values.delete(key)
+          else
+            super
+          end
+        end
+
         # Check all entries in the values hash.  If any of the keys are not columns,
         # move the entry into the noncolumn_values hash.
         def split_noncolumn_values

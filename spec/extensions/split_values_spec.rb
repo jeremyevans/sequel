@@ -54,4 +54,17 @@ describe "Sequel::Plugins::SplitValues" do
     o.save
     @c.db.sqls.must_equal ["UPDATE a SET x = NULL WHERE (id = 1)"]
   end
+
+  it "#remove_key! removes noncolumn value if key is present there" do
+    o = @c.load(:id=>1, :x=>2, :y=>3)
+    o[:x].must_equal 2
+    o.remove_key!(:x)
+    o[:x].must_be_nil
+
+    o[:y].must_equal 3
+    o.remove_key!(:y)
+    o[:y].must_be_nil
+
+    o.values.must_equal(:id=>1)
+  end
 end

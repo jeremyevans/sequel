@@ -954,3 +954,20 @@ describe "Model::include" do
     including_class.included_modules.must_include(mod2)
   end
 end
+
+describe "Model#remove_key!" do
+  before do
+    @o = Class.new(Sequel::Model(:a)).load(:id=>1)
+  end
+
+  it "should remove the value from values and return it" do
+    @o.values.must_equal(:id=>1)
+    @o.remove_key!(:id).must_equal 1
+    @o.values.must_equal({})
+  end
+
+  it "should return nil if the entry does not exist in values" do
+    @o.remove_key!(:foo).must_be_nil
+    @o.values.must_equal(:id=>1)
+  end
+end

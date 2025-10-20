@@ -111,7 +111,7 @@ module Sequel
           ancestor_base_case_columns = prkey_array.zip(key_aliases).map{|k, ka_| SQL::AliasedExpression.new(k, ka_)} + c_all
           descendant_base_case_columns = key_array.zip(key_aliases).map{|k, ka_| SQL::AliasedExpression.new(k, ka_)} + c_all
           recursive_case_columns = prkey_array.zip(key_aliases).map{|k, ka_| SQL::QualifiedIdentifier.new(t, ka_)} + c_all
-          extract_key_alias = lambda{|m| key_aliases.map{|ka_| bd_conv[m.values.delete(ka_)]}}
+          extract_key_alias = lambda{|m| key_aliases.map{|ka_| bd_conv[m.remove_key!(ka_)]}}
         else
           key_present = key_conv = lambda{|m| m[key]}
           prkey_conv = lambda{|m| m[prkey]}
@@ -119,7 +119,7 @@ module Sequel
           ancestor_base_case_columns = [SQL::AliasedExpression.new(prkey, ka)] + c_all
           descendant_base_case_columns = [SQL::AliasedExpression.new(key, ka)] + c_all
           recursive_case_columns = [SQL::QualifiedIdentifier.new(t, ka)] + c_all
-          extract_key_alias = lambda{|m| bd_conv[m.values.delete(ka)]}
+          extract_key_alias = lambda{|m| bd_conv[m.remove_key!(ka)]}
         end
         
         parent = opts.merge(opts.fetch(:parent, OPTS)).fetch(:name, :parent)
@@ -307,7 +307,7 @@ module Sequel
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
           model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>OPTS)) do |obj|
             if level
-              no_cache = no_cache_level == obj.values.delete(la)
+              no_cache = no_cache_level == obj.remove_key!(la)
             end
             
             opk = prkey_conv[obj]

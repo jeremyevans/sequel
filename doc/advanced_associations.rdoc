@@ -834,7 +834,7 @@ name, with no duplicates?
           join(:lyrics, id: :lyric_id){Sequel.or(composer_id: ids, arranger_id: ids, vocalist_id: ids, lyricist_id: ids)}.
           order{songs[:name]}.all do |song|
             [:composer_id, :arranger_id, :vocalist_id, :lyricist_id].each do |x|
-              recs = h[song.values.delete(x)]
+              recs = h[song.remove_key!(x)]
               recs.each{|r| r.associations[:songs] << song} if recs
             end
           end
@@ -862,7 +862,7 @@ associated tickets.
        select_group(:project_id).
        select_append{sum(hours).as(hours)}.
        all do |t|
-        p = eo[:id_map][t.values.delete(:project_id)].first
+        p = eo[:id_map][t.remove_key!(:project_id)].first
         p.associations[:ticket_hours] = t
        end
      end)

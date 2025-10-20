@@ -3323,3 +3323,70 @@ describe "ClassTableInheritanceConstraintValidations Plugin" do
     CvManager.new(status: "active", level: "senior").must_be :valid?
   end
 end unless DB.frozen?
+
+describe "split_values plugin with eager loading" do
+  before do
+    @db = DB
+    @db.create_table!(:artists) do
+      primary_key :id
+    end
+
+    @db.create_table!(:logs) do
+      primary_key :id
+    end
+
+    @db.create_table!(:log_entries) do
+      primary_key :id
+      foreign_key :log_id, :logs
+    end
+
+    @db.create_join_table!({artist_id: :artists, log_entry_id: :log_entries})
+
+    @Artist = Class.new(Sequel::Model(@db[:artists])) do
+      def self.name; "Artist" end
+      plugin :split_values
+      plugin :many_through_many
+    end
+
+    @Log = Class.new(Sequel::Model(@db[:logs])) do
+      def self.name; "Log" end
+      plugin :split_values
+    end
+
+    @LogEntry = Class.new(Sequel::Model(@db[:log_entries])) do
+      def self.name; "LogEntry" end
+      plugin :split_values
+    end
+
+    @Artist.many_to_many :log_entries, class: @LogEntry
+    @LogEntry.one_through_one :artist, class: @Artist
+    @Log.one_to_many :log_entries, eager: [:artist], class: @LogEntry
+    @LogEntry.many_to_one :log, class: @Log
+
+    @Artist.many_through_many :logs,
+      [
+        [:artists_log_entries, :artist_id, :log_entry_id],
+        [:log_entries, :id, :log_id]
+      ],
+      class: @Log
+
+    @artist = @Artist.create
+    @log = @Log.create
+    @log_entry = @LogEntry.create(log_id: @log.id)
+    DB[:artists_log_entries].insert(log_entry_id: @log_entry.id, artist_id: @artist.id)
+  end
+
+  after do
+    @db.drop_join_table({artist_id: :artists, log_entry_id: :log_entries})
+    @db.drop_table(:log_entries, :logs, :artists)
+  end
+
+  it "should have working eager loading" do
+    @Log.first.log_entries.first.artist.must_equal @artist
+    @Log.eager(:log_entries).all.first.log_entries.must_equal [@log_entry]
+    @Artist.eager(:log_entries).all.first.log_entries.must_equal [@log_entry]
+    @LogEntry.eager(:artist).all.first.artist.must_equal @artist
+    @Log.eager(:log_entries).all.first.log_entries.must_equal [@log_entry]
+    @Artist.eager(:logs).all.first.logs.must_equal [@log]
+  end
+end

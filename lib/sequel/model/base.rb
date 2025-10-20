@@ -1499,6 +1499,20 @@ END
         refresh
       end
   
+      # Remove a key from the instances values, and return the value
+      # of the key.
+      #
+      #   a = Album[1]
+      #   a.values
+      #   # => {id: 1, artist_id: 2}
+      #   a.remove_key!(:artist_id)
+      #   # => 2
+      #   a.values
+      #   # => {id: 1}
+      def remove_key!(key)
+        @values.delete(key)
+      end
+
       # Creates or updates the record, after making sure the record
       # is valid and before hooks execute successfully. Fails if:
       #

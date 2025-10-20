@@ -70,7 +70,7 @@ module Sequel
       class DuplicateQueries < Sequel::Error
         # A hash of queries that were duplicate. Keys are arrays
         # with 2 entries, the first being the query SQL, and the
-        # second being the related caller line.
+        # second being the related call stack (backtrace).
         # The values are the number of query executions.
         attr_reader :queries
 

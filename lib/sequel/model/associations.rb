@@ -302,7 +302,7 @@ module Sequel
 
             if strategy == :window_function
               delete_rn = ds.row_number_column 
-              objects.each{|obj| obj.values.delete(delete_rn)}
+              objects.each{|obj| obj.remove_key!(delete_rn)}
             end
           elsif strategy == :union
             objects = []
@@ -1291,11 +1291,11 @@ module Sequel
           name = self[:name]
 
           self[:model].eager_load_results(self, eo) do |assoc_record|
-            assoc_record.values.delete(delete_rn) if delete_rn
+            assoc_record.remove_key!(delete_rn) if delete_rn
             hash_key = if uses_lcks
-              left_key_alias.map{|k| assoc_record.values.delete(k)}
+              left_key_alias.map{|k| assoc_record.remove_key!(k)}
             else
-              assoc_record.values.delete(left_key_alias)
+              assoc_record.remove_key!(left_key_alias)
             end
 
             objects = h[hash_key]
@@ -2387,7 +2387,7 @@ module Sequel
             delete_rn = opts.delete_row_number_column
 
             eager_load_results(opts, eo) do |assoc_record|
-              assoc_record.values.delete(delete_rn) if delete_rn
+              assoc_record.remove_key!(delete_rn) if delete_rn
               hash_key = uses_cks ? km.map{|k| assoc_record.get_column_value(k)} : assoc_record.get_column_value(km)
               objects = h[hash_key]
               if assign_singular
