@@ -22,6 +22,7 @@ Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
 Sequel::Model.plugin :prepared_statements if ENV['SEQUEL_MODEL_PREPARED_STATEMENTS']
 Sequel::Model.plugin :throw_failures if ENV['SEQUEL_MODEL_THROW_FAILURES']
 Sequel::Model.plugin :primary_key_lookup_check_values if ENV['SEQUEL_PRIMARY_KEY_LOOKUP_CHECK_VALUES']
+Sequel::Model.plugin :split_values if ENV["SEQUEL_SPLIT_VALUES"]
 Sequel::Model.use_transactions = false
 Sequel::Model.cache_anonymous_models = false
 
