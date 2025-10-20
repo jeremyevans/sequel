@@ -1,5 +1,7 @@
 === master
 
+* Make the rcte_tree and split_values plugins work together (jeremyevans)
+
 * Make split_values plugin work when eager loading using join tables (jeremyevans) (#2336)
 
 * Add Model#remove_key! to remove a key from values (jeremyevans)

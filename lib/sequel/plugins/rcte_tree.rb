@@ -200,7 +200,7 @@ module Sequel
           model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil)) do |obj|
             opk = prkey_conv[obj]
             if idm_obj = parent_map[opk]
-              key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
+              key_aliases.each{|ka_| idm_obj[ka_] = obj[ka_]}
               obj = idm_obj
             else
               obj.associations[parent] = nil
@@ -312,7 +312,7 @@ module Sequel
             
             opk = prkey_conv[obj]
             if idm_obj = parent_map[opk]
-              key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
+              key_aliases.each{|ka_| idm_obj[ka_] = obj[ka_]}
               obj = idm_obj
             else
               obj.associations[childrena] = [] unless no_cache
