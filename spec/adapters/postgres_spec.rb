@@ -3312,6 +3312,17 @@ if uses_pg && DB.server_version >= 90000
       proc{@db.listen('foo', :loop=>true)}.must_raise Sequel::Error
     end
 
+    it "should clear notifications received after UNLISTEN" do
+      DB.listen('foo', :after_listen=>proc{2.times{@db.notify('foo', :payload=>'bar')}}) do |x, _, y|
+        x.must_equal 'foo'
+        y.must_equal 'bar'
+      end.must_equal 'foo'
+      DB.listen('quux', :after_listen=>proc{@db.notify('quux', :payload=>'baz')}) do |x, _, y|
+        x.must_equal 'quux'
+        y.must_equal 'baz'
+      end.must_equal 'quux'
+    end
+
     it "should accept a :timeout option in listen" do
       @db.listen('foo2', :timeout=>0.001).must_be_nil
       called = false

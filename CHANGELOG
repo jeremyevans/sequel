@@ -1,5 +1,7 @@
 === master
 
+* Fix Database#listen in postgres adapter to ignore all notifications after UNLISTEN (jeremyevans)
+
 * Make Model.any? forward to the dataset, to work better with the any_not_empty extension (jeremyevans) (#2337)
 
 * Make the rcte_tree and split_values plugins work together (jeremyevans)

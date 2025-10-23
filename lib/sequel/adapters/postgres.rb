@@ -516,6 +516,7 @@ module Sequel
                 end
               ensure
                 conn.execute("UNLISTEN *")
+                true while conn.wait_for_notify(0)
               end
             end
           end
