@@ -1,5 +1,7 @@
 === master
 
+* Make Model.any? forward to the dataset, to work better with the any_not_empty extension (jeremyevans) (#2337)
+
 * Make the rcte_tree and split_values plugins work together (jeremyevans)
 
 * Make split_values plugin work when eager loading using join tables (jeremyevans) (#2336)

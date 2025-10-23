@@ -11,6 +11,8 @@ describe Sequel::Model, "class dataset methods"  do
   it "should call the dataset method of the same name with the same args" do
     @c.all.must_equal [@c.load(:id=>1)]
     @db.sqls.must_equal ["SELECT * FROM items"]
+    @c.any?.must_equal true
+    @db.sqls.must_equal ["SELECT * FROM items"]
     @c.avg(:id).must_equal 1
     @db.sqls.must_equal ["SELECT avg(id) AS avg FROM items LIMIT 1"]
     @c.count.must_equal 1

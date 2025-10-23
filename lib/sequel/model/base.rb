@@ -2,13 +2,15 @@
 
 module Sequel
   class Model
+    # SEQUEL6: Remove Enumerable here, and send all Enumerable methods to dataset
+    # by default, with a plugin for the current behavior.
     extend Enumerable
     extend Inflections
 
     # Class methods for Sequel::Model that implement basic model functionality.
     #
     # * All of the following methods have class methods created that send the method
-    #   to the model's dataset: all, as_hash, avg, count, cross_join, distinct, each,
+    #   to the model's dataset: all, any?, as_hash, avg, count, cross_join, distinct, each,
     #   each_server, empty?, except, exclude, exclude_having, fetch_rows,
     #   filter, first, first!, for_update, from, from_self, full_join, full_outer_join,
     #   get, graph, grep, group, group_and_count, group_append, group_by, having, import,
@@ -695,7 +697,7 @@ module Sequel
       end
   
       # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server]) - [:<<, :or, :[], :columns, :columns!, :delete, :update, :set_graph_aliases, :add_graph_aliases])
+      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:any?, :each_server]) - [:<<, :or, :[], :columns, :columns!, :delete, :update, :set_graph_aliases, :add_graph_aliases])
   
       private
       
