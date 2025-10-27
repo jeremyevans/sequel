@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # If the model's dataset selects explicit columns and the
+    # If the model's dataset selects explicit columns (or table.*) and the
     # database supports it, the insert_returning_select plugin will
     # automatically set the RETURNING clause on the dataset used to
     # insert rows to the columns selected, which allows the default model
@@ -45,6 +45,9 @@ module Sequel
           ret
         end
 
+        RETURN_ALL = [Sequel::Dataset::WILDCARD].freeze
+        private_constant :RETURN_ALL
+
         # Determine the columns to use for the returning clause, or return nil
         # if they can't be determined and a returning clause should not be
         # added automatically.
@@ -52,6 +55,12 @@ module Sequel
           return unless ds.supports_returning?(:insert)
           return unless values = ds.opts[:select]
 
+          # SELECT table.* -> RETURNING *
+          if values.length == 1 && values[0].is_a?(Sequel::SQL::ColumnAll)
+            return RETURN_ALL
+          end
+
+          # SELECT column1, table.column2, ... -> RETURNING column1, column2, ...
           values = values.map{|v| ds.unqualified_column_for(v)}
           if values.all?
             values

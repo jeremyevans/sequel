@@ -1,5 +1,7 @@
 === master
 
+* Make insert_returning_select use RETURNING when using table_select plugin (jeremyevans) (#2339)
+
 * Fix Database#listen in postgres adapter to ignore all notifications after UNLISTEN (jeremyevans)
 
 * Make Model.any? forward to the dataset, to work better with the any_not_empty extension (jeremyevans) (#2337)

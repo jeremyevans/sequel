@@ -38,6 +38,16 @@ describe "Sequel::Plugins::InsertReturningSelect" do
     @db.sqls.must_equal ['INSERT INTO albums (x) VALUES (2) RETURNING id, x']
   end
 
+  it "should add a returning clause when dataset selects all columns from a single table" do
+    @Album = Class.new(Sequel::Model(@db[:albums]))
+    @Album.columns :id, :x
+    @Album.plugin :table_select
+    @Album.plugin :insert_returning_select
+    @db.sqls
+    @Album.create(:x=>2).must_equal @Album.load(:id=>1, :x=>2)
+    @db.sqls.must_equal ['INSERT INTO albums (x) VALUES (2) RETURNING *']
+  end
+
   it "should not add a returning clause if no columns are selected" do
     @Album.plugin :insert_returning_select
     @Album.dataset = @Album.dataset.select_all

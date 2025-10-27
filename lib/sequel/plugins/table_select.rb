@@ -9,6 +9,13 @@ module Sequel
     # in the result sets (and possibly overwrite columns in the
     # current model with the same name).
     #
+    # Note that by default on databases that supporting RETURNING,
+    # using this plugin will cause instance creations
+    # to use two queries (insert and refresh) instead of a single
+    # query using RETURNING.  You can use the insert_returning_select
+    # plugin to automatically use RETURNING for instance creations
+    # for models using this plugin.
+    #
     # Usage:
     #
     #   # Make all model subclasses select table.*
