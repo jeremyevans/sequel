@@ -3340,7 +3340,7 @@ describe "split_values plugin with eager loading" do
       foreign_key :log_id, :logs
     end
 
-    @db.create_join_table!({artist_id: :artists, log_entry_id: :log_entries})
+    @db.create_join_table!({artist_id: :artists, log_entry_id: :log_entries}, :index_options => {:name => :als_idx})
 
     @Artist = Class.new(Sequel::Model(@db[:artists])) do
       def self.name; "Artist" end
