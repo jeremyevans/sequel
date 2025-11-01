@@ -1,0 +1,52 @@
+= New Features
+
+* A pg_auto_parameterize_duplicate_query_detection extension has
+  been added. This allows for detection of cases where the same
+  SQL query (with potentially different parameters) is being sent
+  to the database with the same callstack. This can detect most N+1
+  issues when the pg_auto_parameterize extension is used.
+
+  To detect duplicate queries in a block of code, you wrap the code:
+
+    DB.detect_duplicate_queries{your_code} 
+
+  If you are using Sequel in a web application, you can do this in
+  a rack middleware to find N+1 issues in your application. Note that
+  this may report duplicate queries that you may not consider to be
+  problems. To ignore those cases, you can use:
+
+    DB.ignore_duplicate_queries{your_code} 
+
+  By default, the extension will raise an exception for duplicate
+  queries. It's possible to warn instead (handler: :warn) or to have
+  custom behavior.  It's also possible to filter the displayed
+  backtraces (backtrace_filter: /\A#{Regexp.escape(Dir.pwd)}/).
+  See the plugin documentation for more details.
+
+* Model#remove_key! has been added to remove a key from the instance's
+  values. You could previously use values.delete(key), but that
+  didn't necessarily work correctly when using the split_values plugin.
+
+* Model.any? has been added, which will call any? on the model's dataset
+  instead of Enumerable#any?. This avoids unexpected behavior when using
+  the any_not_empty extension.
+
+= Other Improvements
+
+* The split_values plugin now supports eager loading associations that
+  use join tables (e.g. many_to_many associations).
+
+* The rcte_tree plugin now works correctly when using the split_values
+  plugin.
+
+* The insert_returning_select plugin now uses RETURNING * if the model
+  uses SELECT table.* FROM table, allowing it to work better with the
+  table_select plugin.
+
+* Database#listen in the postgres adapter now ignores all received
+  notifications after it sends the UNLISTEN statement, so future calls
+  to #listen do not return notifications from a previous call.
+
+* Sequel now recognizes sqlite:filename and amalgalite:filename
+  connection strings, treating them like sqlite://filename and
+  amalgalite://filename.
