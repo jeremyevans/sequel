@@ -38,6 +38,8 @@ Sequel::Plugins::TableSelect
 <div id='description'>
 <p>The table_select plugin changes the default selection for a model dataset from <code>*</code> to <code>table.*</code>. This makes it so that if you join the model’s dataset to other tables, columns in the other tables do not appear in the result sets (and possibly overwrite columns in the current model with the same name).</p>
 
+<p>Note that by default on databases that supporting RETURNING, using this plugin will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the insert_returning_select plugin to automatically use RETURNING for instance creations for models using this plugin.</p>
+
 <p>Usage:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Make all model subclasses select table.*</span>
@@ -81,11 +83,11 @@ Sequel::Plugins::TableSelect
 [show source]
 </a>
 <pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/table_select.rb</span>
-<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
-<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">24</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
-<span class="line-num">25</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)
+<span class="line-num">30</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">31</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>
+<span class="line-num">32</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -36,7 +36,7 @@ Sequel::Plugins::InsertReturningSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>If the model’s dataset selects explicit columns and the database supports it, the insert_returning_select plugin will automatically set the RETURNING clause on the dataset used to insert rows to the columns selected, which allows the default model support to run the insert and refresh of the data in a single query, instead of two separate queries.  This is Sequel’s default behavior when the model does not select explicit columns.</p>
+<p>If the model’s dataset selects explicit columns (or table.*) and the database supports it, the insert_returning_select plugin will automatically set the RETURNING clause on the dataset used to insert rows to the columns selected, which allows the default model support to run the insert and refresh of the data in a single query, instead of two separate queries.  This is Sequel’s default behavior when the model does not select explicit columns.</p>
 
 <p>Usage:</p>
 

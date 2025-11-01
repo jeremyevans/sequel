@@ -838,7 +838,7 @@ Superclass:
 <span class="line-num">302</span> 
 <span class="line-num">303</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">strategy</span> <span class="ruby-operator">==</span> <span class="ruby-value">:window_function</span>
 <span class="line-num">304</span>       <span class="ruby-identifier">delete_rn</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">row_number_column</span> 
-<span class="line-num">305</span>       <span class="ruby-identifier">objects</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">delete_rn</span>)}
+<span class="line-num">305</span>       <span class="ruby-identifier">objects</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">remove_key!</span>(<span class="ruby-identifier">delete_rn</span>)}
 <span class="line-num">306</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">307</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">strategy</span> <span class="ruby-operator">==</span> <span class="ruby-value">:union</span>
 <span class="line-num">308</span>     <span class="ruby-identifier">objects</span> = []

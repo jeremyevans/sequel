@@ -579,10 +579,11 @@ Superclass:
 <span class="line-num">516</span>         <span class="ruby-keyword">end</span>
 <span class="line-num">517</span>       <span class="ruby-keyword">ensure</span>
 <span class="line-num">518</span>         <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&quot;UNLISTEN *&quot;</span>)
-<span class="line-num">519</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">520</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">521</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">522</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">519</span>         <span class="ruby-keyword">true</span> <span class="ruby-keyword">while</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">wait_for_notify</span>(<span class="ruby-value">0</span>)
+<span class="line-num">520</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">521</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">522</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">523</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

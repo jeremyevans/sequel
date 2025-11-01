@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.98.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.98.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.98.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A pg_auto_parameterize_duplicate_query_detection extension has been added. This allows for detection of cases where the same SQL query (with potentially different parameters) is being sent to the database with the same callstack. This can detect most N+1 issues when the pg_auto_parameterize extension is used.</p>
+
+<p>To detect duplicate queries in a block of code, you wrap the code:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">detect_duplicate_queries</span>{<span class="ruby-identifier">your_code</span>}
+</pre>
+
+<p>If you are using <a href="../../../classes/Sequel.html"><code>Sequel</code></a> in a web application, you can do this in a rack middleware to find N+1 issues in your application. Note that this may report duplicate queries that you may not consider to be problems. To ignore those cases, you can use:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">ignore_duplicate_queries</span>{<span class="ruby-identifier">your_code</span>}
+</pre>
+
+<p>By default, the extension will raise an exception for duplicate queries. It’s possible to warn instead (handler: :warn) or to have custom behavior.  It’s also possible to filter the displayed backtraces (backtrace_filter: /A#{Regexp.escape(Dir.pwd)}/). See the plugin documentation for more details.</p>
+</li><li>
+<p>Model#remove_key! has been added to remove a key from the instance’s values. You could previously use values.delete(key), but that didn’t necessarily work correctly when using the split_values plugin.</p>
+</li><li>
+<p>Model.any? has been added, which will call any? on the model’s dataset instead of Enumerable#any?. This avoids unexpected behavior when using the any_not_empty extension.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The split_values plugin now supports eager loading associations that use join tables (e.g. many_to_many associations).</p>
+</li><li>
+<p>The rcte_tree plugin now works correctly when using the split_values plugin.</p>
+</li><li>
+<p>The insert_returning_select plugin now uses RETURNING * if the model uses SELECT table.* FROM table, allowing it to work better with the table_select plugin.</p>
+</li><li>
+<p>Database#listen in the postgres adapter now ignores all received notifications after it sends the UNLISTEN statement, so future calls to listen do not return notifications from a previous call.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes sqlite:filename and amalgalite:filename connection strings, treating them like sqlite://filename and amalgalite://filename.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

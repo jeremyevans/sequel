@@ -33,6 +33,25 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.98.0+-282025-11-01-29"><a href="doc/release_notes/5_98_0_txt.html">5.98.0</a> (2025-11-01)<span><a href="#label-5.98.0+-282025-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make insert_returning_select use RETURNING when using table_select plugin (jeremyevans) (#2339)</p>
+</li><li>
+<p>Fix Database#listen in postgres adapter to ignore all notifications after UNLISTEN (jeremyevans)</p>
+</li><li>
+<p>Make Model.any? forward to the dataset, to work better with the any_not_empty extension (jeremyevans) (#2337)</p>
+</li><li>
+<p>Make the rcte_tree and split_values plugins work together (jeremyevans)</p>
+</li><li>
+<p>Make split_values plugin work when eager loading using join tables (jeremyevans) (#2336)</p>
+</li><li>
+<p>Add Model#remove_key! to remove a key from values (jeremyevans)</p>
+</li><li>
+<p>Add pg_auto_parameterize_duplicate_query_detection extension for N+1 query detection (jeremyevans)</p>
+</li><li>
+<p>Recognize sqlite:filename and amalgalite:filename connection URLs (jeremyevans) (#2334)</p>
+</li></ul>
+
 <h3 id="label-5.97.0+-282025-10-01-29"><a href="doc/release_notes/5_97_0_txt.html">5.97.0</a> (2025-10-01)<span><a href="#label-5.97.0+-282025-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Simplify Postgres::PGRange#inspect output (jeremyevans)</p>

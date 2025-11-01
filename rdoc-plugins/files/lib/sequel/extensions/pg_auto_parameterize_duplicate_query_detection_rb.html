@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>pg_auto_parameterize_duplicate_query_detection.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>pg_auto_parameterize_duplicate_query_detection.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/pg_auto_parameterize_duplicate_query_detection.rb
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_auto_parameterize_duplicate_query_detection extension builds on the pg_auto_parameterize extension, adding support for detecting duplicate queries inside a block that occur at the same location. This is designed mostly to catch duplicate query issues (e.g. N+1 queries) during testing.</p>
+
+<p>To detect duplicate queries inside a block of code, wrap the code with <code>detect_duplicate_queries</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">detect_duplicate_queries</span>{<span class="ruby-identifier">your_code</span>}
+</pre>
+
+<p>With this approach, if the test runs code where the same query is executed more than once with the same call stack, a <a href="../../../../classes/Sequel/Postgres/AutoParameterizeDuplicateQueryDetection/DuplicateQueries.html"><code>Sequel::Postgres::AutoParameterizeDuplicateQueryDetection::DuplicateQueries</code></a> exception will be raised.</p>
+
+<p>You can pass the <code>:warn</code> option to <code>detect_duplicate_queries</code> to warn instead of raising. Note that if the block passed to <code>detect_duplicate_queries</code> raises, this extension will warn, and raise the original exception.</p>
+
+<p>For more control, you can pass the <code>:handler</code> option to <code>detect_duplicate_queries</code>. If the <code>:handler</code> option is provided, this extension will call the <code>:handler</code> option with the hash of duplicate query information, and will not raise or warn. This can be useful in production environments, to record duplicate queries for later analysis.</p>
+
+<p>For accuracy, the entire call stack is always used as part of the hash key to determine whether a query is duplicate. However, you can filter the displayed backtrace by using the <code>:backtrace_filter</code> option.</p>
+
+<p><code>detect_duplicate_queries</code> is concurrency aware, it uses the same approach that Sequel’s default connection pools use. So if you are running multiple threads, <code>detect_duplicate_queries</code> will only report duplicate queries for the current thread (or fiber if the fiber_concurrency extension is used).</p>
+
+<p>When testing applications, it’s probably best to use this to wrap the application being tested. For example, testing with rack-test, if your app is <code>App</code>, you would want to wrap it:</p>
+
+<pre class="ruby"><span class="ruby-identifier">include</span> <span class="ruby-constant">Rack</span><span class="ruby-operator">::</span><span class="ruby-constant">Test</span><span class="ruby-operator">::</span><span class="ruby-constant">Methods</span>
+
+<span class="ruby-constant">WrappedApp</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">env</span><span class="ruby-operator">|</span>
+  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">detect_duplicate_queries</span>{<span class="ruby-constant">App</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">env</span>)}
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">app</span>
+  <span class="ruby-constant">WrappedApp</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>It is possible to use this to wrap each separate spec using an around hook, but that can result in false positives when using libraries that have implicit retrying (such as Capybara), as you can have the same call stack for multiple requests.</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/AutoParameterizeDuplicateQueryDetection.html"><code>Sequel::Postgres::AutoParameterizeDuplicateQueryDetection</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
