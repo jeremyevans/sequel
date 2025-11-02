@@ -727,10 +727,7 @@ module Sequel
     end
 
     # Selects the column given (either as an argument or as a block), and
-    # returns an array of all values of that column in the dataset.  If you
-    # give a block argument that returns an array with multiple entries,
-    # the contents of the resulting array are undefined.  Raises an Error
-    # if called with both an argument and a block.
+    # returns an array of all values of that column in the dataset.
     #
     #   DB[:table].select_map(:id) # SELECT id FROM table
     #   # => [3, 5, 8, 1, ...]
