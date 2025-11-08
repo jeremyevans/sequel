@@ -553,6 +553,12 @@ handle locking:
   # INSERT INTO "table" ("id") VALUES (2) RETURNING NULL;
   # COMMIT;
 
+== PostgreSQL-specific reflection Support
+
+The Database#indexes method supports the options :include_partial and :include_invalid.
+These options allow partial and invalid indexes to be included in the results, respectively.
+By default, Sequel excludes both partial and invalid indexes.
+
 == Extended Error Info (<tt>postgres/pg only</tt>)
 
 If you run a query that raises a Sequel::DatabaseError, you can pass the exception object to

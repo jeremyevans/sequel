@@ -1576,6 +1576,13 @@ describe "A PostgreSQL dataset" do
     @db.indexes(:test, :include_partial=>true)[:tnv_partial].must_equal(:columns=>[:name, :value], :unique=>false, :deferrable=>nil)
   end
 
+  it "should support parsing invalid indexes with :include_invalid option" do
+    @db.add_index :test, [:name, :value], :name=>:tnv_invalid
+    @db.run("UPDATE pg_index SET indisvalid = false WHERE indexrelid = 'tnv_invalid'::regclass;")
+    @db.indexes(:test)[:tnv_invalid].must_be_nil
+    @db.indexes(:test, :include_invalid=>true)[:tnv_invalid].must_equal(:columns=>[:name, :value], :unique=>false, :deferrable=>nil)
+  end
+
   it "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true, :name=>'tnv0'
   end

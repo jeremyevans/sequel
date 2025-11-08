@@ -674,6 +674,7 @@ module Sequel
         m = output_identifier_meth
         cond = {Sequel[:tab][:oid]=>regclass_oid(table, opts)}
         cond[:indpred] = nil unless opts[:include_partial]
+        cond[:indisvalid] = true unless opts[:include_invalid]
 
         indexes = {}
         _indexes_ds.where_each(cond) do |r|
@@ -1049,8 +1050,7 @@ module Sequel
             where{{
               indc[:relkind]=>%w'i I',
               ind[:indisprimary]=>false,
-              :indexprs=>nil,
-              :indisvalid=>true}}.
+              :indexprs=>nil}}.
             order(*order).
             select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
