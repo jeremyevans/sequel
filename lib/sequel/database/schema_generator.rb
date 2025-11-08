@@ -299,6 +299,7 @@ module Sequel
       # :opclass :: Set an opclass to use for all columns (per-column opclasses require
       #             custom SQL).
       # :tablespace :: Specify tablespace for index.
+      # :only :: Create index only for given table, not for any child tables (PostgreSQL 11+)
       #
       # Microsoft SQL Server specific options:
       #

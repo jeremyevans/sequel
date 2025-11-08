@@ -1641,6 +1641,15 @@ describe "A PostgreSQL dataset" do
     @db.add_index :atest, :a, :tablespace=>:pg_default
   end
 
+  it "should support creating indexes with ONLY option" do
+    @db.create_table(:atest, partition_by: :id, :partition_type=>:range){Integer :id}
+    @db.create_table(:btest, partition_of: :atest){from 1; to 3}
+    @db.add_index :atest, :id, :only=>true
+
+    @db.indexes(:atest, :include_invalid=>true).size.must_equal 1
+    @db.indexes(:btest, :include_invalid=>true).must_be_empty
+  end if DB.server_version >= 110000
+
   it "#lock should lock table if inside a transaction" do
     @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
