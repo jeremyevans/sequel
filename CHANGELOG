@@ -1,3 +1,9 @@
+=== master
+
+* Add support for Database#create_index :only option on PostgreSQL 11+ (KirIgor) (#2343)
+
+* Add support for Database#indexes :invalid option on PostgresSQL (KirIgor, jeremyevans) (#2343)
+
 === 5.98.0 (2025-11-01)
 
 * Make insert_returning_select use RETURNING when using table_select plugin (jeremyevans) (#2339)

@@ -1576,13 +1576,6 @@ describe "A PostgreSQL dataset" do
     @db.indexes(:test, :include_partial=>true)[:tnv_partial].must_equal(:columns=>[:name, :value], :unique=>false, :deferrable=>nil)
   end
 
-  it "should support parsing invalid indexes with :include_invalid option" do
-    @db.add_index :test, [:name, :value], :name=>:tnv_invalid
-    @db.run("UPDATE pg_index SET indisvalid = false WHERE indexrelid = 'tnv_invalid'::regclass;")
-    @db.indexes(:test)[:tnv_invalid].must_be_nil
-    @db.indexes(:test, :include_invalid=>true)[:tnv_invalid].must_equal(:columns=>[:name, :value], :unique=>false, :deferrable=>nil)
-  end
-
   it "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true, :name=>'tnv0'
   end
@@ -1642,12 +1635,20 @@ describe "A PostgreSQL dataset" do
   end
 
   it "should support creating indexes with ONLY option" do
-    @db.create_table(:atest, partition_by: :id, :partition_type=>:range){Integer :id}
+    @db.create_table(:atest, partition_by: :id, :partition_type=>:range){Integer :id; String :name}
     @db.create_table(:btest, partition_of: :atest){from 1; to 3}
-    @db.add_index :atest, :id, :only=>true
+    @db.add_index :atest, :id, :only=>true, :name=>:atest_id_only_idx
+    @db.add_index :atest, :name, :name=>:atest_name_only_idx
 
-    @db.indexes(:atest, :include_invalid=>true).size.must_equal 1
-    @db.indexes(:btest, :include_invalid=>true).must_be_empty
+    @db.indexes(:atest).keys.must_equal [:atest_name_only_idx]
+    @db.indexes(:atest, :invalid=>true).keys.must_equal [:atest_id_only_idx]
+    @db.indexes(:atest, :invalid=>:only).keys.must_equal [:atest_id_only_idx]
+    @db.indexes(:atest, :invalid=>:include).keys.sort.must_equal [:atest_id_only_idx, :atest_name_only_idx]
+
+    @db.indexes(:btest).keys.must_equal [:btest_name_idx]
+    @db.indexes(:btest, :invalid=>true).keys.must_equal []
+    @db.indexes(:btest, :invalid=>:only).keys.must_equal []
+    @db.indexes(:btest, :invalid=>:include).keys.sort.must_equal [:btest_name_idx]
   end if DB.server_version >= 110000
 
   it "#lock should lock table if inside a transaction" do

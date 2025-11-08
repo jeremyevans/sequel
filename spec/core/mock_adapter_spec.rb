@@ -627,6 +627,11 @@ describe "PostgreSQL support" do
     @db.sqls.must_equal ['CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)']
   end
 
+  it "should support add_index :only option" do
+    @db.alter_table(:posts){add_index(:user_id, :only=> true)}
+    @db.sqls.must_equal ['CREATE INDEX "posts_user_id_index" ON ONLY "posts" ("user_id")']
+  end
+
   it 'should quote NaN' do
     nan = 0.0/0.0
     @db[:test5].insert_sql(:value => nan).must_equal %q{INSERT INTO "test5" ("value") VALUES ('NaN')}

@@ -669,12 +669,25 @@ module Sequel
         _set_constraints(' IMMEDIATE', opts)
       end
 
-      # Use the pg_* system tables to determine indexes on a table
+      # Use the pg_* system tables to determine indexes on a table. Options:
+      #
+      # :include_partial :: Set to true to include partial indexes
+      # :invalid :: Set to true or :only to only return invalid indexes.
+      #             Set to :include to also return both valid and invalid indexes.
+      #             When not set or other value given, does not return invalid indexes.
       def indexes(table, opts=OPTS)
         m = output_identifier_meth
         cond = {Sequel[:tab][:oid]=>regclass_oid(table, opts)}
         cond[:indpred] = nil unless opts[:include_partial]
-        cond[:indisvalid] = true unless opts[:include_invalid]
+
+        case opts[:invalid]
+        when true, :only
+          cond[:indisvalid] = false
+        when :include
+          # nothing
+        else
+          cond[:indisvalid] = true
+        end
 
         indexes = {}
         _indexes_ds.where_each(cond) do |r|
