@@ -1487,6 +1487,12 @@ describe "Sequel::Dataset convenience methods" do
     ds.to_hash_groups(:a, :d, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
+  it "should have working #as_set" do
+    @ds.as_set(:a).must_equal Set[1, 5]
+    @ds.as_set(:b).must_equal Set[2, 6]
+    @ds.as_set([:a, :b]).must_equal Set[[1, 2], [5, 6]]
+  end
+  
   it "should have working #select_map" do
     @ds.select_map(:a).must_equal [1, 5]
     @ds.select_map(:b).must_equal [2, 6]
@@ -1547,6 +1553,22 @@ describe "Sequel::Dataset convenience methods" do
     ds.select_hash_groups([:a, :c], [:b, :d]).must_equal([1, 3]=>[[2, 4], [2, 9]], [5, 7]=>[[6, 8]])
     ds.select_hash_groups(:a, :d, :hash => (tmp = {})).must_be_same_as(tmp)
     @ds.extension(:null_dataset).nullify.select_hash_groups(:a, :d).must_equal({})
+  end
+
+  it "should have working #select_set" do
+    @ds.select_set(:a).must_equal Set[1, 5]
+    @ds.select_set(:b).must_equal Set[2, 6]
+    @ds.select_set([:a]).must_equal Set[[1], [5]]
+    @ds.select_set([:a, :b]).must_equal Set[[1, 2], [5, 6]]
+    @ds.extension(:null_dataset).nullify.select_set([:a, :b]).must_equal Set[]
+
+    @ds.select_set(Sequel[:a].as(:e)).must_equal Set[1, 5]
+    @ds.select_set(Sequel[:b].as(:e)).must_equal Set[2, 6]
+    @ds.select_set([Sequel[:a].as(:e), Sequel[:b].as(:f)]).must_equal Set[[1, 2], [5, 6]]
+    @ds.select_set([Sequel[:a][:a].as(:e), Sequel[:a][:b].as(:f)]).must_equal Set[[1, 2], [5, 6]]
+    @ds.select_set([Sequel.expr(Sequel[:a][:a]).as(:e), Sequel.expr(Sequel[:a][:b]).as(:f)]).must_equal Set[[1, 2], [5, 6]]
+    @ds.select_set([Sequel.qualify(:a, :a).as(:e), Sequel.qualify(:a, :b).as(:f)]).must_equal Set[[1, 2], [5, 6]]
+    @ds.select_set([Sequel.identifier(:a).qualify(:a).as(:e), Sequel.qualify(:a, :b).as(:f)]).must_equal Set[[1, 2], [5, 6]]
   end
 end
 

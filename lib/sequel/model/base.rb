@@ -10,7 +10,7 @@ module Sequel
     # Class methods for Sequel::Model that implement basic model functionality.
     #
     # * All of the following methods have class methods created that send the method
-    #   to the model's dataset: all, any?, as_hash, avg, count, cross_join, distinct, each,
+    #   to the model's dataset: all, any?, as_hash, as_set, avg, count, cross_join, distinct, each,
     #   each_server, empty?, except, exclude, exclude_having, fetch_rows,
     #   filter, first, first!, for_update, from, from_self, full_join, full_outer_join,
     #   get, graph, grep, group, group_and_count, group_append, group_by, having, import,
@@ -19,7 +19,7 @@ module Sequel
     #   natural_join, natural_left_join, natural_right_join, offset, order, order_append, order_by,
     #   order_more, order_prepend, paged_each, qualify, reverse, reverse_order, right_join,
     #   right_outer_join, select, select_all, select_append, select_group, select_hash,
-    #   select_hash_groups, select_map, select_more, select_order_map, select_prepend, server,
+    #   select_hash_groups, select_map, select_more, select_order_map, select_prepend, select_set, server,
     #   single_record, single_record!, single_value, single_value!, sum, to_hash, to_hash_groups,
     #   truncate, unfiltered, ungraphed, ungrouped, union, unlimited, unordered, where, where_all,
     #   where_each, where_single_value, with, with_recursive, with_sql

@@ -11,11 +11,12 @@ module Sequel
     
     # Action methods defined by Sequel that execute code on the database.
     ACTION_METHODS = (<<-METHS).split.map(&:to_sym).freeze
-      << [] all as_hash avg count columns columns! delete each
+      << [] all as_hash as_set avg count columns columns! delete each
       empty? fetch_rows first first! get import insert last
-      map max min multi_insert paged_each select_hash select_hash_groups select_map select_order_map
-      single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
-      where_all where_each where_single_value
+      map max min multi_insert paged_each select_hash select_hash_groups
+      select_map select_order_map select_set single_record single_record!
+      single_value single_value! sum to_hash to_hash_groups
+      truncate update where_all where_each where_single_value
     METHS
 
     # The clone options to use when retrieving columns for a dataset.
@@ -51,6 +52,26 @@ module Sequel
       _all(block){|a| each{|r| a << r}}
     end
     
+    # Returns sets for column values for each record in the dataset.
+    #
+    #   DB[:table].as_set(:id) # SELECT * FROM table
+    #   # => Set[1, 2, 3, ...]
+    #
+    # You can also provide an array of column names, in which case the elements
+    # of the returned set are arrays (not sets):
+    #
+    #   DB[:table].as_set([:id, :name]) # SELECT * FROM table
+    #   # => Set[[1, 'A'], [2, 'B'], [3, 'C'], ...]
+    def as_set(column)
+      return naked.as_set(column) if row_proc
+
+      if column.is_a?(Array)
+        to_set{|r| r.values_at(*column)}
+      else
+        to_set{|r| r[column]}
+      end
+    end
+
     # Returns the average value for the given column/expression.
     # Uses a virtual row block if no argument is given.
     #
@@ -765,6 +786,35 @@ module Sequel
       _select_map(column, true, &block)
     end
 
+    # Selects the column given (either as an argument or as a block), and
+    # returns a set of all values of that column in the dataset.
+    #
+    #   DB[:table].select_set(:id) # SELECT id FROM table
+    #   # => Set[3, 5, 8, 1, ...]
+    #
+    #   DB[:table].select_set{id * 2} # SELECT (id * 2) FROM table
+    #   # => Set[6, 10, 16, 2, ...]
+    #
+    # You can also provide an array of column names, which returns a set
+    # with array elements (not set elements):
+    #
+    #   DB[:table].select_map([:id, :name]) # SELECT id, name FROM table
+    #   # => Set[[1, 'A'], [2, 'B'], [3, 'C'], ...]
+    #
+    # If you provide an array of expressions, you must be sure that each entry
+    # in the array has an alias that Sequel can determine.
+    def select_set(column=nil, &block)
+      ds = ungraphed.naked
+      columns = Array(column)
+      virtual_row_columns(columns, block)
+      select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns
+      if column.is_a?(Array) || (columns.length > 1)
+        ds.select(*select_cols)._select_set_multiple(hash_key_symbols(select_cols))
+      else
+        ds.select(auto_alias_expression(select_cols.first))._select_set_single
+      end
+    end
+    
     # Limits the dataset to one record, and returns the first record in the dataset,
     # or nil if the dataset has no records. Users should probably use +first+ instead of
     # this method. Example:
@@ -1087,6 +1137,17 @@ module Sequel
     def _select_map_single
       k = nil
       map{|r| r[k||=r.keys.first]}
+    end
+  
+    # Return a set of arrays of values given by the symbols in ret_cols.
+    def _select_set_multiple(ret_cols)
+      to_set{|r| r.values_at(*ret_cols)}
+    end
+  
+    # Returns a set of the first value in each row.
+    def _select_set_single
+      k = nil
+      to_set{|r| r[k||=r.keys.first]}
     end
   
     # A dataset for returning single values from the current dataset.

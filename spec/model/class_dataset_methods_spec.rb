@@ -13,6 +13,8 @@ describe Sequel::Model, "class dataset methods"  do
     @db.sqls.must_equal ["SELECT * FROM items"]
     @c.any?.must_equal true
     @db.sqls.must_equal ["SELECT * FROM items"]
+    @c.as_set(:id).must_equal Set[1]
+    @db.sqls.must_equal ["SELECT * FROM items"]
     @c.avg(:id).must_equal 1
     @db.sqls.must_equal ["SELECT avg(id) AS avg FROM items LIMIT 1"]
     @c.count.must_equal 1
@@ -100,6 +102,8 @@ describe Sequel::Model, "class dataset methods"  do
     @c.select_order_map(:id).must_equal [1]
     @db.sqls.must_equal ["SELECT id FROM items ORDER BY id"]
     @c.select_prepend(:a).sql.must_equal "SELECT a, items.* FROM items"
+    @c.select_set(:id).must_equal Set[1]
+    @db.sqls.must_equal ["SELECT id FROM items"]
     @c.server(:a).opts[:server].must_equal :a
     @c.single_record.must_equal @c.load(:id=>1)
     @db.sqls.must_equal ["SELECT * FROM items LIMIT 1"]

@@ -2314,6 +2314,26 @@ describe "Dataset#to_hash_groups" do
   end
 end
 
+describe "Dataset#as_set" do
+  before do
+    @d = Sequel.mock(:fetch=>[{:a => 1, :b => 2}, {:a => 3, :b => 4}, {:a => 5, :b => 6}])[:items]
+  end
+  
+  it "should return set of column elements if column symbol is given" do
+    @d.as_set(:a).must_equal Set[1, 3, 5]
+  end
+  
+  it "should support set with array elements if an array of column symbols is given" do
+    @d.as_set([:a, :b]).must_equal Set[[1, 2], [3, 4], [5, 6]]
+  end
+  
+  it "should not call the row_proc" do
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
+    @d.as_set(:a).must_equal Set[1, 3, 5]
+    @d.as_set([:a, :b]).must_equal Set[[1, 2], [3, 4], [5, 6]]
+  end
+end
+
 describe "Dataset#distinct" do
   before do
     @db = Sequel.mock
@@ -5417,6 +5437,100 @@ describe "Modifying joined datasets" do
   deprecated "should have check_modification_allowed! private method" do
     @ds.send(:check_modification_allowed!).must_be_nil
     proc{@ds2.send(:check_modification_allowed!)}.must_raise Sequel::InvalidOperation
+  end
+end
+
+describe "Sequel::Dataset#select_set" do
+  before do
+    @ds = Sequel.mock(:fetch=>[{:c=>1}, {:c=>2}])[:t]
+  end
+
+  it "should do select and map in one step" do
+    @ds.select_set(:a).must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a FROM t']
+  end
+
+  it "should handle qualified identifiers in arguments" do
+    @ds.select_set(Sequel[:a][:b]).must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a.b FROM t']
+  end
+
+  with_symbol_splitting "should handle implicit qualifiers in arguments" do
+    @ds.select_set(:a__b).must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a.b FROM t']
+  end
+
+  it "should raise if multiple arguments and can't determine alias" do
+    proc{@ds.select_set([Sequel.function(:a), :b])}.must_raise(Sequel::Error)
+    proc{@ds.select_set(Sequel.function(:a)){b}}.must_raise(Sequel::Error)
+    proc{@ds.select_set{[a.function, b]}}.must_raise(Sequel::Error)
+  end
+
+  with_symbol_splitting "should handle implicit aliases in arguments" do
+    @ds.select_set(:a___b).must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a AS b FROM t']
+  end
+
+  it "should handle aliased expressions in arguments" do
+    @ds.select_set(Sequel[:a].as(:b)).must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a AS b FROM t']
+  end
+
+  it "should handle other objects" do
+    @ds.select_set(Sequel.lit("a").as(:b)).must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a AS b FROM t']
+  end
+  
+  it "should handle identifiers with strings" do
+    @ds.select_set([Sequel::SQL::Identifier.new('c'), :c]).must_equal Set[[1, 1], [2, 2]]
+    @ds.db.sqls.must_equal ['SELECT c, c FROM t']
+  end
+  
+  it "should raise an error for plain strings" do
+    proc{@ds.select_set(['c', :c])}.must_raise(Sequel::Error)
+    @ds.db.sqls.must_equal []
+  end
+  
+  it "should handle an expression without a determinable alias" do
+    @ds.select_set{a(t[c])}.must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a(t.c) AS v FROM t']
+  end
+
+  it "should accept a block" do
+    @ds.select_set{a(t[c]).as(b)}.must_equal Set[1, 2]
+    @ds.db.sqls.must_equal ['SELECT a(t.c) AS b FROM t']
+  end
+
+  it "should accept a block with an array of columns" do
+    @ds.select_set{[a(t[c]).as(c), a(t[c]).as(c)]}.must_equal Set[[1, 1], [2, 2]]
+    @ds.db.sqls.must_equal ['SELECT a(t.c) AS c, a(t.c) AS c FROM t']
+  end
+
+  it "should accept a block with a column" do
+    @ds.select_set(:c){a(t[c]).as(c)}.must_equal Set[[1, 1], [2, 2]]
+    @ds.db.sqls.must_equal ['SELECT c, a(t.c) AS c FROM t']
+  end
+
+  it "should accept a block and array of arguments" do
+    @ds.select_set([:c, :c]){[a(t[c]).as(c), a(t[c]).as(c)]}.must_equal Set[[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.db.sqls.must_equal ['SELECT c, c, a(t.c) AS c, a(t.c) AS c FROM t']
+  end
+
+  it "should handle an array of columns" do
+    @ds.select_set([:c, :c]).must_equal Set[[1, 1], [2, 2]]
+    @ds.db.sqls.must_equal ['SELECT c, c FROM t']
+    @ds.select_set([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b)]).must_equal Set[[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.db.sqls.must_equal ['SELECT d AS c, b.c, c, b.c FROM t']
+  end
+
+  with_symbol_splitting "should handle an array of columns with splittable symbols" do
+    @ds.select_set([:a__c, :a__d___c]).must_equal Set[[1, 1], [2, 2]]
+    @ds.db.sqls.must_equal ['SELECT a.c, a.d AS c FROM t']
+  end
+
+  it "should handle an array with a single element" do
+    @ds.select_set([:c]).must_equal Set[[1], [2]]
+    @ds.db.sqls.must_equal ['SELECT c FROM t']
   end
 end
 

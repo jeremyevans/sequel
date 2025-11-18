@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-%w'bigdecimal date thread time uri'.each{|f| require f}
+%w'bigdecimal date set thread time uri'.each{|f| require f}
 
 # Top level module for Sequel
 #
