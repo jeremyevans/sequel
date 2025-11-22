@@ -3544,7 +3544,7 @@ module Sequel
           else
             vals = Array(obj).reject{|o| !meths.all?{|m| o.get_column_value(m)}}
             return SQL::Constants::FALSE if vals.empty?
-            if obj.is_a?(Array)
+            if obj.is_a?(Array) || obj.is_a?(Set)
               if keys.length == 1
                 meth = meths.first
                 {keys.first=>vals.map{|o| o.get_column_value(meth)}}

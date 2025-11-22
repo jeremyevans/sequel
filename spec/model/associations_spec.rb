@@ -4259,6 +4259,10 @@ describe "Filtering by associations" do
     @Album.filter(:artist=>[@Artist.load(:id=>3), @Artist.load(:id=>4)]).sql.must_equal 'SELECT * FROM albums WHERE (albums.artist_id IN (3, 4))'
   end
 
+  it "should be able to filter on multiple many_to_one associations using sets" do
+    @Album.filter(:artist=>Set[@Artist.load(:id=>3), @Artist.load(:id=>4)]).sql.must_equal 'SELECT * FROM albums WHERE (albums.artist_id IN (3, 4))'
+  end
+
   it "should be able to filter on multiple one_to_many associations" do
     @Album.filter(:tracks=>[@Track.load(:album_id=>3), @Track.load(:album_id=>4)]).sql.must_equal 'SELECT * FROM albums WHERE (albums.id IN (3, 4))'
   end
@@ -4305,6 +4309,10 @@ describe "Filtering by associations" do
 
   it "should be able to filter on multiple many_to_one associations with composite keys" do
     @Album.filter(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.load(:id1=>5, :id2=>6)]).sql.must_equal 'SELECT * FROM albums WHERE ((albums.artist_id1, albums.artist_id2) IN ((3, 4), (5, 6)))'
+  end
+
+  it "should be able to filter on multiple many_to_one associations with composite keys using sets" do
+    @Album.filter(:cartist=>Set[@Artist.load(:id1=>3, :id2=>4), @Artist.load(:id1=>5, :id2=>6)]).sql.must_equal 'SELECT * FROM albums WHERE ((albums.artist_id1, albums.artist_id2) IN ((3, 4), (5, 6)))'
   end
 
   it "should be able to filter on multiple one_to_many associations with composite keys" do
