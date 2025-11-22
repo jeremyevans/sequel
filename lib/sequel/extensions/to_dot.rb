@@ -79,6 +79,11 @@ module Sequel
         e.each_with_index do |val, j|
           v(val, j)
         end
+      when Set
+        dot "Set"
+        e.each_with_index do |val, j|
+          v(val, j)
+        end
       when Hash
         dot "Hash"
         e.each do |k, val|

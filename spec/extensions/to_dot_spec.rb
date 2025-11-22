@@ -68,6 +68,10 @@ END
     dot(@ds.filter(true)).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"ComplexExpression: NOOP\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"true\"];"]
   end
 
+  it "should handle WHERE with sets" do
+    dot(@ds.filter(:a => Set["a", "b"])).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"ComplexExpression: IN\"];", "2 -> 3 [label=\"0\"];", "3 [label=\":a\"];", "2 -> 4 [label=\"1\"];", "4 [label=\"Set\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"\\\"a\\\"\"];", "4 -> 6 [label=\"1\"];", "6 [label=\"\\\"b\\\"\"];"]
+  end
+
   it "should handle GROUP" do
     dot(@ds.group(:a)).must_equal ["1 -> 2 [label=\"group\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\":a\"];"]
   end
