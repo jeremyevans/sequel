@@ -635,7 +635,7 @@ module Sequel
     # Typecast the value to a String
     def typecast_value_string(value)
       case value
-      when Hash, Array
+      when Hash, Array, Set
         raise Sequel::InvalidValue, "invalid value for String: #{value.inspect}"
       else
         value.to_s

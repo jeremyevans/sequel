@@ -2620,8 +2620,8 @@ describe "Database#typecast_value" do
     end
   end
 
-  it "should raise errors when typecasting hash and array values to String" do
-    [[], {}].each do |i|
+  it "should raise errors when typecasting hash, array, and set values to String" do
+    [[], {}, Set[]].each do |i|
       proc{@db.typecast_value(:string, i)}.must_raise(Sequel::InvalidValue)
     end
   end
