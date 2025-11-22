@@ -319,8 +319,8 @@ module Sequel
         end
 
         # Typecast the given object to the appropriate type using the
-        # typecaster.  Note that this does not conversion for the members
-        # of the composite type, since those conversion expect strings and
+        # typecaster.  Note that this does no conversion for the members
+        # of the composite type, since those conversions expect strings and
         # strings may not be provided.  
         def typecast(obj)
           case obj 
