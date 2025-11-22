@@ -176,6 +176,19 @@ module Sequel
           h
         end
 
+        # Use the cache instead of a query to get the results.
+        def as_set(column)
+          set = Set.new
+
+          if column.is_a?(Array)
+            @all.each{|r| set.add(r.values.values_at(*column))}
+          else
+            @all.each{|r| set.add(r[column])}
+          end
+
+          set
+        end
+
         # Alias of as_hash for backwards compatibility.
         def to_hash(*a)
           as_hash(*a)

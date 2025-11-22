@@ -132,6 +132,13 @@ describe "Sequel::Plugins::StaticCache" do
       proc{@c.map(:id){}}.must_raise(Sequel::Error)
     end
 
+    it "should have as_set not send a query" do
+      @c.as_set(:id).must_equal Set[1, 2]
+      @db.sqls.must_equal []
+      @c.as_set([:id,:id]).must_equal Set[[1,1], [2,2]]
+      @db.sqls.must_equal []
+    end
+
     it "should have other enumerable methods work without sending a query" do
       a = @c.sort_by{|o| o.id}
       a.first.must_equal @c1

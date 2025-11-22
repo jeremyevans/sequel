@@ -1,5 +1,7 @@
 === master
 
+* Optimize Model.as_set calls to avoid queries in the static_cache plugin (jeremyevans)
+
 * Support filtering by associations with sets in the pg_array_associations plugin (jeremyevans)
 
 * Support sets in the to_dot extension (jeremyevans)
