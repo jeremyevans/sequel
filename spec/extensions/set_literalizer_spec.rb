@@ -3,7 +3,9 @@ require_relative "spec_helper"
 describe "set_literalizer extension" do
   before do
     @db = Sequel.mock
-    @db.extension :set_literalizer
+    deprecated do
+      @db.extension :set_literalizer
+    end
     @set = Set.new([1, 'c'])
     @empty_set = Set.new([])
     @cond_set = Set.new([[:c, 'c'], [:d, 2]])

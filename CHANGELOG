@@ -1,5 +1,7 @@
 === master
 
+* Deprecate the set_literalizer extension (jeremyevans)
+
 * Support sets in dataset filters similar to arrays, using IN/NOT IN (jeremyevans)
 
 * Add Dataset#as_set and Dataset#select_set, as Set will be a core class in Ruby 4 (jeremyevans)
