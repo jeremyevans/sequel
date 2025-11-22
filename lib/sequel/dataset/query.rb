@@ -1496,7 +1496,7 @@ module Sequel
         end
       when LiteralString
         LiteralString.new("(#{expr})")
-      when Numeric, SQL::NumericExpression, SQL::StringExpression, Proc, String
+      when Numeric, SQL::NumericExpression, SQL::StringExpression, Proc, String, Set
         raise Error, "Invalid filter expression: #{expr.inspect}"
       when TrueClass, FalseClass
         if supports_where_true?

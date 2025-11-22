@@ -672,6 +672,10 @@ describe "Dataset#where" do
     proc{@dataset.filter(Sequel.expr(:x) + 1)}.must_raise(Sequel::Error)
     proc{@dataset.filter(Sequel.expr(:x).sql_string)}.must_raise(Sequel::Error)
   end
+
+  it "should raise an error if a set is used" do
+    proc{@dataset.filter(Set[1])}.must_raise(Sequel::Error)
+  end
 end
 
 describe "Dataset#or" do

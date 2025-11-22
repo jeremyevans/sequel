@@ -17,6 +17,10 @@ describe "set_literalizer extension" do
     @db.literal(@cond_set).must_equal "((c = 'c') AND (d = 2))"
   end
 
+  it "should allow using sets as condition specifiers" do
+    @db[:t].where(@cond_set).sql.must_equal "SELECT * FROM t WHERE ((c = 'c') AND (d = 2))"
+  end
+
   it "should automatically handle Set instances in right hand side of condition specifiers the same as array instances" do
     @db[:a].where(:b=>@set).sql.must_equal "SELECT * FROM a WHERE (b IN (1, 'c'))"
     @db[:a].where(:b=>@empty_set).sql.must_equal "SELECT * FROM a WHERE (1 = 0)"

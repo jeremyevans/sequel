@@ -19,6 +19,15 @@ module Sequel
     module SetLiteralizer
       private
 
+      # Allow using sets as condition specifiers.
+      def filter_expr(expr = nil, &block)
+        if expr.is_a?(Set)
+          expr
+        else
+          super
+        end
+      end
+
       # Literalize Set instances by converting the set to array.
       def literal_set_append(sql, v)
         literal_append(sql, v.to_a) 
