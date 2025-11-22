@@ -1108,7 +1108,7 @@ module Sequel
           else
             new(:'=', 1, 1)
           end
-        when ::Array
+        when ::Array, ::Set
           r = r.dup.freeze unless r.frozen?
           new(:IN, l, r)
         when ::String

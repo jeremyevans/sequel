@@ -521,18 +521,29 @@ describe "Dataset#where" do
     @dataset.exclude([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
   end
 
+  it "should handle all types of IN/NOT IN queries with empty sets" do
+    @dataset.filter(:id => Set[]).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.filter([:id1, :id2] => Set[]).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.exclude(:id => Set[]).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
+    @dataset.exclude([:id1, :id2] => Set[]).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
+  end
+
   it "should handle all types of IN/NOT IN queries" do
     @dataset.filter(:id => @d1.select(:id)).sql.must_equal "SELECT * FROM test WHERE (id IN (SELECT id FROM test WHERE (region = 'Asia')))"
     @dataset.filter(:id => [1, 2]).sql.must_equal "SELECT * FROM test WHERE (id IN (1, 2))"
+    @dataset.filter(:id => Set[1, 2]).sql.must_equal "SELECT * FROM test WHERE (id IN (1, 2))"
     @dataset.filter([:id1, :id2] => @d1.select(:id1, :id2)).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) IN (SELECT id1, id2 FROM test WHERE (region = 'Asia')))"
     @dataset.filter([:id1, :id2] => Sequel.value_list([[1, 2], [3,4]])).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
+    @dataset.filter([:id1, :id2] => Set[[1, 2], [3, 4]]).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
 
     @dataset.exclude(:id => @d1.select(:id)).sql.must_equal "SELECT * FROM test WHERE (id NOT IN (SELECT id FROM test WHERE (region = 'Asia')))"
     @dataset.exclude(:id => [1, 2]).sql.must_equal "SELECT * FROM test WHERE (id NOT IN (1, 2))"
+    @dataset.exclude(:id => Set[1, 2]).sql.must_equal "SELECT * FROM test WHERE (id NOT IN (1, 2))"
     @dataset.exclude([:id1, :id2] => @d1.select(:id1, :id2)).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) NOT IN (SELECT id1, id2 FROM test WHERE (region = 'Asia')))"
     @dataset.exclude([:id1, :id2] => Sequel.value_list([[1, 2], [3,4]])).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
+    @dataset.exclude([:id1, :id2] => Set[[1, 2], [3, 4]]).sql.must_equal "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
   end
 
   it "should handle IN/NOT IN queries with multiple columns and an array where the database doesn't support it" do
@@ -541,6 +552,12 @@ describe "Dataset#where" do
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
     @dataset.filter([:id1, :id2] => Sequel.value_list([[1, 2], [3,4]])).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
     @dataset.exclude([:id1, :id2] => Sequel.value_list([[1, 2], [3,4]])).sql.must_equal "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
+  end
+
+  it "should handle IN/NOT IN queries with multiple columns and a set where the database doesn't support it" do
+    @dataset = @dataset.with_extend{def supports_multiple_column_in?; false end}
+    @dataset.filter([:id1, :id2] => Set[[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
+    @dataset.exclude([:id1, :id2] => Set[[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
   end
 
   it "should handle IN/NOT IN queries with multiple columns and a dataset where the database doesn't support it" do

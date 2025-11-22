@@ -39,6 +39,13 @@ If you need to select multiple items from a dataset, you can supply an array:
   items.where(id: [1, 38, 47, 99]).sql
   # "SELECT * FROM items WHERE (id IN (1, 38, 47, 99))"
 
+== Filtering using a set
+
+Similarly, you can also supply a set:
+
+  items.where(id: Set[1, 38, 47, 99]).sql
+  # "SELECT * FROM items WHERE (id IN (1, 38, 47, 99))"
+
 == Filtering using expressions
 
 You can pass a block to where (referred to as a virtual row block), which is evaluated in a special context:

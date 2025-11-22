@@ -230,9 +230,12 @@ You can also specify ranges:
   my_posts = posts.where(stamp: (Date.today - 14)..(Date.today - 7))
   # WHERE ((stamp >= '2010-06-30') AND (stamp <= '2010-07-07'))
   
-Or arrays of values:
+Or arrays or sets of values:
 
   my_posts = posts.where(category: ['ruby', 'postgres', 'linux'])
+  # WHERE (category IN ('ruby', 'postgres', 'linux'))
+
+  my_posts = posts.where(category: Set['ruby', 'postgres', 'linux'])
   # WHERE (category IN ('ruby', 'postgres', 'linux'))
   
 By passing a block to where, you can use expressions (this is fairly "magical"):

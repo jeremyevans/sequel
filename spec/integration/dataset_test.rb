@@ -1754,6 +1754,19 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude([:a, :b]=>[[10, 10], [20, 20]]).all.must_equal [{:a=>20, :b=>10}]
   end
 
+  it "should work with multiple value sets" do
+    wait{@ds.insert(20, 10)}
+    @ds.filter([:a, :b]=>Set[[20, 10]]).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>Set[[10, 20]]).all.must_equal []
+    @ds.filter([:a, :b]=>Set[[20, 10], [1, 2]]).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>Set[[10, 10], [20, 20]]).all.must_equal []
+    
+    @ds.exclude([:a, :b]=>Set[[20, 10]]).all.must_equal []
+    @ds.exclude([:a, :b]=>Set[[10, 20]]).all.must_equal [{:a=>20, :b=>10}]
+    @ds.exclude([:a, :b]=>Set[[20, 10], [1, 2]]).all.must_equal []
+    @ds.exclude([:a, :b]=>Set[[10, 10], [20, 20]]).all.must_equal [{:a=>20, :b=>10}]
+  end
+
   it "should work with IN/NOT in with datasets" do
     wait{@ds.insert(20, 10)}
     ds = @ds.unordered
@@ -1780,6 +1793,14 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude([:a, :b]=>[]).all.must_equal [{:a=>20, :b=>10}]
   end
   
+  it "should work empty sets" do
+    wait{@ds.insert(20, 10)}
+    @ds.filter(:a=>Set[]).all.must_equal []
+    @ds.exclude(:a=>Set[]).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>Set[]).all.must_equal []
+    @ds.exclude([:a, :b]=>Set[]).all.must_equal [{:a=>20, :b=>10}]
+  end
+  
   it "should work empty arrays with nulls when using empty_array_consider_nulls extension" do
     @ds = @ds.extension(:empty_array_consider_nulls)
     wait{@ds.insert(nil, nil)}
@@ -1798,13 +1819,17 @@ describe "Sequel::Dataset DSL support" do
     end
   end
   
-  it "should work empty arrays with nulls" do
+  it "should work empty arrays/sets with nulls" do
     ds = @ds
     wait{ds.insert(nil, nil)}
     ds.filter(:a=>[]).all.must_equal []
     ds.exclude(:a=>[]).all.must_equal [{:a=>nil, :b=>nil}]
     ds.filter([:a, :b]=>[]).all.must_equal []
     ds.exclude([:a, :b]=>[]).all.must_equal [{:a=>nil, :b=>nil}]
+    ds.filter(:a=>Set[]).all.must_equal []
+    ds.exclude(:a=>Set[]).all.must_equal [{:a=>nil, :b=>nil}]
+    ds.filter([:a, :b]=>Set[]).all.must_equal []
+    ds.exclude([:a, :b]=>Set[]).all.must_equal [{:a=>nil, :b=>nil}]
 
     unless Sequel.guarded?(:mssql, :oracle, :db2, :sqlanywhere)
       # Some databases don't like boolean results in the select list
@@ -1813,6 +1838,10 @@ describe "Sequel::Dataset DSL support" do
       pr[ds.get(~Sequel.expr(:a=>[]))].must_equal true
       pr[ds.get(Sequel.expr([:a, :b]=>[]))].must_equal false
       pr[ds.get(~Sequel.expr([:a, :b]=>[]))].must_equal true
+      pr[ds.get(Sequel.expr(:a=>Set[]))].must_equal false
+      pr[ds.get(~Sequel.expr(:a=>Set[]))].must_equal true
+      pr[ds.get(Sequel.expr([:a, :b]=>Set[]))].must_equal false
+      pr[ds.get(~Sequel.expr([:a, :b]=>Set[]))].must_equal true
     end
   end
 

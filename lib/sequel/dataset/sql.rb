@@ -85,6 +85,8 @@ module Sequel
         literal_date_append(sql, v)
       when Dataset
         literal_dataset_append(sql, v)
+      when Set
+        literal_set_append(sql, v)
       else
         literal_other_append(sql, v)
       end
@@ -375,9 +377,9 @@ module Sequel
         cols = args[0]
         vals = args[1]
         col_array = true if cols.is_a?(Array)
-        if vals.is_a?(Array)
+        if vals.is_a?(Array) || vals.is_a?(Set)
           val_array = true
-          empty_val_array = vals == []
+          empty_val_array = vals.empty?
         end
         if empty_val_array
           literal_append(sql, empty_array_value(op, cols))
@@ -1446,6 +1448,12 @@ module Sequel
         # don't cache SQL for a dataset that uses this.
         disable_sql_caching!
       end
+    end
+
+    # Append a literalization of the set to SQL string.
+    # Treats as an expression as an SQL value list.
+    def literal_set_append(sql, v)
+      array_sql_append(sql, v)
     end
 
     # SQL fragment for Sequel::SQLTime, containing just the time part

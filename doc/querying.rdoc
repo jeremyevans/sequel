@@ -332,9 +332,12 @@ equality statement:
   Artist.where(name: 'YJM')
   # SELECT * FROM artists WHERE (name = 'YJM')
 
-For arrays, Sequel uses the IN operator with a value list:
+For arrays and sets, Sequel uses the IN operator with a value list:
 
   Artist.where(id: [1, 2])
+  # SELECT * FROM artists WHERE (id IN (1, 2))
+
+  Artist.where(id: Set[1, 2])
   # SELECT * FROM artists WHERE (id IN (1, 2))
 
 For datasets, Sequel uses the IN operator with a subselect:

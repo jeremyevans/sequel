@@ -1,5 +1,7 @@
 === master
 
+* Support sets in dataset filters similar to arrays, using IN/NOT IN (jeremyevans)
+
 * Add Dataset#as_set and Dataset#select_set, as Set will be a core class in Ruby 4 (jeremyevans)
 
 * Add support for Database#create_index :only option on PostgreSQL 11+ (KirIgor) (#2343)
