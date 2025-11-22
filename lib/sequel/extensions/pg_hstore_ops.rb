@@ -294,13 +294,18 @@ module Sequel
         SQL::Function.new(name, self, *args)
       end
 
-      # Wrap argument in a PGArray if it is an array
+      # Wrap argument in a PGArray if it is an array or a set
       def wrap_input_array(obj)
-        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array) 
-          Sequel.pg_array(obj)
-        else
-          obj
+        if Sequel.respond_to?(:pg_array)
+          case obj
+          when Array
+            return Sequel.pg_array(obj)
+          when Set
+            return Sequel.pg_array(obj.to_a)
+          end
         end
+
+        obj
       end
 
       # Wrap argument in an Hstore if it is a hash

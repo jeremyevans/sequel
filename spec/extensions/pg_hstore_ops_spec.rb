@@ -26,6 +26,10 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal(@h - %w'a').must_equal "(h - ARRAY['a'])"
   end
 
+  it "#- should handle sets" do
+    @ds.literal(@h - Set['a']).must_equal "(h - ARRAY['a'])"
+  end
+
   it "#- should handle hashes" do
     @ds.literal(@h - {'a'=>'b'}).must_equal "(h - '\"a\"=>\"b\"'::hstore)"
   end
@@ -102,12 +106,20 @@ describe "Sequel::Postgres::HStoreOp" do
     @ds.literal(@h.contain_all(%w'h1')).must_equal "(h ?& ARRAY['h1'])"
   end
 
+  it "#contain_all handle sets" do
+    @ds.literal(@h.contain_all(Set['h1'])).must_equal "(h ?& ARRAY['h1'])"
+  end
+
   it "#contain_any should use the ?| operator" do
     @ds.literal(@h.contain_any(:h1)).must_equal "(h ?| h1)"
   end
 
   it "#contain_any should handle arrays" do
     @ds.literal(@h.contain_any(%w'h1')).must_equal "(h ?| ARRAY['h1'])"
+  end
+
+  it "#contain_any should handle arrays" do
+    @ds.literal(@h.contain_any(Set['h1'])).must_equal "(h ?| ARRAY['h1'])"
   end
 
   it "#contains should use the @> operator" do
@@ -136,6 +148,10 @@ describe "Sequel::Postgres::HStoreOp" do
 
   it "#delete should handle arrays" do
     @ds.literal(@h.delete(%w'a')).must_equal "delete(h, ARRAY['a'])"
+  end
+
+  it "#delete should handle sets" do
+    @ds.literal(@h.delete(Set['a'])).must_equal "delete(h, ARRAY['a'])"
   end
 
   it "#delete should handle hashes" do
