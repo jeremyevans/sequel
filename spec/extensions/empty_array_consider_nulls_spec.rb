@@ -12,6 +12,13 @@ describe "filter_having extension" do
     @dataset.exclude([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
   end
 
+  it "should handle all types of IN/NOT IN queries with empty sets" do
+    @dataset.filter(:id => Set[]).sql.must_equal "SELECT * FROM test WHERE (id != id)"
+    @dataset.filter([:id1, :id2] => Set[]).sql.must_equal "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
+    @dataset.exclude(:id => Set[]).sql.must_equal "SELECT * FROM test WHERE (id = id)"
+    @dataset.exclude([:id1, :id2] => Set[]).sql.must_equal "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
+  end
+
   it "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it" do
     db = Sequel.mock
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)

@@ -9,6 +9,13 @@
 #   DB[:test].exclude(name: [])
 #   # SELECT * FROM test WHERE (name = name)
 #
+# This works for sets in addition to arrays:
+#
+#   DB[:test].where(name: Set[])
+#   # SELECT * FROM test WHERE (name != name)
+#   DB[:test].exclude(name: Set[])
+#   # SELECT * FROM test WHERE (name = name)
+#
 # The default Sequel behavior is to ignore NULLs, as the above
 # query is not generally optimized well by databases.
 #

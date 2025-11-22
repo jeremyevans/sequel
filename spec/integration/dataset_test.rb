@@ -1801,13 +1801,17 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude([:a, :b]=>Set[]).all.must_equal [{:a=>20, :b=>10}]
   end
   
-  it "should work empty arrays with nulls when using empty_array_consider_nulls extension" do
+  it "should work empty arrays/sets with nulls when using empty_array_consider_nulls extension" do
     @ds = @ds.extension(:empty_array_consider_nulls)
     wait{@ds.insert(nil, nil)}
     @ds.filter(:a=>[]).all.must_equal []
     @ds.exclude(:a=>[]).all.must_equal []
     @ds.filter([:a, :b]=>[]).all.must_equal []
     @ds.exclude([:a, :b]=>[]).all.must_equal []
+    @ds.filter(:a=>Set[]).all.must_equal []
+    @ds.exclude(:a=>Set[]).all.must_equal []
+    @ds.filter([:a, :b]=>Set[]).all.must_equal []
+    @ds.exclude([:a, :b]=>Set[]).all.must_equal []
 
     unless Sequel.guarded?(:mssql, :oracle, :db2, :sqlanywhere)
       # Some databases don't like boolean results in the select list
@@ -1816,6 +1820,10 @@ describe "Sequel::Dataset DSL support" do
       pr[@ds.get(~Sequel.expr(:a=>[]))].must_be_nil
       pr[@ds.get(Sequel.expr([:a, :b]=>[]))].must_be_nil
       pr[@ds.get(~Sequel.expr([:a, :b]=>[]))].must_be_nil
+      pr[@ds.get(Sequel.expr(:a=>Set[]))].must_be_nil
+      pr[@ds.get(~Sequel.expr(:a=>Set[]))].must_be_nil
+      pr[@ds.get(Sequel.expr([:a, :b]=>Set[]))].must_be_nil
+      pr[@ds.get(~Sequel.expr([:a, :b]=>Set[]))].must_be_nil
     end
   end
   
