@@ -1,5 +1,7 @@
 === master
 
+* Auto parameterize IN/NOT IN with sets of integers in the pg_auto_parameterize extension (jeremyevans)
+
 * Support sets in the eval_inspect extension (jeremyevans)
 
 * Support sets of integers or strings for include validations in the constraint_validations extension (jeremyevans)

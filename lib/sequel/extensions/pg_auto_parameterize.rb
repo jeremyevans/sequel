@@ -408,9 +408,9 @@ module Sequel
           end
         end
 
-        # Whether the given argument is an array of integers or NULL values, recursively.
+        # Whether the given argument is an array or set of integers or NULL values, recursively.
         def _integer_array?(v)
-          Array === v && v.all?{|x| nil == x || Integer === x}
+          (Array === v || Set === v) && v.all?{|x| nil == x || Integer === x}
         end
 
         # Create the bound variable string that will be used for the IN (int, ...) to = ANY($)

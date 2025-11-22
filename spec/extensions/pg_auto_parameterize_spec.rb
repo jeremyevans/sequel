@@ -263,6 +263,14 @@ describe "pg_auto_parameterize extension" do
     sql = @db[:table].where(:a=>[1,nil,3]).sql
     sql.must_equal 'SELECT * FROM "table" WHERE ("a" = ANY(CAST($1 AS int8[])))'
     sql.args.must_equal ['{1,NULL,3}']
+
+    sql = @db[:table].where(:a=>Set[1,2,3]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" = ANY(CAST($1 AS int8[])))'
+    sql.args.must_equal ['{1,2,3}']
+
+    sql = @db[:table].where(:a=>Set[1,nil,3]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" = ANY(CAST($1 AS int8[])))'
+    sql.args.must_equal ['{1,NULL,3}']
   end
 
   it "should automatically switch column NOT IN (int, ...) to column != ALL($) with parameter" do
@@ -273,15 +281,31 @@ describe "pg_auto_parameterize extension" do
     sql = @db[:table].exclude(:a=>[1,nil,3]).sql
     sql.must_equal 'SELECT * FROM "table" WHERE ("a" != ALL(CAST($1 AS int8[])))'
     sql.args.must_equal ['{1,NULL,3}']
+
+    sql = @db[:table].exclude(:a=>Set[1,2,3]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" != ALL(CAST($1 AS int8[])))'
+    sql.args.must_equal ['{1,2,3}']
+
+    sql = @db[:table].exclude(:a=>Set[1,nil,3]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" != ALL(CAST($1 AS int8[])))'
+    sql.args.must_equal ['{1,NULL,3}']
   end
 
   it "should not convert IN/NOT IN expressions that don't use integers" do
-    sql = @db[:table].where([:a, :b]=>%w[1 2]).sql
-    sql.must_equal 'SELECT * FROM "table" WHERE (("a", "b") IN ($1, $2))'
+    sql = @db[:table].where(:a=>%w[1 2]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" IN ($1, $2))'
     sql.args.must_equal %w[1 2]
 
-    sql = @db[:table].exclude([:a, :b]=>%w[1 2]).sql
-    sql.must_equal 'SELECT * FROM "table" WHERE (("a", "b") NOT IN ($1, $2))'
+    sql = @db[:table].exclude(:a=>%w[1 2]).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" NOT IN ($1, $2))'
+    sql.args.must_equal %w[1 2]
+
+    sql = @db[:table].where(:a=>Set['1', '2']).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" IN ($1, $2))'
+    sql.args.must_equal %w[1 2]
+
+    sql = @db[:table].exclude(:a=>Set['1', '2']).sql
+    sql.must_equal 'SELECT * FROM "table" WHERE ("a" NOT IN ($1, $2))'
     sql.args.must_equal %w[1 2]
   end
 
