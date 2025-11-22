@@ -127,9 +127,14 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.exclude(:a_artists=>@o1).sql.must_equal "SELECT * FROM tags WHERE ((tags.id NOT IN (SELECT _smtopgaa_key_ FROM artists CROSS JOIN unnest(artists.tag_ids) AS _smtopgaa_(_smtopgaa_key_) WHERE ((name = 'A') AND (artists.tag_ids IS NOT NULL) AND (artists.id = 1)))) OR (tags.id IS NULL))"
   end
 
-  it "should allowing filtering by multiple associations" do
+  it "should allowing filtering by multiple associations with arrays" do
     @c1.filter(:tags=>[@c2.load(:id=>1), @c2.load(:id=>2)]).sql.must_equal "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[1,2]::integer[])"
     @c2.filter(:artists=>[@c1.load(:tag_ids=>Sequel.pg_array([3, 4])), @c1.load(:tag_ids=>Sequel.pg_array([4, 5]))]).sql.must_equal "SELECT * FROM tags WHERE (tags.id IN (3, 4, 5))"
+  end
+
+  it "should allowing filtering by multiple associations with sets" do
+    @c1.filter(:tags=>Set[@c2.load(:id=>1), @c2.load(:id=>2)]).sql.must_equal "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[1,2]::integer[])"
+    @c2.filter(:artists=>Set[@c1.load(:tag_ids=>Sequel.pg_array([3, 4])), @c1.load(:tag_ids=>Sequel.pg_array([4, 5]))]).sql.must_equal "SELECT * FROM tags WHERE (tags.id IN (3, 4, 5))"
   end
 
   it "should allowing filtering by multiple associations with :conditions" do

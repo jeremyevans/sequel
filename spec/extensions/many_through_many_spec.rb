@@ -257,9 +257,14 @@ describe Sequel::Model, "many_through_many" do
     @c1.exclude(:tags=>@c2.load(:id=>1, :h1=>1234, :h2=>85)).sql.must_equal "SELECT * FROM artists WHERE (((artists.id, artists.yyy) NOT IN (SELECT albums_artists.b1, albums_artists.b2 FROM tags INNER JOIN albums_tags ON ((albums_tags.g1 = tags.h1) AND (albums_tags.g2 = tags.h2)) INNER JOIN albums ON ((albums.e1 = albums_tags.f1) AND (albums.e2 = albums_tags.f2)) INNER JOIN albums_artists ON ((albums_artists.c1 = albums.d1) AND (albums_artists.c2 = albums.d2)) WHERE ((name = 'A') AND (albums_artists.b1 IS NOT NULL) AND (albums_artists.b2 IS NOT NULL) AND (tags.id = 1)))) OR (artists.id IS NULL) OR (artists.yyy IS NULL))"
   end
 
-  it "should allowing filtering by multiple many_through_many associations" do
+  it "should allowing filtering by multiple many_through_many associations with arrays" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     @c1.filter(:tags=>[@c2.load(:id=>1234), @c2.load(:id=>2345)]).sql.must_equal 'SELECT * FROM artists WHERE (artists.id IN (SELECT albums_artists.artist_id FROM albums_artists INNER JOIN albums ON (albums.id = albums_artists.album_id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) WHERE ((albums_tags.tag_id IN (1234, 2345)) AND (albums_artists.artist_id IS NOT NULL))))'
+  end
+
+  it "should allowing filtering by multiple many_through_many associations with sets" do
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    @c1.filter(:tags=>Set[@c2.load(:id=>1234), @c2.load(:id=>2345)]).sql.must_equal 'SELECT * FROM artists WHERE (artists.id IN (SELECT albums_artists.artist_id FROM albums_artists INNER JOIN albums ON (albums.id = albums_artists.album_id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) WHERE ((albums_tags.tag_id IN (1234, 2345)) AND (albums_artists.artist_id IS NOT NULL))))'
   end
 
   it "should allowing filtering by multiple many_through_many associations with composite keys" do

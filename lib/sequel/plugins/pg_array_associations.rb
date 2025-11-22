@@ -541,7 +541,7 @@ module Sequel
             if (assoc_pks = obj.get_column_value(key)) && !assoc_pks.empty?
               Sequel[pk=>assoc_pks.to_a]
             end
-          when Array
+          when Array, Set
             if (assoc_pks = obj.map{|o| o.get_column_value(key)}.flatten.compact.uniq) && !assoc_pks.empty?
               Sequel[pk=>assoc_pks]
             end
@@ -563,7 +563,7 @@ module Sequel
             if pkv = obj.get_column_value(ref.primary_key_method)
               Sequel.pg_array_op(key).contains(Sequel.pg_array([pkv], ref.array_type))
             end
-          when Array
+          when Array, Set
             if (pkvs = obj.map{|o| o.get_column_value(ref.primary_key_method)}.compact) && !pkvs.empty?
               Sequel.pg_array(key).overlaps(Sequel.pg_array(pkvs, ref.array_type))
             end

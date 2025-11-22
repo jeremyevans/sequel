@@ -1,5 +1,7 @@
 === master
 
+* Support filtering by associations with sets in the pg_array_associations plugin (jeremyevans)
+
 * Support sets in the to_dot extension (jeremyevans)
 
 * Support splitting nil values from sets in the split_array_nil extension (jeremyevans)
