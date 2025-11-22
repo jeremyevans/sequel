@@ -436,7 +436,7 @@ module Sequel
             else
               raise Error, "validates includes with a range only supports integers currently, cannot handle: #{arg.inspect}"
             end
-          elsif arg.is_a?(Array)
+          elsif arg.is_a?(Array) || arg.is_a?(Set)
             if arg.all?{|x| x.is_a?(Integer)}
               validation_type = :includes_int_array
             elsif arg.all?{|x| x.is_a?(String)}
@@ -444,9 +444,9 @@ module Sequel
             else
               raise Error, "validates includes with an array only supports strings and integers currently, cannot handle: #{arg.inspect}"
             end
-            arg = arg.join(',')
+            arg = Sequel.array_or_set_join(arg, ',')
           else
-            raise Error, "validates includes only supports arrays and ranges currently, cannot handle: #{arg.inspect}"
+            raise Error, "validates includes only supports arrays, sets, and ranges currently, cannot handle: #{arg.inspect}"
           end
         when :like, :ilike
           generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| Sequel.public_send(validation_type, c, arg)})

@@ -293,6 +293,20 @@ describe "constraint_validations extension" do
     sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN (1, 2, 3))))"]
   end
 
+  it "should support :includes constraint validation with a set of strings" do
+    @db.create_table(:foo){String :name; validate{includes Set['a', 'b', 'c'], :name}}
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"includes_str_array", :column=>"name", :table=>"foo", :argument=>'a,b,c')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN ('a', 'b', 'c'))))"]
+  end
+
+  it "should support :includes constraint validation with a set of integers" do
+    @db.create_table(:foo){String :name; validate{includes Set[1, 2, 3], :name}}
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(0)).must_equal(:validation_type=>"includes_int_array", :column=>"name", :table=>"foo", :argument=>'1,2,3')
+    sqls.must_equal ["CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (name IN (1, 2, 3))))"]
+  end
+
   it "should support :includes constraint validation with a inclusive range of integers" do
     @db.create_table(:foo){String :name; validate{includes 3..5, :name}}
     sqls = @db.sqls

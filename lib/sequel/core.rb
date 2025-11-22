@@ -164,6 +164,20 @@ module Sequel
       JSON::ParserError
     end
 
+    if RUBY_VERSION >= '3'
+      # Join the array or set.
+      def array_or_set_join(obj, arg)
+        obj.join(arg)
+      end
+    # :nocov:
+    else
+      def array_or_set_join(obj, arg)
+        obj = obj.to_a if obj.is_a?(Set)
+        obj.join(arg)
+      end
+    end
+    # :nocov:
+
     if RUBY_VERSION >= '3.3'
       # Create a new module using the block, and set the temporary name
       # on it using the given a containing module and name.
