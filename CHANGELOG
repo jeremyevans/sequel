@@ -1,5 +1,7 @@
 === master
 
+* Auto parameterize IN/NOT IN with sets in the pg_auto_parameterize_in_array extension (jeremyevans)
+
 * Auto parameterize IN/NOT IN with sets of integers in the pg_auto_parameterize extension (jeremyevans)
 
 * Support sets in the eval_inspect extension (jeremyevans)

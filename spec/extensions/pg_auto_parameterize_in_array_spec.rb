@@ -29,9 +29,14 @@ describe "pg_auto_parameterize_in_array extension" do
     it "should fallback to pg_auto_parameterize extension behavior when switching column IN/NOT IN to = ANY/!= ALL for integers" do
       v = [1, 2, 3]
       nv = [1, nil, 3]
+      set = Set[1, 2, 3]
       type = "int8"
 
       sql = @db[:table].where(:a=>v).sql
+      sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" = ANY(CAST($1 AS #{type}[])))'
+      sql.args.must_equal ['{1,2,3}']
+
+      sql = @db[:table].where(:a=>set).sql
       sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" = ANY(CAST($1 AS #{type}[])))'
       sql.args.must_equal ['{1,2,3}']
 
@@ -40,6 +45,10 @@ describe "pg_auto_parameterize_in_array extension" do
       sql.args.must_equal ['{1,NULL,3}']
 
       sql = @db[:table].exclude(:a=>v).sql
+      sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" != ALL(CAST($1 AS #{type}[])))'
+      sql.args.must_equal ['{1,2,3}']
+
+      sql = @db[:table].exclude(:a=>set).sql
       sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" != ALL(CAST($1 AS #{type}[])))'
       sql.args.must_equal ['{1,2,3}']
 
@@ -52,9 +61,14 @@ describe "pg_auto_parameterize_in_array extension" do
   types.each do |desc, conv, type|
     it "should automatically switch column IN/NOT IN to = ANY/!= ALL for #{desc}" do
       v = [1,2,3].map(&conv)
+      set = v.to_set
       nv = (v + [nil]).freeze
 
       sql = @db[:table].where(:a=>v).sql
+      sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" = ANY($1::#{type}[]))'
+      sql.args.must_equal [v]
+
+      sql = @db[:table].where(:a=>set).sql
       sql.must_equal %'SELECT * FROM \"table\" WHERE ("a" = ANY($1::#{type}[]))'
       sql.args.must_equal [v]
 
@@ -63,6 +77,10 @@ describe "pg_auto_parameterize_in_array extension" do
       sql.args.must_equal [nv]
 
       sql = @db[:table].exclude(:a=>v).sql
+      sql.must_equal %'SELECT * FROM "table" WHERE ("a" != ALL($1::#{type}[]))'
+      sql.args.must_equal [v]
+
+      sql = @db[:table].exclude(:a=>set).sql
       sql.must_equal %'SELECT * FROM "table" WHERE ("a" != ALL($1::#{type}[]))'
       sql.args.must_equal [v]
 

@@ -120,7 +120,7 @@ module Sequel
       # The bound variable type string to use for the bound variable array.
       # Returns nil if a bound variable should not be used for the array.
       def _bound_variable_type_for_array(r)
-        return unless Array === r && r.size >= pg_auto_parameterize_min_array_size
+        return unless (Array === r || Set === r) && r.size >= pg_auto_parameterize_min_array_size
         classes = r.map(&:class)
         classes.uniq!
         classes.delete(NilClass)
@@ -165,6 +165,7 @@ module Sequel
 
       # Convert RHS of IN/NOT IN operator to PGArray with given type.
       def _convert_array_to_pg_array_with_type(r, type)
+        r = r.to_a if Set === r
         Sequel.pg_array(r, type)
       end
     end
