@@ -26,6 +26,8 @@ module Sequel
         h = {}
         o.each{|k, val| h[v(k)] = v(val)}
         h
+      when Set
+        Set.new(o.map{|x| v(x)})
       when SQL::NumericExpression
         if o.op == :extract
           o.class.new(o.op, o.args[0], v(o.args[1]))

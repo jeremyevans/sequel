@@ -4701,6 +4701,10 @@ describe "Sequel::Dataset#qualify" do
     @ds.filter(:a=>[:b, :c]).qualify.sql.must_equal 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
   end
 
+  it "should handle sets" do
+    @ds.filter(:a=>Set[:b, :c]).qualify.sql.must_equal 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+  end
+
   it "should handle hashes" do
     @ds.select(Sequel.case({:b=>{:c=>1}}, false)).qualify.sql.must_equal "SELECT (CASE WHEN t.b THEN (t.c = 1) ELSE 'f' END) FROM t"
   end
