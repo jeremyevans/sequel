@@ -1,5 +1,7 @@
 === master
 
+* Support sets in the eval_inspect extension (jeremyevans)
+
 * Support sets of integers or strings for include validations in the constraint_validations extension (jeremyevans)
 
 * Support filtering by associations using a set of associated objects (jeremyevans)

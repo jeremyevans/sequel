@@ -20,6 +20,8 @@ describe "eval_inspect extension" do
       Sequel::SQL::Cast.new(:a, :b),
       Sequel::SQL::ColumnAll.new(:a),
       Sequel::SQL::ComplexExpression.new(:'=', :b, :a),
+      Sequel::SQL::ComplexExpression.new(:'IN', :b, [Sequel::SQL::Identifier.new(:a)]),
+      Sequel::SQL::ComplexExpression.new(:'IN', :b, Set[Sequel::SQL::Identifier.new(:a)]),
       Sequel::SQL::Constant.new(:a),
       Sequel::CURRENT_DATE,
       Sequel::CURRENT_TIMESTAMP,

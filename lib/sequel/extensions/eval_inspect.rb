@@ -34,6 +34,8 @@ module Sequel
         "#{obj.class}.new(#{obj.to_a.inspect})"
       when Array
         "[#{obj.map{|o| eval_inspect(o)}.join(', ')}]"
+      when Set
+        "Set[#{obj.map{|o| eval_inspect(o)}.join(', ')}]"
       when Hash
         "{#{obj.map{|k, v| "#{eval_inspect(k)} => #{eval_inspect(v)}"}.join(', ')}}"
       when Time
