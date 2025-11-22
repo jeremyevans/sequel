@@ -242,12 +242,20 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.contain_all(%w'h1')].must_equal "(j ?& ARRAY['h1'])"
   end
 
+  it "#contain_all handle sets" do
+    @l[@jb.contain_all(Set['h1'])].must_equal "(j ?& ARRAY['h1'])"
+  end
+
   it "#contain_any should use the ?| operator" do
     @l[@jb.contain_any(:h1)].must_equal "(j ?| h1)"
   end
 
   it "#contain_any should handle arrays" do
     @l[@jb.contain_any(%w'h1')].must_equal "(j ?| ARRAY['h1'])"
+  end
+
+  it "#contain_any should handle sets" do
+    @l[@jb.contain_any(Set['h1'])].must_equal "(j ?| ARRAY['h1'])"
   end
 
   it "#contains should use the @> operator" do
@@ -453,6 +461,10 @@ describe "Sequel::Postgres::JSONOp" do
 
   it "#delete_path should handle arrays" do
     @l[@jb.delete_path(['a'])].must_equal "(j #- ARRAY['a'])"
+  end
+
+  it "#delete_path should handle sets" do
+    @l[@jb.delete_path(Set['a'])].must_equal "(j #- ARRAY['a'])"
   end
 
   it "#has_key? and aliases should use the ? operator" do
