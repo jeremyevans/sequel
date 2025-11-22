@@ -1,5 +1,7 @@
 === master
 
+* Support splitting nil values from sets in the split_array_nil extension (jeremyevans)
+
 * Support sets as input where arrays are accepted as input and order doesn't matter in the pg_hstore_ops/pg_json_ops extensions (jeremyevans)
 
 * Auto parameterize IN/NOT IN with sets in the pg_auto_parameterize_in_array extension (jeremyevans)

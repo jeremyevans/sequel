@@ -13,9 +13,22 @@ describe "split_array_nil extension" do
     @ds.exclude(:a=>[1, nil]).sql.must_equal "SELECT * FROM table WHERE ((a NOT IN (1)) AND (a IS NOT NULL))"
   end
 
-  it "should not affect other IN/NOT in clauses" do
+  it "should not affect other IN/NOT in clauses with arrays" do
     @ds.filter(:a=>[1, 2]).sql.must_equal "SELECT * FROM table WHERE (a IN (1, 2))"
     @ds.exclude(:a=>[1, 2]).sql.must_equal "SELECT * FROM table WHERE (a NOT IN (1, 2))"
+  end
+
+  it "should split IN with nil in set into separate OR IS NULL clause" do
+    @ds.filter(:a=>Set[1, nil]).sql.must_equal "SELECT * FROM table WHERE ((a IN (1)) OR (a IS NULL))"
+  end
+
+  it "should split NOT IN with nil in set into separate AND IS NOT NULL clause" do
+    @ds.exclude(:a=>Set[1, nil]).sql.must_equal "SELECT * FROM table WHERE ((a NOT IN (1)) AND (a IS NOT NULL))"
+  end
+
+  it "should not affect other IN/NOT in clauses with sets" do
+    @ds.filter(:a=>Set[1, 2]).sql.must_equal "SELECT * FROM table WHERE (a IN (1, 2))"
+    @ds.exclude(:a=>Set[1, 2]).sql.must_equal "SELECT * FROM table WHERE (a NOT IN (1, 2))"
   end
 
   it "should not affect other types of filters clauses" do

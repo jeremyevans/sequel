@@ -25,6 +25,11 @@
 #   # with split_array_nils extension:
 #   #   SELECT * FROM table WHERE ((column NOT IN (1)) AND (column IS NOT NULL)))
 #
+# In addition to arrays, this splitting is also done for sets:
+#
+#   ds = DB[:table].where(column: Set[1, nil])
+#   # SELECT * FROM table WHERE ((column IN (1)) OR (column IS NULL)))
+#
 # To use this extension with a single dataset:
 #
 #   ds = ds.extension(:split_array_nil)
@@ -47,9 +52,14 @@ module Sequel
       case op
       when :IN, :"NOT IN"
         vals = args[1]
-        if vals.is_a?(Array) && vals.any?(&:nil?)
+        if (vals.is_a?(Array) || vals.is_a?(Set)) && vals.any?(&:nil?)
           cols = args[0]
-          vals = vals.compact
+          if vals.is_a?(Set)
+            vals = vals.dup
+            vals.delete(nil)
+          else
+            vals = vals.compact
+          end
           c = Sequel::SQL::BooleanExpression
           if op == :IN
             literal_append(sql, c.new(:OR, c.new(:IN, cols, vals), c.new(:IS, cols, nil)))
