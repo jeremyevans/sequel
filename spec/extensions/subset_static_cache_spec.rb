@@ -126,12 +126,12 @@ describe "subset_static_cache plugin" do
     @db.sqls.must_equal []
   end
 
-  it "should have .map with symbol argument iterate map over instances without a query" do
+  it "should have .map with symbol argument return array without a query" do
     @ds.map(:id).sort.must_equal [1, 2]
     @db.sqls.must_equal []
   end
 
-  it "should have .map with array argument iterate map over instances without a query" do
+  it "should have .map with array argument return array without a query" do
     @ds.map([:id]).sort.must_equal [[1], [2]]
     @db.sqls.must_equal []
   end
@@ -150,6 +150,21 @@ describe "subset_static_cache plugin" do
 
   it "should have .map work on cloned datasets using a query" do
     @ds.where(:baz).map(:id).must_equal [1, 2]
+    @db.sqls.must_equal ["SELECT * FROM t WHERE (bar AND baz)"]
+  end
+
+  it "should have .as_set with symbol argument return set without a query" do
+    @ds.as_set(:id).must_equal Set[1, 2]
+    @db.sqls.must_equal []
+  end
+
+  it "should have .as_set with array argument return set without a query" do
+    @ds.as_set([:id]).must_equal Set[[1], [2]]
+    @db.sqls.must_equal []
+  end
+
+  it "should have .as_set work on cloned datasets using a query" do
+    @ds.where(:baz).as_set(:id).must_equal Set[1, 2]
     @db.sqls.must_equal ["SELECT * FROM t WHERE (bar AND baz)"]
   end
 
