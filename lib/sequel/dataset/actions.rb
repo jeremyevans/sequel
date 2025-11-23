@@ -807,11 +807,10 @@ module Sequel
       ds = ungraphed.naked
       columns = Array(column)
       virtual_row_columns(columns, block)
-      select_cols = order ? columns.map{|c| c.is_a?(SQL::OrderedExpression) ? c.expression : c} : columns
       if column.is_a?(Array) || (columns.length > 1)
-        ds.select(*select_cols)._select_set_multiple(hash_key_symbols(select_cols))
+        ds.select(*columns)._select_set_multiple(hash_key_symbols(columns))
       else
-        ds.select(auto_alias_expression(select_cols.first))._select_set_single
+        ds.select(auto_alias_expression(columns.first))._select_set_single
       end
     end
     
