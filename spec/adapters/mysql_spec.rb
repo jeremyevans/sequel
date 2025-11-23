@@ -681,6 +681,7 @@ describe "A MySQL database" do
 
     @db[:posts].full_text_search(:title, 'rails').all.must_equal [{:title=>'ruby rails', :body=>'y'}]
     @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.must_equal [{:title=>'sequel', :body=>'ruby'}]
+    @db[:posts].full_text_search([:title, :body], Set['sequel', 'ruby']).all.must_equal [{:title=>'sequel', :body=>'ruby'}]
     @db[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).all.must_equal [{:title=>'ruby scooby', :body=>'x'}]
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').must_equal [{:title=>'ruby rails', :body=>'y'}]

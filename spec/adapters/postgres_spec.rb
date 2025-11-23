@@ -2168,6 +2168,7 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search(:title, 'rails').all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search(:title, 'rails', :headline=>true).all.must_equal [{:title=>'ruby rails', :body=>'yowsa', :headline=>'ruby <b>rails</b>'}]
     @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.must_equal [:title=>'ruby rails', :body=>'yowsa']
+    @db[:posts].full_text_search([:title, :body], Set['yowsa', 'rails']).all.must_equal [:title=>'ruby rails', :body=>'yowsa']
     @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.must_equal [{:title=>'ruby scooby', :body=>'x'}]
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').must_equal [{:title=>'ruby rails', :body=>'yowsa'}]

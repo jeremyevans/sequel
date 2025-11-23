@@ -1,5 +1,7 @@
 === master
 
+* Support passing a set as a Dataset#full_text_search terms argument on MSSQL, MySQL, and PostgreSQL (jeremyevans)
+
 * Optimize Dataset#as_set calls to avoid queries in the subset_static_cache plugin (jeremyevans)
 
 * Optimize Model.as_set calls to avoid queries in the static_cache plugin (jeremyevans)

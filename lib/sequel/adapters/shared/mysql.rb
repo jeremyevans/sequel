@@ -797,7 +797,7 @@ module Sequel
       
       # MySQL specific full text search syntax.
       def full_text_sql(cols, terms, opts = OPTS)
-        terms = terms.join(' ') if terms.is_a?(Array)
+        terms = Sequel.array_or_set_join(terms, ' ') if terms.is_a?(Array) || terms.is_a?(Set)
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
       end
 

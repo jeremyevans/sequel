@@ -2173,7 +2173,7 @@ module Sequel
         end
 
         unless opts[:tsquery]
-          phrase_terms = terms.is_a?(Array) ? terms.join(' | ') : terms
+          phrase_terms = terms.is_a?(Array) || terms.is_a?(Set) ? Sequel.array_or_set_join(terms, ' | ') : terms
 
           query_func = case to_tsquery = opts[:to_tsquery]
           when :phrase, :plain
