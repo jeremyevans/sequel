@@ -2344,5 +2344,17 @@ END
     # :nocov:
       singleton_class.send(:undef_method, :initialize_clone, :initialize_dup)
     end
+
+    # :nocov:
+    if defined?(Sequel::Postgres::SEQUEL_PG_VERSION_INTEGER) && Sequel::Postgres::SEQUEL_PG_VERSION_INTEGER >= 11800
+      # Automatically optimize model loading when sequel/core was loaded,
+      # then sequel/adapters/postgres (with sequel_pg), then sequel/model
+      begin
+        require "sequel_pg/model"
+      rescue LoadError
+        # nothing
+      end
+    end
+    # :nocov:
   end
 end
