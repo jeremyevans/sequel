@@ -32,7 +32,7 @@
 
 * Add Dataset#as_set and Dataset#select_set, as Set will be a core class in Ruby 4 (jeremyevans)
 
-* Add support for Database#create_index :only option on PostgreSQL 11+ (KirIgor) (#2343)
+* Add support for Database#add_index :only option on PostgreSQL 11+ (KirIgor) (#2343)
 
 * Add support for Database#indexes :invalid option on PostgresSQL (KirIgor, jeremyevans) (#2343)
 
