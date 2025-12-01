@@ -33,26 +33,11 @@ lib/sequel/extensions/set_literalizer.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The set_literalizer extension allows for using Set instances in many of the same places that you would use <a href="../../../../classes/Array.html"><code>Array</code></a> instances:</p>
-
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Set</span>.<span class="ruby-identifier">new</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]))
-<span class="ruby-comment"># SELECT FROM table WHERE (column IN (1, 2, 3))</span>
-</pre>
-
-<p>To load the extension into all datasets created from a given Database:</p>
-
-<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:set_literalizer</span>
-</pre>
+<p>The set_literalizer extension should no longer be used, as <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> now supports Set values by default. For backwards compatibility the set_literalizer extension will treat a set that contains only 2 element arrays as a condition specifier (matching the behavior for arrays where all elements are 2 element arrays). This is not compatible with Sequel’s current default behavior. If you are relying on this behavior, it is recommended you convert the set to an array.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Dataset/SetLiteralizer.html"><code>Sequel::Dataset::SetLiteralizer</code></a></p>
 </div>
 <div id='context'>
-<div id='requires'>
-<h2>Required files</h2>
-<ol>
-<li>set</li>
-</ol>
-</div>
 </div>
 
 </div>

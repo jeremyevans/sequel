@@ -576,6 +576,10 @@ doc/postgresql.rdoc
 <span class="ruby-comment"># COMMIT;</span>
 </pre>
 
+<h2 id="label-PostgreSQL-specific+reflection+Support">PostgreSQL-specific reflection Support<span><a href="#label-PostgreSQL-specific+reflection+Support">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The Database#indexes method supports the options :include_partial and :invalid. These options allows partial indexes to be included and invalid indexes to be included in the results (‘invalid: :include`) or to only return invalid indexes (`invalid: :only`), respectively.  By default, <a href="../../classes/Sequel.html"><code>Sequel</code></a> excludes both partial and invalid indexes.</p>
+
 <h2 id="label-Extended+Error+Info+-28postgres-2Fpg+only-29">Extended Error Info (<code>postgres/pg only</code>)<span><a href="#label-Extended+Error+Info+-28postgres-2Fpg+only-29">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>If you run a query that raises a Sequel::DatabaseError, you can pass the exception object to <code>Database#error_info</code>, and that will return a hash with metadata regarding the error, such as the related table and column or constraint.</p>

@@ -287,9 +287,12 @@ README.rdoc
 <span class="ruby-comment"># WHERE ((stamp &gt;= &#39;2010-06-30&#39;) AND (stamp &lt;= &#39;2010-07-07&#39;))</span>
 </pre>
 
-<p>Or arrays of values:</p>
+<p>Or arrays or sets of values:</p>
 
 <pre class="ruby"><span class="ruby-identifier">my_posts</span> = <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> [<span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-string">&#39;postgres&#39;</span>, <span class="ruby-string">&#39;linux&#39;</span>])
+<span class="ruby-comment"># WHERE (category IN (&#39;ruby&#39;, &#39;postgres&#39;, &#39;linux&#39;))</span>
+
+<span class="ruby-identifier">my_posts</span> = <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-constant">Set</span>[<span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-string">&#39;postgres&#39;</span>, <span class="ruby-string">&#39;linux&#39;</span>])
 <span class="ruby-comment"># WHERE (category IN (&#39;ruby&#39;, &#39;postgres&#39;, &#39;linux&#39;))</span>
 </pre>
 

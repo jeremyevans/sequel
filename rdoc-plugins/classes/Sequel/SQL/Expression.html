@@ -71,24 +71,24 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-inspect-source'>   <span class="ruby-comment"># File lib/sequel/extensions/eval_inspect.rb</span>
-<span class="line-num">63</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
-<span class="line-num">64</span>   <span class="ruby-comment"># Assume by default that the object can be recreated by calling</span>
-<span class="line-num">65</span>   <span class="ruby-comment"># self.class.new with any attr_reader values defined on the class,</span>
-<span class="line-num">66</span>   <span class="ruby-comment"># in the order they were defined.</span>
-<span class="line-num">67</span>   <span class="ruby-identifier">klass</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>
-<span class="line-num">68</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">inspect_args</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span>
-<span class="line-num">69</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">start_with?</span>(<span class="ruby-string">&#39;*&#39;</span>)
-<span class="line-num">70</span>       <span class="ruby-comment"># Special case string arguments starting with *, indicating that</span>
-<span class="line-num">71</span>       <span class="ruby-comment"># they should return an array to be splatted as the remaining arguments.</span>
-<span class="line-num">72</span>       <span class="ruby-comment"># Allow calling private methods to get inspect output.</span>
-<span class="line-num">73</span>       <span class="ruby-identifier">send</span>(<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-string">&#39;*&#39;</span>, <span class="ruby-string">&#39;&#39;</span>)).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">eval_inspect</span>(<span class="ruby-identifier">a</span>)}.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>)
-<span class="line-num">74</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">75</span>       <span class="ruby-comment"># Allow calling private methods to get inspect output.</span>
-<span class="line-num">76</span>       <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">eval_inspect</span>(<span class="ruby-identifier">send</span>(<span class="ruby-identifier">arg</span>))
-<span class="line-num">77</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">78</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">79</span>   <span class="ruby-node">&quot;#{klass}.#{inspect_new_method}(#{args.join(&#39;, &#39;)})&quot;</span>
-<span class="line-num">80</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>
+<span class="line-num">66</span>   <span class="ruby-comment"># Assume by default that the object can be recreated by calling</span>
+<span class="line-num">67</span>   <span class="ruby-comment"># self.class.new with any attr_reader values defined on the class,</span>
+<span class="line-num">68</span>   <span class="ruby-comment"># in the order they were defined.</span>
+<span class="line-num">69</span>   <span class="ruby-identifier">klass</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>
+<span class="line-num">70</span>   <span class="ruby-identifier">args</span> = <span class="ruby-identifier">inspect_args</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span>
+<span class="line-num">71</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">start_with?</span>(<span class="ruby-string">&#39;*&#39;</span>)
+<span class="line-num">72</span>       <span class="ruby-comment"># Special case string arguments starting with *, indicating that</span>
+<span class="line-num">73</span>       <span class="ruby-comment"># they should return an array to be splatted as the remaining arguments.</span>
+<span class="line-num">74</span>       <span class="ruby-comment"># Allow calling private methods to get inspect output.</span>
+<span class="line-num">75</span>       <span class="ruby-identifier">send</span>(<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-string">&#39;*&#39;</span>, <span class="ruby-string">&#39;&#39;</span>)).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">eval_inspect</span>(<span class="ruby-identifier">a</span>)}.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>)
+<span class="line-num">76</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">77</span>       <span class="ruby-comment"># Allow calling private methods to get inspect output.</span>
+<span class="line-num">78</span>       <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">eval_inspect</span>(<span class="ruby-identifier">send</span>(<span class="ruby-identifier">arg</span>))
+<span class="line-num">79</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">80</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">81</span>   <span class="ruby-node">&quot;#{klass}.#{inspect_new_method}(#{args.join(&#39;, &#39;)})&quot;</span>
+<span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

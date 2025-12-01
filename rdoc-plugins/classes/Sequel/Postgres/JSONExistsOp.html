@@ -122,13 +122,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">922</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">923</span>   <span class="ruby-ivar">@expr</span> = <span class="ruby-identifier">expr</span>
-<span class="line-num">924</span>   <span class="ruby-ivar">@path</span> = <span class="ruby-identifier">path</span>
-<span class="line-num">925</span>   <span class="ruby-ivar">@passing</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:passing</span>]
-<span class="line-num">926</span>   <span class="ruby-ivar">@on_error</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_error</span>]
-<span class="line-num">927</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">928</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">929</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">930</span>   <span class="ruby-ivar">@expr</span> = <span class="ruby-identifier">expr</span>
+<span class="line-num">931</span>   <span class="ruby-ivar">@path</span> = <span class="ruby-identifier">path</span>
+<span class="line-num">932</span>   <span class="ruby-ivar">@passing</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:passing</span>]
+<span class="line-num">933</span>   <span class="ruby-ivar">@on_error</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_error</span>]
+<span class="line-num">934</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">935</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -148,11 +148,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sequel_ast_transform-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">939</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_ast_transform</span>(<span class="ruby-identifier">transformer</span>)
-<span class="line-num">940</span>   <span class="ruby-identifier">opts</span> = {}
-<span class="line-num">941</span>   <span class="ruby-identifier">transform_opts</span>(<span class="ruby-identifier">transformer</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">942</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@expr</span>), <span class="ruby-ivar">@path</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">943</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">946</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_ast_transform</span>(<span class="ruby-identifier">transformer</span>)
+<span class="line-num">947</span>   <span class="ruby-identifier">opts</span> = {}
+<span class="line-num">948</span>   <span class="ruby-identifier">transform_opts</span>(<span class="ruby-identifier">transformer</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">949</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@expr</span>), <span class="ruby-ivar">@path</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">950</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_s_append'>
@@ -171,12 +171,12 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_s_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>
-<span class="line-num">931</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">932</span>   <span class="ruby-identifier">to_s_append_function_name</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">933</span>   <span class="ruby-identifier">to_s_append_args_passing</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">934</span>   <span class="ruby-identifier">to_s_append_on_error</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">935</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">936</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">938</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">939</span>   <span class="ruby-identifier">to_s_append_function_name</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">940</span>   <span class="ruby-identifier">to_s_append_args_passing</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">941</span>   <span class="ruby-identifier">to_s_append_on_error</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">942</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">943</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

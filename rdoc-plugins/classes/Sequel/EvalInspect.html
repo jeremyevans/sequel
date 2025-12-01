@@ -74,21 +74,23 @@ Sequel::EvalInspect
 <span class="line-num">34</span>     <span class="ruby-node">&quot;#{obj.class}.new(#{obj.to_a.inspect})&quot;</span>
 <span class="line-num">35</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>
 <span class="line-num">36</span>     <span class="ruby-node">&quot;[#{obj.map{|o| eval_inspect(o)}.join(&#39;, &#39;)}]&quot;</span>
-<span class="line-num">37</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
-<span class="line-num">38</span>     <span class="ruby-node">&quot;{#{obj.map{|k, v| &quot;#{eval_inspect(k)} =&gt; #{eval_inspect(v)}&quot;}.join(&#39;, &#39;)}}&quot;</span>
-<span class="line-num">39</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Time</span>
-<span class="line-num">40</span>     <span class="ruby-identifier">datepart</span> = <span class="ruby-string">&quot;%Y-%m-%dT&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>)
-<span class="line-num">41</span>     <span class="ruby-node">&quot;#{obj.class}.parse(#{obj.strftime(&quot;#{datepart}%T.%N%z&quot;).inspect})#{&#39;.utc&#39; if obj.utc?}&quot;</span>
-<span class="line-num">42</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">DateTime</span>
-<span class="line-num">43</span>     <span class="ruby-comment"># Ignore date of calendar reform</span>
-<span class="line-num">44</span>     <span class="ruby-node">&quot;DateTime.parse(#{obj.strftime(&#39;%FT%T.%N%z&#39;).inspect})&quot;</span>
-<span class="line-num">45</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Date</span>
-<span class="line-num">46</span>     <span class="ruby-comment"># Ignore offset and date of calendar reform</span>
-<span class="line-num">47</span>     <span class="ruby-node">&quot;Date.new(#{obj.year}, #{obj.month}, #{obj.day})&quot;</span>
-<span class="line-num">48</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">49</span>     <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">inspect</span>
-<span class="line-num">50</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">37</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Set</span>
+<span class="line-num">38</span>     <span class="ruby-node">&quot;Set[#{obj.map{|o| eval_inspect(o)}.join(&#39;, &#39;)}]&quot;</span>
+<span class="line-num">39</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
+<span class="line-num">40</span>     <span class="ruby-node">&quot;{#{obj.map{|k, v| &quot;#{eval_inspect(k)} =&gt; #{eval_inspect(v)}&quot;}.join(&#39;, &#39;)}}&quot;</span>
+<span class="line-num">41</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Time</span>
+<span class="line-num">42</span>     <span class="ruby-identifier">datepart</span> = <span class="ruby-string">&quot;%Y-%m-%dT&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>)
+<span class="line-num">43</span>     <span class="ruby-node">&quot;#{obj.class}.parse(#{obj.strftime(&quot;#{datepart}%T.%N%z&quot;).inspect})#{&#39;.utc&#39; if obj.utc?}&quot;</span>
+<span class="line-num">44</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">DateTime</span>
+<span class="line-num">45</span>     <span class="ruby-comment"># Ignore date of calendar reform</span>
+<span class="line-num">46</span>     <span class="ruby-node">&quot;DateTime.parse(#{obj.strftime(&#39;%FT%T.%N%z&#39;).inspect})&quot;</span>
+<span class="line-num">47</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Date</span>
+<span class="line-num">48</span>     <span class="ruby-comment"># Ignore offset and date of calendar reform</span>
+<span class="line-num">49</span>     <span class="ruby-node">&quot;Date.new(#{obj.year}, #{obj.month}, #{obj.day})&quot;</span>
+<span class="line-num">50</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">51</span>     <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">inspect</span>
+<span class="line-num">52</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

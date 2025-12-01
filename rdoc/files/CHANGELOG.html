@@ -33,6 +33,45 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.99.0+-282025-12-01-29"><a href="doc/release_notes/5_99_0_txt.html">5.99.0</a> (2025-12-01)<span><a href="#label-5.99.0+-282025-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support passing a set as a Dataset#full_text_search terms argument on MSSQL, MySQL, and PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Optimize Dataset#as_set calls to avoid queries in the subset_static_cache plugin (jeremyevans)</p>
+</li><li>
+<p>Optimize Model.as_set calls to avoid queries in the static_cache plugin (jeremyevans)</p>
+</li><li>
+<p>Support filtering by associations with sets in the pg_array_associations plugin (jeremyevans)</p>
+</li><li>
+<p>Support sets in the to_dot extension (jeremyevans)</p>
+</li><li>
+<p>Support splitting nil values from sets in the split_array_nil extension (jeremyevans)</p>
+</li><li>
+<p>Support sets as input where arrays are accepted as input and order doesn’t matter in the pg_hstore_ops/pg_json_ops extensions (jeremyevans)</p>
+</li><li>
+<p>Auto parameterize IN/NOT IN with sets in the pg_auto_parameterize_in_array extension (jeremyevans)</p>
+</li><li>
+<p>Auto parameterize IN/NOT IN with sets of integers in the pg_auto_parameterize extension (jeremyevans)</p>
+</li><li>
+<p>Support sets in the eval_inspect extension (jeremyevans)</p>
+</li><li>
+<p>Support sets of integers or strings for include validations in the constraint_validations extension (jeremyevans)</p>
+</li><li>
+<p>Support filtering by associations using a set of associated objects (jeremyevans)</p>
+</li><li>
+<p>Disallow typecasting sets to string (similar to how hash and array are disallowed) (jeremyevans)</p>
+</li><li>
+<p>Deprecate the set_literalizer extension (jeremyevans)</p>
+</li><li>
+<p>Support sets in dataset filters similar to arrays, using IN/NOT IN (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#as_set and Dataset#select_set, as Set will be a core class in Ruby 4 (jeremyevans)</p>
+</li><li>
+<p>Add support for Database#add_index :only option on PostgreSQL 11+ (KirIgor) (#2343)</p>
+</li><li>
+<p>Add support for Database#indexes :invalid option on PostgresSQL (KirIgor, jeremyevans) (#2343)</p>
+</li></ul>
+
 <h3 id="label-5.98.0+-282025-11-01-29"><a href="doc/release_notes/5_98_0_txt.html">5.98.0</a> (2025-11-01)<span><a href="#label-5.98.0+-282025-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make insert_returning_select use RETURNING when using table_select plugin (jeremyevans) (#2339)</p>

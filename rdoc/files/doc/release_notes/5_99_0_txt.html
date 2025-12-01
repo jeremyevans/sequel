@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.99.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.99.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.99.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>As Set will be a core class in Ruby 4+, this release integrates Set support into <a href="../../../classes/Sequel.html"><code>Sequel</code></a>. Dataset#as_set and select_set have been added to return sets. Dataset#as_set is similar to Dataset#map, and Dataset#select_set is similar to Dataset#select_map, except that Dataset#as_set and select_set return sets instead of arrays.</p>
+
+<p>Sets are now supported in dataset filters:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">c:</span> <span class="ruby-constant">Set</span>[<span class="ruby-string">&quot;d&quot;</span>, <span class="ruby-string">&quot;e&quot;</span>])
+<span class="ruby-comment"># SELECT * FROM t WHERE (c IN (&#39;d&#39;, &#39;e&#39;))</span>
+</pre>
+
+<p>The empty_array_consider_nulls and split_array_nil extensions now support sets in addition to arrays.</p>
+
+<p>Dataset#qualify now supports sets.</p>
+
+<p>Passing a set as an argument to Dataset#where, exclude, and similar filtering methods now raises an error.</p>
+
+<p>Database typecasting of sets to string is now disallowed, similar to how typecasting hashes and arrays to string is already disallowed.</p>
+
+<p>Filtering by associations now supports a set of associated objects.</p>
+
+<p>The constraint_validations extension now supports sets of integers or strings for include validations.</p>
+
+<p>The eval_inspect and to_dot extensions now supports sets.</p>
+
+<p>The pg_auto_parameterize extension now auto parameterizes IN/NOT IN filters with sets of integers. The pg_auto_parameterize_in_array now auto parameterizes IN/NOT IN with sets of other values.</p>
+
+<p>The pg_hstore_ops and pg_json_ops extensions now support sets in situations where arrays are supported and order is not relevant.</p>
+
+<p>The static_cache plugin now optimizes Model#as_set calls to avoid a database query. The subset_static_cache plugin now optimizes Dataset#as_set calls for static subsets to avoid a database query.</p>
+
+<p>Dataset#full_text_search on Microsoft SQL Server, MySQL, and PostgreSQL now supports a set for the terms argument.</p>
+</li><li>
+<p>The create_table index method and related methods on PostgreSQL 11+ now support an :only option to create an index only for the specific table, and not any child tables.</p>
+</li><li>
+<p>Database#indexes on PostgreSQL now supports an :invalid option.  To include invalid indexes, you can use invalid: :include. To limit the returned indexes to only invalid indexes, you can use invalid: :only.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Requiring sequel/model will now require sequel_pg/model if sequel_pg has been previously required and sequel_pg 1.18+ is in use. This allows for more optimizations in the case where sequel/core is required, a connection to a PostgreSQL database is made (requiring the postgres adapter and sequel_pg), and then sequel/model is required. This is a common and recommended pattern so that code that only needs access to a <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> and not <a href="../../../classes/Sequel.html"><code>Sequel</code></a> models does not need to load the model support, so it was considered worth optimizing.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The set_literalizer extension has been deprecated. Most of what the set_literalizer extension supports is now supported by default. The one difference is the set_literalizer extension will treat a set containing only arrays with two elements the same as an array containing only arrays with two elements, and the default set support deliberately does not do that.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

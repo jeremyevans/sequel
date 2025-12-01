@@ -55,6 +55,12 @@ lib/sequel/extensions/split_array_nil.rb
 <span class="ruby-comment">#   SELECT * FROM table WHERE ((column NOT IN (1)) AND (column IS NOT NULL)))</span>
 </pre>
 
+<p>In addition to arrays, this splitting is also done for sets:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">column:</span> <span class="ruby-constant">Set</span>[<span class="ruby-value">1</span>, <span class="ruby-keyword">nil</span>])
+<span class="ruby-comment"># SELECT * FROM table WHERE ((column IN (1)) OR (column IS NULL)))</span>
+</pre>
+
 <p>To use this extension with a single dataset:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:split_array_nil</span>)

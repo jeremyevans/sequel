@@ -64,10 +64,10 @@ Sequel::EmptyArrayConsiderNulls
 [show source]
 </a>
 <pre id='method-i-empty_array_value-source'>   <span class="ruby-comment"># File lib/sequel/extensions/empty_array_consider_nulls.rb</span>
-<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty_array_value</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">cols</span>)
-<span class="line-num">32</span>   <span class="ruby-identifier">c</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">cols</span>)
-<span class="line-num">33</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">c</span>), <span class="ruby-value">:AND</span>, <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>)
-<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty_array_value</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">cols</span>)
+<span class="line-num">39</span>   <span class="ruby-identifier">c</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">cols</span>)
+<span class="line-num">40</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">c</span>), <span class="ruby-value">:AND</span>, <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>)
+<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -80,6 +80,14 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE (id IN (1, 38, 47, 99))&quot;</span>
 </pre>
 
+<h2 id="label-Filtering+using+a+set">Filtering using a set<span><a href="#label-Filtering+using+a+set">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Similarly, you can also supply a set:</p>
+
+<pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-constant">Set</span>[<span class="ruby-value">1</span>, <span class="ruby-value">38</span>, <span class="ruby-value">47</span>, <span class="ruby-value">99</span>]).<span class="ruby-identifier">sql</span>
+<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (id IN (1, 38, 47, 99))&quot;</span>
+</pre>
+
 <h2 id="label-Filtering+using+expressions">Filtering using expressions<span><a href="#label-Filtering+using+expressions">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>You can pass a block to where (referred to as a virtual row block), which is evaluated in a special context:</p>

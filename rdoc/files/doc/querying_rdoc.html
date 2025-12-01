@@ -324,9 +324,12 @@ doc/querying.rdoc
 <span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;)</span>
 </pre>
 
-<p>For arrays, <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses the IN operator with a value list:</p>
+<p>For arrays and sets, <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses the IN operator with a value list:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])
+<span class="ruby-comment"># SELECT * FROM artists WHERE (id IN (1, 2))</span>
+
+<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-constant">Set</span>[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])
 <span class="ruby-comment"># SELECT * FROM artists WHERE (id IN (1, 2))</span>
 </pre>
 

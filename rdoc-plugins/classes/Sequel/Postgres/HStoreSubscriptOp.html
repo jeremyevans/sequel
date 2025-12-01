@@ -116,11 +116,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb</span>
-<span class="line-num">337</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)
-<span class="line-num">338</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>
-<span class="line-num">339</span>   <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>
-<span class="line-num">340</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">341</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">342</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)
+<span class="line-num">343</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>
+<span class="line-num">344</span>   <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>
+<span class="line-num">345</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">346</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -140,9 +140,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sequel_ast_transform-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb</span>
-<span class="line-num">351</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_ast_transform</span>(<span class="ruby-identifier">transformer</span>)
-<span class="line-num">352</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@expression</span>), <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@sub</span>))
-<span class="line-num">353</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">356</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_ast_transform</span>(<span class="ruby-identifier">transformer</span>)
+<span class="line-num">357</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@expression</span>), <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@sub</span>))
+<span class="line-num">358</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_s_append'>
@@ -161,11 +161,11 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_s_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb</span>
-<span class="line-num">344</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">345</span>   <span class="ruby-identifier">server_version</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>
-<span class="line-num">346</span>   <span class="ruby-identifier">frag</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">140000</span> <span class="ruby-operator">?</span> <span class="ruby-constant">SUBSCRIPT</span> <span class="ruby-operator">:</span> <span class="ruby-constant">HStoreOp</span><span class="ruby-operator">::</span><span class="ruby-constant">LOOKUP</span>
-<span class="line-num">347</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">frag</span>, [<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span>]))
-<span class="line-num">348</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">349</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">350</span>   <span class="ruby-identifier">server_version</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span>
+<span class="line-num">351</span>   <span class="ruby-identifier">frag</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">140000</span> <span class="ruby-operator">?</span> <span class="ruby-constant">SUBSCRIPT</span> <span class="ruby-operator">:</span> <span class="ruby-constant">HStoreOp</span><span class="ruby-operator">::</span><span class="ruby-constant">LOOKUP</span>
+<span class="line-num">352</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">frag</span>, [<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span>]))
+<span class="line-num">353</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

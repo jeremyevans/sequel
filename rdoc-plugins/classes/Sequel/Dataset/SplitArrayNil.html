@@ -64,26 +64,31 @@ Sequel::Dataset::SplitArrayNil
 [show source]
 </a>
 <pre id='method-i-complex_expression_sql_append-source'>   <span class="ruby-comment"># File lib/sequel/extensions/split_array_nil.rb</span>
-<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
-<span class="line-num">47</span> <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
-<span class="line-num">48</span> <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
-<span class="line-num">49</span>   <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
-<span class="line-num">50</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:nil?</span>)
-<span class="line-num">51</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
-<span class="line-num">52</span>     <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">compact</span>
-<span class="line-num">53</span>     <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>
-<span class="line-num">54</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>
-<span class="line-num">55</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IN</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IS</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))
-<span class="line-num">56</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">57</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;NOT IN&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;IS NOT&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))
-<span class="line-num">58</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">59</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">60</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">61</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">62</span> <span class="ruby-keyword">else</span>
-<span class="line-num">63</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">64</span> <span class="ruby-keyword">end</span>
-<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)
+<span class="line-num">52</span> <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>
+<span class="line-num">53</span> <span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>
+<span class="line-num">54</span>   <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+<span class="line-num">55</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">vals</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Set</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:nil?</span>)
+<span class="line-num">56</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+<span class="line-num">57</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Set</span>)
+<span class="line-num">58</span>       <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">dup</span>
+<span class="line-num">59</span>       <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">nil</span>)
+<span class="line-num">60</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">61</span>       <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">compact</span>
+<span class="line-num">62</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">63</span>     <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>
+<span class="line-num">64</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>
+<span class="line-num">65</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IN</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IS</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))
+<span class="line-num">66</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">67</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;NOT IN&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;IS NOT&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))
+<span class="line-num">68</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">69</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">70</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">71</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">72</span> <span class="ruby-keyword">else</span>
+<span class="line-num">73</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">74</span> <span class="ruby-keyword">end</span>
+<span class="line-num">75</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

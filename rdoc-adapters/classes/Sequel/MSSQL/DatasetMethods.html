@@ -326,7 +326,7 @@ Sequel::MSSQL::DatasetMethods
 </a>
 <pre id='method-i-full_text_search-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb</span>
 <span class="line-num">681</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_search</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)
-<span class="line-num">682</span>   <span class="ruby-identifier">terms</span> = <span class="ruby-node">&quot;\&quot;#{terms.join(&#39;&quot; OR &quot;&#39;)}\&quot;&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">682</span>   <span class="ruby-identifier">terms</span> = <span class="ruby-node">&quot;\&quot;#{Sequel.array_or_set_join(terms, &#39;&quot; OR &quot;&#39;)}\&quot;&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Set</span>)
 <span class="line-num">683</span>   <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;CONTAINS (?, ?)&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>))
 <span class="line-num">684</span> <span class="ruby-keyword">end</span></pre>
 </div>

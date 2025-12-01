@@ -65,9 +65,9 @@ Sequel::Plugins::StaticCache::ForbidLazyLoadClassMethods
 [show source]
 </a>
 <pre id='method-i-cache_get_pk-source'>    <span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb</span>
-<span class="line-num">254</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">255</span>   <span class="ruby-identifier">primary_key_lookup</span>(<span class="ruby-identifier">pk</span>)
-<span class="line-num">256</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">267</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">268</span>   <span class="ruby-identifier">primary_key_lookup</span>(<span class="ruby-identifier">pk</span>)
+<span class="line-num">269</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-first'>
@@ -86,15 +86,15 @@ Sequel::Plugins::StaticCache::ForbidLazyLoadClassMethods
 [show source]
 </a>
 <pre id='method-i-first-source'>    <span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb</span>
-<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">260</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">261</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">o</span> = <span class="ruby-ivar">@all</span>.<span class="ruby-identifier">first</span>
-<span class="line-num">262</span>       <span class="ruby-identifier">_static_cache_frozen_copy</span>(<span class="ruby-identifier">o</span>)
-<span class="line-num">263</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">264</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">265</span>     <span class="ruby-keyword">super</span>
-<span class="line-num">266</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">267</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">272</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">273</span>   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">yield</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">274</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">o</span> = <span class="ruby-ivar">@all</span>.<span class="ruby-identifier">first</span>
+<span class="line-num">275</span>       <span class="ruby-identifier">_static_cache_frozen_copy</span>(<span class="ruby-identifier">o</span>)
+<span class="line-num">276</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">277</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">278</span>     <span class="ruby-keyword">super</span>
+<span class="line-num">279</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">280</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

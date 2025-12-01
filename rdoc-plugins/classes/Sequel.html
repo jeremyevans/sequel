@@ -900,6 +900,10 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 </pre>
 
 <p>Related module: <a href="Sequel/Dataset/RoundTimestamps.html"><code>Sequel::Dataset::RoundTimestamps</code></a></p>
+
+<p>The set_literalizer extension should no longer be used, as <a href="Sequel.html"><code>Sequel</code></a> now supports Set values by default. For backwards compatibility the set_literalizer extension will treat a set that contains only 2 element arrays as a condition specifier (matching the behavior for arrays where all elements are 2 element arrays). This is not compatible with Sequel’s current default behavior. If you are relying on this behavior, it is recommended you convert the set to an array.</p>
+
+<p>Related module: <a href="Sequel/Dataset/SetLiteralizer.html"><code>Sequel::Dataset::SetLiteralizer</code></a></p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
