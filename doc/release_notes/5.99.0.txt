@@ -1,0 +1,74 @@
+= New Features
+
+* As Set will be a core class in Ruby 4+, this release integrates Set
+  support into Sequel. Dataset#as_set and #select_set have been added
+  to return sets. Dataset#as_set is similar to Dataset#map, and
+  Dataset#select_set is similar to Dataset#select_map, except that
+  Dataset#as_set and #select_set return sets instead of arrays.
+
+  Sets are now supported in dataset filters:
+
+    DB[:t].where(c: Set["d", "e"])
+    # SELECT * FROM t WHERE (c IN ('d', 'e'))
+
+  The empty_array_consider_nulls and split_array_nil extensions now
+  support sets in addition to arrays.
+
+  Dataset#qualify now supports sets.
+
+  Passing a set as an argument to Dataset#where, #exclude, and similar
+  filtering methods now raises an error.
+
+  Database typecasting of sets to string is now disallowed, similar to
+  how typecasting hashes and arrays to string is already disallowed.
+
+  Filtering by associations now supports a set of associated objects.
+
+  The constraint_validations extension now supports sets of integers
+  or strings for include validations.
+
+  The eval_inspect and to_dot extensions now supports sets.
+
+  The pg_auto_parameterize extension now auto parameterizes IN/NOT IN
+  filters with sets of integers. The pg_auto_parameterize_in_array now
+  auto parameterizes IN/NOT IN with sets of other values.
+
+  The pg_hstore_ops and pg_json_ops extensions now support sets in
+  situations where arrays are supported and order is not relevant.
+
+  The static_cache plugin now optimizes Model#as_set calls to avoid a
+  database query. The subset_static_cache plugin now optimizes
+  Dataset#as_set calls for static subsets to avoid a database query.
+
+  Dataset#full_text_search on Microsoft SQL Server, MySQL, and
+  PostgreSQL now supports a set for the terms argument.
+
+* The create_table index method and related methods on PostgreSQL 11+
+  now support an :only option to create an index only for the specific
+  table, and not any child tables.
+
+* Database#indexes on PostgreSQL now supports an :invalid option.  To
+  include invalid indexes, you can use invalid: :include. To limit the
+  returned indexes to only invalid indexes, you can use
+  invalid: :only.
+
+= Other Improvements
+
+* Requiring sequel/model will now require sequel_pg/model if sequel_pg
+  has been previously required and sequel_pg 1.18+ is in use. This
+  allows for more optimizations in the case where sequel/core is
+  required, a connection to a PostgreSQL database is made (requiring
+  the postgres adapter and sequel_pg), and then sequel/model is
+  required. This is a common and recommended pattern so that code that
+  only needs access to a Sequel::Database and not Sequel models does
+  not need to load the model support, so it was considered worth
+  optimizing.
+
+= Backwards Compatibility
+
+* The set_literalizer extension has been deprecated. Most of what the
+  set_literalizer extension supports is now supported by default. The
+  one difference is the set_literalizer extension will treat a set
+  containing only arrays with two elements the same as an array
+  containing only arrays with two elements, and the default set
+  support deliberately does not do that.
