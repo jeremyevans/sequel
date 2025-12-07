@@ -1,5 +1,7 @@
 === master
 
+* Add single_statement_dataset_destroy plugin, so that dataset.destroy uses a single DELETE statement (jeremyevans)
+
 * Support :collate option in set_column_type (jeremyevans)
 
 === 5.99.0 (2025-12-01)

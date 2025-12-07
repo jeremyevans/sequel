@@ -3390,3 +3390,46 @@ describe "split_values plugin with eager loading" do
     @Artist.eager(:logs).all.first.logs.must_equal [@log]
   end
 end
+
+describe "single_statement_dataset_destroy plugin" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:sqdd_test) do
+      Integer :id
+    end
+  end
+  before do
+    @a = a = []
+    @db[:sqdd_test].import([:id], [1, 2, 3])
+    @class = Class.new(Sequel::Model(@db[:sqdd_test])) do
+      set_primary_key :id
+      plugin :single_statement_dataset_destroy
+      define_method(:before_destroy){a << :"b#{pk}"; super()}
+      define_method(:after_destroy){super(); a << :"a#{pk}"}
+    end
+  end
+  after do
+    @db[:sqdd_test].delete
+  end
+  after(:all) do
+    @db.drop_table?(:sqdd_test)
+  end
+
+  it "should delete expected rows, running all before hooks first and all after hooks last" do
+    @class.order(:id).where(:id=>[1,3]).destroy.must_equal 2
+    @a.must_equal [:b1, :b3, :a1, :a3]
+  end
+
+  it "should use default behavior of multiple queries if a custom around_destroy hook is used" do
+    @class.send(:define_method, :around_destroy){|&b|b.call}
+    @class.order(:id).where(:id=>[1,3]).destroy.must_equal 2
+    @a.must_equal [:b1, :a1, :b3, :a3]
+  end
+
+  it "should raise and rollback if the dataset is modified during the destroy" do
+    @class.send(:include, Module.new{def before_destroy; model.create{|o| o.id = id + 3}; super end})
+    proc{@class.order(:id).where(:id=>[1,3,4,6]).destroy}.must_raise(Sequel::Error).
+      message.must_equal "dataset changed during destroy, expected rows: 2, actual rows: 4"
+    @class.count.must_equal 3
+  end
+end
