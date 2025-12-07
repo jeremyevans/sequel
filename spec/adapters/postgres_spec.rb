@@ -1531,6 +1531,13 @@ describe "A PostgreSQL dataset" do
     @db[:atest].get(Sequel.extract(:year, :t)).must_equal 2010
   end
 
+  it "should support :collate and :using when altering a column's type" do
+    @db.create_table!(:atest){Integer :t}
+    @db[:atest].insert(1262404000)
+    @db.alter_table(:atest){set_column_type :t, String, :using=>Sequel.cast(:t, String), :collate=>:C}
+    @db[:atest].get(:t).must_equal "1262404000"
+  end if DB.server_version >= 90100
+
   it "should support :using with a string when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
     @db[:atest].insert(1262304000)

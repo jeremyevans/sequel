@@ -486,7 +486,9 @@ module Sequel
     end
 
     def alter_table_set_column_type_sql(table, op)
-      "ALTER COLUMN #{quote_identifier(op[:name])} TYPE #{type_literal(op)}"
+      sql = "ALTER COLUMN #{quote_identifier(op[:name])} TYPE #{type_literal(op)}".dup
+      column_definition_collate_sql(sql, op)
+      sql
     end
 
     def alter_table_set_column_default_sql(table, op)

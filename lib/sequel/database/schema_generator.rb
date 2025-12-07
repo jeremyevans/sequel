@@ -657,9 +657,11 @@ module Sequel
         nil
       end
 
-      # Modify the type of one of the table's column.
+      # Modify the type of one of the table's column. The given options are considered when
+      # determining the new type.
       #
       #   set_column_type(:artist_name, 'char(10)') # ALTER COLUMN artist_name TYPE char(10)
+      #   set_column_type(:artist_name, String, size: 10) # ALTER COLUMN artist_name TYPE varchar(10)
       #
       # PostgreSQL specific options:
       #

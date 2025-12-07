@@ -1554,6 +1554,13 @@ require_relative "spec_helper"
         )
       end
 
+      it "should support set_column_type with :collate option" do
+        @db.alter_table(:cats) do
+          set_column_type :score, :text, collate: "C"
+        end
+        @db.sqls.must_equal ["ALTER TABLE cats ALTER COLUMN score TYPE text COLLATE C"]
+      end
+
       it "should combine operations into a single query if the database supports it" do
         @db.define_singleton_method(:supports_combining_alter_table_ops?){true}
         @db.alter_table(:cats) do

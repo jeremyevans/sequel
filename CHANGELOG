@@ -1,3 +1,7 @@
+=== master
+
+* Support :collate option in set_column_type (jeremyevans)
+
 === 5.99.0 (2025-12-01)
 
 * Support passing a set as a Dataset#full_text_search terms argument on MSSQL, MySQL, and PostgreSQL (jeremyevans)

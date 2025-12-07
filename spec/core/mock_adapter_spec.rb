@@ -607,6 +607,24 @@ describe "PostgreSQL support" do
     @db.sqls.grep(/DEF/).must_equal ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
   end
 
+  it "should support set_column_type with :collate option" do
+    @db.alter_table(:cats) do
+      set_column_type :score, :text, collate: :C
+    end
+    @db.sqls.must_equal ['ALTER TABLE "cats" ALTER COLUMN "score" TYPE text COLLATE "C"']
+    @db.alter_table(:cats) do
+      set_column_type :score, :text, collate: '"C"'
+    end
+    @db.sqls.must_equal ['ALTER TABLE "cats" ALTER COLUMN "score" TYPE text COLLATE "C"']
+  end
+
+  it "should support set_column_type with :collate and :using options" do
+    @db.alter_table(:cats) do
+      set_column_type :score, :text, collate: :C, using: Sequel.function(:foo, :score)
+    end
+    @db.sqls.must_equal ['ALTER TABLE "cats" ALTER COLUMN "score" TYPE text COLLATE "C" USING foo("score")']
+  end
+
   it "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true
     @db.sqls.must_equal ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")']
