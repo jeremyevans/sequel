@@ -1,5 +1,7 @@
 === master
 
+* Make Postgres::PGRange#to_s an alias of #inspect, showing friendly output (jeremyevans)
+
 * Add single_statement_dataset_destroy plugin, so that dataset.destroy uses a single DELETE statement (jeremyevans)
 
 * Support :collate option in set_column_type (jeremyevans)

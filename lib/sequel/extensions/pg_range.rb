@@ -431,6 +431,7 @@ module Sequel
 
         "#<#{self.class.name} #{range}#{"::#{@db_type}" if @db_type}>"
       end
+      alias to_s inspect
 
       # Append a literalize version of the receiver to the sql.
       def sql_literal_append(ds, sql)
