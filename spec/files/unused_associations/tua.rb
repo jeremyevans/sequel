@@ -1,5 +1,5 @@
 class TUA < Sequel::Model
-  many_to_one :a1, :key=>:t_id, :class=>self
+  many_to_one :a1, :key=>:t_id, :class=>self, :is_used=>!!ENV['A1_IS_USED']
   one_to_many :a2s, :key=>:t_id, :class=>self
   one_to_one :a3, :key=>:t_id, :class=>self
   a4s_opts = {:right_key=>:t_id, :left_key=>:t_id, :class=>self}

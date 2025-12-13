@@ -1,5 +1,7 @@
 === master
 
+* Do not report associations with :is_used option as unused in the unused_associations plugin (jeremyevans)
+
 * Make Postgres::PGRange#to_s an alias of #inspect, showing friendly output (jeremyevans)
 
 * Add single_statement_dataset_destroy plugin, so that dataset.destroy uses a single DELETE statement (jeremyevans)

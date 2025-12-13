@@ -198,7 +198,8 @@ module Sequel
     #
     # Since this plugin is based on coverage information, if you do
     # not have tests that cover all usage of associations in your
-    # application, you can end up with coverage that shows the
+    # application, or you are mocking the related association methods
+    # and not calling them, you can end up with coverage that shows the
     # association is not used, when it is used in code that is not
     # covered.  The output of plugin can still be useful in such cases,
     # as long as you are manually checking it.  However, you should
@@ -208,6 +209,8 @@ module Sequel
     # option for any association that you know is used. If an
     # association uses the :is_used association option, this plugin
     # will not modify it if the :modify_associations option is used.
+    # It will also not report the association as unused if the :is_used
+    # association option is present.
     #
     # This plugin does not handle anonymous classes. Any unused
     # associations defined in anonymous classes will not be
@@ -361,6 +364,9 @@ module Sequel
               # Do not report associations using methods_module option, because this plugin only
               # looks in the class's overridable_methods_module
               next if ref[:methods_module]
+
+              # Do not report associations if they are explicitly marked as used.
+              next if ref[:is_used]
 
               info = {}
               if reflection_data.include?(assoc.to_s)

@@ -60,6 +60,12 @@ describe "unused_associations plugin" do
   end
   
   it "should use association reflection access to determine which associations are used" do
+    ua, uao = check("TUA.association_reflection(:a1); TUA::O.a2s", 'A1_IS_USED'=>'1', 'A5_IS_USED'=>'1')
+    ua.must_equal [["TUA", "a3"], ["TUA", "a4s"], ["TUA", "a6s"], ["TUA::SC", "a7"]]
+    uao.must_equal [["TUA", "a2s", {"read_only"=>true, "no_dataset_method"=>true}]]
+  end
+  
+  it "should not report associations as unused if they have an :is_used option" do
     ua, uao = check("TUA.association_reflection(:a1); TUA::O.a2s")
     ua.must_equal [["TUA", "a3"], ["TUA", "a4s"], ["TUA", "a5"], ["TUA", "a6s"], ["TUA::SC", "a7"]]
     uao.must_equal [
