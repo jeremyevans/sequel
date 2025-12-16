@@ -2977,6 +2977,23 @@ if DB.adapter_scheme == :postgres
       i.must_equal 1
     end
 
+    it "should also cursor usage with map/hash/set methods" do
+      @ds.use_cursor.map(:x).sort.must_equal((0..1000).to_a)
+      @ds.use_cursor.map([:x]).sort.must_equal((0..1000).map{|x| [x]})
+      @ds.use_cursor.select_map(:x).sort.must_equal((0..1000).to_a)
+      @ds.use_cursor.select_order_map(:x).must_equal((0..1000).to_a)
+      @ds.use_cursor.select_map([:x]).sort.must_equal((0..1000).map{|x| [x]})
+      @ds.use_cursor.select_order_map([:x]).must_equal((0..1000).map{|x| [x]})
+      @ds.use_cursor.as_hash(:x, :x).must_equal(Hash[(0..1000).map{|x| [x, x]}])
+      @ds.use_cursor.select_hash(:x, Sequel.as(:x, :y)).must_equal(Hash[(0..1000).map{|x| [x, x]}])
+      @ds.use_cursor.to_hash_groups(:x, :x).must_equal(Hash[(0..1000).map{|x| [x, [x]]}])
+      @ds.use_cursor.select_hash_groups(:x, Sequel.as(:x, :y)).must_equal(Hash[(0..1000).map{|x| [x, [x]]}])
+      @ds.use_cursor.as_set(:x).must_equal(Set.new(0..1000))
+      @ds.use_cursor.as_set([:x]).must_equal(Set.new((0..1000).map{|x| [x]}))
+      @ds.use_cursor.select_set(:x).must_equal(Set.new(0..1000))
+      @ds.use_cursor.select_set([:x]).must_equal(Set.new((0..1000).map{|x| [x]}))
+    end
+
     it "should respect the :hold=>true option for creating the cursor WITH HOLD and not using a transaction" do
       @ds.use_cursor.each{@db.in_transaction?.must_equal true}
       @ds.use_cursor(:hold=>true).each{@db.in_transaction?.must_equal false}
