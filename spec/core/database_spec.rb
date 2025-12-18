@@ -118,18 +118,15 @@ describe "A new Database" do
 
   it "should just use a :uri option for jdbc with the full connection string" do
     begin
-      Sequel::Database.singleton_class.send(:alias_method, :adapter_class, :adapter_class)
-      Sequel::Database.singleton_class.send(:alias_method, :orig_adapter_class, :adapter_class)
-      def (Sequel::Database).adapter_class(_)
-        Class.new(Sequel::Database){def connect(*); Object.new end}
+      dbc = Class.new(Sequel::Database) do
+        set_adapter_scheme :jdbc
+        def connect(*); Object.new end
       end
       db = Sequel.connect('jdbc:test://host/db_name')
-      db.must_be_kind_of(Sequel::Database)
+      db.must_be_kind_of(dbc)
       db.opts[:uri].must_equal 'jdbc:test://host/db_name'
     ensure
-      Sequel::Database.singleton_class.send(:alias_method, :adapter_class, :adapter_class)
-      Sequel::Database.singleton_class.send(:alias_method, :adapter_class, :orig_adapter_class)
-      Sequel::Database.singleton_class.send(:remove_method, :orig_adapter_class)
+      Sequel::ADAPTER_MAP.delete(:jdbc)
     end
   end
 
