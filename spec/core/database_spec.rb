@@ -117,11 +117,20 @@ describe "A new Database" do
   end unless ENV['SEQUEL_DEFAULT_CONNECTION_POOL']
 
   it "should just use a :uri option for jdbc with the full connection string" do
-    db = Sequel::Database.stub(:adapter_class, Class.new(Sequel::Database){def connect(*); Object.new end}) do
-      Sequel.connect('jdbc:test://host/db_name')
+    begin
+      Sequel::Database.singleton_class.send(:alias_method, :adapter_class, :adapter_class)
+      Sequel::Database.singleton_class.send(:alias_method, :orig_adapter_class, :adapter_class)
+      def (Sequel::Database).adapter_class(_)
+        Class.new(Sequel::Database){def connect(*); Object.new end}
+      end
+      db = Sequel.connect('jdbc:test://host/db_name')
+      db.must_be_kind_of(Sequel::Database)
+      db.opts[:uri].must_equal 'jdbc:test://host/db_name'
+    ensure
+      Sequel::Database.singleton_class.send(:alias_method, :adapter_class, :adapter_class)
+      Sequel::Database.singleton_class.send(:alias_method, :adapter_class, :orig_adapter_class)
+      Sequel::Database.singleton_class.send(:remove_method, :orig_adapter_class)
     end
-    db.must_be_kind_of(Sequel::Database)
-    db.opts[:uri].must_equal 'jdbc:test://host/db_name'
   end
 
   it "should populate :adapter option when using connection string" do
