@@ -3400,7 +3400,7 @@ describe "single_statement_dataset_destroy plugin" do
   end
   before do
     @a = a = []
-    @db[:sqdd_test].import([:id], [1, 2, 3])
+    @db[:sqdd_test].import([:id], [[1], [2], [3]])
     @class = Class.new(Sequel::Model(@db[:sqdd_test])) do
       set_primary_key :id
       plugin :single_statement_dataset_destroy
