@@ -638,12 +638,11 @@ module Sequel
         if args.empty?
           sql << str
         else
-          re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
-          while true
+          re = /:(#{Regexp.union(args.keys.map(&:to_s))})\b/
+          until str.empty?
             previous, q, str = str.partition(re)
             sql << previous
-            literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
-            break if str.empty?
+            literal_append(sql, args[$1.to_sym]) unless q.empty?
           end
         end
       elsif str.is_a?(Array)
