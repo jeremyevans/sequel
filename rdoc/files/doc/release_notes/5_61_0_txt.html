@@ -33,7 +33,7 @@ doc/release_notes/5.61.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p>When typecasting strings to other types, <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> will now by default not typecast strings that are much longer than expected for the underlying type. Depending on the underlying type, there is a limit of either 100 or 1000 bytes on the input string.  This avoids potential performance issues when trying to convert arbitrary sized user input to specific types.</p>
 </li><li>
@@ -46,7 +46,7 @@ doc/release_notes/5.61.0.txt
 <p>Timestamps before the date of calendar reform are now handled correctly by the pg_extended_date_support extension when using Ruby 3.2 preview 2+.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The change to not typecast strings that are too long can break backwards compatibility for applications that expect typecasting for input beyond Sequel’s limits.  You can disable the string bytesize checking by setting:</p>
 

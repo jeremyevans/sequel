@@ -33,11 +33,11 @@ doc/sharding.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Primary-2FReplica+Configurations+and+Database+Sharding">Primary/Replica Configurations and Database Sharding<span><a href="#label-Primary-2FReplica+Configurations+and+Database+Sharding">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Primary-2FReplica+Configurations+and+Database+Sharding"><a href="#label-Primary-2FReplica+Configurations+and+Database+Sharding">Primary/Replica Configurations and Database Sharding</a></h1>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> has support for primary/replica configurations (writable primary database with read only replicas databases), as well as database sharding (where you can pick a server to use for a given dataset).  Support for both features is database independent, and should work for all database adapters that ship with <a href="../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
-<h2 id="label-The+-3Aservers+Database+option">The :servers Database option<span><a href="#label-The+-3Aservers+Database+option">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-The+-3Aservers+Database+option"><a href="#label-The+-3Aservers+Database+option">The :servers Database option</a></h2>
 
 <p>Sharding and read_only support are both enabled via the :servers database option.  Using the :servers database option makes <a href="../../classes/Sequel.html"><code>Sequel</code></a> use a connection pool class that supports sharding, and the minimum required to enable sharding support is to use the empty hash:</p>
 
@@ -48,9 +48,9 @@ doc/sharding.rdoc
 
 <p>Note that all servers should have the same schema for all tables you are accessing, unless you really know what you are doing.</p>
 
-<h2 id="label-Primary+and+Replica+Database+Configurations">Primary and Replica Database Configurations<span><a href="#label-Primary+and+Replica+Database+Configurations">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Primary+and+Replica+Database+Configurations"><a href="#label-Primary+and+Replica+Database+Configurations">Primary and Replica Database Configurations</a></h2>
 
-<h3 id="label-Single+Primary-2C+Single+Replica">Single Primary, Single Replica<span><a href="#label-Single+Primary-2C+Single+Replica">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Single+Primary-2C+Single+Replica"><a href="#label-Single+Primary-2C+Single+Replica">Single Primary, Single Replica</a></h3>
 
 <p>To use a single, read-only replica that handles SELECT queries, the following is the simplest configuration:</p>
 
@@ -69,7 +69,7 @@ doc/sharding.rdoc
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span>
 </pre>
 
-<h3 id="label-Single+Primary-2C+Multiple+Replicas">Single Primary, Multiple Replicas<span><a href="#label-Single+Primary-2C+Multiple+Replicas">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Single+Primary-2C+Multiple+Replicas"><a href="#label-Single+Primary-2C+Multiple+Replicas">Single Primary, Multiple Replicas</a></h3>
 
 <p>Let’s say you have 4 replica servers with names replica_server0, replica_server1, replica_server2, and replica_server3.</p>
 
@@ -84,7 +84,7 @@ doc/sharding.rdoc
 
 <p>This will use one of the replica servers for SELECT queries and use the primary server for other queries.  It’s also possible to pick a random host instead of using the round robin approach presented above, but that can result in less optimal resource usage.</p>
 
-<h3 id="label-Multiple+Primary-2C+Multiple+Replicas">Multiple Primary, Multiple Replicas<span><a href="#label-Multiple+Primary-2C+Multiple+Replicas">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Multiple+Primary-2C+Multiple+Replicas"><a href="#label-Multiple+Primary-2C+Multiple+Replicas">Multiple Primary, Multiple Replicas</a></h3>
 
 <p>This involves the same basic idea as the multiple replicas, single primary, but it shows that the primary database is named :default.  So for 4 primary servers and 4 replica servers:</p>
 
@@ -102,7 +102,7 @@ doc/sharding.rdoc
   <span class="ruby-value">servers:</span> {<span class="ruby-value">default:</span> <span class="ruby-identifier">default_proc</span>, <span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})
 </pre>
 
-<h2 id="label-Sharding">Sharding<span><a href="#label-Sharding">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sharding"><a href="#label-Sharding">Sharding</a></h2>
 
 <p>There is specific support in <a href="../../classes/Sequel.html"><code>Sequel</code></a> for handling primary/replica database combinations, with the only necessary setup being the database configuration. However, since sharding is always going to be implementation dependent, <a href="../../classes/Sequel.html"><code>Sequel</code></a> supplies the basic infrastructure, but you have to tell it which server to use for each dataset.  Let’s assume a simple scenario, a distributed rainbow table for SHA-1 hashes, sharding based on the first hex character (for a total of 16 shards).  First, you need to configure the database:</p>
 
@@ -141,7 +141,7 @@ doc/sharding.rdoc
 <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">plaintext_for_hash</span>(<span class="ruby-string">&quot;e580726d31f6e1ad216ffd87279e536d1f74e606&quot;</span>)
 </pre>
 
-<h3 id="label-3Aservers_hash+Option">:servers_hash Option<span><a href="#label-3Aservers_hash+Option">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-3Aservers_hash+Option"><a href="#label-3Aservers_hash+Option">:servers_hash Option</a></h3>
 
 <p>The connection pool can be further controlled to change how it handles attempts to access shards that haven’t been configured.  The default is to assume the :default shard.  However, you can specify a different shard using the :servers_hash option when connecting to the database:</p>
 
@@ -163,7 +163,7 @@ doc/sharding.rdoc
   <span class="ruby-value">servers_hash:</span> <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Invalid Server&quot;</span>})
 </pre>
 
-<h3 id="label-Sharding+Plugin">Sharding Plugin<span><a href="#label-Sharding+Plugin">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Sharding+Plugin"><a href="#label-Sharding+Plugin">Sharding Plugin</a></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> comes with a sharding plugin that makes it easy to use sharding with model objects. It makes sure that objects retrieved from a specific shard are always saved back to that shard, allows you to create objects on specific shards, and even makes sure associations work well with shards.  You just need to remember to set to model to use the plugin:</p>
 
@@ -179,7 +179,7 @@ doc/sharding.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:sharding</span>
 </pre>
 
-<h3 id="label-server_block+Extension">server_block Extension<span><a href="#label-server_block+Extension">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-server_block+Extension"><a href="#label-server_block+Extension">server_block Extension</a></h3>
 
 <p>By default, you must specify the server/shard you want to use for every dataset/action, or <a href="../../classes/Sequel.html"><code>Sequel</code></a> will use the default shard.  If you have a group of queries that should use the same shard, it can get a bit redundant to specify the same shard for all of them.</p>
 
@@ -211,7 +211,7 @@ doc/sharding.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-arbitrary_servers+Extension">arbitrary_servers Extension<span><a href="#label-arbitrary_servers+Extension">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-arbitrary_servers+Extension"><a href="#label-arbitrary_servers+Extension">arbitrary_servers Extension</a></h3>
 
 <p>By default, Sequel’s sharding support is designed to work with predefined shards.  It ships with Database#add_servers and Database#remove_servers methods to modify these predefined shards on the fly, but it is a bit cumbersome to work with truly arbitrary servers (requiring you to call add_servers before use, then remove_servers after use).</p>
 
@@ -248,7 +248,7 @@ doc/sharding.rdoc
 
 <p>just remove or comment out that code.</p>
 
-<h2 id="label-JDBC">JDBC<span><a href="#label-JDBC">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-JDBC"><a href="#label-JDBC">JDBC</a></h2>
 
 <p>If you are using the jdbc adapter, note that it does not handle separate options such as <code>:host</code>, <code>:user</code>, and <code>:port</code>.  If you would like to use the <code>:servers</code> option when connecting to a JDBC database, each hash value in the <code>servers</code> option should contain a <code>:uri</code> key with a JDBC connection string for that shard as the value.  Example:</p>
 

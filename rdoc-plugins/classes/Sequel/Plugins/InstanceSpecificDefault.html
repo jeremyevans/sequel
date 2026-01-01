@@ -36,7 +36,7 @@ Sequel::Plugins::InstanceSpecificDefault
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The instance_specific_default plugin exists to make it easier to use a global :instance_specific association option, or to warn or raise when <a href="../../Sequel.html"><code>Sequel</code></a> has to guess which value to use :instance_specific option (<a href="../../Sequel.html"><code>Sequel</code></a> defaults to guessing true as that is the conservative setting).  It is helpful to use this plugin, particularly with the :warn or :raise settings, to determine which associations should have :instance_specific set.  Setting the :instance_specific to false for associations that are not instance specific can improve performance.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/instance_specific_default_rb.html">instance_specific_default</a> plugin exists to make it easier to use a global :instance_specific association option, or to warn or raise when <a href="../../Sequel.html"><code>Sequel</code></a> has to guess which value to use :instance_specific option (<a href="../../Sequel.html"><code>Sequel</code></a> defaults to guessing true as that is the conservative setting).  It is helpful to use this plugin, particularly with the :warn or :raise settings, to determine which associations should have :instance_specific set.  Setting the :instance_specific to false for associations that are not instance specific can improve performance.</p>
 
 <p>Associations are instance-specific if their block calls a model instance method, or where the value of the block varies based on runtime state, and the variance is outside of a delayed evaluation. For example, with the following three associations:</p>
 

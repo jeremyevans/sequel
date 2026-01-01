@@ -33,7 +33,7 @@ doc/release_notes/3.12.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Migration+Changes">Migration Changes<span><a href="#label-Migration+Changes">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Migration+Changes"><a href="#label-Migration+Changes">Migration Changes</a></h1>
 <ul><li>
 <p>A TimestampMigrator has been added to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, and is automatically used if any migration has a version greater than</p>
 <ol><li>
@@ -64,7 +64,7 @@ doc/release_notes/3.12.0.txt
 <p>Execution times for migrations are now logged to the database’s loggers.</p>
 </li></ul>
 
-<h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Plugins"><a href="#label-New+Plugins">New Plugins</a></h1>
 <ul><li>
 <p>A sharding plugin has been added that allows model objects to work well with sharded databases.  When using it, model objects know which shard they were retrieved from, so when you save the object, it is saved back to that shard.  The sharding plugin also works with associations, so associated records are retrieved from the same shard the main object was retreived from.  The sharding plugin also works with both methods of eager loading, and provides methods that you can use to create objects on specific shards.</p>
 </li><li>
@@ -77,7 +77,7 @@ doc/release_notes/3.12.0.txt
 <p>A skip_create_refresh plugin has been added that skips the refresh of after you save a new model object.  On most databases, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> refreshes the model object after inserting it in order to get values for all of the columns.  For performance reasons, you can use this plugin to skip the refresh if it isn’t necessary for you.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p>Sequel::Model#set_fields and update_fields were added.  These methods have a similar API to set_only and update_only, but they operate differently. While set_only and update_only operate over the hash, these methods operate over the array of fields, so they don’t raise errors if the hash contains fields not in the array:</p>
 
@@ -153,7 +153,7 @@ doc/release_notes/3.12.0.txt
 <p>For consistency, you can now use Dataset#order_append as an alias for order_more.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now correctly removes schema entries when altering tables. Previously, some adapters that had to query the existing schema when altering tables resulted in the previous schema being cached.</p>
 </li><li>
@@ -191,7 +191,7 @@ doc/release_notes/3.12.0.txt
 <p>RDoc section support was added to <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a>, making the method documentation easier to read.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> now defines the indexes and tables methods, even if the adapter does not implement them, similar to how connect and execute are defined.  Previously, you could use respond_to? to check if the adapter supported them, now they raise Sequel::NotImplemented if the database adapter does not implement them.</p>
 </li><li>

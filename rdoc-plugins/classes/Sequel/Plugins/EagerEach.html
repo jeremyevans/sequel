@@ -36,7 +36,7 @@ Sequel::Plugins::EagerEach
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The eager_each plugin makes calling each on an eager loaded dataset do eager loading. By default, each does not work on an eager loaded dataset, because each iterates over rows of the dataset as they come in, and to eagerly load you need to have all values up front.  With the default associations code, you must call all on an eagerly loaded dataset, as calling each on an eager dataset skips the eager loading, and calling each on an eager_graph dataset makes it yield plain hashes with columns from all tables, instead of yielding the instances of the main model.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/eager_each_rb.html">eager_each</a> plugin makes calling each on an eager loaded dataset do eager loading. By default, each does not work on an eager loaded dataset, because each iterates over rows of the dataset as they come in, and to eagerly load you need to have all values up front.  With the default associations code, you must call all on an eagerly loaded dataset, as calling each on an eager dataset skips the eager loading, and calling each on an eager_graph dataset makes it yield plain hashes with columns from all tables, instead of yielding the instances of the main model.</p>
 
 <p>This plugin makes each call all for eagerly loaded datasets.  As all usually calls each, this is a bit of issue, but this plugin resolves the issue by cloning the dataset and setting a new flag in the cloned dataset, so that each can check with the flag to determine whether it should call all.</p>
 

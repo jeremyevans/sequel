@@ -36,7 +36,7 @@ Sequel::Plugins::SingleTableInheritance
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The single_table_inheritance plugin allows storing all objects in the same class hierarchy in the same table.  It makes it so subclasses of this model only load rows related to the subclass, and when you retrieve rows from the main class, you get instances of the subclasses (if the rows should use the subclasses’s class).</p>
+<p>The <a href="../../../files/lib/sequel/plugins/single_table_inheritance_rb.html">single_table_inheritance</a> plugin allows storing all objects in the same class hierarchy in the same table.  It makes it so subclasses of this model only load rows related to the subclass, and when you retrieve rows from the main class, you get instances of the subclasses (if the rows should use the subclasses’s class).</p>
 
 <p>By default, the plugin assumes that the <code>sti_key</code> column (the first argument to the plugin) holds the class name as a string.  However, you can override this by using the <code>:model_map</code> option and/or the <code>:key_map</code> option.</p>
 

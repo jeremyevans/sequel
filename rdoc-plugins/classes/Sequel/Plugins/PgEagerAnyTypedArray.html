@@ -36,7 +36,7 @@ Sequel::Plugins::PgEagerAnyTypedArray
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_eager_any_typed_array plugin automatically converts the predicate expressions used for eager loading from:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/pg_eager_any_typed_array_rb.html">pg_eager_any_typed_array</a> plugin automatically converts the predicate expressions used for eager loading from:</p>
 
 <pre class="ruby"><span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span> <span class="ruby-constant">IN</span> (<span class="ruby-identifier">value_list</span>)
 </pre>
@@ -46,7 +46,7 @@ Sequel::Plugins::PgEagerAnyTypedArray
 <pre class="ruby"><span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span> = <span class="ruby-constant">ANY</span>(<span class="ruby-identifier">array_expr</span><span class="ruby-operator">::</span><span class="ruby-identifier">type</span>[])
 </pre>
 
-<p>This makes it easier to use the pg_auto_parameterize_in_array extension with the :treat_string_list_as_text_array option, when using foreign keys with non-text database types that are represented by Ruby strings, such as enum and uuid types.</p>
+<p>This makes it easier to use the <a href="../../../files/lib/sequel/extensions/pg_auto_parameterize_in_array_rb.html">pg_auto_parameterize_in_array</a> extension with the :treat_string_list_as_text_array option, when using foreign keys with non-text database types that are represented by Ruby strings, such as enum and uuid types.</p>
 
 <p>Most association types that ship with <a href="../../Sequel.html"><code>Sequel</code></a> have their predicate expressions converted by this plugin.  Here are the exceptions:</p>
 <ul><li>
@@ -61,7 +61,7 @@ Sequel::Plugins::PgEagerAnyTypedArray
 
 <p>To avoid predicate conversion for particular associations, set the :eager_loading_predicate_transform association option to nil/false.</p>
 
-<p>This plugin loads the pg_array extension into the model’s <a href="../../Database.html"><code>Database</code></a>.</p>
+<p>This plugin loads the <a href="../../../files/lib/sequel/extensions/pg_array_rb.html">pg_array</a> extension into the model’s <a href="../../Database.html"><code>Database</code></a>.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -93,7 +93,7 @@ Sequel::Plugins::PgEagerAnyTypedArray
 </div>
 <div class='description'>
 
-<p>Add the pg_array extension to the database</p>
+<p>Add the <a href="../../../files/lib/sequel/extensions/pg_array_rb.html">pg_array</a> extension to the database</p>
 
 </div>
 <div class='source'>

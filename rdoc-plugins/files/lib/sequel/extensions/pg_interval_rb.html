@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_interval.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_interval extension adds support for PostgreSQL’s interval type.</p>
+<p>The <a href="pg_interval_rb.html">pg_interval</a> extension adds support for PostgreSQL’s interval type.</p>
 
 <p>This extension integrates with Sequel’s native postgres and jdbc/postgresql adapters, so that when interval type values are retrieved, they are parsed and returned as instances of ActiveSupport::Duration.</p>
 
@@ -44,7 +44,7 @@ lib/sequel/extensions/pg_interval.rb
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_interval</span>
 </pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of interval types, load the pg_array extension before the pg_interval extension:</p>
+<p>This extension integrates with the <a href="pg_array_rb.html">pg_array</a> extension.  If you plan to use arrays of interval types, load the <a href="pg_array_rb.html">pg_array</a> extension before the <a href="pg_interval_rb.html">pg_interval</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_interval</span>
 </pre>

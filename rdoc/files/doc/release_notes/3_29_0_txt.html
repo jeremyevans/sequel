@@ -33,7 +33,7 @@ doc/release_notes/3.29.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Adapter+Support">New Adapter Support<span><a href="#label-New+Adapter+Support">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Adapter+Support"><a href="#label-New+Adapter+Support">New Adapter Support</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has much better support for Oracle, both in the ruby-oci8-based oracle adapter and in the jdbc/oracle adapter.</p>
 </li><li>
@@ -57,7 +57,7 @@ doc/release_notes/3.29.0.txt
 <p>In addition to being useful in the specs, the mock adapter is also used if you use bin/sequel without a database argument, which makes it much easier to play around with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> on the command line without being tied to a real database.</p>
 </li></ul>
 
-<h1 id="label-New+Transaction+Features">New Transaction Features<span><a href="#label-New+Transaction+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Transaction+Features"><a href="#label-New+Transaction+Features">New Transaction Features</a></h1>
 <ul><li>
 <p>Database after_commit and after_rollback hooks have been added, allowing you to set procs that are called after the currently- in-effect transaction commits or rolls back.  If the Database is not currently in a transaction, the after_commit proc is called immediately and the after_rollback proc is ignored.</p>
 </li><li>
@@ -80,7 +80,7 @@ DB1.transaction{DB2.transaction{...}}</pre>
 <p>The generic JDBC transaction support, used by 6 of Sequel’s jdbc subapters, now supports savepoints if the underlying JDBC driver supports savepoints.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p>A dataset_associations plugin has been added, allowing datasets to call association methods, which return datasets of rows in the associated table that are associated to rows in the current dataset.</p>
 
@@ -170,7 +170,7 @@ DB1.transaction{DB2.transaction{...}}</pre>
 <p>The rcte_tree plugin now checks this setting an works correctly on databases that set it to true, such as Oracle and HSQLDB.</p>
 </li></ul>
 
-<h1 id="label-Performance+Improvements">Performance Improvements<span><a href="#label-Performance+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Performance+Improvements"><a href="#label-Performance+Improvements">Performance Improvements</a></h1>
 <ul><li>
 <p>Numerous optimizations were made to loading model objects from the database, resulting in a 7-16% speedup.</p>
 
@@ -183,7 +183,7 @@ DB1.transaction{DB2.transaction{...}}</pre>
 <p>The Model.[] optimization is now applied in more cases.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now creates accessor methods for all columns in a model’s table, even if the dataset doesn’t select the columns.  This has been the specified behavior for a while, but the spec was broken. This allows you do to:</p>
 
@@ -246,7 +246,7 @@ DB1.transaction{DB2.transaction{...}}</pre>
 <p>Sequel’s integration tests were sped up considerably, halving the execution time on some adapters.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Because Model.load is now an alias for .call, plugins should no longer override load.  Instead, they should override .call.</p>
 </li><li>
@@ -300,7 +300,7 @@ DB1.transaction{DB2.transaction{...}}</pre>
 <p>The oracle support changed dramatically, so if you were relying on the internals of the oracle support, you should take extra care when upgrading.</p>
 </li></ul>
 
-<h1 id="label-Advance+Notice">Advance Notice<span><a href="#label-Advance+Notice">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Advance+Notice"><a href="#label-Advance+Notice">Advance Notice</a></h1>
 <ul><li>
 <p>The next release of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will contain significant changes to how a dataset is literalized into an SQL string.  If you have a custom plugin, extension, or adapter that overrides a method containing “literal”, “sql”, or “quote”, or you make other modifications or extensions to how <a href="../../../classes/Sequel.html"><code>Sequel</code></a> currently literalizes datasets to SQL, your code will likely need to be modified to support the next release.</p>
 </li></ul>

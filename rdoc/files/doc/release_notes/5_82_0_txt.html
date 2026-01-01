@@ -33,7 +33,7 @@ doc/release_notes/5.82.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>MERGE RETURNING is now supported when using PostgreSQL 17+. For datasets supporting RETURNING, calling merge with a block will yield each returned row:</p>
 
@@ -62,7 +62,7 @@ doc/release_notes/5.82.0.txt
 <p>Note that the jdbc adapter relies on URIs and not option hashes, so when using the jdbc adapter with this feature, you’ll generally need to set the :uri option.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>A race condition in the threaded connection pools that could result in a delay or timeout error in checking out connections in low-traffic environments has been fixed.</p>
 </li><li>
@@ -71,7 +71,7 @@ doc/release_notes/5.82.0.txt
 <p>The tactical_eager_loading plugin now handles cases where inheritance is used and the objects used include associations with the same name but different definitions.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now only eager load the association for objects that use the same association definition as the receiver.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>bin/sequel no longer requires logger if passed the -E or -l options. Instead, it uses a simple implementation that supports only debug/warn/info/error methods.  If you are using bin/sequel and depending on the log format produced by the logger library, or calling methods on the logger object other than debug/warn/info/error, you’ll need to update your code.  This change was made because logger is moving out of stdlib in a future Ruby version.</p>
 </li></ul>

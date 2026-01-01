@@ -33,7 +33,7 @@ doc/release_notes/5.49.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Model#validates_no_null_byte has been added to the validation_helpers.  It checks that the value being validated does not contain an ASCII NUL (‘0’) byte.  Some databases will return an error if a string contains a NUL byte.</p>
 
@@ -65,7 +65,7 @@ UPDATE &quot;table&quot; SET &quot;column&quot;[&#39;key&#39;] = &#39;value&#39;
 <p>SQL::Expression#sequel_ast_transform has been added to support AST transforms of custom expression classes.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports calling PostgreSQL procedures without arguments when using Database#call_procedure.  Previously, attempts to call procuredures without arguments would call the procedure with a single NULL argument.</p>
 </li><li>

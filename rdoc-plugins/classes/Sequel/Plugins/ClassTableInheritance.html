@@ -42,11 +42,11 @@ Sequel::Plugins::ClassTableInheritance
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Overview">Overview<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Overview"><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Overview">Overview</a></h1>
 
-<p>The class_table_inheritance plugin uses the single_table_inheritance plugin, so it supports all of the single_table_inheritance features, but it additionally supports subclasses that have additional columns, which are stored in a separate table with a key referencing the primary table.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">class_table_inheritance</a> plugin uses the <a href="../../../files/lib/sequel/plugins/single_table_inheritance_rb.html">single_table_inheritance</a> plugin, so it supports all of the <a href="../../../files/lib/sequel/plugins/single_table_inheritance_rb.html">single_table_inheritance</a> features, but it additionally supports subclasses that have additional columns, which are stored in a separate table with a key referencing the primary table.</p>
 
-<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Detail">Detail<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Detail">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Detail"><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Detail">Detail</a></h1>
 
 <p>For example, with this hierarchy:</p>
 
@@ -69,13 +69,13 @@ Cook      Executive
 <p>id, num_managers</p>
 </td></tr></tbody></table>
 
-<p>The class_table_inheritance plugin assumes that the root table (e.g. employees) has a primary key column (usually autoincrementing), and all other tables have a foreign key of the same name that points to the same column in their superclass’s table, which is also the primary key for that table.  In this example, the employees table has an id column is a primary key and the id column in every other table is a foreign key referencing employees.id, which is also the primary key of that table.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">class_table_inheritance</a> plugin assumes that the root table (e.g. employees) has a primary key column (usually autoincrementing), and all other tables have a foreign key of the same name that points to the same column in their superclass’s table, which is also the primary key for that table.  In this example, the employees table has an id column is a primary key and the id column in every other table is a foreign key referencing employees.id, which is also the primary key of that table.</p>
 
 <p>Additionally, note that other than the primary key column, no subclass table has a column with the same name as any superclass table. This plugin does not support cases where the column names in a subclass table overlap with any column names in a superclass table.</p>
 
 <p>In this example the staff table also stores Cook model objects and the executives table also stores CEO model objects.</p>
 
-<p>When using the class_table_inheritance plugin, subclasses that have additional columns use joined datasets in subselects:</p>
+<p>When using the <a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">class_table_inheritance</a> plugin, subclasses that have additional columns use joined datasets in subselects:</p>
 
 <pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>
 <span class="ruby-comment"># SELECT * FROM employees</span>
@@ -101,7 +101,7 @@ Cook      Executive
 
 <p>This allows CEO.all to return instances with all attributes loaded.  The plugin overrides the deleting, inserting, and updating in the model to work with multiple tables, by handling each table individually.</p>
 
-<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">Subclass loading<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading"><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">Subclass loading</a></h1>
 
 <p>When model objects are retrieved for a superclass the result can contain subclass instances that only have column entries for the columns in the superclass table.  Calling the column method on the subclass instance for a column not in the superclass table will cause a query to the database to get the value for that column.  If the subclass instance was retreived using Dataset#all, the query to the database will attempt to load the column values for all subclass instances that were retrieved.  For example:</p>
 
@@ -138,7 +138,7 @@ Cook      Executive
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Usage">Usage<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Usage"><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Usage">Usage</a></h1>
 
 <pre class="ruby"><span class="ruby-comment"># Use the default of storing the class name in the sti_key</span>
 <span class="ruby-comment"># column (:kind in this case)</span>
@@ -232,7 +232,7 @@ Cook      Executive
 </div>
 <div class='description'>
 
-<p>The class_table_inheritance plugin requires the single_table_inheritance plugin and the lazy_attributes plugin to handle lazily-loaded attributes for subclass instances returned by superclass methods.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">class_table_inheritance</a> plugin requires the <a href="../../../files/lib/sequel/plugins/single_table_inheritance_rb.html">single_table_inheritance</a> plugin and the <a href="../../../files/lib/sequel/plugins/lazy_attributes_rb.html">lazy_attributes</a> plugin to handle lazily-loaded attributes for subclass instances returned by superclass methods.</p>
 
 </div>
 <div class='source'>

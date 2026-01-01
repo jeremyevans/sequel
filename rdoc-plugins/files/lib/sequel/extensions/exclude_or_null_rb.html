@@ -33,7 +33,7 @@ lib/sequel/extensions/exclude_or_null.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The exclude_or_null extension adds Dataset#exclude_or_null and Dataset#exclude_or_null_having.  These methods are similar to Dataset#exclude and Dataset#exclude_having, except that they will also exclude rows where the condition IS NULL.</p>
+<p>The <a href="exclude_or_null_rb.html">exclude_or_null</a> extension adds Dataset#exclude_or_null and Dataset#exclude_or_null_having.  These methods are similar to Dataset#exclude and Dataset#exclude_having, except that they will also exclude rows where the condition IS NULL.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">exclude_or_null</span>(<span class="ruby-value">foo:</span> <span class="ruby-value">1</span>)
 <span class="ruby-comment"># SELECT * FROM table WHERE NOT coalesce((foo = 1), false)</span>

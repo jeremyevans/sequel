@@ -33,7 +33,7 @@ doc/release_notes/5.59.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A require_valid_schema plugin has been added, for checking that model classes have schema parsed as expected.  By default, model classes are not required to have valid schema, because it is allowed to have model classes based on arbitrary datasets (such as those using joins or set-returning functions), and it is not possible to determine the schema for arbitary datasets.</p>
 
@@ -50,7 +50,7 @@ doc/release_notes/5.59.0.txt
 <p>View creation methods on PostgreSQL 15+ now support a :security_invoker option to create a view where access is determined by the permissions of the role that is accessing the view, instead of the role that created the view.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The :allow_eager association option is now set to false by default for associations explicitly marked as :instance_specific, if the :eager_loader association is not given.</p>
 </li><li>
@@ -61,7 +61,7 @@ doc/release_notes/5.59.0.txt
 <p>Model classes created from aliased expressions and literal strings no longer use the simple_table optimization, as there are cases where doing so is not safe.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The change to not swallow disconnect errors when not swallowing connection errors can result in exceptions being raised which weren’t raised previously.  In most cases, this will alert you to issues in your application that should be fixed, but it potentially it can result in regressions if you were OK with the errors being swallowed.  If this does result in regressions in your application, please file an issue and we can probably add a setting controlling this feature.</p>
 </li></ul>

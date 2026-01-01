@@ -33,14 +33,14 @@ doc/release_notes/5.75.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#{defer,immediate}_constraints methods have been added on PostgreSQL for changing handling of deferrable constraints inside a transaction. defer_constraints sets deferrable constraints to be deferred (not checked until transaction commit), and immediate_constraints sets deferrable constraints to be checked as part of the related query, and any already deferred constraint checks to be applied immediately. You can pass the :constraints option to only apply the changes to specific constraints.</p>
 </li><li>
 <p>TimestampMigrator.run_single has been added, to migrate a single migration up or down.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>INSERT RETURNING is now supported on MariaDB 10.5+, and used automatically when saving new model objects. Note that this is not supported when using the jdbc adapter, because the jdbc-mysql driver doesn’t support it.  A jdbc/mariadb adapter could be added, as it’s likely recent versions of the jdbc-mariadb driver would support it, but the jdbc-mariadb gem hasn’t been updated in over 4 years.  Talk to the jdbc-mariadb gem maintainers if you want to use this feature with the jdbc adapter.</p>
 </li><li>

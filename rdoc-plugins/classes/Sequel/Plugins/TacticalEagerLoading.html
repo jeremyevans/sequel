@@ -36,7 +36,7 @@ Sequel::Plugins::TacticalEagerLoading
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The tactical_eager_loading plugin allows you to eagerly load an association for all objects retrieved from the same dataset without calling <code>eager</code> on the dataset.  If you attempt to load associated objects for a record and the association for that object is currently not cached, it assumes you want to get the associated objects for all objects retrieved with the dataset that retrieved the current object.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/tactical_eager_loading_rb.html">tactical_eager_loading</a> plugin allows you to eagerly load an association for all objects retrieved from the same dataset without calling <code>eager</code> on the dataset.  If you attempt to load associated objects for a record and the association for that object is currently not cached, it assumes you want to get the associated objects for all objects retrieved with the dataset that retrieved the current object.</p>
 
 <p>Tactical eager loading only takes affect if you retrieved the current object with Dataset#all, it doesn’t work if you retrieved the current object with Dataset#each.</p>
 
@@ -88,7 +88,7 @@ Sequel::Plugins::TacticalEagerLoading
 
 <p>Note that the :eager option only takes effect if the association has not already been loaded for the model.</p>
 
-<p>The tactical_eager_loading plugin also allows transparent eager loading when calling association methods on associated objects eagerly loaded via Dataset#eager_graph.  This can reduce N queries to a single query when iterating over all associated objects. Consider the following code:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/tactical_eager_loading_rb.html">tactical_eager_loading</a> plugin also allows transparent eager loading when calling association methods on associated objects eagerly loaded via Dataset#eager_graph.  This can reduce N queries to a single query when iterating over all associated objects. Consider the following code:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>
 <span class="ruby-identifier">artists</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>
@@ -109,7 +109,7 @@ Sequel::Plugins::TacticalEagerLoading
 # SELECT * FROM tracks WHERE album_id = 10;
 # ...</pre>
 
-<p>With the tactical_eager_loading plugin, this uses the same query to load the artists and albums, but then issues a single query to load the tracks for all albums.</p>
+<p>With the <a href="../../../files/lib/sequel/plugins/tactical_eager_loading_rb.html">tactical_eager_loading</a> plugin, this uses the same query to load the artists and albums, but then issues a single query to load the tracks for all albums.</p>
 
 <pre># SELECT artists.id, ...
          albums.id, ...
@@ -117,7 +117,7 @@ Sequel::Plugins::TacticalEagerLoading
 # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);
 # SELECT * FROM tracks WHERE (tracks.album_id IN (1, 2, 10, ...));</pre>
 
-<p>Note that transparent eager loading for associated objects loaded by eager_graph will only take place if the associated classes also use the tactical_eager_loading plugin.</p>
+<p>Note that transparent eager loading for associated objects loaded by eager_graph will only take place if the associated classes also use the <a href="../../../files/lib/sequel/plugins/tactical_eager_loading_rb.html">tactical_eager_loading</a> plugin.</p>
 
 <p>When using this plugin, calling association methods on separate instances of the same result set is not thread-safe, because this plugin attempts to modify all instances of the same result set to eagerly set the associated objects, and having separate threads modify the same model instance is not thread-safe.</p>
 

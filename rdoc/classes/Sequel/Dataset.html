@@ -7977,40 +7977,39 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 <span class="line-num">638</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
 <span class="line-num">639</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">str</span>
 <span class="line-num">640</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">641</span>       <span class="ruby-identifier">re</span> = <span class="ruby-regexp">/:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join(&#39;|&#39;)})\b/</span>
-<span class="line-num">642</span>       <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
+<span class="line-num">641</span>       <span class="ruby-identifier">re</span> = <span class="ruby-regexp">/:(#{Regexp.union(args.keys.map(&amp;:to_s))})\b/</span>
+<span class="line-num">642</span>       <span class="ruby-keyword">until</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">empty?</span>
 <span class="line-num">643</span>         <span class="ruby-identifier">previous</span>, <span class="ruby-identifier">q</span>, <span class="ruby-identifier">str</span> = <span class="ruby-identifier">str</span>.<span class="ruby-identifier">partition</span>(<span class="ruby-identifier">re</span>)
 <span class="line-num">644</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">previous</span>
-<span class="line-num">645</span>         <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[(<span class="ruby-node">$1</span><span class="ruby-operator">||</span><span class="ruby-identifier">q</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">to_sym</span>]) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">646</span>         <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">647</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">648</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">649</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
-<span class="line-num">650</span>     <span class="ruby-identifier">len</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span>
-<span class="line-num">651</span>     <span class="ruby-identifier">str</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
-<span class="line-num">652</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>
-<span class="line-num">653</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-identifier">i</span>]) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">i</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">len</span>
-<span class="line-num">654</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">655</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
-<span class="line-num">656</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Mismatched number of placeholders (#{str.length}) and placeholder arguments (#{args.length}) when using placeholder array&quot;</span>
-<span class="line-num">657</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">658</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">659</span>     <span class="ruby-identifier">i</span> = <span class="ruby-value">-1</span>
-<span class="line-num">660</span>     <span class="ruby-identifier">match_len</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>
-<span class="line-num">661</span>     <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
-<span class="line-num">662</span>       <span class="ruby-identifier">previous</span>, <span class="ruby-identifier">q</span>, <span class="ruby-identifier">str</span> = <span class="ruby-identifier">str</span>.<span class="ruby-identifier">partition</span>(<span class="ruby-string">&#39;?&#39;</span>)
-<span class="line-num">663</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">previous</span>
-<span class="line-num">664</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-identifier">i</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>)) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">665</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">666</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">i</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">match_len</span>
-<span class="line-num">667</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Mismatched number of placeholders (#{i+1}) and placeholder arguments (#{args.length}) when using placeholder string&quot;</span>
-<span class="line-num">668</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">669</span>         <span class="ruby-keyword">break</span>
-<span class="line-num">670</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">671</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">672</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">673</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">pls</span>.<span class="ruby-identifier">parens</span>
-<span class="line-num">674</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">645</span>         <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-node">$1</span>.<span class="ruby-identifier">to_sym</span>]) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">646</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">647</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">648</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">649</span>     <span class="ruby-identifier">len</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">650</span>     <span class="ruby-identifier">str</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+<span class="line-num">651</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>
+<span class="line-num">652</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-identifier">i</span>]) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">i</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">len</span>
+<span class="line-num">653</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">654</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
+<span class="line-num">655</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Mismatched number of placeholders (#{str.length}) and placeholder arguments (#{args.length}) when using placeholder array&quot;</span>
+<span class="line-num">656</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">657</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">658</span>     <span class="ruby-identifier">i</span> = <span class="ruby-value">-1</span>
+<span class="line-num">659</span>     <span class="ruby-identifier">match_len</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>
+<span class="line-num">660</span>     <span class="ruby-keyword">while</span> <span class="ruby-keyword">true</span>
+<span class="line-num">661</span>       <span class="ruby-identifier">previous</span>, <span class="ruby-identifier">q</span>, <span class="ruby-identifier">str</span> = <span class="ruby-identifier">str</span>.<span class="ruby-identifier">partition</span>(<span class="ruby-string">&#39;?&#39;</span>)
+<span class="line-num">662</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">previous</span>
+<span class="line-num">663</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-identifier">i</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>)) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">664</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">665</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">i</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">match_len</span>
+<span class="line-num">666</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Mismatched number of placeholders (#{i+1}) and placeholder arguments (#{args.length}) when using placeholder string&quot;</span>
+<span class="line-num">667</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">668</span>         <span class="ruby-keyword">break</span>
+<span class="line-num">669</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">670</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">671</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">672</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">pls</span>.<span class="ruby-identifier">parens</span>
+<span class="line-num">673</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-qualified_identifier_sql_append'>
@@ -8029,11 +8028,11 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-qualified_identifier_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">679</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualified_identifier_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>=(<span class="ruby-identifier">c</span> = <span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span>; <span class="ruby-identifier">table</span> = <span class="ruby-identifier">table</span>.<span class="ruby-identifier">table</span>; <span class="ruby-identifier">c</span>))
-<span class="line-num">680</span>   <span class="ruby-identifier">identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>)
-<span class="line-num">681</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;.&#39;</span>
-<span class="line-num">682</span>   <span class="ruby-identifier">identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">column</span>)
-<span class="line-num">683</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">678</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">qualified_identifier_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>=(<span class="ruby-identifier">c</span> = <span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span>; <span class="ruby-identifier">table</span> = <span class="ruby-identifier">table</span>.<span class="ruby-identifier">table</span>; <span class="ruby-identifier">c</span>))
+<span class="line-num">679</span>   <span class="ruby-identifier">identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>)
+<span class="line-num">680</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;.&#39;</span>
+<span class="line-num">681</span>   <span class="ruby-identifier">identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">column</span>)
+<span class="line-num">682</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quote_identifier_append'>
@@ -8052,19 +8051,19 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-quote_identifier_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">689</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
-<span class="line-num">690</span>   <span class="ruby-identifier">name</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">value</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>)
-<span class="line-num">691</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>)
-<span class="line-num">692</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>
-<span class="line-num">693</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">694</span>     <span class="ruby-identifier">name</span> = <span class="ruby-identifier">input_identifier</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">695</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">quote_identifiers?</span>
-<span class="line-num">696</span>       <span class="ruby-identifier">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
-<span class="line-num">697</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">698</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>
-<span class="line-num">699</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">700</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">701</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">688</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
+<span class="line-num">689</span>   <span class="ruby-identifier">name</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">value</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>)
+<span class="line-num">690</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>)
+<span class="line-num">691</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>
+<span class="line-num">692</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">693</span>     <span class="ruby-identifier">name</span> = <span class="ruby-identifier">input_identifier</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">694</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">quote_identifiers?</span>
+<span class="line-num">695</span>       <span class="ruby-identifier">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
+<span class="line-num">696</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">697</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>
+<span class="line-num">698</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">699</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">700</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quote_schema_table_append'>
@@ -8083,17 +8082,17 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-quote_schema_table_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">704</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>)
-<span class="line-num">705</span>   <span class="ruby-identifier">qualifiers</span> = <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">706</span>   <span class="ruby-identifier">table</span> = <span class="ruby-identifier">qualifiers</span>.<span class="ruby-identifier">pop</span>
-<span class="line-num">707</span> 
-<span class="line-num">708</span>   <span class="ruby-identifier">qualifiers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
-<span class="line-num">709</span>     <span class="ruby-identifier">quote_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">q</span>)
-<span class="line-num">710</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;.&#39;</span>
-<span class="line-num">711</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">712</span> 
-<span class="line-num">713</span>   <span class="ruby-identifier">quote_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>)
-<span class="line-num">714</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">703</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>)
+<span class="line-num">704</span>   <span class="ruby-identifier">qualifiers</span> = <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">705</span>   <span class="ruby-identifier">table</span> = <span class="ruby-identifier">qualifiers</span>.<span class="ruby-identifier">pop</span>
+<span class="line-num">706</span> 
+<span class="line-num">707</span>   <span class="ruby-identifier">qualifiers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
+<span class="line-num">708</span>     <span class="ruby-identifier">quote_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">q</span>)
+<span class="line-num">709</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;.&#39;</span>
+<span class="line-num">710</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">711</span> 
+<span class="line-num">712</span>   <span class="ruby-identifier">quote_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">table</span>)
+<span class="line-num">713</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quoted_identifier_append'>
@@ -8112,9 +8111,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-quoted_identifier_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">720</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
-<span class="line-num">721</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;&quot;&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;&quot;&#39;</span>, <span class="ruby-string">&#39;&quot;&quot;&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;&quot;&#39;</span>
-<span class="line-num">722</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">719</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span>)
+<span class="line-num">720</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;&quot;&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;&quot;&#39;</span>, <span class="ruby-string">&#39;&quot;&quot;&#39;</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;&quot;&#39;</span>
+<span class="line-num">721</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-schema_and_table'>
@@ -8135,22 +8134,22 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-schema_and_table-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">731</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_and_table</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-identifier">sch</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">732</span>   <span class="ruby-identifier">sch</span> = <span class="ruby-identifier">sch</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">sch</span>
-<span class="line-num">733</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">table_name</span>
-<span class="line-num">734</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
-<span class="line-num">735</span>     <span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span>, <span class="ruby-identifier">_</span> = <span class="ruby-identifier">split_symbol</span>(<span class="ruby-identifier">table_name</span>)
-<span class="line-num">736</span>     [<span class="ruby-identifier">s</span><span class="ruby-operator">||</span><span class="ruby-identifier">sch</span>, <span class="ruby-identifier">t</span>]
-<span class="line-num">737</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
-<span class="line-num">738</span>     [<span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">table</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>]
-<span class="line-num">739</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>
-<span class="line-num">740</span>     [<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>]
-<span class="line-num">741</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>
-<span class="line-num">742</span>     [<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span>]
-<span class="line-num">743</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">744</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String&#39;</span>
-<span class="line-num">745</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">746</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">730</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_and_table</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-identifier">sch</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">731</span>   <span class="ruby-identifier">sch</span> = <span class="ruby-identifier">sch</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">sch</span>
+<span class="line-num">732</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">table_name</span>
+<span class="line-num">733</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>
+<span class="line-num">734</span>     <span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span>, <span class="ruby-identifier">_</span> = <span class="ruby-identifier">split_symbol</span>(<span class="ruby-identifier">table_name</span>)
+<span class="line-num">735</span>     [<span class="ruby-identifier">s</span><span class="ruby-operator">||</span><span class="ruby-identifier">sch</span>, <span class="ruby-identifier">t</span>]
+<span class="line-num">736</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
+<span class="line-num">737</span>     [<span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">table</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>]
+<span class="line-num">738</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>
+<span class="line-num">739</span>     [<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>]
+<span class="line-num">740</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>
+<span class="line-num">741</span>     [<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table_name</span>]
+<span class="line-num">742</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">743</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String&#39;</span>
+<span class="line-num">744</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">745</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-split_qualifiers'>
@@ -8175,15 +8174,15 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-split_qualifiers-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">754</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_qualifiers</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">755</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">table_name</span>
-<span class="line-num">756</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
-<span class="line-num">757</span>     <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">table</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">column</span>, <span class="ruby-keyword">nil</span>)
-<span class="line-num">758</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">759</span>     <span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-<span class="line-num">760</span>     <span class="ruby-identifier">sch</span> <span class="ruby-operator">?</span> [<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table</span>] <span class="ruby-operator">:</span> [<span class="ruby-identifier">table</span>]
-<span class="line-num">761</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">762</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">753</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_qualifiers</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">754</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">table_name</span>
+<span class="line-num">755</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
+<span class="line-num">756</span>     <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">table</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table_name</span>.<span class="ruby-identifier">column</span>, <span class="ruby-keyword">nil</span>)
+<span class="line-num">757</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">758</span>     <span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+<span class="line-num">759</span>     <span class="ruby-identifier">sch</span> <span class="ruby-operator">?</span> [<span class="ruby-identifier">sch</span>, <span class="ruby-identifier">table</span>] <span class="ruby-operator">:</span> [<span class="ruby-identifier">table</span>]
+<span class="line-num">760</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">761</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-subscript_sql_append'>
@@ -8202,32 +8201,32 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-subscript_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">765</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subscript_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">s</span>)
-<span class="line-num">766</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">expression</span>
-<span class="line-num">767</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Subscript</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
-<span class="line-num">768</span>     <span class="ruby-comment"># nothing</span>
-<span class="line-num">769</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">770</span>     <span class="ruby-identifier">wrap_expression</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">771</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
-<span class="line-num">772</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">773</span>   <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">expression</span>)
-<span class="line-num">774</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">wrap_expression</span>
-<span class="line-num">775</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)[&#39;</span>
-<span class="line-num">776</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">777</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[&#39;</span>
-<span class="line-num">778</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">779</span>   <span class="ruby-identifier">sub</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">sub</span>
-<span class="line-num">780</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">range</span> = <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">first</span>).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Range</span>)
-<span class="line-num">781</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">range</span>.<span class="ruby-identifier">begin</span>)
-<span class="line-num">782</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;:&#39;</span>
-<span class="line-num">783</span>     <span class="ruby-identifier">e</span> = <span class="ruby-identifier">range</span>.<span class="ruby-identifier">end</span>
-<span class="line-num">784</span>     <span class="ruby-identifier">e</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">range</span>.<span class="ruby-identifier">exclude_end?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
-<span class="line-num">785</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">e</span>)
-<span class="line-num">786</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">787</span>     <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">sub</span>)
-<span class="line-num">788</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">789</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;]&#39;</span>
-<span class="line-num">790</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">764</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subscript_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">s</span>)
+<span class="line-num">765</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">expression</span>
+<span class="line-num">766</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Subscript</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>
+<span class="line-num">767</span>     <span class="ruby-comment"># nothing</span>
+<span class="line-num">768</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">769</span>     <span class="ruby-identifier">wrap_expression</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">770</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
+<span class="line-num">771</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">772</span>   <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">expression</span>)
+<span class="line-num">773</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">wrap_expression</span>
+<span class="line-num">774</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)[&#39;</span>
+<span class="line-num">775</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">776</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[&#39;</span>
+<span class="line-num">777</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">778</span>   <span class="ruby-identifier">sub</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">sub</span>
+<span class="line-num">779</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">range</span> = <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">first</span>).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Range</span>)
+<span class="line-num">780</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">range</span>.<span class="ruby-identifier">begin</span>)
+<span class="line-num">781</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;:&#39;</span>
+<span class="line-num">782</span>     <span class="ruby-identifier">e</span> = <span class="ruby-identifier">range</span>.<span class="ruby-identifier">end</span>
+<span class="line-num">783</span>     <span class="ruby-identifier">e</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">range</span>.<span class="ruby-identifier">exclude_end?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)
+<span class="line-num">784</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">e</span>)
+<span class="line-num">785</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">786</span>     <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">sub</span>)
+<span class="line-num">787</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">788</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;]&#39;</span>
+<span class="line-num">789</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-window_sql_append'>
@@ -8246,90 +8245,90 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-window_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">793</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">window_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">794</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;This dataset does not support window functions&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_window_functions?</span>
-<span class="line-num">795</span>   <span class="ruby-identifier">space</span> = <span class="ruby-keyword">false</span>
-<span class="line-num">796</span>   <span class="ruby-identifier">space_s</span> = <span class="ruby-string">&#39; &#39;</span>
-<span class="line-num">797</span> 
-<span class="line-num">798</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
-<span class="line-num">799</span> 
-<span class="line-num">800</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">window</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:window</span>]
-<span class="line-num">801</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">window</span>)
-<span class="line-num">802</span>     <span class="ruby-identifier">space</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">803</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">804</span> 
-<span class="line-num">805</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">part</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:partition</span>]
-<span class="line-num">806</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">space_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">space</span>
-<span class="line-num">807</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;PARTITION BY &quot;</span>
-<span class="line-num">808</span>     <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">part</span>))
-<span class="line-num">809</span>     <span class="ruby-identifier">space</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">810</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">811</span> 
-<span class="line-num">812</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">order</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order</span>]
-<span class="line-num">813</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">space_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">space</span>
-<span class="line-num">814</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ORDER BY &quot;</span>
-<span class="line-num">815</span>     <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">order</span>))
-<span class="line-num">816</span>     <span class="ruby-identifier">space</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">817</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">818</span> 
-<span class="line-num">819</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:frame</span>]
-<span class="line-num">820</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">space_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">space</span>
-<span class="line-num">821</span> 
-<span class="line-num">822</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
-<span class="line-num">823</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">frame</span>
-<span class="line-num">824</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">825</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">frame</span>
-<span class="line-num">826</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>
-<span class="line-num">827</span>         <span class="ruby-identifier">frame_type</span> = <span class="ruby-value">:rows</span>
-<span class="line-num">828</span>         <span class="ruby-identifier">frame_start</span> = <span class="ruby-value">:preceding</span>
-<span class="line-num">829</span>         <span class="ruby-identifier">frame_end</span> = <span class="ruby-value">:following</span>
-<span class="line-num">830</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>, <span class="ruby-value">:groups</span>
-<span class="line-num">831</span>         <span class="ruby-identifier">frame_type</span> = <span class="ruby-identifier">frame</span>
-<span class="line-num">832</span>         <span class="ruby-identifier">frame_start</span> = <span class="ruby-value">:preceding</span>
-<span class="line-num">833</span>         <span class="ruby-identifier">frame_end</span> = <span class="ruby-value">:current</span>
-<span class="line-num">834</span>       <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
-<span class="line-num">835</span>         <span class="ruby-identifier">frame_type</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:type</span>]
-<span class="line-num">836</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frame_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:rows</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">frame_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:range</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">frame_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:groups</span>
-<span class="line-num">837</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame :type option: #{frame_type.inspect}&quot;</span>
-<span class="line-num">838</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">839</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frame_start</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:start</span>]
-<span class="line-num">840</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame :start option: #{frame_start.inspect}&quot;</span>
-<span class="line-num">841</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">842</span>         <span class="ruby-identifier">frame_end</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:end</span>]
-<span class="line-num">843</span>         <span class="ruby-identifier">frame_exclude</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:exclude</span>]
-<span class="line-num">844</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">845</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame option: #{frame.inspect}&quot;</span>
-<span class="line-num">846</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">847</span> 
-<span class="line-num">848</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">frame_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; &quot;</span>
-<span class="line-num">849</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;BETWEEN &#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame_end</span>
-<span class="line-num">850</span>       <span class="ruby-identifier">window_frame_boundary_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">frame_start</span>, <span class="ruby-value">:preceding</span>)
-<span class="line-num">851</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame_end</span>
-<span class="line-num">852</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; AND &quot;</span>
-<span class="line-num">853</span>         <span class="ruby-identifier">window_frame_boundary_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">frame_end</span>, <span class="ruby-value">:following</span>)
-<span class="line-num">854</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">855</span> 
-<span class="line-num">856</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame_exclude</span>
-<span class="line-num">857</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; EXCLUDE &quot;</span>
-<span class="line-num">858</span> 
-<span class="line-num">859</span>         <span class="ruby-keyword">case</span> <span class="ruby-identifier">frame_exclude</span>
-<span class="line-num">860</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:current</span>
-<span class="line-num">861</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;CURRENT ROW&quot;</span>
-<span class="line-num">862</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:group</span>
-<span class="line-num">863</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;GROUP&quot;</span>
-<span class="line-num">864</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:ties</span>
-<span class="line-num">865</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;TIES&quot;</span>
-<span class="line-num">866</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:no_others</span>
-<span class="line-num">867</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;NO OTHERS&quot;</span>
-<span class="line-num">868</span>         <span class="ruby-keyword">else</span>
-<span class="line-num">869</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame :exclude option: #{frame_exclude.inspect}&quot;</span>
-<span class="line-num">870</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">871</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">872</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">873</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">874</span> 
-<span class="line-num">875</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
-<span class="line-num">876</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">792</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">window_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">793</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;This dataset does not support window functions&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_window_functions?</span>
+<span class="line-num">794</span>   <span class="ruby-identifier">space</span> = <span class="ruby-keyword">false</span>
+<span class="line-num">795</span>   <span class="ruby-identifier">space_s</span> = <span class="ruby-string">&#39; &#39;</span>
+<span class="line-num">796</span> 
+<span class="line-num">797</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>
+<span class="line-num">798</span> 
+<span class="line-num">799</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">window</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:window</span>]
+<span class="line-num">800</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">window</span>)
+<span class="line-num">801</span>     <span class="ruby-identifier">space</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">802</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">803</span> 
+<span class="line-num">804</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">part</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:partition</span>]
+<span class="line-num">805</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">space_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">space</span>
+<span class="line-num">806</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;PARTITION BY &quot;</span>
+<span class="line-num">807</span>     <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">part</span>))
+<span class="line-num">808</span>     <span class="ruby-identifier">space</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">809</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">810</span> 
+<span class="line-num">811</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">order</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order</span>]
+<span class="line-num">812</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">space_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">space</span>
+<span class="line-num">813</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ORDER BY &quot;</span>
+<span class="line-num">814</span>     <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">order</span>))
+<span class="line-num">815</span>     <span class="ruby-identifier">space</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">816</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">817</span> 
+<span class="line-num">818</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:frame</span>]
+<span class="line-num">819</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">space_s</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">space</span>
+<span class="line-num">820</span> 
+<span class="line-num">821</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)
+<span class="line-num">822</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">frame</span>
+<span class="line-num">823</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">824</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">frame</span>
+<span class="line-num">825</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>
+<span class="line-num">826</span>         <span class="ruby-identifier">frame_type</span> = <span class="ruby-value">:rows</span>
+<span class="line-num">827</span>         <span class="ruby-identifier">frame_start</span> = <span class="ruby-value">:preceding</span>
+<span class="line-num">828</span>         <span class="ruby-identifier">frame_end</span> = <span class="ruby-value">:following</span>
+<span class="line-num">829</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>, <span class="ruby-value">:groups</span>
+<span class="line-num">830</span>         <span class="ruby-identifier">frame_type</span> = <span class="ruby-identifier">frame</span>
+<span class="line-num">831</span>         <span class="ruby-identifier">frame_start</span> = <span class="ruby-value">:preceding</span>
+<span class="line-num">832</span>         <span class="ruby-identifier">frame_end</span> = <span class="ruby-value">:current</span>
+<span class="line-num">833</span>       <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>
+<span class="line-num">834</span>         <span class="ruby-identifier">frame_type</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:type</span>]
+<span class="line-num">835</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frame_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:rows</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">frame_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:range</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">frame_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:groups</span>
+<span class="line-num">836</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame :type option: #{frame_type.inspect}&quot;</span>
+<span class="line-num">837</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">838</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frame_start</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:start</span>]
+<span class="line-num">839</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame :start option: #{frame_start.inspect}&quot;</span>
+<span class="line-num">840</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">841</span>         <span class="ruby-identifier">frame_end</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:end</span>]
+<span class="line-num">842</span>         <span class="ruby-identifier">frame_exclude</span> = <span class="ruby-identifier">frame</span>[<span class="ruby-value">:exclude</span>]
+<span class="line-num">843</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">844</span>         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame option: #{frame.inspect}&quot;</span>
+<span class="line-num">845</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">846</span> 
+<span class="line-num">847</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">frame_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; &quot;</span>
+<span class="line-num">848</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;BETWEEN &#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame_end</span>
+<span class="line-num">849</span>       <span class="ruby-identifier">window_frame_boundary_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">frame_start</span>, <span class="ruby-value">:preceding</span>)
+<span class="line-num">850</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame_end</span>
+<span class="line-num">851</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; AND &quot;</span>
+<span class="line-num">852</span>         <span class="ruby-identifier">window_frame_boundary_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">frame_end</span>, <span class="ruby-value">:following</span>)
+<span class="line-num">853</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">854</span> 
+<span class="line-num">855</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">frame_exclude</span>
+<span class="line-num">856</span>         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; EXCLUDE &quot;</span>
+<span class="line-num">857</span> 
+<span class="line-num">858</span>         <span class="ruby-keyword">case</span> <span class="ruby-identifier">frame_exclude</span>
+<span class="line-num">859</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:current</span>
+<span class="line-num">860</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;CURRENT ROW&quot;</span>
+<span class="line-num">861</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:group</span>
+<span class="line-num">862</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;GROUP&quot;</span>
+<span class="line-num">863</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:ties</span>
+<span class="line-num">864</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;TIES&quot;</span>
+<span class="line-num">865</span>         <span class="ruby-keyword">when</span> <span class="ruby-value">:no_others</span>
+<span class="line-num">866</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;NO OTHERS&quot;</span>
+<span class="line-num">867</span>         <span class="ruby-keyword">else</span>
+<span class="line-num">868</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid window :frame :exclude option: #{frame_exclude.inspect}&quot;</span>
+<span class="line-num">869</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">870</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">871</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">872</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">873</span> 
+<span class="line-num">874</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>
+<span class="line-num">875</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -8349,9 +8348,9 @@ WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</pre>
 [show source]
 </a>
 <pre id='method-i-compound_from_self-source'>    <span class="ruby-comment"># File lib/sequel/dataset/sql.rb</span>
-<span class="line-num">882</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">compound_from_self</span>
-<span class="line-num">883</span>   (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]) <span class="ruby-operator">?</span> <span class="ruby-identifier">from_self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>
-<span class="line-num">884</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">881</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">compound_from_self</span>
+<span class="line-num">882</span>   (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:offset</span>]) <span class="ruby-operator">?</span> <span class="ruby-identifier">from_self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>
+<span class="line-num">883</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

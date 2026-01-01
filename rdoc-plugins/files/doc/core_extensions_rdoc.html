@@ -33,9 +33,9 @@ doc/core_extensions.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Sequel-27s+Core+Extensions">Sequel’s Core Extensions<span><a href="#label-Sequel-27s+Core+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Sequel-27s+Core+Extensions"><a href="#label-Sequel-27s+Core+Extensions">Sequel’s Core Extensions</a></h1>
 
-<h2 id="label-Background">Background<span><a href="#label-Background">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Background"><a href="#label-Background">Background</a></h2>
 
 <p>Historically, <a href="../../classes/Sequel.html"><code>Sequel</code></a> added methods to many of the core classes, and usage of those methods was the primary and recommended way to use <a href="../../classes/Sequel.html"><code>Sequel</code></a>.  For example:</p>
 
@@ -62,7 +62,7 @@ doc/core_extensions.rdoc
 
 <p>Almost all of the core extension methods have a replacement on the <a href="../../classes/Sequel.html"><code>Sequel</code></a> module.  So it is now up to the user which style to use.  Using the methods on the <a href="../../classes/Sequel.html"><code>Sequel</code></a> module results in slightly more verbose code, but allows the code to work without modifications to the core classes.</p>
 
-<h2 id="label-Issues">Issues<span><a href="#label-Issues">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Issues"><a href="#label-Issues">Issues</a></h2>
 
 <p>There is no recommendation on whether the <a href="core_extensions_rdoc.html">core_extensions</a> should be used or not.  It is very rare that any of the methods added by <a href="core_extensions_rdoc.html">core_extensions</a> actually causes a problem, but some of them can make it more difficult to find other problems.  For example, if you type:</p>
 
@@ -76,18 +76,18 @@ doc/core_extensions.rdoc
 
 <p>and value is a <a href="../../classes/Symbol.html"><code>Symbol</code></a>, instead of a NoMethodError being raised because Symbol#| is not implemented by default, <code>value | other_value</code> will return a <a href="../../classes/Sequel.html"><code>Sequel</code></a> expression object, which if will evaluate as true, and do_something will be called.</p>
 
-<h2 id="label-Usage">Usage<span><a href="#label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Usage"><a href="#label-Usage">Usage</a></h2>
 
 <p>All of Sequel’s extensions to the core classes are stored in Sequel’s <a href="core_extensions_rdoc.html">core_extensions</a> extension, which you can load via:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:core_extensions</span>
 </pre>
 
-<h2 id="label-No+Internal+Dependency">No Internal Dependency<span><a href="#label-No+Internal+Dependency">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-No+Internal+Dependency"><a href="#label-No+Internal+Dependency">No Internal Dependency</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> has no internal dependency on the core extensions.  This includes Sequel’s core, <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>, and all plugins and extensions that ship with <a href="../../classes/Sequel.html"><code>Sequel</code></a>.  However, it is possible that external plugins and extensions will depend on the core extensions.  Such plugins and extensions should be updated so that they no longer depend on the core extensions.</p>
 
-<h2 id="label-Refinements">Refinements<span><a href="#label-Refinements">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Refinements"><a href="#label-Refinements">Refinements</a></h2>
 
 <p>Most of the these extensions can be added on a per-file basis using refinements (if you are using Ruby 2.0+).  To use refinements, first load them:</p>
 
@@ -99,13 +99,13 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CoreRefinements</span>
 </pre>
 
-<h2 id="label-Core+Extension+Methods">Core Extension Methods<span><a href="#label-Core+Extension+Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Core+Extension+Methods"><a href="#label-Core+Extension+Methods">Core Extension Methods</a></h2>
 
 <p>This section will briefly describe all of the methods added to the core classes, and what the alternative method is that doesn’t require the core extensions.</p>
 
-<h3 id="label-Symbol+-26+String"><a href="../../classes/Symbol.html"><code>Symbol</code></a> &amp; <a href="../../classes/String.html"><code>String</code></a><span><a href="#label-Symbol+-26+String">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Symbol+-26+String"><a href="#label-Symbol+-26+String"><a href="../../classes/Symbol.html"><code>Symbol</code></a> &amp; <a href="../../classes/String.html"><code>String</code></a></a></h3>
 
-<h4 id="label-as">as<span><a href="#label-as">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-as"><a href="#label-as">as</a></h4>
 
 <p>Symbol#as and String#as return <a href="../../classes/Sequel.html"><code>Sequel</code></a> aliased expressions using the provided alias:</p>
 
@@ -119,7 +119,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)
 </pre>
 
-<h4 id="label-cast">cast<span><a href="#label-cast">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-cast"><a href="#label-cast">cast</a></h4>
 
 <p>Symbol#cast and String#cast return <a href="../../classes/Sequel.html"><code>Sequel</code></a> cast expressions for typecasting in the database:</p>
 
@@ -133,7 +133,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Integer</span>)
 </pre>
 
-<h4 id="label-cast_numeric">cast_numeric<span><a href="#label-cast_numeric">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-cast_numeric"><a href="#label-cast_numeric">cast_numeric</a></h4>
 
 <p>Symbol#cast_numeric and String#cast_numeric return <a href="../../classes/Sequel.html"><code>Sequel</code></a> cast expressions for typecasting in the database, defaulting to integers, where the returned expression is treated as an numeric value:</p>
 
@@ -147,7 +147,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-value">:a</span>)
 </pre>
 
-<h4 id="label-cast_string">cast_string<span><a href="#label-cast_string">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-cast_string"><a href="#label-cast_string">cast_string</a></h4>
 
 <p>Symbol#cast_string and String#cast_string return <a href="../../classes/Sequel.html"><code>Sequel</code></a> cast expressions for typecasting in the database, defaulting to strings, where the returned expression is treated as a string value:</p>
 
@@ -161,9 +161,9 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-value">:a</span>)
 </pre>
 
-<h3 id="label-Symbol"><a href="../../classes/Symbol.html"><code>Symbol</code></a><span><a href="#label-Symbol">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Symbol"><a href="#label-Symbol"><a href="../../classes/Symbol.html"><code>Symbol</code></a></a></h3>
 
-<h4 id="label-identifier">identifier<span><a href="#label-identifier">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-identifier"><a href="#label-identifier">identifier</a></h4>
 
 <p><a href="../../classes/Symbol.html#method-i-identifier"><code>Symbol#identifier</code></a> wraps the symbol in an <a href="../../classes/Sequel.html"><code>Sequel</code></a> identifier object.  If symbol splitting is enabled (no longer the default), it also makes sure the symbol will not be split.  If symbol splitting is disabled (the default), there is little reason to use this).</p>
 
@@ -176,7 +176,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-value">:column</span>)
 </pre>
 
-<h4 id="label-asc">asc<span><a href="#label-asc">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-asc"><a href="#label-asc">asc</a></h4>
 
 <p>Symbol#asc is used to define an ascending order on a column.  It exists mostly for consistency with desc, since ascending is the default order:</p>
 
@@ -189,7 +189,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:a</span>)
 </pre>
 
-<h4 id="label-desc">desc<span><a href="#label-desc">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-desc"><a href="#label-desc">desc</a></h4>
 
 <p>Symbol#desc is used to defined a descending order on a column.  The returned value is usually passed to one of the dataset order methods.</p>
 
@@ -202,7 +202,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:a</span>)
 </pre>
 
-<h4 id="label-2B-2C+--2C+-2A-2C+-2F">+, -, *, /<span><a href="#label-2B-2C+--2C+-2A-2C+-2F">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-2B-2C+--2C+-2A-2C+-2F"><a href="#label-2B-2C+--2C+-2A-2C+-2F">+, -, *, /</a></h4>
 
 <p>The standard mathematical operators are defined on <a href="../../classes/Symbol.html"><code>Symbol</code></a>, and return a <a href="../../classes/Sequel.html"><code>Sequel</code></a> numeric expression object representing the operation:</p>
 
@@ -233,7 +233,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">**</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>)
 </pre>
 
-<h4 id="label-2A">*<span><a href="#label-2A">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-2A"><a href="#label-2A">*</a></h4>
 
 <p>The * operator is overloaded on <a href="../../classes/Symbol.html"><code>Symbol</code></a> such that if it is called with no arguments, it represents a selection of all columns in the table:</p>
 
@@ -245,7 +245,7 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">*</span>
 </pre>
 
-<h4 id="label-qualify">qualify<span><a href="#label-qualify">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-qualify"><a href="#label-qualify">qualify</a></h4>
 
 <p>Symbol#qualify qualifies the identifier (e.g. a column) with a another identifier (e.g. a table):</p>
 
@@ -259,7 +259,7 @@ doc/core_extensions.rdoc
 
 <p>Note the reversed order of the arguments.  For the Symbol#qualify method, the argument is the qualifier, while for <a href="">Sequel[]</a>, the first [] is the qualifier, and the second [] is the identifier.</p>
 
-<h4 id="label-like">like<span><a href="#label-like">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-like"><a href="#label-like">like</a></h4>
 
 <p>Symbol#like returns a case sensitive LIKE expression between the identifier and the given argument:</p>
 
@@ -272,7 +272,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;b%&#39;</span>)
 </pre>
 
-<h4 id="label-ilike">ilike<span><a href="#label-ilike">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-ilike"><a href="#label-ilike">ilike</a></h4>
 
 <p>Symbol#ilike returns a case insensitive LIKE expression between the identifier and the given argument:</p>
 
@@ -285,7 +285,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;b%&#39;</span>)
 </pre>
 
-<h4 id="label-sql_subscript">sql_subscript<span><a href="#label-sql_subscript">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_subscript"><a href="#label-sql_subscript">sql_subscript</a></h4>
 
 <p>Symbol#sql_subscript returns a <a href="../../classes/Sequel.html"><code>Sequel</code></a> expression representing an SQL array access:</p>
 
@@ -298,7 +298,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>)
 </pre>
 
-<h4 id="label-extract">extract<span><a href="#label-extract">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-extract"><a href="#label-extract">extract</a></h4>
 
 <p>Symbol#extract does a datetime part extraction from the receiver:</p>
 
@@ -311,7 +311,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-value">:year</span>, <span class="ruby-value">:a</span>)
 </pre>
 
-<h4 id="label-sql_boolean-2C+sql_number-2C+sql_string">sql_boolean, sql_number, sql_string<span><a href="#label-sql_boolean-2C+sql_number-2C+sql_string">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_boolean-2C+sql_number-2C+sql_string"><a href="#label-sql_boolean-2C+sql_number-2C+sql_string">sql_boolean, sql_number, sql_string</a></h4>
 
 <p>These <a href="../../classes/Symbol.html"><code>Symbol</code></a> methods are used to force the treating of the object as a specific SQL type, instead of as a general SQL type.  For example:</p>
 
@@ -327,7 +327,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">sql_string</span>
 </pre>
 
-<h4 id="label-sql_function">sql_function<span><a href="#label-sql_function">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_function"><a href="#label-sql_function">sql_function</a></h4>
 
 <p><a href="../../classes/Symbol.html#method-i-sql_function"><code>Symbol#sql_function</code></a> returns an SQL function call expression object:</p>
 
@@ -342,9 +342,9 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:sum</span>, <span class="ruby-value">:a</span>)
 </pre>
 
-<h3 id="label-String"><a href="../../classes/String.html"><code>String</code></a><span><a href="#label-String">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-String"><a href="#label-String"><a href="../../classes/String.html"><code>String</code></a></a></h3>
 
-<h4 id="label-lit">lit<span><a href="#label-lit">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-lit"><a href="#label-lit">lit</a></h4>
 
 <p><a href="../../classes/String.html#method-i-lit"><code>String#lit</code></a> creates a literal string, using placeholders if any arguments are given.  Literal strings are not escaped, they are treated as SQL code, not as an SQL string:</p>
 
@@ -358,7 +358,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = ?&#39;</span>, <span class="ruby-value">1</span>)
 </pre>
 
-<h4 id="label-to_sequel_blob">to_sequel_blob<span><a href="#label-to_sequel_blob">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-to_sequel_blob"><a href="#label-to_sequel_blob">to_sequel_blob</a></h4>
 
 <p><a href="../../classes/String.html#method-i-to_sequel_blob"><code>String#to_sequel_blob</code></a> returns the string wrapper in <a href="../../classes/Sequel.html"><code>Sequel</code></a> blob object.  Often blobs need to be handled differently than regular strings by the database adapters.</p>
 
@@ -370,9 +370,9 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">blob</span>(<span class="ruby-string">&quot;a\0&quot;</span>)
 </pre>
 
-<h3 id="label-Hash-2C+Array-2C+-26+Symbol"><a href="../../classes/Hash.html"><code>Hash</code></a>, <a href="../../classes/Array.html"><code>Array</code></a>, &amp; <a href="../../classes/Symbol.html"><code>Symbol</code></a><span><a href="#label-Hash-2C+Array-2C+-26+Symbol">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Hash-2C+Array-2C+-26+Symbol"><a href="#label-Hash-2C+Array-2C+-26+Symbol"><a href="../../classes/Hash.html"><code>Hash</code></a>, <a href="../../classes/Array.html"><code>Array</code></a>, &amp; <a href="../../classes/Symbol.html"><code>Symbol</code></a></a></h3>
 
-<h4 id="label-~">~<span><a href="#label-~">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-~"><a href="#label-~">~</a></h4>
 
 <p><a href="../../classes/Array.html#method-i-~"><code>Array#~</code></a>, <a href="../../classes/Hash.html#method-i-~"><code>Hash#~</code></a>, and Symbol#~ treat the receiver as a conditions specifier, not matching all of the conditions:</p>
 
@@ -386,9 +386,9 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])
 </pre>
 
-<h3 id="label-Hash+-26+Array"><a href="../../classes/Hash.html"><code>Hash</code></a> &amp; <a href="../../classes/Array.html"><code>Array</code></a><span><a href="#label-Hash+-26+Array">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Hash+-26+Array"><a href="#label-Hash+-26+Array"><a href="../../classes/Hash.html"><code>Hash</code></a> &amp; <a href="../../classes/Array.html"><code>Array</code></a></a></h3>
 
-<h4 id="label-case">case<span><a href="#label-case">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-case"><a href="#label-case">case</a></h4>
 
 <p><a href="../../classes/Array.html#method-i-case"><code>Array#case</code></a> and <a href="../../classes/Hash.html#method-i-case"><code>Hash#case</code></a> return an SQL CASE expression, where the keys are conditions and the values are results:</p>
 
@@ -401,7 +401,7 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({{<span class="ruby-value">a:</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>)
 </pre>
 
-<h4 id="label-sql_expr">sql_expr<span><a href="#label-sql_expr">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_expr"><a href="#label-sql_expr"><a href="../lib/sequel/extensions/sql_expr_rb.html">sql_expr</a></a></h4>
 
 <p><a href="../../classes/Array.html#method-i-sql_expr"><code>Array#sql_expr</code></a> and <a href="../../classes/Hash.html#method-i-sql_expr"><code>Hash#sql_expr</code></a> treat the receiver as a conditions specifier, matching all of the conditions in the array.</p>
 
@@ -414,7 +414,7 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]
 </pre>
 
-<h4 id="label-sql_negate">sql_negate<span><a href="#label-sql_negate">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_negate"><a href="#label-sql_negate">sql_negate</a></h4>
 
 <p><a href="../../classes/Array.html#method-i-sql_negate"><code>Array#sql_negate</code></a> and <a href="../../classes/Hash.html#method-i-sql_negate"><code>Hash#sql_negate</code></a> treat the receiver as a conditions specifier, matching none of the conditions in the array:</p>
 
@@ -427,7 +427,7 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])
 </pre>
 
-<h4 id="label-sql_or">sql_or<span><a href="#label-sql_or">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_or"><a href="#label-sql_or">sql_or</a></h4>
 
 <p><a href="../../classes/Array.html#method-i-sql_or"><code>Array#sql_or</code></a> nd <a href="../../classes/Hash.html#method-i-sql_or"><code>Hash#sql_or</code></a> treat the receiver as a conditions specifier, matching any of the conditions in the array:</p>
 
@@ -440,9 +440,9 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])
 </pre>
 
-<h3 id="label-Array"><a href="../../classes/Array.html"><code>Array</code></a><span><a href="#label-Array">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Array"><a href="#label-Array"><a href="../../classes/Array.html"><code>Array</code></a></a></h3>
 
-<h4 id="label-sql_value_list">sql_value_list<span><a href="#label-sql_value_list">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_value_list"><a href="#label-sql_value_list">sql_value_list</a></h4>
 
 <p><a href="../../classes/Array.html#method-i-sql_value_list"><code>Array#sql_value_list</code></a> wraps the array in an array subclass, which <a href="../../classes/Sequel.html"><code>Sequel</code></a> will always treat as a value list and not a conditions specifier.  By default, <a href="../../classes/Sequel.html"><code>Sequel</code></a> treats arrays of two element arrays as a conditions specifier.</p>
 
@@ -455,7 +455,7 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">value_list</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])
 </pre>
 
-<h4 id="label-sql_string_join">sql_string_join<span><a href="#label-sql_string_join">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-sql_string_join"><a href="#label-sql_string_join">sql_string_join</a></h4>
 
 <p><a href="../../classes/Array.html#method-i-sql_string_join"><code>Array#sql_string_join</code></a> joins all of the elements in the array in an SQL string concatentation expression:</p>
 
@@ -470,9 +470,9 @@ doc/core_extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-value">:b</span>], <span class="ruby-string">&#39; &#39;</span>)
 </pre>
 
-<h3 id="label-Hash+-26+Symbol"><a href="../../classes/Hash.html"><code>Hash</code></a> &amp; <a href="../../classes/Symbol.html"><code>Symbol</code></a><span><a href="#label-Hash+-26+Symbol">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Hash+-26+Symbol"><a href="#label-Hash+-26+Symbol"><a href="../../classes/Hash.html"><code>Hash</code></a> &amp; <a href="../../classes/Symbol.html"><code>Symbol</code></a></a></h3>
 
-<h4 id="label-26">&amp;<span><a href="#label-26">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-26"><a href="#label-26">&amp;</a></h4>
 
 <p><a href="../../classes/Hash.html#method-i-26"><code>Hash#&amp;</code></a> and Symbol#& return a <a href="../../classes/Sequel.html"><code>Sequel</code></a> boolean expression, matching the condition specified by the receiver and the condition specified by the given argument:</p>
 
@@ -487,7 +487,7 @@ doc/core_extensions.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">a:</span> <span class="ruby-value">1</span>}, <span class="ruby-value">:b</span>)
 </pre>
 
-<h4 id="label-7C">|<span><a href="#label-7C">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-7C"><a href="#label-7C">|</a></h4>
 
 <p><a href="../../classes/Hash.html#method-i-7C"><code>Hash#|</code></a> returns a <a href="../../classes/Sequel.html"><code>Sequel</code></a> boolean expression, matching the condition specified by the receiver or the condition specified by the given argument:</p>
 

@@ -33,7 +33,7 @@ doc/release_notes/4.2.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>LATERAL subqueries are now supported on PostgreSQL 9.3+, HSQLDB, and DB2 via Dataset#lateral:</p>
 
@@ -76,7 +76,7 @@ doc/release_notes/4.2.0.txt
 <p>The mysql2 adapter now supports a :flags Database option allowing to set custom mysql2 flags (e.g. ::Mysql2::Client::MULTI_STATEMENTS).</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#freeze has been implemented.  Previously, it was not implemented, so Object#freeze was used, which resulted in a dataset that wasn’t cloneable.  Dataset#freeze now works as expected, resulting in a cloneable dataset, but it doesn’t allow methods to be called that mutate the receiver.</p>
 </li><li>
@@ -96,7 +96,7 @@ doc/release_notes/4.2.0.txt
 <p>Placeholder literal strings with an empty parameter hash are now handled correctly.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The static_cache plugin now disallows saving/destroying instances unless the :frozen=&gt;false option is used.  As the cached objects returned by the model were frozen anyway, this affects creating new instances or saving/destroying instances returned from the underlying dataset.</p>
 </li><li>

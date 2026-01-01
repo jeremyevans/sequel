@@ -33,12 +33,12 @@ doc/release_notes/5.72.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_auto_parameterize_in_array extension has been added, which handles conversion of IN/NOT IN to = ANY or != ALL for more types. The pg_auto_parameterize extension only handles integer types by default, because other types require the pg_array extension. This new extension adds handling for Float, BigDecimal, Date, Time, DateTime, <a href="../../../classes/Sequel/SQLTime.html"><code>Sequel::SQLTime</code></a>, and <a href="../../../classes/Sequel/SQL/Blob.html"><code>Sequel::SQL::Blob</code></a> types.  It can also handle String types if the :treat_string_list_as_text_array Database option is present, using the text type for that. Handling String values as text is not the default because that may cause issues for some queries.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The defaults_setter plugin now does a deep copy of database default values that are hash/array or delegates to hash/array. This fixes cases where the database default values are mutated.</p>
 </li><li>

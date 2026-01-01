@@ -33,7 +33,7 @@ doc/release_notes/5.62.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with the pg driver has been added back to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.  This extension was originally added in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_34_0_txt.html">3.34.0</a>, but was removed in <a href="4_0_0_txt.html">4.0.0</a> due to the many corner cases it had.  Almost all of the corner cases have now been fixed, and the extension is now recommended for production use.  Compared to the original version in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3, the reintroduced version of the extension includes the following changes:</p>
 <ul><li>
@@ -77,7 +77,7 @@ doc/release_notes/5.62.0.txt
 <p>Note that these shard-specific options will not be respected if you are calling after_connect= or connect_sqls= on the Database’s connection pool.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>A Sequel::Postgres::IntegerOutsideBigintRange exception will now be raised if trying to literalize an integer outside PostgreSQL bigint range, to avoid PostgreSQL treating the integer as a numeric type and not respecting indexes on the related column.</p>
 
@@ -98,12 +98,12 @@ doc/release_notes/5.62.0.txt
 <p>The mock postgres adapter now assumes PostgreSQL 15 instead of PostgreSQL 14 by default.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>If you are using Ruby integers outside PostgreSQL bigint range when dealing with PostgreSQL numeric column values, this version may not be compatible.  It is recommended you explicitly convert the Ruby integers to BigDecimal objects if you are using them for numeric column values.  You can also use the pg_extended_integer_support extension introduced in this version.</p>
 </li></ul>
 
-<h1 id="label-Workaround+for+Older+Versions">Workaround for Older Versions<span><a href="#label-Workaround+for+Older+Versions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Workaround+for+Older+Versions"><a href="#label-Workaround+for+Older+Versions">Workaround for Older Versions</a></h1>
 <ul><li>
 <p>If you cannot upgrade to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_62_0_txt.html">5.62.0</a>, but still want to avoid the problems that come from using literal large integers on PostgreSQL, you can use the following code, where DB is your <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object:</p>
 

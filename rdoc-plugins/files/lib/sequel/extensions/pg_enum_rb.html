@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_enum.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_enum extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL’s enum types.  To use this extension, first load it into your Database instance:</p>
+<p>The <a href="pg_enum_rb.html">pg_enum</a> extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL’s enum types.  To use this extension, first load it into your Database instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_enum</span>
 </pre>
@@ -78,7 +78,7 @@ lib/sequel/extensions/pg_enum.rb
 [[<span class="ruby-value">:column_name</span>, {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:enum</span>, <span class="ruby-value">:enum_values</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;value1&#39;</span>, <span class="ruby-string">&#39;value2&#39;</span>]}]]
 </pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of enum types, load the pg_array extension before the pg_enum extension:</p>
+<p>This extension integrates with the <a href="pg_array_rb.html">pg_array</a> extension.  If you plan to use arrays of enum types, load the <a href="pg_array_rb.html">pg_array</a> extension before the <a href="pg_enum_rb.html">pg_enum</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_enum</span>
 

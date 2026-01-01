@@ -33,7 +33,7 @@ doc/release_notes/4.42.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>There have been numerous improvements this release related to frozen datasets.  Frozen datasets now work in almost all cases, except when calling a dataset mutation method.</p>
 
@@ -97,7 +97,7 @@ doc/release_notes/4.42.0.txt
 <p>The mock adapter now supports Dataset#with_{autoid,fetch,numrows}, allowing mocking of results when using frozen datasets.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Using an eager load callback when eager loading a one_to_one association that uses an order or offset now works correctly on databases that do not support window functions.</p>
 </li><li>
@@ -142,7 +142,7 @@ doc/release_notes/4.42.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now issues a deprecation message instead of a warning when used with PostgreSQL &lt;8.2.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Any external dataset extensions or adapters that modified or directly accessed dataset instance variables other than @db and @opts (such as @columns) needs to be updated to work with the new dataset internals.</p>
 </li><li>

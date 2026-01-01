@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_range_ops.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_range_ops extension adds support to Sequel’s DSL to make it easier to call PostgreSQL range and multirange functions and operators.</p>
+<p>The <a href="pg_range_ops_rb.html">pg_range_ops</a> extension adds support to Sequel’s DSL to make it easier to call PostgreSQL range and multirange functions and operators.</p>
 
 <p>To load the extension:</p>
 
@@ -45,18 +45,18 @@ lib/sequel/extensions/pg_range_ops.rb
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range_op</span>(<span class="ruby-value">:range</span>)
 </pre>
 
-<p>If you have also loaded the pg_range or pg_multirange extensions, you can use Sequel.pg_range or Sequel.pg_multirange as well:</p>
+<p>If you have also loaded the <a href="pg_range_rb.html">pg_range</a> or <a href="pg_multirange_rb.html">pg_multirange</a> extensions, you can use Sequel.pg_range or Sequel.pg_multirange as well:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-value">:range</span>)
 <span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_multirange</span>(<span class="ruby-value">:range</span>)
 </pre>
 
-<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the pg_range method:</p>
+<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the <a href="pg_range_rb.html">pg_range</a> method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:range</span>].<span class="ruby-identifier">pg_range</span>
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/RangeOpMethods.html#method-i-pg_range"><code>Symbol#pg_range</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/RangeOpMethods.html#method-i-pg_range"><code>Symbol#pg_range</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-value">:range</span>.<span class="ruby-identifier">pg_range</span>
 </pre>
@@ -92,7 +92,7 @@ lib/sequel/extensions/pg_range_ops.rb
 
 <p>See the PostgreSQL range and multirange function and operator documentation for more details on what these functions and operators do.</p>
 
-<p>If you are also using the pg_range or pg_multirange extension, you should load them before loading this extension.  Doing so will allow you to use PGRange#op and PGMultiRange#op to get a RangeOp, allowing you to perform range operations on range literals.</p>
+<p>If you are also using the <a href="pg_range_rb.html">pg_range</a> or <a href="pg_multirange_rb.html">pg_multirange</a> extension, you should load them before loading this extension.  Doing so will allow you to use PGRange#op and PGMultiRange#op to get a RangeOp, allowing you to perform range operations on range literals.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/RangeOp.html"><code>Sequel::Postgres::RangeOp</code></a></p>
 </div>

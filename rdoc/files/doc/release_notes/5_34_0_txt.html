@@ -33,7 +33,7 @@ doc/release_notes/5.34.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The association_pks plugin now creates *_pks_dataset methods for each association.  These are similar to the existing *_pks getter methods, but they return a dataset of the keys instead of the keys themselves.</p>
 </li><li>
@@ -42,7 +42,7 @@ doc/release_notes/5.34.0.txt
 <p>The *_pks getter methods supported by the association_pks plugin now support a :refresh option to ignore any cached values, similar to how the association getter methods work.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>If trying to disconnect a server that doesn’t exist when using a sharded connection pool, a <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> is now raised.  Previously, the sharded threaded pool raised a NoMethodError and the sharded single connection pool did not raise an error.</p>
 </li><li>

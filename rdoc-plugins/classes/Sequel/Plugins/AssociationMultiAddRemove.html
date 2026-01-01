@@ -36,7 +36,7 @@ Sequel::Plugins::AssociationMultiAddRemove
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The association_multi_add_remove plugin allows adding, removing and setting multiple associated objects in a single method call. By default <a href="../Model.html"><code>Sequel::Model</code></a> defines singular <code>add_*</code> and <code>remove_*</code> methods that operate on a single associated object, this adds plural forms that operate on multiple associated objects. Example:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/association_multi_add_remove_rb.html">association_multi_add_remove</a> plugin allows adding, removing and setting multiple associated objects in a single method call. By default <a href="../Model.html"><code>Sequel::Model</code></a> defines singular <code>add_*</code> and <code>remove_*</code> methods that operate on a single associated object, this adds plural forms that operate on multiple associated objects. Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># =&gt; [album1]</span>
 <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_albums</span>([<span class="ruby-identifier">album2</span>, <span class="ruby-identifier">album3</span>])

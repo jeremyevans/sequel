@@ -33,7 +33,7 @@ lib/sequel/extensions/arbitrary_servers.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The arbitrary_servers extension allows you to connect to arbitrary servers/shards that were not defined when you created the database. To use it, you first load the extension into the Database object:</p>
+<p>The <a href="arbitrary_servers_rb.html">arbitrary_servers</a> extension allows you to connect to arbitrary servers/shards that were not defined when you created the database. To use it, you first load the extension into the Database object:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:arbitrary_servers</span>
 </pre>
@@ -61,7 +61,7 @@ lib/sequel/extensions/arbitrary_servers.rb
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>You can use this extension in conjunction with the server_block extension:</p>
+<p>You can use this extension in conjunction with the <a href="server_block_rb.html">server_block</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;...&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
@@ -74,7 +74,7 @@ lib/sequel/extensions/arbitrary_servers.rb
 <span class="ruby-keyword">end</span>
 </pre>
 
-<p>Anyone using this extension in conjunction with the server_block extension may want to do the following to so that you don’t need to call synchronize separately:</p>
+<p>Anyone using this extension in conjunction with the <a href="server_block_rb.html">server_block</a> extension may want to do the following to so that you don’t need to call synchronize separately:</p>
 
 <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
   <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>){<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}

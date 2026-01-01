@@ -33,7 +33,7 @@ doc/release_notes/5.67.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A set_literalizer extension has been added, for treating Set instances in datasets similar to Array instances:</p>
 
@@ -43,7 +43,7 @@ doc/release_notes/5.67.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids the use of singleton classes for datasets on Ruby 2.4+, instead creating a regular subclass whenever a dataset would be extended via extension or with_extend.  This significantly improves performance, up to 20-40% for common dataset usage, because it avoids creating new singleton classes for every dataset clone, and it allows for cached method lookup.</p>
 </li><li>
@@ -54,7 +54,7 @@ doc/release_notes/5.67.0.txt
 <p>The schema_dumper extension now correctly dumps string column sizes when using Microsoft SQL Server.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Calling <a href="../../../classes/Sequel/Dataset.html#method-c-register_extension"><code>Sequel::Dataset.register_extension</code></a> where the second argument is not a module now issues a deprecation warning.  Support for this will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6.</p>
 </li></ul>

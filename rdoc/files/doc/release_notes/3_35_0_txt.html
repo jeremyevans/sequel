@@ -33,7 +33,7 @@ doc/release_notes/3.35.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A dirty plugin has been added, which saves the initial value of the column when the column is changed, similar to ActiveModel::Dirty:</p>
 
@@ -83,7 +83,7 @@ doc/release_notes/3.35.0.txt
 <p>The <a href="../../../classes/Sequel.html#method-c-migration"><code>Sequel.migration</code></a> DSL now has a transaction method that forces transaction use for the given migration.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Many theoretical thread-safety issues have been fixed for ruby implementations that don’t use a global interpreter lock. Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> relied on MRI’s global interpreter lock for part of its thread safety, now it does manually locking in more places to avoid thread-safety issues on JRuby (and other ruby implementations without a global interpreter lock).</p>
 
@@ -114,7 +114,7 @@ doc/release_notes/3.35.0.txt
 <p>The schema dumper now recognized the identity type.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Association reflections now store cached information in a separate subhash due to the thread-safety changes.  Any code accessing an association reflection should always call the related method to get the cached data instead of checking for a specific location in the hash.</p>
 </li><li>

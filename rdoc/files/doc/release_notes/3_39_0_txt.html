@@ -33,7 +33,7 @@ doc/release_notes/3.39.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A constraint_validations extension and plugin have been added, which allow you to define validations when creating tables, which are enforced by database constraints, and have those validations be automatically discovered and used by your <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> classes.</p>
 
@@ -109,7 +109,7 @@ doc/release_notes/3.39.0.txt
 <p>bin/sequel now accepts a -c argument for running an arbitrary code string instead of using an IRB prompt.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now parses current date/timestamp column defaults when parsing the schema for a table.  The values will be returned as Sequel::CURRENT_DATE for date columns and Sequel::CURRENT_TIMESTAMP for timestamp columns.</p>
 
@@ -159,7 +159,7 @@ doc/release_notes/3.39.0.txt
 <p>The specs now cleanup after themselves, dropping the tables that they create for testing.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The defaults_setter plugin’s behavior changed due to the current date/timestamp support.  Previously, it would not set a value for the column, since the default wasn’t recognized. Therefore, the database would use the default value on insert, which would be the database’s current timestamp.</p>
 

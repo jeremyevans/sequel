@@ -36,7 +36,7 @@ Sequel::Plugins::BooleanSubsets
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The boolean_subsets plugin allows for the automatic creation of subsets for for boolean columns, which can DRY up model classes that define such subsets manually.  By default, subsets are created for all columns of type :boolean, with the subset name being the same as column name, and the conditions being <code>column IS TRUE</code> (assuming the database supports that syntax).</p>
+<p>The <a href="../../../files/lib/sequel/plugins/boolean_subsets_rb.html">boolean_subsets</a> plugin allows for the automatic creation of subsets for for boolean columns, which can DRY up model classes that define such subsets manually.  By default, subsets are created for all columns of type :boolean, with the subset name being the same as column name, and the conditions being <code>column IS TRUE</code> (assuming the database supports that syntax).</p>
 
 <p>You can provide a block to the plugin, which will be called with column name symbol, and should return an array of arguments to pass to <code>dataset_module.where</code>. Using this, you can change the method name and arguments for each column. This block is executed in the context of the model class.</p>
 

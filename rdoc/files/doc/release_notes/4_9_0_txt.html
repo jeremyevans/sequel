@@ -33,7 +33,7 @@ doc/release_notes/4.9.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Performance+Enhancements"><a href="#label-Performance+Enhancements">Performance Enhancements</a></h1>
 <ul><li>
 <p>Dataset::PlaceholderLiteralizer has been added as an optimization framework.  This allows you to record changes to a given dataset using placeholder arguments, and later quickly execute the query providing values for the placeholders.  This is similar in idea to prepared statements, except that the SQL for each query can change depending on the values for the placeholders.</p>
 
@@ -90,7 +90,7 @@ doc/release_notes/4.9.0.txt
 <p>Dataset#with_sql_{each,all,first,single_value,insert,update} have been added.  These methods take specific SQL and execute it on the database, returning the appropriate value.  They are significantly faster than the previous approach of with_sql(SQL).{each,all,first,single_value,insert,update}, as they don’t require cloning the dataset.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#create_join_table! and create_join_table? have been added, for consistency with create_table! and create_table?.</p>
 </li><li>
@@ -109,7 +109,7 @@ doc/release_notes/4.9.0.txt
 <p>The jdbc adapter now supports a :driver option, useful when <a href="../../../classes/Sequel.html"><code>Sequel</code></a> doesn’t have direct support for the underlying driver, and where java.sql.DriverManager.getConnection does not work correctly due to Java class loading issues.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Multiple corner cases in Dataset#eager_graph have been fixed.</p>
 </li><li>
@@ -132,7 +132,7 @@ doc/release_notes/4.9.0.txt
 <p>Adapters that emulate bitwise operators now do so using an append only design, similar to how all other queries are built in <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>In some cases <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer adds superfluous parentheses when constructing SQL strings.  If you are testing for specific SQL, this can cause test failures.</p>
 </li><li>

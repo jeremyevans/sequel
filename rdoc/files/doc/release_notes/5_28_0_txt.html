@@ -33,14 +33,14 @@ doc/release_notes/5.28.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>An any_not_empty extension has been added, for making Dataset#any? without a block be the same as !empty?.  This can result in a much faster database query.</p>
 </li><li>
 <p>An exclude_or_null extension has been added, adding a Dataset#exclude_or_null method that returns rows where the given expression is false or NULL.  This extension is supported on PostgreSQL, SQLite, MySQL, H2, and HSQLDB.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>When using the jdbc/postgresql adapter, calling with_fetch_size on a dataset will emit a warning.  This is because the driver will ignore the setting.</p>
 </li></ul>

@@ -33,7 +33,7 @@ lib/sequel/extensions/symbol_as_refinement.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The symbol_as_refinement extension adds a refinement that makes Symbol#as return Sequel::SQL::AliasedExpression instances.  It’s designed as a shortcut so that instead of:</p>
+<p>The <a href="symbol_as_refinement_rb.html">symbol_as_refinement</a> extension adds a refinement that makes Symbol#as return Sequel::SQL::AliasedExpression instances.  It’s designed as a shortcut so that instead of:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>) <span class="ruby-comment"># column AS alias</span>
 </pre>
@@ -53,7 +53,7 @@ lib/sequel/extensions/symbol_as_refinement.rb
 <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SymbolAs</span>
 </pre>
 
-<p>If you would like this extension to be enabled globally instead of as a refinement, use the symbol_as extension.</p>
+<p>If you would like this extension to be enabled globally instead of as a refinement, use the <a href="symbol_as_rb.html">symbol_as</a> extension.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/SymbolAs.html"><code>Sequel::SymbolAs</code></a></p>
 </div>

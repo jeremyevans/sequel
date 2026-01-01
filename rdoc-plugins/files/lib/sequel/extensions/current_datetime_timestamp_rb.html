@@ -33,9 +33,9 @@ lib/sequel/extensions/current_datetime_timestamp.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The current_datetime_timestamp extension makes Dataset#current_datetime return an object that operates like Sequel.datetime_class.now, but will be literalized as CURRENT_TIMESTAMP.</p>
+<p>The <a href="current_datetime_timestamp_rb.html">current_datetime_timestamp</a> extension makes Dataset#current_datetime return an object that operates like Sequel.datetime_class.now, but will be literalized as CURRENT_TIMESTAMP.</p>
 
-<p>This allows you to use the defaults_setter, timestamps, and touch model plugins and make sure that CURRENT_TIMESTAMP is used instead of a literalized timestamp value.</p>
+<p>This allows you to use the <a href="../plugins/defaults_setter_rb.html">defaults_setter</a>, timestamps, and touch model plugins and make sure that CURRENT_TIMESTAMP is used instead of a literalized timestamp value.</p>
 
 <p>The reason that CURRENT_TIMESTAMP is better than a literalized version of the timestamp is that it obeys correct transactional semantics (all calls to CURRENT_TIMESTAMP in the same transaction return the same timestamp, at least on some databases).</p>
 

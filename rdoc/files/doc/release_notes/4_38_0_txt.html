@@ -33,7 +33,7 @@ doc/release_notes/4.38.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel/SQL/NumericMethods.html#method-i-coerce"><code>Sequel::SQL::NumericMethods#coerce</code></a> has been added, which adds support for ruby’s coercion protocol when performing numeric operations.  Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> supported code like:</p>
 
@@ -59,14 +59,14 @@ doc/release_notes/4.38.0.txt
 <p>The postgres adapter now supports a :driver_options option when using the pg driver, which is passed directly to pg.  This can be used to specify a client SSL certificate or to specify the certificate authority root certificate when using :sslmode=&gt;‘verify-full’.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer uses after_commit/rollback database hooks by default if the after_commit/after_rollback model methods are not overridden. This provides a performance speedup, but the main benefit is that it no longer causes memory issues when saving a large number of model instances in a single transaction, and it also works with prepared transactions/2 phase commit.  You can still set use_after_commit_rollback= manually to force the after_commit/rollback setting.</p>
 
 <p>Note that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 will move after_commit/rollback model hooks to a plugin, and the default and recommended approach will be to use the database after_commit/rollback hooks in the after_save or similar model hooks.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> use_after_commit_rollback class and instance methods now return nil by default instead of true.  nil now indicates the default behavior of checking whether the appropriate model hook has been defined, and only adding a database hook if so.</p>
 </li></ul>

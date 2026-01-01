@@ -36,11 +36,11 @@ Sequel::Plugins::ColumnEncryption
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The column_encryption plugin adds support for encrypting the content of individual columns in a table.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/column_encryption_rb.html">column_encryption</a> plugin adds support for encrypting the content of individual columns in a table.</p>
 
 <p>Column values are encrypted with AES-256-GCM using a per-value cipher key derived from a key provided in the configuration using HMAC-SHA256.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Usage">Usage<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Usage"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Usage">Usage</a></h1>
 
 <p>If you would like to support encryption of columns in more than one model, you should probably load the plugin into the parent class of your models and specify the keys:</p>
 
@@ -120,7 +120,7 @@ Sequel::Plugins::ColumnEncryption
 
 <p>Note that changing the key_id, key string, or auth_data for an existing key will break decryption of values encrypted with that key.  If you would like to change any aspect of the key, add a new key, rotate to the new encryption key, and then remove the previous key, as described in the section below on key rotation.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Searching+Encrypted+Values">Searching Encrypted Values<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Searching+Encrypted+Values">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Searching+Encrypted+Values"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Searching+Encrypted+Values">Searching Encrypted Values</a></h1>
 
 <p>To search searchable encrypted columns, use <code>with_encrypted_value</code>.  This example code will return the model instance created in the code example in the previous section:</p>
 
@@ -130,7 +130,7 @@ Sequel::Plugins::ColumnEncryption
   <span class="ruby-identifier">first</span>
 </pre>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Encryption+Key+Rotation">Encryption Key Rotation<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Encryption+Key+Rotation">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Encryption+Key+Rotation"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Encryption+Key+Rotation">Encryption Key Rotation</a></h1>
 
 <p>To rotate encryption keys, add a new key above the existing key, with a new key ID:</p>
 
@@ -162,9 +162,9 @@ Sequel::Plugins::ColumnEncryption
 
 <p>Once an encryption key has been removed, after no data uses it, it is safe to reuse the same key id for a new key.  This approach allows for up to 256 concurrent keys in the same configuration.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Encrypting+Additional+Formats">Encrypting Additional Formats<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Encrypting+Additional+Formats">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Encrypting+Additional+Formats"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Encrypting+Additional+Formats">Encrypting Additional Formats</a></h1>
 
-<p>By default, the column_encryption plugin assumes that the decrypted data should be returned as a string, and a string will be passed to encrypt.  However, using the <code>:format</code> option, you can specify an alternate format.  For example, if you want to encrypt a JSON representation of the object, so that you can deal with an array/hash and automatically have it serialized with JSON and then encrypted when saving, and then deserialized with JSON after decryption when it is retrieved:</p>
+<p>By default, the <a href="../../../files/lib/sequel/plugins/column_encryption_rb.html">column_encryption</a> plugin assumes that the decrypted data should be returned as a string, and a string will be passed to encrypt.  However, using the <code>:format</code> option, you can specify an alternate format.  For example, if you want to encrypt a JSON representation of the object, so that you can deal with an array/hash and automatically have it serialized with JSON and then encrypted when saving, and then deserialized with JSON after decryption when it is retrieved:</p>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;json&#39;</span>
 <span class="ruby-constant">ConfidentialModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_encryption</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">enc</span><span class="ruby-operator">|</span>
@@ -181,11 +181,11 @@ Sequel::Plugins::ColumnEncryption
 
 <p>You can use both <code>:searchable</code> and <code>:format</code> together for searchable encrypted serialized columns.  However, note that this allows only exact searches of the serialized version of the data.  So for JSON, a search for <code>{&#39;a&#39;=&gt;1, &#39;b&#39;=&gt;2}</code> would not match <code>{&#39;b&#39;=&gt;2, &#39;a&#39;=&gt;1}</code> even though the objects are considered equal.  If this is an issue, make sure you use a serialization format where all equal objects are serialized to the same string.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Enforcing+Uniqueness">Enforcing Uniqueness<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Enforcing+Uniqueness">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Enforcing+Uniqueness"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Enforcing+Uniqueness">Enforcing Uniqueness</a></h1>
 
 <p>You cannot enforce uniqueness of unencrypted data at the database level if you also want to support key rotation.  However, absent key rotation, a unique index on the first 48 characters of the encrypted column can enforce uniqueness, as long as the column is searchable.  If the encrypted column is case-insensitive searchable, the uniqueness is case insensitive as well.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Column+Value+Cryptography-2FFormat">Column Value Cryptography/Format<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Column+Value+Cryptography-2FFormat">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Column+Value+Cryptography-2FFormat"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Column+Value+Cryptography-2FFormat">Column Value Cryptography/Format</a></h1>
 
 <p>Column values used by this plugin use the following format (<code>key</code> is specified in the plugin configuration and must be exactly 32 bytes):</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>column_value </td><td>
@@ -220,25 +220,25 @@ Sequel::Plugins::ColumnEncryption
 
 <p>The reason for the padding is so that a database administrator cannot be sure exactly how many bytes are in the column.  It is stored encrypted because otherwise the database administrator could calculate it by decoding the base64 data.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Unsupported+Features">Unsupported Features<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Unsupported+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Unsupported+Features"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Unsupported+Features">Unsupported Features</a></h1>
 
 <p>The following features are delibrately not supported:</p>
 
-<h2 id="module-Sequel::Plugins::ColumnEncryption-label-Compression">Compression<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Compression">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="module-Sequel::Plugins::ColumnEncryption-label-Compression"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Compression">Compression</a></h2>
 
 <p>Allowing compression with encryption is inviting security issues later. While padding can reduce the risk of compression with encryption, it does not eliminate it entirely.  Users that must have compression with encryption can use the <code>:format</code> option with a serializer that compresses and a deserializer that decompresses.</p>
 
-<h2 id="module-Sequel::Plugins::ColumnEncryption-label-Mixing+Encrypted-2FUnencrypted+Data">Mixing Encrypted/Unencrypted Data<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Mixing+Encrypted-2FUnencrypted+Data">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="module-Sequel::Plugins::ColumnEncryption-label-Mixing+Encrypted-2FUnencrypted+Data"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Mixing+Encrypted-2FUnencrypted+Data">Mixing Encrypted/Unencrypted Data</a></h2>
 
 <p>Mixing encrypted and unencrypted data increases the complexity and security risk, since there is a chance unencrypted data could look like encrypted data in the pathologic case. If you have existing unencrypted data that would like to encrypt, create a new column for the encrypted data, and then migrate the data from the unencrypted column to the encrypted column.  After all unencrypted values have been migrated, drop the unencrypted column.</p>
 
-<h2 id="module-Sequel::Plugins::ColumnEncryption-label-Arbitrary+Encryption+Schemes">Arbitrary Encryption Schemes<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Arbitrary+Encryption+Schemes">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="module-Sequel::Plugins::ColumnEncryption-label-Arbitrary+Encryption+Schemes"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Arbitrary+Encryption+Schemes">Arbitrary Encryption Schemes</a></h2>
 
 <p>Supporting arbitrary encryption schemes increases the complexity risk. If in the future AES-256-GCM is not considered a secure enough cipher, it is possible to extend the current format using the reserved values in the first two bytes of the header.</p>
 
-<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Caveats">Caveats<span><a href="#module-Sequel::Plugins::ColumnEncryption-label-Caveats">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::ColumnEncryption-label-Caveats"><a href="#module-Sequel::Plugins::ColumnEncryption-label-Caveats">Caveats</a></h1>
 
-<p>As column_encryption is a model plugin, it only works with using model instance methods. If you directly modify the database using a dataset or an external program that modifies the contents of the encrypted columns, you will probably corrupt the data. To make data corruption less likely, it is best to have a CHECK constraints on the encrypted column with a basic format and length check:</p>
+<p>As <a href="../../../files/lib/sequel/plugins/column_encryption_rb.html">column_encryption</a> is a model plugin, it only works with using model instance methods. If you directly modify the database using a dataset or an external program that modifies the contents of the encrypted columns, you will probably corrupt the data. To make data corruption less likely, it is best to have a CHECK constraints on the encrypted column with a basic format and length check:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:encrypted_column_name</span>]
@@ -262,7 +262,7 @@ Sequel::Plugins::ColumnEncryption
 
 <p>If the database supports transparent data encryption and you trust the database administrator, using the database support is probably a better approach.</p>
 
-<p>The column_encryption plugin is only supported on Ruby 2.3+ and when the Ruby openssl standard library supports the AES-256-GCM cipher.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/column_encryption_rb.html">column_encryption</a> plugin is only supported on Ruby 2.3+ and when the Ruby openssl standard library supports the AES-256-GCM cipher.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>

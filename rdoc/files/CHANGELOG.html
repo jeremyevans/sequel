@@ -33,7 +33,18 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h3 id="label-5.99.0+-282025-12-01-29"><a href="doc/release_notes/5_99_0_txt.html">5.99.0</a> (2025-12-01)<span><a href="#label-5.99.0+-282025-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.100.0+-282026-01-01-29"><a href="#label-5.100.0+-282026-01-01-29"><a href="doc/release_notes/5_100_0_txt.html">5.100.0</a> (2026-01-01)</a></h3>
+<ul><li>
+<p>Do not report associations with :is_used option as unused in the unused_associations plugin (jeremyevans)</p>
+</li><li>
+<p>Make Postgres::PGRange#to_s an alias of inspect, showing friendly output (jeremyevans)</p>
+</li><li>
+<p>Add single_statement_dataset_destroy plugin, so that dataset.destroy uses a single DELETE statement (jeremyevans)</p>
+</li><li>
+<p>Support :collate option in set_column_type (jeremyevans)</p>
+</li></ul>
+
+<h3 id="label-5.99.0+-282025-12-01-29"><a href="#label-5.99.0+-282025-12-01-29"><a href="doc/release_notes/5_99_0_txt.html">5.99.0</a> (2025-12-01)</a></h3>
 <ul><li>
 <p>Support passing a set as a Dataset#full_text_search terms argument on MSSQL, MySQL, and PostgreSQL (jeremyevans)</p>
 </li><li>
@@ -72,7 +83,7 @@ CHANGELOG
 <p>Add support for Database#indexes :invalid option on PostgresSQL (KirIgor, jeremyevans) (#2343)</p>
 </li></ul>
 
-<h3 id="label-5.98.0+-282025-11-01-29"><a href="doc/release_notes/5_98_0_txt.html">5.98.0</a> (2025-11-01)<span><a href="#label-5.98.0+-282025-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.98.0+-282025-11-01-29"><a href="#label-5.98.0+-282025-11-01-29"><a href="doc/release_notes/5_98_0_txt.html">5.98.0</a> (2025-11-01)</a></h3>
 <ul><li>
 <p>Make insert_returning_select use RETURNING when using table_select plugin (jeremyevans) (#2339)</p>
 </li><li>
@@ -91,7 +102,7 @@ CHANGELOG
 <p>Recognize sqlite:filename and amalgalite:filename connection URLs (jeremyevans) (#2334)</p>
 </li></ul>
 
-<h3 id="label-5.97.0+-282025-10-01-29"><a href="doc/release_notes/5_97_0_txt.html">5.97.0</a> (2025-10-01)<span><a href="#label-5.97.0+-282025-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.97.0+-282025-10-01-29"><a href="#label-5.97.0+-282025-10-01-29"><a href="doc/release_notes/5_97_0_txt.html">5.97.0</a> (2025-10-01)</a></h3>
 <ul><li>
 <p>Simplify Postgres::PGRange#inspect output (jeremyevans)</p>
 </li><li>
@@ -102,7 +113,7 @@ CHANGELOG
 <p>Add Database#rename_schema on PostgreSQL (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.96.0+-282025-09-01-29"><a href="doc/release_notes/5_96_0_txt.html">5.96.0</a> (2025-09-01)<span><a href="#label-5.96.0+-282025-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.96.0+-282025-09-01-29"><a href="#label-5.96.0+-282025-09-01-29"><a href="doc/release_notes/5_96_0_txt.html">5.96.0</a> (2025-09-01)</a></h3>
 <ul><li>
 <p>Support alter_table rename_constraint on PostgreSQL 9.2+ (jeremyevans) (#2274)</p>
 </li><li>
@@ -115,14 +126,14 @@ CHANGELOG
 <p>Support VIRTUAL generated columns on PostgreSQL 18+ using :virtual option (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.95.1+-282025-08-05-29">5.95.1 (2025-08-05)<span><a href="#label-5.95.1+-282025-08-05-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.95.1+-282025-08-05-29"><a href="#label-5.95.1+-282025-08-05-29">5.95.1 (2025-08-05)</a></h3>
 <ul><li>
 <p>Fix regression in <a href="doc/release_notes/5_95_0_txt.html">5.95.0</a> where :deferred would be ignored for unique and primary key constraints on PostgreSQL (jeremyevans) (#2321)</p>
 </li></ul>
 
-<h3 id="label-5.95.0+-282025-08-01-29"><a href="doc/release_notes/5_95_0_txt.html">5.95.0</a> (2025-08-01)<span><a href="#label-5.95.0+-282025-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.95.0+-282025-08-01-29"><a href="#label-5.95.0+-282025-08-01-29"><a href="doc/release_notes/5_95_0_txt.html">5.95.0</a> (2025-08-01)</a></h3>
 <ul><li>
-<p>Support num_waiting for the timed_queue and shared_timed_queue connection pools (jeremyevans)</p>
+<p>Support num_waiting for the <a href="lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> and shared_timed_queue connection pools (jeremyevans)</p>
 </li><li>
 <p>Add class_table_inheritance_constraint_validations plugin, supporting constraint validations for all of the model’s tables (sterlzbd, jeremyevans) (#2316, #2319)</p>
 </li><li>
@@ -141,7 +152,7 @@ CHANGELOG
 <p>Support :without_overlaps primary_key and unique option for WITHOUT OVERLAPS on PostgreSQL 18+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.94.0+-282025-07-01-29"><a href="doc/release_notes/5_94_0_txt.html">5.94.0</a> (2025-07-01)<span><a href="#label-5.94.0+-282025-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.94.0+-282025-07-01-29"><a href="#label-5.94.0+-282025-07-01-29"><a href="doc/release_notes/5_94_0_txt.html">5.94.0</a> (2025-07-01)</a></h3>
 <ul><li>
 <p>Support ALTER TABLE ALTER CONSTRAINT on PostgreSQL using alter_table alter_constraint method (jeremyevans)</p>
 </li><li>
@@ -164,7 +175,7 @@ CHANGELOG
 <p>Numerous minor performance improvements, mostly from rubocop-performance (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.93.0+-282025-06-01-29"><a href="doc/release_notes/5_93_0_txt.html">5.93.0</a> (2025-06-01)<span><a href="#label-5.93.0+-282025-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.93.0+-282025-06-01-29"><a href="#label-5.93.0+-282025-06-01-29"><a href="doc/release_notes/5_93_0_txt.html">5.93.0</a> (2025-06-01)</a></h3>
 <ul><li>
 <p>Add support to Dataset#explain for all PostgreSQL EXPLAIN options (jeremyevans)</p>
 </li><li>
@@ -181,7 +192,7 @@ CHANGELOG
 <p>Add Dataset#prepare_sql_type for setting the SQL type to use for prepare/call (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.92.0+-282025-05-01-29"><a href="doc/release_notes/5_92_0_txt.html">5.92.0</a> (2025-05-01)<span><a href="#label-5.92.0+-282025-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.92.0+-282025-05-01-29"><a href="#label-5.92.0+-282025-05-01-29"><a href="doc/release_notes/5_92_0_txt.html">5.92.0</a> (2025-05-01)</a></h3>
 <ul><li>
 <p>Use a qualified primary key for Model.paged_each and for the paged_operations plugin when using joined datasets (jeremyevans, davekaro) (#2299, #2300)</p>
 </li><li>
@@ -192,7 +203,7 @@ CHANGELOG
 <p>Support set_column_not_null as a reversible migration method (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.91.0+-282025-04-01-29"><a href="doc/release_notes/5_91_0_txt.html">5.91.0</a> (2025-04-01)<span><a href="#label-5.91.0+-282025-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.91.0+-282025-04-01-29"><a href="#label-5.91.0+-282025-04-01-29"><a href="doc/release_notes/5_91_0_txt.html">5.91.0</a> (2025-04-01)</a></h3>
 <ul><li>
 <p>Recognize datetime(N) types as :datetime again (broke in 5.32) (jeremyevans) (#2293)</p>
 </li><li>
@@ -207,7 +218,7 @@ CHANGELOG
 <p>Support allow_by_default option in forbid_lazy_load extension (brandur) (#2288)</p>
 </li></ul>
 
-<h3 id="label-5.90.0+-282025-03-01-29"><a href="doc/release_notes/5_90_0_txt.html">5.90.0</a> (2025-03-01)<span><a href="#label-5.90.0+-282025-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.90.0+-282025-03-01-29"><a href="#label-5.90.0+-282025-03-01-29"><a href="doc/release_notes/5_90_0_txt.html">5.90.0</a> (2025-03-01)</a></h3>
 <ul><li>
 <p>Avoid one query per enum when loading pg_enum extension when pg_array extension is already loaded (nick96) (#2278, #2279)</p>
 </li><li>
@@ -228,7 +239,7 @@ CHANGELOG
 <p>Do not call Model.name while holding a mutex when setting temporary names for anonymous modules (jeremyevans) (#2273)</p>
 </li></ul>
 
-<h3 id="label-5.89.0+-282025-02-01-29"><a href="doc/release_notes/5_89_0_txt.html">5.89.0</a> (2025-02-01)<span><a href="#label-5.89.0+-282025-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.89.0+-282025-02-01-29"><a href="#label-5.89.0+-282025-02-01-29"><a href="doc/release_notes/5_89_0_txt.html">5.89.0</a> (2025-02-01)</a></h3>
 <ul><li>
 <p>Make connection_validator extension handle case where Database#valid_connection? raises an exception (jeremyevans)</p>
 </li><li>
@@ -243,7 +254,7 @@ CHANGELOG
 <p>Add temporary names for internally defined anonymous classes and modules on Ruby 3.3+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.88.0+-282025-01-01-29"><a href="doc/release_notes/5_88_0_txt.html">5.88.0</a> (2025-01-01)<span><a href="#label-5.88.0+-282025-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.88.0+-282025-01-01-29"><a href="#label-5.88.0+-282025-01-01-29"><a href="doc/release_notes/5_88_0_txt.html">5.88.0</a> (2025-01-01)</a></h3>
 <ul><li>
 <p>Add subset_static_cache plugin for statically caching subsets of a model class (jeremyevans)</p>
 </li><li>
@@ -256,7 +267,7 @@ CHANGELOG
 <p>Fix strict_unused_block warnings when running specs on Ruby 3.4 (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.87.0+-282024-12-01-29"><a href="doc/release_notes/5_87_0_txt.html">5.87.0</a> (2024-12-01)<span><a href="#label-5.87.0+-282024-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.87.0+-282024-12-01-29"><a href="#label-5.87.0+-282024-12-01-29"><a href="doc/release_notes/5_87_0_txt.html">5.87.0</a> (2024-12-01)</a></h3>
 <ul><li>
 <p>Add pg_schema_caching extension, for reloading OIDs for custom types when loading cached schema (jeremyevans)</p>
 </li><li>
@@ -271,7 +282,7 @@ CHANGELOG
 <p>Do not limit imports to 40 rows at a time if using pg_auto_parameterize extension with the no_auto_parameterize method (davekaro) (#2242)</p>
 </li></ul>
 
-<h3 id="label-5.86.0+-282024-11-01-29"><a href="doc/release_notes/5_86_0_txt.html">5.86.0</a> (2024-11-01)<span><a href="#label-5.86.0+-282024-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.86.0+-282024-11-01-29"><a href="#label-5.86.0+-282024-11-01-29"><a href="doc/release_notes/5_86_0_txt.html">5.86.0</a> (2024-11-01)</a></h3>
 <ul><li>
 <p>Support the :disable_dqs Database option in the sqlite adapter to disable treating double quoted values as strings (jeremyevans) (#2233)</p>
 </li><li>
@@ -288,7 +299,7 @@ CHANGELOG
 <p>Handle FROM tables that are SQL::DelayedEvaluation instances when trying to get primary key values after INSERT on PostgreSQL (tomasmiguez) (#2230, #2232)</p>
 </li></ul>
 
-<h3 id="label-5.85.0+-282024-10-01-29"><a href="doc/release_notes/5_85_0_txt.html">5.85.0</a> (2024-10-01)<span><a href="#label-5.85.0+-282024-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.85.0+-282024-10-01-29"><a href="#label-5.85.0+-282024-10-01-29"><a href="doc/release_notes/5_85_0_txt.html">5.85.0</a> (2024-10-01)</a></h3>
 <ul><li>
 <p>Support json_table on PostgreSQL 17+ in the pg_json_ops extension (jeremyevans)</p>
 </li><li>
@@ -296,10 +307,10 @@ CHANGELOG
 </li><li>
 <p>Add dataset_run extension, for building SQL using datasets, and running with Database#run (jeremyevans)</p>
 </li><li>
-<p>Switch default connection pool to timed_queue on Ruby 3.2+ (jeremyevans)</p>
+<p>Switch default connection pool to <a href="lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> on Ruby 3.2+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.84.0+-282024-09-01-29"><a href="doc/release_notes/5_84_0_txt.html">5.84.0</a> (2024-09-01)<span><a href="#label-5.84.0+-282024-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.84.0+-282024-09-01-29"><a href="#label-5.84.0+-282024-09-01-29"><a href="doc/release_notes/5_84_0_txt.html">5.84.0</a> (2024-09-01)</a></h3>
 <ul><li>
 <p>Support creating VIRTUAL tables on SQLite via the create_table :using option (jeremyevans)</p>
 </li><li>
@@ -308,12 +319,12 @@ CHANGELOG
 <p>Remove documentation from the gem to reduce gem size by 25% (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.83.1+-282024-08-08-29">5.83.1 (2024-08-08)<span><a href="#label-5.83.1+-282024-08-08-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.83.1+-282024-08-08-29"><a href="#label-5.83.1+-282024-08-08-29">5.83.1 (2024-08-08)</a></h3>
 <ul><li>
 <p>Restore unescaping of database file paths in the sqlite and amalgalite adapters (jeremyevans) (#2201)</p>
 </li></ul>
 
-<h3 id="label-5.83.0+-282024-08-01-29"><a href="doc/release_notes/5_83_0_txt.html">5.83.0</a> (2024-08-01)<span><a href="#label-5.83.0+-282024-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.83.0+-282024-08-01-29"><a href="#label-5.83.0+-282024-08-01-29"><a href="doc/release_notes/5_83_0_txt.html">5.83.0</a> (2024-08-01)</a></h3>
 <ul><li>
 <p>Make optimistic_locking plugin not keep lock column in changed_columns after updating instance (jeremyevans) (#2196)</p>
 </li><li>
@@ -330,7 +341,7 @@ CHANGELOG
 <p>Simplify Database#inspect output to database_type, host, database, and user (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.82.0+-282024-07-01-29"><a href="doc/release_notes/5_82_0_txt.html">5.82.0</a> (2024-07-01)<span><a href="#label-5.82.0+-282024-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.82.0+-282024-07-01-29"><a href="#label-5.82.0+-282024-07-01-29"><a href="doc/release_notes/5_82_0_txt.html">5.82.0</a> (2024-07-01)</a></h3>
 <ul><li>
 <p>Limit tactically eager loading to objects that have the same association reflection (jeremyevans) (#2181)</p>
 </li><li>
@@ -345,7 +356,7 @@ CHANGELOG
 <p>Support :connect_opts_proc Database option for late binding options (jeremyevans) (#2164)</p>
 </li></ul>
 
-<h3 id="label-5.81.0+-282024-06-01-29"><a href="doc/release_notes/5_81_0_txt.html">5.81.0</a> (2024-06-01)<span><a href="#label-5.81.0+-282024-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.81.0+-282024-06-01-29"><a href="#label-5.81.0+-282024-06-01-29"><a href="doc/release_notes/5_81_0_txt.html">5.81.0</a> (2024-06-01)</a></h3>
 <ul><li>
 <p>Fix ignored block warnings in a couple plugin apply methods on Ruby 3.4 (jeremyevans)</p>
 </li><li>
@@ -354,7 +365,7 @@ CHANGELOG
 <p>Add temporarily_release_connection Database extension for multithreaded transactional testing (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.80.0+-282024-05-01-29"><a href="doc/release_notes/5_80_0_txt.html">5.80.0</a> (2024-05-01)<span><a href="#label-5.80.0+-282024-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.80.0+-282024-05-01-29"><a href="#label-5.80.0+-282024-05-01-29"><a href="doc/release_notes/5_80_0_txt.html">5.80.0</a> (2024-05-01)</a></h3>
 <ul><li>
 <p>Support Dataset#skip_locked on MariaDB 10.6+ (simi) (#2150)</p>
 </li><li>
@@ -363,7 +374,7 @@ CHANGELOG
 <p>Add provenance dataset extension, which includes comments in queries showing how and where the dataset was built (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.79.0+-282024-04-01-29"><a href="doc/release_notes/5_79_0_txt.html">5.79.0</a> (2024-04-01)<span><a href="#label-5.79.0+-282024-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.79.0+-282024-04-01-29"><a href="#label-5.79.0+-282024-04-01-29"><a href="doc/release_notes/5_79_0_txt.html">5.79.0</a> (2024-04-01)</a></h3>
 <ul><li>
 <p>Support create_or_replace_view with :materialized option on PostgreSQL (nashby) (#2144)</p>
 </li><li>
@@ -372,7 +383,7 @@ CHANGELOG
 <p>Add Dataset#select_prepend for prepending to the current selected columns (jeremyevans) (#2139)</p>
 </li></ul>
 
-<h3 id="label-5.78.0+-282024-03-01-29"><a href="doc/release_notes/5_78_0_txt.html">5.78.0</a> (2024-03-01)<span><a href="#label-5.78.0+-282024-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.78.0+-282024-03-01-29"><a href="#label-5.78.0+-282024-03-01-29"><a href="doc/release_notes/5_78_0_txt.html">5.78.0</a> (2024-03-01)</a></h3>
 <ul><li>
 <p>Support SQLite 3.45+ jsonb functions in the sqlite_json_ops extension (jeremyevans) (#2133)</p>
 </li><li>
@@ -383,7 +394,7 @@ CHANGELOG
 <p>Support Database#with_advisory_lock on PostgreSQL, MySQL, and Microsoft SQL Server (jeremyevans) (#2089)</p>
 </li></ul>
 
-<h3 id="label-5.77.0+-282024-02-01-29"><a href="doc/release_notes/5_77_0_txt.html">5.77.0</a> (2024-02-01)<span><a href="#label-5.77.0+-282024-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.77.0+-282024-02-01-29"><a href="#label-5.77.0+-282024-02-01-29"><a href="doc/release_notes/5_77_0_txt.html">5.77.0</a> (2024-02-01)</a></h3>
 <ul><li>
 <p>Support create_table :without_rowid option on SQLite (loranger32) (#2126)</p>
 </li><li>
@@ -397,14 +408,14 @@ CHANGELOG
 </li><li>
 <p>Respect list plugin :top option when inserting the first row into the model’s table (johanmagnusson) (#2115)</p>
 </li><li>
-<p>Switch default connection pool to timed_queue on Ruby 3.4+ (jeremyevans)</p>
+<p>Switch default connection pool to <a href="lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> on Ruby 3.4+ (jeremyevans)</p>
 </li><li>
 <p>Support on_duplicate_columns={raise,warn} parameter in connection URL when using duplicate_columns_handler extension (jeremyevans)</p>
 </li><li>
 <p>Add transaction_connection_validator extension for retrying transactions on new connection if there is a disconnect error when starting transaction (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.76.0+-282024-01-01-29"><a href="doc/release_notes/5_76_0_txt.html">5.76.0</a> (2024-01-01)<span><a href="#label-5.76.0+-282024-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.76.0+-282024-01-01-29"><a href="#label-5.76.0+-282024-01-01-29"><a href="doc/release_notes/5_76_0_txt.html">5.76.0</a> (2024-01-01)</a></h3>
 <ul><li>
 <p>Improve performance and flexibility of regexp matching in sqlite adapter (paddor) (#2108)</p>
 </li><li>
@@ -433,7 +444,7 @@ CHANGELOG
 <p>Add auto_cast_date_and_time extension, for casting date and time values using SQL standard functions (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.75.0+-282023-12-01-29"><a href="doc/release_notes/5_75_0_txt.html">5.75.0</a> (2023-12-01)<span><a href="#label-5.75.0+-282023-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.75.0+-282023-12-01-29"><a href="#label-5.75.0+-282023-12-01-29"><a href="doc/release_notes/5_75_0_txt.html">5.75.0</a> (2023-12-01)</a></h3>
 <ul><li>
 <p>Make any_not_empty? extension support passing pattern argument to any? (jeremyevans) (#2100)</p>
 </li><li>
@@ -446,7 +457,7 @@ CHANGELOG
 <p>Add Database#{defer,immediate}_constraints on PostgreSQL for changing handling of deferrable constraints in a transaction (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.74.0+-282023-11-01-29"><a href="doc/release_notes/5_74_0_txt.html">5.74.0</a> (2023-11-01)<span><a href="#label-5.74.0+-282023-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.74.0+-282023-11-01-29"><a href="#label-5.74.0+-282023-11-01-29"><a href="doc/release_notes/5_74_0_txt.html">5.74.0</a> (2023-11-01)</a></h3>
 <ul><li>
 <p>Make generated columns show up in Database#schema when using SQLite 3.37+ (jeremyevans) (#2087)</p>
 </li><li>
@@ -457,7 +468,7 @@ CHANGELOG
 <p>Avoid infinite loop when handling exceptions with a cause loop in jdbc adapter (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.73.0+-282023-10-01-29"><a href="doc/release_notes/5_73_0_txt.html">5.73.0</a> (2023-10-01)<span><a href="#label-5.73.0+-282023-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.73.0+-282023-10-01-29"><a href="#label-5.73.0+-282023-10-01-29"><a href="doc/release_notes/5_73_0_txt.html">5.73.0</a> (2023-10-01)</a></h3>
 <ul><li>
 <p>Handle disconnect errors in ibmdb and jdbc/db2 adapters (jeremyevans) (#2083)</p>
 </li><li>
@@ -476,7 +487,7 @@ CHANGELOG
 <p>Stop using base64 library in column_encryption plugin (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.72.0+-282023-09-01-29"><a href="doc/release_notes/5_72_0_txt.html">5.72.0</a> (2023-09-01)<span><a href="#label-5.72.0+-282023-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.72.0+-282023-09-01-29"><a href="#label-5.72.0+-282023-09-01-29"><a href="doc/release_notes/5_72_0_txt.html">5.72.0</a> (2023-09-01)</a></h3>
 <ul><li>
 <p>Sort caches before marshalling when using schema_caching, index_caching, static_cache_cache, and pg_auto_constraint_validations (jeremyevans)</p>
 </li><li>
@@ -487,7 +498,7 @@ CHANGELOG
 <p>Fix literalization of infinite and NaN float values in PostgreSQL array bound variables (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.71.0+-282023-08-01-29"><a href="doc/release_notes/5_71_0_txt.html">5.71.0</a> (2023-08-01)<span><a href="#label-5.71.0+-282023-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.71.0+-282023-08-01-29"><a href="#label-5.71.0+-282023-08-01-29"><a href="doc/release_notes/5_71_0_txt.html">5.71.0</a> (2023-08-01)</a></h3>
 <ul><li>
 <p>Support ILIKE ANY on PostgreSQL by not forcing the use of ESCAPE for ILIKE (gilesbowkett) (#2066)</p>
 </li><li>
@@ -498,7 +509,7 @@ CHANGELOG
 <p>Make set_column_allow_null method reversible in migrations (enescakir) (#2060)</p>
 </li></ul>
 
-<h3 id="label-5.70.0+-282023-07-01-29"><a href="doc/release_notes/5_70_0_txt.html">5.70.0</a> (2023-07-01)<span><a href="#label-5.70.0+-282023-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.70.0+-282023-07-01-29"><a href="#label-5.70.0+-282023-07-01-29"><a href="doc/release_notes/5_70_0_txt.html">5.70.0</a> (2023-07-01)</a></h3>
 <ul><li>
 <p>Make static_cache plugin better handle cases where forbid_lazy_load plugin is already loaded (jeremyevans)</p>
 </li><li>
@@ -506,16 +517,16 @@ CHANGELOG
 </li><li>
 <p>Support SEQUEL_DEFAULT_CONNECTION_POOL environment variable for choosing connection pool when :pool_class Database option is not set (jeremyevans)</p>
 </li><li>
-<p>Add sharded_timed_queue connection pool (jeremyevans)</p>
+<p>Add <a href="lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pool (jeremyevans)</p>
 </li><li>
-<p>Make connection_{validator,expiration} and async_thread_pool extensions work with timed_queue connection pool (jeremyevans)</p>
+<p>Make connection_{validator,expiration} and async_thread_pool extensions work with <a href="lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> connection pool (jeremyevans)</p>
 </li><li>
 <p>Make connection_{validator,expiration} extensions raise error when used with single threaded pools (HoneyryderChuck, jeremyevans) (#2049)</p>
 </li><li>
 <p>Workaround possible resource starvation in threaded connection pool (ioquatix) (#2048)</p>
 </li></ul>
 
-<h3 id="label-5.69.0+-282023-06-01-29"><a href="doc/release_notes/5_69_0_txt.html">5.69.0</a> (2023-06-01)<span><a href="#label-5.69.0+-282023-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.69.0+-282023-06-01-29"><a href="#label-5.69.0+-282023-06-01-29"><a href="doc/release_notes/5_69_0_txt.html">5.69.0</a> (2023-06-01)</a></h3>
 <ul><li>
 <p>Avoid unsupported flag warning when using the mysql adapter with ruby-mysql 3+ (jeremyevans)</p>
 </li><li>
@@ -526,7 +537,7 @@ CHANGELOG
 <p>Add trilogy adapter (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.68.0+-282023-05-01-29"><a href="doc/release_notes/5_68_0_txt.html">5.68.0</a> (2023-05-01)<span><a href="#label-5.68.0+-282023-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.68.0+-282023-05-01-29"><a href="#label-5.68.0+-282023-05-01-29"><a href="doc/release_notes/5_68_0_txt.html">5.68.0</a> (2023-05-01)</a></h3>
 <ul><li>
 <p>Add validation_helpers_generic_type_messages plugin for more useful type validation failure messages (jeremyevans) (#2028)</p>
 </li><li>
@@ -539,7 +550,7 @@ CHANGELOG
 <p>Include :min_value and :max_value schema entries for date/timestamp/timestamptz columns on PostgreSQL 9.6+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.67.0+-282023-04-01-29"><a href="doc/release_notes/5_67_0_txt.html">5.67.0</a> (2023-04-01)<span><a href="#label-5.67.0+-282023-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.67.0+-282023-04-01-29"><a href="#label-5.67.0+-282023-04-01-29"><a href="doc/release_notes/5_67_0_txt.html">5.67.0</a> (2023-04-01)</a></h3>
 <ul><li>
 <p>Fix dumping of string column sizes in the schema dumper on MSSQL (jeremyevans) (#2013)</p>
 </li><li>
@@ -554,7 +565,7 @@ CHANGELOG
 <p>Add set_literalizer extension, for treating set usage in datasets similar to array usage (jeremyevans) (#1997)</p>
 </li></ul>
 
-<h3 id="label-5.66.0+-282023-03-01-29"><a href="doc/release_notes/5_66_0_txt.html">5.66.0</a> (2023-03-01)<span><a href="#label-5.66.0+-282023-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.66.0+-282023-03-01-29"><a href="#label-5.66.0+-282023-03-01-29"><a href="doc/release_notes/5_66_0_txt.html">5.66.0</a> (2023-03-01)</a></h3>
 <ul><li>
 <p>Recognize SQLite error related to strict tables as a constraint violation when using the amalgalite adapter (jeremyevans)</p>
 </li><li>
@@ -565,7 +576,7 @@ CHANGELOG
 <p>Make Dataset#empty? correctly handle datasets with custom SQL or using Dataset#values where the first value is NULL (andy-k, jeremyevans) (#1990)</p>
 </li></ul>
 
-<h3 id="label-5.65.0+-282023-02-01-29"><a href="doc/release_notes/5_65_0_txt.html">5.65.0</a> (2023-02-01)<span><a href="#label-5.65.0+-282023-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.65.0+-282023-02-01-29"><a href="#label-5.65.0+-282023-02-01-29"><a href="doc/release_notes/5_65_0_txt.html">5.65.0</a> (2023-02-01)</a></h3>
 <ul><li>
 <p>Allow pg_auto_parameterize extension to use placeholder loaders (jeremyevans)</p>
 </li><li>
@@ -574,7 +585,7 @@ CHANGELOG
 <p>Make Database#indexes return indexes for partitioned tables on PostgreSQL 11+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.64.0+-282023-01-01-29"><a href="doc/release_notes/5_64_0_txt.html">5.64.0</a> (2023-01-01)<span><a href="#label-5.64.0+-282023-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.64.0+-282023-01-01-29"><a href="#label-5.64.0+-282023-01-01-29"><a href="doc/release_notes/5_64_0_txt.html">5.64.0</a> (2023-01-01)</a></h3>
 <ul><li>
 <p>Make :db_type column schema entries on SQLAnywhere include precision/scale information (jeremyevans)</p>
 </li><li>
@@ -585,7 +596,7 @@ CHANGELOG
 <p>Make many_through_many and many_through_one associations support eager_graph callbacks (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.63.0+-282022-12-01-29"><a href="doc/release_notes/5_63_0_txt.html">5.63.0</a> (2022-12-01)<span><a href="#label-5.63.0+-282022-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.63.0+-282022-12-01-29"><a href="#label-5.63.0+-282022-12-01-29"><a href="doc/release_notes/5_63_0_txt.html">5.63.0</a> (2022-12-01)</a></h3>
 <ul><li>
 <p>Make validates_associated plugin avoid database type errors for non-integer association keys (jeremyevans) (#1968)</p>
 </li><li>
@@ -600,7 +611,7 @@ CHANGELOG
 <p>Skip use of JRuby workaround on JRuby 9.3.9.0+ in named_timezones extension as JRuby fixed the related bug (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.62.0+-282022-11-01-29"><a href="doc/release_notes/5_62_0_txt.html">5.62.0</a> (2022-11-01)<span><a href="#label-5.62.0+-282022-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.62.0+-282022-11-01-29"><a href="#label-5.62.0+-282022-11-01-29"><a href="doc/release_notes/5_62_0_txt.html">5.62.0</a> (2022-11-01)</a></h3>
 <ul><li>
 <p>Add back the pg_auto_parameterize extension for automatically using bound variables when using postgres adapter with pg driver (jeremyevans)</p>
 </li><li>
@@ -633,7 +644,7 @@ CHANGELOG
 <p>Support server/shard specific :after_connect and :connect_sqls Database options (jeremyevans) (#1935)</p>
 </li></ul>
 
-<h3 id="label-5.61.0+-282022-10-01-29"><a href="doc/release_notes/5_61_0_txt.html">5.61.0</a> (2022-10-01)<span><a href="#label-5.61.0+-282022-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.61.0+-282022-10-01-29"><a href="#label-5.61.0+-282022-10-01-29"><a href="doc/release_notes/5_61_0_txt.html">5.61.0</a> (2022-10-01)</a></h3>
 <ul><li>
 <p>Make Database#foreign_key_list on PostgreSQL return results for partitioned tables (jeremyevans)</p>
 </li><li>
@@ -646,12 +657,12 @@ CHANGELOG
 <p>Fix handling of timestamps before the date of calendar reform when using pg_extended_date_support extension on Ruby 3.2 (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.60.1+-282022-09-02-29">5.60.1 (2022-09-02)<span><a href="#label-5.60.1+-282022-09-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.60.1+-282022-09-02-29"><a href="#label-5.60.1+-282022-09-02-29">5.60.1 (2022-09-02)</a></h3>
 <ul><li>
 <p>Revert conversion of respond_to? to defined?, as it breaks with unused refinements on Ruby 2 (jeremyevans) (#1919)</p>
 </li></ul>
 
-<h3 id="label-5.60.0+-282022-09-01-29"><a href="doc/release_notes/5_60_0_txt.html">5.60.0</a> (2022-09-01)<span><a href="#label-5.60.0+-282022-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.60.0+-282022-09-01-29"><a href="#label-5.60.0+-282022-09-01-29"><a href="doc/release_notes/5_60_0_txt.html">5.60.0</a> (2022-09-01)</a></h3>
 <ul><li>
 <p>Support arbitrary expressions for date_arithmetic interval values on PostgreSQL 9.4+ (jeremyevans)</p>
 </li><li>
@@ -662,7 +673,7 @@ CHANGELOG
 <p>Convert most respond_to? calls to equivalent defined? for better performance (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.59.0+-282022-08-01-29"><a href="doc/release_notes/5_59_0_txt.html">5.59.0</a> (2022-08-01)<span><a href="#label-5.59.0+-282022-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.59.0+-282022-08-01-29"><a href="#label-5.59.0+-282022-08-01-29"><a href="doc/release_notes/5_59_0_txt.html">5.59.0</a> (2022-08-01)</a></h3>
 <ul><li>
 <p>Set :allow_eager association option to false for instance specific associations without eager loaders (jeremyevans)</p>
 </li><li>
@@ -681,14 +692,14 @@ CHANGELOG
 <p>Support sequel-postgres-pr driver in the postgres adapter (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.58.0+-282022-07-01-29"><a href="doc/release_notes/5_58_0_txt.html">5.58.0</a> (2022-07-01)<span><a href="#label-5.58.0+-282022-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.58.0+-282022-07-01-29"><a href="#label-5.58.0+-282022-07-01-29"><a href="doc/release_notes/5_58_0_txt.html">5.58.0</a> (2022-07-01)</a></h3>
 <ul><li>
 <p>Support :disable_split_materialized Database option on MySQL to work around optimizer bug in MariaDB 10.5+ affecting association tests (jeremyevans)</p>
 </li><li>
 <p>Add Dataset#merge* methods to support MERGE statement on PostgreSQL 15+, MSSQL, Oracle, DB2, H2, HSQLDB, and Derby (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.57.0+-282022-06-01-29"><a href="doc/release_notes/5_57_0_txt.html">5.57.0</a> (2022-06-01)<span><a href="#label-5.57.0+-282022-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.57.0+-282022-06-01-29"><a href="#label-5.57.0+-282022-06-01-29"><a href="doc/release_notes/5_57_0_txt.html">5.57.0</a> (2022-06-01)</a></h3>
 <ul><li>
 <p>Make Database#create_function on PostgreSQL accept :parallel option (bananarne) (#1870)</p>
 </li><li>
@@ -697,7 +708,7 @@ CHANGELOG
 <p>Add is_distinct_from extension with support for the IS DISTINCT FROM operator (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.56.0+-282022-05-01-29"><a href="doc/release_notes/5_56_0_txt.html">5.56.0</a> (2022-05-01)<span><a href="#label-5.56.0+-282022-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.56.0+-282022-05-01-29"><a href="#label-5.56.0+-282022-05-01-29"><a href="doc/release_notes/5_56_0_txt.html">5.56.0</a> (2022-05-01)</a></h3>
 <ul><li>
 <p>Make alter_table add_column/add_foreign_key methods support :index option to create an index on the column (jeremyevans)</p>
 </li><li>
@@ -708,7 +719,7 @@ CHANGELOG
 <p>Recognize “INTEGER” type same as “integer” type in the schema dumper, helpful on SQLite <a href="doc/release_notes/3_37_0_txt.html">3.37.0</a>+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.55.0+-282022-04-01-29"><a href="doc/release_notes/5_55_0_txt.html">5.55.0</a> (2022-04-01)<span><a href="#label-5.55.0+-282022-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.55.0+-282022-04-01-29"><a href="#label-5.55.0+-282022-04-01-29"><a href="doc/release_notes/5_55_0_txt.html">5.55.0</a> (2022-04-01)</a></h3>
 <ul><li>
 <p>Support :setup_regexp_function Database option in the sqlite adapter to allow the use of regexps when querying (jeremyevans)</p>
 </li><li>
@@ -717,12 +728,12 @@ CHANGELOG
 <p>Fix placeholder literalizer optimization for dataset aggregate methods on a model dataset (belousovAV) (#1847, #1848)</p>
 </li></ul>
 
-<h3 id="label-5.54.0+-282022-03-01-29"><a href="doc/release_notes/5_54_0_txt.html">5.54.0</a> (2022-03-01)<span><a href="#label-5.54.0+-282022-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.54.0+-282022-03-01-29"><a href="#label-5.54.0+-282022-03-01-29"><a href="doc/release_notes/5_54_0_txt.html">5.54.0</a> (2022-03-01)</a></h3>
 <ul><li>
 <p>Add enum plugin for treating columns as enums in a model (jeremyevans) (#1839)</p>
 </li></ul>
 
-<h3 id="label-5.53.0+-282022-02-01-29"><a href="doc/release_notes/5_53_0_txt.html">5.53.0</a> (2022-02-01)<span><a href="#label-5.53.0+-282022-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.53.0+-282022-02-01-29"><a href="#label-5.53.0+-282022-02-01-29"><a href="doc/release_notes/5_53_0_txt.html">5.53.0</a> (2022-02-01)</a></h3>
 <ul><li>
 <p>Make Dataset#_sql_comment private when using the Database sql_comments extension (jeremyevans)</p>
 </li><li>
@@ -735,7 +746,7 @@ CHANGELOG
 <p>Fix error handling if trying to setup column_encryption plugin without keys (jeremyevans) (#1815)</p>
 </li></ul>
 
-<h3 id="label-5.52.0+-282022-01-01-29"><a href="doc/release_notes/5_52_0_txt.html">5.52.0</a> (2022-01-01)<span><a href="#label-5.52.0+-282022-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.52.0+-282022-01-01-29"><a href="#label-5.52.0+-282022-01-01-29"><a href="doc/release_notes/5_52_0_txt.html">5.52.0</a> (2022-01-01)</a></h3>
 <ul><li>
 <p>Use Class#subclasses if available in the subclasses plugin, instead of a custom Model.subclasses accessor (jeremyevans)</p>
 </li><li>
@@ -764,7 +775,7 @@ CHANGELOG
 <p>Fix sql_comments extension to not modify cached SQL for a dataset (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.51.0+-282021-12-01-29"><a href="doc/release_notes/5_51_0_txt.html">5.51.0</a> (2021-12-01)<span><a href="#label-5.51.0+-282021-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.51.0+-282021-12-01-29"><a href="#label-5.51.0+-282021-12-01-29"><a href="doc/release_notes/5_51_0_txt.html">5.51.0</a> (2021-12-01)</a></h3>
 <ul><li>
 <p>Make eager loading via tactical_eager_loading no longer modify objects who already have a cached value for the association (jeremyevans)</p>
 </li><li>
@@ -779,7 +790,7 @@ CHANGELOG
 <p>Avoid method redefined verbose mode warnings in lazy_attributes plugin (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.50.0+-282021-11-01-29"><a href="doc/release_notes/5_50_0_txt.html">5.50.0</a> (2021-11-01)<span><a href="#label-5.50.0+-282021-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.50.0+-282021-11-01-29"><a href="#label-5.50.0+-282021-11-01-29"><a href="doc/release_notes/5_50_0_txt.html">5.50.0</a> (2021-11-01)</a></h3>
 <ul><li>
 <p>Make Migrator :allow_missing_migration_files also allow down migrations where the current database version is greater than the last migration file version (francisconeves97) (#1789)</p>
 </li><li>
@@ -798,7 +809,7 @@ CHANGELOG
 <p>Add pg_multirange extension with support for PostgreSQL 14+ multirange types (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.49.0+-282021-10-01-29"><a href="doc/release_notes/5_49_0_txt.html">5.49.0</a> (2021-10-01)<span><a href="#label-5.49.0+-282021-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.49.0+-282021-10-01-29"><a href="#label-5.49.0+-282021-10-01-29"><a href="doc/release_notes/5_49_0_txt.html">5.49.0</a> (2021-10-01)</a></h3>
 <ul><li>
 <p>Switch block_given? usage to defined?(yield) (jeremyevans)</p>
 </li><li>
@@ -819,7 +830,7 @@ CHANGELOG
 <p>Add Model#validates_no_null_byte to validation_helpers plugin (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.48.0+-282021-09-01-29"><a href="doc/release_notes/5_48_0_txt.html">5.48.0</a> (2021-09-01)<span><a href="#label-5.48.0+-282021-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.48.0+-282021-09-01-29"><a href="#label-5.48.0+-282021-09-01-29"><a href="doc/release_notes/5_48_0_txt.html">5.48.0</a> (2021-09-01)</a></h3>
 <ul><li>
 <p>Make the unused_associations plugin association reflection tracking work correctly when combining coverage runs (jeremyevans)</p>
 </li><li>
@@ -828,7 +839,7 @@ CHANGELOG
 <p>Add Model::Errors#full_message private method for easiest i18n support for errors with multiple attributes (jeremyevans) (#1779)</p>
 </li></ul>
 
-<h3 id="label-5.47.0+-282021-08-01-29"><a href="doc/release_notes/5_47_0_txt.html">5.47.0</a> (2021-08-01)<span><a href="#label-5.47.0+-282021-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.47.0+-282021-08-01-29"><a href="#label-5.47.0+-282021-08-01-29"><a href="doc/release_notes/5_47_0_txt.html">5.47.0</a> (2021-08-01)</a></h3>
 <ul><li>
 <p>Make the unused_associations plugin track access to association reflections to determine whether associations are used (jeremyevans)</p>
 </li><li>
@@ -843,14 +854,14 @@ CHANGELOG
 <p>Support Dataset#returning on SQLite 3.35+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.46.0+-282021-07-01-29"><a href="doc/release_notes/5_46_0_txt.html">5.46.0</a> (2021-07-01)<span><a href="#label-5.46.0+-282021-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.46.0+-282021-07-01-29"><a href="#label-5.46.0+-282021-07-01-29"><a href="doc/release_notes/5_46_0_txt.html">5.46.0</a> (2021-07-01)</a></h3>
 <ul><li>
 <p>Add unused_associations plugin, for determining which associations and association methods are not used (jeremyevans)</p>
 </li><li>
 <p>Make nil :setter/:adder/:remover/:clearer association options not create related methods (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.45.0+-282021-06-01-29"><a href="doc/release_notes/5_45_0_txt.html">5.45.0</a> (2021-06-01)<span><a href="#label-5.45.0+-282021-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.45.0+-282021-06-01-29"><a href="#label-5.45.0+-282021-06-01-29"><a href="doc/release_notes/5_45_0_txt.html">5.45.0</a> (2021-06-01)</a></h3>
 <ul><li>
 <p>Fix handling of NULL values in boolean columns in the ODBC adapter (jeremyevans) (#1765)</p>
 </li><li>
@@ -861,7 +872,7 @@ CHANGELOG
 <p>Use ALTER TABLE DROP COLUMN for dropping columns on SQLite 3.35+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.44.0+-282021-05-01-29"><a href="doc/release_notes/5_44_0_txt.html">5.44.0</a> (2021-05-01)<span><a href="#label-5.44.0+-282021-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.44.0+-282021-05-01-29"><a href="#label-5.44.0+-282021-05-01-29"><a href="doc/release_notes/5_44_0_txt.html">5.44.0</a> (2021-05-01)</a></h3>
 <ul><li>
 <p>Add concurrent_eager_loading plugin, for eager loading multiple associations concurrently using separate threads (jeremyevans)</p>
 </li><li>
@@ -872,12 +883,12 @@ CHANGELOG
 <p>Support dropping non-composite unique constraints on SQLite (jeremyevans) (#1755)</p>
 </li></ul>
 
-<h3 id="label-5.43.0+-282021-04-01-29"><a href="doc/release_notes/5_43_0_txt.html">5.43.0</a> (2021-04-01)<span><a href="#label-5.43.0+-282021-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.43.0+-282021-04-01-29"><a href="#label-5.43.0+-282021-04-01-29"><a href="doc/release_notes/5_43_0_txt.html">5.43.0</a> (2021-04-01)</a></h3>
 <ul><li>
 <p>Add column_encryption plugin, for encrypting column values (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.42.0+-282021-03-01-29"><a href="doc/release_notes/5_42_0_txt.html">5.42.0</a> (2021-03-01)<span><a href="#label-5.42.0+-282021-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.42.0+-282021-03-01-29"><a href="#label-5.42.0+-282021-03-01-29"><a href="doc/release_notes/5_42_0_txt.html">5.42.0</a> (2021-03-01)</a></h3>
 <ul><li>
 <p>Make the ado timestamp conversion proc a normal conversion proc that can be overridden similar to other conversion procs (jeremyevans)</p>
 </li><li>
@@ -894,7 +905,7 @@ CHANGELOG
 <p>Add Model#to_json_data to the json_serializer plugin, returning a JSON data structure (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.41.0+-282021-02-01-29"><a href="doc/release_notes/5_41_0_txt.html">5.41.0</a> (2021-02-01)<span><a href="#label-5.41.0+-282021-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.41.0+-282021-02-01-29"><a href="#label-5.41.0+-282021-02-01-29"><a href="doc/release_notes/5_41_0_txt.html">5.41.0</a> (2021-02-01)</a></h3>
 <ul><li>
 <p>Have explicit :text option for a String column take priority over :size option on PostgreSQL (jeremyevans) (#1750)</p>
 </li><li>
@@ -907,7 +918,7 @@ CHANGELOG
 <p>Make pg_interval use the same number of seconds per year and per month as ActiveSupport::Duration when using ActiveSupport 5.1+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.40.0+-282021-01-01-29"><a href="doc/release_notes/5_40_0_txt.html">5.40.0</a> (2021-01-01)<span><a href="#label-5.40.0+-282021-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.40.0+-282021-01-01-29"><a href="#label-5.40.0+-282021-01-01-29"><a href="doc/release_notes/5_40_0_txt.html">5.40.0</a> (2021-01-01)</a></h3>
 <ul><li>
 <p>Support UPDATE FROM syntax in SQLite <a href="doc/release_notes/3_33_0_txt.html">3.33.0</a>+ (jeremyevans)</p>
 </li><li>
@@ -918,7 +929,7 @@ CHANGELOG
 <p>Avoid method redefinition warnings in verbose warning mode (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.39.0+-282020-12-01-29"><a href="doc/release_notes/5_39_0_txt.html">5.39.0</a> (2020-12-01)<span><a href="#label-5.39.0+-282020-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.39.0+-282020-12-01-29"><a href="#label-5.39.0+-282020-12-01-29"><a href="doc/release_notes/5_39_0_txt.html">5.39.0</a> (2020-12-01)</a></h3>
 <ul><li>
 <p>Support :clustered option for primary key and unique constraints on Microsoft SQL Server (jeremyevans)</p>
 </li><li>
@@ -931,7 +942,7 @@ CHANGELOG
 <p>Make Database#tables return partitioned tables on PostgreSQL 10+ (epoberezhny) (#1729, #1730)</p>
 </li></ul>
 
-<h3 id="label-5.38.0+-282020-11-01-29"><a href="doc/release_notes/5_38_0_txt.html">5.38.0</a> (2020-11-01)<span><a href="#label-5.38.0+-282020-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.38.0+-282020-11-01-29"><a href="#label-5.38.0+-282020-11-01-29"><a href="doc/release_notes/5_38_0_txt.html">5.38.0</a> (2020-11-01)</a></h3>
 <ul><li>
 <p>Do not add new Database instances to Sequel::DATABASES if the test connection fails (jeremyevans) (#1727)</p>
 </li><li>
@@ -944,7 +955,7 @@ CHANGELOG
 <p>Make the single_table_inheritance and <a href="doc/prepared_statements_rdoc.html">prepared_statements</a> plugins work if loaded into the same class (jeremyevans) (#1721)</p>
 </li></ul>
 
-<h3 id="label-5.37.0+-282020-10-01-29"><a href="doc/release_notes/5_37_0_txt.html">5.37.0</a> (2020-10-01)<span><a href="#label-5.37.0+-282020-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.37.0+-282020-10-01-29"><a href="#label-5.37.0+-282020-10-01-29"><a href="doc/release_notes/5_37_0_txt.html">5.37.0</a> (2020-10-01)</a></h3>
 <ul><li>
 <p>Recognize more unsigned decimal/float types in the schema dumper (akimd, jeremyevans) (#1720)</p>
 </li><li>
@@ -955,7 +966,7 @@ CHANGELOG
 <p>Raise Migrator::Error if attempting to migrate down to a version where there are necessary migration files missing (jeremyevans) (#1716)</p>
 </li></ul>
 
-<h3 id="label-5.36.0+-282020-09-01-29"><a href="doc/release_notes/5_36_0_txt.html">5.36.0</a> (2020-09-01)<span><a href="#label-5.36.0+-282020-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.36.0+-282020-09-01-29"><a href="#label-5.36.0+-282020-09-01-29"><a href="doc/release_notes/5_36_0_txt.html">5.36.0</a> (2020-09-01)</a></h3>
 <ul><li>
 <p>Handle passing keyword arguments through class methods defined via Plugins.def_dataset_method on Ruby 2.7+ (jeremyevans)</p>
 </li><li>
@@ -967,7 +978,7 @@ CHANGELOG
 </li><li>
 <p>Handle passing keyword arguments through the association proxy when using the association_proxies plugin on Ruby 2.7+ (jeremyevans)</p>
 </li><li>
-<p>Handle passing keyword arguments through the class method to a method defined in dataset_module on Ruby 2.7+ (adam12) (#1713)</p>
+<p>Handle passing keyword arguments through the class method to a method defined in <a href="lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> on Ruby 2.7+ (adam12) (#1713)</p>
 </li><li>
 <p>Stream result sets in the odbc adapter for better performance and lower memory usage (sparrovv) (#1711)</p>
 </li><li>
@@ -980,7 +991,7 @@ CHANGELOG
 <p>Recognize another disconnect error in the mysql and mysql2 adapters (jeremyevans) (#1706)</p>
 </li></ul>
 
-<h3 id="label-5.35.0+-282020-08-01-29"><a href="doc/release_notes/5_35_0_txt.html">5.35.0</a> (2020-08-01)<span><a href="#label-5.35.0+-282020-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.35.0+-282020-08-01-29"><a href="#label-5.35.0+-282020-08-01-29"><a href="doc/release_notes/5_35_0_txt.html">5.35.0</a> (2020-08-01)</a></h3>
 <ul><li>
 <p>Recognize another disconnect error in the oracle adapter (sterlzbd) (#1705)</p>
 </li><li>
@@ -1005,7 +1016,7 @@ CHANGELOG
 <p>Fix exception class in run_transaction_hooks extension if calling run_after_{commit,rollback}_hooks outside of a transaction (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.34.0+-282020-07-01-29"><a href="doc/release_notes/5_34_0_txt.html">5.34.0</a> (2020-07-01)<span><a href="#label-5.34.0+-282020-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.34.0+-282020-07-01-29"><a href="#label-5.34.0+-282020-07-01-29"><a href="doc/release_notes/5_34_0_txt.html">5.34.0</a> (2020-07-01)</a></h3>
 <ul><li>
 <p>Make eager_graph work correctly if called with no associations (jeremyevans)</p>
 </li><li>
@@ -1024,7 +1035,7 @@ CHANGELOG
 <p>Add *_pks_dataset methods for one_to_many and many_to_many associations when using the association_pks plugin (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.33.0+-282020-06-01-29"><a href="doc/release_notes/5_33_0_txt.html">5.33.0</a> (2020-06-01)<span><a href="#label-5.33.0+-282020-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.33.0+-282020-06-01-29"><a href="#label-5.33.0+-282020-06-01-29"><a href="doc/release_notes/5_33_0_txt.html">5.33.0</a> (2020-06-01)</a></h3>
 <ul><li>
 <p>Support custom join types on a per-association basis when using eager_graph/association_join (jeremyevans)</p>
 </li><li>
@@ -1033,7 +1044,7 @@ CHANGELOG
 <p>Add Database#current_timestamp_utc accessor on SQLite to keep CURRENT_* in UTC instead of converting to localtime (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.32.0+-282020-05-01-29"><a href="doc/release_notes/5_32_0_txt.html">5.32.0</a> (2020-05-01)<span><a href="#label-5.32.0+-282020-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.32.0+-282020-05-01-29"><a href="#label-5.32.0+-282020-05-01-29"><a href="doc/release_notes/5_32_0_txt.html">5.32.0</a> (2020-05-01)</a></h3>
 <ul><li>
 <p>Allow Database#create_table? work with :partition_of option on PostgreSQL (jeremyevans) (#1690)</p>
 </li><li>
@@ -1050,7 +1061,7 @@ CHANGELOG
 <p>Recognize timestamp(N) with time zone type (isc) (#1684)</p>
 </li></ul>
 
-<h3 id="label-5.31.0+-282020-04-01-29"><a href="doc/release_notes/5_31_0_txt.html">5.31.0</a> (2020-04-01)<span><a href="#label-5.31.0+-282020-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.31.0+-282020-04-01-29"><a href="#label-5.31.0+-282020-04-01-29"><a href="doc/release_notes/5_31_0_txt.html">5.31.0</a> (2020-04-01)</a></h3>
 <ul><li>
 <p>Fix alter_table drop_constraint :primary_key option on SQLite for non-integer primary keys (jeremyevans)</p>
 </li><li>
@@ -1071,7 +1082,7 @@ CHANGELOG
 <p>Add forbid_lazy_load plugin for forbidding lazy loading of associations, to help find N+1 issues (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.30.0+-282020-03-01-29"><a href="doc/release_notes/5_30_0_txt.html">5.30.0</a> (2020-03-01)<span><a href="#label-5.30.0+-282020-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.30.0+-282020-03-01-29"><a href="#label-5.30.0+-282020-03-01-29"><a href="doc/release_notes/5_30_0_txt.html">5.30.0</a> (2020-03-01)</a></h3>
 <ul><li>
 <p>Remove specs and old release notes from the gem to reduce gem size by over 40% (jeremyevans)</p>
 </li><li>
@@ -1080,7 +1091,7 @@ CHANGELOG
 <p>Support generated columns on SQLite 3.31+ using :generated_always_as and :generated_type options (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.29.0+-282020-02-01-29"><a href="doc/release_notes/5_29_0_txt.html">5.29.0</a> (2020-02-01)<span><a href="#label-5.29.0+-282020-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.29.0+-282020-02-01-29"><a href="#label-5.29.0+-282020-02-01-29"><a href="doc/release_notes/5_29_0_txt.html">5.29.0</a> (2020-02-01)</a></h3>
 <ul><li>
 <p>Recognize another disconnect error in the tinytds adapter (jeremyevans)</p>
 </li><li>
@@ -1093,7 +1104,7 @@ CHANGELOG
 <p>Add Dataset#json_serializer_opts to json_serializer plugin, allowing to set json_serializer options on a per-dataset basis (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.28.0+-282020-01-01-29"><a href="doc/release_notes/5_28_0_txt.html">5.28.0</a> (2020-01-01)<span><a href="#label-5.28.0+-282020-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.28.0+-282020-01-01-29"><a href="#label-5.28.0+-282020-01-01-29"><a href="doc/release_notes/5_28_0_txt.html">5.28.0</a> (2020-01-01)</a></h3>
 <ul><li>
 <p>Warn when calling Sequel::JDBC::Postgres::Dataset#with_fetch_size (jeremyevans) (#1665)</p>
 </li><li>
@@ -1102,7 +1113,7 @@ CHANGELOG
 <p>Add any_not_empty extension, for making Dataset#any? without a block mean !empty? (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.27.0+-282019-12-01-29"><a href="doc/release_notes/5_27_0_txt.html">5.27.0</a> (2019-12-01)<span><a href="#label-5.27.0+-282019-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.27.0+-282019-12-01-29"><a href="#label-5.27.0+-282019-12-01-29"><a href="doc/release_notes/5_27_0_txt.html">5.27.0</a> (2019-12-01)</a></h3>
 <ul><li>
 <p>Add Sequel::DEFAULT for a DEFAULT expression, useful for assigning to default values (jeremyevans)</p>
 </li><li>
@@ -1115,7 +1126,7 @@ CHANGELOG
 <p>Support ordering by NULLS FIRST/NULLS LAST without emulation on SQLite 3.30+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.26.0+-282019-11-01-29"><a href="doc/release_notes/5_26_0_txt.html">5.26.0</a> (2019-11-01)<span><a href="#label-5.26.0+-282019-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.26.0+-282019-11-01-29"><a href="#label-5.26.0+-282019-11-01-29"><a href="doc/release_notes/5_26_0_txt.html">5.26.0</a> (2019-11-01)</a></h3>
 <ul><li>
 <p>Recognize two additional foreign key constraint violation codes on MySQL 8.0.13+ (rianmcguire) (#1657)</p>
 </li><li>
@@ -1130,7 +1141,7 @@ CHANGELOG
 <p>Add support for SQL/JSON path expressions to the pg_json_ops extension, supported by PostgreSQL 12+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.25.0+-282019-10-01-29"><a href="doc/release_notes/5_25_0_txt.html">5.25.0</a> (2019-10-01)<span><a href="#label-5.25.0+-282019-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.25.0+-282019-10-01-29"><a href="#label-5.25.0+-282019-10-01-29"><a href="doc/release_notes/5_25_0_txt.html">5.25.0</a> (2019-10-01)</a></h3>
 <ul><li>
 <p>Fix <a href="../classes/Sequel/SQL/NumericMethods.html#method-i-coerce"><code>Sequel::SQL::NumericMethods#coerce</code></a> to not raise NoMethodError if super method is not defined (jeremyevans) (#1645)</p>
 </li><li>
@@ -1143,7 +1154,7 @@ CHANGELOG
 <p>Make sharding plugin integrate with server_block extension (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.24.0+-282019-09-01-29"><a href="doc/release_notes/5_24_0_txt.html">5.24.0</a> (2019-09-01)<span><a href="#label-5.24.0+-282019-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.24.0+-282019-09-01-29"><a href="#label-5.24.0+-282019-09-01-29"><a href="doc/release_notes/5_24_0_txt.html">5.24.0</a> (2019-09-01)</a></h3>
 <ul><li>
 <p>Add Database#skip_logging? private method designed for extensions to force query timing even if no logger is present (adam12) (#1640)</p>
 </li><li>
@@ -1160,7 +1171,7 @@ CHANGELOG
 <p>Support :generated_always_as column option on PostgreSQL 12+ (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.23.0+-282019-08-01-29"><a href="doc/release_notes/5_23_0_txt.html">5.23.0</a> (2019-08-01)<span><a href="#label-5.23.0+-282019-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.23.0+-282019-08-01-29"><a href="#label-5.23.0+-282019-08-01-29"><a href="doc/release_notes/5_23_0_txt.html">5.23.0</a> (2019-08-01)</a></h3>
 <ul><li>
 <p>Work around a bug on jdbc-sqlite3 3.27.2.1 when parsing schema for tables with columns with default values (jeremyevans)</p>
 </li><li>
@@ -1185,7 +1196,7 @@ CHANGELOG
 <p>Support Sequel.datetime_class = Time when using the named_timezones extension (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.22.0+-282019-07-01-29"><a href="doc/release_notes/5_22_0_txt.html">5.22.0</a> (2019-07-01)<span><a href="#label-5.22.0+-282019-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.22.0+-282019-07-01-29"><a href="#label-5.22.0+-282019-07-01-29"><a href="doc/release_notes/5_22_0_txt.html">5.22.0</a> (2019-07-01)</a></h3>
 <ul><li>
 <p>Fix Dataset#multi_insert and import with return: :primary_key on MSSQL when the dataset has a row_proc (jeremyevans) (#1627)</p>
 </li><li>
@@ -1200,7 +1211,7 @@ CHANGELOG
 <p>Support ruby 2.7+ startless ranges in filters, using just a &lt;= or &lt; operator for them (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.21.0+-282019-06-01-29"><a href="doc/release_notes/5_21_0_txt.html">5.21.0</a> (2019-06-01)<span><a href="#label-5.21.0+-282019-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.21.0+-282019-06-01-29"><a href="#label-5.21.0+-282019-06-01-29"><a href="doc/release_notes/5_21_0_txt.html">5.21.0</a> (2019-06-01)</a></h3>
 <ul><li>
 <p>Recognize additional DatabaseLockTimeout errors in mysql and mysql2 adapters (jeremyevans)</p>
 </li><li>
@@ -1225,7 +1236,7 @@ CHANGELOG
 <p>Fix handling of decimal values in the ado adapter when using locales where the decimal separator is , and not . (jeremyevans) (#1619)</p>
 </li></ul>
 
-<h3 id="label-5.20.0+-282019-05-01-29"><a href="doc/release_notes/5_20_0_txt.html">5.20.0</a> (2019-05-01)<span><a href="#label-5.20.0+-282019-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.20.0+-282019-05-01-29"><a href="#label-5.20.0+-282019-05-01-29"><a href="doc/release_notes/5_20_0_txt.html">5.20.0</a> (2019-05-01)</a></h3>
 <ul><li>
 <p>Fix reversing of alter_table add_foreign_key when :type option is used (jeremyevans) (#1615)</p>
 </li><li>
@@ -1250,7 +1261,7 @@ CHANGELOG
 <p>Make Database#check_constraints on PostgreSQL also include constraints where the related columns are not known (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.19.0+-282019-04-02-29"><a href="doc/release_notes/5_19_0_txt.html">5.19.0</a> (2019-04-02)<span><a href="#label-5.19.0+-282019-04-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.19.0+-282019-04-02-29"><a href="#label-5.19.0+-282019-04-02-29"><a href="doc/release_notes/5_19_0_txt.html">5.19.0</a> (2019-04-02)</a></h3>
 <ul><li>
 <p>Use more optimized approach to merging hashes in ruby 2.5+ (jeremyevans)</p>
 </li><li>
@@ -1267,7 +1278,7 @@ CHANGELOG
 <p>Speed up row fetching and type conversion in the sqlanywhere adapter (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.18.0+-282019-03-01-29"><a href="doc/release_notes/5_18_0_txt.html">5.18.0</a> (2019-03-01)<span><a href="#label-5.18.0+-282019-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.18.0+-282019-03-01-29"><a href="#label-5.18.0+-282019-03-01-29"><a href="doc/release_notes/5_18_0_txt.html">5.18.0</a> (2019-03-01)</a></h3>
 <ul><li>
 <p>Use singleton .call methods on plain objects instead of procs/methods for faster type conversion (jeremyevans)</p>
 </li><li>
@@ -1286,7 +1297,7 @@ CHANGELOG
 <p>Support tzinfo 2 in addition to tzinfo 1 in the named_timezones extension (jeremyevans) (#1596)</p>
 </li></ul>
 
-<h3 id="label-5.17.0+-282019-02-01-29"><a href="doc/release_notes/5_17_0_txt.html">5.17.0</a> (2019-02-01)<span><a href="#label-5.17.0+-282019-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.17.0+-282019-02-01-29"><a href="#label-5.17.0+-282019-02-01-29"><a href="doc/release_notes/5_17_0_txt.html">5.17.0</a> (2019-02-01)</a></h3>
 <ul><li>
 <p>Support skip_auto_validations instance method in auto_validations plugin (oldgreen, jeremyevans) (#1592)</p>
 </li><li>
@@ -1297,7 +1308,7 @@ CHANGELOG
 <p>Allow Sequel[].as to be used for constructing aliases with eager_graph (e.g. <a href=":a">Model.eager_graph(Sequel</a>.as(:b))) (jeremyevans) (#1588)</p>
 </li></ul>
 
-<h3 id="label-5.16.0+-282019-01-02-29"><a href="doc/release_notes/5_16_0_txt.html">5.16.0</a> (2019-01-02)<span><a href="#label-5.16.0+-282019-01-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.16.0+-282019-01-02-29"><a href="#label-5.16.0+-282019-01-02-29"><a href="doc/release_notes/5_16_0_txt.html">5.16.0</a> (2019-01-02)</a></h3>
 <ul><li>
 <p>Convert integer columns to bigint columns when copying SQLite databases to other databases using bin/sequel -C (jeremyevans) (#1584)</p>
 </li><li>
@@ -1326,7 +1337,7 @@ CHANGELOG
 <p>Use parentheses for expressions being subscripted (e.g. (<a href="1">array_agg(column))</a>) (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.15.0+-282018-12-01-29"><a href="doc/release_notes/5_15_0_txt.html">5.15.0</a> (2018-12-01)<span><a href="#label-5.15.0+-282018-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.15.0+-282018-12-01-29"><a href="#label-5.15.0+-282018-12-01-29"><a href="doc/release_notes/5_15_0_txt.html">5.15.0</a> (2018-12-01)</a></h3>
 <ul><li>
 <p>Add :conn_str option in the postgres adapter for PostgreSQL connection strings, if the pg driver is used (graywolf) (#1572)</p>
 </li><li>
@@ -1345,7 +1356,7 @@ CHANGELOG
 <p>Add Model#skip_validation_on_next_save! for skipping validation on next save call (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.14.0+-282018-11-01-29"><a href="doc/release_notes/5_14_0_txt.html">5.14.0</a> (2018-11-01)<span><a href="#label-5.14.0+-282018-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.14.0+-282018-11-01-29"><a href="#label-5.14.0+-282018-11-01-29"><a href="doc/release_notes/5_14_0_txt.html">5.14.0</a> (2018-11-01)</a></h3>
 <ul><li>
 <p>Drop defaulting the :port option to 5432 in the postgres adapter, so that setting the :service option in :driver_options works (jeremyevans) (#1558)</p>
 </li><li>
@@ -1366,7 +1377,7 @@ CHANGELOG
 <p>Do not push down expression inversion in cases where it may result in incorrect behavior (e.g. ANY/SOME/ALL operators) (jeremyevans) (#1549)</p>
 </li></ul>
 
-<h3 id="label-5.13.0+-282018-10-01-29"><a href="doc/release_notes/5_13_0_txt.html">5.13.0</a> (2018-10-01)<span><a href="#label-5.13.0+-282018-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.13.0+-282018-10-01-29"><a href="#label-5.13.0+-282018-10-01-29"><a href="doc/release_notes/5_13_0_txt.html">5.13.0</a> (2018-10-01)</a></h3>
 <ul><li>
 <p>Support :single_value type in prepared statements (rintaun) (#1547)</p>
 </li><li>
@@ -1377,7 +1388,7 @@ CHANGELOG
 <p>Do not cache from_self datasets if options are given (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.12.0+-282018-08-31-29"><a href="doc/release_notes/5_12_0_txt.html">5.12.0</a> (2018-08-31)<span><a href="#label-5.12.0+-282018-08-31-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.12.0+-282018-08-31-29"><a href="#label-5.12.0+-282018-08-31-29"><a href="doc/release_notes/5_12_0_txt.html">5.12.0</a> (2018-08-31)</a></h3>
 <ul><li>
 <p>Make constraint_validations extension respect Database#constraint_validations_table setting (jeremyevans)</p>
 </li><li>
@@ -1410,7 +1421,7 @@ CHANGELOG
 <p>Refactor emulated prepared statement internals to use a placeholder literalizer (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.11.0+-282018-08-01-29"><a href="doc/release_notes/5_11_0_txt.html">5.11.0</a> (2018-08-01)<span><a href="#label-5.11.0+-282018-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.11.0+-282018-08-01-29"><a href="#label-5.11.0+-282018-08-01-29"><a href="doc/release_notes/5_11_0_txt.html">5.11.0</a> (2018-08-01)</a></h3>
 <ul><li>
 <p>Fix using the jdbc/sqlserver adapter on JRuby 9.2+ (jeremyevans)</p>
 </li><li>
@@ -1431,7 +1442,7 @@ CHANGELOG
 <p>Allow using set_column_default with a nil value to remove the default value for a column on MySQL when the column is NOT NULL (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.10.0+-282018-07-01-29"><a href="doc/release_notes/5_10_0_txt.html">5.10.0</a> (2018-07-01)<span><a href="#label-5.10.0+-282018-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.10.0+-282018-07-01-29"><a href="#label-5.10.0+-282018-07-01-29"><a href="doc/release_notes/5_10_0_txt.html">5.10.0</a> (2018-07-01)</a></h3>
 <ul><li>
 <p>Use input type casts when using the postgres adapter with pg 0.18+ to reduce string allocations for some primitive types used as prepared statement arguments (jeremyevans)</p>
 </li><li>
@@ -1466,7 +1477,7 @@ CHANGELOG
 <p>Support ruby 2.6+ endless ranges in filters, using just a &gt;= operator for them (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.9.0+-282018-06-01-29"><a href="doc/release_notes/5_9_0_txt.html">5.9.0</a> (2018-06-01)<span><a href="#label-5.9.0+-282018-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.9.0+-282018-06-01-29"><a href="#label-5.9.0+-282018-06-01-29"><a href="doc/release_notes/5_9_0_txt.html">5.9.0</a> (2018-06-01)</a></h3>
 <ul><li>
 <p>Support generated columns on MySQL 5.7+ and MariaDB 5.2+ (wjordan, jeremyevans) (#1517)</p>
 </li><li>
@@ -1488,7 +1499,7 @@ CHANGELOG
 </li><li>
 <p>Make both threaded connection pools avoid disconnecting connections while holding the connection pool mutex (jeremyevans)</p>
 </li><li>
-<p>Don’t deadlock when disconnecting connections in the sharded_threaded connection pool when using connection_validator or connection_expiration extensions (jeremyevans)</p>
+<p>Don’t deadlock when disconnecting connections in the <a href="lib/sequel/connection_pool/sharded_threaded_rb.html">sharded_threaded</a> connection pool when using connection_validator or connection_expiration extensions (jeremyevans)</p>
 </li><li>
 <p>Don’t modify hash argument passed in Model.nested_attributes in the nested_attributes plugin (jeremyevans)</p>
 </li><li>
@@ -1497,7 +1508,7 @@ CHANGELOG
 <p>Fix duplicate objects in nested associations when eager_graphing cascaded many_to_one=&gt;one_to_many associations (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.8.0+-282018-05-01-29"><a href="doc/release_notes/5_8_0_txt.html">5.8.0</a> (2018-05-01)<span><a href="#label-5.8.0+-282018-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.8.0+-282018-05-01-29"><a href="#label-5.8.0+-282018-05-01-29"><a href="doc/release_notes/5_8_0_txt.html">5.8.0</a> (2018-05-01)</a></h3>
 <ul><li>
 <p>Don’t mark SQLAnywhere as supporting WITH in INSERT statement (jeremyevans)</p>
 </li><li>
@@ -1554,7 +1565,7 @@ CHANGELOG
 <p>Cache Dataset#distinct datasets if no arguments or block is given (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.7.0+-282018-04-01-29"><a href="doc/release_notes/5_7_0_txt.html">5.7.0</a> (2018-04-01)<span><a href="#label-5.7.0+-282018-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.7.0+-282018-04-01-29"><a href="#label-5.7.0+-282018-04-01-29"><a href="doc/release_notes/5_7_0_txt.html">5.7.0</a> (2018-04-01)</a></h3>
 <ul><li>
 <p>Add Sequel.start_timer and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)</p>
 </li><li>
@@ -1583,7 +1594,7 @@ CHANGELOG
 <p>Set :auto_increment schema entry correctly for PostgreSQL 10+ identity columns (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.6.0+-282018-03-01-29"><a href="doc/release_notes/5_6_0_txt.html">5.6.0</a> (2018-03-01)<span><a href="#label-5.6.0+-282018-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.6.0+-282018-03-01-29"><a href="#label-5.6.0+-282018-03-01-29"><a href="doc/release_notes/5_6_0_txt.html">5.6.0</a> (2018-03-01)</a></h3>
 <ul><li>
 <p>Dedup :db_type strings in schema hashes on Ruby 2.5+ (jeremyevans)</p>
 </li><li>
@@ -1596,7 +1607,7 @@ CHANGELOG
 <p>Respect identifier mangling rules when renaming columns on Microsoft SQL Server (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.5.0+-282018-01-31-29"><a href="doc/release_notes/5_5_0_txt.html">5.5.0</a> (2018-01-31)<span><a href="#label-5.5.0+-282018-01-31-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.5.0+-282018-01-31-29"><a href="#label-5.5.0+-282018-01-31-29"><a href="doc/release_notes/5_5_0_txt.html">5.5.0</a> (2018-01-31)</a></h3>
 <ul><li>
 <p>Make Database#copy_table in the postgres adapter handle errors that occur while processing rows (jeremyevans) (#1470)</p>
 </li><li>
@@ -1623,7 +1634,7 @@ CHANGELOG
 <p>Freeze string values in hashes returned by Database#schema (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.4.0+-282018-01-04-29"><a href="doc/release_notes/5_4_0_txt.html">5.4.0</a> (2018-01-04)<span><a href="#label-5.4.0+-282018-01-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.4.0+-282018-01-04-29"><a href="#label-5.4.0+-282018-01-04-29"><a href="doc/release_notes/5_4_0_txt.html">5.4.0</a> (2018-01-04)</a></h3>
 <ul><li>
 <p>Enable fractional seconds in timestamps on DB2 (jeremyevans) (#1463)</p>
 </li><li>
@@ -1654,7 +1665,7 @@ CHANGELOG
 <p>Add WHERE NULL filter for Dataset#where calls with no existing filter, no argument, and where the virtual row block returns nil (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.3.0+-282017-12-01-29"><a href="doc/release_notes/5_3_0_txt.html">5.3.0</a> (2017-12-01)<span><a href="#label-5.3.0+-282017-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.3.0+-282017-12-01-29"><a href="#label-5.3.0+-282017-12-01-29"><a href="doc/release_notes/5_3_0_txt.html">5.3.0</a> (2017-12-01)</a></h3>
 <ul><li>
 <p>Add logger to Database instance before making first connection in bin/sequel (jeremyevans)</p>
 </li><li>
@@ -1687,7 +1698,7 @@ CHANGELOG
 <p>Support Date::Infinity values in the pg_extended_date_support extension (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.2.0+-282017-10-27-29"><a href="doc/release_notes/5_2_0_txt.html">5.2.0</a> (2017-10-27)<span><a href="#label-5.2.0+-282017-10-27-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.2.0+-282017-10-27-29"><a href="#label-5.2.0+-282017-10-27-29"><a href="doc/release_notes/5_2_0_txt.html">5.2.0</a> (2017-10-27)</a></h3>
 <ul><li>
 <p>Fix type conversion for smallint unsigned and integer unsigned types on jdbc/mysql (jeremyevans) (#1443)</p>
 </li><li>
@@ -1696,7 +1707,7 @@ CHANGELOG
 <p>Do not ignore existing @dataset instance variable when subclassing <a href="../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (bjmllr) (#1435)</p>
 </li></ul>
 
-<h3 id="label-5.1.0+-282017-10-01-29"><a href="doc/release_notes/5_1_0_txt.html">5.1.0</a> (2017-10-01)<span><a href="#label-5.1.0+-282017-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.1.0+-282017-10-01-29"><a href="#label-5.1.0+-282017-10-01-29"><a href="doc/release_notes/5_1_0_txt.html">5.1.0</a> (2017-10-01)</a></h3>
 <ul><li>
 <p>Make jdbc/h2 and jdbc/hsqldb adapters respect :foreign_key_constraint_name option when adding new foreign key column (jeremyevans)</p>
 </li><li>
@@ -1717,7 +1728,7 @@ CHANGELOG
 <p>Remove deprecated support for Model#_before_validation private method (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-5.0.0+-282017-09-01-29"><a href="doc/release_notes/5_0_0_txt.html">5.0.0</a> (2017-09-01)<span><a href="#label-5.0.0+-282017-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-5.0.0+-282017-09-01-29"><a href="#label-5.0.0+-282017-09-01-29"><a href="doc/release_notes/5_0_0_txt.html">5.0.0</a> (2017-09-01)</a></h3>
 <ul><li>
 <p>Make bin/sequel -M option always use base 10 (jeremyevans)</p>
 </li><li>
@@ -1788,7 +1799,7 @@ CHANGELOG
 <p>Remove deprecated adapters, extensions, plugins, constants, and features (jeremyevans)</p>
 </li></ul>
 
-<h3 id="label-Older">Older<span><a href="#label-Older">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Older"><a href="#label-Older">Older</a></h3>
 
 <p>See <a href="doc/CHANGELOG_old.html">doc/CHANGELOG.old</a></p>
 </div>

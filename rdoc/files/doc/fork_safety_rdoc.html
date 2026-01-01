@@ -33,7 +33,7 @@ doc/fork_safety.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Fork+Safety">Fork Safety<span><a href="#label-Fork+Safety">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Fork+Safety"><a href="#label-Fork+Safety">Fork Safety</a></h1>
 
 <p>If you are forking or using a library that forks after you have created a <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, then you must disconnect database connections before forking. If you don’t do this, you can end up with child processes sharing database connections and all sorts of weird behavior, including crashes.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically create new connections on an as needed basis in the child processes, so you only need to do the following in the parent process:</p>
 
@@ -45,7 +45,7 @@ doc/fork_safety.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DATABASES</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:disconnect</span>)
 </pre>
 
-<h2 id="label-Puma">Puma<span><a href="#label-Puma">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Puma"><a href="#label-Puma">Puma</a></h2>
 
 <p>When using the Puma web server in clustered mode (which is the default behavior in Puma 5+ when using multiple processes), you should disconnect inside the <code>before_fork</code> hook in your Puma config:</p>
 
@@ -54,7 +54,7 @@ doc/fork_safety.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Unicorn">Unicorn<span><a href="#label-Unicorn">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Unicorn"><a href="#label-Unicorn">Unicorn</a></h2>
 
 <p>When using the Unicorn web server and preloading the application (+preload_app true+ in the Unicorn config), you should disconnect inside the <code>before_fork</code> hook in the Unicorn config:</p>
 
@@ -63,7 +63,7 @@ doc/fork_safety.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Passenger">Passenger<span><a href="#label-Passenger">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Passenger"><a href="#label-Passenger">Passenger</a></h2>
 
 <p>In Passenger web server, you should disconnect inside the <code>starting_worker_process</code> event hook:</p>
 
@@ -76,7 +76,7 @@ doc/fork_safety.rdoc
 
 <p>Note that this disconnects after forking instead of before forking.  Passenger does not offer a before fork hook.</p>
 
-<h2 id="label-Spring">Spring<span><a href="#label-Spring">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Spring"><a href="#label-Spring">Spring</a></h2>
 
 <p>In Spring application preloader, you should disconnect inside the <code>after_fork</code> hook:</p>
 
@@ -89,7 +89,7 @@ doc/fork_safety.rdoc
 
 <p>As the method indicates, this disconnects after forking instead of before forking. Spring does not offer a before fork hook.</p>
 
-<h2 id="label-Resque">Resque<span><a href="#label-Resque">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Resque"><a href="#label-Resque">Resque</a></h2>
 
 <p>In Resque, you should disconnect inside the <code>before_fork</code> hook:</p>
 
@@ -98,7 +98,7 @@ doc/fork_safety.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Parallel">Parallel<span><a href="#label-Parallel">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Parallel"><a href="#label-Parallel">Parallel</a></h2>
 
 <p>If you’re using the Parallel gem with processes, you should disconnect before calling it:</p>
 
@@ -106,7 +106,7 @@ doc/fork_safety.rdoc
 <span class="ruby-constant">Parallel</span>.<span class="ruby-identifier">map</span>([<span class="ruby-string">&#39;a&#39;</span>,<span class="ruby-string">&#39;b&#39;</span>,<span class="ruby-string">&#39;c&#39;</span>], <span class="ruby-value">in_processes:</span> <span class="ruby-value">3</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">one_letter</span><span class="ruby-operator">|</span> }
 </pre>
 
-<h2 id="label-Other+Libraries+Calling+fork">Other Libraries Calling fork<span><a href="#label-Other+Libraries+Calling+fork">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Other+Libraries+Calling+fork"><a href="#label-Other+Libraries+Calling+fork">Other Libraries Calling fork</a></h2>
 
 <p>For any other library that calls fork, you should disconnect before calling a method that forks:</p>
 

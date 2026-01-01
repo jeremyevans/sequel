@@ -33,67 +33,67 @@ doc/code_order.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Code+Order">Code Order<span><a href="#label-Code+Order">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Code+Order"><a href="#label-Code+Order">Code Order</a></h1>
 
 <p>In <a href="../../classes/Sequel.html"><code>Sequel</code></a>, the order in which code is executed during initialization is important.  This guide provides the recommended way to order your <a href="../../classes/Sequel.html"><code>Sequel</code></a> code.  Some of these guidelines are not strictly necessary, but others are, and this guide will be specific about which are strictly necessary.</p>
 
-<h2 id="label-Require+Sequel">Require <a href="../../classes/Sequel.html"><code>Sequel</code></a><span><a href="#label-Require+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Require+Sequel"><a href="#label-Require+Sequel">Require <a href="../../classes/Sequel.html"><code>Sequel</code></a></a></h2>
 
 <p>This is sort of a no-brainer, but you need to require the library first.  This is a strict requirement, none of the other code can be executed unless the library has been required first. Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>
 </pre>
 
-<h2 id="label-Add+Global+Extensions">Add Global Extensions<span><a href="#label-Add+Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Add+Global+Extensions"><a href="#label-Add+Global+Extensions">Add Global Extensions</a></h2>
 
 <p>Global extensions are loaded with Sequel.extension, and affect other parts of <a href="../../classes/Sequel.html"><code>Sequel</code></a> or the general ruby environment.  It’s not necessary to load them first, but it is a recommended practice. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:blank</span>
 </pre>
 
-<h2 id="label-Add+Extensions+Applied+to+All+Databases-2FDatasets">Add Extensions Applied to All Databases/Datasets<span><a href="#label-Add+Extensions+Applied+to+All+Databases-2FDatasets">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Add+Extensions+Applied+to+All+Databases-2FDatasets"><a href="#label-Add+Extensions+Applied+to+All+Databases-2FDatasets">Add Extensions Applied to All Databases/Datasets</a></h2>
 
 <p>If you want database or datasets extensions applied to all databases and datasets, you must use <a href="../../classes/Sequel/Database.html#method-c-extension"><code>Sequel::Database.extension</code></a> to load the extension before connecting to a database.  If you connect to a database before using <a href="../../classes/Sequel/Database.html#method-c-extension"><code>Sequel::Database.extension</code></a>, it will not have that extension loaded. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:columns_introspection</span>
 </pre>
 
-<h2 id="label-Connect+to+Databases">Connect to Databases<span><a href="#label-Connect+to+Databases">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Connect+to+Databases"><a href="#label-Connect+to+Databases">Connect to Databases</a></h2>
 
 <p>Connecting to a database is required before running any queries against that database, or creating any datasets or models.  You cannot create model classes without having a database object created first.  The convention for an application with a single Database instance is to store that instance in a constant named DB.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:pass@host/database&#39;</span>)
 </pre>
 
-<h2 id="label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database">Add Extensions Specific to a Database or All Datasets in that Database<span><a href="#label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database"><a href="#label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database">Add Extensions Specific to a Database or All Datasets in that Database</a></h2>
 
 <p>If you want specific databases to use specific extensions, or have all datasets in that database use a specific extension, you need to load that extension into the database after creating it using <a href="../../classes/Sequel/Database.html#method-i-extension"><code>Sequel::Database#extension</code></a>.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>
 </pre>
 
-<h2 id="label-Configure+Global+Model+Behavior">Configure Global Model Behavior<span><a href="#label-Configure+Global+Model+Behavior">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Configure+Global+Model+Behavior"><a href="#label-Configure+Global+Model+Behavior">Configure Global Model Behavior</a></h2>
 
 <p>If you want to change the configuration for all model classes, you must do so before loading your model classes, as configuration is copied into the subclass when model subclasses are created.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span>
 </pre>
 
-<h2 id="label-Add+Global+Model+Plugins">Add Global Model Plugins<span><a href="#label-Add+Global+Model+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Add+Global+Model+Plugins"><a href="#label-Add+Global+Model+Plugins">Add Global Model Plugins</a></h2>
 
 <p>If you want to load a plugin into all models classes, you must do so before loading your model classes, as plugin specific data may need to be copied into the subclass when model subclasses are created.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>
 </pre>
 
-<h2 id="label-Load+Model+Classes">Load Model Classes<span><a href="#label-Load+Model+Classes">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Load+Model+Classes"><a href="#label-Load+Model+Classes">Load Model Classes</a></h2>
 
 <p>After you have established a database connection, and configured your global model configuration and global plugins, you can load your model classes.  It’s recommended to have a separate file for each model class, unless the model classes are very simple.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}
 </pre>
 
-<h2 id="label-Finalize+Associations+and+Freeze+Model+Classes+and+Database">Finalize Associations and Freeze Model Classes and Database<span><a href="#label-Finalize+Associations+and+Freeze+Model+Classes+and+Database">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Finalize+Associations+and+Freeze+Model+Classes+and+Database"><a href="#label-Finalize+Associations+and+Freeze+Model+Classes+and+Database">Finalize Associations and Freeze Model Classes and Database</a></h2>
 
 <p>After all the models have been setup, you can finalize the associations. This can speed up association reflection methods by doing a lookup in advance to find the associated class, and cache related association information in the association itself.</p>
 

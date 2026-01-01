@@ -33,7 +33,7 @@ doc/opening_databases.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Connecting+to+a+database">Connecting to a database<span><a href="#label-Connecting+to+a+database">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Connecting+to+a+database"><a href="#label-Connecting+to+a+database">Connecting to a database</a></h1>
 
 <p>All <a href="../../classes/Sequel.html"><code>Sequel</code></a> activity begins with connecting to a database, which creates a <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object. The Database object is used to create datasets and execute queries. <a href="../../classes/Sequel.html"><code>Sequel</code></a> provides a powerful and flexible mechanism for connecting to databases.  There are two main ways to establish database connections:</p>
 <ol><li>
@@ -46,7 +46,7 @@ doc/opening_databases.rdoc
 
 <p>If you are only connecting to a single database, it is recommended that you store the database object in a constant named DB.  This is not required, but it is the convention that most <a href="../../classes/Sequel.html"><code>Sequel</code></a> code uses.</p>
 
-<h2 id="label-Using+the+Sequel.connect+method">Using the Sequel.connect method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+the+Sequel.connect+method"><a href="#label-Using+the+Sequel.connect+method">Using the Sequel.connect method</a></h2>
 
 <p>The connect method usually takes a well-formed URI, which is parsed into connection options needed to open the database connection.  The scheme/protocol part of the URI is used to determine the adapter to use:</p>
 
@@ -70,7 +70,7 @@ doc/opening_databases.rdoc
 
 <p>All of the above statements are equivalent.</p>
 
-<h2 id="label-Using+the+specialized+adapter+method">Using the specialized adapter method<span><a href="#label-Using+the+specialized+adapter+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+the+specialized+adapter+method"><a href="#label-Using+the+specialized+adapter+method">Using the specialized adapter method</a></h2>
 
 <p>The specialized adapter method is similar to Sequel.connect with an options hash, except that it automatically populates the :adapter option and assumes the first argument is the :database option, unless the first argument is a hash. So the following statements are equivalent to the previous statements.</p>
 
@@ -80,7 +80,7 @@ doc/opening_databases.rdoc
 
 <p>Note that using an adapter method forces the use of the specified adapter, not a database type, even though some adapters have the same name as the database type.  So if you want to connect to SQLite, for example, you can do so using the sqlite, amalgalite, and jdbc adapters. If you want to connect to SQLite on JRuby using the jdbc adapter, you should not use <code>Sequel.sqlite</code> for example, as that uses the C-based sqlite3 gem. Instead, the <code>Sequel.jdbc</code> would be appropriate (though as mentioned below, using <code>Sequel.connect</code> is recommended instead of <code>Sequel.jdbc</code>).</p>
 
-<h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Passing+a+block+to+either+method"><a href="#label-Passing+a+block+to+either+method">Passing a block to either method</a></h2>
 
 <p>Both the Sequel.connect method and the specialized adapter methods take a block.  If you provide a block to the method, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will create a Database object and pass it as an argument to the block.  When the block returns, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will disconnect the database connection. For example:</p>
 
@@ -89,9 +89,9 @@ doc/opening_databases.rdoc
 
 <p>Note that if you do not pass a block to Sequel.connect, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically retain a reference to the object in the <code>Sequel::DATABASES</code> array.  So calling <code>Sequel.connect</code> multiple times (say once per request), can result in a memory leak.  For any application where database access is needed for a long period of time, it’s best to store the result of Sequel.connection in a constant, as recommended above.</p>
 
-<h2 id="label-Using+the+Sequel.connect+method">Using the Sequel.connect method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+the+Sequel.connect+method"><a href="#label-Using+the+Sequel.connect+method">Using the Sequel.connect method</a></h2>
 
-<h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-General+connection+options"><a href="#label-General+connection+options">General connection options</a></h2>
 
 <p>These options are shared by all adapters unless otherwise noted.</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adapter </td><td>
@@ -149,11 +149,11 @@ doc/opening_databases.rdoc
 <p>Whether to use a single-threaded (non-thread safe) connection pool</p>
 </td></tr></tbody></table>
 
-<h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Adapter+specific+connection+options"><a href="#label-Adapter+specific+connection+options">Adapter specific connection options</a></h2>
 
 <p>The following sections explain the options and behavior specific to each adapter. If the library the adapter requires is different from the name of the adapter scheme, it is listed specifically, otherwise you can assume that is requires the library with the same name.</p>
 
-<h3 id="label-ado">ado<span><a href="#label-ado">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-ado"><a href="#label-ado">ado</a></h3>
 
 <p>Requires: win32ole</p>
 
@@ -185,7 +185,7 @@ doc/opening_databases.rdoc
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)
 </pre>
 
-<h3 id="label-amalgalite+">amalgalite <span><a href="#label-amalgalite+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-amalgalite+"><a href="#label-amalgalite+">amalgalite </a></h3>
 
 <p>Amalgalite is an ruby extension that provides self contained access to SQLite, so you don’t need to install SQLite separately.  As amalgalite is a file backed database, the :host, :user, and :password options are not used.</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:database </td><td>
@@ -201,13 +201,13 @@ doc/opening_databases.rdoc
 
 <p>Handles paths in the connection string similar to the SQLite adapter, so see the sqlite section below for details.</p>
 
-<h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-ibmdb"><a href="#label-ibmdb">ibmdb</a></h3>
 
 <p>requires ‘ibm_db’</p>
 
 <p>This connects to DB2 using IBM_DB.  This is the recommended adapter if you are using a C-based ruby to connect to DB2.</p>
 
-<h3 id="label-jdbc+">jdbc <span><a href="#label-jdbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-jdbc+"><a href="#label-jdbc+">jdbc </a></h3>
 
 <p>Requires: java</p>
 
@@ -255,7 +255,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>Depending on the configuration of the MySQL server, jdbc-mysql versions greater 8 may complain about the server time zone being unrecognized.  You can either use an older jdbc-mysql version, or you can specify the <code>serverTimezone</code> option in the connection string, as shown in the example jdbc:mysql connection string above.</p>
 </td></tr></tbody></table>
 
-<h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-mysql+"><a href="#label-mysql+">mysql </a></h3>
 
 <p>Requires: mysql</p>
 
@@ -292,11 +292,11 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <p>The :sslkey, :sslcert, :sslca, :sslcapath, and :sslca options (in that order) are passed to Mysql#ssl_set method if either the :sslca or :sslkey option is given.</p>
 
-<h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-mysql2"><a href="#label-mysql2">mysql2</a></h3>
 
 <p>This is a MySQL adapter that does typecasting in C, so it is often faster than the mysql adapter.  The options given are passed to Mysql2::Client.new, see the mysql2 documentation for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized options supported by the mysql adapter are also supported for mysql2 adapter (and any other adapters connecting to mysql, such as the jdbc/mysql adapter).</p>
 
-<h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-odbc+"><a href="#label-odbc+">odbc </a></h3>
 
 <p>The ODBC adapter allows you to connect to any database with the appropriate ODBC drivers installed.</p>
 
@@ -312,7 +312,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>Can be given an ODBC connection string, and will use ODBC::Database#drvconnect to do the connection.  Typical usage would be: <code>Sequel.odbc(drvconnect: &#39;driver={...};...&#39;)</code></p>
 </td></tr></tbody></table>
 
-<h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-oracle+"><a href="#label-oracle+">oracle </a></h3>
 
 <p>Requires: oci8</p>
 
@@ -325,7 +325,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>The Oracle privilege level.</p>
 </td></tr></tbody></table>
 
-<h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-postgres"><a href="#label-postgres">postgres</a></h3>
 
 <p>Requires: pg (or sequel/postgres-pr or postgres-pr/postgres-compat if pg is not available)</p>
 
@@ -358,7 +358,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>This can be set to false to not force the ISO date format.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> forces it by default to allow for an optimization.</p>
 </td></tr></tbody></table>
 
-<h3 id="label-sqlanywhere">sqlanywhere<span><a href="#label-sqlanywhere">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-sqlanywhere"><a href="#label-sqlanywhere">sqlanywhere</a></h3>
 
 <p>The sqlanywhere driver works off connection strings, so a connection string is built based on the url/options hash provided.  The following additional options are respected:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:commlinks </td><td>
@@ -371,7 +371,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>specify the CharSet connection string option</p>
 </td></tr></tbody></table>
 
-<h3 id="label-sqlite">sqlite<span><a href="#label-sqlite">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-sqlite"><a href="#label-sqlite">sqlite</a></h3>
 
 <p>Requires: sqlite3</p>
 
@@ -407,7 +407,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 
 <p>Note that SQLite memory databases are restricted to a single connection by default.  This is because SQLite does not allow multiple connections to a single memory database.  For this reason, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets the maximum number of connections in the connection pool to 1 by default when an SQLite memory database is used.  Attempts to force the use of more than 1 connection can result in weird behavior, since the connections will be to separate memory databases.</p>
 
-<h3 id="label-tinytds">tinytds<span><a href="#label-tinytds">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-tinytds"><a href="#label-tinytds">tinytds</a></h3>
 
 <p>Requires: tiny_tds</p>
 
@@ -422,7 +422,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 <p>Override the default TEXTSIZE setting for this connection.  The FreeTDS default is small (around 64000 bytes), but can be set up to around 2GB. This should be specified as an integer.  If you plan on setting large text or blob values via tinytds, you should use this option or modify your freetds.conf file.</p>
 </td></tr></tbody></table>
 
-<h3 id="label-trilogy">trilogy<span><a href="#label-trilogy">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-trilogy"><a href="#label-trilogy">trilogy</a></h3>
 
 <p>This is a MySQL adapter that does typecasting in C, and does not require any mysql client libraries installed. The options given are passed to Trilogy.new, see the trilogy documentation for details on what options are supported. The :timeout, :auto_is_null, :sql_mode, and :disable_split_materialized options supported by the mysql adapter are also supported for trilogy adapter.</p>
 </div>

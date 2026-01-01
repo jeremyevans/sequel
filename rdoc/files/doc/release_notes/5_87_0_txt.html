@@ -33,7 +33,7 @@ doc/release_notes/5.87.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Column schema hashes on MySQL and PostgreSQL now include the comment on the column in the :comment entry.</p>
 </li><li>
@@ -49,7 +49,7 @@ doc/release_notes/5.87.0.txt
 <p>Type OIDs are included in column schema hashes on PostgreSQL. The OIDs are static for built-in types, but dynamic for custom types. The pg_schema_caching extension will perform a query to get the type OIDs for the custom types after loading the cached schema.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Database#extension and Dataset#extension no longer attempt to require the extension file if the extension has already been registered.  This is how model plugins work, and makes it easier for applications to use custom extensions without messing with the load path.</p>
 </li><li>

@@ -33,12 +33,12 @@ doc/release_notes/4.43.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#freeze has now been implemented.  It is now recommended to use it in production and during testing, after loading extensions and making other changes to Database state.  Once frozen, the Database settings cannot be modified, but the Database can execute queries and return results.  By freezing the Database, you gain greater thread-safety assurance and will be alerted via an exception if runtime code attempts to modify Database state.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Model#refresh now uses the same optimization that Model.with_pk uses, resulting in faster refreshing for most models.</p>
 </li><li>
@@ -50,7 +50,7 @@ doc/release_notes/4.43.0.txt
 </li><li>
 <p>The jdbc/sqlite adapter will now use SQLite result codes for more accurate exception types, if the jdbc-sqlite driver supports them.</p>
 </li><li>
-<p>dataset_module is now inherited correctly if using the single_table_inheritance plugin.  This was broken in <a href="4_42_0_txt.html">4.42.0</a>, and fixed in 4.42.1.</p>
+<p><a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> is now inherited correctly if using the single_table_inheritance plugin.  This was broken in <a href="4_42_0_txt.html">4.42.0</a>, and fixed in 4.42.1.</p>
 </li><li>
 <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin now respects a server specified for the model instance, instead of always using the default server.</p>
 </li><li>
@@ -77,7 +77,7 @@ doc/release_notes/4.43.0.txt
 <p>The jdbc/postgresql adapter now works correctly if the pg_hstore extension is loaded first.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Maintainers of external adapters and Database extensions should update their code to support Database#freeze.</p>
 </li><li>

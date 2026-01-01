@@ -33,7 +33,7 @@ doc/release_notes/5.5.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The defaults_setter plugin now supports a :cache option, which will cache default values in the model object’s values hash:</p>
 
@@ -61,7 +61,7 @@ doc/release_notes/5.5.0.txt
 <p>The defaults_setter plugin will now give preference to a :callable_default schema entry over a :ruby_default schema entry. Combined with the other changes listed above, this makes default values recognized by the pg_array, pg_hstore, and pg_json extensions work well if the defaults_setter :cache option is also used.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The modification_detection plugin no longer breaks column change detection for new objects.</p>
 </li><li>
@@ -70,7 +70,7 @@ doc/release_notes/5.5.0.txt
 <p>The results of the changed_columns method are now cached in many places internally where they are called in a loop.  This results in better performance, especially if the modification_detection or serialization_modification_detection plugins are used.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The pg_interval extension now sets a :ruby_default schema entry for recognized interval defaults to the same value <a href="../../../classes/Sequel.html"><code>Sequel</code></a> would return if the default value was returned.  Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> would use a string in the :ruby_schema schema value.</p>
 </li><li>

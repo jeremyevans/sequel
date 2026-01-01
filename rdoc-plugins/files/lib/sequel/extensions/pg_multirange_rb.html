@@ -33,9 +33,9 @@ lib/sequel/extensions/pg_multirange.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_multirange extension adds support for the PostgreSQL 14+ multirange types to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  PostgreSQL multirange types are similar to an array of ranges, where a match against the multirange is a match against any of the ranges in the multirange.</p>
+<p>The <a href="pg_multirange_rb.html">pg_multirange</a> extension adds support for the PostgreSQL 14+ multirange types to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  PostgreSQL multirange types are similar to an array of ranges, where a match against the multirange is a match against any of the ranges in the multirange.</p>
 
-<p>When PostgreSQL multirange values are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/PGMultiRange.html"><code>Sequel::Postgres::PGMultiRange</code></a>.  PGMultiRange mostly acts like an array of <a href="../../../../classes/Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a> (see the pg_range extension).</p>
+<p>When PostgreSQL multirange values are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/PGMultiRange.html"><code>Sequel::Postgres::PGMultiRange</code></a>.  PGMultiRange mostly acts like an array of <a href="../../../../classes/Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a> (see the <a href="pg_range_rb.html">pg_range</a> extension).</p>
 
 <p>In addition to the parser, this extension comes with literalizers for PGMultiRanges, so they can be used in queries and as bound variables.</p>
 
@@ -61,12 +61,12 @@ lib/sequel/extensions/pg_multirange.rb
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_multirange_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)
 </pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of multirange types, load the pg_array extension before the pg_multirange extension:</p>
+<p>This extension integrates with the <a href="pg_array_rb.html">pg_array</a> extension.  If you plan to use arrays of multirange types, load the <a href="pg_array_rb.html">pg_array</a> extension before the <a href="pg_multirange_rb.html">pg_multirange</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_multirange</span>
 </pre>
 
-<p>The pg_multirange extension will automatically load the pg_range extension.</p>
+<p>The <a href="pg_multirange_rb.html">pg_multirange</a> extension will automatically load the <a href="pg_range_rb.html">pg_range</a> extension.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/PGMultiRange.html"><code>Sequel::Postgres::PGMultiRange</code></a></p>
 </div>

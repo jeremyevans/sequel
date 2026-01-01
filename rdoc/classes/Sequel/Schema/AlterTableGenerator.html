@@ -550,10 +550,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_column_allow_null-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
-<span class="line-num">681</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)
-<span class="line-num">682</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">allow_null</span>}
-<span class="line-num">683</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">684</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">683</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)
+<span class="line-num">684</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">allow_null</span>}
+<span class="line-num">685</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">686</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_column_default'>
@@ -609,9 +609,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_column_not_null-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
-<span class="line-num">692</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_not_null</span>(<span class="ruby-identifier">name</span>)
-<span class="line-num">693</span>   <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)
-<span class="line-num">694</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">694</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_not_null</span>(<span class="ruby-identifier">name</span>)
+<span class="line-num">695</span>   <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)
+<span class="line-num">696</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_column_type'>
@@ -622,9 +622,10 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Modify the type of one of the table’s column.</p>
+<p>Modify the type of one of the table’s column. The given options are considered when determining the new type.</p>
 
 <pre class="ruby"><span class="ruby-identifier">set_column_type</span>(<span class="ruby-value">:artist_name</span>, <span class="ruby-string">&#39;char(10)&#39;</span>) <span class="ruby-comment"># ALTER COLUMN artist_name TYPE char(10)</span>
+<span class="ruby-identifier">set_column_type</span>(<span class="ruby-value">:artist_name</span>, <span class="ruby-constant">String</span>, <span class="ruby-value">size:</span> <span class="ruby-value">10</span>) <span class="ruby-comment"># ALTER COLUMN artist_name TYPE varchar(10)</span>
 </pre>
 
 <p>PostgreSQL specific options:</p>
@@ -640,10 +641,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-set_column_type-source'>    <span class="ruby-comment"># File lib/sequel/database/schema_generator.rb</span>
-<span class="line-num">670</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">671</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
-<span class="line-num">672</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">673</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">672</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">673</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)
+<span class="line-num">674</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">675</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

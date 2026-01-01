@@ -33,7 +33,7 @@ lib/sequel/extensions/round_timestamps.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The round_timestamps extension will automatically round timestamp values to the database’s supported level of precision before literalizing them.</p>
+<p>The <a href="round_timestamps_rb.html">round_timestamps</a> extension will automatically round timestamp values to the database’s supported level of precision before literalizing them.</p>
 
 <p>For example, if the database supports millisecond precision, and you give it a Time value with microsecond precision, it will round it appropriately:</p>
 
@@ -42,7 +42,7 @@ lib/sequel/extensions/round_timestamps.rb
 <span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span>
 </pre>
 
-<p>The round_timestamps extension correctly deals with databases that support millisecond or second precision.  In addition to handling Time values, it also handles DateTime values and Sequel::SQLTime values (for the TIME type).</p>
+<p>The <a href="round_timestamps_rb.html">round_timestamps</a> extension correctly deals with databases that support millisecond or second precision.  In addition to handling Time values, it also handles DateTime values and Sequel::SQLTime values (for the TIME type).</p>
 
 <p>To round timestamps for a single dataset:</p>
 

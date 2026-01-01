@@ -33,7 +33,7 @@ lib/sequel/extensions/dataset_source_alias.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The dataset_source_alias extension changes Sequel’s default behavior of automatically aliasing datasets from using t1, t2, etc. to using an alias based on the source of the dataset.  Example:</p>
+<p>The <a href="dataset_source_alias_rb.html">dataset_source_alias</a> extension changes Sequel’s default behavior of automatically aliasing datasets from using t1, t2, etc. to using an alias based on the source of the dataset.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>))
 <span class="ruby-comment"># default: SELECT * FROM (SELECT * FROM a) AS t1</span>

@@ -33,7 +33,7 @@ doc/release_notes/4.11.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+SQL+Function+Features">New SQL Function Features<span><a href="#label-New+SQL+Function+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+SQL+Function+Features"><a href="#label-New+SQL+Function+Features">New SQL Function Features</a></h1>
 <ul><li>
 <p>SQL::Function now supports an options hash for functions. Unfortunately, since SQL::Function#initialize does not support an options hash, you need to use SQL::Function.new! to create a function with an options hash.  You can also call methods on the SQL::Function instance, which will return a new SQL::Function with the appropriate option set.</p>
 </li><li>
@@ -50,7 +50,7 @@ doc/release_notes/4.11.0.txt
 <p>SQL::Function#with_ordinality has been added, for creating set returning functions that also include a row number for every row in the set, using WITH ORDINALITY.</p>
 </li></ul>
 
-<h1 id="label-New+PostgreSQL+Features">New PostgreSQL Features<span><a href="#label-New+PostgreSQL+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+PostgreSQL+Features"><a href="#label-New+PostgreSQL+Features">New PostgreSQL Features</a></h1>
 <ul><li>
 <p>The jsonb type added in 9.4 is now supported in the pg_json extension.  To create a jsonb type manually, you need to call Sequel.pg_jsonb.</p>
 
@@ -65,7 +65,7 @@ doc/release_notes/4.11.0.txt
 <p>Postgres::ArrayOp#unnest in the pg_array_ops extension now accepts arguments.  PostgreSQL 9.4+ supports this if unnest is used in the FROM clause.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports derived column lists (table aliases that include column aliases) via Sequel.as and SQL::AliasedMethods#as:</p>
 
@@ -86,7 +86,7 @@ doc/release_notes/4.11.0.txt
 <p>Support for CUBRID/SQLAnywhere emulation has been added to the mock adapter.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#import now supports a default slice size, which <a href="../../../classes/Sequel.html"><code>Sequel</code></a> sets to 500 on SQLite as that is the limit that SQLite supports in a single statement.</p>
 </li><li>
@@ -103,7 +103,7 @@ doc/release_notes/4.11.0.txt
 <p>The mock adapter now sets an emulated version when using MySQL and SQLite.  Additionally, the emulated version for PostgreSQL and Microsoft SQL Server has been updated.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>External adapters that override Dataset#as_sql_append now need to have the method accept two arguments.</p>
 </li><li>

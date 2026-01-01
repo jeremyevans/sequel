@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_hstore.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_hstore extension adds support for the PostgreSQL hstore type to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  hstore is an extension that ships with PostgreSQL, and the hstore type stores an arbitrary key-value table, where the keys are strings and the values are strings or NULL.</p>
+<p>The <a href="pg_hstore_rb.html">pg_hstore</a> extension adds support for the PostgreSQL hstore type to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  hstore is an extension that ships with PostgreSQL, and the hstore type stores an arbitrary key-value table, where the keys are strings and the values are strings or NULL.</p>
 
 <p>This extension integrates with Sequel’s native postgres and jdbc/postgresql adapters, so that when hstore fields are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/HStore.html"><code>Sequel::Postgres::HStore</code></a>.  HStore is a DelegateClass of <a href="../../../../classes/Hash.html"><code>Hash</code></a>, so it mostly acts like a hash, but not completely (is_a?(<a href="../../../../classes/Hash.html"><code>Hash</code></a>) is false).  If you want the actual hash, you can call HStore#to_hash.  This is done so that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does not treat a HStore like a <a href="../../../../classes/Hash.html"><code>Hash</code></a> by default, which would cause issues.</p>
 
@@ -44,7 +44,7 @@ lib/sequel/extensions/pg_hstore.rb
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">hash</span>)
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Hash.html#method-i-hstore"><code>Hash#hstore</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Hash.html#method-i-hstore"><code>Hash#hstore</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">hash</span>.<span class="ruby-identifier">hstore</span>
 </pre>
@@ -112,7 +112,7 @@ lib/sequel/extensions/pg_hstore.rb
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_hstore</span>
 </pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of hstore types, load the pg_array extension before the pg_hstore extension:</p>
+<p>This extension integrates with the <a href="pg_array_rb.html">pg_array</a> extension.  If you plan to use arrays of hstore types, load the <a href="pg_array_rb.html">pg_array</a> extension before the <a href="pg_hstore_rb.html">pg_hstore</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_hstore</span>
 </pre>

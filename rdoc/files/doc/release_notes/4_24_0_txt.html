@@ -33,7 +33,7 @@ doc/release_notes/4.24.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_inet_ops extension has been added, for DSL support for calling PostgreSQL inet functions and operators.  Example:</p>
 
@@ -91,7 +91,7 @@ doc/release_notes/4.24.0.txt
 <p>The :timeout option to Database#listen in the postgres adapter can now be a callable object, previously it had to be Numeric.  This allows you to dynamically change the timeout based on current application state.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The uniqueness validations added by the auto_validations plugin now use a symbol key in the related Errors instance if the underlying index was on a single column.  Previously, the uniqueness validations for a single column would use an array key in the related Errors instance.</p>
 </li><li>
@@ -100,7 +100,7 @@ doc/release_notes/4.24.0.txt
 <p>The jdbc subadapters now work correctly if they issue queries while the subadapter is being loaded.  This can happen in the jdbc/postgresql adapter if the pg_hstore extension is used.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The deprecated db2 and dbi adapters have been removed.</p>
 </li></ul>

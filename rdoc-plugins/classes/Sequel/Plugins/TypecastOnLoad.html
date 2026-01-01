@@ -36,7 +36,7 @@ Sequel::Plugins::TypecastOnLoad
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The typecast_on_load plugin exists because most of Sequel’s database adapters don’t have complete control over typecasting, and may return columns that aren’t typecast correctly (with correct being defined as how the model object would typecast the same column values).</p>
+<p>The <a href="../../../files/lib/sequel/plugins/typecast_on_load_rb.html">typecast_on_load</a> plugin exists because most of Sequel’s database adapters don’t have complete control over typecasting, and may return columns that aren’t typecast correctly (with correct being defined as how the model object would typecast the same column values).</p>
 
 <p>This plugin makes model loading call the setter methods (which typecast by default) for all columns given.  You can either specify the columns to typecast on load in the plugin call itself, or afterwards using add_typecast_on_load_columns:</p>
 

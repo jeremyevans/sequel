@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_json_ops.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_json_ops extension adds support to Sequel’s DSL to make it easier to call PostgreSQL JSON functions and operators (added first in PostgreSQL 9.3).  It also supports the JSONB functions and operators added in PostgreSQL 9.4, as well as additional functions and operators added in later versions.</p>
+<p>The <a href="pg_json_ops_rb.html">pg_json_ops</a> extension adds support to Sequel’s DSL to make it easier to call PostgreSQL JSON functions and operators (added first in PostgreSQL 9.3).  It also supports the JSONB functions and operators added in PostgreSQL 9.4, as well as additional functions and operators added in later versions.</p>
 
 <p>To load the extension:</p>
 
@@ -46,19 +46,19 @@ lib/sequel/extensions/pg_json_ops.rb
 <span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)
 </pre>
 
-<p>If you have also loaded the pg_json extension, you can use Sequel.pg_json or Sequel.pg_jsonb as well:</p>
+<p>If you have also loaded the <a href="pg_json_rb.html">pg_json</a> extension, you can use Sequel.pg_json or Sequel.pg_jsonb as well:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>(<span class="ruby-value">:json_column</span>)
 <span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(<span class="ruby-value">:jsonb_column</span>)
 </pre>
 
-<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the pg_json or pg_jsonb method:</p>
+<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the <a href="pg_json_rb.html">pg_json</a> or pg_jsonb method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:json_column</span>].<span class="ruby-identifier">pg_json</span>
 <span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:jsonb_column</span>].<span class="ruby-identifier">pg_jsonb</span>
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_json"><code>Symbol#pg_json</code></a> or <a href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb"><code>Symbol#pg_jsonb</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_json"><code>Symbol#pg_json</code></a> or <a href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb"><code>Symbol#pg_jsonb</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-value">:json_column</span>.<span class="ruby-identifier">pg_json</span>
 <span class="ruby-identifier">jb</span> = <span class="ruby-value">:jsonb_column</span>.<span class="ruby-identifier">pg_jsonb</span>
@@ -199,9 +199,9 @@ lib/sequel/extensions/pg_json_ops.rb
 <span class="ruby-identifier">j</span>.<span class="ruby-identifier">strip_nulls</span>(<span class="ruby-value">in_arrays:</span> <span class="ruby-keyword">false</span>)  <span class="ruby-comment"># json_strip_nulls(json_column, false)</span>
 </pre>
 
-<p>If you are also using the pg_json extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
+<p>If you are also using the <a href="pg_json_rb.html">pg_json</a> extension, you should load it before loading this extension.  Doing so will allow you to use the op method on JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations on json/jsonb literals.</p>
 
-<p>In order to get the automatic conversion from a ruby array to a PostgreSQL array (as shown in the [] and get_text examples above), you need to load the pg_array extension.</p>
+<p>In order to get the automatic conversion from a ruby array to a PostgreSQL array (as shown in the [] and get_text examples above), you need to load the <a href="pg_array_rb.html">pg_array</a> extension.</p>
 
 <p>Related modules: <a href="../../../../classes/Sequel/Postgres/JSONBaseOp.html"><code>Sequel::Postgres::JSONBaseOp</code></a>,  <a href="../../../../classes/Sequel/Postgres/JSONOp.html"><code>Sequel::Postgres::JSONOp</code></a>, <a href="../../../../classes/Sequel/Postgres/JSONBOp.html"><code>Sequel::Postgres::JSONBOp</code></a></p>
 </div>

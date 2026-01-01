@@ -33,7 +33,7 @@ doc/release_notes/3.33.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A server_block extension has been added that makes Sequel’s sharding support easier to use by scoping database access inside the block to a given server/shard:</p>
 
@@ -97,7 +97,7 @@ doc/release_notes/3.33.0.txt
 <p>Database#supports_savepoints_in_prepared_transactions? has been added for checking if savepoints are supported inside prepared transactions.  This is true if both savepoints and prepared transactions are both supported, except on MySQL &gt; 5.5.12 (due to MySQL bug 64374).</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The mysql and mysql2 adapters now both provide an accurate number of rows matched, so <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> usage on those adapters will now raise a NoExistingObject exception by default if you attempt to delete or update an instance that no longer exists in the database.</p>
 </li><li>
@@ -124,7 +124,7 @@ doc/release_notes/3.33.0.txt
 <p>A very misleading error message has been fixed when attempting to constantize an invalid string in the model inflector.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The sqlite adapter now typecasts columns that SQLite stores as INTEGER/REAL.  Previously, it only typecasted columns that SQLite stored as TEXT/BLOB.  For details about SQLite storage, see <a target="_top" href="http://www.sqlite.org/datatype3.html">www.sqlite.org/datatype3.html</a>.</p>
 

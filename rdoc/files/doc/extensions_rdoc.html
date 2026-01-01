@@ -33,11 +33,11 @@ doc/extensions.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Sequel+Extensions"><a href="../../classes/Sequel.html"><code>Sequel</code></a> Extensions<span><a href="#label-Sequel+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Sequel+Extensions"><a href="#label-Sequel+Extensions"><a href="../../classes/Sequel.html"><code>Sequel</code></a> Extensions</a></h1>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> has an official extension system, for adding global, Database, and Dataset extensions.</p>
 
-<h2 id="label-Global+Extensions">Global Extensions<span><a href="#label-Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Global+Extensions"><a href="#label-Global+Extensions">Global Extensions</a></h2>
 
 <p>Global extensions can add or modify the behavior of any part of <a href="../../classes/Sequel.html"><code>Sequel</code></a>.  Technically, they are not limited to affecting <a href="../../classes/Sequel.html"><code>Sequel</code></a>, as they can also modify code outside of <a href="../../classes/Sequel.html"><code>Sequel</code></a> (e.g. the blank extension).  However, extensions that modify things outside of <a href="../../classes/Sequel.html"><code>Sequel</code></a> generally do so only for backwards compatibility.</p>
 
@@ -48,7 +48,7 @@ doc/extensions.rdoc
 
 <p>All this does is require the relevent extension from <code>sequel/extensions/named_timezones</code> somewhere in the ruby path.  Global extensions are just a simpler, consistent way to require code that modifies <a href="../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
-<h2 id="label-Database+Extensions">Database Extensions<span><a href="#label-Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Database+Extensions"><a href="#label-Database+Extensions">Database Extensions</a></h2>
 
 <p>Database extensions should add or modify the behavior of a single <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance.  They are loaded via <a href="../../classes/Sequel/Database.html#method-i-extension"><code>Sequel::Database#extension</code></a>:</p>
 
@@ -64,7 +64,7 @@ doc/extensions.rdoc
 
 <p>All future <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instances created afterward will then automatically have the server_block extension loaded.</p>
 
-<h2 id="label-Dataset+Extensions">Dataset Extensions<span><a href="#label-Dataset+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Dataset+Extensions"><a href="#label-Dataset+Extensions">Dataset Extensions</a></h2>
 
 <p>Dataset extensions should add or modify the behavior of a single <a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> instance.  They are loaded via <a href="../../classes/Sequel/Dataset.html#method-i-extension"><code>Sequel::Dataset#extension</code></a>.  <a href="../../classes/Sequel/Dataset.html#method-i-extension"><code>Sequel::Dataset#extension</code></a> returns a modifies copy of the dataset that includes the extension (similar to how most dataset query methods work):</p>
 
@@ -83,7 +83,7 @@ doc/extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:columns_introspection</span>
 </pre>
 
-<h2 id="label-Creating+Global+Extensions">Creating Global Extensions<span><a href="#label-Creating+Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Creating+Global+Extensions"><a href="#label-Creating+Global+Extensions">Creating Global Extensions</a></h2>
 
 <p>If you want to create a global extension, you just need to store your code so that you can require it via <code>sequel/extensions/extension_name</code>.  Then users can load it via:</p>
 
@@ -92,7 +92,7 @@ doc/extensions.rdoc
 
 <p>It is recommended you only create a global extension if what you want to do would not work as a Database or Dataset extension.</p>
 
-<h2 id="label-Creating+Database+Extensions">Creating Database Extensions<span><a href="#label-Creating+Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Creating+Database+Extensions"><a href="#label-Creating+Database+Extensions">Creating Database Extensions</a></h2>
 
 <p>Creating Database extensions is similar to global extensions in terms of creating the file.  However, somewhere in the file, you need to call <a href="../../classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a>.  Usually you would call this with the module that will be added to the related <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance when the extension is loaded.  For example, the server_block extension uses something like:</p>
 
@@ -106,7 +106,7 @@ doc/extensions.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:arbitrary_servers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ArbitraryServers</span>)}
 </pre>
 
-<h2 id="label-Creating+Dataset+Extensions">Creating Dataset Extensions<span><a href="#label-Creating+Dataset+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Creating+Dataset+Extensions"><a href="#label-Creating+Dataset+Extensions">Creating Dataset Extensions</a></h2>
 
 <p>Creating Dataset extensions is very similar to creating Database extensions, but instead of calling <a href="../../classes/Sequel/Database.html#method-c-register_extension"><code>Sequel::Database.register_extension</code></a>, you call <a href="../../classes/Sequel/Dataset.html#method-c-register_extension"><code>Sequel::Dataset.register_extension</code></a>.  In general, you would call this with the module that will be added to the related <a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> instance when the extension is loaded.  For example, the columns_introspection extension uses something like:</p>
 

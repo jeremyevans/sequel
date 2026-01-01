@@ -33,12 +33,12 @@ doc/release_notes/5.38.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The jdbc/mysql adapter now supports the newer com.mysql.cj.jdbc.Driver driver.  The adapter will still attempt to load the older com.mysql.jdbc.Driver if the com.mysql.cj.jdbc.Driver is not found.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>When testing a connection after creating a new Database instance raises an exception, the Database instance is removed from Sequel::DATABASES.</p>
 </li><li>
@@ -47,7 +47,7 @@ doc/release_notes/5.38.0.txt
 <p>Database connect and disconnect errors are no longer swallowed when calling Database#create_or_replace_view, Database#server_version on PostgreSQL, or Database#create_table* on Oracle.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Previously, instantiating a new Database instance directly using <a href="../../../classes/Sequel/Database.html#method-c-new"><code>Sequel::Database.new</code></a> did not test the connection by default.  That was instead handled by <a href="../../../classes/Sequel/Database.html#method-c-connect"><code>Sequel::Database.connect</code></a>.  The test connection now happens inside Database#initialize.  This should only affect backwards compatibility for code that is calling <a href="../../../classes/Sequel/Database.html#method-c-new"><code>Sequel::Database.new</code></a> directly.</p>
 </li></ul>

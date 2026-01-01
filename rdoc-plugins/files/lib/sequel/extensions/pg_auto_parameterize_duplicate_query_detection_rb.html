@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_auto_parameterize_duplicate_query_detection.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_auto_parameterize_duplicate_query_detection extension builds on the pg_auto_parameterize extension, adding support for detecting duplicate queries inside a block that occur at the same location. This is designed mostly to catch duplicate query issues (e.g. N+1 queries) during testing.</p>
+<p>The <a href="pg_auto_parameterize_duplicate_query_detection_rb.html">pg_auto_parameterize_duplicate_query_detection</a> extension builds on the <a href="pg_auto_parameterize_rb.html">pg_auto_parameterize</a> extension, adding support for detecting duplicate queries inside a block that occur at the same location. This is designed mostly to catch duplicate query issues (e.g. N+1 queries) during testing.</p>
 
 <p>To detect duplicate queries inside a block of code, wrap the code with <code>detect_duplicate_queries</code>:</p>
 
@@ -48,7 +48,7 @@ lib/sequel/extensions/pg_auto_parameterize_duplicate_query_detection.rb
 
 <p>For accuracy, the entire call stack is always used as part of the hash key to determine whether a query is duplicate. However, you can filter the displayed backtrace by using the <code>:backtrace_filter</code> option.</p>
 
-<p><code>detect_duplicate_queries</code> is concurrency aware, it uses the same approach that Sequel’s default connection pools use. So if you are running multiple threads, <code>detect_duplicate_queries</code> will only report duplicate queries for the current thread (or fiber if the fiber_concurrency extension is used).</p>
+<p><code>detect_duplicate_queries</code> is concurrency aware, it uses the same approach that Sequel’s default connection pools use. So if you are running multiple threads, <code>detect_duplicate_queries</code> will only report duplicate queries for the current thread (or fiber if the <a href="fiber_concurrency_rb.html">fiber_concurrency</a> extension is used).</p>
 
 <p>When testing applications, it’s probably best to use this to wrap the application being tested. For example, testing with rack-test, if your app is <code>App</code>, you would want to wrap it:</p>
 

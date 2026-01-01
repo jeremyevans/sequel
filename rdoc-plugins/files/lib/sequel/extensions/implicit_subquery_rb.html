@@ -33,7 +33,7 @@ lib/sequel/extensions/implicit_subquery.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The implicit_subquery extension changes most dataset methods that return modified datasets to implicitly call from_self if the database currently uses raw SQL.  Sequel’s by default does not do this:</p>
+<p>The <a href="implicit_subquery_rb.html">implicit_subquery</a> extension changes most dataset methods that return modified datasets to implicitly call from_self if the database currently uses raw SQL.  Sequel’s by default does not do this:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM table&quot;</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column</span>).<span class="ruby-identifier">sql</span>
 <span class="ruby-comment"># =&gt; &quot;SELECT * FROM table&quot;</span>

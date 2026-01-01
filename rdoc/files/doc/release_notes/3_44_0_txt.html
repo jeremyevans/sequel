@@ -33,7 +33,7 @@ doc/release_notes/3.44.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Dataset#paged_each has been added, for processing entire datasets without keeping all rows in memory, even if the underlying driver keeps all query results in memory.  This is implemented using limits and offsets, and requires an order (model datasets use a default order by primary key).  It defaults to fetching 1000 rows at a time, but that can be changed via the :rows_per_fetch option.</p>
 
@@ -69,7 +69,7 @@ doc/release_notes/3.44.0.txt
 <p>Temporary views are now supported on PostgreSQL and SQLite using the :temp option to create_view.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Row fetching speed in the tinytds adapter has been increased by up to 60%.</p>
 </li><li>
@@ -116,7 +116,7 @@ doc/release_notes/3.44.0.txt
 <p>The mock mssql adapter now sets a server_version so that more parts of it work.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Offset emulation via ROW_NUMBER works by moving the query to a subselect that also selects from the ROW_NUMBER window function, and filtering on the ROW_NUMBER in the main query.  Previously, the ROW_NUMBER was also present in the output columns, and some adapter code was needed to hide that fact.  Now, the outer select selects all of the inner columns in the subselect except for the ROW_NUMBER, reducing the adapter code needed. This has the side effect of potentially requiring a query (or multiple queries for multiple subselects) to determine the columns to use.  The columns_introspection extension may reduce the number of queries needed.</p>
 </li><li>

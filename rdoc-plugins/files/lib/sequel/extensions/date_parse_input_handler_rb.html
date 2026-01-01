@@ -33,7 +33,7 @@ lib/sequel/extensions/date_parse_input_handler.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The date_parse_input_handler extension allows for configuring how input to date parsing methods should be handled.  By default, the extension does not change behavior.  However, you can use the <code>Sequel.date_parse_input_handler</code> method to support custom handling of input strings to the date parsing methods.  For example, if you want to implement a length check to prevent denial of service vulnerabilities in older versions of Ruby, you can do:</p>
+<p>The <a href="date_parse_input_handler_rb.html">date_parse_input_handler</a> extension allows for configuring how input to date parsing methods should be handled.  By default, the extension does not change behavior.  However, you can use the <code>Sequel.date_parse_input_handler</code> method to support custom handling of input strings to the date parsing methods.  For example, if you want to implement a length check to prevent denial of service vulnerabilities in older versions of Ruby, you can do:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:date_parse_input_handler</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_parse_input_handler</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span>

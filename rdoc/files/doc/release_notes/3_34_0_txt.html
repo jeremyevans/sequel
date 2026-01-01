@@ -33,7 +33,7 @@ doc/release_notes/3.34.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+PostgreSQL+Extensions">New PostgreSQL Extensions<span><a href="#label-New+PostgreSQL+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+PostgreSQL+Extensions"><a href="#label-New+PostgreSQL+Extensions">New PostgreSQL Extensions</a></h1>
 <ul><li>
 <p>A pg_array extension has been added, supporting PostgreSQL’s numeric and string array types.  Both single dimensional and multi-dimensional array types are supported.  Array values are returned as instances of Sequel::Postgres::PGArray, which is a delegate class of Array.  You can turn an existing array into a PGArray using Array#pg_array.</p>
 
@@ -105,7 +105,7 @@ doc/release_notes/3.34.0.txt
 <p>Note that these two extensions do not necessarily improve performance.  For simple queries, they actually hurt performance. They do help for complex queries, but in all cases, it’s faster to use Sequel’s prepared statements API manually.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Extensions">Other New Extensions<span><a href="#label-Other+New+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Extensions"><a href="#label-Other+New+Extensions">Other New Extensions</a></h1>
 <ul><li>
 <p>A query_literals extension has been added that makes the select, group, and order methods operate similar to the filter methods in that if they are given a regular string as their first argument, they treat it as a literal string, with additional arguments, if any, used as placeholder values.  This extension allows you to write code such as:</p>
 
@@ -151,7 +151,7 @@ doc/release_notes/3.34.0.txt
 <p>A null_dataset extension has been added, which adds Dataset#nullify for creating a dataset that will not issue a database query.  It implements the null object pattern for datasets, and is probably most useful in methods that must return a dataset, but can determine that such a dataset will never return a row.</p>
 </li></ul>
 
-<h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Plugins"><a href="#label-New+Plugins">New Plugins</a></h1>
 <ul><li>
 <p>A static_cache plugin has been added, allowing you to cache a model statically.  This plugin is useful for models whose tables do not change while the application is running, such as lookup tables. When using this plugin, the following methods will no longer require queries:</p>
 <ul><li>
@@ -171,7 +171,7 @@ doc/release_notes/3.34.0.txt
 <p>A many_to_one_pk_lookup plugin has been added that changes the many_to_one association retrieval code to do a simple primary key lookup on the associated class in most cases.  This results in significantly better performance, especially if the associated model is using a caching plugin (either caching or static_cache).</p>
 </li></ul>
 
-<h1 id="label-Core+Extension+Replacements">Core Extension Replacements<span><a href="#label-Core+Extension+Replacements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Core+Extension+Replacements"><a href="#label-Core+Extension+Replacements">Core Extension Replacements</a></h1>
 <ul><li>
 <p>Most of Sequel’s core extensions now have equivalent methods defined on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module:</p>
 
@@ -238,7 +238,7 @@ doc/release_notes/3.34.0.txt
 <p>You can now check if the core extensions have been loaded by using Sequel.core_extensions?.</p>
 </li></ul>
 
-<h1 id="label-Foreign+Keys+in+the+Schema+Dumper">Foreign Keys in the Schema Dumper<span><a href="#label-Foreign+Keys+in+the+Schema+Dumper">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Foreign+Keys+in+the+Schema+Dumper"><a href="#label-Foreign+Keys+in+the+Schema+Dumper">Foreign Keys in the Schema Dumper</a></h1>
 <ul><li>
 <p>Database#foreign_key_list has been added that gives an array of foreign key constraints on the table.  It is currently implemented on MySQL, PostgreSQL, and SQLite, and may be implemented on other database types in the future.  Each entry in the return array is a hash, with at least the following keys present:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:columns </td><td>
@@ -269,7 +269,7 @@ doc/release_notes/3.34.0.txt
 <p>When using bin/sequel -C to copy databases, foreign key constraints are now copied if the source database supports Database#foreign_key_list.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p>Dataset#to_hash_groups and select_hash_groups have been added. These methods are similar to to_hash and select_hash in that they return a hash, but hashes returned by *_hash_groups methods have arrays of all matching values, unlike the *_hash methods which just use the last matching value. Example:</p>
 
@@ -344,7 +344,7 @@ doc/release_notes/3.34.0.txt
 <p>SQL::QualifiedIdentifier objects can now contain arbitrary <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expressions.  Before, they could only contain a few expression types.  This makes it easier to add extensions to support PostgreSQL row-valued types.</p>
 </li></ul>
 
-<h1 id="label-Performance+Improvements">Performance Improvements<span><a href="#label-Performance+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Performance+Improvements"><a href="#label-Performance+Improvements">Performance Improvements</a></h1>
 <ul><li>
 <p>Model.[] when called with a primary key has been made about 110% faster for most models by avoiding cloning datasets.</p>
 </li><li>
@@ -361,7 +361,7 @@ doc/release_notes/3.34.0.txt
 <p>Some proc activations have been removed, giving minor speedups when running on MRI.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Database#uri and url now return the connection string given to Sequel.connect.  Previously, they tried to reconstruct the url using the database’s options, but that didn’t work well in corner cases.</p>
 </li><li>
@@ -432,7 +432,7 @@ doc/release_notes/3.34.0.txt
 <p>A spec_model_no_assoc task has been added for running model specs without the association plugin loaded.  This is to check that the SEQUEL_NO_ASSOCIATIONS setting works correctly.</p>
 </li></ul>
 
-<h1 id="label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">Deprecated Features to be Removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_35_0_txt.html">3.35.0</a><span><a href="#label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0"><a href="#label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">Deprecated Features to be Removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_35_0_txt.html">3.35.0</a></a></h1>
 <ul><li>
 <p>Ruby &lt;1.8.7 support is now deprecated.</p>
 </li><li>
@@ -443,7 +443,7 @@ doc/release_notes/3.34.0.txt
 <p>Array#all_two_pairs? is now deprecated.  It was part of the core extensions, but the core extensions have been refactored to no longer require it.  As it doesn’t specifically relate to creating <a href="../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, it is being removed.  The private Array#sql_expr_if_all_two_pairs method is deprecated as well.</p>
 </li></ul>
 
-<h1 id="label-Other+Backwards+Compatibility+Issues">Other Backwards Compatibility Issues<span><a href="#label-Other+Backwards+Compatibility+Issues">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Backwards+Compatibility+Issues"><a href="#label-Other+Backwards+Compatibility+Issues">Other Backwards Compatibility Issues</a></h1>
 <ul><li>
 <p>The generic Bignum type now uses bigint on SQLite, similar to other databases.  The integer type was previously used.  The only exception is for auto incrementing primary keys, which still use integer for Bignum as SQLite doesn’t support autoincrementing columns other than integer.</p>
 </li><li>

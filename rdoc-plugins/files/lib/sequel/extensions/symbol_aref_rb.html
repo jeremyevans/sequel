@@ -33,7 +33,7 @@ lib/sequel/extensions/symbol_aref.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The symbol_aref extension makes <a href="../../../../classes/Symbol.html#method-i-5B-5D"><code>Symbol#[]</code></a> support <a href="../../../../classes/Symbol.html"><code>Symbol</code></a>, Sequel::SQL::Indentifier, and Sequel::SQL::QualifiedIdentifier instances, returning appropriate Sequel::SQL::QualifiedIdentifier instances.  It’s designed as a shortcut so that instead of:</p>
+<p>The <a href="symbol_aref_rb.html">symbol_aref</a> extension makes <a href="../../../../classes/Symbol.html#method-i-5B-5D"><code>Symbol#[]</code></a> support <a href="../../../../classes/Symbol.html"><code>Symbol</code></a>, Sequel::SQL::Indentifier, and Sequel::SQL::QualifiedIdentifier instances, returning appropriate Sequel::SQL::QualifiedIdentifier instances.  It’s designed as a shortcut so that instead of:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>] <span class="ruby-comment"># table.column</span>
 </pre>
@@ -48,7 +48,7 @@ lib/sequel/extensions/symbol_aref.rb
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:symbol_aref</span>
 </pre>
 
-<p>If you are using Ruby 2+, and you would like to use refinements, there is a refinement version of this in the symbol_aref_refinement extension.</p>
+<p>If you are using Ruby 2+, and you would like to use refinements, there is a refinement version of this in the <a href="symbol_aref_refinement_rb.html">symbol_aref_refinement</a> extension.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/SymbolAref.html"><code>Sequel::SymbolAref</code></a></p>
 </div>

@@ -33,7 +33,7 @@ doc/release_notes/5.50.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_multirange extension has been added with support for PostgreSQL 14+ multirange types.  Multirange types are similar to an array of ranges, where a value is in the multirange if it is in any of the ranges contained in the multirange. Multiranges are useful when you need to check against multiple ranges that do not overlap.</p>
 
@@ -76,7 +76,7 @@ doc/release_notes/5.50.0.txt
 <p>A :before_preconnect Database option has been added.  This is useful for configuring extensions added via :preconnect_extensions before the connection takes place.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#columns! now uses a LIMIT 0 query instead of a LIMIT 1 query by default. This can improve performance in cases where the row returned would be large.  Some databases do not support a LIMIT 0 query, and some adapters that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been updated to continue using LIMIT 1.  Custom adapters should be updated to use LIMIT 1 if the database does not support LIMIT 0.</p>
 </li><li>

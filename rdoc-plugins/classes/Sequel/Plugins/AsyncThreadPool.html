@@ -36,13 +36,13 @@ Sequel::Plugins::AsyncThreadPool
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The async_thread_pool plugin makes it slightly easier to use the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension with models.  It makes Model.async return an async dataset for the model, and support async behavior for destroy, with_pk, and with_pk! for model datasets:</p>
+<p>The <a href="../../../files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a> plugin makes it slightly easier to use the <a href="../../../files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a> <a href="../../Database.html"><code>Database</code></a> extension with models.  It makes Model.async return an async dataset for the model, and support async behavior for destroy, with_pk, and with_pk! for model datasets:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Will load the artist with primary key 1 asynchronously</span>
 <span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">async</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)
 </pre>
 
-<p>You must load the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension into the <a href="../../Database.html"><code>Database</code></a> object the model class uses in order for async behavior to work.</p>
+<p>You must load the <a href="../../../files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a> <a href="../../Database.html"><code>Database</code></a> extension into the <a href="../../Database.html"><code>Database</code></a> object the model class uses in order for async behavior to work.</p>
 
 <p>Usage:</p>
 

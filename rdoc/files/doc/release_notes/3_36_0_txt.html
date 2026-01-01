@@ -33,7 +33,7 @@ doc/release_notes/3.36.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>An eager_each plugin has been added, which automatically makes eagerly loaded datasets do eager loading if you call each (or another Enumerable method) instead of all.  By default, if you call each on an eager dataset, it will not do eager loading, and if you call each on an eager_graph dataset, you will get plain hashes with columns from all joined tables instead of model objects.  With this plugin, each on both eager and eager_graph datasets will do eager loading.</p>
 </li><li>
@@ -88,7 +88,7 @@ doc/release_notes/3.36.0.txt
 <p>A jdbc/progress adapter has been added, supporting the Progress database via the jdbc adapter.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#get now works correctly if you pass it a nil or false argument.  Previously, it ignored the argument and used the block instead.  If you want to use the block argument, you should not pass in a regular argument.</p>
 </li><li>
@@ -131,7 +131,7 @@ doc/release_notes/3.36.0.txt
 <p>Most adapter specific options to Database methods are now mentioned in the main Database method RDoc.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The nested_attributes plugin internals changed significantly.  If you were overriding one of the nested_attributes* private methods and calling super to get the default behavior, you may have to update your code.</p>
 </li><li>

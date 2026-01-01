@@ -36,9 +36,9 @@ Sequel::Plugins::TableSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The table_select plugin changes the default selection for a model dataset from <code>*</code> to <code>table.*</code>. This makes it so that if you join the model’s dataset to other tables, columns in the other tables do not appear in the result sets (and possibly overwrite columns in the current model with the same name).</p>
+<p>The <a href="../../../files/lib/sequel/plugins/table_select_rb.html">table_select</a> plugin changes the default selection for a model dataset from <code>*</code> to <code>table.*</code>. This makes it so that if you join the model’s dataset to other tables, columns in the other tables do not appear in the result sets (and possibly overwrite columns in the current model with the same name).</p>
 
-<p>Note that by default on databases that supporting RETURNING, using this plugin will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the insert_returning_select plugin to automatically use RETURNING for instance creations for models using this plugin.</p>
+<p>Note that by default on databases that supporting RETURNING, using this plugin will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the <a href="../../../files/lib/sequel/plugins/insert_returning_select_rb.html">insert_returning_select</a> plugin to automatically use RETURNING for instance creations for models using this plugin.</p>
 
 <p>Usage:</p>
 

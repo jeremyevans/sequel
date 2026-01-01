@@ -33,7 +33,7 @@ doc/release_notes/3.42.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Dataset#avg, interval, min, max, range, and sum now accept virtual row blocks, allowing you to more easily get aggregate values of expressions based on the table:</p>
 
@@ -43,7 +43,7 @@ doc/release_notes/3.42.0.txt
 </li><li>
 <p>Database#do has been added on PostgreSQL for using the DO anonymous code block execution statement.</p>
 </li><li>
-<p>Model.dataset_module now uses a Module subclass, which allows you to call subset inside a dataset_module block, making it easier to consolidate dataset method code:</p>
+<p>Model.dataset_module now uses a Module subclass, which allows you to call subset inside a <a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> block, making it easier to consolidate dataset method code:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
@@ -61,7 +61,7 @@ doc/release_notes/3.42.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports setting the default size of string columns, via the default_string_column_size option or accessor.  In some cases, Sequel’s default string column size of 255 is too large (e.g. MySQL with utf8mb4 character set), and this allows you to change it.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#count and other methods now use a subselect in the case where the dataset has an offset but no limit.</p>
 </li><li>
@@ -73,16 +73,16 @@ doc/release_notes/3.42.0.txt
 </li><li>
 <p>The force_encoding plugin now works with frozen string values.</p>
 </li><li>
-<p>Public methods added to a model dataset_module now have model class methods created for them even if the method was added outside of a dataset_module block.</p>
+<p>Public methods added to a model <a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> now have model class methods created for them even if the method was added outside of a <a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> block.</p>
 </li><li>
 <p>On PostgreSQL, Database#indexes now includes a :deferrable entry for each index hash, which will be true for unique indexes where the underlying constraint is deferrable.</p>
 </li><li>
 <p>On Microsoft SQL Server 2000, Dataset#update no longer includes a limit (TOP), allowing it to work correctly.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
-<p>Model.dataset_methods has been removed.  This was used to store blocks for methods created via def_dataset_method and subset. The internals have been changed so that a dataset_module is always used in these cases, therefore there was no longer a reason for this method.</p>
+<p>Model.dataset_methods has been removed.  This was used to store blocks for methods created via def_dataset_method and subset. The internals have been changed so that a <a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> is always used in these cases, therefore there was no longer a reason for this method.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -33,14 +33,14 @@ doc/release_notes/4.18.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>An :auto_increment key has been added to the schema information for primary key columns on JDBC, PostgreSQL, MySQL, MSSQL, DB2, and SQLite.  This fixes issues in the schema_dumper extension where non-auto-incrementing integer primary keys are no longer dumped as auto-incrementing.</p>
 
 <p>For adapters that don’t have specific support for detecting auto incrementing primary keys, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now assumes a primary key is auto incrementing only if it is not a composite primary key and the type contains int (e.g. int, integer, bigint).</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#empty? now ignores any order on the dataset.  Previously, calling empty? on a dataset ordered by an alias in the SELECT list could raise an exception.</p>
 </li><li>

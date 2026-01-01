@@ -36,7 +36,7 @@ Sequel::Plugins::JsonSerializer
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The json_serializer plugin handles serializing entire <a href="../Model.html"><code>Sequel::Model</code></a> objects to JSON, as well as support for deserializing JSON directly into <a href="../Model.html"><code>Sequel::Model</code></a> objects.  It requires the json library, and can work with either the pure ruby version or the C extension.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/json_serializer_rb.html">json_serializer</a> plugin handles serializing entire <a href="../Model.html"><code>Sequel::Model</code></a> objects to JSON, as well as support for deserializing JSON directly into <a href="../Model.html"><code>Sequel::Model</code></a> objects.  It requires the json library, and can work with either the pure ruby version or the C extension.</p>
 
 <p>Basic Example:</p>
 
@@ -128,7 +128,7 @@ Sequel::Plugins::JsonSerializer
 <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>, <span class="ruby-value">associations:</span> {<span class="ruby-value">artist:</span> {<span class="ruby-value">fields:</span> <span class="ruby-node">%w&#39;id name&#39;</span>, <span class="ruby-value">associations:</span> <span class="ruby-value">:tags</span>}})
 </pre>
 
-<p>Note that active_support/json makes incompatible changes to the to_json API, and breaks some aspects of the json_serializer plugin.  You can undo the damage done by active_support/json by doing:</p>
+<p>Note that active_support/json makes incompatible changes to the to_json API, and breaks some aspects of the <a href="../../../files/lib/sequel/plugins/json_serializer_rb.html">json_serializer</a> plugin.  You can undo the damage done by active_support/json by doing:</p>
 
 <pre class="ruby"><span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">ToJsonWithActiveSupportEncoder</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:remove_method</span>, <span class="ruby-value">:to_json</span>)
 </pre>

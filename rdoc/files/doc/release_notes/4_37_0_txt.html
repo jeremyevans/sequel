@@ -33,7 +33,7 @@ doc/release_notes/4.37.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#values has been added on SQLite#3.8.3+, operating similarly to the support on PostgreSQL:</p>
 
@@ -48,7 +48,7 @@ doc/release_notes/4.37.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports the use of native prepared statements and bound variables in the mysql2 adapter, when mysql2 0.4+ is used. Previously, the mysql2 adapter supported database prepared statements, but variables were always literalized.  That is still supported when mysql2 &lt;0.4 is used.</p>
 </li><li>
@@ -65,7 +65,7 @@ doc/release_notes/4.37.0.txt
 <p>A frozen string literal issue has been fixed when multiple different database connection approaches have failed in the jdbc adapter.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>External database adapters need to make sure that Database#database_error_classes returns a valid result if called during Database#initialize.  If you have an external adapter where one of the error classes depends on an argument given when connecting (such as the connection string), you may have to make some changes.</p>
 </li></ul>

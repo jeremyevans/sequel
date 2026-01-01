@@ -33,7 +33,7 @@ doc/release_notes/3.24.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Prepared+Statement+Plugins">Prepared Statement Plugins<span><a href="#label-Prepared+Statement+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Prepared+Statement+Plugins"><a href="#label-Prepared+Statement+Plugins">Prepared Statement Plugins</a></h1>
 <ul><li>
 <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin makes <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> classes use prepared statements for creating, updating, and destroying model instances, as well as looking up model objects by primary key. With this plugin, all of the following will use prepared statements:</p>
 
@@ -94,7 +94,7 @@ Artist.filter(...).with_pk(1)</pre>
 </pre>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p>Filtering by associations got a lot more powerful.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_23_0_txt.html">3.23.0</a> introduced filtering by associations:</p>
 
@@ -214,7 +214,7 @@ Artist.filter(...).with_pk(1)</pre>
 <p>A <a href="../../../classes/Sequel/ASTTransformer.html"><code>Sequel::ASTTransformer</code></a> class was added that makes it easy to write custom transformers of Sequel’s internal abstract syntax trees.  Dataset#qualify now uses a subclass of ASTTransformer to do its transformations, as does the new Dataset#unbind.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Database#create_table? now uses a single query with IF NOT EXISTS if the database supports such syntax.  Previously, it issued a SELECT query to determine table existence.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> currently supports this syntax on MySQL, H2, and SQLite <a href="3_3_0_txt.html">3.3.0</a>+.</p>
 
@@ -301,7 +301,7 @@ Artist.filter(...).with_pk(1)</pre>
 <p>The connection pool specs are now about 10 times faster and not subject to race conditions due to using Queues instead of sleeping.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Model#save no longer calls Model#valid?.  It now calls the Model#_valid? private method that Model#valid? also calls.  To mark a model instance invalid, you should override the Model#validate method and add validation errors to the object.</p>
 </li><li>

@@ -1,6 +1,6 @@
-Mon, 01 Dec 2025 10:45:47 -0800
+Thu, 01 Jan 2026 09:09:02 -0800
 README.rdoc	Sun, 23 Nov 2025 09:58:00 -0800
-CHANGELOG	Mon, 01 Dec 2025 10:20:59 -0800
+CHANGELOG	Thu, 01 Jan 2026 08:57:49 -0800
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Mon, 01 Dec 2025 10:20:59 -0800
+lib/sequel/version.rb	Thu, 01 Jan 2026 08:57:49 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Thu, 24 Jul 2025 11:17:44 -0700
@@ -30,7 +30,7 @@ lib/sequel/dataset/misc.rb	Mon, 23 Jan 2023 11:36:37 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Mon, 23 Jan 2023 11:36:37 -0800
 lib/sequel/dataset/prepared_statements.rb	Fri, 02 May 2025 23:03:08 -0700
 lib/sequel/dataset/query.rb	Sun, 23 Nov 2025 09:58:00 -0800
-lib/sequel/dataset/sql.rb	Sun, 23 Nov 2025 09:58:00 -0800
+lib/sequel/dataset/sql.rb	Mon, 22 Dec 2025 13:40:25 -0800
 lib/sequel/database/connecting.rb	Thu, 08 Aug 2024 09:05:13 -0700
 lib/sequel/database/dataset.rb	Tue, 28 Mar 2023 14:16:05 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 22 Apr 2025 00:20:10 -0700
@@ -38,8 +38,8 @@ lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
 lib/sequel/database/misc.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/database/query.rb	Tue, 03 Jun 2025 09:09:55 -0700
-lib/sequel/database/schema_generator.rb	Sat, 08 Nov 2025 14:52:11 -0800
-lib/sequel/database/schema_methods.rb	Fri, 04 Jul 2025 18:00:22 -0700
+lib/sequel/database/schema_generator.rb	Sat, 06 Dec 2025 18:19:06 -0800
+lib/sequel/database/schema_methods.rb	Sat, 06 Dec 2025 18:19:06 -0800
 lib/sequel/database/transactions.rb	Thu, 21 Sep 2023 15:53:42 -0700
 lib/sequel/model/associations.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/model/base.rb	Sun, 23 Nov 2025 18:29:09 -0800
@@ -201,6 +201,7 @@ doc/release_notes/4.9.0.txt	Tue, 01 Apr 2014 10:01:57 -0700
 doc/release_notes/5.0.0.txt	Fri, 01 Sep 2017 17:57:51 -0700
 doc/release_notes/5.1.0.txt	Sun, 01 Oct 2017 09:19:35 -0700
 doc/release_notes/5.10.0.txt	Sun, 01 Jul 2018 09:35:21 -0700
+doc/release_notes/5.100.0.txt	Thu, 01 Jan 2026 08:57:49 -0800
 doc/release_notes/5.11.0.txt	Wed, 01 Aug 2018 08:13:54 -0700
 doc/release_notes/5.12.0.txt	Fri, 31 Aug 2018 08:39:42 -0700
 doc/release_notes/5.13.0.txt	Mon, 01 Oct 2018 07:21:49 -0700

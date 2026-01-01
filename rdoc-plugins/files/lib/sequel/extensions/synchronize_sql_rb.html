@@ -33,7 +33,7 @@ lib/sequel/extensions/synchronize_sql.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The synchronize_sql extension checks out a connection from the pool while generating an SQL string.  In cases where a connection is necessary in order to properly escape input, and multiple inputs in the query need escaping, this can result in fewer connection checkouts and better overall performance. In other cases this results in a performance decrease because a connection is checked out and either not used or kept checked out longer than necessary.</p>
+<p>The <a href="synchronize_sql_rb.html">synchronize_sql</a> extension checks out a connection from the pool while generating an SQL string.  In cases where a connection is necessary in order to properly escape input, and multiple inputs in the query need escaping, this can result in fewer connection checkouts and better overall performance. In other cases this results in a performance decrease because a connection is checked out and either not used or kept checked out longer than necessary.</p>
 
 <p>The adapters where this extension may improve performance include amalgalite, mysql2, postgres, jdbc/postgresql, and tinytds. In these adapters, escaping strings requires a connection object for as proper escaping requires calling an escaping method on the connection object.</p>
 

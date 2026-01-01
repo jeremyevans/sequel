@@ -33,14 +33,14 @@ doc/release_notes/4.22.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A csv_serializer plugin has been added, for serializing model objects and datasets to CSV, or parsing CSV into a model object or array of model objects.  Behavior and API is similar to the existing xml_serializer and json_serializer plugins.</p>
 </li><li>
 <p><a href="../../../classes/Sequel/MassAssignmentRestriction.html"><code>Sequel::MassAssignmentRestriction</code></a> is now raised for mass assignment errors in strict mode (the default).  Previously the generic <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> was used.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>On Ruby 1.9+, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses condition variables instead of busy waiting for connections in the threaded conection pools.  This can significantly decrease overhead when waiting for connections, which can improve performance on machines that are compute bottlenecked.  This also makes the connection pool checkouts more fair, reducing the chance that a request for a connection will fail with a PoolTimeout when under heavy resource contention.</p>
 </li><li>
@@ -72,7 +72,7 @@ doc/release_notes/4.22.0.txt
 <p>Bit types are now converted to boolean values in the ODBC adapter.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The db2, dbi, fdbsql, firebird, jdbc/fdbsql, informix, and openbase adapters are now deprecated and will be removed in a future version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li></ul>

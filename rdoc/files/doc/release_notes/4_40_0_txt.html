@@ -33,7 +33,7 @@ doc/release_notes/4.40.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A Sequel.split_symbols setting has been added.  This setting is true by default, so there is no change to backwards compatibility by default.  However, users can now do:</p>
 
@@ -137,7 +137,7 @@ doc/release_notes/4.40.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer attempts to combine arguments for non-associative operators, as doing so leads to invalid code in cases such as:</p>
 
@@ -165,7 +165,7 @@ doc/release_notes/4.40.0.txt
 <p>When using Database#tables with the :qualify=&gt;true option on PostgreSQL, table names with double or triple underscores are now handled correctly.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The following Dataset constants are now frozen: NON_SQL_OPTIONS, ACTION_METHODS, QUERY_METHODS, CONDITIONED_JOIN_TYPES, UNCONDITIONED_JOIN_TYPES, and JOIN_METHODS.  Of these, NON_SQL_OPTIONS was previously modified in a non-thread-safe manner by some adapters.  External adapters should switch to having the adapter’s dataset non_sql_options method return an array of options that do not affect the SELECT SQL for the adapter’s datasets, rather than modifying NON_SQL_OPTIONS.</p>
 </li></ul>

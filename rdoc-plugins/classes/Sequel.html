@@ -548,6 +548,9 @@ Sequel
 <a href="../files/lib/sequel/plugins/sharding_rb.html">lib/sequel/plugins/sharding.rb</a>
 </li>
 <li class='other'>
+<a href="../files/lib/sequel/plugins/single_statement_dataset_destroy_rb.html">lib/sequel/plugins/single_statement_dataset_destroy.rb</a>
+</li>
+<li class='other'>
 <a href="../files/lib/sequel/plugins/single_table_inheritance_rb.html">lib/sequel/plugins/single_table_inheritance.rb</a>
 </li>
 <li class='other'>
@@ -651,7 +654,7 @@ Sequel
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The date_parse_input_handler extension allows for configuring how input to date parsing methods should be handled.  By default, the extension does not change behavior.  However, you can use the <code>Sequel.date_parse_input_handler</code> method to support custom handling of input strings to the date parsing methods.  For example, if you want to implement a length check to prevent denial of service vulnerabilities in older versions of Ruby, you can do:</p>
+<p>The <a href="../files/lib/sequel/extensions/date_parse_input_handler_rb.html">date_parse_input_handler</a> extension allows for configuring how input to date parsing methods should be handled.  By default, the extension does not change behavior.  However, you can use the <code>Sequel.date_parse_input_handler</code> method to support custom handling of input strings to the date parsing methods.  For example, if you want to implement a length check to prevent denial of service vulnerabilities in older versions of Ruby, you can do:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:date_parse_input_handler</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_parse_input_handler</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span>
@@ -669,7 +672,7 @@ Sequel
 
 <p>Be aware that modern versions of Ruby will raise an exception if date parsing input exceeds 128 bytes.</p>
 
-<p>The duplicate_columns_handler extension allows you to customize handling of duplicate column names in your queries on a per-database or per-dataset level.</p>
+<p>The <a href="../files/lib/sequel/extensions/duplicate_columns_handler_rb.html">duplicate_columns_handler</a> extension allows you to customize handling of duplicate column names in your queries on a per-database or per-dataset level.</p>
 
 <p>For example, you may want to raise an exception if you join 2 tables together which contains a column that will override another columns.</p>
 
@@ -761,7 +764,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 
 <p>Related module: <a href="Sequel/Postgres/AutoParameterize.html"><code>Sequel::Postgres::AutoParameterize</code></a></p>
 
-<p>The pg_auto_parameterize_duplicate_query_detection extension builds on the pg_auto_parameterize extension, adding support for detecting duplicate queries inside a block that occur at the same location. This is designed mostly to catch duplicate query issues (e.g. N+1 queries) during testing.</p>
+<p>The <a href="../files/lib/sequel/extensions/pg_auto_parameterize_duplicate_query_detection_rb.html">pg_auto_parameterize_duplicate_query_detection</a> extension builds on the <a href="../files/lib/sequel/extensions/pg_auto_parameterize_rb.html">pg_auto_parameterize</a> extension, adding support for detecting duplicate queries inside a block that occur at the same location. This is designed mostly to catch duplicate query issues (e.g. N+1 queries) during testing.</p>
 
 <p>To detect duplicate queries inside a block of code, wrap the code with <code>detect_duplicate_queries</code>:</p>
 
@@ -776,7 +779,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 
 <p>For accuracy, the entire call stack is always used as part of the hash key to determine whether a query is duplicate. However, you can filter the displayed backtrace by using the <code>:backtrace_filter</code> option.</p>
 
-<p><code>detect_duplicate_queries</code> is concurrency aware, it uses the same approach that Sequel’s default connection pools use. So if you are running multiple threads, <code>detect_duplicate_queries</code> will only report duplicate queries for the current thread (or fiber if the fiber_concurrency extension is used).</p>
+<p><code>detect_duplicate_queries</code> is concurrency aware, it uses the same approach that Sequel’s default connection pools use. So if you are running multiple threads, <code>detect_duplicate_queries</code> will only report duplicate queries for the current thread (or fiber if the <a href="../files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency</a> extension is used).</p>
 
 <p>When testing applications, it’s probably best to use this to wrap the application being tested. For example, testing with rack-test, if your app is <code>App</code>, you would want to wrap it:</p>
 
@@ -795,7 +798,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 
 <p>Related module: <a href="Sequel/Postgres/AutoParameterizeDuplicateQueryDetection.html"><code>Sequel::Postgres::AutoParameterizeDuplicateQueryDetection</code></a></p>
 
-<p>The pg_auto_parameterize_in_array extension builds on the pg_auto_parameterize extension, adding support for handling additional types when converting from IN to = ANY and NOT IN to != ALL:</p>
+<p>The <a href="../files/lib/sequel/extensions/pg_auto_parameterize_in_array_rb.html">pg_auto_parameterize_in_array</a> extension builds on the <a href="../files/lib/sequel/extensions/pg_auto_parameterize_rb.html">pg_auto_parameterize</a> extension, adding support for handling additional types when converting from IN to = ANY and NOT IN to != ALL:</p>
 
 <pre>DB[:table].where(column: [1.0, 2.0, ...])
 # Without extension: column IN ($1::numeric, $2:numeric, ...) # bound variables: 1.0, 2.0, ...
@@ -811,9 +814,9 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 </td></tr><tr><td class='label'>Date </td><td>
 <p>date</p>
 </td></tr><tr><td class='label'>Time </td><td>
-<p>timestamp (or timestamptz if pg_timestamptz extension is used)</p>
+<p>timestamp (or timestamptz if <a href="../files/lib/sequel/extensions/pg_timestamptz_rb.html">pg_timestamptz</a> extension is used)</p>
 </td></tr><tr><td class='label'>DateTime </td><td>
-<p>timestamp (or timestamptz if pg_timestamptz extension is used)</p>
+<p>timestamp (or timestamptz if <a href="../files/lib/sequel/extensions/pg_timestamptz_rb.html">pg_timestamptz</a> extension is used)</p>
 </td></tr><tr><td class='label'>Sequel::SQLTime </td><td>
 <p>time</p>
 </td></tr><tr><td class='label'>Sequel::SQL::Blob </td><td>
@@ -830,7 +833,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 
 <p>:nocov:</p>
 
-<p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby’s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby’s ranges, allowing exclusive beginnings and endings (ruby’s range only allows exclusive endings).</p>
+<p>The <a href="../files/lib/sequel/extensions/pg_range_rb.html">pg_range</a> extension adds support for the PostgreSQL 9.2+ range types to <a href="Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby’s <a href="Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby’s ranges, allowing exclusive beginnings and endings (ruby’s range only allows exclusive endings).</p>
 
 <p>When PostgreSQL range values are retreived, they are parsed and returned as instances of <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="Range.html"><code>Range</code></a>, but it’s not a <a href="Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby’s <a href="Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
 
@@ -841,7 +844,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>)
 </pre>
 
-<p>If you have loaded the <a href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="Range.html#method-i-pg_range"><code>Range#pg_range</code></a>:</p>
+<p>If you have loaded the <a href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="../files/lib/sequel/extensions/core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="Range.html#method-i-pg_range"><code>Range#pg_range</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span>
 </pre>
@@ -871,14 +874,14 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)
 </pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of range types, load the pg_array extension before the pg_range extension:</p>
+<p>This extension integrates with the <a href="../files/lib/sequel/extensions/pg_array_rb.html">pg_array</a> extension.  If you plan to use arrays of range types, load the <a href="../files/lib/sequel/extensions/pg_array_rb.html">pg_array</a> extension before the <a href="../files/lib/sequel/extensions/pg_range_rb.html">pg_range</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_range</span>
 </pre>
 
 <p>Related module: <a href="Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a></p>
 
-<p>The round_timestamps extension will automatically round timestamp values to the database’s supported level of precision before literalizing them.</p>
+<p>The <a href="../files/lib/sequel/extensions/round_timestamps_rb.html">round_timestamps</a> extension will automatically round timestamp values to the database’s supported level of precision before literalizing them.</p>
 
 <p>For example, if the database supports millisecond precision, and you give it a Time value with microsecond precision, it will round it appropriately:</p>
 
@@ -887,7 +890,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 <span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span>
 </pre>
 
-<p>The round_timestamps extension correctly deals with databases that support millisecond or second precision.  In addition to handling Time values, it also handles DateTime values and Sequel::SQLTime values (for the TIME type).</p>
+<p>The <a href="../files/lib/sequel/extensions/round_timestamps_rb.html">round_timestamps</a> extension correctly deals with databases that support millisecond or second precision.  In addition to handling Time values, it also handles DateTime values and Sequel::SQLTime values (for the TIME type).</p>
 
 <p>To round timestamps for a single dataset:</p>
 
@@ -901,7 +904,7 @@ on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</p
 
 <p>Related module: <a href="Sequel/Dataset/RoundTimestamps.html"><code>Sequel::Dataset::RoundTimestamps</code></a></p>
 
-<p>The set_literalizer extension should no longer be used, as <a href="Sequel.html"><code>Sequel</code></a> now supports Set values by default. For backwards compatibility the set_literalizer extension will treat a set that contains only 2 element arrays as a condition specifier (matching the behavior for arrays where all elements are 2 element arrays). This is not compatible with Sequel’s current default behavior. If you are relying on this behavior, it is recommended you convert the set to an array.</p>
+<p>The <a href="../files/lib/sequel/extensions/set_literalizer_rb.html">set_literalizer</a> extension should no longer be used, as <a href="Sequel.html"><code>Sequel</code></a> now supports Set values by default. For backwards compatibility the <a href="../files/lib/sequel/extensions/set_literalizer_rb.html">set_literalizer</a> extension will treat a set that contains only 2 element arrays as a condition specifier (matching the behavior for arrays where all elements are 2 element arrays). This is not compatible with Sequel’s current default behavior. If you are relying on this behavior, it is recommended you convert the set to an array.</p>
 
 <p>Related module: <a href="Sequel/Dataset/SetLiteralizer.html"><code>Sequel::Dataset::SetLiteralizer</code></a></p>
 </div>

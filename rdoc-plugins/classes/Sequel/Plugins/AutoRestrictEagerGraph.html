@@ -36,7 +36,7 @@ Sequel::Plugins::AutoRestrictEagerGraph
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The auto_restrict_eager_graph plugin will automatically disallow the use of eager_graph for associations that have associated blocks but no :graph_* association options.  The reason for this is the block will have an effect during regular and eager loading, but not loading via eager_graph, and it is likely that whatever the block is doing should have an equivalent done when eager_graphing.  Most likely, not including a :graph_* option was either an oversight (and one should be added), or use with eager_graph was never intended (and usage should be forbidden).  Disallowing eager_graph in this case prevents likely unexpected behavior during eager_graph.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/auto_restrict_eager_graph_rb.html">auto_restrict_eager_graph</a> plugin will automatically disallow the use of eager_graph for associations that have associated blocks but no :graph_* association options.  The reason for this is the block will have an effect during regular and eager loading, but not loading via eager_graph, and it is likely that whatever the block is doing should have an equivalent done when eager_graphing.  Most likely, not including a :graph_* option was either an oversight (and one should be added), or use with eager_graph was never intended (and usage should be forbidden).  Disallowing eager_graph in this case prevents likely unexpected behavior during eager_graph.</p>
 
 <p>As an example of this, consider the following code:</p>
 
@@ -53,7 +53,7 @@ Sequel::Plugins::AutoRestrictEagerGraph
 <span class="ruby-comment"># SELECT ... FROM albums LEFT JOIN tracks ON (tracks.album_id = albums.id)</span>
 </pre>
 
-<p>With the auto_restrict_eager_graph plugin, the eager_graph call above will raise an error, alerting you to the fact that you either should not be using eager_graph with the association, or that you should be adding an appropriate :graph_* option, such as:</p>
+<p>With the <a href="../../../files/lib/sequel/plugins/auto_restrict_eager_graph_rb.html">auto_restrict_eager_graph</a> plugin, the eager_graph call above will raise an error, alerting you to the fact that you either should not be using eager_graph with the association, or that you should be adding an appropriate :graph_* option, such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:popular_tracks</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Track</span>, <span class="ruby-value">graph_conditions:</span> {<span class="ruby-value">popular:</span> <span class="ruby-keyword">true</span>} <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>
   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">popular:</span> <span class="ruby-keyword">true</span>)

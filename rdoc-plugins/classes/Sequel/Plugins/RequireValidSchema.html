@@ -36,7 +36,7 @@ Sequel::Plugins::RequireValidSchema
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The require_valid_schema plugin makes <a href="../../Sequel.html"><code>Sequel</code></a> raise or warn if attempting to set the dataset of a model class to a simple table, where the database supports schema parsing, but schema parsing does not work for the model’s table.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/require_valid_schema_rb.html">require_valid_schema</a> plugin makes <a href="../../Sequel.html"><code>Sequel</code></a> raise or warn if attempting to set the dataset of a model class to a simple table, where the database supports schema parsing, but schema parsing does not work for the model’s table.</p>
 
 <p>The plugin’s default behavior requires that all models that select from a single identifier have a valid table schema, if the database supports schema parsing. If the schema cannot be determined for such a model, an error is raised:</p>
 

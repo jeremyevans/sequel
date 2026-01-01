@@ -33,7 +33,7 @@ doc/release_notes/5.77.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A transaction_connection_validator extension has been added.  This extension allows for transparently switching to a new connection if a disconnect error is raised while trying to start a transaction, as long as a connection was not already checked out from the pool when the transaction method was called.  Transparent reconnection is safe in this case, since no user code is retried.</p>
 
@@ -46,7 +46,7 @@ doc/release_notes/5.77.0.txt
 <p>The duplicate_columns_handler extension now supports specifying the on_duplicate_columns option as a connection string parameter.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The list plugin now honors the :top option for the position when adding the first item to the list, instead of always using 1.</p>
 </li><li>
@@ -54,10 +54,10 @@ doc/release_notes/5.77.0.txt
 </li><li>
 <p>The uniqueness validation in the validation_helpers plugin now uses empty? instead of count == 0, for better performance.</p>
 </li><li>
-<p>On Ruby 3.4+, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses the timed_queue connection pool instead of the threaded connection pool by default.  This should make it so no existing applications are affected by the default switch. This should hopefully allow ample testing of the timed_queue connection pool.  At some point in the future, if no problems are repoted, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will likely switch to using the timed_queue connection pool by default on Ruby 3.2+.</p>
+<p>On Ruby 3.4+, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses the <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> connection pool instead of the threaded connection pool by default.  This should make it so no existing applications are affected by the default switch. This should hopefully allow ample testing of the <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> connection pool.  At some point in the future, if no problems are repoted, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will likely switch to using the <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> connection pool by default on Ruby 3.2+.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now warns by default if using eager_graph/association_join with an association that uses a block, in the cases where the block would be ignored and there are no appropriate graph options set. In <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 6, this warning will be turned into an exception. It is recommended that users use the auto_restrict_eager_graph plugin to turn this into an exception now, or use the :graph_use_association_block option so that the block is not ignored when graphing.</p>
 </li></ul>

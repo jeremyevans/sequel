@@ -33,7 +33,7 @@ lib/sequel/extensions/constraint_validations.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The constraint_validations extension is designed to easily create database constraints inside create_table and alter_table blocks.  It also adds relevant metadata about the constraints to a separate table, which the constraint_validations model plugin uses to setup automatic validations.</p>
+<p>The <a href="constraint_validations_rb.html">constraint_validations</a> extension is designed to easily create database constraints inside create_table and alter_table blocks.  It also adds relevant metadata about the constraints to a separate table, which the <a href="constraint_validations_rb.html">constraint_validations</a> model plugin uses to setup automatic validations.</p>
 
 <p>To use this extension, you first need to load it into the database:</p>
 
@@ -65,7 +65,7 @@ lib/sequel/extensions/constraint_validations.rb
 
 <p>However, note that you cannot use change migrations with this extension, you need to use separate up/down migrations.</p>
 
-<p>The API for creating the constraints with automatic validations is similar to the validation_helpers model plugin API.  However, instead of having separate validates_* methods, it just adds a validate method that accepts a block to the schema generators.  Like the create_table and alter_table blocks, this block is instance_execed and offers its own DSL. Example:</p>
+<p>The API for creating the constraints with automatic validations is similar to the <a href="../plugins/validation_helpers_rb.html">validation_helpers</a> model plugin API.  However, instead of having separate validates_* methods, it just adds a validate method that accepts a block to the schema generators.  Like the create_table and alter_table blocks, this block is instance_execed and offers its own DSL. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-constant">Integer</span> <span class="ruby-value">:id</span>

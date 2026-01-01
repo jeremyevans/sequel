@@ -33,7 +33,7 @@ doc/release_notes/5.8.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_auto_constraint_validations plugin has been added, which automatically converts many constraint violations raised as exceptions to ValidationFailed exceptions when saving a model instance.</p>
 
@@ -110,7 +110,7 @@ doc/release_notes/5.8.0.txt
 <p>Database#error_info on PostgreSQL now returns much more metadata regarding the error.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The dataset returned by the following dataset methods is cached, which can improve performance significantly in certain cases:</p>
 <ul><li>
@@ -155,7 +155,7 @@ doc/release_notes/5.8.0.txt
 <p>Model#_valid? is no longer made a public method in the error_splitter plugin.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Calling the filter method on a proxy object returned by the association_proxies plugin now warns on ruby &lt;2.6.  This is because starting in ruby 2.6, the behavior will change and the method will be called on the array of associated objects instead of on the dataset, as Enumerable#filter is being added in ruby 2.6.</p>
 </li></ul>

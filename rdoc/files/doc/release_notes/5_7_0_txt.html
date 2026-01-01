@@ -33,7 +33,7 @@ doc/release_notes/5.7.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>An integer64 extension has been added, which treats the Integer class as a generic 64-bit integer type.  Sequel’s default behavior for Integer is to use the integer type, which on most databases is a 32-bit type.</p>
 
@@ -56,7 +56,7 @@ doc/release_notes/5.7.0.txt
 <p>Dataset#overriding_system_value and overriding_user_value are now supported on PostgreSQL to work with identity columns.  You can use overriding_system_value to force the use of a user provided value for identity columns that are GENERATED ALWAYS, and you can use overriding_user_value to ignore any user value for identity columns and always use the next entry in the sequence.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>On PostgreSQL 10.2+, identity columns are now used instead of serial columns as the default for auto incrementing primary keys:</p>
 
@@ -91,7 +91,7 @@ doc/release_notes/5.7.0.txt
 <p>The <a href="../../../classes/Sequel.html"><code>Sequel</code></a> &lt;4 release notes and changelog are no longer shipped with the gem, decreasing the size of the gem by 20%.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The switch to using identity columns instead of serial columns by default on PostgreSQL 10.2+ may break backwards compatibilty in some situations, such as code that relies on what are generally considered bugs in serial columns, such as CREATE TABLE LIKE using the same sequence for the column in both the existing table and the new table, or that dropping the default value for the column does not drop the related sequence.</p>
 </li></ul>

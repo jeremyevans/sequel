@@ -33,7 +33,7 @@ doc/release_notes/4.8.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A one_through_one association type has been added.  This is similar to the many_to_many association type in that it uses a join table, but it returns a single record instead of an array of records. This is designed for cases where the foreign key in the join table that references the current table has a unique constraint, or where you want to use an order to just pick the first matching record.</p>
 
@@ -82,7 +82,7 @@ doc/release_notes/4.8.0.txt
 <p>SQL::AliasedExpression#alias has been added as an alias for aliaz.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now automatically use an eager limit strategy for *_one associations that use an :order option.  For associations that are truly one-to-one, an :order option is not needed, so it only makes sense to have an :order option if the association could theoretically return multiple results (in which case an eager limit strategy is helpful).</p>
 </li><li>
@@ -145,7 +145,7 @@ doc/release_notes/4.8.0.txt
 <p>The obdc/mssql adapter now inputs timestamps with 3 decimal places.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The private Model.apply_window_function_eager_limit_strategy method has been removed.</p>
 </li></ul>

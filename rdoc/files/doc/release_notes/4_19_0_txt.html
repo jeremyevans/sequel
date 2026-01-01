@@ -33,7 +33,7 @@ doc/release_notes/4.19.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Model#get_column_value and set_column_value have been added for getting/setting column values.  Historically, to get column values, you would just send the column name, and to set column values you would send the column name suffixed by =.  However, this doesn’t work when such methods are already defined by ruby or <a href="../../../classes/Sequel.html"><code>Sequel</code></a> itself (e.g. class, model, object_id).</p>
 
@@ -46,7 +46,7 @@ doc/release_notes/4.19.0.txt
 <p>Model#cancel_action has been added for canceling actions in before hooks, instead of having the before hook methods return false (which is still supported).  In addition to being easier to use, this also makes it possible to use custom exception messages for hook failures, if you are using the default behavior of raising exceptions on save failures.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset#union, intersect, and except now automatically handle datasets with raw SQL, by wrapping such datasets in subqueries.</p>
 </li><li>

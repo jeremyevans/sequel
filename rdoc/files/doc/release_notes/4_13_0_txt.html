@@ -33,7 +33,7 @@ doc/release_notes/4.13.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A modification_detection plugin has been added, for automatic detection of in-place column value modifications.  This makes it so you don’t have to call Model#modified! manually when changing a value in place.</p>
 </li><li>
@@ -66,7 +66,7 @@ doc/release_notes/4.13.0.txt
 <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now emulates RETURNING support using the OUTPUT clause, as long as only simple column references are used.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>A regression has been fixed in the timestamps and table inheritance plugins, where column values would not be saved when skipping validations.  This was first broken in 4.11.0.</p>
 </li><li>
@@ -115,7 +115,7 @@ doc/release_notes/4.13.0.txt
 <p>The rake default task now runs plugin specs in addition to core and model specs.</p>
 </li></ul>
 
-<h1 id="label-bin-2Fsequel+Improvements">bin/sequel Improvements<span><a href="#label-bin-2Fsequel+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-bin-2Fsequel+Improvements"><a href="#label-bin-2Fsequel+Improvements">bin/sequel Improvements</a></h1>
 <ul><li>
 <p>Add the sequel lib directory to the front of the load path instead of the end, fixing cases where you end up requiring an old version of the sequel gem (e.g. by using sequel_pg).</p>
 </li><li>
@@ -130,7 +130,7 @@ doc/release_notes/4.13.0.txt
 <p>If sequel -v is given along with a database or code string to execute, print the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> version but also continue, similar to how ruby -v works.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The switch from JOIN ON to JOIN USING in the class_table_inheritance can break certain usage, such as querying using unqualified primary key.  Users should switch to using a qualified primary key instead.</p>
 </li><li>

@@ -36,7 +36,7 @@ Sequel::Plugins::SkipCreateRefresh
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The skip_create_refresh plugin skips the refresh after saving a new model object.  <a href="../../Sequel.html"><code>Sequel</code></a> does the refresh by default to make sure all columns are populated, which is necessary so that database defaults work correctly.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/skip_create_refresh_rb.html">skip_create_refresh</a> plugin skips the refresh after saving a new model object.  <a href="../../Sequel.html"><code>Sequel</code></a> does the refresh by default to make sure all columns are populated, which is necessary so that database defaults work correctly.</p>
 
 <p>This plugin is mostly for performance reasons where you want to save the cost of select statement after the insert, but it could also help cases where records are not immediately available for selection after insertion.</p>
 

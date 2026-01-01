@@ -36,7 +36,7 @@ Sequel::Plugins::DelayAddAssociation
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The delay_add_association plugin delays the adding of associated objects to a new (unsaved) object until after the new object is saved.  By default, if you attempt to add associated objects to a new object, <a href="../../Sequel.html"><code>Sequel</code></a> will raise an error, because you need to have a primary key before saving the objects.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/delay_add_association_rb.html">delay_add_association</a> plugin delays the adding of associated objects to a new (unsaved) object until after the new object is saved.  By default, if you attempt to add associated objects to a new object, <a href="../../Sequel.html"><code>Sequel</code></a> will raise an error, because you need to have a primary key before saving the objects.</p>
 
 <p>When delaying the add of an associated object, the object will be immediately added to the cached association array. When saving the current object, it will also attempt to validate any associated objects, and if the associated objects are not valid, the current object will also be considered not valid.</p>
 
@@ -75,7 +75,7 @@ Sequel::Plugins::DelayAddAssociation
 </div>
 <div class='description'>
 
-<p>Depend on the validate_associated plugin.</p>
+<p>Depend on the <a href="../../../files/lib/sequel/plugins/validate_associated_rb.html">validate_associated</a> plugin.</p>
 
 </div>
 <div class='source'>

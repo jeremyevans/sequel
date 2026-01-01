@@ -33,7 +33,7 @@ doc/release_notes/3.15.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Performance+Enhancements"><a href="#label-Performance+Enhancements">Performance Enhancements</a></h1>
 <ul><li>
 <p>A mysql2 adapter was added to <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.  It offers a large (2-6x) performance increase over the standard mysql adapter. In order to use it, you need to install mysql2, and change your connection strings to use mysql2:// instead of mysql://.</p>
 </li><li>
@@ -42,7 +42,7 @@ doc/release_notes/3.15.0.txt
 <p>Mass assignment has been made about 10x faster by caching the allowed setter methods in the model.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The following construct is now safe to use in environments that reload code without unloading existing constants:</p>
 
@@ -77,7 +77,7 @@ doc/release_notes/3.15.0.txt
 <p>An bug in the error handling when connecting to PostgreSQL using the do (DataObjects) adapter has been fixed.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The caching of allowed mass assignment methods can result in the incorrect exception class being raised if you manually undefine instance setter methods in the model class.  If you do this, you need to clear the setter methods cache manually:</p>
 

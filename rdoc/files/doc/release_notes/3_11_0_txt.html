@@ -33,7 +33,7 @@ doc/release_notes/3.11.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A few new features were added to query logging.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now includes execution time when logging queries.  Queries that raise exceptions are now logged at ERROR level.  You can now set the log_warn_duration attribute on the Database instance and queries that take longer than that will be logged at WARN level.  By using different log levels, you can now only log queries that raise errors, or only log queries that take a long time.</p>
 
@@ -144,7 +144,7 @@ doc/release_notes/3.11.0.txt
 <p>When connecting to SQLite, a Database#sqlite_version method is available that gives you the SQLite version as an integer (e.g. 30613 for 3.6.13).</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer raises an error if you give Dataset#filter or related method an empty argument such as {}, [], or ”. This allows code such as the following to work:</p>
 
@@ -197,7 +197,7 @@ doc/release_notes/3.11.0.txt
 <p>Many documentation improvements were made, including the addition of a dataset basics guide, an association basics guide, an expanded virtual row guide, and the separation of the <a href="../../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> RDoc page into sections.  Additional, the RDoc class/method documentation now contains links to the appropriate guides.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>When connecting to SQLite, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now automatically sets the foreign_keys PRAGMA to true, which will make SQLite 3.6.19+ use database enforced foreign key constraints.  If you do not want the database to enforce the foreign key constraints, you should use the :foreign_keys=&gt;false option when connecting to the database.</p>
 </li><li>

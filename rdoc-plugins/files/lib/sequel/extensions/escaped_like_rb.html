@@ -33,7 +33,7 @@ lib/sequel/extensions/escaped_like.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The escaped_like extension adds <code>escaped_like</code> and <code>escaped_ilike</code> methods to <a href="../../../../classes/Sequel/SQL/StringMethods.html"><code>Sequel::SQL::StringMethods</code></a>, which allow them to be easily used with most of Sequel’s expression objects.  Example:</p>
+<p>The <a href="escaped_like_rb.html">escaped_like</a> extension adds <a href="escaped_like_rb.html">escaped_like</a> and <code>escaped_ilike</code> methods to <a href="../../../../classes/Sequel/SQL/StringMethods.html"><code>Sequel::SQL::StringMethods</code></a>, which allow them to be easily used with most of Sequel’s expression objects.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">string_column</span>.<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-identifier">user_input</span>)}
 <span class="ruby-comment"># user_input is &#39;foo&#39;:</span>

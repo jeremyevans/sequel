@@ -36,7 +36,7 @@ Sequel::Plugins::SqlComments
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The sql_comments plugin will automatically use <a href="../SQL.html"><code>SQL</code></a> comments on queries for the model it is loaded into.  These comments will show the related model, what type of method was called, and the method name (or association name for queries to load associations):</p>
+<p>The <a href="../../../files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a> plugin will automatically use <a href="../SQL.html"><code>SQL</code></a> comments on queries for the model it is loaded into.  These comments will show the related model, what type of method was called, and the method name (or association name for queries to load associations):</p>
 
 <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]
 <span class="ruby-comment"># SELECT * FROM albums WHERE (id = 1) LIMIT 1</span>
@@ -67,7 +67,7 @@ Sequel::Plugins::SqlComments
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">sql_comments_dataset_methods</span> <span class="ruby-value">:to_csv</span> <span class="ruby-comment"># csv_serializer plugin</span>
 </pre>
 
-<p>In order for the sql_comments plugin to work, the sql_comments <a href="../../Database.html"><code>Database</code></a> extension must be loaded into the model’s database, so loading the plugin does this automatically.</p>
+<p>In order for the <a href="../../../files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a> plugin to work, the <a href="../../../files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a> <a href="../../Database.html"><code>Database</code></a> extension must be loaded into the model’s database, so loading the plugin does this automatically.</p>
 
 <p>Note that in order to make sure <a href="../SQL.html"><code>SQL</code></a> comments are included, some optimizations are disabled if this plugin is loaded.</p>
 

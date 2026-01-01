@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_auto_parameterize_in_array.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_auto_parameterize_in_array extension builds on the pg_auto_parameterize extension, adding support for handling additional types when converting from IN to = ANY and NOT IN to != ALL:</p>
+<p>The <a href="pg_auto_parameterize_in_array_rb.html">pg_auto_parameterize_in_array</a> extension builds on the <a href="pg_auto_parameterize_rb.html">pg_auto_parameterize</a> extension, adding support for handling additional types when converting from IN to = ANY and NOT IN to != ALL:</p>
 
 <pre>DB[:table].where(column: [1.0, 2.0, ...])
 # Without extension: column IN ($1::numeric, $2:numeric, ...) # bound variables: 1.0, 2.0, ...
@@ -49,9 +49,9 @@ lib/sequel/extensions/pg_auto_parameterize_in_array.rb
 </td></tr><tr><td class='label'>Date </td><td>
 <p>date</p>
 </td></tr><tr><td class='label'>Time </td><td>
-<p>timestamp (or timestamptz if pg_timestamptz extension is used)</p>
+<p>timestamp (or timestamptz if <a href="pg_timestamptz_rb.html">pg_timestamptz</a> extension is used)</p>
 </td></tr><tr><td class='label'>DateTime </td><td>
-<p>timestamp (or timestamptz if pg_timestamptz extension is used)</p>
+<p>timestamp (or timestamptz if <a href="pg_timestamptz_rb.html">pg_timestamptz</a> extension is used)</p>
 </td></tr><tr><td class='label'>Sequel::SQLTime </td><td>
 <p>time</p>
 </td></tr><tr><td class='label'>Sequel::SQL::Blob </td><td>

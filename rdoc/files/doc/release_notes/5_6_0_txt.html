@@ -33,7 +33,7 @@ doc/release_notes/5.6.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p>Running migrations using one of the included migrators on separate Database objects in separate threads simultaneously is now supported.  Previously, the migrators were not thread-safe.</p>
 </li><li>
@@ -46,7 +46,7 @@ doc/release_notes/5.6.0.txt
 <p>Identifier mangling rules are now respected when renaming columns on Microsoft SQL Server.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The migrator internals were modified in order to support thread-safety.  The private Migrator#remove_migration_classes method has been removed, and load_migration_file now returns the migration object/class instead of populating Migration.descendants. Migration.descendants is now only used for temporary storage, and will no longer contain all migration objects/classes used by the migrator.</p>
 </li></ul>

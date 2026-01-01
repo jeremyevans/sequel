@@ -36,7 +36,7 @@ Sequel::Plugins::PgAutoValidateEnums
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_auto_validate_enums plugin implements automatic validations for enum columns, ensuring that enum columns have a valid value.  With this plugin, trying to save with an invalid enum value results in Sequel::ValidationFailed before saving, instead of <a href="../DatabaseError.html"><code>Sequel::DatabaseError</code></a> (wrapping PG::InvalidTextRepresentation or similar exception) during saving.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/pg_auto_validate_enums_rb.html">pg_auto_validate_enums</a> plugin implements automatic validations for enum columns, ensuring that enum columns have a valid value.  With this plugin, trying to save with an invalid enum value results in Sequel::ValidationFailed before saving, instead of <a href="../DatabaseError.html"><code>Sequel::DatabaseError</code></a> (wrapping PG::InvalidTextRepresentation or similar exception) during saving.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-comment"># assume state enum column with allowed values active and inactive</span>
@@ -49,7 +49,7 @@ Sequel::Plugins::PgAutoValidateEnums
 
 <p>While you can load this into individual model classes, typical use would be to load it into <a href="../Model.html"><code>Sequel::Model</code></a> or the appropriate model base class, and have all models that inherit from that class automatically pick it up.</p>
 
-<p>This plugin depends on the validation_helpers plugin.</p>
+<p>This plugin depends on the <a href="../../../files/lib/sequel/plugins/validation_helpers_rb.html">validation_helpers</a> plugin.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -79,7 +79,7 @@ Sequel::Plugins::PgAutoValidateEnums
 </div>
 <div class='description'>
 
-<p>Load the validation_helpers plugin.</p>
+<p>Load the <a href="../../../files/lib/sequel/plugins/validation_helpers_rb.html">validation_helpers</a> plugin.</p>
 
 </div>
 <div class='source'>
@@ -100,7 +100,7 @@ Sequel::Plugins::PgAutoValidateEnums
 </div>
 <div class='description'>
 
-<p>Load the pg_enum extension into the database, and reload the schema if it is already loaded. The opts given are used for the validates_includes validations (with allow_nil: true and from: :values enabled by default, to avoid issues with nullable enum columns and cases where the column method has been overridden.</p>
+<p>Load the <a href="../../../files/lib/sequel/extensions/pg_enum_rb.html">pg_enum</a> extension into the database, and reload the schema if it is already loaded. The opts given are used for the validates_includes validations (with allow_nil: true and from: :values enabled by default, to avoid issues with nullable enum columns and cases where the column method has been overridden.</p>
 
 </div>
 <div class='source'>

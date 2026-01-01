@@ -33,9 +33,9 @@ doc/release_notes/5.95.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
-<p>The timed_queue and sharded_timed_queue connection pools (the default on Ruby 3.2+) now implement a num_waiting method, which will return now many threads or fibers are waiting to checkout a connection. This can be used for metrics on how loaded the connection pool is, which can help provide information on whether the connection pool max size should be modified.</p>
+<p>The <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> and <a href="../../lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pools (the default on Ruby 3.2+) now implement a num_waiting method, which will return now many threads or fibers are waiting to checkout a connection. This can be used for metrics on how loaded the connection pool is, which can help provide information on whether the connection pool max size should be modified.</p>
 </li><li>
 <p>A class_table_inheritance_constraint_validations plugin has been added, which will allow subclasses using the class_table_inheritance plugin to respect constraint validations for all of the class’s tables.</p>
 </li><li>

@@ -36,9 +36,9 @@ Sequel::Plugins::LazyAttributes
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The lazy_attributes plugin allows users to easily set that some attributes should not be loaded by default when loading model objects.  If the attribute is needed after the instance has been retrieved, a database query is made to retreive the value of the attribute.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/lazy_attributes_rb.html">lazy_attributes</a> plugin allows users to easily set that some attributes should not be loaded by default when loading model objects.  If the attribute is needed after the instance has been retrieved, a database query is made to retreive the value of the attribute.</p>
 
-<p>This plugin depends on the tactical_eager_loading plugin, and allows you to eagerly load lazy attributes for all objects retrieved with the current object. So the following code should issue one query to get the albums and one query to get the reviews for all of those albums:</p>
+<p>This plugin depends on the <a href="../../../files/lib/sequel/plugins/tactical_eager_loading_rb.html">tactical_eager_loading</a> plugin, and allows you to eagerly load lazy attributes for all objects retrieved with the current object. So the following code should issue one query to get the albums and one query to get the reviews for all of those albums:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
@@ -49,7 +49,7 @@ Sequel::Plugins::LazyAttributes
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>, <span class="ruby-value">:review</span>, <span class="ruby-value">:tracklist</span>
 </pre>
 
-<p>Note that by default on databases that supporting RETURNING, using explicit column selections will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the insert_returning_select plugin to automatically use RETURNING for instance creations for models using the lazy_attributes plugin.</p>
+<p>Note that by default on databases that supporting RETURNING, using explicit column selections will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the <a href="../../../files/lib/sequel/plugins/insert_returning_select_rb.html">insert_returning_select</a> plugin to automatically use RETURNING for instance creations for models using the <a href="../../../files/lib/sequel/plugins/lazy_attributes_rb.html">lazy_attributes</a> plugin.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -79,7 +79,7 @@ Sequel::Plugins::LazyAttributes
 </div>
 <div class='description'>
 
-<p>Lazy attributes requires the tactical_eager_loading plugin</p>
+<p>Lazy attributes requires the <a href="../../../files/lib/sequel/plugins/tactical_eager_loading_rb.html">tactical_eager_loading</a> plugin</p>
 
 </div>
 <div class='source'>

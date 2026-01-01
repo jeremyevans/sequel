@@ -33,7 +33,7 @@ doc/release_notes/5.73.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A paged_operations plugin has been added, which adds support for paged_datasets, paged_update, and paged_delete dataset methods. This methods are designed to be used on large datasets, to split a large query into separate smaller queries, to avoid locking the related database table for a long period of time. paged_update and paged_delete operate the same as update and delete, returning the number of rows updated or deleted. paged_datasets yields one or more datasets representing subsets of the receiver, with the union of all of those datasets comprising all records in the receiver:</p>
 
@@ -74,7 +74,7 @@ doc/release_notes/5.73.0.txt
 <p>The <a href="../../../classes/Sequel/MassAssignmentRestriction.html"><code>Sequel::MassAssignmentRestriction</code></a> exception now supports model and column methods to get provide additional information about the exception.  Additionally, the exception message now includes information about the model class.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The ibmdb and jdbc/db2 adapter now both handle disconnect errors correctly, removing the related connection from the pool.</p>
 </li><li>

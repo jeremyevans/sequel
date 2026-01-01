@@ -33,7 +33,7 @@ doc/release_notes/4.21.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>SQL::GenericExpression#=~ has been added as an alternative method of specifying equality/inclusion/identity.  Previously, you had to use a hash.  This led to some slightly weird looking syntax when used inside virtual rows:</p>
 
@@ -104,7 +104,7 @@ doc/release_notes/4.21.0.txt
 <p>Database#full_text_search on PostgreSQL now supports :tsquery and :tsvector options for using existing tsquery and/or tsvector arguments, instead of assuming the arguments are query terms or the text to be search.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Database#transaction now works inside after_commit and after_rollback hooks.  Previously, it didn’t work correctly as it thought it was already inside the previously committed/rolled back transaction.</p>
 </li><li>
@@ -113,7 +113,7 @@ doc/release_notes/4.21.0.txt
 <p>The tinytds adapter no longer tries to cancel a query on a closed connection, which was causing an exception to be raised.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The default root name used in the JSON serializer is now demodulized before being underscored.  This changes the behavior when the model is namespaced.  For example, if the model class name is Mod::Model, the previous default root name would be “mod/model”, the new default root name is “model”.</p>
 </li><li>

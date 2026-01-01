@@ -33,7 +33,7 @@ doc/release_notes/3.45.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#transaction now recognizes a :retry_on option, which should contain an exception class or array of exception classes. If the transaction raises one of the given exceptions, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will automatically retry the transaction block.  It’s a bad idea to use this option if the transaction block is not idempotent.</p>
 
@@ -58,7 +58,7 @@ doc/release_notes/3.45.0.txt
 <p>The named_timezones extension now adds a Sequel.tzinfo_disambiguator accessor to automatically handle TZInfo::AmbiguousTime exceptions.  This should be a callable object that accepts two arguments, a DateTime instance and an array of timezone periods, and returns the timezone period to use.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles JSON securely, specifying the :create_additions=&gt;false option when using JSON.parse.  If you really want to get the old vulnerable behavior back, override Sequel.parse_json.</p>
 </li><li>
@@ -109,7 +109,7 @@ doc/release_notes/3.45.0.txt
 <p>Coverage testing now uses simplecov instead of rcov on ruby 1.9+.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The switch to using JSON.parse :create_additions=&gt;false means that if your app expected JSON to deserialize into arbitrary ruby objects, it is probably broken.  You should update your application code to manually convert the deserialized hashes into the ruby objects you want.</p>
 

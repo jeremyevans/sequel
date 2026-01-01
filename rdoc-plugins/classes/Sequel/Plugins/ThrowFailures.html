@@ -36,7 +36,7 @@ Sequel::Plugins::ThrowFailures
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The throw_failures plugin throws HookFailed and ValidationFailed exceptions instead of raising them.  If there is no matching catch block, the UncaughtThrowError will be rescued and the HookFailed or ValidationFailed exception will be raised normally.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/throw_failures_rb.html">throw_failures</a> plugin throws HookFailed and ValidationFailed exceptions instead of raising them.  If there is no matching catch block, the UncaughtThrowError will be rescued and the HookFailed or ValidationFailed exception will be raised normally.</p>
 
 <p>If you are setting up the catch blocks to handle these failures, in the failure case this plugin is about 10-15% faster on CRuby and 10x faster on JRuby.  If you are not setting up the catch blocks, in the failure case this plugin is about 30% slower on CRuby and 2x slower on JRuby.  So this plugin should only be used if you are setting up catch blocks manually.</p>
 

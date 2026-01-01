@@ -36,14 +36,14 @@ Sequel::Plugins::AutoValidationsConstraintValidationsPresenceMessage
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The auto_validations_constraint_validations_presence_message plugin provides integration for the auto_validations and constraint_validations plugins in the following situation:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/auto_validations_constraint_validations_presence_message_rb.html">auto_validations_constraint_validations_presence_message</a> plugin provides integration for the <a href="../../../files/lib/sequel/plugins/auto_validations_rb.html">auto_validations</a> and <a href="../../../files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a> plugins in the following situation:</p>
 <ul><li>
 <p>A column has a NOT NULL constraint in the database</p>
 </li><li>
 <p>A constraint validation for presence exists on the column, with a :message option to set a column-specific message, and with the :allow_nil option set to true because the CHECK constraint doesn’t need to check for NULL values as the column itself is NOT NULL</p>
 </li></ul>
 
-<p>In this case, by default the validation error message on the column will use the more specific constraint validation error message if the column has a non-NULL empty value, but will use the default auto_validations message if the column has a NULL value.  With this plugin, the column-specific constraint validation error message will be used in both cases.</p>
+<p>In this case, by default the validation error message on the column will use the more specific constraint validation error message if the column has a non-NULL empty value, but will use the default <a href="../../../files/lib/sequel/plugins/auto_validations_rb.html">auto_validations</a> message if the column has a NULL value.  With this plugin, the column-specific constraint validation error message will be used in both cases.</p>
 
 <p>Usage:</p>
 

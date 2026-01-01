@@ -33,7 +33,7 @@ doc/release_notes/3.32.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Prepared statements now support :map and :to_hash prepared statement types.  The main reason for this is that certain extensions (e.g. sequel_pg) optimize map/to_hash calls, and there previously was not a way to use prepared statements with the map/to_hash optimizations.</p>
 </li><li>
@@ -59,7 +59,7 @@ doc/release_notes/3.32.0.txt
 <p>On Microsoft SQL Server, the :include option is now supported when creating indexes, for storing column values in the index, which can be used by the query optimizer.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The filtering/excluding by associations code now uses qualified identifiers instead of unqualified identifiers, which allows it to avoid ambiguous column names if you are doing your own joins.</p>
 </li><li>
@@ -104,7 +104,7 @@ doc/release_notes/3.32.0.txt
 <p>Transaction related queries are no longer logged twice in the mock adapter.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Sequel’s default handling of NOT IN operators with an empty array of values has changed, which can change which rows are returned for such queries.</p>
 

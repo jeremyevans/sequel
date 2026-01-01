@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::SingleStatementDatasetDestroy::DatasetMethods</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::SingleStatementDatasetDestroy::DatasetMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/single_statement_dataset_destroy_rb.html">lib/sequel/plugins/single_statement_dataset_destroy.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-destroy">destroy</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-destroy'>
+<a name='method-i-destroy'></a>
+<div class='synopsis'>
+<span class='name'>destroy</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Destroy all rows in a single DELETE statement. Run the before_destroy hooks for all rows before the DELETE, and all after_destroy hooks for all rows after the DELETE. If the model uses an around_destroy hook, fallback to using a separate DELETE statement per row.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-destroy-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/single_statement_dataset_destroy.rb</span>
+<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>
+<span class="line-num">32</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-value">:around_destroy</span>).<span class="ruby-identifier">owner</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">InstanceMethods</span>
+<span class="line-num">33</span> 
+<span class="line-num">34</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
+<span class="line-num">35</span>     <span class="ruby-identifier">rows</span> = <span class="ruby-identifier">all</span>
+<span class="line-num">36</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:before_destroy</span>)
+<span class="line-num">37</span>     <span class="ruby-identifier">expected_rows</span> = <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">38</span>     <span class="ruby-identifier">n</span> = <span class="ruby-identifier">delete</span>
+<span class="line-num">39</span>     <span class="ruby-keyword">unless</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">expected_rows</span>
+<span class="line-num">40</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;dataset changed during destroy, expected rows: #{expected_rows}, actual rows: #{n}&quot;</span>
+<span class="line-num">41</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">42</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:after_destroy</span>)
+<span class="line-num">43</span>     <span class="ruby-identifier">n</span>
+<span class="line-num">44</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

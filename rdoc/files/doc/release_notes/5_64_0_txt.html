@@ -33,7 +33,7 @@ doc/release_notes/5.64.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A :graph_use_association_block association option has been added, which makes eager_graph use the association block (as eager does), generally resulting in a JOIN to a subquery:</p>
 
@@ -52,7 +52,7 @@ doc/release_notes/5.64.0.txt
 <p>Numeric/Decimal column schema entries now include :min_value and :max_value entries on most databases, indicating the minimum and maximum values supported for the column. Similar to the support for integer columns added in <a href="5_62_0_txt.html">5.62.0</a>, this allows the auto_validations plugin to automatically validate the values of the columns are in the allowed range.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>many_through_{one,many} associations now support eager_graph callbacks.</p>
 </li><li>
@@ -61,7 +61,7 @@ doc/release_notes/5.64.0.txt
 <p>The oracle adapter now includes a :column_size column schema entry containing the precision of the columns, to work with the numeric/decimal column min_value/max_value support.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The private Database#column_schema_integer_min_max_values method added in <a href="5_62_0_txt.html">5.62.0</a> now takes a column schema hash instead of a database type string.</p>
 </li><li>

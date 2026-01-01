@@ -33,7 +33,7 @@ doc/release_notes/4.49.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Forward+Compatibility">Forward Compatibility<span><a href="#label-Forward+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Forward+Compatibility"><a href="#label-Forward+Compatibility">Forward Compatibility</a></h1>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="4_49_0_txt.html">4.49.0</a> will be the last minor release of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4. While the vast majority of backwards incompatible changes in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 have deprecation warnings in <a href="4_49_0_txt.html">4.49.0</a>, there are a few changes that do not.  Here is a brief list of changes coming in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 that do not have deprecation warnings (note that this list may not be exhaustive):</p>
 <ul><li>
@@ -58,7 +58,7 @@ doc/release_notes/4.49.0.txt
 <p>The @was_new instance variable set during model instance creation will be removed.</p>
 </li></ul>
 
-<h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features"><a href="#label-Deprecated+Features">Deprecated Features</a></h1>
 <ul><li>
 <p>Model association before callbacks returning false canceling the action is now deprecated.  The callbacks should now call Model#cancel_action to cancel the action.</p>
 </li><li>
@@ -91,7 +91,7 @@ doc/release_notes/4.49.0.txt
 <p>Additional internal constants are now deprecated.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#extend_datasets and Database#with_extend if given a block now use a Dataset::DatasetModule instance instead of a plain Module instance.  Dataset::DatasetModule is a subset of Model::DatasetModule, and allows for the easy creation of dataset methods that can perform caching for frozen datasets.</p>
 
@@ -155,7 +155,7 @@ doc/release_notes/4.49.0.txt
 <p>The single_table_inheritance plugin now supports an sti_class_from_sti_key method for getting the appropriate subclass for the given key.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Using the dataset_associations plugin with a many_through_many association that joins to the same table multiple times is now handled correctly by automatically aliasing the table appropriately.</p>
 </li><li>

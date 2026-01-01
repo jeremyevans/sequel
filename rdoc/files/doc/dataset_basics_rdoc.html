@@ -33,13 +33,13 @@ doc/dataset_basics.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Dataset+Basics+">Dataset Basics <span><a href="#label-Dataset+Basics+">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Dataset+Basics+"><a href="#label-Dataset+Basics+">Dataset Basics </a></h1>
 
-<h2 id="label-Introduction">Introduction<span><a href="#label-Introduction">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Introduction"><a href="#label-Introduction">Introduction</a></h2>
 
 <p>Datasets are the primary way <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses to access the database. While most database libraries have specific support for updating all records or only a single record, Sequel’s ability to represent SQL queries themselves as datasets is what gives <a href="../../classes/Sequel.html"><code>Sequel</code></a> most of its power.  This document aims to give a basic introduction to datasets and how to use them.</p>
 
-<h2 id="label-Basics">Basics<span><a href="#label-Basics">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Basics"><a href="#label-Basics">Basics</a></h2>
 
 <p>The most basic dataset is the simple selection of all columns in a table:</p>
 
@@ -94,7 +94,7 @@ doc/dataset_basics.rdoc
 
 <p>This is because all will return an array of hashes, and <code>select</code>, <code>order</code>, and <code>where</code> are dataset methods, not array methods.</p>
 
-<h2 id="label-Methods">Methods<span><a href="#label-Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Methods"><a href="#label-Methods">Methods</a></h2>
 
 <p>Most Dataset methods that users will use can be broken down into two types:</p>
 <ul><li>
@@ -103,7 +103,7 @@ doc/dataset_basics.rdoc
 <p>Methods that execute code on the database</p>
 </li></ul>
 
-<h3 id="label-Methods+that+return+modified+datasets">Methods that return modified datasets<span><a href="#label-Methods+that+return+modified+datasets">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Methods+that+return+modified+datasets"><a href="#label-Methods+that+return+modified+datasets">Methods that return modified datasets</a></h3>
 
 <p>Most dataset methods fall into this category, which can be further broken down by the clause they affect:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>SELECT</td><td>
@@ -132,7 +132,7 @@ doc/dataset_basics.rdoc
 <p>distinct, naked, qualify, server, with_sql</p>
 </td></tr></tbody></table>
 
-<h3 id="label-Methods+that+execute+code+on+the+database">Methods that execute code on the database<span><a href="#label-Methods+that+execute+code+on+the+database">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Methods+that+execute+code+on+the+database"><a href="#label-Methods+that+execute+code+on+the+database">Methods that execute code on the database</a></h3>
 
 <p>Most other dataset methods commonly used will execute the dataset’s SQL on the database:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>SELECT (All Records)</td><td>
@@ -153,7 +153,7 @@ doc/dataset_basics.rdoc
 <p>columns, columns!, truncate</p>
 </td></tr></tbody></table>
 
-<h3 id="label-Other+methods">Other methods<span><a href="#label-Other+methods">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Other+methods"><a href="#label-Other+methods">Other methods</a></h3>
 
 <p>See the <a href="../../classes/Sequel/Dataset.html"><code>Sequel::Dataset</code></a> RDoc for other methods that are less commonly used.</p>
 </div>

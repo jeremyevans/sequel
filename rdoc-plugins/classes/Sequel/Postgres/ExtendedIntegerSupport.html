@@ -58,9 +58,9 @@ Sequel::Postgres::ExtendedIntegerSupport
 
 <p>Set the strategy for handling integers outside PostgreSQL bigint range.  Supported values:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:quote </td><td>
-<p>Quote the integer value. PostgreSQL will treat the integer as a unknown type, implicitly casting to any other type as needed. This is the default value when using the pg_extended_integer_support extension.</p>
+<p>Quote the integer value. PostgreSQL will treat the integer as a unknown type, implicitly casting to any other type as needed. This is the default value when using the <a href="../../../files/lib/sequel/extensions/pg_extended_integer_support_rb.html">pg_extended_integer_support</a> extension.</p>
 </td></tr><tr><td class='label'>:raise </td><td>
-<p>Raise error when attempting to literalize the integer (the default behavior of <a href="../../Sequel.html"><code>Sequel</code></a> on PostgreSQL when not using the pg_extended_integer_support extension).</p>
+<p>Raise error when attempting to literalize the integer (the default behavior of <a href="../../Sequel.html"><code>Sequel</code></a> on PostgreSQL when not using the <a href="../../../files/lib/sequel/extensions/pg_extended_integer_support_rb.html">pg_extended_integer_support</a> extension).</p>
 </td></tr><tr><td class='label'>:raw </td><td>
 <p>Use raw integer value without quoting. PostgreSQL will treat the integer as a numeric. This was Sequel’s historical behavior, but it is unlikely to be desired.</p>
 </td></tr></tbody></table>

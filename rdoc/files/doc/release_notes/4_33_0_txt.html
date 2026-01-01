@@ -33,7 +33,7 @@ doc/release_notes/4.33.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A Sequel::Model.require_valid_table accessor has been added. This setting is false for backwards compatibility, but if set to true, will raise an error you try to create a model class where an invalid table name is used or the schema or columns cannot be determined.  This makes it easier to catch bugs, as things will fail fast, but it means that you must change code like:</p>
 
@@ -53,7 +53,7 @@ doc/release_notes/4.33.0.txt
 <p><a href="../../../classes/Sequel/Database.html#method-i-transaction"><code>Sequel::Database#transaction</code></a> now supports a :savepoint=&gt;:only option, which will create a savepoint if already inside a transaction, but will yield without creating a transaction if not inside a transaction.  The use case for this is when you are running code that may raise an exception, and you don’t want to invalidate the current transaction state.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The graph_each extension now splits results into subhashes when using <a href="../../../classes/Sequel/Dataset.html#method-i-first"><code>Sequel::Dataset#first</code></a>, as it did before <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.27.0.</p>
 </li><li>
@@ -79,7 +79,7 @@ doc/release_notes/4.33.0.txt
 <p>It is now possible to raise <a href="../../../classes/Sequel/ValidationFailed.html"><code>Sequel::ValidationFailed</code></a> and <a href="../../../classes/Sequel/HookFailed.html"><code>Sequel::HookFailed</code></a> without an argument.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> no longer swallows many errors when subclassing or setting datasets.  While this should hopefully not affect backwards compatibility, it may break things where the methods were raising exceptions.  If this does break backwards compatibility, it is most likely because it is no longer hiding another bug that should be fixed.  Specific changes include:</p>
 <ul><li>

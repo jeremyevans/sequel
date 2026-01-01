@@ -45,7 +45,7 @@ Sequel::Plugins::ConstraintValidations
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The constraint_validations plugin is designed to be used with databases that used the constraint_validations extension when creating their tables.  The extension adds validation metadata for constraints created, and this plugin reads that metadata and automatically creates validations for all of the constraints.  For example, if you used the extension and created your albums table like this:</p>
+<p>The <a href="../../../files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a> plugin is designed to be used with databases that used the <a href="../../../files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a> extension when creating their tables.  The extension adds validation metadata for constraints created, and this plugin reads that metadata and automatically creates validations for all of the constraints.  For example, if you used the extension and created your albums table like this:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:albums</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
@@ -126,7 +126,7 @@ Sequel::Plugins::ConstraintValidations
 </div>
 <div class='description'>
 
-<p>Automatically load the validation_helpers plugin to run the actual validations.</p>
+<p>Automatically load the <a href="../../../files/lib/sequel/plugins/validation_helpers_rb.html">validation_helpers</a> plugin to run the actual validations.</p>
 
 </div>
 <div class='source'>

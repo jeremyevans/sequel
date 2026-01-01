@@ -33,7 +33,7 @@ lib/sequel/extensions/is_distinct_from.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The is_distinct_from extension adds the ability to use the SQL standard IS DISTINCT FROM operator, which is similar to the not equals operator, except that NULL values are considered equal.  PostgreSQL, SQLite 3.39+, and H2 currently support this operator.  On other databases, support is emulated.</p>
+<p>The <a href="is_distinct_from_rb.html">is_distinct_from</a> extension adds the ability to use the SQL standard IS DISTINCT FROM operator, which is similar to the not equals operator, except that NULL values are considered equal.  PostgreSQL, SQLite 3.39+, and H2 currently support this operator.  On other databases, support is emulated.</p>
 
 <p>First, you need to load the extension into the database:</p>
 
@@ -46,7 +46,7 @@ lib/sequel/extensions/is_distinct_from.rb
 <span class="ruby-comment"># (column_a IS DISTINCT FROM column_b)</span>
 </pre>
 
-<p>You can also use the <code>is_distinct_from</code> method on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
+<p>You can also use the <a href="is_distinct_from_rb.html">is_distinct_from</a> method on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
 
 <pre class="ruby"><span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column_a</span>].<span class="ruby-identifier">is_distinct_from</span>(<span class="ruby-value">:column_b</span>)
 <span class="ruby-comment"># (column_a IS DISTINCT FROM column_b)</span>

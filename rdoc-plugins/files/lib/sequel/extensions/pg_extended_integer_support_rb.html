@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_extended_integer_support.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_extended_integer_support extension supports literalizing Ruby integers outside of PostgreSQL bigint range on PostgreSQL. <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> by default will raise exceptions when literalizing such integers, as PostgreSQL would treat them as numeric type values instead of integer/bigint type values if unquoted, which can result in unexpected negative performance (e.g. forcing sequential scans when index scans would be used for an integer/bigint type).</p>
+<p>The <a href="pg_extended_integer_support_rb.html">pg_extended_integer_support</a> extension supports literalizing Ruby integers outside of PostgreSQL bigint range on PostgreSQL. <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> by default will raise exceptions when literalizing such integers, as PostgreSQL would treat them as numeric type values instead of integer/bigint type values if unquoted, which can result in unexpected negative performance (e.g. forcing sequential scans when index scans would be used for an integer/bigint type).</p>
 
 <p>To load the extension into a Dataset (this returns a new Dataset):</p>
 

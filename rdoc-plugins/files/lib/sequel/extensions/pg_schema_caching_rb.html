@@ -33,9 +33,9 @@ lib/sequel/extensions/pg_schema_caching.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_schema_caching extension builds on top of the schema_caching extension, and allows it to handle custom PostgreSQL types. On PostgreSQL, column schema hashes include an :oid entry for the OID for the column’s type.  For custom types, this OID is dependent on the PostgreSQL database, so in most cases, test and development versions of the same database, created with the same migrations, will have different OIDs.</p>
+<p>The <a href="pg_schema_caching_rb.html">pg_schema_caching</a> extension builds on top of the <a href="schema_caching_rb.html">schema_caching</a> extension, and allows it to handle custom PostgreSQL types. On PostgreSQL, column schema hashes include an :oid entry for the OID for the column’s type.  For custom types, this OID is dependent on the PostgreSQL database, so in most cases, test and development versions of the same database, created with the same migrations, will have different OIDs.</p>
 
-<p>To fix this case, the pg_schema_caching extension removes custom OIDs from the schema cache when dumping the schema, replacing them with a placeholder. When loading the cached schema, the Database object makes a single query to get the OIDs for all custom types used by the cached schema, and it updates all related column schema hashes to set the correct :oid entry for the current database.</p>
+<p>To fix this case, the <a href="pg_schema_caching_rb.html">pg_schema_caching</a> extension removes custom OIDs from the schema cache when dumping the schema, replacing them with a placeholder. When loading the cached schema, the Database object makes a single query to get the OIDs for all custom types used by the cached schema, and it updates all related column schema hashes to set the correct :oid entry for the current database.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/SchemaCaching.html"><code>Sequel::Postgres::SchemaCaching</code></a></p>
 </div>

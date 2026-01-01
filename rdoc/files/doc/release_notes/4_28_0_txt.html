@@ -33,7 +33,7 @@ doc/release_notes/4.28.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A subset_conditions plugin has been added, which adds a method for each subset that returns the filter conditions for the subset.  This makes it easier to reuse the subset conditions:</p>
 
@@ -68,7 +68,7 @@ doc/release_notes/4.28.0.txt
 <p>As with similar plugins, you can add the boolean_subsets plugin to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself, and all subclasses created afterward will have the boolean subset methods automatically created.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>If Model#refresh can’t find the related row, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises a Sequel::NoExistingObject exception instead of a generic <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> exception.</p>
 </li><li>
@@ -77,7 +77,7 @@ doc/release_notes/4.28.0.txt
 <p>The list plugin now works better with the auto_validations plugin, or any other time there is a validation on the position column.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The change to the csv_serializer plugin can change results if you are overriding any of the column accessor methods.  It can also break existing code if one of the columns being used isn’t defined as a method or the method requires more than one argument.</p>
 </li></ul>

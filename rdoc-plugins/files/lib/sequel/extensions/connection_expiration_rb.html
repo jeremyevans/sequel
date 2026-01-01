@@ -33,7 +33,7 @@ lib/sequel/extensions/connection_expiration.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The connection_expiration extension modifies a database’s connection pool to validate that connections checked out from the pool are not expired, before yielding them for use.  If it detects an expired connection, it removes it from the pool and tries the next available connection, creating a new connection if no available connection is unexpired.  Example of use:</p>
+<p>The <a href="connection_expiration_rb.html">connection_expiration</a> extension modifies a database’s connection pool to validate that connections checked out from the pool are not expired, before yielding them for use.  If it detects an expired connection, it removes it from the pool and tries the next available connection, creating a new connection if no available connection is unexpired.  Example of use:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:connection_expiration</span>)
 </pre>

@@ -33,7 +33,7 @@ doc/transactions.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Database+Transactions+">Database Transactions <span><a href="#label-Database+Transactions+">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Database+Transactions+"><a href="#label-Database+Transactions+">Database Transactions </a></h1>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> uses autocommit mode by default for all of its database adapters, so in general in <a href="../../classes/Sequel.html"><code>Sequel</code></a> if you want to use database transactions, you need to be explicit about it.  There are a few cases where transactions are used implicitly by default:</p>
 <ul><li>
@@ -58,7 +58,7 @@ doc/transactions.rdoc
 
 <p>Everywhere else, it is up to you to use a database transaction if you want to.</p>
 
-<h2 id="label-Basic+Transaction+Usage">Basic Transaction Usage<span><a href="#label-Basic+Transaction+Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Basic+Transaction+Usage"><a href="#label-Basic+Transaction+Usage">Basic Transaction Usage</a></h2>
 
 <p>In <a href="../../classes/Sequel.html"><code>Sequel</code></a>, the <code>Database#transaction</code> method should be called if you want to use a database transaction.  This method must be called with a block.  If the block does not raise an exception, the transaction is committed:</p>
 
@@ -114,7 +114,7 @@ doc/transactions.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Transaction+Hooks">Transaction Hooks<span><a href="#label-Transaction+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Transaction+Hooks"><a href="#label-Transaction+Hooks">Transaction Hooks</a></h2>
 
 <p>You can add hooks to an in progress transaction that are called after the transaction commits or rolls back:</p>
 
@@ -135,7 +135,7 @@ doc/transactions.rdoc
 <span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>
 </pre>
 
-<h2 id="label-Nested+Transaction+Calls+-2F+Savepoints">Nested Transaction Calls / Savepoints<span><a href="#label-Nested+Transaction+Calls+-2F+Savepoints">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Nested+Transaction+Calls+-2F+Savepoints"><a href="#label-Nested+Transaction+Calls+-2F+Savepoints">Nested Transaction Calls / Savepoints</a></h2>
 
 <p>You can nest calls to transaction, which by default just reuses the existing transaction:</p>
 
@@ -220,7 +220,7 @@ doc/transactions.rdoc
 <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>
 </pre>
 
-<h3 id="label-Savepoint+Hooks">Savepoint Hooks<span><a href="#label-Savepoint+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Savepoint+Hooks"><a href="#label-Savepoint+Hooks">Savepoint Hooks</a></h3>
 
 <p>When using savepoints, you can use the <code>:savepoint</code> option to <code>after_commit</code> or <code>after_rollback</code> to use a savepoint hook.  For <code>after_commit</code>, this will only run the hook after transaction commit if all enclosing savepoints are released (not rolled back). For <code>after_rollback</code>, this will run the hook after any enclosing savepoint is rolled back (before transaction commit), or after the transaction is rolled back if all enclosing savepoints are released:</p>
 
@@ -259,7 +259,7 @@ doc/transactions.rdoc
 <span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>
 </pre>
 
-<h2 id="label-Prepared+Transactions+-2F+Two-Phase+Commit">Prepared Transactions / Two-Phase Commit<span><a href="#label-Prepared+Transactions+-2F+Two-Phase+Commit">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Prepared+Transactions+-2F+Two-Phase+Commit"><a href="#label-Prepared+Transactions+-2F+Two-Phase+Commit">Prepared Transactions / Two-Phase Commit</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> supports database prepared transactions on PostgreSQL, MySQL, and H2.  With prepared transactions, at the end of the transaction, the transaction is not immediately committed (it acts like a rollback).  Later, you can call <code>commit_prepared_transaction</code> to commit the transaction or <code>rollback_prepared_transaction</code> to roll the transaction back.  Prepared transactions are usually used with distributed databases to make sure all databases commit the same transaction or none of them do.</p>
 
@@ -280,7 +280,7 @@ doc/transactions.rdoc
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;foo&#39;</span>)
 </pre>
 
-<h2 id="label-Transaction+Isolation+Levels">Transaction Isolation Levels<span><a href="#label-Transaction+Isolation+Levels">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Transaction+Isolation+Levels"><a href="#label-Transaction+Isolation+Levels">Transaction Isolation Levels</a></h2>
 
 <p>The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on most databases, you can specify which transaction isolation level you want to use via the :isolation option to <code>Database#transaction</code>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option makes <a href="../../classes/Sequel.html"><code>Sequel</code></a> use the correct transaction isolation syntax for your database:</p>
 
@@ -290,7 +290,7 @@ doc/transactions.rdoc
 <span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>
 </pre>
 
-<h2 id="label-Automatically+Restarting+Transactions">Automatically Restarting Transactions<span><a href="#label-Automatically+Restarting+Transactions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Automatically+Restarting+Transactions"><a href="#label-Automatically+Restarting+Transactions">Automatically Restarting Transactions</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> offers the ability to automatically restart transactions if specific types of errors are detected.  For example, if you want to automatically restart a transaction if a serialization failure is detected:</p>
 

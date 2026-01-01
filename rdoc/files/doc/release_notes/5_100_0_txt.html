@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.100.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.100.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.100.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
+<ul><li>
+<p>A single_statement_dataset_destroy plugin has been added. This plugin will run the before_destroy hooks for all instances, then run a DELETE statement on the dataset, then run the after_destroy hooks for all instances. However, this optimized form will not be used if the model uses a custom around_destroy hook.</p>
+</li><li>
+<p>The set_column_type schema modification method now supports a :collate option on PostgreSQL 9.1+ and MySQL.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
+<ul><li>
+<p>The unused_associations plugin no longer reports associations with the :is_used option as unused. Previously, the :is_used option only disabled changes by the :modify_associations plugin option.</p>
+</li><li>
+<p>Postgres::PGRange#to_s is now an alias of inspect, so it also uses the friendly inspect output added in 5.97.0.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

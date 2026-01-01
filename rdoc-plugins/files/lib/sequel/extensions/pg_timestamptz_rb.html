@@ -33,9 +33,9 @@ lib/sequel/extensions/pg_timestamptz.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_timestamptz extension changes the default timestamp type for the database to be <code>timestamptz</code> (<code>timestamp with time zone</code>) instead of <code>timestamp</code> (<code>timestamp without time zone</code>).  This is recommended if you are dealing with multiple timezones in your application.</p>
+<p>The <a href="pg_timestamptz_rb.html">pg_timestamptz</a> extension changes the default timestamp type for the database to be <code>timestamptz</code> (<code>timestamp with time zone</code>) instead of <code>timestamp</code> (<code>timestamp without time zone</code>).  This is recommended if you are dealing with multiple timezones in your application.</p>
 
-<p>If you are using the auto_cast_date_and_time extension, the pg_timestamptz extension will automatically cast Time and DateTime values to <code>TIMESTAMP WITH TIME ZONE</code> instead of <code>TIMESTAMP</code>.</p>
+<p>If you are using the <a href="auto_cast_date_and_time_rb.html">auto_cast_date_and_time</a> extension, the <a href="pg_timestamptz_rb.html">pg_timestamptz</a> extension will automatically cast Time and DateTime values to <code>TIMESTAMP WITH TIME ZONE</code> instead of <code>TIMESTAMP</code>.</p>
 
 <p>To load the extension into the database:</p>
 
@@ -47,7 +47,7 @@ lib/sequel/extensions/pg_timestamptz.rb
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_timestamptz</span>)
 </pre>
 
-<p>Note that the loading into individual datasets only affects the integration with the auto_cast_date_and_time extension.</p>
+<p>Note that the loading into individual datasets only affects the integration with the <a href="auto_cast_date_and_time_rb.html">auto_cast_date_and_time</a> extension.</p>
 
 <p>Related modules: <a href="../../../../classes/Sequel/Postgres/Timestamptz.html"><code>Sequel::Postgres::Timestamptz</code></a>, <a href="../../../../classes/Sequel/Postgres/TimestamptzDatasetMethods.html"><code>Sequel::Postgres::TimestamptzDatasetMethods</code></a></p>
 </div>

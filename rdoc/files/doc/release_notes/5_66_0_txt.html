@@ -33,7 +33,7 @@ doc/release_notes/5.66.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p>Dataset#empty? now correctly handles datasets using custom SQL or Dataset#values where the first value in the first row is NULL.</p>
 </li><li>
@@ -46,7 +46,7 @@ doc/release_notes/5.66.0.txt
 <p>Dataset#values will now raise an exception when called with an empty array. Previously, an exception would not be raised until the query was sent to the database.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The changes to make Dataset#empty? and count work with custom SQL on Microsoft SQL Server now result in running the custom SQL, which could result in worse performance than in previous versions. You can wrap such datasets with Dataset#from_self manually to restore the previous behavior.</p>
 </li></ul>

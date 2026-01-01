@@ -47,11 +47,11 @@ Sequel::Plugins::PgXminOptimisticLocking
 <span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># raises Sequel::NoExistingObject</span>
 </pre>
 
-<p>The advantage of pg_xmin_optimistic_locking plugin compared to the regular optimistic_locking plugin as that it does not require any additional columns setup on the model.  This allows it to be loaded in the base model and have all subclasses automatically use optimistic locking.  The disadvantage is that testing can be more difficult if you are modifying the underlying row between when a model is retrieved and when it is saved.</p>
+<p>The advantage of <a href="../../../files/lib/sequel/plugins/pg_xmin_optimistic_locking_rb.html">pg_xmin_optimistic_locking</a> plugin compared to the regular <a href="../../../files/lib/sequel/plugins/optimistic_locking_rb.html">optimistic_locking</a> plugin as that it does not require any additional columns setup on the model.  This allows it to be loaded in the base model and have all subclasses automatically use optimistic locking.  The disadvantage is that testing can be more difficult if you are modifying the underlying row between when a model is retrieved and when it is saved.</p>
 
-<p>This plugin may not work with the class_table_inheritance plugin.</p>
+<p>This plugin may not work with the <a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">class_table_inheritance</a> plugin.</p>
 
-<p>This plugin relies on the instance_filters plugin.</p>
+<p>This plugin relies on the <a href="../../../files/lib/sequel/plugins/instance_filters_rb.html">instance_filters</a> plugin.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>

@@ -33,9 +33,9 @@ lib/sequel/extensions/transaction_connection_validator.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The transaction_connection_validator extension automatically retries a transaction on a connection if an disconnect error is raised when sending the statement to begin a new transaction, as long as the user has not already checked out a connection.  This is safe to do because no other queries have been issued on the connection, and no user-level code is run before retrying.</p>
+<p>The <a href="transaction_connection_validator_rb.html">transaction_connection_validator</a> extension automatically retries a transaction on a connection if an disconnect error is raised when sending the statement to begin a new transaction, as long as the user has not already checked out a connection.  This is safe to do because no other queries have been issued on the connection, and no user-level code is run before retrying.</p>
 
-<p>This approach to connection validation can be significantly lower overhead than the connection_validator extension, though it does not handle all cases handled by the connection_validator extension.  However, it performs the validation checks on every new transaction, so it will automatically handle disconnected connections in some cases where the connection_validator extension will not by default (as the connection_validator extension only checks connections if they have not been used in the last hour by default).</p>
+<p>This approach to connection validation can be significantly lower overhead than the <a href="connection_validator_rb.html">connection_validator</a> extension, though it does not handle all cases handled by the <a href="connection_validator_rb.html">connection_validator</a> extension.  However, it performs the validation checks on every new transaction, so it will automatically handle disconnected connections in some cases where the <a href="connection_validator_rb.html">connection_validator</a> extension will not by default (as the <a href="connection_validator_rb.html">connection_validator</a> extension only checks connections if they have not been used in the last hour by default).</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/TransactionConnectionValidator.html"><code>Sequel::TransactionConnectionValidator</code></a></p>
 </div>

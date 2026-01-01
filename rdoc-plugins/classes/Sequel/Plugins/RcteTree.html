@@ -36,13 +36,13 @@ Sequel::Plugins::RcteTree
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="module-Sequel::Plugins::RcteTree-label-Overview">Overview<span><a href="#module-Sequel::Plugins::RcteTree-label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::RcteTree-label-Overview"><a href="#module-Sequel::Plugins::RcteTree-label-Overview">Overview</a></h1>
 
-<p>The rcte_tree plugin deals with tree structured data stored in the database using the adjacency list model (where child rows have a foreign key pointing to the parent rows), using recursive common table expressions to load all ancestors in a single query, all descendants in a single query, and all descendants to a given level (where level 1 is children, level 2 is children and grandchildren etc.) in a single query.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/rcte_tree_rb.html">rcte_tree</a> plugin deals with tree structured data stored in the database using the adjacency list model (where child rows have a foreign key pointing to the parent rows), using recursive common table expressions to load all ancestors in a single query, all descendants in a single query, and all descendants to a given level (where level 1 is children, level 2 is children and grandchildren etc.) in a single query.</p>
 
-<h1 id="module-Sequel::Plugins::RcteTree-label-Usage">Usage<span><a href="#module-Sequel::Plugins::RcteTree-label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::RcteTree-label-Usage"><a href="#module-Sequel::Plugins::RcteTree-label-Usage">Usage</a></h1>
 
-<p>The rcte_tree plugin adds four associations to the model: parent, children, ancestors, and descendants.  Both the parent and children are fairly standard many_to_one and one_to_many associations, respectively.  However, the ancestors and descendants associations are special.  Both the ancestors and descendants associations will automatically set the parent and children associations, respectively, for current object and all of the ancestor or descendant objects, whenever they are loaded (either eagerly or lazily).  Additionally, the descendants association can take a level argument when called eagerly, which limits the returned objects to only that many levels in the tree (see the Overview).</p>
+<p>The <a href="../../../files/lib/sequel/plugins/rcte_tree_rb.html">rcte_tree</a> plugin adds four associations to the model: parent, children, ancestors, and descendants.  Both the parent and children are fairly standard many_to_one and one_to_many associations, respectively.  However, the ancestors and descendants associations are special.  Both the ancestors and descendants associations will automatically set the parent and children associations, respectively, for current object and all of the ancestor or descendant objects, whenever they are loaded (either eagerly or lazily).  Additionally, the descendants association can take a level argument when called eagerly, which limits the returned objects to only that many levels in the tree (see the Overview).</p>
 
 <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:rcte_tree</span>
 
@@ -63,7 +63,7 @@ Sequel::Plugins::RcteTree
 <span class="ruby-constant">Model</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(<span class="ruby-value">descendants:</span> <span class="ruby-value">3</span>).<span class="ruby-identifier">all</span>
 </pre>
 
-<h1 id="module-Sequel::Plugins::RcteTree-label-Options">Options<span><a href="#module-Sequel::Plugins::RcteTree-label-Options">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="module-Sequel::Plugins::RcteTree-label-Options"><a href="#module-Sequel::Plugins::RcteTree-label-Options">Options</a></h1>
 
 <p>You can override the options for any specific association by making sure the plugin options contain one of the following keys:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:parent </td><td>

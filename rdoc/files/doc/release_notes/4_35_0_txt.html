@@ -33,7 +33,7 @@ doc/release_notes/4.35.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Forwards+Compatibility">Forwards Compatibility<span><a href="#label-Forwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Forwards+Compatibility"><a href="#label-Forwards+Compatibility">Forwards Compatibility</a></h1>
 <ul><li>
 <p>Ruby 2.4 will unify the Fixnum and Bignum classes into the Integer class, making both Fixnum and Bignum references to Integer. This will have the affect of changing the behavior of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> migrations that use a reference to the Bignum class.</p>
 
@@ -69,7 +69,7 @@ doc/release_notes/4.35.0.txt
 <p>Note that you should only do this if you are using <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="4_35_0_txt.html">4.35.0</a>+, as previous versions of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will treat the :Bignum symbol as a database-specific type named Bignum.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A <a href="../../../classes/Sequel/Database.html#attribute-i-log_connection_info"><code>Sequel::Database#log_connection_info</code></a> accessor has been added.  If set to true, this includes connection information in Sequel’s query log.  In threaded connection pools (the default), this makes it simple to see which connection is executing which queries.</p>
 
@@ -114,7 +114,7 @@ doc/release_notes/4.35.0.txt
 <p>Sequel::Postgres::PGRange#cover? has been added to the pg_range extension, which works with empty, unbounded, and exclusive beginning ranges.  Previously, using cover? with these ranges would raise an exception.  Note that cover? is now always defined, where previously it was only defined on ruby 1.9+.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The jdbc adapters now work correctly on JRuby 9.1.  Previously, some parts were broken on JRuby 9.1 due to frozen string literal issues.</p>
 </li><li>
@@ -129,7 +129,7 @@ doc/release_notes/4.35.0.txt
 <p>The schema_dumper extension now recognizes bool as a boolean type, for consistency with the Database schema parser.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Custom adapters should switch from using log_yield to log_connection_yield so that they work correctly when using log_connection_info.</p>
 </li></ul>

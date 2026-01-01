@@ -33,7 +33,7 @@ lib/sequel/extensions/run_transaction_hooks.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The run_transaction_hooks extension allows for running after_commit or after_rollback extensions before commit or rollback.  It then removes the hook after running it, so it will not be run twice.</p>
+<p>The <a href="run_transaction_hooks_rb.html">run_transaction_hooks</a> extension allows for running after_commit or after_rollback extensions before commit or rollback.  It then removes the hook after running it, so it will not be run twice.</p>
 
 <p>This extension should only be used in transactional tests where the transaction always rolls back, to test the behavior of the after_commit and after_rollback hooks.  Any other usage is probably a bad idea.</p>
 

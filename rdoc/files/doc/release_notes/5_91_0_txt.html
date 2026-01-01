@@ -33,7 +33,7 @@ doc/release_notes/5.91.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_auto_validate_enums plugin has been added, for automatically validating enum values on PostgreSQL:</p>
 
@@ -56,7 +56,7 @@ SELECT * FROM table WHERE enum_column = ANY($1)</pre>
 <p>The forbid_lazy_load plugin now supports an :allow_by_default plugin option, which does not automatically forbid lazy loading when retrieving multiple model instances. With this option, lazy loading can still be forbidding explicitly on a per-object basis. This can make it easier to gradually update code to support the plugin.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The pg_auto_constraint_validations plugin now sorts subhashes before saving the cache file, resulting in more deterministic behavior.</p>
 </li><li>
@@ -67,7 +67,7 @@ SELECT * FROM table WHERE enum_column = ANY($1)</pre>
 <p>It is now possible to override nested_attributes behavior for creating new objects by overriding Model#nested_attributes_new. You can use this to support nested attributes for models using the class_table_inheritance plugin.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Database options to configure the pg_auto_parameterize_in_array extension must now be set before loading the extension.  Setting the options after loading the extension no longer has an effect.</p>
 </li></ul>

@@ -33,7 +33,7 @@ doc/release_notes/3.27.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Model.dataset_module has been added for easily adding methods to a model’s dataset:</p>
 
@@ -48,7 +48,7 @@ doc/release_notes/3.27.0.txt
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_name_like</span>(<span class="ruby-string">&#39;Foo%&#39;</span>).<span class="ruby-identifier">selling_at_least</span>(<span class="ruby-value">100000</span>).<span class="ruby-identifier">all</span>
 </pre>
 
-<p>Previously, you could use def_dataset_method to accomplish the same thing.  dataset_module is generally cleaner, plus you are using actual methods instead of blocks, so calling the methods is faster on some ruby implementations.</p>
+<p>Previously, you could use def_dataset_method to accomplish the same thing.  <a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> is generally cleaner, plus you are using actual methods instead of blocks, so calling the methods is faster on some ruby implementations.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a <a href="../../../classes/Sequel/SQLTime.html"><code>Sequel::SQLTime</code></a> class (a subclass of Time) when dealing with values for SQL time columns (which don’t have a date component).  These values are handled correctly when used in filters or insert/update statements (using only the time component), so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now successfully round trip values for time columns.  Not all adapters support returning time column values as SQLTime instances, but the most common ones do.</p>
 </li><li>
@@ -57,7 +57,7 @@ doc/release_notes/3.27.0.txt
 <p>The ODBC adapter now has initial support for the DB2 database, use the :db_type=&gt;‘db2’ option to load the support.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The mysql2 adapter now uses native prepared statements.</p>
 </li><li>
@@ -83,7 +83,7 @@ doc/release_notes/3.27.0.txt
 <p>Model#exists? now always returns false for new model objects.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>If you were previously setting primary key values manually for new model objects and then calling exists? to see if the instance is already in the database, you need to change your code from:</p>
 

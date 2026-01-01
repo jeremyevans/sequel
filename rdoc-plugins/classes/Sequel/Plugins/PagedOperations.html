@@ -36,7 +36,7 @@ Sequel::Plugins::PagedOperations
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The paged_operations plugin adds <code>paged_update</code> and <code>paged_delete</code> dataset methods.  These behave similarly to the default <code>update</code> and <code>delete</code> dataset methods, except that the update or deletion is done in potentially multiple queries (by default, affecting 1000 rows per query). For a large table, this prevents the change from locking the table for a long period of time.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/paged_operations_rb.html">paged_operations</a> plugin adds <code>paged_update</code> and <code>paged_delete</code> dataset methods.  These behave similarly to the default <code>update</code> and <code>delete</code> dataset methods, except that the update or deletion is done in potentially multiple queries (by default, affecting 1000 rows per query). For a large table, this prevents the change from locking the table for a long period of time.</p>
 
 <p>Because the point of this is to prevent locking tables for long periods of time, the separate queries are not contained in a transaction, which means if a later query fails, earlier queries will still be committed.  You could prevent this by using a transaction manually, but that defeats the purpose of using these methods.</p>
 

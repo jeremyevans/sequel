@@ -36,7 +36,7 @@ Sequel::Plugins::AssociationPks
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The association_pks plugin adds association_pks, association_pks=, and association_pks_dataset instance methods to the model class for each one_to_many and many_to_many association added.  These methods allow for easily returning the primary keys of the associated objects, and easily modifying which objects are associated:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a> plugin adds <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a>, <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a>=, and association_pks_dataset instance methods to the model class for each one_to_many and many_to_many association added.  These methods allow for easily returning the primary keys of the associated objects, and easily modifying which objects are associated:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>
 <span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]
@@ -54,13 +54,13 @@ Sequel::Plugins::AssociationPks
 
 <p>This plugin makes modifications directly to the underlying tables, it does not create or return any model objects, and therefore does not call any callbacks.  If you have any association callbacks, you probably should not use the setter methods this plugin adds.</p>
 
-<p>By default, changes to the association will not happen until the object is saved.  However, using the delay_pks: false association option, you can have the changes made immediately when the association_pks setter method is called.</p>
+<p>By default, changes to the association will not happen until the object is saved.  However, using the delay_pks: false association option, you can have the changes made immediately when the <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a> setter method is called.</p>
 
-<p>By default, repeated calls to the association_pks getter method will not be cached, unless the setter method has been used and the delay_pks: false association option is not used.  You can set caching of repeated calls to the association_pks getter method using the :cache_pks association option.  You can pass the :refresh option when calling the getter method to ignore any existing cached values, similar to how the :refresh option works with associations.</p>
+<p>By default, repeated calls to the <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a> getter method will not be cached, unless the setter method has been used and the delay_pks: false association option is not used.  You can set caching of repeated calls to the <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a> getter method using the :cache_pks association option.  You can pass the :refresh option when calling the getter method to ignore any existing cached values, similar to how the :refresh option works with associations.</p>
 
 <p>By default, if you pass a nil value to the setter, an exception will be raised. You can change this behavior by using the :association_pks_nil association option. If set to :ignore, the setter will take no action if nil is given. If set to :remove, the setter will treat the nil as an empty array, removing the association all currently associated values.</p>
 
-<p>For many_to_many associations, association_pks assumes the related pks can be accessed directly from the join table.  This works in most cases, but in cases where the :right_primary_key association option is used to specify a different primary key in the associated table, association_pks will return the value of the association primary keys (foreign key values to associated table in the join table), not the associated model primary keys.  If you would like to use the associated model primary keys, you need to use the :association_pks_use_associated_table association option. If the :association_pks_use_associated_table association option is used, no setter method will be added.</p>
+<p>For many_to_many associations, <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a> assumes the related pks can be accessed directly from the join table.  This works in most cases, but in cases where the :right_primary_key association option is used to specify a different primary key in the associated table, <a href="../../../files/lib/sequel/plugins/association_pks_rb.html">association_pks</a> will return the value of the association primary keys (foreign key values to associated table in the join table), not the associated model primary keys.  If you would like to use the associated model primary keys, you need to use the :association_pks_use_associated_table association option. If the :association_pks_use_associated_table association option is used, no setter method will be added.</p>
 
 <p>Usage:</p>
 

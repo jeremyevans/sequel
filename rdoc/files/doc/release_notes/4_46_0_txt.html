@@ -33,7 +33,7 @@ doc/release_notes/4.46.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features"><a href="#label-Deprecated+Features">Deprecated Features</a></h1>
 <ul><li>
 <p>Symbol splitting is now deprecated by default.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has split symbols since the very first version, but it has caused many problems over the years and while terse, it isn’t intuitive to new <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users and causes significant problems when using databases that use double/triple underscores in identifiers.</p>
 
@@ -215,14 +215,14 @@ doc/release_notes/4.46.0.txt
 <p>Dataset#_filter and _filter_or_exclude private methods have been deprecated.  If you have an extension that was calling these methods, switch to the new add_filter private method.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The class_table_inheritance plugin now supports an :alias option. If provided, this wraps subclass datasets in subqueries, avoiding problems with ambiguous columns and cases where the wrong table name is used.  Due to the deprecation of joined datasets for models, use of the class_table_inheritance plugin without this :alias option will result in deprecation warnings.  In <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5, class_table_inheritance will default to using an :alias option with the same as the name of the parent table.</p>
 </li><li>
 <p>The Dataset#sqltime_precision private method has been added. Adapters can use override this if the precision for time values is different from the precision for timestamp values. <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses this support on Microsoft SQL Server, so that time values now support microsecond precision, instead of millisecond precision.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> classes that use a SQL::Identifier or SQL::QualifiedIdentifier FROM table value will now use optimized lookups and deletes, just as is done for those that use a Symbol or String.</p>
 </li><li>
@@ -242,7 +242,7 @@ doc/release_notes/4.46.0.txt
 </li><li>
 <p>Calling Database#disconnect when using the single connection pool without an active connection works correctly again. It was broken starting in <a href="4_43_0_txt.html">4.43.0</a> during changes to implement Database#freeze.</p>
 </li><li>
-<p>Model class methods are no longer added for private methods defined in a dataset_module block.  Previously, a public model class method was defined, but it would raise an error when called.</p>
+<p>Model class methods are no longer added for private methods defined in a <a href="../../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> block.  Previously, a public model class method was defined, but it would raise an error when called.</p>
 </li><li>
 <p>Fixnum is no longer referenced in the sqlanywhere shared adapter, fixing deprecation warnings on ruby 2.4.</p>
 </li><li>
@@ -259,7 +259,7 @@ doc/release_notes/4.46.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer issues deprecation warnings on ruby 1.8.7. <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 will drop support for ruby 1.8.7, and it doesn’t make sense to issue a deprecation warning if you couldn’t upgrade anyway.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>When specifying the :fields option to a nested_attributes setter, set_fields is now used internally instead of set_only. set_fields has been recommended over set_fields since it’s introduction in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.12, but nested_attributes was added in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.4, before set_fields was available.  The result of this change is that if additional fields are provided that do not match the fields in the :fields option, they will be ignored instead of an exception being raised.</p>
 </li><li>

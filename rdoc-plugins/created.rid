@@ -1,4 +1,4 @@
-Mon, 01 Dec 2025 10:46:30 -0800
+Thu, 01 Jan 2026 09:09:31 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -62,7 +62,7 @@ lib/sequel/extensions/pg_json.rb	Thu, 16 Jan 2025 10:18:06 -0800
 lib/sequel/extensions/pg_json_ops.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/extensions/pg_loose_count.rb	Mon, 24 May 2021 12:25:38 -0700
 lib/sequel/extensions/pg_multirange.rb	Tue, 26 Aug 2025 15:04:09 -0700
-lib/sequel/extensions/pg_range.rb	Fri, 19 Sep 2025 11:46:00 -0700
+lib/sequel/extensions/pg_range.rb	Wed, 10 Dec 2025 12:26:27 -0800
 lib/sequel/extensions/pg_range_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
 lib/sequel/extensions/pg_row.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/extensions/pg_row_ops.rb	Sat, 18 Dec 2021 12:49:34 -0800
@@ -175,6 +175,7 @@ lib/sequel/plugins/require_valid_schema.rb	Thu, 21 Jul 2022 15:46:29 -0700
 lib/sequel/plugins/serialization.rb	Thu, 16 Jan 2025 10:47:44 -0800
 lib/sequel/plugins/serialization_modification_detection.rb	Wed, 27 Oct 2021 08:42:57 -0700
 lib/sequel/plugins/sharding.rb	Fri, 02 Sep 2022 09:11:30 -0700
+lib/sequel/plugins/single_statement_dataset_destroy.rb	Sat, 06 Dec 2025 18:19:06 -0800
 lib/sequel/plugins/single_table_inheritance.rb	Tue, 15 Nov 2022 14:53:26 -0800
 lib/sequel/plugins/singular_table_names.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -195,7 +196,7 @@ lib/sequel/plugins/touch.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/tree.rb	Mon, 02 Nov 2020 12:46:04 -0800
 lib/sequel/plugins/typecast_on_load.rb	Wed, 09 Oct 2019 09:00:49 -0700
 lib/sequel/plugins/unlimited_update.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/unused_associations.rb	Tue, 03 Jun 2025 09:09:55 -0700
+lib/sequel/plugins/unused_associations.rb	Fri, 12 Dec 2025 18:11:06 -0800
 lib/sequel/plugins/update_or_create.rb	Tue, 21 Sep 2021 14:24:30 -0700
 lib/sequel/plugins/update_primary_key.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/plugins/update_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700

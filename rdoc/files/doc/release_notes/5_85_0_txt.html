@@ -33,7 +33,7 @@ doc/release_notes/5.85.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The pg_json_ops extension now supports json_table on PostgreSQL 17+:</p>
 
@@ -71,16 +71,16 @@ doc/release_notes/5.85.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
-<p>The default connection pool on Ruby 3.2+ has switched from threaded to timed_queue.  The timed_queue connection pool has been shown to have sufficient advantages over the threaded connection pool to justify the minor backwards compatibility issues (which are documented below).  If you would like to continue using the the threaded connection pool, you can use the pool_class: :threaded Database option.</p>
+<p>The default connection pool on Ruby 3.2+ has switched from threaded to timed_queue.  The <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> connection pool has been shown to have sufficient advantages over the threaded connection pool to justify the minor backwards compatibility issues (which are documented below).  If you would like to continue using the the threaded connection pool, you can use the pool_class: :threaded Database option.</p>
 </li><li>
 <p>When calling Dataset#get and first without arguments or blocks, if the receiver already uses raw SQL, no intermediate datasets are created.  This improves performance, and fixes an issue with Dataset#get when using the implicit_subquery extension.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
-<p>The default connection pool switch from threaded to timed_queue can break backwards compatibility if you are accessing the pool directly and using the available_connections or allocated accessor methods. If you are using those methods, or a library that uses them, you’ll need to stop using them, or force the use of the threaded connection pool as described above.</p>
+<p>The default connection pool switch from threaded to <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> can break backwards compatibility if you are accessing the pool directly and using the available_connections or allocated accessor methods. If you are using those methods, or a library that uses them, you’ll need to stop using them, or force the use of the threaded connection pool as described above.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -33,7 +33,7 @@ lib/sequel/extensions/fiber_concurrency.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The fiber_concurrency extension changes the default concurrency primitive in <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to be Fiber.current instead of Thread.current. This is the value used in various hash keys to implement safe concurrency (thread-safe concurrency by default, fiber-safe concurrency with this extension.  It can be enabled via:</p>
+<p>The <a href="fiber_concurrency_rb.html">fiber_concurrency</a> extension changes the default concurrency primitive in <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to be Fiber.current instead of Thread.current. This is the value used in various hash keys to implement safe concurrency (thread-safe concurrency by default, fiber-safe concurrency with this extension.  It can be enabled via:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:fiber_concurrency</span>
 </pre>

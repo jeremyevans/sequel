@@ -33,7 +33,7 @@ doc/release_notes/3.28.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Adapter+Support">New Adapter Support<span><a href="#label-New+Adapter+Support">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Adapter+Support"><a href="#label-New+Adapter+Support">New Adapter Support</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has much better support for the DB2 database.</p>
 </li><li>
@@ -48,7 +48,7 @@ doc/release_notes/3.28.0.txt
 <p>A jdbc firebird subadapter has been added, allowing connection to firebird databases from JRuby.</p>
 </li></ul>
 
-<h1 id="label-New+PostgreSQL+9.1+Features">New PostgreSQL 9.1 Features<span><a href="#label-New+PostgreSQL+9.1+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+PostgreSQL+9.1+Features"><a href="#label-New+PostgreSQL+9.1+Features">New PostgreSQL 9.1 Features</a></h1>
 <ul><li>
 <p>Dataset#returning has been added for using the RETURNING clause on INSERT/UPDATE/DELETE queries.  RETURNING allows such queries to return results in much the same way as a SELECT query works. When Dataset#returning is used, Dataset insert, update, and delete now accept a block that is passed to Dataset fetch_rows which is yielded plain ruby hashes for each row inserted, updated, or deleted.  If Dataset#returning is used and a block is not given to those methods, those methods will return an array of plain hashes for all rows inserted, updated, and deleted.</p>
 </li><li>
@@ -67,7 +67,7 @@ doc/release_notes/3.28.0.txt
 <p>Database#create_table? now uses CREATE TABLE IF NOT EXISTS on PostgreSQL 9.1.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p>The :limit option is now respected when eager loading via either eager or eager_graph.  By default, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will just do an array slice of the resulting ruby array, which gets the correct answer, but does not offer any performance improvements.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> also offers a new :eager_limit_strategy option for using more advanced query types that only load the related records from the database. The available values for the :eager_limit_strategy option are:</p>
 
@@ -158,7 +158,7 @@ doc/release_notes/3.28.0.txt
 <p>Dataset#supports_where_true? has been added for checking for support of WHERE TRUE (or WHERE 1 if 1 is true).  Not all databases support using such a construct, and on the databases that do not, you have to use WHERE (1 = 1) or something similar.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="3_27_0_txt.html">3.27.0</a> was negatively affected by a serious bug in ActiveSupport’s Time.=== that has still not been fixed, which broke the literalization of Time objects.  In spite of the bad precedent it sets, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids using Time.=== on a subclass of Time to work around this ActiveSupport bug.</p>
 </li><li>
@@ -173,7 +173,7 @@ doc/release_notes/3.28.0.txt
 <p>Typecasting values for time columns from Time values to <a href="../../../classes/Sequel/SQLTime.html"><code>Sequel::SQLTime</code></a> values now correctly handles fractional seconds on ruby 1.9.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Dataset#insert_returning_sql has been changed to a private method in the PostgreSQL and Firebird adapters, and it operates differently than it did previously.  The private insert_returning_pk_sql and insert_returning_select_sql methods have been removed.</p>
 </li><li>

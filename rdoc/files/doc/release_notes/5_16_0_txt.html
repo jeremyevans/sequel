@@ -33,7 +33,7 @@ doc/release_notes/5.16.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#rollback_on_exit has been added, which allows you to rollback transactions instead of committing them when exiting the transaction block.  Previously, the only way to rollback a transaction from inside a transaction block was to raise an exception.  This allows you to tell <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to roll the transaction back on exit, and then use return or throw to exit the transaction block.</p>
 
@@ -88,7 +88,7 @@ doc/release_notes/5.16.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports window functions on SQLite <a href="3_26_0_txt.html">3.26.0</a>+. SQLite technically supports window functions on <a href="3_25_0_txt.html">3.25.0</a>+, but enabling window function support in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> opens up a code path that generates queries that cause older versions of SQLite to produce a segmentation fault.  This bug in SQLite has been fixed in 3.26.0.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> no longer overrides existing methods when defining getters and setters.  Historically, it only checked for existing method definitions for methods that could be directly expressed (e.g. not requiring send).  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 broke the check for setter methods that could be directly expressed.  This fixes cases where model inheritance is used and the setter methods are overridden in a parent class.</p>
 </li><li>
@@ -113,7 +113,7 @@ doc/release_notes/5.16.0.txt
 <p>bin/sequel -C when converting from SQLite to another database type will now use 64-bit integer columns in the other database when the SQLite column type is integer, as SQLite supports storing 64-bit values in integer columns, and most other databases only support 32-bit values in integer columns.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The mysql adapter no longer attempts to load the mysqlplus driver, it now only attempts to load the mysql driver.</p>
 </li></ul>

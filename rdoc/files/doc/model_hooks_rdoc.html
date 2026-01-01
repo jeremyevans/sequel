@@ -33,15 +33,15 @@ doc/model_hooks.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Model+Hooks">Model Hooks<span><a href="#label-Model+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Model+Hooks"><a href="#label-Model+Hooks">Model Hooks</a></h1>
 
 <p>This guide is based on <a target="_top" href="http://guides.rubyonrails.org/activerecord_validations_callbacks.html">guides.rubyonrails.org/activerecord_validations_callbacks.html</a></p>
 
-<h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Overview"><a href="#label-Overview">Overview</a></h2>
 
 <p>Model hooks are used to specify actions that occur at a given point in a model instance’s lifecycle, such as before or after the model object is saved, created, updated, destroyed, or validated.  There are also around hooks for all types, which wrap the before hooks, the behavior, and the after hooks.</p>
 
-<h2 id="label-Basic+Usage">Basic Usage<span><a href="#label-Basic+Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Basic+Usage"><a href="#label-Basic+Usage">Basic Usage</a></h2>
 
 <p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> uses instance methods for hooks.  To define a hook on a model, you just add an instance method to the model class:</p>
 
@@ -55,7 +55,7 @@ doc/model_hooks.rdoc
 
 <p>The one important thing to note here is the call to <code>super</code> inside the hook.  Whenever you override one of <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>‘s methods, you should be calling <code>super</code> to get the default behavior.  Many of the plugins that ship with <a href="../../classes/Sequel.html"><code>Sequel</code></a> work by overriding the hook methods and calling <code>super</code>.  If you use these plugins and override the hook methods but do not call <code>super</code>, it’s likely the plugins will not work correctly.</p>
 
-<h2 id="label-Available+Hooks">Available Hooks<span><a href="#label-Available+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Available+Hooks"><a href="#label-Available+Hooks">Available Hooks</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> calls hooks in the following order when saving/creating a new object (one that does not already exist in the database):</p>
 <ul><li>
@@ -141,7 +141,7 @@ doc/model_hooks.rdoc
 
 <p>Note that these hooks are only called when using <code>Model#destroy</code>, they are not called if you use <code>Model#delete</code>.</p>
 
-<h2 id="label-Transaction-related+Hooks">Transaction-related Hooks<span><a href="#label-Transaction-related+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Transaction-related+Hooks"><a href="#label-Transaction-related+Hooks">Transaction-related Hooks</a></h2>
 
 <p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> no longer offers transaction hooks for model instances.  However, you can use the database transaction hooks inside model <code>before_save</code> and <code>after_save</code> hooks:</p>
 
@@ -158,7 +158,7 @@ doc/model_hooks.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Running+Hooks">Running Hooks<span><a href="#label-Running+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Running+Hooks"><a href="#label-Running+Hooks">Running Hooks</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> does not provide a simple way to turn off the running of save/create/update hooks.  If you attempt to save a model object, the save hooks are always called.  All model instance methods that modify the database call save in some manner, so you can be sure that if you define the hooks, they will be called when you save the object.</p>
 
@@ -180,7 +180,7 @@ doc/model_hooks.rdoc
 <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">destroy</span> <span class="ruby-comment"># runs destroy hooks</span>
 </pre>
 
-<h2 id="label-Skipping+Hooks">Skipping Hooks<span><a href="#label-Skipping+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Skipping+Hooks"><a href="#label-Skipping+Hooks">Skipping Hooks</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> makes it easy to skip destroy hooks by calling <code>delete</code> instead of <code>destroy</code>:</p>
 
@@ -202,7 +202,7 @@ doc/model_hooks.rdoc
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># does not run hooks</span>
 </pre>
 
-<h2 id="label-Canceling+Actions+in+Hooks">Canceling Actions in Hooks<span><a href="#label-Canceling+Actions+in+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Canceling+Actions+in+Hooks"><a href="#label-Canceling+Actions+in+Hooks">Canceling Actions in Hooks</a></h2>
 
 <p>Sometimes want to cancel an action in a before hook, so the action is not performed.  For example, you may want to not allow destroying or saving a record in certain cases.  In those cases, you can call <code>cancel_action</code> inside the <code>before_*</code> hook, which will stop processing the hook and will either raise a <a href="../../classes/Sequel/HookFailed.html"><code>Sequel::HookFailed</code></a> exception (the default), or return <code>nil</code> if <code>raise_on_save_failure</code> is <code>false</code>).  You can use this to implement validation-like behavior, that will run even if validations are skipped:</p>
 
@@ -218,7 +218,7 @@ doc/model_hooks.rdoc
 
 <p>By default, <a href="../../classes/Sequel.html"><code>Sequel</code></a> runs hooks other than validation hooks inside a transaction, so if you cancel the action by calling <code>cancel_action</code> in any hook, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will rollback the transaction.  However, note that the implicit use of transactions when saving and destroying model objects is conditional (it depends on the model instance’s <code>use_transactions</code> setting and the <code>:transaction</code> option passed to save).</p>
 
-<h2 id="label-Conditional+Hooks">Conditional Hooks<span><a href="#label-Conditional+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Conditional+Hooks"><a href="#label-Conditional+Hooks">Conditional Hooks</a></h2>
 
 <p>Sometimes you only take to take a certain action in a hook if the object meets a certain condition.  For example, let’s say you only want to make sure a timestamp is set when updating if the object is at a certain status level:</p>
 
@@ -232,7 +232,7 @@ doc/model_hooks.rdoc
 
 <p>Note how this hook action is made conditional just be using the standard ruby <code>if</code> conditional.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> makes it easy to handle conditional hook actions by using standard ruby conditionals inside the instance methods.</p>
 
-<h2 id="label-Using+Hooks+in+Multiple+Classes">Using Hooks in Multiple Classes<span><a href="#label-Using+Hooks+in+Multiple+Classes">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+Hooks+in+Multiple+Classes"><a href="#label-Using+Hooks+in+Multiple+Classes">Using Hooks in Multiple Classes</a></h2>
 
 <p>If you want all your model classes to use the same hook, you can just define that hook in <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>:</p>
 
@@ -248,7 +248,7 @@ doc/model_hooks.rdoc
 
 <p>If you don’t want all classes to use the same hook, but want to reuse hooks in multiple classes, you should use a plugin or a simple module:</p>
 
-<h3 id="label-Plugin">Plugin<span><a href="#label-Plugin">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Plugin"><a href="#label-Plugin">Plugin</a></h3>
 
 <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">SetCreatedAt</span>
   <span class="ruby-keyword">module</span> <span class="ruby-constant">InstanceMethods</span>
@@ -262,7 +262,7 @@ doc/model_hooks.rdoc
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-constant">SetCreatedAt</span>)
 </pre>
 
-<h3 id="label-Simple+Module">Simple Module<span><a href="#label-Simple+Module">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Simple+Module"><a href="#label-Simple+Module">Simple Module</a></h3>
 
 <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">SetCreatedAt</span>
   <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_create</span>
@@ -274,7 +274,7 @@ doc/model_hooks.rdoc
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">SetCreatedAt</span>)
 </pre>
 
-<h2 id="label-super+Ordering"><code>super</code> Ordering<span><a href="#label-super+Ordering">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-super+Ordering"><a href="#label-super+Ordering"><code>super</code> Ordering</a></h2>
 
 <p>While it’s not enforced anywhere, it’s a good idea to make <code>super</code> the last expression when you override a before hook, and the first expression when you override an after hook:</p>
 
@@ -311,7 +311,7 @@ doc/model_hooks.rdoc
 
 <p>Again, <a href="../../classes/Sequel.html"><code>Sequel</code></a> does not enforce that, and you are free to call <code>super</code> in an order other than the recommended one (just make sure that you call it).</p>
 
-<h2 id="label-Around+Hooks">Around Hooks<span><a href="#label-Around+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Around+Hooks"><a href="#label-Around+Hooks">Around Hooks</a></h2>
 
 <p>Around hooks should only be used if you cannot accomplish the same results with before and after hooks.  For example, if you want to catch database errors caused by the <code>INSERT</code> or <code>UPDATE</code> query when saving a model object and raise them as validation errors, you cannot use a before or after hook.  You have use an <code>around_save</code> hook:</p>
 
@@ -335,17 +335,17 @@ doc/model_hooks.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Hook+related+plugins">Hook related plugins<span><a href="#label-Hook+related+plugins">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Hook+related+plugins"><a href="#label-Hook+related+plugins">Hook related plugins</a></h2>
 
-<h3 id="label-instance_hooks"><code>instance_hooks</code><span><a href="#label-instance_hooks">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-instance_hooks"><a href="#label-instance_hooks"><code>instance_hooks</code></a></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also ships with an <code>instance_hooks</code> plugin that allows you to define before and after hooks on a per instance basis.  It’s very useful as it allows you to delay action on an instance until before or after saving.  This can be important if you want to modify a group of related objects together (which is how the <code>nested_attributes</code> plugin uses <code>instance_hooks</code>).</p>
 
-<h3 id="label-hook_class_methods"><code>hook_class_methods</code><span><a href="#label-hook_class_methods">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-hook_class_methods"><a href="#label-hook_class_methods"><code>hook_class_methods</code></a></h3>
 
 <p>While it’s recommended to write your hooks as instance methods, <a href="../../classes/Sequel.html"><code>Sequel</code></a> ships with a <code>hook_class_methods</code> plugin that allows you to define hooks via class methods. It exists mostly for legacy compatibility, but is still supported.  However, it does not implement around hooks.</p>
 
-<h3 id="label-after_initialize"><code>after_initialize</code><span><a href="#label-after_initialize">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-after_initialize"><a href="#label-after_initialize"><code>after_initialize</code></a></h3>
 
 <p>The after_initialize plugin adds an after_initialize hook, that is called for all model instances on creation (both new instances and instances retrieved from the database).  It exists mostly for legacy compatibility, but it is still supported.</p>
 </div>

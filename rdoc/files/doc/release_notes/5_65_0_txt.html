@@ -33,7 +33,7 @@ doc/release_notes/5.65.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p>The pg_auto_parameterize extension now uses a modified placeholder literalizer for speeding up the generation of SQL queries in the same cases where a standard dataset would use a placeholder literalizer. This can provide a 4% speedup for simple queries, with greater speedups for more complex queries.</p>
 </li><li>
@@ -42,7 +42,7 @@ doc/release_notes/5.65.0.txt
 <p>MySQL versions not supporting CHECK constraints no longer include :min_value/:max_value schema entries for decimal/numeric columns.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The Dataset::PlaceholderLiterlizer::Record.loader API has changed, it now accepts the Dataset::PlaceholderLiterlizer class to use as the first argument.  This makes it easier to create Dataset::PlaceholderLiterlizer subclasses, such as the one now used by the pg_auto_parameterize extension.</p>
 </li></ul>

@@ -33,7 +33,7 @@ doc/release_notes/4.0.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>All behavior resulting in deprecation messages in <a href="3_48_0_txt.html">3.48.0</a> has been removed or modified.  If you plan on upgrading to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="4_0_0_txt.html">4.0.0</a> and have not yet upgraded to <a href="3_48_0_txt.html">3.48.0</a>, upgrade to <a href="3_48_0_txt.html">3.48.0</a> first, fix code that results in deprecation warnings, and then upgrade to 4.0.0.</p>
 </li><li>
@@ -100,7 +100,7 @@ doc/release_notes/4.0.0.txt
 <p>In the <a href="3_48_0_txt.html">3.48.0</a> release notes, it was announced that Dataset#join_table would default to :qualify=&gt;:deep in 4.0.0.  This change was made but reverted before the release of <a href="4_0_0_txt.html">4.0.0</a> as it was determined too likely to break existing code, there was no deprecation warning (since it just changed a setting), and the benefit was minimal. You can make deep qualification the default by by overriding Dataset#default_join_table_qualification.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_array_associations plugin has been added, for creating an association based on a PostgreSQL array column containing foreign keys.  Example:</p>
 
@@ -159,7 +159,7 @@ doc/release_notes/4.0.0.txt
 <p>The pg_json extension now handles non-JSON plain strings, integers and floats in PostgreSQL JSON columns.</p>
 </li></ul>
 
-<h1 id="label-Support+for+New+Features+in+PostgreSQL+9.3">Support for New Features in PostgreSQL 9.3<span><a href="#label-Support+for+New+Features+in+PostgreSQL+9.3">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Support+for+New+Features+in+PostgreSQL+9.3"><a href="#label-Support+for+New+Features+in+PostgreSQL+9.3">Support for New Features in PostgreSQL 9.3</a></h1>
 <ul><li>
 <p>A pg_json_ops extension has been added to support the new json operators and functions.</p>
 </li><li>
@@ -174,7 +174,7 @@ doc/release_notes/4.0.0.txt
 <p>Database#refresh_view has been added on PostgreSQL for refreshing materialized views.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Check constraints are now always surrounded by parantheses, since that is required by the SQL standard.  This fixes issues in the cases where parentheses were not used automatically, such as when a function call was used.</p>
 </li><li>

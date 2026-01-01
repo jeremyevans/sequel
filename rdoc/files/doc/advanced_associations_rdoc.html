@@ -33,13 +33,13 @@ doc/advanced_associations.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Advanced+Associations">Advanced Associations<span><a href="#label-Advanced+Associations">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Advanced+Associations"><a href="#label-Advanced+Associations">Advanced Associations</a></h1>
 
 <p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>‘s association support is powerful and flexible, but it can be difficult for new users to understand what the support enables.  This guide shows off some of the more advanced <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> association features.</p>
 
 <p>You should probably review the <a href="association_basics_rdoc.html">Model Associations Basics and Options guide</a> before reviewing this guide.</p>
 
-<h2 id="label-Sequel-3A-3AModel+Eager+Loading"><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> Eager Loading<span><a href="#label-Sequel-3A-3AModel+Eager+Loading">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sequel-3A-3AModel+Eager+Loading"><a href="#label-Sequel-3A-3AModel+Eager+Loading"><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> Eager Loading</a></h2>
 
 <p><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> offers two different ways to perform eager loading, <code>eager</code> and <code>eager_graph</code>. <code>eager</code> uses an SQL query per association, <code>eager_graph</code> uses a single SQL query containing JOINs.</p>
 
@@ -88,7 +88,7 @@ doc/advanced_associations.rdoc
 
 <p>Whether <code>eager</code> or <code>eager_graph</code> performs better is association and database dependent. If you are concerned about performance, you should try benchmarking both cases with appropriate data to see which performs better.</p>
 
-<h3 id="label-Mixing+eager+and+eager_graph">Mixing eager and eager_graph<span><a href="#label-Mixing+eager+and+eager_graph">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Mixing+eager+and+eager_graph"><a href="#label-Mixing+eager+and+eager_graph">Mixing eager and eager_graph</a></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> offers the ability to mix <code>eager</code> and <code>eager_graph</code> when loading results.  This can be done at the main level by calling both <code>eager</code> and <code>eager_graph</code> on the same dataset:</p>
 
@@ -157,7 +157,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-comment"># WHERE (tracks.album_id IN (...));</span>
 </pre>
 
-<h2 id="label-Sequel-3A-3AModel+Association+Loading+Options"><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> Association Loading Options<span><a href="#label-Sequel-3A-3AModel+Association+Loading+Options">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sequel-3A-3AModel+Association+Loading+Options"><a href="#label-Sequel-3A-3AModel+Association+Loading+Options"><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> Association Loading Options</a></h2>
 
 <p>There are a bunch of advanced association options that are available to handle more complex cases.  First we’ll go over some of the simpler ones:</p>
 
@@ -215,7 +215,7 @@ doc/advanced_associations.rdoc
 
 <p>For lazy loading (e.g. <a href="1">Model</a>.association), the <code>:dataset</code> option can be used to specify an arbitrary dataset (one that uses different keys, multiple keys, joins to other tables, etc.).</p>
 
-<h2 id="label-Custom+Eager+Loaders">Custom Eager Loaders<span><a href="#label-Custom+Eager+Loaders">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Custom+Eager+Loaders"><a href="#label-Custom+Eager+Loaders">Custom Eager Loaders</a></h2>
 
 <p>For eager loading via <code>eager</code>, the <code>:eager_loader</code> option can be used to specify how to eagerly load a complex association.  This is an extremely powerful option.  Though it can often be verbose (compared to other things in <a href="../../classes/Sequel.html"><code>Sequel</code></a>), it allows you complete control over how to eagerly load associations for a group of objects.</p>
 
@@ -297,7 +297,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-Two+basic+example+eager+loaders">Two basic example eager loaders<span><a href="#label-Two+basic+example+eager+loaders">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Two+basic+example+eager+loaders"><a href="#label-Two+basic+example+eager+loaders">Two basic example eager loaders</a></h3>
 
 <p>Putting the code in the above examples together, you almost have enough for a basic working eager loader.  The main important thing that is missing is you need to set initial values for the eagerly loaded associations.  For the artist association, you need to initial the values to nil:</p>
 
@@ -357,7 +357,7 @@ doc/advanced_associations.rdoc
 
 <p>Using the :eager_loader proc, you should be able to eagerly load all associations that can be eagerly loaded, even if <a href="../../classes/Sequel.html"><code>Sequel</code></a> doesn’t natively support such eager loading.</p>
 
-<h2 id="label-Limited+Associations">Limited Associations<span><a href="#label-Limited+Associations">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Limited+Associations"><a href="#label-Limited+Associations">Limited Associations</a></h2>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> supports specifying limits and/or offsets for associations:</p>
 
@@ -370,7 +370,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-comment"># SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10</span>
 </pre>
 
-<h3 id="label-Eager+Loading+via+eager">Eager Loading via eager<span><a href="#label-Eager+Loading+via+eager">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Eager+Loading+via+eager"><a href="#label-Eager+Loading+via+eager">Eager Loading via eager</a></h3>
 
 <p>However, if you want to eagerly load an association, you must use a different approach.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> has 4 separate strategies for dealing with such cases.</p>
 
@@ -409,7 +409,7 @@ doc/advanced_associations.rdoc
 
 <p>Alternatively, you can use the :ruby strategy, which will fall back to retrieving all records, and then will slice the resulting array to get the first 10 after retrieval.</p>
 
-<h3 id="label-Dynamic+Eager+Loading+Limits">Dynamic Eager Loading Limits<span><a href="#label-Dynamic+Eager+Loading+Limits">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Dynamic+Eager+Loading+Limits"><a href="#label-Dynamic+Eager+Loading+Limits">Dynamic Eager Loading Limits</a></h3>
 
 <p>If you need to eager load variable numbers of records (with limits that aren’t known at the time of the association definition), <a href="../../classes/Sequel.html"><code>Sequel</code></a> supports an :eager_limit dataset option that can be defined in an eager loading callback:</p>
 
@@ -431,7 +431,7 @@ doc/advanced_associations.rdoc
 
 <p>The :eager_limit and :eager_limit_strategy options currently only work when eager loading via eager, not with eager_graph.</p>
 
-<h3 id="label-Eager+Loading+via+eager_graph_with_options">Eager Loading via eager_graph_with_options<span><a href="#label-Eager+Loading+via+eager_graph_with_options">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Eager+Loading+via+eager_graph_with_options"><a href="#label-Eager+Loading+via+eager_graph_with_options">Eager Loading via eager_graph_with_options</a></h3>
 
 <p>When eager loading an association via eager_graph (which uses JOINs), the situation is similar.  While the UNION-based strategy cannot be used as you don’t know the records being eagerly loaded in advance, <a href="../../classes/Sequel.html"><code>Sequel</code></a> can use a variant of the other 3 strategies.  By default it retrieves all records and then does the array slice in ruby.  As eager_graph does not support options, to use an eager_graph limit strategy you have to use the eager_graph_with_options method with the :limit_strategy option.</p>
 
@@ -489,7 +489,7 @@ doc/advanced_associations.rdoc
 
 <p>It’s recommended to only use an eager_graph limit strategy if you have benchmarked it against the default behavior and found it is faster for your use case.</p>
 
-<h3 id="label-Filtering+By+Associations">Filtering By Associations<span><a href="#label-Filtering+By+Associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Filtering+By+Associations"><a href="#label-Filtering+By+Associations">Filtering By Associations</a></h3>
 
 <p>In order to return correct results, <a href="../../classes/Sequel.html"><code>Sequel</code></a> automatically uses a limit strategy when using filtering by associations with limited associations, if the database supports it.  As in the eager_graph case, the UNION-based strategy doesn’t work.  Unlike in the eager and eager_graph cases, the array slicing in ruby approach does not work, you must use an SQL-based strategy.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> will select an appropriate default strategy based on the database you are using, and you can override it using the :filter_limit_strategy option.</p>
 
@@ -544,13 +544,13 @@ doc/advanced_associations.rdoc
 
 <p>Note that filtering by limited associations does not work on MySQL, as MySQL does not support any of the strategies.  It’s also not supported when using composite keys on databases that don’t support window functions and don’t support multiple columns in IN.</p>
 
-<h3 id="label-Additional+Association+Types">Additional Association Types<span><a href="#label-Additional+Association+Types">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Additional+Association+Types"><a href="#label-Additional+Association+Types">Additional Association Types</a></h3>
 
 <p>While the above examples for limited associations showed one_to_many and one_to_one associations, it’s just because those are the simplest examples.  <a href="../../classes/Sequel.html"><code>Sequel</code></a> supports all of the same features for many_to_many and one_through_one associations that are enabled by default, as well as the many_through_many and one_through_many associations that are added by the many_through_many plugin.</p>
 
-<h2 id="label-More+advanced+association+examples+">More advanced association examples <span><a href="#label-More+advanced+association+examples+">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-More+advanced+association+examples+"><a href="#label-More+advanced+association+examples+">More advanced association examples </a></h2>
 
-<h3 id="label-Association+extensions">Association extensions<span><a href="#label-Association+extensions">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Association+extensions"><a href="#label-Association+extensions">Association extensions</a></h3>
 
 <p>All associations come with an <code><em>association</em>_dataset</code> method that can be further filtered or otherwise modified:</p>
 
@@ -573,7 +573,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Blah&#39;</span>, <span class="ruby-value">number:</span> <span class="ruby-value">10</span>)
 </pre>
 
-<h3 id="label-many_to_many+associations+through+model+tables">many_to_many associations through model tables<span><a href="#label-many_to_many+associations+through+model+tables">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-many_to_many+associations+through+model+tables"><a href="#label-many_to_many+associations+through+model+tables">many_to_many associations through model tables</a></h3>
 
 <p>The many_to_many association can be used even when the join table is a table used for a model.  The only requirement is the join table has foreign keys to both the current model and the associated model.  Anytime there is a one_to_many association from model A to model B, and model B has a many_to_one association to model C, you can use a many_to_many association from model A to model C.</p>
 
@@ -591,7 +591,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-ivar">@author</span>.<span class="ruby-identifier">books</span>
 </pre>
 
-<h3 id="label-many_to_many+for+three-level+associations">many_to_many for three-level associations<span><a href="#label-many_to_many+for+three-level+associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-many_to_many+for+three-level+associations"><a href="#label-many_to_many+for+three-level+associations">many_to_many for three-level associations</a></h3>
 
 <p>You can even use a many_to_many association between model A and model C if model A has a one_to_many association to model B, and model B has a one_to_many association to model C. You just need to use the appropriate :right_key and :right_primary_key options.  And in the reverse direction from model C to model A, you can use a one_through_one association using the :left_key and :left_primary_key options.</p>
 
@@ -616,7 +616,7 @@ doc/advanced_associations.rdoc
 
 <p>To handle cases where there are multiple join tables, you can use the many_through_many plugin that ships with <a href="../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
-<h3 id="label-Polymorphic+Associations">Polymorphic Associations<span><a href="#label-Polymorphic+Associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Polymorphic+Associations"><a href="#label-Polymorphic+Associations">Polymorphic Associations</a></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> discourages the use of polymorphic associations, which is the reason they are not supported by default.  All polymorphic associations can be made non-polymorphic by using additional tables and/or columns instead of having a column containing the associated class name as a string.</p>
 
@@ -671,7 +671,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-ivar">@asset</span>.<span class="ruby-identifier">attachable</span> = <span class="ruby-ivar">@note</span>
 </pre>
 
-<h3 id="label-Joining+on+multiple+keys">Joining on multiple keys<span><a href="#label-Joining+on+multiple+keys">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Joining+on+multiple+keys"><a href="#label-Joining+on+multiple+keys">Joining on multiple keys</a></h3>
 
 <p>Let’s say you have two tables that are associated with each other with multiple keys.  This can be handled using Sequel’s built in composite key support for associations:</p>
 
@@ -687,7 +687,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-Tree+-+All+Ancestors+and+Descendants">Tree - All Ancestors and Descendants<span><a href="#label-Tree+-+All+Ancestors+and+Descendants">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Tree+-+All+Ancestors+and+Descendants"><a href="#label-Tree+-+All+Ancestors+and+Descendants">Tree - All Ancestors and Descendants</a></h3>
 
 <p>Let’s say you want to store a tree relationship in your database, it’s pretty simple:</p>
 
@@ -764,7 +764,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-Joining+multiple+keys+to+a+single+key-2C+through+a+third+table">Joining multiple keys to a single key, through a third table<span><a href="#label-Joining+multiple+keys+to+a+single+key-2C+through+a+third+table">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Joining+multiple+keys+to+a+single+key-2C+through+a+third+table"><a href="#label-Joining+multiple+keys+to+a+single+key-2C+through+a+third+table">Joining multiple keys to a single key, through a third table</a></h3>
 
 <p>Let’s say you have a database of songs, lyrics, and artists.  Each song may or may not have a lyric (most songs are instrumental).  The lyric can be associated to an artist in each of four ways: composer, arranger, vocalist, or lyricist.  These may all be the same, or they could all be different, and none of them are required.  The songs table has a lyric_id field to associate it to the lyric, and the lyric table has four fields to associate it to the artist (composer_id, arranger_id, vocalist_id, and lyricist_id).</p>
 
@@ -791,7 +791,7 @@ doc/advanced_associations.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-Statistics+Associations+-28Sum+of+Associated+Table+Column-29">Statistics Associations (Sum of Associated Table Column)<span><a href="#label-Statistics+Associations+-28Sum+of+Associated+Table+Column-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Statistics+Associations+-28Sum+of+Associated+Table+Column-29"><a href="#label-Statistics+Associations+-28Sum+of+Associated+Table+Column-29">Statistics Associations (Sum of Associated Table Column)</a></h3>
 
 <p>In addition to getting associated records, you can use Sequel’s association support to get aggregate information for columns in associated tables (sums, averages, etc.).</p>
 

@@ -33,7 +33,7 @@ lib/sequel/extensions/thread_local_timezones.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The thread_local_timezones extension allows you to set a per-thread timezone that will override the default global timezone while the thread is executing.  The main use case is for web applications that execute each request in its own thread, and want to set the timezones based on the request.</p>
+<p>The <a href="thread_local_timezones_rb.html">thread_local_timezones</a> extension allows you to set a per-thread timezone that will override the default global timezone while the thread is executing.  The main use case is for web applications that execute each request in its own thread, and want to set the timezones based on the request.</p>
 
 <p>To load the extension:</p>
 
@@ -47,7 +47,7 @@ lib/sequel/extensions/thread_local_timezones.rb
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = <span class="ruby-identifier">current_user</span>.<span class="ruby-identifier">timezone</span>
 </pre>
 
-<p>This extension is designed to work with the named_timezones extension.</p>
+<p>This extension is designed to work with the <a href="named_timezones_rb.html">named_timezones</a> extension.</p>
 
 <p>This extension adds the thread_application_timezone=, thread_database_timezone=, and thread_typecast_timezone= methods to the <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> module.  It overrides the application_timezone, database_timezone, and typecast_timezone methods to check the related thread local timezone first, and use it if present. If the related thread local timezone is not present, it falls back to the default global timezone.</p>
 

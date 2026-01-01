@@ -127,6 +127,11 @@ Superclass:
 <td>-&gt;</td>
 <td class='context-item-value'><a href="#method-i-eql-3F">eql?</a></td>
 </tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>to_s</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-inspect">inspect</a></td>
+</tr>
 </table>
 </div>
 </div>
@@ -496,9 +501,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sequel_auto_param_type-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">496</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">497</span>   <span class="ruby-node">&quot;::#{db_type}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-operator">!</span><span class="ruby-ivar">@begin</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-ivar">@begin</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-operator">!</span><span class="ruby-ivar">@end</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-ivar">@end</span>))
-<span class="line-num">498</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">497</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sequel_auto_param_type</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">498</span>   <span class="ruby-node">&quot;::#{db_type}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-operator">!</span><span class="ruby-ivar">@begin</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-ivar">@begin</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-operator">!</span><span class="ruby-ivar">@end</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:auto_param_type</span>, <span class="ruby-ivar">@end</span>))
+<span class="line-num">499</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -517,22 +522,22 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">436</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
-<span class="line-num">437</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">s</span> = <span class="ruby-ivar">@db_type</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>
-<span class="line-num">438</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;(&quot;</span>
-<span class="line-num">439</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>)
-<span class="line-num">440</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
-<span class="line-num">441</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>)
-<span class="line-num">442</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
-<span class="line-num">443</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{exclude_begin? ? &quot;(&quot; : &quot;[&quot;}#{exclude_end? ? &quot;)&quot; : &quot;]&quot;}&quot;</span>)
-<span class="line-num">444</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>
-<span class="line-num">445</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">446</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">unquoted_literal</span>(<span class="ruby-identifier">ds</span>))
-<span class="line-num">447</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>
-<span class="line-num">448</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span>
-<span class="line-num">449</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">450</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">451</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">437</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">438</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">s</span> = <span class="ruby-ivar">@db_type</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>
+<span class="line-num">439</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;(&quot;</span>
+<span class="line-num">440</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>)
+<span class="line-num">441</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
+<span class="line-num">442</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>)
+<span class="line-num">443</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;,&#39;</span>
+<span class="line-num">444</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{exclude_begin? ? &quot;(&quot; : &quot;[&quot;}#{exclude_end? ? &quot;)&quot; : &quot;]&quot;}&quot;</span>)
+<span class="line-num">445</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>
+<span class="line-num">446</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">447</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">unquoted_literal</span>(<span class="ruby-identifier">ds</span>))
+<span class="line-num">448</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>
+<span class="line-num">449</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span>
+<span class="line-num">450</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">451</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">452</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_range'>
@@ -551,16 +556,16 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-to_range-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">457</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_range</span>
-<span class="line-num">458</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@range</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@range</span>
-<span class="line-num">459</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range for an empty PostgreSQL range&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>
-<span class="line-num">460</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range excludes beginning element&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">exclude_begin?</span>
-<span class="line-num">461</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">462</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded beginning&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">STARTLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>
-<span class="line-num">463</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded ending&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>
-<span class="line-num">464</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">465</span>   <span class="ruby-ivar">@range</span> = <span class="ruby-constant">Range</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>, <span class="ruby-identifier">exclude_end?</span>)
-<span class="line-num">466</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">458</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_range</span>
+<span class="line-num">459</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@range</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@range</span>
+<span class="line-num">460</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range for an empty PostgreSQL range&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>
+<span class="line-num">461</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range excludes beginning element&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">exclude_begin?</span>
+<span class="line-num">462</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">463</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded beginning&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">STARTLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>
+<span class="line-num">464</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded ending&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>
+<span class="line-num">465</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">466</span>   <span class="ruby-ivar">@range</span> = <span class="ruby-constant">Range</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>, <span class="ruby-identifier">exclude_end?</span>)
+<span class="line-num">467</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unbounded_begin-3F'>
@@ -579,9 +584,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-unbounded_begin-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">476</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_begin?</span>
-<span class="line-num">477</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>
-<span class="line-num">478</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">477</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_begin?</span>
+<span class="line-num">478</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>
+<span class="line-num">479</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unbounded_end-3F'>
@@ -600,9 +605,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-unbounded_end-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">481</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_end?</span>
-<span class="line-num">482</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>
-<span class="line-num">483</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">482</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_end?</span>
+<span class="line-num">483</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>
+<span class="line-num">484</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unquoted_literal'>
@@ -621,13 +626,13 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-unquoted_literal-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">487</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unquoted_literal</span>(<span class="ruby-identifier">ds</span>)
-<span class="line-num">488</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>
-<span class="line-num">489</span>     <span class="ruby-string">&#39;empty&#39;</span>
-<span class="line-num">490</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">491</span>     <span class="ruby-node">&quot;#{exclude_begin? ? &quot;(&quot; : &quot;[&quot;}#{escape_value(self.begin, ds)},#{escape_value(self.end, ds)}#{exclude_end? ? &quot;)&quot; : &quot;]&quot;}&quot;</span>
-<span class="line-num">492</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">493</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">488</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unquoted_literal</span>(<span class="ruby-identifier">ds</span>)
+<span class="line-num">489</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>
+<span class="line-num">490</span>     <span class="ruby-string">&#39;empty&#39;</span>
+<span class="line-num">491</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">492</span>     <span class="ruby-node">&quot;#{exclude_begin? ? &quot;(&quot; : &quot;[&quot;}#{escape_value(self.begin, ds)},#{escape_value(self.end, ds)}#{exclude_end? ? &quot;)&quot; : &quot;]&quot;}&quot;</span>
+<span class="line-num">493</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">494</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-valid_ruby_range-3F'>
@@ -646,9 +651,9 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-valid_ruby_range-3F-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">471</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid_ruby_range?</span>
-<span class="line-num">472</span>   <span class="ruby-operator">!</span>(<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">exclude_begin?</span> <span class="ruby-operator">||</span> (<span class="ruby-constant">STARTLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>) <span class="ruby-operator">||</span> (<span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>))
-<span class="line-num">473</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">472</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid_ruby_range?</span>
+<span class="line-num">473</span>   <span class="ruby-operator">!</span>(<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">exclude_begin?</span> <span class="ruby-operator">||</span> (<span class="ruby-constant">STARTLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>) <span class="ruby-operator">||</span> (<span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>))
+<span class="line-num">474</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

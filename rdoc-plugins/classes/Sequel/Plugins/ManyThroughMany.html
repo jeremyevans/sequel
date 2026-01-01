@@ -36,13 +36,13 @@ Sequel::Plugins::ManyThroughMany
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The many_through_many plugin allow you to create an association using multiple join tables. For example, assume the following associations:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/many_through_many_rb.html">many_through_many</a> plugin allow you to create an association using multiple join tables. For example, assume the following associations:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:albums</span>
 <span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:tags</span>
 </pre>
 
-<p>The many_through_many plugin would allow this:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/many_through_many_rb.html">many_through_many</a> plugin would allow this:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:many_through_many</span>
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> <span class="ruby-value">:tags</span>, [[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>], [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]
@@ -50,7 +50,7 @@ Sequel::Plugins::ManyThroughMany
 
 <p>Which will give you the tags for all of the artist’s albums.</p>
 
-<p>Let’s break down the 2nd argument of the many_through_many call:</p>
+<p>Let’s break down the 2nd argument of the <a href="../../../files/lib/sequel/plugins/many_through_many_rb.html">many_through_many</a> call:</p>
 
 <pre class="ruby">[[<span class="ruby-value">:albums_artists</span>, <span class="ruby-value">:artist_id</span>, <span class="ruby-value">:album_id</span>],
  [<span class="ruby-value">:albums_tags</span>, <span class="ruby-value">:album_id</span>, <span class="ruby-value">:tag_id</span>]]
@@ -107,7 +107,7 @@ Sequel::Plugins::ManyThroughMany
  <span class="ruby-value">distinct:</span> <span class="ruby-keyword">true</span>
 </pre>
 
-<p>In addition to many_through_many, this plugin also adds one_through_many, for an association to a single object through multiple join tables. This is useful if there are unique constraints on the foreign keys in the join tables that reference back to the current table, or if you want to set an order on the association and just want the first record.</p>
+<p>In addition to <a href="../../../files/lib/sequel/plugins/many_through_many_rb.html">many_through_many</a>, this plugin also adds one_through_many, for an association to a single object through multiple join tables. This is useful if there are unique constraints on the foreign keys in the join tables that reference back to the current table, or if you want to set an order on the association and just want the first record.</p>
 
 <p>Usage:</p>
 

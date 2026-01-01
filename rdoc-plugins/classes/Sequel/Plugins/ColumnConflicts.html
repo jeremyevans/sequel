@@ -36,7 +36,7 @@ Sequel::Plugins::ColumnConflicts
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The column_conflicts plugin overrides Model#get_column_value and set_column_value to automatically handle column names that conflict with Ruby/Sequel method names.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/column_conflicts_rb.html">column_conflicts</a> plugin overrides Model#get_column_value and set_column_value to automatically handle column names that conflict with Ruby/Sequel method names.</p>
 
 <p>By default, Model#get_column_value and set_column_value just call send, this plugin overrides the methods and gets/sets the value directly in the values hash if the column name conflicts with an existing <a href="../Model.html"><code>Sequel::Model</code></a> instance method name.</p>
 

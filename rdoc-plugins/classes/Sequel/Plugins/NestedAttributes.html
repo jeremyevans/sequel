@@ -36,14 +36,14 @@ Sequel::Plugins::NestedAttributes
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The nested_attributes plugin allows you to create, update, and delete associated objects directly by calling a method on the current object. Nested attributes are defined using the nested_attributes class method:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">nested_attributes</a> plugin allows you to create, update, and delete associated objects directly by calling a method on the current object. Nested attributes are defined using the <a href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">nested_attributes</a> class method:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:nested_attributes</span>
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>
 </pre>
 
-<p>The nested_attributes call defines a single method, <code><em>association</em>_attributes=</code>, (e.g. <code>albums_attributes=</code>).  So if you have an Artist instance:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">nested_attributes</a> call defines a single method, <code><em>association</em>_attributes=</code>, (e.g. <code>albums_attributes=</code>).  So if you have an Artist instance:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;YJM&#39;</span>)
 </pre>
@@ -67,13 +67,13 @@ Sequel::Plugins::NestedAttributes
 
 <p>Since the primary key field is filled in, the plugin will update the album with id 1 instead of creating a new album.</p>
 
-<p>If you would like to delete the associated object instead of updating it, you add a _delete entry to the hash, and also pass the :destroy option when calling <code>nested_attributes</code>:</p>
+<p>If you would like to delete the associated object instead of updating it, you add a _delete entry to the hash, and also pass the :destroy option when calling <a href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">nested_attributes</a>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">destroy:</span> <span class="ruby-keyword">true</span>
 <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">albums_attributes:</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_delete:</span> <span class="ruby-keyword">true</span>}])
 </pre>
 
-<p>This will delete the related associated object from the database.  If you want to leave the associated object in the database, but just remove it from the association, add a _remove entry in the hash, and also pass the :remove option when calling <code>nested_attributes</code>:</p>
+<p>This will delete the related associated object from the database.  If you want to leave the associated object in the database, but just remove it from the association, add a _remove entry in the hash, and also pass the :remove option when calling <a href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">nested_attributes</a>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">remove:</span> <span class="ruby-keyword">true</span>
 <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">albums_attributes:</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_remove:</span> <span class="ruby-keyword">true</span>}])
@@ -138,7 +138,7 @@ Sequel::Plugins::NestedAttributes
 </div>
 <div class='description'>
 
-<p>Depend on the validate_associated plugin.</p>
+<p>Depend on the <a href="../../../files/lib/sequel/plugins/validate_associated_rb.html">validate_associated</a> plugin.</p>
 
 </div>
 <div class='source'>

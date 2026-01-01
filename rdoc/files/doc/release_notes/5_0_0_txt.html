@@ -33,7 +33,7 @@ doc/release_notes/5.0.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Major+Changes">Major Changes<span><a href="#label-Major+Changes">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Major+Changes"><a href="#label-Major+Changes">Major Changes</a></h1>
 <ul><li>
 <p>Datasets are now frozen by default.  Since Sequel’s inception, datasets have used a method-chaining API that returned modified copies, but previously they still supported direct mutation.  Now, datasets are always frozen and cannot be mutated. This allows many additional default optimizations related to caching, and provides greater thread safety.</p>
 
@@ -74,7 +74,7 @@ doc/release_notes/5.0.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>All adapters, extensions, plugins, features, and constants deprecated in <a href="4_49_0_txt.html">4.49.0</a> have been removed.  Before upgrading to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> <a href="5_0_0_txt.html">5.0.0</a>, upgrade to <a href="4_49_0_txt.html">4.49.0</a> and fix all deprecation warnings.</p>
 </li><li>
@@ -105,14 +105,14 @@ doc/release_notes/5.0.0.txt
 <p>Modifying Model.input_transformer_order in the input_transformer plugin no longer has an effect.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#add_index :if_not_exists option is now supported on PostgreSQL 9.5+.</p>
 </li><li>
 <p>SQL::Subscript#expression has been added to retrieve the expression that is subscripted.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Threaded connection pools no longer block while new connections are being made.  Previously, attempting to establish a new connection blocked all connection pool activity until the new connection was made.</p>
 </li><li>
@@ -131,7 +131,7 @@ doc/release_notes/5.0.0.txt
 <p>The bin/sequel -M option now uses base 10.  Previously, it used the Kernel#Integer default, which was base 8 if there was a preceding 0.</p>
 </li></ul>
 
-<h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features"><a href="#label-Deprecated+Features">Deprecated Features</a></h1>
 
 <p>These deprecated features will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.1.0.</p>
 <ul><li>

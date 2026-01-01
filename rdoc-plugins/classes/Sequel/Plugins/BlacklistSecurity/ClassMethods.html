@@ -99,7 +99,7 @@ Sequel::Plugins::BlacklistSecurity::ClassMethods
 
 <p>Set the columns to restrict when using mass assignment (e.g. <code>set</code>).  Using this means that attempts to call setter methods for the columns listed here will cause an exception or be silently skipped (based on the <code>strict_param_setting</code> setting). If you have any virtual setter methods (methods that end in =) that you want not to be used during mass assignment, they need to be listed here as well (without the =).</p>
 
-<p>It’s generally a bad idea to rely on a blacklist approach for security.  Using a whitelist approach such as the whitelist_security plugin or the set_fields methods is usually a better choice.  So use of this method is generally a bad idea.</p>
+<p>It’s generally a bad idea to rely on a blacklist approach for security.  Using a whitelist approach such as the <a href="../../../../files/lib/sequel/plugins/whitelist_security_rb.html">whitelist_security</a> plugin or the set_fields methods is usually a better choice.  So use of this method is generally a bad idea.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_restricted_columns</span>(<span class="ruby-value">:records_sold</span>)
 <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>

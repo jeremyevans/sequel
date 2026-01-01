@@ -33,7 +33,7 @@ doc/release_notes/3.23.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now allows dynamic customization for eager loading. Previously, the parameters for eager loading were fixed at association creation time.  Now, they can be modified at query time.  To dynamically modify an eager load, you use a hash with the proc as the value. For example, if you have this code:</p>
 
@@ -127,7 +127,7 @@ doc/release_notes/3.23.0.txt
 <p>With this plugin, such modifications can be detected, at a potentially significant performance cost.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>When using a migration directory containing both older integer migrations and newer timestamp migrations, where some integer migrations have not been applied, make sure to apply the remaining integer migrations before the timestamp migrations.  Previously, they could be applied out of order due to a lexicographic sort being used instead of a numeric sort.</p>
 </li><li>
@@ -144,7 +144,7 @@ doc/release_notes/3.23.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now using GitHub Issues for issue tracking.  Old issues have been migrated from Google Code.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The filter by associations support breaks backward compatibilty for users who previously added an sql_literal instance method to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.  Usually, that was done to for reasons similar to but inferior than the filter by association support.  The following code can be used as a temporary workaround until you can modify your program to use the new filter by associations support:</p>
 

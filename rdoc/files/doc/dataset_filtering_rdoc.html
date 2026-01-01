@@ -33,11 +33,11 @@ doc/dataset_filtering.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Dataset+Filtering">Dataset Filtering<span><a href="#label-Dataset+Filtering">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Dataset+Filtering"><a href="#label-Dataset+Filtering">Dataset Filtering</a></h1>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> is very flexible when it comes to filtering records. You can specify your conditions as a hash of values to compare against, or as ruby code that <a href="../../classes/Sequel.html"><code>Sequel</code></a> translates into SQL expressions, or as an SQL code fragment (with optional parameters), .</p>
 
-<h2 id="label-Filtering+using+a+hash">Filtering using a hash<span><a href="#label-Filtering+using+a+hash">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+using+a+hash"><a href="#label-Filtering+using+a+hash">Filtering using a hash</a></h2>
 
 <p>If you just need to compare records against values, you can supply a hash:</p>
 
@@ -72,7 +72,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE (price &gt;= 100 AND price &lt; 200)&quot;</span>
 </pre>
 
-<h2 id="label-Filtering+using+an+array">Filtering using an array<span><a href="#label-Filtering+using+an+array">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+using+an+array"><a href="#label-Filtering+using+an+array">Filtering using an array</a></h2>
 
 <p>If you need to select multiple items from a dataset, you can supply an array:</p>
 
@@ -80,7 +80,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE (id IN (1, 38, 47, 99))&quot;</span>
 </pre>
 
-<h2 id="label-Filtering+using+a+set">Filtering using a set<span><a href="#label-Filtering+using+a+set">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+using+a+set"><a href="#label-Filtering+using+a+set">Filtering using a set</a></h2>
 
 <p>Similarly, you can also supply a set:</p>
 
@@ -88,7 +88,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE (id IN (1, 38, 47, 99))&quot;</span>
 </pre>
 
-<h2 id="label-Filtering+using+expressions">Filtering using expressions<span><a href="#label-Filtering+using+expressions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+using+expressions"><a href="#label-Filtering+using+expressions">Filtering using expressions</a></h2>
 
 <p>You can pass a block to where (referred to as a virtual row block), which is evaluated in a special context:</p>
 
@@ -144,7 +144,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price &gt;= 100 AND price &lt;= 200) AND active)&quot;</span>
 </pre>
 
-<h2 id="label-Filtering+using+a+custom+filter+string">Filtering using a custom filter string<span><a href="#label-Filtering+using+a+custom+filter+string">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+using+a+custom+filter+string"><a href="#label-Filtering+using+a+custom+filter+string">Filtering using a custom filter string</a></h2>
 
 <p>If you wish to include an SQL fragment as part of a filter, you need to wrap it with <code>Sequel.lit</code> to mark that it is literal SQL code, and pass it to the where method:</p>
 
@@ -182,7 +182,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># SELECT * FROM items WHERE ((name = &#39;Programming in Ruby&#39;) AND ((category IS NULL) OR (category = &#39;ruby&#39;)))</span>
 </pre>
 
-<h3 id="label-Specifying+SQL+functions">Specifying SQL functions<span><a href="#label-Specifying+SQL+functions">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Specifying+SQL+functions"><a href="#label-Specifying+SQL+functions">Specifying SQL functions</a></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also allows you to specify functions by using the Sequel.function method:</p>
 
@@ -194,7 +194,7 @@ doc/dataset_filtering.rdoc
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">avg</span>(<span class="ruby-identifier">price</span>)}
 </pre>
 
-<h3 id="label-Negating+conditions">Negating conditions<span><a href="#label-Negating+conditions">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Negating+conditions"><a href="#label-Negating+conditions">Negating conditions</a></h3>
 
 <p>You can use the exclude method to exclude whole conditions:</p>
 
@@ -223,7 +223,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category != &#39;ruby&#39;) AND ((price + 100) &lt; 200))&quot;</span>
 </pre>
 
-<h3 id="label-Comparing+against+column+references">Comparing against column references<span><a href="#label-Comparing+against+column+references">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Comparing+against+column+references"><a href="#label-Comparing+against+column+references">Comparing against column references</a></h3>
 
 <p>You can also compare against other columns:</p>
 
@@ -237,7 +237,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price - 100) &lt; max(price))&quot;</span>
 </pre>
 
-<h2 id="label-String+search+functions">String search functions<span><a href="#label-String+search+functions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-String+search+functions"><a href="#label-String+search+functions">String search functions</a></h2>
 
 <p>You can search SQL strings in a case sensitive manner using the Sequel.like method:</p>
 
@@ -263,7 +263,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((name LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;) OR (name ~ &#39;Beta.*&#39;))&quot;</span>
 </pre>
 
-<h2 id="label-String+concatenation">String concatenation<span><a href="#label-String+concatenation">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-String+concatenation"><a href="#label-String+concatenation">String concatenation</a></h2>
 
 <p>You can concatenate SQL strings using Sequel.join:</p>
 
@@ -277,7 +277,7 @@ doc/dataset_filtering.rdoc
 <span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((name || &#39;:&#39; || comment) LIKE &#39;John:%nice%&#39; ESCAPE &#39;\&#39;)&quot;</span>
 </pre>
 
-<h2 id="label-Filtering+using+sub-queries">Filtering using sub-queries<span><a href="#label-Filtering+using+sub-queries">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+using+sub-queries"><a href="#label-Filtering+using+sub-queries">Filtering using sub-queries</a></h2>
 
 <p>Datasets can be used as subqueries. Subqueries can be very useful for filtering records, and many times provide a simpler alternative to table joins. Subqueries can be used in all forms of filters:</p>
 
@@ -288,7 +288,7 @@ doc/dataset_filtering.rdoc
 
 <p>Note that if you are checking for the inclusion of a single column in a subselect, the subselect should only select a single column.</p>
 
-<h2 id="label-Using+OR+instead+of+AND">Using OR instead of AND<span><a href="#label-Using+OR+instead+of+AND">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+OR+instead+of+AND"><a href="#label-Using+OR+instead+of+AND">Using OR instead of AND</a></h2>
 
 <p>By default, if you chain calls to <code>where</code>, the conditions get ANDed together.  If you want to use an OR for a condition, you can use the <code>or</code> method:</p>
 

@@ -33,7 +33,7 @@ doc/release_notes/3.30.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Dataset+Literalization+Refactoring">Dataset Literalization Refactoring<span><a href="#label-Dataset+Literalization+Refactoring">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Dataset+Literalization+Refactoring"><a href="#label-Dataset+Literalization+Refactoring">Dataset Literalization Refactoring</a></h1>
 <ul><li>
 <p>As warned about in the <a href="3_29_0_txt.html">3.29.0</a> release notes, dataset literalization has been completely refactored.  It now uses an append-only design which is faster in all cases, about twice as fast for large objects and deeply nested structures, and over two orders of magnitude faster in some pathological cases.</p>
 
@@ -60,7 +60,7 @@ doc/release_notes/3.30.0.txt
 <p>If you have questions about modifying your custom adapter or extension, please ask on the Google Group or the IRC channel.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Model#set_server has been added to the base support (it was previously only in the sharding plugin), which allows you to set the shard on which to save/delete the model instance:</p>
 
@@ -79,7 +79,7 @@ doc/release_notes/3.30.0.txt
 <p>The postgres adapter now respects a :connect_timeout option if you are using the pg driver.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Type conversion of Java to Ruby types in the JDBC adapter has been made much faster, as conversion method lookup is now O(number of columns) instead of O(number of columns*number of rows).</p>
 </li><li>
@@ -108,7 +108,7 @@ doc/release_notes/3.30.0.txt
 <p>The plugin/extension specs were cleaned up using the mock adapter.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>In addition to the previously mentioned dataset literalization changes, any custom adapters that overrode *_clause_methods methods need to be modified to add a method that adds the SELECT/UPDATE/INSERT/DELETE.  Previously, this was done by default, but due to common table expressions and the dataset literalization changes, a separate method is now needed.</p>
 </li><li>

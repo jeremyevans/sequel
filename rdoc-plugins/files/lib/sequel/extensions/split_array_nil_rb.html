@@ -33,7 +33,7 @@ lib/sequel/extensions/split_array_nil.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The split_array_nil extension overrides Sequel’s default handling of IN/NOT IN with arrays of values to do specific nil checking.  For example,</p>
+<p>The <a href="split_array_nil_rb.html">split_array_nil</a> extension overrides Sequel’s default handling of IN/NOT IN with arrays of values to do specific nil checking.  For example,</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">column:</span> [<span class="ruby-value">1</span>, <span class="ruby-keyword">nil</span>])
 </pre>

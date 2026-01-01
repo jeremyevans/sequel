@@ -33,7 +33,7 @@ doc/release_notes/5.4.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>An index_caching extension has been added, which makes Database#indexes use a cache similar to Database#schema, and also offers methods for saving and loading the cache from a file, similar to the schema_caching extension.</p>
 
@@ -50,7 +50,7 @@ doc/release_notes/5.4.0.txt
 <p>The class_table_inheritance plugin now supports an :ignore_subclass_columns option which takes an array of column symbols to ignore in subclasses.  This allows you to use the plugin when your table inheritance hierarchy includes non-primary key columns with the same name in different tables.</p>
 </li></ul>
 
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p>Dataset#insert_select now returns false instead of nil if it runs an INSERT statement but does not return a value on Microsoft SQL Server or PostgreSQL.  This can happen on both databases if triggers are used.</p>
 
@@ -65,7 +65,7 @@ doc/release_notes/5.4.0.txt
 <p>Database#synchronize is now optimized on ruby 2.5+ and is about 10% faster by relying on the new lazy proc allocation feature.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Fractional second timestamps are now enabled on DB2.  If you are connecting to a DB2 database that does not support fractional seconds, you should add the following code (where DB is your <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance):</p>
 

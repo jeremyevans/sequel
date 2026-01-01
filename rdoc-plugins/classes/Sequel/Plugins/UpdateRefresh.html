@@ -36,7 +36,7 @@ Sequel::Plugins::UpdateRefresh
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The update_refresh plugin makes the model class refresh the object after updating.  By default, <a href="../../Sequel.html"><code>Sequel</code></a> only refreshes automatically after inserting new rows, not after updating.  However, if you are using triggers to modify the contents of updated rows, it can be helpful to immediately get the current data after updating.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/update_refresh_rb.html">update_refresh</a> plugin makes the model class refresh the object after updating.  By default, <a href="../../Sequel.html"><code>Sequel</code></a> only refreshes automatically after inserting new rows, not after updating.  However, if you are using triggers to modify the contents of updated rows, it can be helpful to immediately get the current data after updating.</p>
 
 <p>If the dataset supports UPDATE RETURNING, this plugin will use it so that it can retrieve the current data in the same query it uses for the update.</p>
 

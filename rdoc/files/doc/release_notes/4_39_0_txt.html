@@ -33,7 +33,7 @@ doc/release_notes/4.39.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Sequel.[] has been added as an alias to Sequel.expr. This makes it a little easier to get Sequel-specific objects:</p>
 
@@ -114,7 +114,7 @@ doc/release_notes/4.39.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The hook_class_methods plugin only adds a Database transaction hook if one of the after commit/rollback hook class methods is actually used.  This means that loading the plugin no longer keeps all saved/deleted objects in memory until transaction commit.</p>
 </li><li>
@@ -125,7 +125,7 @@ doc/release_notes/4.39.0.txt
 <p>The pg_interval extension now supports ActiveSupport::Duration objects that use week and hour parts (new in ActiveSupport 5).</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The change to the touch plugin to touch associations on create could possibly affect existing behavior, so if you are using this plugin, you should test that this does not cause any problems.</p>
 </li><li>

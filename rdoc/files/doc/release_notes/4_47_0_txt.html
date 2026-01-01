@@ -33,7 +33,7 @@ doc/release_notes/4.47.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features"><a href="#label-Deprecated+Features">Deprecated Features</a></h1>
 <ul><li>
 <p>Setting an invalid dataset for a model is now deprecated. Historically, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has swallowed exceptions for this to keep backwards compatibility, but it generally just results in code breaking later.  To allow invalid datasets to be used:</p>
 
@@ -45,7 +45,7 @@ doc/release_notes/4.47.0.txt
 <p>The pg_typecast_on_load plugin is now deprecated.  It is only useful on the already deprecated do and swift adapters.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#with_server in the server_block extension now accepts an optional second argument for the read only server to use.  This allows for overriding the default server while providing a separate default for read only queries:</p>
 
@@ -64,7 +64,7 @@ doc/release_notes/4.47.0.txt
 <p>Database#views on PostgreSQL now accepts a :materialized option to return materialized views instead of regular views.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Setting Sequel::Model.require_valid_table = true no longer raises an exception when using a valid dataset that selects from a subquery or table returning function or uses a join.</p>
 </li><li>
@@ -73,7 +73,7 @@ doc/release_notes/4.47.0.txt
 <p>The schema_dumper extension now handles Oracle 11g XE behavior of appending not null to the database type.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>External callers of Database#check_non_connection_error (private method) should update their code to call it with a true or false argument specifying whether to raise an error for exceptions that are not connection errors.</p>
 </li></ul>

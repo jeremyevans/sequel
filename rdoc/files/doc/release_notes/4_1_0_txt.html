@@ -33,7 +33,7 @@ doc/release_notes/4.1.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#run and << now accept SQL::PlaceholderLiteralString objects, allowing you to more easily run arbitrary DDL queries with placeholders:</p>
 
@@ -75,7 +75,7 @@ doc/release_notes/4.1.0.txt
 <p>The odbc adapter now supports a :drvconnect option that accepts an ODBC connection string that is passed to ruby-odbc verbatim.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin no longer breaks the instance_filters and update_primary_key plugins.</p>
 </li><li>
@@ -86,7 +86,7 @@ doc/release_notes/4.1.0.txt
 <p>When an invalid virtual row block function call is detected, an error is now properly raised.  Previously, the error was not raised until the SQL was produced for the query.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The :driver option to the odbc adapter is deprecated and will be removed in a future version.  It is thought to be broken, and users wanting to use DSN-less connections should use the new :drvconnect option.</p>
 </li><li>

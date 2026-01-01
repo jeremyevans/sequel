@@ -33,7 +33,7 @@ lib/sequel/extensions/any_not_empty.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The any_not_empty extension changes the behavior of Dataset#any? if called without a block.  By default, this method uses the standard Enumerable behavior of enumerating results and seeing if any result is not false or nil.  With this extension, it just checks whether the dataset is empty.  This approach can be much faster if the dataset is currently large.</p>
+<p>The <a href="any_not_empty_rb.html">any_not_empty</a> extension changes the behavior of Dataset#any? if called without a block.  By default, this method uses the standard Enumerable behavior of enumerating results and seeing if any result is not false or nil.  With this extension, it just checks whether the dataset is empty.  This approach can be much faster if the dataset is currently large.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">any?</span>
 <span class="ruby-comment"># SELECT * FROM table</span>

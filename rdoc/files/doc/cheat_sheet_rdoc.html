@@ -33,9 +33,9 @@ doc/cheat_sheet.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Cheat+Sheet+++">Cheat Sheet   <span><a href="#label-Cheat+Sheet+++">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Cheat+Sheet+++"><a href="#label-Cheat+Sheet+++">Cheat Sheet   </a></h1>
 
-<h2 id="label-Open+a+database">Open a database<span><a href="#label-Open+a+database">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Open+a+database"><a href="#label-Open+a+database">Open a database</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>
 
@@ -45,14 +45,14 @@ doc/cheat_sheet.rdoc
 <span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-string">&#39;mydb&#39;</span>)
 </pre>
 
-<h2 id="label-Open+an+SQLite+memory+database">Open an SQLite memory database<span><a href="#label-Open+an+SQLite+memory+database">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Open+an+SQLite+memory+database"><a href="#label-Open+an+SQLite+memory+database">Open an SQLite memory database</a></h2>
 
 <p>Without a filename argument, the sqlite adapter will setup a new sqlite database in memory.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>
 </pre>
 
-<h2 id="label-Logging+SQL+statements">Logging SQL statements<span><a href="#label-Logging+SQL+statements">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Logging+SQL+statements"><a href="#label-Logging+SQL+statements">Logging SQL statements</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;logger&#39;</span>
 <span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-value">loggers:</span> [<span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stdout</span>)])
@@ -60,7 +60,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">loggers</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stdout</span>)
 </pre>
 
-<h2 id="label-Using+raw+SQL">Using raw SQL<span><a href="#label-Using+raw+SQL">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+raw+SQL"><a href="#label-Using+raw+SQL">Using raw SQL</a></h2>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&quot;CREATE TABLE users (name VARCHAR(255) NOT NULL, age INT(3) NOT NULL)&quot;</span>
 <span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT age FROM users WHERE name = ?&quot;</span>, <span class="ruby-identifier">name</span>]
@@ -70,23 +70,23 @@ doc/cheat_sheet.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Create+a+dataset">Create a dataset<span><a href="#label-Create+a+dataset">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Create+a+dataset"><a href="#label-Create+a+dataset">Create a dataset</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]
 <span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:items</span>)
 </pre>
 
-<h2 id="label-Most+dataset+methods+are+chainable">Most dataset methods are chainable<span><a href="#label-Most+dataset+methods+are+chainable">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Most+dataset+methods+are+chainable"><a href="#label-Most+dataset+methods+are+chainable">Most dataset methods are chainable</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:managers</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">salary:</span> <span class="ruby-value">5000</span><span class="ruby-operator">..</span><span class="ruby-value">10000</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:department</span>)
 </pre>
 
-<h2 id="label-Insert+rows">Insert rows<span><a href="#label-Insert+rows">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Insert+rows"><a href="#label-Insert+rows">Insert rows</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Sharon&#39;</span>, <span class="ruby-value">grade:</span> <span class="ruby-value">50</span>)
 </pre>
 
-<h2 id="label-Retrieve+rows">Retrieve rows<span><a href="#label-Retrieve+rows">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Retrieve+rows"><a href="#label-Retrieve+rows">Retrieve rows</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">r</span>}
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># =&gt; [{...}, {...}, ...]</span>
@@ -94,14 +94,14 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">last</span> <span class="ruby-comment"># =&gt; {...}</span>
 </pre>
 
-<h2 id="label-Update-2FDelete+rows">Update/Delete rows<span><a href="#label-Update-2FDelete+rows">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Update-2FDelete+rows"><a href="#label-Update-2FDelete+rows">Update/Delete rows</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">delete</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">update</span>(<span class="ruby-value">active:</span> <span class="ruby-keyword">true</span>)
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">price:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:price</span>] <span class="ruby-operator">*</span> <span class="ruby-value">0.90</span>)
 </pre>
 
-<h1 id="label-Merge+rows">Merge rows<span><a href="#label-Merge+rows">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Merge+rows"><a href="#label-Merge+rows">Merge rows</a></h1>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.
   <span class="ruby-identifier">merge_using</span>(<span class="ruby-value">:table</span>, <span class="ruby-value">col1:</span> <span class="ruby-value">:col2</span>).
@@ -110,7 +110,7 @@ doc/cheat_sheet.rdoc
   <span class="ruby-identifier">merge_update</span>(<span class="ruby-value">col3:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:col3</span>] <span class="ruby-operator">+</span> <span class="ruby-value">:col4</span>)
 </pre>
 
-<h2 id="label-Datasets+are+Enumerable">Datasets are Enumerable<span><a href="#label-Datasets+are+Enumerable">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Datasets+are+Enumerable"><a href="#label-Datasets+are+Enumerable">Datasets are Enumerable</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>]}
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">map</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># same as above</span>
@@ -119,20 +119,20 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-value">:value</span>) <span class="ruby-comment"># better</span>
 </pre>
 
-<h2 id="label-Filtering+-28see+also+Dataset+Filtering-29">Filtering (see also <a href="dataset_filtering_rdoc.html">Dataset Filtering</a>)<span><a href="#label-Filtering+-28see+also+Dataset+Filtering-29">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Filtering+-28see+also+Dataset+Filtering-29"><a href="#label-Filtering+-28see+also+Dataset+Filtering-29">Filtering (see also <a href="dataset_filtering_rdoc.html">Dataset Filtering</a>)</a></h2>
 
-<h3 id="label-Equality">Equality<span><a href="#label-Equality">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Equality"><a href="#label-Equality">Equality</a></h3>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;abc&#39;</span>)
 </pre>
 
-<h3 id="label-Inequality">Inequality<span><a href="#label-Inequality">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Inequality"><a href="#label-Inequality">Inequality</a></h3>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">value</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>}
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">value</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">100</span>}
 </pre>
 
-<h3 id="label-Inclusion">Inclusion<span><a href="#label-Inclusion">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Inclusion"><a href="#label-Inclusion">Inclusion</a></h3>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">value:</span> <span class="ruby-value">50</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>)
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">value</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">value</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">100</span>)}
@@ -141,18 +141,18 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">other_dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:other_id</span>))
 </pre>
 
-<h3 id="label-Subselects+as+scalar+values">Subselects as scalar values<span><a href="#label-Subselects+as+scalar+values">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Subselects+as+scalar+values"><a href="#label-Subselects+as+scalar+values">Subselects as scalar values</a></h3>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-identifier">avg</span>(<span class="ruby-identifier">price</span>) <span class="ruby-operator">+</span> <span class="ruby-value">100</span>)}
 </pre>
 
-<h3 id="label-LIKE-2FRegexp">LIKE/Regexp<span><a href="#label-LIKE-2FRegexp">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-LIKE-2FRegexp"><a href="#label-LIKE-2FRegexp">LIKE/Regexp</a></h3>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;AL%&#39;</span>))
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-regexp">/^AL/</span>)
 </pre>
 
-<h3 id="label-AND-2FOR-2FNOT">AND/OR/NOT<span><a href="#label-AND-2FOR-2FNOT">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-AND-2FOR-2FNOT"><a href="#label-AND-2FOR-2FNOT">AND/OR/NOT</a></h3>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>)} 
 <span class="ruby-comment"># SELECT * FROM items WHERE ((x &gt; 5) AND (y &gt; 10))</span>
@@ -161,7 +161,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-comment"># SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))</span>
 </pre>
 
-<h3 id="label-Mathematical+operators">Mathematical operators<span><a href="#label-Mathematical+operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Mathematical+operators"><a href="#label-Mathematical+operators">Mathematical operators</a></h3>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">z</span>} 
 <span class="ruby-comment"># SELECT * FROM items WHERE ((x + y) &gt; z)</span>
@@ -170,7 +170,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-comment"># SELECT * FROM items WHERE ((price - 100) &lt; avg(price))</span>
 </pre>
 
-<h3 id="label-Raw+SQL+Fragments">Raw SQL Fragments<span><a href="#label-Raw+SQL+Fragments">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Raw+SQL+Fragments"><a href="#label-Raw+SQL+Fragments">Raw SQL Fragments</a></h3>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;id= 1&#39;</span>))
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;name = ?&#39;</span>, <span class="ruby-string">&#39;abc&#39;</span>))
@@ -178,21 +178,21 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;price &gt; (SELECT avg(price) + 100 FROM table)&#39;</span>))
 </pre>
 
-<h2 id="label-Ordering">Ordering<span><a href="#label-Ordering">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Ordering"><a href="#label-Ordering">Ordering</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order</span>(<span class="ruby-value">:kind</span>) <span class="ruby-comment"># kind</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">reverse</span>(<span class="ruby-value">:kind</span>) <span class="ruby-comment"># kind DESC</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:kind</span>), <span class="ruby-value">:name</span>) <span class="ruby-comment"># kind DESC, name</span>
 </pre>
 
-<h2 id="label-Limit-2FOffset">Limit/Offset<span><a href="#label-Limit-2FOffset">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Limit-2FOffset"><a href="#label-Limit-2FOffset">Limit/Offset</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">30</span>) <span class="ruby-comment"># LIMIT 30</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">30</span>, <span class="ruby-value">10</span>) <span class="ruby-comment"># LIMIT 30 OFFSET 10</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">30</span>).<span class="ruby-identifier">offset</span>(<span class="ruby-value">10</span>) <span class="ruby-comment"># LIMIT 30 OFFSET 10</span>
 </pre>
 
-<h2 id="label-Joins">Joins<span><a href="#label-Joins">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Joins"><a href="#label-Joins">Joins</a></h2>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">left_outer_join</span>(<span class="ruby-value">:categories</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:category_id</span>) 
 <span class="ruby-comment"># SELECT * FROM items</span>
@@ -205,7 +205,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-comment"># INNER JOIN groups ON groups.id = items.group_id</span>
 </pre>
 
-<h2 id="label-Aggregate+functions+methods">Aggregate functions methods<span><a href="#label-Aggregate+functions+methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Aggregate+functions+methods"><a href="#label-Aggregate+functions+methods">Aggregate functions methods</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">count</span> <span class="ruby-comment">#=&gt; record count</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-value">:price</span>)
@@ -217,7 +217,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select_group</span>(<span class="ruby-value">:category</span>).<span class="ruby-identifier">select_append</span>{<span class="ruby-identifier">avg</span>(<span class="ruby-value">:price</span>)}
 </pre>
 
-<h2 id="label-SQL+Functions+-2F+Literals">SQL Functions / Literals<span><a href="#label-SQL+Functions+-2F+Literals">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-SQL+Functions+-2F+Literals"><a href="#label-SQL+Functions+-2F+Literals">SQL Functions / Literals</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">updated_at:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:NOW</span>))
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">updated_at:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;NOW()&#39;</span>))
@@ -226,7 +226,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">updated_at:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:DateValue</span>, <span class="ruby-string">&#39;1/1/2001&#39;</span>))
 </pre>
 
-<h2 id="label-Schema+Manipulation">Schema Manipulation<span><a href="#label-Schema+Manipulation">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Schema+Manipulation"><a href="#label-Schema+Manipulation">Schema Manipulation</a></h2>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span> <span class="ruby-value">:items</span> <span class="ruby-keyword">do</span>
   <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>
@@ -241,7 +241,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_table</span> <span class="ruby-value">:items</span>
 </pre>
 
-<h2 id="label-Aliasing">Aliasing<span><a href="#label-Aliasing">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Aliasing"><a href="#label-Aliasing">Aliasing</a></h2>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:name</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:item_name</span>))
 <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:item_name</span>))
@@ -252,7 +252,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-comment"># SELECT items_table.name AS item_name FROM items AS items_table</span>
 </pre>
 
-<h2 id="label-Transactions">Transactions<span><a href="#label-Transactions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Transactions"><a href="#label-Transactions">Transactions</a></h2>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>
   <span class="ruby-comment"># BEGIN</span>
@@ -303,7 +303,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Retrieving+SQL">Retrieving SQL<span><a href="#label-Retrieving+SQL">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Retrieving+SQL"><a href="#label-Retrieving+SQL">Retrieving SQL</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># &quot;SELECT * FROM items&quot;</span>
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;INSERT INTO items (a) VALUES (1)&quot;</span>
@@ -311,7 +311,7 @@ doc/cheat_sheet.rdoc
 <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">delete_sql</span> <span class="ruby-comment"># &quot;DELETE FROM items&quot;</span>
 </pre>
 
-<h2 id="label-Basic+introspection">Basic introspection<span><a href="#label-Basic+introspection">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Basic+introspection"><a href="#label-Basic+introspection">Basic introspection</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">columns</span> <span class="ruby-comment"># =&gt; [:id, :name, ...]</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span> <span class="ruby-comment"># =&gt; [:items, ...]</span>

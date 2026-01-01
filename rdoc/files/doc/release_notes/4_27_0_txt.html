@@ -33,7 +33,7 @@ doc/release_notes/4.27.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A before_after_save plugin has been added, which for newly created objects refreshes the object before calling after_create, and resets the modified flag before calling after_update. Previously, these actions were not taken until after after_save was called.  This will be the default behavior in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.</p>
 </li><li>
@@ -58,7 +58,7 @@ doc/release_notes/4.27.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Sequel.synchronize is no longer a stub on MRI.  Testing has shown that relying on the global interpreter lock to protect multi-threaded access to hashes is not safe in all environments, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a mutex on MRI just as it does on other ruby interpreters.</p>
 </li><li>
@@ -79,7 +79,7 @@ doc/release_notes/4.27.0.txt
 <p>The jdbc/postgresql adapter now recognizes an additional disconnect error.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Users who were relying on with_sql_single_value returning an array instead of a single value for model datasets need to update their code.</p>
 </li></ul>

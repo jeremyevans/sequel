@@ -33,7 +33,7 @@ doc/release_notes/4.10.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Performance+Enhancements"><a href="#label-Performance+Enhancements">Performance Enhancements</a></h1>
 <ul><li>
 <p>Dataset literalization for simple datasets is now faster by creating a per-adapter SQL literalization method instead of having all adapters share a generic method with higher overhead. Sequel.split_symbol now caches results globally. Symbol literalization is now cached per Database.</p>
 
@@ -63,7 +63,7 @@ ds2     187%     32%</pre>
 <p>The jdbc/oracle adapter now defaults to a fetch_size of 100, similar to the oci8-based oracle adapter, significantly improving performance for large datasets.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#transaction now supports an :auto_savepoint option.  This option makes it so that transactions inside the transaction block automatically use savepoints unless they use the :savepoint=&gt;false option.  This should make testing transactional behavior easier.</p>
 </li><li>
@@ -103,7 +103,7 @@ ds2     187%     32%</pre>
 <p>A :server_version Database option is now supported on Microsoft SQL Server, which will use the value given instead of querying for it.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Dataset::PlaceholderLiteralizer arguments are how handled correctly when emulating offsets via the row_number window function on DB2, MSSQL &lt;=2012, and Oracle.</p>
 </li><li>
@@ -134,7 +134,7 @@ ds2     187%     32%</pre>
 <p>bin/sequel now uses the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> code in the related lib directory. This makes it easier to use from a repository checkout.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>AssociationReflection#associated_dataset now returns a joined dataset for associations that require joins (e.g. many_to_many). Anyone using this directly for associations that require joins probably needs to update their code.</p>
 </li><li>

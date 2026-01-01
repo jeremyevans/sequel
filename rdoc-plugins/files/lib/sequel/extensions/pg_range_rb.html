@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_range.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby’s <a href="../../../../classes/Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby’s ranges, allowing exclusive beginnings and endings (ruby’s range only allows exclusive endings).</p>
+<p>The <a href="pg_range_rb.html">pg_range</a> extension adds support for the PostgreSQL 9.2+ range types to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  PostgreSQL range types are similar to ruby’s <a href="../../../../classes/Range.html"><code>Range</code></a> class, representating an array of values.  However, they are more flexible than ruby’s ranges, allowing exclusive beginnings and endings (ruby’s range only allows exclusive endings).</p>
 
 <p>When PostgreSQL range values are retreived, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/PGRange.html"><code>Sequel::Postgres::PGRange</code></a>.  PGRange mostly acts like a <a href="../../../../classes/Range.html"><code>Range</code></a>, but it’s not a <a href="../../../../classes/Range.html"><code>Range</code></a> as not all PostgreSQL range type values would be valid ruby ranges.  If the range type value you are using is a valid ruby range, you can call PGRange#to_range to get a <a href="../../../../classes/Range.html"><code>Range</code></a>.  However, if you call PGRange#to_range on a range type value uses features that ruby’s <a href="../../../../classes/Range.html"><code>Range</code></a> does not support, an exception will be raised.</p>
 
@@ -44,7 +44,7 @@ lib/sequel/extensions/pg_range.rb
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>)
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Range.html#method-i-pg_range"><code>Range#pg_range</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Range.html#method-i-pg_range"><code>Range#pg_range</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span>
 </pre>
@@ -74,7 +74,7 @@ lib/sequel/extensions/pg_range.rb
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)
 </pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use arrays of range types, load the pg_array extension before the pg_range extension:</p>
+<p>This extension integrates with the <a href="pg_array_rb.html">pg_array</a> extension.  If you plan to use arrays of range types, load the <a href="pg_array_rb.html">pg_array</a> extension before the <a href="pg_range_rb.html">pg_range</a> extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_range</span>
 </pre>

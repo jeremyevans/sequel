@@ -33,7 +33,7 @@ README.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h2 id="label-Sequel-3A+The+Database+Toolkit+for+Ruby">Sequel: The Database Toolkit for Ruby<span><a href="#label-Sequel-3A+The+Database+Toolkit+for+Ruby">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sequel-3A+The+Database+Toolkit+for+Ruby"><a href="#label-Sequel-3A+The+Database+Toolkit+for+Ruby">Sequel: The Database Toolkit for Ruby</a></h2>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> is a simple, flexible, and powerful SQL database access toolkit for Ruby.</p>
 <ul><li>
@@ -46,7 +46,7 @@ README.rdoc
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> currently has adapters for ADO, Amalgalite, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle, PostgreSQL, SQLAnywhere, SQLite3, TinyTDS, and Trilogy.</p>
 </li></ul>
 
-<h2 id="label-Resources">Resources<span><a href="#label-Resources">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Resources"><a href="#label-Resources">Resources</a></h2>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>Website </td><td>
 <p><a target="_top" href="https://sequel.jeremyevans.net">sequel.jeremyevans.net</a></p>
 </td></tr><tr><td class='label'>RDoc Documentation </td><td>
@@ -67,16 +67,16 @@ README.rdoc
 
 <pre>git clone git://github.com/jeremyevans/sequel.git</pre>
 
-<h3 id="label-Contact">Contact<span><a href="#label-Contact">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Contact"><a href="#label-Contact">Contact</a></h3>
 
 <p>If you have any comments or suggestions please post to the Google group.</p>
 
-<h2 id="label-Installation">Installation<span><a href="#label-Installation">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Installation"><a href="#label-Installation">Installation</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">gem</span> <span class="ruby-identifier">install</span> <span class="ruby-identifier">sequel</span>
 </pre>
 
-<h2 id="label-A+Short+Example">A Short Example<span><a href="#label-A+Short+Example">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-A+Short+Example"><a href="#label-A+Short+Example">A Short Example</a></h2>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>
 
@@ -102,7 +102,7 @@ README.rdoc
 <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;The average price is: #{items.avg(:price)}&quot;</span>
 </pre>
 
-<h2 id="label-The+Sequel+Console">The <a href="../classes/Sequel.html"><code>Sequel</code></a> Console<span><a href="#label-The+Sequel+Console">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-The+Sequel+Console"><a href="#label-The+Sequel+Console">The <a href="../classes/Sequel.html"><code>Sequel</code></a> Console</a></h2>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> includes an IRB console for quick access to databases (usually referred to as <code>bin/sequel</code>). You can use it like this:</p>
 
@@ -112,7 +112,7 @@ README.rdoc
 
 <p>In addition to providing an IRB shell (the default behavior), bin/sequel also has support for migrating databases, dumping schema migrations, and copying databases.  See the <a href="doc/bin_sequel_rdoc.html">bin/sequel guide</a> for more details.</p>
 
-<h2 id="label-An+Introduction">An Introduction<span><a href="#label-An+Introduction">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-An+Introduction"><a href="#label-An+Introduction">An Introduction</a></h2>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> is designed to take the hassle away from connecting to databases and manipulating them. <a href="../classes/Sequel.html"><code>Sequel</code></a> deals with all the boring stuff like maintaining connections, formatting SQL correctly and fetching records so you can concentrate on your application.</p>
 
@@ -144,9 +144,9 @@ README.rdoc
 <pre class="ruby"><span class="ruby-identifier">middle_east</span>.<span class="ruby-identifier">as_hash</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:area</span>) <span class="ruby-comment"># =&gt; {&#39;Israel&#39; =&gt; 20000, &#39;Turkey&#39; =&gt; 120000, ...}</span>
 </pre>
 
-<h2 id="label-Getting+Started">Getting Started<span><a href="#label-Getting+Started">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Getting+Started"><a href="#label-Getting+Started">Getting Started</a></h2>
 
-<h3 id="label-Connecting+to+a+database">Connecting to a database<span><a href="#label-Connecting+to+a+database">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Connecting+to+a+database"><a href="#label-Connecting+to+a+database">Connecting to a database</a></h3>
 
 <p>To connect to a database you simply provide <code>Sequel.connect</code> with a URL:</p>
 
@@ -176,13 +176,13 @@ README.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@host:port/database_name&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:posts</span>].<span class="ruby-identifier">delete</span>}
 </pre>
 
-<h3 id="label-The+DB+convention">The DB convention<span><a href="#label-The+DB+convention">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-The+DB+convention"><a href="#label-The+DB+convention">The DB convention</a></h3>
 
 <p>Throughout Sequel’s documentation, you will see the <code>DB</code> constant used to refer to the <a href="../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance you create. This reflects the recommendation that for an app with a single <a href="../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance, the <a href="../classes/Sequel.html"><code>Sequel</code></a> convention is to store the instance in the <code>DB</code> constant.  This is just a convention, it’s not required, but it is recommended.</p>
 
 <p>Note that some frameworks that use <a href="../classes/Sequel.html"><code>Sequel</code></a> may create the <a href="../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance for you, and you might not know how to access it.  In most cases, you can access the <a href="../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance through <code>Sequel::Model.db</code>.</p>
 
-<h3 id="label-Arbitrary+SQL+queries">Arbitrary SQL queries<span><a href="#label-Arbitrary+SQL+queries">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Arbitrary+SQL+queries"><a href="#label-Arbitrary+SQL+queries">Arbitrary SQL queries</a></h3>
 
 <p>You can execute arbitrary SQL code using <code>Database#run</code>:</p>
 
@@ -212,7 +212,7 @@ README.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-Getting+Dataset+Instances">Getting Dataset Instances<span><a href="#label-Getting+Dataset+Instances">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Getting+Dataset+Instances"><a href="#label-Getting+Dataset+Instances">Getting Dataset Instances</a></h3>
 
 <p>Datasets are the primary way records are retrieved and manipulated.  They are generally created via the <code>Database#from</code> or <code>Database#[]</code> methods:</p>
 
@@ -222,7 +222,7 @@ README.rdoc
 
 <p>Datasets will only fetch records when you tell them to. They can be manipulated to filter records, change ordering, join tables, etc.  Datasets are always frozen, and they are safe to use by multiple threads concurrently.</p>
 
-<h3 id="label-Retrieving+Records">Retrieving Records<span><a href="#label-Retrieving+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Retrieving+Records"><a href="#label-Retrieving+Records">Retrieving Records</a></h3>
 
 <p>You can retrieve all records by using the <code>all</code> method:</p>
 
@@ -273,7 +273,7 @@ README.rdoc
 <span class="ruby-comment"># SELECT name FROM posts WHERE id = 1 LIMIT 1</span>
 </pre>
 
-<h3 id="label-Filtering+Records">Filtering Records<span><a href="#label-Filtering+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Filtering+Records"><a href="#label-Filtering+Records">Filtering Records</a></h3>
 
 <p>The most common way to filter records is to provide a hash of values to match to <code>where</code>:</p>
 
@@ -356,11 +356,11 @@ README.rdoc
 
 <p>See the <a href="doc/dataset_filtering_rdoc.html">Dataset Filtering</a> file for more details.</p>
 
-<h3 id="label-Security">Security<span><a href="#label-Security">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Security"><a href="#label-Security">Security</a></h3>
 
 <p>Designing apps with security in mind is a best practice. Please read the <a href="doc/security_rdoc.html">Security Guide</a> for details on security issues that you should be aware of when using <a href="../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
-<h3 id="label-Summarizing+Records">Summarizing Records<span><a href="#label-Summarizing+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Summarizing+Records"><a href="#label-Summarizing+Records">Summarizing Records</a></h3>
 
 <p>Counting records is easy using <code>count</code>:</p>
 
@@ -385,7 +385,7 @@ README.rdoc
 <span class="ruby-comment"># SELECT avg(price) FROM items</span>
 </pre>
 
-<h3 id="label-Ordering+Records">Ordering Records<span><a href="#label-Ordering+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Ordering+Records"><a href="#label-Ordering+Records">Ordering Records</a></h3>
 
 <p>Ordering datasets is simple using <code>order</code>:</p>
 
@@ -417,7 +417,7 @@ README.rdoc
 <span class="ruby-comment"># ORDER BY stamp DESC</span>
 </pre>
 
-<h3 id="label-Core+Extensions">Core Extensions<span><a href="#label-Core+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Core+Extensions"><a href="#label-Core+Extensions">Core Extensions</a></h3>
 
 <p>Note the use of <code>Sequel.desc(:stamp)</code> in the above example.  Much of Sequel’s DSL uses this style, calling methods on the <a href="../classes/Sequel.html"><code>Sequel</code></a> module that return SQL expression objects.  <a href="../classes/Sequel.html"><code>Sequel</code></a> also ships with a <a href="doc/core_extensions_rdoc.html">core_extensions extension</a> that integrates Sequel’s DSL better into the Ruby language, allowing you to write:</p>
 
@@ -429,7 +429,7 @@ README.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:stamp</span>)
 </pre>
 
-<h3 id="label-Selecting+Columns">Selecting Columns<span><a href="#label-Selecting+Columns">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Selecting+Columns"><a href="#label-Selecting+Columns">Selecting Columns</a></h3>
 
 <p>Selecting specific columns to be returned is also simple using <code>select</code>:</p>
 
@@ -453,7 +453,7 @@ README.rdoc
 <span class="ruby-comment"># SELECT name, stamp FROM posts</span>
 </pre>
 
-<h3 id="label-Deleting+Records">Deleting Records<span><a href="#label-Deleting+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Deleting+Records"><a href="#label-Deleting+Records">Deleting Records</a></h3>
 
 <p>Deleting records from the table is done with <code>delete</code>:</p>
 
@@ -469,7 +469,7 @@ README.rdoc
 <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">delete</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>)
 </pre>
 
-<h3 id="label-Inserting+Records">Inserting Records<span><a href="#label-Inserting+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Inserting+Records"><a href="#label-Inserting+Records">Inserting Records</a></h3>
 
 <p>Inserting records into the table is done with <code>insert</code>:</p>
 
@@ -477,7 +477,7 @@ README.rdoc
 <span class="ruby-comment"># INSERT INTO posts (category, author) VALUES (&#39;ruby&#39;, &#39;david&#39;)</span>
 </pre>
 
-<h3 id="label-Updating+Records">Updating Records<span><a href="#label-Updating+Records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Updating+Records"><a href="#label-Updating+Records">Updating Records</a></h3>
 
 <p>Updating records in the table is done with <code>update</code>:</p>
 
@@ -499,7 +499,7 @@ README.rdoc
 <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">state:</span> <span class="ruby-string">&#39;archived&#39;</span>).<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:stamp</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>)
 </pre>
 
-<h3 id="label-Merging+records">Merging records<span><a href="#label-Merging+records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Merging+records"><a href="#label-Merging+records">Merging records</a></h3>
 
 <p>Merging records using the SQL MERGE statement is done using <code>merge*</code> methods. You use <code>merge_using</code> to specify the merge source and join conditions. You can use <code>merge_insert</code>, <code>merge_delete</code>, and/or <code>merge_update</code> to set the INSERT, DELETE, and UPDATE clauses for the merge. <code>merge_insert</code> takes the same arguments as <code>insert</code>, and <code>merge_update</code> takes the same arguments as <code>update</code>. <code>merge_insert</code>, <code>merge_delete</code>, and <code>merge_update</code> can all be called with blocks, to set the conditions for the related INSERT, DELETE, or UPDATE.</p>
 
@@ -518,7 +518,7 @@ README.rdoc
 <span class="ruby-comment"># WHEN MATCHED THEN UPDATE SET i1 = (i1 + i2 + 10), a = (a + b + 20)</span>
 </pre>
 
-<h3 id="label-Transactions">Transactions<span><a href="#label-Transactions">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Transactions"><a href="#label-Transactions">Transactions</a></h3>
 
 <p>You can wrap a block of code in a database transaction using the <code>Database#transaction</code> method:</p>
 
@@ -546,7 +546,7 @@ README.rdoc
 <span class="ruby-comment"># ROLLBACK</span>
 </pre>
 
-<h3 id="label-Joining+Tables">Joining Tables<span><a href="#label-Joining+Tables">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Joining+Tables"><a href="#label-Joining+Tables">Joining Tables</a></h3>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> makes it easy to join tables:</p>
 
@@ -568,7 +568,7 @@ README.rdoc
 
 <p>Note that the default selection in <a href="../classes/Sequel.html"><code>Sequel</code></a> is <code>*</code>, which includes all columns in all joined tables.  Because <a href="../classes/Sequel.html"><code>Sequel</code></a> returns results as a hash keyed by column name symbols, if any tables have columns with the same name, this will clobber the columns in the returned hash.  So when joining you are usually going to want to change the selection using <code>select</code>, <code>select_all</code>, and/or <code>select_append</code>.</p>
 
-<h2 id="label-Column+references+in+Sequel">Column references in <a href="../classes/Sequel.html"><code>Sequel</code></a><span><a href="#label-Column+references+in+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Column+references+in+Sequel"><a href="#label-Column+references+in+Sequel">Column references in <a href="../classes/Sequel.html"><code>Sequel</code></a></a></h2>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> expects column names to be specified using symbols. In addition, returned hashes always use symbols as their keys. This allows you to freely mix literal values and column references in many cases. For example, the two following lines produce equivalent SQL:</p>
 
@@ -584,7 +584,7 @@ README.rdoc
 <span class="ruby-comment"># SELECT * FROM items WHERE (x = &#39;x&#39;)</span>
 </pre>
 
-<h3 id="label-Qualifying+identifiers+-28column-2Ftable+names-29">Qualifying identifiers (column/table names)<span><a href="#label-Qualifying+identifiers+-28column-2Ftable+names-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Qualifying+identifiers+-28column-2Ftable+names-29"><a href="#label-Qualifying+identifiers+-28column-2Ftable+names-29">Qualifying identifiers (column/table names)</a></h3>
 
 <p>An identifier in SQL is a name that represents a column, table, or schema. The recommended way to qualify columns is to use <code>Sequel[][]</code> or <code>Sequel.qualify</code></p>
 
@@ -605,7 +605,7 @@ README.rdoc
 <span class="ruby-comment"># schema.table.column</span>
 </pre>
 
-<h3 id="label-Expression+aliases">Expression aliases<span><a href="#label-Expression+aliases">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Expression+aliases"><a href="#label-Expression+aliases">Expression aliases</a></h3>
 
 <p>You can alias identifiers using  <code>Sequel[].as</code> or <code>Sequel.as</code>:</p>
 
@@ -626,7 +626,7 @@ README.rdoc
 <span class="ruby-comment"># (column + 2) AS c_plus_2</span>
 </pre>
 
-<h2 id="label-Sequel+Models"><a href="../classes/Sequel.html"><code>Sequel</code></a> Models<span><a href="#label-Sequel+Models">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sequel+Models"><a href="#label-Sequel+Models"><a href="../classes/Sequel.html"><code>Sequel</code></a> Models</a></h2>
 
 <p>A model class wraps a dataset, and an instance of that class wraps a single record in the dataset.</p>
 
@@ -657,7 +657,7 @@ README.rdoc
 <span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:my_posts</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:date</span>)); <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-Model+instances">Model instances<span><a href="#label-Model+instances">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Model+instances"><a href="#label-Model+instances">Model instances</a></h3>
 
 <p>Model instances are identified by a primary key.  <a href="../classes/Sequel.html"><code>Sequel</code></a> queries the database to determine the primary key for each model. The <code>Model.[]</code> method can be used to fetch records by their primary key:</p>
 
@@ -696,7 +696,7 @@ README.rdoc
 <span class="ruby-constant">Post</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">class</span> <span class="ruby-comment"># =&gt; Post</span>
 </pre>
 
-<h3 id="label-Acts+like+a+dataset">Acts like a dataset<span><a href="#label-Acts+like+a+dataset">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Acts+like+a+dataset"><a href="#label-Acts+like+a+dataset">Acts like a dataset</a></h3>
 
 <p>A model class forwards many methods to the underlying dataset. This means that you can use most of the <code>Dataset</code> API to create customized queries that return model instances, e.g.:</p>
 
@@ -709,7 +709,7 @@ README.rdoc
 <span class="ruby-constant">Post</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:title</span>, <span class="ruby-regexp">/ruby/</span>)).<span class="ruby-identifier">update</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>)
 </pre>
 
-<h3 id="label-Accessing+record+values">Accessing record values<span><a href="#label-Accessing+record+values">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Accessing+record+values"><a href="#label-Accessing+record+values">Accessing record values</a></h3>
 
 <p>A model instance stores its values as a hash with column symbol keys, which you can access directly via the <code>values</code> method:</p>
 
@@ -739,7 +739,7 @@ README.rdoc
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">save</span>
 </pre>
 
-<h3 id="label-Mass+assignment">Mass assignment<span><a href="#label-Mass+assignment">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Mass+assignment"><a href="#label-Mass+assignment">Mass assignment</a></h3>
 
 <p>You can also set the values for multiple columns in a single method call, using one of the mass-assignment methods.  See the <a href="doc/mass_assignment_rdoc.html">mass assignment guide</a> for details.  For example <code>set</code> updates the model’s column values without saving:</p>
 
@@ -751,7 +751,7 @@ README.rdoc
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">title:</span> <span class="ruby-string">&#39;hey there&#39;</span>, <span class="ruby-value">updated_by:</span> <span class="ruby-string">&#39;foo&#39;</span>)
 </pre>
 
-<h3 id="label-Creating+new+records">Creating new records<span><a href="#label-Creating+new+records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Creating+new+records"><a href="#label-Creating+new+records">Creating new records</a></h3>
 
 <p>New model instances can be created by calling <code>Model.new</code>, which returns a new model instance without updating the database:</p>
 
@@ -777,7 +777,7 @@ README.rdoc
 <span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">create</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span>.<span class="ruby-identifier">title</span> = <span class="ruby-string">&#39;hello world&#39;</span>}
 </pre>
 
-<h3 id="label-Hooks">Hooks<span><a href="#label-Hooks">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Hooks"><a href="#label-Hooks">Hooks</a></h3>
 
 <p>You can execute custom code when creating, updating, or deleting records by defining hook methods. The <code>before_create</code> and <code>after_create</code> hook methods wrap record creation. The <code>before_update</code> and <code>after_update</code> hook methods wrap record updating. The <code>before_save</code> and <code>after_save</code> hook methods wrap record creation and updating. The <code>before_destroy</code> and <code>after_destroy</code> hook methods wrap destruction. The <code>before_validation</code> and <code>after_validation</code> hook methods wrap validation. Example:</p>
 
@@ -798,7 +798,7 @@ README.rdoc
 
 <p>For the example above, you should probably use a database trigger if you can.  Hooks can be used for data integrity, but they will only enforce that integrity when you are modifying the database through model instances, and even then they are often subject to race conditions.  It’s best to use database triggers and database constraints to enforce data integrity.</p>
 
-<h3 id="label-Deleting+records">Deleting records<span><a href="#label-Deleting+records">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Deleting+records"><a href="#label-Deleting+records">Deleting records</a></h3>
 
 <p>You can delete individual records by calling <code>delete</code> or <code>destroy</code>. The only difference between the two methods is that <code>destroy</code> invokes <code>before_destroy</code> and <code>after_destroy</code> hook methods, while <code>delete</code> does not:</p>
 
@@ -814,7 +814,7 @@ README.rdoc
 
 <p>Please note that if <code>destroy</code> is called, each record is deleted separately, but <code>delete</code> deletes all matching records with a single SQL query.</p>
 
-<h3 id="label-Associations">Associations<span><a href="#label-Associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Associations"><a href="#label-Associations">Associations</a></h3>
 
 <p>Associations are used in order to specify relationships between model classes that reflect relationships between tables in the database, which are usually specified using foreign keys.  You specify model associations via class methods:</p>
 
@@ -861,7 +861,7 @@ README.rdoc
 <span class="ruby-identifier">post</span>.<span class="ruby-identifier">tags_dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">subscribers:</span> <span class="ruby-value">0</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">all</span>
 </pre>
 
-<h3 id="label-Eager+Loading">Eager Loading<span><a href="#label-Eager+Loading">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Eager+Loading"><a href="#label-Eager+Loading">Eager Loading</a></h3>
 
 <p>Associations can be eagerly loaded via <code>eager</code> and the <code>:eager</code> association option. Eager loading is used when loading a group of objects. It loads all associated objects for all of the current objects in one query, instead of using a separate query to get the associated objects for each current object. Eager loading requires that you retrieve all model objects at once via <code>all</code> (instead of individually by <code>each</code>). Eager loading can be cascaded, loading association’s associated objects.</p>
 
@@ -932,7 +932,7 @@ README.rdoc
 <span class="ruby-constant">Post</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">replies:</span> {<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">text</span>, <span class="ruby-string">&#39;%foo%&#39;</span>))} <span class="ruby-operator">=&gt;</span> [<span class="ruby-value">:person</span>, <span class="ruby-value">:tags</span>]}).<span class="ruby-identifier">all</span>
 </pre>
 
-<h3 id="label-Joining+with+Associations">Joining with Associations<span><a href="#label-Joining+with+Associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Joining+with+Associations"><a href="#label-Joining+with+Associations">Joining with Associations</a></h3>
 
 <p>You can use the <code>association_join</code> method to add a join to the model’s dataset based on the association:</p>
 
@@ -957,9 +957,9 @@ README.rdoc
 <span class="ruby-comment"># INNER JOIN people AS person ON (person.id = replies.person_id)</span>
 </pre>
 
-<h3 id="label-Extending+the+underlying+dataset">Extending the underlying dataset<span><a href="#label-Extending+the+underlying+dataset">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Extending+the+underlying+dataset"><a href="#label-Extending+the+underlying+dataset">Extending the underlying dataset</a></h3>
 
-<p>The recommended way to implement table-wide logic by defining methods on the dataset using <code>dataset_module</code>:</p>
+<p>The recommended way to implement table-wide logic by defining methods on the dataset using <a href="lib/sequel/dataset/dataset_module_rb.html">dataset_module</a>:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
@@ -980,7 +980,7 @@ README.rdoc
 <span class="ruby-comment"># DELETE FROM posts WHERE ((category = &#39;ruby&#39;) AND (num_comments &lt; 30))</span>
 </pre>
 
-<p>Inside <code>dataset_module</code> blocks, there are numerous methods that support easy creation of dataset methods. Most of these methods are named after the dataset methods themselves, such as <code>select</code>, <code>order</code>, and <code>group</code>:</p>
+<p>Inside <a href="lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> blocks, there are numerous methods that support easy creation of dataset methods. Most of these methods are named after the dataset methods themselves, such as <code>select</code>, <code>order</code>, and <code>group</code>:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
@@ -998,9 +998,9 @@ README.rdoc
 <span class="ruby-comment"># LIMIT 10</span>
 </pre>
 
-<p>One advantage of using these methods inside dataset_module blocks, instead of defining methods manually, is that the created methods will generally cache the resulting values and result in better performance.</p>
+<p>One advantage of using these methods inside <a href="lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> blocks, instead of defining methods manually, is that the created methods will generally cache the resulting values and result in better performance.</p>
 
-<h3 id="label-Model+Validations">Model Validations<span><a href="#label-Model+Validations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Model+Validations"><a href="#label-Model+Validations">Model Validations</a></h3>
 
 <p>You can define a <code>validate</code> method for your model, which <code>save</code> will check before attempting to save the model in the database. If an attribute of the model isn’t valid, you should add an error message for that attribute to the model object’s <code>errors</code>. If an object has any errors added by the validate method, <code>save</code> will raise an error by default:</p>
 
@@ -1013,11 +1013,11 @@ README.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Testing+Sequel">Testing <a href="../classes/Sequel.html"><code>Sequel</code></a><span><a href="#label-Testing+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Testing+Sequel"><a href="#label-Testing+Sequel">Testing <a href="../classes/Sequel.html"><code>Sequel</code></a></a></h2>
 
 <p>Please see the <a href="doc/testing_rdoc.html">testing guide</a> for recommendations on testing applications that use <a href="../classes/Sequel.html"><code>Sequel</code></a>, as well as the how to run the tests for <a href="../classes/Sequel.html"><code>Sequel</code></a> itself.</p>
 
-<h2 id="label-Sequel+Release+Policy"><a href="../classes/Sequel.html"><code>Sequel</code></a> Release Policy<span><a href="#label-Sequel+Release+Policy">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Sequel+Release+Policy"><a href="#label-Sequel+Release+Policy"><a href="../classes/Sequel.html"><code>Sequel</code></a> Release Policy</a></h2>
 
 <p>New major versions of <a href="../classes/Sequel.html"><code>Sequel</code></a> do not have a defined release policy, but historically have occurred once every few years.</p>
 
@@ -1025,11 +1025,11 @@ README.rdoc
 
 <p>New tiny versions of <a href="../classes/Sequel.html"><code>Sequel</code></a> are only released to address security issues or regressions in the most current release.</p>
 
-<h2 id="label-Ruby+Support+Policy">Ruby Support Policy<span><a href="#label-Ruby+Support+Policy">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Ruby+Support+Policy"><a href="#label-Ruby+Support+Policy">Ruby Support Policy</a></h2>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> fully supports the currently supported versions of Ruby (MRI) and JRuby.  It may support unsupported versions of Ruby or JRuby, but such support may be dropped in any minor version if keeping it becomes a support issue.  The minimum Ruby version required to run the current version of <a href="../classes/Sequel.html"><code>Sequel</code></a> is 1.9.2, and the minimum JRuby version is 9.2.0.0 (due to the bigdecimal dependency).</p>
 
-<h2 id="label-Maintainer">Maintainer<span><a href="#label-Maintainer">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Maintainer"><a href="#label-Maintainer">Maintainer</a></h2>
 
 <p>Jeremy Evans &lt;code@jeremyevans.net&gt;</p>
 </div>

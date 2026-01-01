@@ -33,7 +33,7 @@ doc/release_notes/5.99.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>As Set will be a core class in Ruby 4+, this release integrates Set support into <a href="../../../classes/Sequel.html"><code>Sequel</code></a>. Dataset#as_set and select_set have been added to return sets. Dataset#as_set is similar to Dataset#map, and Dataset#select_set is similar to Dataset#select_map, except that Dataset#as_set and select_set return sets instead of arrays.</p>
 
@@ -70,12 +70,12 @@ doc/release_notes/5.99.0.txt
 <p>Database#indexes on PostgreSQL now supports an :invalid option.  To include invalid indexes, you can use invalid: :include. To limit the returned indexes to only invalid indexes, you can use invalid: :only.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Requiring sequel/model will now require sequel_pg/model if sequel_pg has been previously required and sequel_pg 1.18+ is in use. This allows for more optimizations in the case where sequel/core is required, a connection to a PostgreSQL database is made (requiring the postgres adapter and sequel_pg), and then sequel/model is required. This is a common and recommended pattern so that code that only needs access to a <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> and not <a href="../../../classes/Sequel.html"><code>Sequel</code></a> models does not need to load the model support, so it was considered worth optimizing.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The set_literalizer extension has been deprecated. Most of what the set_literalizer extension supports is now supported by default. The one difference is the set_literalizer extension will treat a set containing only arrays with two elements the same as an array containing only arrays with two elements, and the default set support deliberately does not do that.</p>
 </li></ul>

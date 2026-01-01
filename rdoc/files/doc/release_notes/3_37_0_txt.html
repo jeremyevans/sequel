@@ -33,7 +33,7 @@ doc/release_notes/3.37.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Database#extension and Dataset#extension have been added and make it much easier to use extensions that just define modules, where you previously had to manually extend a Database or Dataset object with the module to get the extension’s behavior. These methods operate similarly to model plugins, where you just specify the extension symbol, except that you can specify multiple extensions at once:</p>
 
@@ -161,7 +161,7 @@ doc/release_notes/3.37.0.txt
 <p>There are a lot of cases that this extension does not handle, but it does a decent job in most cases.  This is currently only used internally in a specific case in the schema_dumper extension.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The filter by associations support now respects the method reference vs column reference distinction that other parts of the association code have respected since 3.32.0.</p>
 </li><li>
@@ -207,7 +207,7 @@ doc/release_notes/3.37.0.txt
 <p>In addition to Sequel’s rigorous pre-push testing, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now also uses TravisCI for continuous integration testing across a wider range of ruby implementations.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The keys in the :key_hash entry passed to the :eager_loader proc are now method references instead of column references.  For most associations, they are the same thing, but for associations using the :key_column/:primary_key_column/:left_primary_key_column options, the values could be different.  If you were using one of those options and had a custom eager_loader, you should switch from indexing into the :key_hash option to just using the :id_map option.</p>
 </li><li>

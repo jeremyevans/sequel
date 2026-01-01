@@ -42,7 +42,7 @@ Sequel::Plugins::PgRow
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_row plugin allows you to use <a href="../Model.html"><code>Sequel::Model</code></a> classes as composite type classes, via the pg_row extension.  So if you have an address table:</p>
+<p>The <a href="../../../files/lib/sequel/extensions/pg_row_rb.html">pg_row</a> plugin allows you to use <a href="../Model.html"><code>Sequel::Model</code></a> classes as composite type classes, via the <a href="../../../files/lib/sequel/extensions/pg_row_rb.html">pg_row</a> extension.  So if you have an address table:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:address</span>) <span class="ruby-keyword">do</span>
   <span class="ruby-constant">String</span> <span class="ruby-value">:street</span>
@@ -117,7 +117,7 @@ Sequel::Plugins::PgRow
 </div>
 <div class='description'>
 
-<p>When loading the extension, make sure the database has the pg_row extension loaded, load the custom database extensions, and automatically register the row type if the model has a dataset.</p>
+<p>When loading the extension, make sure the database has the <a href="../../../files/lib/sequel/extensions/pg_row_rb.html">pg_row</a> extension loaded, load the custom database extensions, and automatically register the row type if the model has a dataset.</p>
 
 </div>
 <div class='source'>

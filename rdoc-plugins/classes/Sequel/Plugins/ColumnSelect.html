@@ -36,9 +36,9 @@ Sequel::Plugins::ColumnSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The column_select plugin changes the default selection for a model dataset to explicit select all columns from the table: <code>table.column1, table.column2, table.column3, ...</code>. This makes it simpler to add columns to the model’s table in a migration concurrently while running the application, without it affecting the operation of the application.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/column_select_rb.html">column_select</a> plugin changes the default selection for a model dataset to explicit select all columns from the table: <code>table.column1, table.column2, table.column3, ...</code>. This makes it simpler to add columns to the model’s table in a migration concurrently while running the application, without it affecting the operation of the application.</p>
 
-<p>Note that by default on databases that supporting RETURNING, using explicit column selections will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the insert_returning_select plugin to automatically use RETURNING for instance creations for models where the column_select plugin automatically sets up an explicit column selection.</p>
+<p>Note that by default on databases that supporting RETURNING, using explicit column selections will cause instance creations to use two queries (insert and refresh) instead of a single query using RETURNING.  You can use the <a href="../../../files/lib/sequel/plugins/insert_returning_select_rb.html">insert_returning_select</a> plugin to automatically use RETURNING for instance creations for models where the <a href="../../../files/lib/sequel/plugins/column_select_rb.html">column_select</a> plugin automatically sets up an explicit column selection.</p>
 
 <p>Usage:</p>
 

@@ -36,7 +36,7 @@ Sequel::Plugins::InsertConflict
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The insert_conflict plugin allows handling conflicts due to unique constraints when saving new model instance, using the INSERT ON CONFLICT support in PostgreSQL 9.5+ and <a href="../SQLite.html"><code>SQLite</code></a> 3.24.0+. Example:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/insert_conflict_rb.html">insert_conflict</a> plugin allows handling conflicts due to unique constraints when saving new model instance, using the INSERT ON CONFLICT support in PostgreSQL 9.5+ and <a href="../SQLite.html"><code>SQLite</code></a> 3.24.0+. Example:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">plugin</span> <span class="ruby-value">:insert_conflict</span>
@@ -50,7 +50,7 @@ Sequel::Plugins::InsertConflict
   <span class="ruby-identifier">save</span>
 </pre>
 
-<p>This example will try to insert the album, but if there is an existing album with the name ‘Foo’, this will update the copies_sold attribute for that album.  See the PostgreSQL and <a href="../SQLite.html"><code>SQLite</code></a> adapter documention for the options you can pass to the insert_conflict method.</p>
+<p>This example will try to insert the album, but if there is an existing album with the name ‘Foo’, this will update the copies_sold attribute for that album.  See the PostgreSQL and <a href="../SQLite.html"><code>SQLite</code></a> adapter documention for the options you can pass to the <a href="../../../files/lib/sequel/plugins/insert_conflict_rb.html">insert_conflict</a> method.</p>
 
 <p>You should not attempt to use this plugin to ignore conflicts when inserting, you should only use it to turn insert conflicts into updates. Any usage to ignore conflicts is not recommended or supported.</p>
 

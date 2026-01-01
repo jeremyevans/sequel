@@ -36,7 +36,7 @@ Sequel::Plugins::AutoValidations
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The auto_validations plugin automatically sets up the following types of validations for your model columns:</p>
+<p>The <a href="../../../files/lib/sequel/plugins/auto_validations_rb.html">auto_validations</a> plugin automatically sets up the following types of validations for your model columns:</p>
 <ol><li>
 <p>type validations for all columns</p>
 </li><li>
@@ -53,7 +53,7 @@ Sequel::Plugins::AutoValidations
 
 <p>To determine the columns to use for the type/not_null/max_length/no_null_byte/max_value/min_value validations, the plugin looks at the database schema for the model’s table.  To determine the unique validations, <a href="../../Sequel.html"><code>Sequel</code></a> looks at the indexes on the table.  In order for this plugin to be fully functional, the underlying database adapter needs to support both schema and index parsing.  Additionally, unique validations are only added for models that select from a simple table, they are not added for models that select from a subquery.</p>
 
-<p>This plugin uses the validation_helpers plugin underneath to implement the validations.  It does not allow for any per-column validation message customization, but you can alter the messages for the given type of validation on a per-model basis (see the validation_helpers documentation).</p>
+<p>This plugin uses the <a href="../../../files/lib/sequel/plugins/validation_helpers_rb.html">validation_helpers</a> plugin underneath to implement the validations.  It does not allow for any per-column validation message customization, but you can alter the messages for the given type of validation on a per-model basis (see the <a href="../../../files/lib/sequel/plugins/validation_helpers_rb.html">validation_helpers</a> documentation).</p>
 
 <p>You can skip certain types of validations from being automatically added via:</p>
 
@@ -86,7 +86,7 @@ Sequel::Plugins::AutoValidations
 
 <p>This works for unique_opts, max_length_opts, schema_types_opts, max_value_opts, min_value_opts, no_null_byte_opts, explicit_not_null_opts, and not_null_opts.</p>
 
-<p>If you only want auto_validations to add validations to columns that do not already have an error associated with them, you can use the skip_invalid option:</p>
+<p>If you only want <a href="../../../files/lib/sequel/plugins/auto_validations_rb.html">auto_validations</a> to add validations to columns that do not already have an error associated with them, you can use the skip_invalid option:</p>
 
 <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:auto_validations</span>, <span class="ruby-value">skip_invalid:</span> <span class="ruby-keyword">true</span>
 </pre>

@@ -33,7 +33,7 @@ doc/release_notes/4.48.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Deprecated+Features"><a href="#label-Deprecated+Features">Deprecated Features</a></h1>
 <ul><li>
 <p>The identifier_columns plugin is now deprecated.  There is no reason to use it when Sequel.split_symbols = false, which will be the default in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.</p>
 </li><li>
@@ -129,7 +129,7 @@ doc/release_notes/4.48.0.txt
 <p>Many more internal <a href="../../../classes/Sequel.html"><code>Sequel</code></a> constants have been deprecated.</p>
 </li></ul>
 
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The Model#to_json and Dataset#to_json methods in the json_serializer plugin now support a block.  This block is called with the hash/array that would have be serialized to JSON, and the block should return the object to serialize.  This makes it easy to customize the JSON output by adding new entries, or wrapping the object in other object.</p>
 
@@ -167,7 +167,7 @@ doc/release_notes/4.48.0.txt
 <p>A Dataset#with_convert_types method has been added to the jdbc adapter, for returning a modified dataset with the convert_types setting changed.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Using the postgres adapter with pg 0.21.0 no longer results in deprecation warnings.</p>
 </li><li>
@@ -218,7 +218,7 @@ doc/release_notes/4.48.0.txt
 <p>The deprecated Sequel::Model::ANONYMOUS_MODEL_CLASSES constant is now correctly populated with classes created by Sequel::Model().  This was broken in starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.45.0.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The pg_array_associations plugin now loads the pg_array extension into the Database instance if it is not already loaded.  This can break cases where the pg_array_associations plugin is used on a non-PostgreSQL database.</p>
 </li><li>

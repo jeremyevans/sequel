@@ -33,7 +33,7 @@ doc/release_notes/3.47.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Plugins"><a href="#label-New+Plugins">New Plugins</a></h1>
 <ul><li>
 <p>An auto_validations plugin has been added, which automatically adds not null, type, and unique validations based on information obtained from parsing the database schema.  If you don’t require customization of the validation error message per column, this can significantly DRY up validation code.  Currently this plugin requires the database support index parsing; that restriction will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
@@ -42,7 +42,7 @@ doc/release_notes/3.47.0.txt
 <p>An error_splitter plugin has been added, for splitting validation errors applying to multiple columns into a separate validation error per column.  This is useful if you want to to include such errors when using Errors#on to get all errors on the column. In general, only uniqueness errors apply to multiple columns, so those are the only errors likely to be affected.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p>Database.extension has been added, allowing you to load an extension into all future databases.  This is similar to loading a plugin into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself.  For example, if you want all Database instances to use the query_literals extension, run the following before creating your Database instances:</p>
 
@@ -91,7 +91,7 @@ doc/release_notes/3.47.0.txt
 <p>Database#supports_schema_parsing? has been added to check if schema parsing via the Database#schema method is supported.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>A race condition related to prepared_sql for newly prepared statements has been fixed.</p>
 </li><li>
@@ -136,7 +136,7 @@ doc/release_notes/3.47.0.txt
 <p>A guide describing Sequel’s support for advanced PostgreSQL features has been added.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>If you have already used the constraint_validations plugin to create validations with the :allow_nil=&gt;true option, you should drop and regenerate those constraints to ensure they handle NULL values correctly.</p>
 </li><li>
@@ -158,7 +158,7 @@ doc/release_notes/3.47.0.txt
 <p>Database#schema_column_type was made public accidently by an adapter and a few extensions.  That has been fixed, but if you were calling it with an explicit receiver and it happened to work by accident before, you’ll need to update your code.</p>
 </li></ul>
 
-<h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Sequel+4+Implementation+Planning"><a href="#label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 Implementation Planning</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 implementation work will begin shortly.  All <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to read about the proposed changes and provide feedback on the implementation plan. For details, see <a target="_top" href="https://github.com/jeremyevans/sequel-4-plans">github.com/jeremyevans/sequel-4-plans</a>.</p>
 </li></ul>

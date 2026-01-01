@@ -33,7 +33,7 @@ doc/release_notes/3.14.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Dataset#grep now accepts :all_patterns, :all_columns, and :case_insensitive options.  Previously, grep would use a case sensitive search where it would match if any pattern matched any column.  These three options give you more control over how the pattern matching will work:</p>
 
@@ -80,7 +80,7 @@ doc/release_notes/3.14.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles the literalization of OCI8::CLOB objects in the Oracle adapter.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>When using the timezone support, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now correctly load times and datetimes in standard time when the current timezone is in daylight time, or vice versa.  Previously, if you tried to to load a time or datetime in December when in July in a timezone that used daylight time, it would be off by an hour.</p>
 </li><li>
@@ -109,7 +109,7 @@ doc/release_notes/3.14.0.txt
 <p>Significant improvements were made to the Dataset and Model RDoc documentation.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Model#valid? now must accept an optional options hash.</p>
 </li><li>

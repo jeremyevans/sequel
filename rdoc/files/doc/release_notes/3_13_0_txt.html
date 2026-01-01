@@ -33,7 +33,7 @@ doc/release_notes/3.13.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Plugins"><a href="#label-New+Plugins">New Plugins</a></h1>
 <ul><li>
 <p>A json_serializer plugin was added that allows you to serialize model instances or datasets to JSON using to_json.  It requires the json library.  The API was modeled on ActiveRecord’s JSON serialization support.  You can use :only and :except options to specify the columns included, :include to specify associations to include, as well pass options to nested associations using a hash.  In addition to serializing to JSON, it also adds support for parsing JSON to model objects via JSON.parse or from_json.</p>
 </li><li>
@@ -44,7 +44,7 @@ doc/release_notes/3.13.0.txt
 <p>A list plugin was added that allows you to treat <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> objects as being part of a list.  This adds instance methods to get the next and prev items in the list, or to move the item to a specific place in the list.  You can specify that all rows in the table belong to the same list, or specify arbitrary scopes so that the same table can contain many separate lists.</p>
 </li></ul>
 
-<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+New+Features"><a href="#label-Other+New+Features">Other New Features</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now compatible with Ruby 1.9.2pre3.</p>
 </li><li>
@@ -95,7 +95,7 @@ doc/release_notes/3.13.0.txt
 <p>A :methods_module association option was added, allowing you to specify the module into which association instance methods are placed.  By default, it uses the module containing the column accessor methods.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The :encoding option for the native MySQL adapter should now work correctly in all cases.  This fix was included in 3.12.1.</p>
 </li><li>
@@ -133,7 +133,7 @@ doc/release_notes/3.13.0.txt
 <p>If a plugin cannot be loaded, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now gives a more detailed error message.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Array#sql_array and the Sequel::SQL::SQLArray class are now considered deprecated.  Use the Array#sql_value_list and the <a href="../../../classes/Sequel/SQL/ValueList.html"><code>Sequel::SQL::ValueList</code></a> class instead.  SQLArray is now just an alias for ValueList, but it now is an Array subclass instead of a <a href="../../../classes/Sequel/SQL/Expression.html"><code>Sequel::SQL::Expression</code></a> subclass.</p>
 </li><li>

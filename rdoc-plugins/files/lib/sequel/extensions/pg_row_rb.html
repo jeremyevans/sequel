@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_row.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_row extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL’s row-valued/composite types.</p>
+<p>The <a href="pg_row_rb.html">pg_row</a> extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL’s row-valued/composite types.</p>
 
 <p>This extension integrates with Sequel’s native postgres and jdbc/postgresql adapters, so that when composite fields are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/PGRow.html"><code>Sequel::Postgres::PGRow</code></a>::(HashRow|ArrayRow), or optionally a custom type.  HashRow and ArrayRow are DelegateClasses of <a href="../../../../classes/Hash.html"><code>Hash</code></a> and <a href="../../../../classes/Array.html"><code>Array</code></a>, so they mostly act like a hash or array, but not completely (is_a?(<a href="../../../../classes/Hash.html"><code>Hash</code></a>) and is_a?(<a href="../../../../classes/Array.html"><code>Array</code></a>) are false).  If you want the actual hash for a HashRow, call HashRow#to_hash, and if you want the actual array for an ArrayRow, call ArrayRow#to_a.  This is done so that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does not treat a values like an <a href="../../../../classes/Array.html"><code>Array</code></a> or <a href="../../../../classes/Hash.html"><code>Hash</code></a> by default, which would cause issues.</p>
 
@@ -44,7 +44,7 @@ lib/sequel/extensions/pg_row.rb
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_row</span>
 </pre>
 
-<p>If you plan to use arrays of composite types, make sure you load the pg_array extension first:</p>
+<p>If you plan to use arrays of composite types, make sure you load the <a href="pg_array_rb.html">pg_array</a> extension first:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_row</span>
 </pre>
@@ -54,7 +54,7 @@ lib/sequel/extensions/pg_row.rb
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row</span>(<span class="ruby-identifier">array</span>)
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Array.html#method-i-pg_row"><code>Array#pg_row</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Array.html#method-i-pg_row"><code>Array#pg_row</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_row</span>
 </pre>

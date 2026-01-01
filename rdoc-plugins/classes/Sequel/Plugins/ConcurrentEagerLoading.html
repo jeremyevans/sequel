@@ -36,7 +36,7 @@ Sequel::Plugins::ConcurrentEagerLoading
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The concurrent_eager_loading plugin allows for eager loading multiple associations concurrently in separate threads.  You must load the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension into the <a href="../../Database.html"><code>Database</code></a> object the model class uses in order for this plugin to work.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/concurrent_eager_loading_rb.html">concurrent_eager_loading</a> plugin allows for eager loading multiple associations concurrently in separate threads.  You must load the <a href="../../../files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a> <a href="../../Database.html"><code>Database</code></a> extension into the <a href="../../Database.html"><code>Database</code></a> object the model class uses in order for this plugin to work.</p>
 
 <p>By default in <a href="../../Sequel.html"><code>Sequel</code></a>, eager loading happens in a serial manner.  If you have code such as:</p>
 
@@ -45,7 +45,7 @@ Sequel::Plugins::ConcurrentEagerLoading
 
 <p><a href="../../Sequel.html"><code>Sequel</code></a> will load the albums, then the artists for the albums, then the genres for the albums, then the tracks for the albums.</p>
 
-<p>With the concurrent_eager_loading plugin, you can use the <code>eager_load_concurrently</code> method to allow for concurrent eager loading:</p>
+<p>With the <a href="../../../files/lib/sequel/plugins/concurrent_eager_loading_rb.html">concurrent_eager_loading</a> plugin, you can use the <code>eager_load_concurrently</code> method to allow for concurrent eager loading:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_load_concurrently</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:genre</span>, <span class="ruby-value">:tracks</span>)
 </pre>
@@ -57,7 +57,7 @@ Sequel::Plugins::ConcurrentEagerLoading
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_load_serially</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:genre</span>, <span class="ruby-value">:tracks</span>)
 </pre>
 
-<p>Note that making concurrent eager loading the default is probably a bad idea if you are eager loading inside transactions and want the eager load to reflect changes made inside the transaction, unless you plan to use <code>eager_load_serially</code> for such cases.  See the async_thread_pool <a href="../../Database.html"><code>Database</code></a> extension documentation for more general caveats regarding its use.</p>
+<p>Note that making concurrent eager loading the default is probably a bad idea if you are eager loading inside transactions and want the eager load to reflect changes made inside the transaction, unless you plan to use <code>eager_load_serially</code> for such cases.  See the <a href="../../../files/lib/sequel/extensions/async_thread_pool_rb.html">async_thread_pool</a> <a href="../../Database.html"><code>Database</code></a> extension documentation for more general caveats regarding its use.</p>
 
 <p>The default eager loaders for all of the association types that ship with <a href="../../Sequel.html"><code>Sequel</code></a> support safe concurrent eager loading.  However, if you are specifying a custom <code>:eager_loader</code> for an association, it may not work safely unless it it modified to support concurrent eager loading.  Taking this example from the Advanced Associations guide</p>
 

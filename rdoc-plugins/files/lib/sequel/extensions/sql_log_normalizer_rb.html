@@ -33,7 +33,7 @@ lib/sequel/extensions/sql_log_normalizer.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The sql_log_normalizer extension normalizes the SQL that is logged, removing the literal strings and numbers in the SQL, and removing the logging of any bound variables:</p>
+<p>The <a href="sql_log_normalizer_rb.html">sql_log_normalizer</a> extension normalizes the SQL that is logged, removing the literal strings and numbers in the SQL, and removing the logging of any bound variables:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-string">&#39;something&#39;</span>)
 <span class="ruby-comment"># Without sql_log_normalizer extension</span>

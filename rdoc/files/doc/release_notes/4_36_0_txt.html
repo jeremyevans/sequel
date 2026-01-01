@@ -33,7 +33,7 @@ doc/release_notes/4.36.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Sequel::Model::Model() has been added, which allows for Sequel::Model() like behavior where the base class used is a subclass of <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.  To make it easier to use, Sequel::Model.def_Model has also been added, which takes a module and adds a Model() method to the module that calls Model() on the receiver.</p>
 
@@ -93,7 +93,7 @@ doc/release_notes/4.36.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The validates_operator validation in validation_helpers now considers nil values as invalid unless :allow_nil or a similar option is used.  Previously, using validates_operator with a nil value would probably raise a NoMethodError.  This makes validates_operator more similar to other validations.</p>
 </li><li>
@@ -108,7 +108,7 @@ doc/release_notes/4.36.0.txt
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles disconnect errors that occur when literalizing strings in the mysql2 and postgres adapters.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Using the Bignum class as a generic type is now deprecated.  As announced in the <a href="4_35_0_txt.html">4.35.0</a> release notes, ruby 2.4 is unifying the Fixnum and Bignum classes into Integer, which results in the behavior of the Bignum class changing.  <a href="4_35_0_txt.html">4.35.0</a> added support for using the :Bignum symbol as a generic 64-bit integer type, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users now need to switch to that to avoid the deprecation warning.</p>
 

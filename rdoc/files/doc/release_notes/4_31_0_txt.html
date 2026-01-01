@@ -33,7 +33,7 @@ doc/release_notes/4.31.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Improvements"><a href="#label-Improvements">Improvements</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now works with ruby 2.3’s –enable-frozen-string-literal, and all of the library files are set to use frozen string literals by default.</p>
 
@@ -60,7 +60,7 @@ doc/release_notes/4.31.0.txt
 <p>Database#disconnect in the oracle adapter now works correctly on more recent versions of oci8 where logoff can raise OCIException instead of OCIInvalidHandle.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The pg_array extension no longer defines Sequel::Postgres::PGArray::JSONCreator.  This should only affect backwards compatibility if you were accessing the constant directly. The :parser option to Sequel::Postgres::PGArray.register is also no longer respected, but that should not affect backwards compatibility.</p>
 </li><li>

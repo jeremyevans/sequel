@@ -36,9 +36,9 @@ Sequel::Plugins::PreparedStatements
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The prepared_statements plugin modifies the model to use prepared statements for instance level inserts and updates. This plugin exists for backwards compatibility and is not recommended for general use.</p>
+<p>The <a href="../../../files/lib/sequel/plugins/prepared_statements_rb.html">prepared_statements</a> plugin modifies the model to use prepared statements for instance level inserts and updates. This plugin exists for backwards compatibility and is not recommended for general use.</p>
 
-<p>Note that this plugin is unsafe in some circumstances, as it can allow up to 2^N prepared statements to be created for each type of insert and update query, where N is the number of columns in the table. It is recommended that you use the <code>prepared_statements_safe</code> plugin in addition to this plugin to reduce the number of prepared statements that can be created, unless you tightly control how your model instances are saved.</p>
+<p>Note that this plugin is unsafe in some circumstances, as it can allow up to 2^N prepared statements to be created for each type of insert and update query, where N is the number of columns in the table. It is recommended that you use the <a href="../../../files/lib/sequel/plugins/prepared_statements_safe_rb.html">prepared_statements_safe</a> plugin in addition to this plugin to reduce the number of prepared statements that can be created, unless you tightly control how your model instances are saved.</p>
 
 <p>Usage:</p>
 

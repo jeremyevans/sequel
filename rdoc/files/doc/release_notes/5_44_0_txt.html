@@ -33,7 +33,7 @@ doc/release_notes/5.44.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A concurrent_eager_loading plugin has been added.  This plugin builds on top of the async_thread_pool Database extension and allows eager loading multiple associations concurrently in separate threads.  With this plugin, you can mark datasets for concurrent eager loading using eager_load_concurrently:</p>
 
@@ -45,7 +45,7 @@ doc/release_notes/5.44.0.txt
 <p>All of the association types that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now support concurrent eager loading when using this plugin. For custom eager loaders using the :eager_loader association option, please see the documentation for the plugin for how to enable custom eager loading for them.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The date_arithmetic extension now handles ActiveSupport::Duration values with weeks, as well as :weeks as a key in a hash value. Weeks are converted into 7 days internally.</p>
 </li><li>

@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_inet_ops.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_inet_ops extension adds support to Sequel’s DSL to make it easier to call PostgreSQL inet functions and operators.</p>
+<p>The <a href="pg_inet_ops_rb.html">pg_inet_ops</a> extension adds support to Sequel’s DSL to make it easier to call PostgreSQL inet functions and operators.</p>
 
 <p>To load the extension:</p>
 
@@ -45,12 +45,12 @@ lib/sequel/extensions/pg_inet_ops.rb
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_inet_op</span>(<span class="ruby-value">:inet</span>)
 </pre>
 
-<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the pg_inet method:</p>
+<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the <a href="pg_inet_rb.html">pg_inet</a> method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:ip</span>].<span class="ruby-identifier">pg_inet</span>
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/InetOpMethods.html#method-i-pg_inet"><code>Symbol#pg_inet</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/InetOpMethods.html#method-i-pg_inet"><code>Symbol#pg_inet</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-value">:inet</span>.<span class="ruby-identifier">pg_inet</span>
 </pre>

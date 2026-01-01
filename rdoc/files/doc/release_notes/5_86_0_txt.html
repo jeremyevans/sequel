@@ -33,7 +33,7 @@ doc/release_notes/5.86.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>The subset_conditions plugin now supports where_all and where_any methods for combining existing subsets.  It also adds *_conditions methods for exclude method calls, in addition to subset and where method calls:</p>
 
@@ -67,7 +67,7 @@ doc/release_notes/5.86.0.txt
 <p>The sqlite adapter now supports the :disable_dqs Database option, to disable treating double quoted values as strings. As described by the SQLite documentation, treating double quoted values as strings instead of identifiers is a misfeature. This support requires SQLite <a href="3_29_0_txt.html">3.29.0</a>+ and sqlite3 gem version 1.4.3+.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>On PostgreSQL, datasets using an SQL::DelayedEvaluation instance as the table now support returning the primary key for inserts and imports.</p>
 </li><li>
@@ -76,7 +76,7 @@ doc/release_notes/5.86.0.txt
 <p>The schema_dumper extension now uses colons instead of hashrockets when using Ruby 3.4+ (following the Hash#inspect change in Ruby 3.4.0-preview2).</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The schema_dumper change can break backwards compatibility for tests that expect the hashrocket format, but only on Ruby 3.4+.</p>
 </li></ul>

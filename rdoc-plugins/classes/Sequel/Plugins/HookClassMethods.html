@@ -36,7 +36,7 @@ Sequel::Plugins::HookClassMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Sequel’s built-in hook_class_methods plugin is designed for backwards compatibility.  Its use is not encouraged, it is recommended to use instance methods and super instead of this plugin.  This plugin allows calling class methods with blocks to define hooks:</p>
+<p>Sequel’s built-in <a href="../../../files/lib/sequel/plugins/hook_class_methods_rb.html">hook_class_methods</a> plugin is designed for backwards compatibility.  Its use is not encouraged, it is recommended to use instance methods and super instead of this plugin.  This plugin allows calling class methods with blocks to define hooks:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Block only, can cause duplicate hooks if code is reloaded</span>
 <span class="ruby-identifier">before_save</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}

@@ -33,7 +33,7 @@ doc/release_notes/3.38.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A pg_row extension has been added that supports PostgreSQL’s row-valued/composite types.  You can register support for specific row types:</p>
 
@@ -129,7 +129,7 @@ doc/release_notes/3.38.0.txt
 <p>SQL::Blob values now have as, cast, and lit methods even if the core extensions are not loaded.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>When loading multiple pg_* extensions into a Database instance, the conversion procs are only reset once instead of once per extension.</p>
 </li><li>
@@ -164,7 +164,7 @@ doc/release_notes/3.38.0.txt
 <p>All of Sequel’s specs now run without the core extensions loaded, ensuring that none of the internals depend on the core extensions. The only exception is the specs for the core extensions themselves.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The pg_* extensions no longer modify core classes if the <a href="../core_extensions_rdoc.html">core_extensions</a> extension is not loaded.  All methods they added now have equivalent methods on the main <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module:</p>
 

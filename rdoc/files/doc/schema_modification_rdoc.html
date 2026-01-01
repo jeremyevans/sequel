@@ -33,11 +33,11 @@ doc/schema_modification.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Schema+modification+methods">Schema modification methods<span><a href="#label-Schema+modification+methods">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Schema+modification+methods"><a href="#label-Schema+modification+methods">Schema modification methods</a></h1>
 
 <p>Here’s a brief description of the most common schema modification methods:</p>
 
-<h2 id="label-create_table"><code>create_table</code><span><a href="#label-create_table">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-create_table"><a href="#label-create_table"><code>create_table</code></a></h2>
 
 <p><code>create_table</code> is the most common schema modification method, and it’s used for adding new tables to the database.  You provide it with the name of the table as a symbol, as well a block:</p>
 
@@ -49,7 +49,7 @@ doc/schema_modification.rdoc
 
 <p>Note that if you want a primary key for the table, you need to specify it, <a href="../../classes/Sequel.html"><code>Sequel</code></a> does not create one by default.</p>
 
-<h3 id="label-Column+types">Column types<span><a href="#label-Column+types">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Column+types"><a href="#label-Column+types">Column types</a></h3>
 
 <p>Most method calls inside the create_table block will create columns, since <code>method_missing</code> calls <code>column</code>. Columns are generally created by specifying the column type as the method name, followed by the column name symbol to use, and after that any options that should be used. If the method is a ruby class name that <a href="../../classes/Sequel.html"><code>Sequel</code></a> recognizes, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will transform it into the appropriate type for the given database.  So while you specified <code>String</code>, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will actually use <code>varchar</code> or <code>text</code> depending on the underlying database.  Here’s a list of all ruby classes that <a href="../../classes/Sequel.html"><code>Sequel</code></a> will convert to database types:</p>
 
@@ -103,7 +103,7 @@ doc/schema_modification.rdoc
 
 <p>If you use a ruby class as the type, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will try to guess the appropriate type name for the database you are using.  If a symbol or string is used as the type, it is used verbatim as the type name in SQL, with the exception of :Bignum.  Using the symbol :Bignum as a type will use the appropriate 64-bit integer type for the database you are using.</p>
 
-<h3 id="label-Column+options">Column options<span><a href="#label-Column+options">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Column+options"><a href="#label-Column+options">Column options</a></h3>
 
 <p>When using the type name as method, the second argument is an options hash, and when using the <code>column</code> method, the third argument is the options hash.  The following options are supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:default </td><td>
@@ -124,11 +124,11 @@ doc/schema_modification.rdoc
 <p>The name to give the unique constraint.</p>
 </td></tr></tbody></table>
 
-<h3 id="label-Other+methods">Other methods<span><a href="#label-Other+methods">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Other+methods"><a href="#label-Other+methods">Other methods</a></h3>
 
 <p>In addition to the <code>column</code> method and other methods that create columns, there are other methods that can be used:</p>
 
-<h4 id="label-primary_key"><code>primary_key</code><span><a href="#label-primary_key">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-primary_key"><a href="#label-primary_key"><code>primary_key</code></a></h4>
 
 <p>You’ve seen this one used already.  It’s used to create an autoincrementing integer primary key column.</p>
 
@@ -157,7 +157,7 @@ doc/schema_modification.rdoc
 
 <p>If provided with an array, <code>primary_key</code> does not create a column, it just sets up the primary key constraint.</p>
 
-<h4 id="label-foreign_key"><code>foreign_key</code><span><a href="#label-foreign_key">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-foreign_key"><a href="#label-foreign_key"><code>foreign_key</code></a></h4>
 
 <p><code>foreign_key</code> is used to create a foreign key column that references a column in another table (or the same table). It takes the column name as the first argument, the table it references as the second argument, and an options hash as its third argument.  A simple example is:</p>
 
@@ -221,7 +221,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h4 id="label-index"><code>index</code><span><a href="#label-index">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-index"><a href="#label-index"><code>index</code></a></h4>
 
 <p><code>index</code> creates indexes on the table.  For single columns, calling index is the same as using the <code>:index</code> option when creating the column:</p>
 
@@ -261,7 +261,7 @@ doc/schema_modification.rdoc
 <p>Create a partial index (only supported by some databases)</p>
 </td></tr></tbody></table>
 
-<h4 id="label-unique"><code>unique</code><span><a href="#label-unique">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-unique"><a href="#label-unique"><code>unique</code></a></h4>
 
 <p>The <code>unique</code> method creates a unique constraint on the table.  A unique constraint generally operates identically to a unique index, so the following three <code>create_table</code> blocks are pretty much identical:</p>
 
@@ -287,11 +287,11 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h4 id="label-full_text_index+and+spatial_index"><code>full_text_index</code> and <code>spatial_index</code><span><a href="#label-full_text_index+and+spatial_index">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-full_text_index+and+spatial_index"><a href="#label-full_text_index+and+spatial_index"><code>full_text_index</code> and <code>spatial_index</code></a></h4>
 
 <p>Both of these create specialized index types supported by some databases.  They both take the same options as <code>index</code>.</p>
 
-<h4 id="label-constraint"><code>constraint</code><span><a href="#label-constraint">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-constraint"><a href="#label-constraint"><code>constraint</code></a></h4>
 
 <p><code>constraint</code> creates a named table constraint:</p>
 
@@ -311,7 +311,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h4 id="label-check"><code>check</code><span><a href="#label-check">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<h4 id="label-check"><a href="#label-check"><code>check</code></a></h4>
 
 <p><code>check</code> operates just like <code>constraint</code>, except that it doesn’t take a name and it creates an unnamed constraint:</p>
 
@@ -324,7 +324,7 @@ doc/schema_modification.rdoc
 
 <p>It’s recommended that you use the <code>constraint</code> method and provide a name for the constraint, as that makes it easier to drop the constraint later if necessary.</p>
 
-<h2 id="label-create_join_table"><code>create_join_table</code><span><a href="#label-create_join_table">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-create_join_table"><a href="#label-create_join_table"><code>create_join_table</code></a></h2>
 
 <p><code>create_join_table</code> is a shortcut that you can use to create simple many-to-many join tables:</p>
 
@@ -341,18 +341,18 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-create_table+-3Aas"><code>create_table :as</code><span><a href="#label-create_table+-3Aas">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-create_table+-3Aas"><a href="#label-create_table+-3Aas"><code>create_table :as</code></a></h2>
 
 <p>To create a table from the result of a SELECT query, instead of passing a block to <code>create_table</code>, provide a dataset to the :as option:</p>
 
 <pre class="ruby"><span class="ruby-identifier">create_table</span>(<span class="ruby-value">:older_items</span>, <span class="ruby-value">as:</span> <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">updated_at</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">6</span>})
 </pre>
 
-<h2 id="label-alter_table"><code>alter_table</code><span><a href="#label-alter_table">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-alter_table"><a href="#label-alter_table"><code>alter_table</code></a></h2>
 
 <p><code>alter_table</code> is used to alter existing tables, changing their columns, indexes, or constraints.  It it used just like <code>create_table</code>, accepting a block which is instance_evaled, and providing its own methods:</p>
 
-<h3 id="label-add_column"><code>add_column</code><span><a href="#label-add_column">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_column"><a href="#label-add_column"><code>add_column</code></a></h3>
 
 <p>One of the most common methods, <code>add_column</code> is used to add a column to the table. Its API is similar to that of <code>create_table</code>‘s <code>column</code> method, where the first argument is the column name, the second is the type, and the third is an options hash:</p>
 
@@ -361,7 +361,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-drop_column"><code>drop_column</code><span><a href="#label-drop_column">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_column"><a href="#label-drop_column"><code>drop_column</code></a></h3>
 
 <p>As you may expect, <code>drop_column</code> takes a column name and drops the column.  It’s often used in the <code>down</code> block of a migration to drop a column added in an <code>up</code> block:</p>
 
@@ -370,7 +370,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-rename_column"><code>rename_column</code><span><a href="#label-rename_column">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-rename_column"><a href="#label-rename_column"><code>rename_column</code></a></h3>
 
 <p><code>rename_column</code> is used to rename a column.  It takes the old column name as the first argument, and the new column name as the second argument:</p>
 
@@ -379,7 +379,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-add_primary_key"><code>add_primary_key</code><span><a href="#label-add_primary_key">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_primary_key"><a href="#label-add_primary_key"><code>add_primary_key</code></a></h3>
 
 <p>If you forgot to include a primary key on the table, and want to add one later, you can use <code>add_primary_key</code>.  A common use of this is to make many_to_many association join tables into real models:</p>
 
@@ -409,7 +409,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-add_foreign_key"><code>add_foreign_key</code><span><a href="#label-add_foreign_key">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_foreign_key"><a href="#label-add_foreign_key"><code>add_foreign_key</code></a></h3>
 
 <p><code>add_foreign_key</code> can be used to add a new foreign key column or constraint to a table. Like <code>add_primary_key</code>, if you provide it with a symbol as the first argument, it creates a new column:</p>
 
@@ -446,7 +446,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-drop_foreign_key"><code>drop_foreign_key</code><span><a href="#label-drop_foreign_key">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_foreign_key"><a href="#label-drop_foreign_key"><code>drop_foreign_key</code></a></h3>
 
 <p><code>drop_foreign_key</code> is used to drop foreign keys from tables.  If you provide a symbol as the first argument, it drops both the foreign key constraint and the column:</p>
 
@@ -471,7 +471,7 @@ doc/schema_modification.rdoc
 
 <p>If you do not provide a :name option and <a href="../../classes/Sequel.html"><code>Sequel</code></a> is not able to determine the name to use, it will probably raise a <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> exception.</p>
 
-<h3 id="label-add_index"><code>add_index</code><span><a href="#label-add_index">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_index"><a href="#label-add_index"><code>add_index</code></a></h3>
 
 <p><code>add_index</code> works just like <code>create_table</code>‘s <code>index</code> method, creating a new index on the table:</p>
 
@@ -487,7 +487,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-drop_index"><code>drop_index</code><span><a href="#label-drop_index">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_index"><a href="#label-drop_index"><code>drop_index</code></a></h3>
 
 <p>As you may expect, <code>drop_index</code> drops an existing index:</p>
 
@@ -505,11 +505,11 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-add_full_text_index-2C+add_spatial_index"><code>add_full_text_index</code>, <code>add_spatial_index</code><span><a href="#label-add_full_text_index-2C+add_spatial_index">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_full_text_index-2C+add_spatial_index"><a href="#label-add_full_text_index-2C+add_spatial_index"><code>add_full_text_index</code>, <code>add_spatial_index</code></a></h3>
 
 <p>Corresponding to <code>create_table</code>‘s <code>full_text_index</code> and <code>spatial_index</code> methods, these two methods create new indexes on the table.</p>
 
-<h3 id="label-add_constraint"><code>add_constraint</code><span><a href="#label-add_constraint">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_constraint"><a href="#label-add_constraint"><code>add_constraint</code></a></h3>
 
 <p>This adds a named constraint to the table, similar to <code>create_table</code>‘s <code>constraint</code> method:</p>
 
@@ -520,7 +520,7 @@ doc/schema_modification.rdoc
 
 <p>There is no method to add an unnamed constraint, but you can pass <code>nil</code> as the first argument of <code>add_constraint</code> to do so.  However, it’s not recommended to do that as it is more difficult to drop such a constraint.</p>
 
-<h3 id="label-add_unique_constraint"><code>add_unique_constraint</code><span><a href="#label-add_unique_constraint">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-add_unique_constraint"><a href="#label-add_unique_constraint"><code>add_unique_constraint</code></a></h3>
 
 <p>This adds a unique constraint to the table, similar to <code>create_table</code>‘s <code>unique</code> method.  This usually has the same effect as adding a unique index.</p>
 
@@ -536,7 +536,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-drop_constraint"><code>drop_constraint</code><span><a href="#label-drop_constraint">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_constraint"><a href="#label-drop_constraint"><code>drop_constraint</code></a></h3>
 
 <p>This method drops an existing named constraint:</p>
 
@@ -556,7 +556,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-set_column_default"><code>set_column_default</code><span><a href="#label-set_column_default">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-set_column_default"><a href="#label-set_column_default"><code>set_column_default</code></a></h3>
 
 <p>This modifies the default value of a column:</p>
 
@@ -572,7 +572,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-set_column_type"><code>set_column_type</code><span><a href="#label-set_column_type">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-set_column_type"><a href="#label-set_column_type"><code>set_column_type</code></a></h3>
 
 <p>This modifies a column’s type.  Most databases will attempt to convert existing values in the columns to the new type:</p>
 
@@ -583,7 +583,7 @@ doc/schema_modification.rdoc
 
 <p>You can specify the type as a string or symbol, in which case it is used verbatim, or as a supported ruby class or the :Bignum symbol, in which case it gets converted to an appropriate database type.</p>
 
-<h3 id="label-set_column_allow_null"><code>set_column_allow_null</code><span><a href="#label-set_column_allow_null">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-set_column_allow_null"><a href="#label-set_column_allow_null"><code>set_column_allow_null</code></a></h3>
 
 <p>This allows you to set the column as allowing NULL values:</p>
 
@@ -592,7 +592,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-set_column_not_null"><code>set_column_not_null</code><span><a href="#label-set_column_not_null">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-set_column_not_null"><a href="#label-set_column_not_null"><code>set_column_not_null</code></a></h3>
 
 <p>This allows you to set the column as not allowing NULL values:</p>
 
@@ -601,7 +601,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h2 id="label-Other+Database+schema+modification+methods">Other <code>Database</code> schema modification methods<span><a href="#label-Other+Database+schema+modification+methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Other+Database+schema+modification+methods"><a href="#label-Other+Database+schema+modification+methods">Other <code>Database</code> schema modification methods</a></h2>
 
 <p><a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> has many schema modification instance methods, most of which are shortcuts to the same methods in <code>alter_table</code>.  The following <code>Database</code> instance methods just call <code>alter_table</code> with a block that calls the method with the same name inside the <code>alter_table</code> block with all arguments after the first argument (which is used as the table name):</p>
 <ul><li>
@@ -628,7 +628,7 @@ doc/schema_modification.rdoc
 
 <p>There are some other schema modification methods that have no <code>alter_table</code> counterpart:</p>
 
-<h3 id="label-drop_table"><code>drop_table</code><span><a href="#label-drop_table">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_table"><a href="#label-drop_table"><code>drop_table</code></a></h3>
 
 <p><code>drop_table</code> takes multiple arguments and treats all arguments as a table name to drop:</p>
 
@@ -637,18 +637,18 @@ doc/schema_modification.rdoc
 
 <p>Note that when dropping tables, you may need to drop them in a specific order if you are using foreign keys and the database is enforcing referential integrity.  In general, you need to drop the tables containing the foreign keys before the tables containing the primary keys they reference.</p>
 
-<h3 id="label-drop_table-3F"><code>drop_table?</code><span><a href="#label-drop_table-3F">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_table-3F"><a href="#label-drop_table-3F"><code>drop_table?</code></a></h3>
 
 <p><code>drop_table?</code> is similar to drop_table, except that it only drops the table if the table already exists.  On some databases, it uses <code>IF NOT EXISTS</code>, on others it does a separate query to check for existence.</p>
 
-<h3 id="label-rename_table"><code>rename_table</code><span><a href="#label-rename_table">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-rename_table"><a href="#label-rename_table"><code>rename_table</code></a></h3>
 
 <p>You can rename an existing table using <code>rename_table</code>.  Like <code>rename_column</code>, the first argument is the current name, and the second is the new name:</p>
 
 <pre class="ruby"><span class="ruby-identifier">rename_table</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:artists</span>)
 </pre>
 
-<h3 id="label-create_table-21"><code>create_table!</code><span><a href="#label-create_table-21">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-create_table-21"><a href="#label-create_table-21"><code>create_table!</code></a></h3>
 
 <p><code>create_table!</code> drops the table if it exists before attempting to create it, so:</p>
 
@@ -665,7 +665,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-create_table-3F"><code>create_table?</code><span><a href="#label-create_table-3F">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-create_table-3F"><a href="#label-create_table-3F"><code>create_table?</code></a></h3>
 
 <p><code>create_table?</code> only creates the table if it does not already exist, so:</p>
 
@@ -683,7 +683,7 @@ doc/schema_modification.rdoc
 <span class="ruby-keyword">end</span>
 </pre>
 
-<h3 id="label-create_view+and+create_or_replace_view"><code>create_view</code> and <code>create_or_replace_view</code><span><a href="#label-create_view+and+create_or_replace_view">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-create_view+and+create_or_replace_view"><a href="#label-create_view+and+create_or_replace_view"><code>create_view</code> and <code>create_or_replace_view</code></a></h3>
 
 <p>These can be used to create views.  The difference between them is that <code>create_or_replace_view</code> will unconditionally replace an existing view of the same name, while <code>create_view</code> will probably raise an error.  Both methods take the name as the first argument, and either an string or a dataset as the second argument:</p>
 
@@ -691,7 +691,7 @@ doc/schema_modification.rdoc
 <span class="ruby-identifier">create_or_replace_view</span>(<span class="ruby-value">:gold_albums</span>, <span class="ruby-string">&quot;SELECT * FROM albums WHERE copies_sold &gt; 500000&quot;</span>)
 </pre>
 
-<h3 id="label-drop_view"><code>drop_view</code><span><a href="#label-drop_view">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-drop_view"><a href="#label-drop_view"><code>drop_view</code></a></h3>
 
 <p><code>drop_view</code> drops existing views.  Just like <code>drop_table</code>, it can accept multiple arguments:</p>
 

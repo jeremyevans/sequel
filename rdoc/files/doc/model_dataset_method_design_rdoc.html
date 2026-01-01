@@ -33,11 +33,11 @@ doc/model_dataset_method_design.rdoc
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Model+Dataset+Method+Design+Guide">Model Dataset Method Design Guide<span><a href="#label-Model+Dataset+Method+Design+Guide">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Model+Dataset+Method+Design+Guide"><a href="#label-Model+Dataset+Method+Design+Guide">Model Dataset Method Design Guide</a></h1>
 
 <p>How you design your model dataset methods can significantly affect the flexibility of your API for your model classes, as well as the performance.  The goal of this guide is to provide an example of how to design your model dataset methods for maximum flexibility and performance.</p>
 
-<h2 id="label-Flexibility-3A+Use+Single+Method+Per+Task">Flexibility: Use Single Method Per Task<span><a href="#label-Flexibility-3A+Use+Single+Method+Per+Task">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Flexibility-3A+Use+Single+Method+Per+Task"><a href="#label-Flexibility-3A+Use+Single+Method+Per+Task">Flexibility: Use Single Method Per Task</a></h2>
 
 <p>In general, it is recommended that you have a single method per task for maximum flexibility.  For example, let’s say you need to retrieve all albums released in a given year, ordered by number of units sold descending, and only care about the id, name and number of units sold.  One way to do this is in your application code (outside the model), you can call the dataset methods directly:</p>
 
@@ -69,7 +69,7 @@ doc/model_dataset_method_design.rdoc
 
 <p>The advantage of this approach is that you can change your schema at any point in the future, and you should only need to change your model code, you should never need to change other application code.</p>
 
-<h2 id="label-Performance">Performance<span><a href="#label-Performance">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Performance"><a href="#label-Performance">Performance</a></h2>
 
 <p>After designing your dataset methods for flexibility, stop.  Don’t worry about performance until you need to worry about performance.  However, assuming you have profiled your application and profiling shows you can benefit from optimizing the above method, you can then consider the performance impact of future design choices.</p>
 
@@ -87,7 +87,7 @@ doc/model_dataset_method_design.rdoc
 
 <p>Third, you need to understand that <a href="../../classes/Sequel.html"><code>Sequel</code></a> has optimizations specifically designed to reduce the number of objects allocated, by caching intermediate datasets.  Unfortunately, those optimizations do not apply in this case.  The reason for this is that <code>select</code>, <code>where</code>, and <code>order</code> can potentially receive arbitrary arguments, and enabling caching for them could easily lead to unbounded cache size (denial of service due to memory exhaustion).</p>
 
-<p>To allow intermediate dataset caching to work, you need to signal to <a href="../../classes/Sequel.html"><code>Sequel</code></a> that particular arguments to these methods should be cached, and you can do that by calling methods inside <code>dataset_module</code> blocks such as <code>select</code> and <code>order</code>.  These methods will add dataset methods to the model that can cache the returned dataset to optimize performance.  Here is an example using these methods:</p>
+<p>To allow intermediate dataset caching to work, you need to signal to <a href="../../classes/Sequel.html"><code>Sequel</code></a> that particular arguments to these methods should be cached, and you can do that by calling methods inside <a href="../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> blocks such as <code>select</code> and <code>order</code>.  These methods will add dataset methods to the model that can cache the returned dataset to optimize performance.  Here is an example using these methods:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>
   <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>
@@ -152,14 +152,14 @@ doc/model_dataset_method_design.rdoc
 
 <p>So the general advice on designing dataset methods for performance is:</p>
 <ul><li>
-<p>Use <code>dataset_module</code> methods to create named dataset methods that return cached datasets</p>
+<p>Use <a href="../lib/sequel/dataset/dataset_module_rb.html">dataset_module</a> methods to create named dataset methods that return cached datasets</p>
 </li><li>
 <p>If any filtering is to be done, have it done last using <code>where_all</code>, <code>where_each</code>, <code>first</code>, or <code>where_single_value</code>.</p>
 </li></ul>
 
 <p>By following this advice, you can significantly increase the performance of your model dataset code.</p>
 
-<h3 id="label-Further+Increasing+Performance">Further Increasing Performance<span><a href="#label-Further+Increasing+Performance">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Further+Increasing+Performance"><a href="#label-Further+Increasing+Performance">Further Increasing Performance</a></h3>
 
 <p>The best way to further increase performance at the <a href="../../classes/Sequel.html"><code>Sequel</code></a> level is to switch to using prepared statements.  This does require more significant changes to the API.  Here’s an example using prepared statements:</p>
 

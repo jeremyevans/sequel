@@ -352,7 +352,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Wrap the array or hash in a <a href="../Postgres/JSONArray.html"><code>Postgres::JSONArray</code></a> or <a href="../Postgres/JSONHash.html"><code>Postgres::JSONHash</code></a>. Also handles <a href="../Postgres/JSONObject.html"><code>Postgres::JSONObject</code></a> and JSONBObjects. For other objects, calls <code>Sequel.pg_json_op</code> (which is defined by the pg_json_ops extension).</p>
+<p>Wrap the array or hash in a <a href="../Postgres/JSONArray.html"><code>Postgres::JSONArray</code></a> or <a href="../Postgres/JSONHash.html"><code>Postgres::JSONHash</code></a>. Also handles <a href="../Postgres/JSONObject.html"><code>Postgres::JSONObject</code></a> and JSONBObjects. For other objects, calls <code>Sequel.pg_json_op</code> (which is defined by the <a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a> extension).</p>
 
 </div>
 <div class='source'>
@@ -437,7 +437,7 @@ Sequel::SQL::Builders
 </div>
 <div class='description'>
 
-<p>Wrap the array or hash in a <a href="../Postgres/JSONBArray.html"><code>Postgres::JSONBArray</code></a> or <a href="../Postgres/JSONBHash.html"><code>Postgres::JSONBHash</code></a>. Also handles <a href="../Postgres/JSONObject.html"><code>Postgres::JSONObject</code></a> and JSONBObjects. For other objects, calls <code>Sequel.pg_json_op</code> (which is defined by the pg_json_ops extension).</p>
+<p>Wrap the array or hash in a <a href="../Postgres/JSONBArray.html"><code>Postgres::JSONBArray</code></a> or <a href="../Postgres/JSONBHash.html"><code>Postgres::JSONBHash</code></a>. Also handles <a href="../Postgres/JSONObject.html"><code>Postgres::JSONObject</code></a> and JSONBObjects. For other objects, calls <code>Sequel.pg_json_op</code> (which is defined by the <a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a> extension).</p>
 
 </div>
 <div class='source'>
@@ -563,21 +563,21 @@ Sequel::SQL::Builders
 [show source]
 </a>
 <pre id='method-i-pg_range-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>
-<span class="line-num">531</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_range</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">532</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
-<span class="line-num">533</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>
-<span class="line-num">534</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">db_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">db_type</span>
-<span class="line-num">535</span>       <span class="ruby-identifier">v</span>
-<span class="line-num">536</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">537</span>       <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">end</span>, <span class="ruby-value">:exclude_begin</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">exclude_begin?</span>, <span class="ruby-value">:exclude_end</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">exclude_end?</span>, <span class="ruby-value">:db_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">db_type</span>)
-<span class="line-num">538</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">539</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Range</span>
-<span class="line-num">540</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">db_type</span>)
-<span class="line-num">541</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">542</span>     <span class="ruby-comment"># May not be defined unless the pg_range_ops extension is used</span>
-<span class="line-num">543</span>     <span class="ruby-identifier">pg_range_op</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">544</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">545</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">532</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_range</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">533</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>
+<span class="line-num">534</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>
+<span class="line-num">535</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">db_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">db_type</span>
+<span class="line-num">536</span>       <span class="ruby-identifier">v</span>
+<span class="line-num">537</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">538</span>       <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">end</span>, <span class="ruby-value">:exclude_begin</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">exclude_begin?</span>, <span class="ruby-value">:exclude_end</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">exclude_end?</span>, <span class="ruby-value">:db_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">db_type</span>)
+<span class="line-num">539</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">540</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Range</span>
+<span class="line-num">541</span>     <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">db_type</span>)
+<span class="line-num">542</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">543</span>     <span class="ruby-comment"># May not be defined unless the pg_range_ops extension is used</span>
+<span class="line-num">544</span>     <span class="ruby-identifier">pg_range_op</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">545</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">546</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_range_op'>

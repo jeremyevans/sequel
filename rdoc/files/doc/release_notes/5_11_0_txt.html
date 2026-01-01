@@ -33,7 +33,7 @@ doc/release_notes/5.11.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports more window frame specification types when using window functions.  You can now provide the window frame specification as a hash, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will format the correct SQL.  Specifically, this adds support for RANGE and GROUPS, numeric offsets, and EXCLUDE on a database that supports it (e.g. PostgreSQL 11+).  Examples:</p>
 
@@ -83,7 +83,7 @@ doc/release_notes/5.11.0.txt
 <p>Dataset#window for the WINDOW clause has been moved from the PostgreSQL-specific support to core, and has been enabled on MySQL 8+ and SQLAnywhere.  This allows you to specify a shared window specification in a query, which can be used by multiple window functions.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>When using the static_cache plugin, Model.first when called without a block and without arguments or with a single Integer argument now uses the cached values instead of issuing a query.</p>
 </li><li>

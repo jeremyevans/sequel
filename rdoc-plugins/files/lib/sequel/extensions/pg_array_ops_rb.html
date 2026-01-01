@@ -33,7 +33,7 @@ lib/sequel/extensions/pg_array_ops.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_array_ops extension adds support to Sequel’s DSL to make it easier to call PostgreSQL array functions and operators.</p>
+<p>The <a href="pg_array_ops_rb.html">pg_array_ops</a> extension adds support to Sequel’s DSL to make it easier to call PostgreSQL array functions and operators.</p>
 
 <p>To load the extension:</p>
 
@@ -45,17 +45,17 @@ lib/sequel/extensions/pg_array_ops.rb
 <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>(<span class="ruby-value">:int_array_column</span>)
 </pre>
 
-<p>If you have also loaded the pg_array extension, you can use Sequel.pg_array as well:</p>
+<p>If you have also loaded the <a href="pg_array_rb.html">pg_array</a> extension, you can use Sequel.pg_array as well:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-value">:int_array_column</span>)
 </pre>
 
-<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the pg_array method:</p>
+<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the <a href="pg_array_rb.html">pg_array</a> method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:int_array_column</span>].<span class="ruby-identifier">pg_array</span>
 </pre>
 
-<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/ArrayOpMethods.html#method-i-pg_array"><code>Symbol#pg_array</code></a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the <a href="core_refinements_rb.html">core_refinements</a> extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/ArrayOpMethods.html#method-i-pg_array"><code>Symbol#pg_array</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-value">:int_array_column</span>.<span class="ruby-identifier">pg_array</span>
 </pre>
@@ -100,9 +100,9 @@ lib/sequel/extensions/pg_array_ops.rb
 
 <p>See the PostgreSQL array function and operator documentation for more details on what these functions and operators do.</p>
 
-<p>If you are also using the pg_array extension, you should load it before loading this extension.  Doing so will allow you to use PGArray#op to get an ArrayOp, allowing you to perform array operations on array literals.</p>
+<p>If you are also using the <a href="pg_array_rb.html">pg_array</a> extension, you should load it before loading this extension.  Doing so will allow you to use PGArray#op to get an ArrayOp, allowing you to perform array operations on array literals.</p>
 
-<p>In order for hstore to automatically wrap the returned value correctly in an HStoreOp, you need to load the pg_hstore_ops extension.</p>
+<p>In order for hstore to automatically wrap the returned value correctly in an HStoreOp, you need to load the <a href="pg_hstore_ops_rb.html">pg_hstore_ops</a> extension.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/Postgres/ArrayOp.html"><code>Sequel::Postgres::ArrayOp</code></a></p>
 </div>

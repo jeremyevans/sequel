@@ -33,7 +33,7 @@ doc/release_notes/5.40.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>On SQLite <a href="3_33_0_txt.html">3.33.0</a>+, the UPDATE FROM syntax is now supported. This allows you to update one table based on a join to another table. The SQLite syntax is based on the PostgreSQL syntax, and the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> API is the same for both.  You need to pass multiple tables to Dataset#from.  The first table is the table to update, and the remaining tables are used to construct the UPDATE FROM clause:</p>
 
@@ -49,14 +49,14 @@ doc/release_notes/5.40.0.txt
 </li></ul>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The pg_interval and date_arithmetic extensions now support ActiveSupport 6.1.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer issues method redefinition warnings in verbose mode.  As Ruby 3 has dropped uninitialized instance variable warnings, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now verbose warning free on Ruby 3.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Trying to truncate or insert into a joined dataset now correctly raises an exception even if the joined dataset supports updates.</p>
 </li><li>

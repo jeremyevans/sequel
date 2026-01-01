@@ -33,7 +33,7 @@ doc/release_notes/5.83.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>MERGE WHEN NOT MATCHED BY SOURCE is now supported when using PostgreSQL 17+.  You can use this SQL syntax via the following Dataset methods:</p>
 <ul><li>
@@ -53,7 +53,7 @@ doc/release_notes/5.83.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Database#inspect now only displays the database type, host, database name, and user.  In addition to being easier to read, this also prevents displaying the password, enhancing security.</p>
 </li><li>
@@ -66,7 +66,7 @@ doc/release_notes/5.83.0.txt
 <p>Database#create_temp with :temp option and an SQL::QualifiedIdentifier table name will now attempt to create a schema qualified table.  Note that schema qualified temporary tables are not supported by many (any?) databases, but this change prevents the CREATE TABLE statement from succeeding with an unexpected table name.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>The Database.uri_to_options private class method now handles conversion of URI parameters to options.  Previously, this was handled by callers of this method (change reverted in 5.83.1).</p>
 </li><li>

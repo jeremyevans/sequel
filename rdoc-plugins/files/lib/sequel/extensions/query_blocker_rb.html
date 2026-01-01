@@ -33,7 +33,7 @@ lib/sequel/extensions/query_blocker.rb
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The query_blocker extension adds Database#block_queries. Inside the block passed to block_queries, any attempts to execute a query/statement on the database will raise a <a href="../../../../classes/Sequel/QueryBlocker/BlockedQuery.html"><code>Sequel::QueryBlocker::BlockedQuery</code></a> exception.</p>
+<p>The <a href="query_blocker_rb.html">query_blocker</a> extension adds Database#block_queries. Inside the block passed to block_queries, any attempts to execute a query/statement on the database will raise a <a href="../../../../classes/Sequel/QueryBlocker/BlockedQuery.html"><code>Sequel::QueryBlocker::BlockedQuery</code></a> exception.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_blocker</span>
 <span class="ruby-constant">DB</span>.<span class="ruby-identifier">block_queries</span> <span class="ruby-keyword">do</span>

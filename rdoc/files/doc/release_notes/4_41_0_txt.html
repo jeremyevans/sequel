@@ -33,7 +33,7 @@ doc/release_notes/4.41.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>Dataset#with_* methods have been added as equivalents for a few Dataset#*= methods, but instead of modifying the receiver, they return a modified copy, similar to the dataset query methods. Specific methods added:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>with_extend </td><td>
@@ -59,7 +59,7 @@ doc/release_notes/4.41.0.txt
 </pre>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>The association dataset methods now correctly handle cases where one of the keys is nil.  Previously, they would incorrectly use an IS NULL predicate in such cases.  Now, they use a false predicate.</p>
 </li><li>
@@ -74,7 +74,7 @@ doc/release_notes/4.41.0.txt
 <p>Pure java exceptions that don’t support the message= method are now handled properly when reraising the exception on connection errors in the jdbc adapter.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>Support for using the Bignum constant as a generic type has been removed, as was preannounced in the <a href="4_36_0_txt.html">4.36.0</a> release notes.  Users should switch to using the :Bignum constant if they haven’t already.</p>
 </li><li>

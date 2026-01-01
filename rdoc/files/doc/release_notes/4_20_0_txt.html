@@ -33,7 +33,7 @@ doc/release_notes/4.20.0.txt
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
 <ul><li>
 <p>A :before_retry option has been added to Database#transaction, which specifies a proc to call when retrying if the :retry_on option is used.  This can be used to implement additional logging, sleeping between retries, or other things.</p>
 </li><li>
@@ -44,7 +44,7 @@ doc/release_notes/4.20.0.txt
 <p>You can now set the :instance_specific association option to false. Previously, it was automatically set to true in some cases.  If you know the association does not depend on anything instance-specific other than the foreign/primary key, setting this option can allow <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to perform some additional optimizations.</p>
 </li></ul>
 
-<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
 <ul><li>
 <p>Eager loading queries are now skipped if there are no matching keys. There was code to check this previously, but it was accidently removed in an earlier refactoring.</p>
 </li><li>
@@ -73,7 +73,7 @@ doc/release_notes/4.20.0.txt
 <p>The swift adapter now respects database and application timezone settings.</p>
 </li></ul>
 
-<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Backwards+Compatibility"><a href="#label-Backwards+Compatibility">Backwards Compatibility</a></h1>
 <ul><li>
 <p>AssociationReflection#apply_ruby_eager_limit_strategy no longer checks that the strategy is :ruby, callers are now expected to check the value themselves.  This should only matter if you are using custom association types.</p>
 </li></ul>

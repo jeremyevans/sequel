@@ -214,7 +214,7 @@ Project.association_reflection(:portfolio)
 
 <p>The following options can be supplied:</p>
 
-<h3 id="method-i-associate-label-Multiple+Types">Multiple Types<span><a href="#method-i-associate-label-Multiple+Types">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="method-i-associate-label-Multiple+Types"><a href="#method-i-associate-label-Multiple+Types">Multiple Types</a></h3>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adder </td><td>
 <p>Proc used to define the private <em>add</em>* method for doing the database work to associate the given object to the current object (*_to_many assocations). Set to nil to not define a add_* method for the association.</p>
 </td></tr><tr><td class='label'>:after_add </td><td>
@@ -321,7 +321,7 @@ Project.association_reflection(:portfolio)
 <p>Set to false to not validate when implicitly saving any associated object.</p>
 </td></tr></tbody></table>
 
-<h3 id="method-i-associate-label-3Amany_to_one">:many_to_one<span><a href="#method-i-associate-label-3Amany_to_one">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="method-i-associate-label-3Amany_to_one"><a href="#method-i-associate-label-3Amany_to_one">:many_to_one</a></h3>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:key </td><td>
 <p>foreign key in current model’s table that references associated model’s primary key, as a symbol.  Defaults to :“#{name}_id”.  Can use an array of symbols for a composite key association.</p>
 </td></tr><tr><td class='label'>:key_column </td><td>
@@ -334,7 +334,7 @@ Project.association_reflection(:portfolio)
 <p>Whether to use qualified primary keys when loading the association.  The default is true, so you must set to false to not qualify.  Qualification rarely causes problems, but it’s necessary to disable in some cases, such as when you are doing a JOIN USING operation on the column on Oracle.</p>
 </td></tr></tbody></table>
 
-<h3 id="method-i-associate-label-3Aone_to_many+and+-3Aone_to_one">:one_to_many and :one_to_one<span><a href="#method-i-associate-label-3Aone_to_many+and+-3Aone_to_one">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="method-i-associate-label-3Aone_to_many+and+-3Aone_to_one"><a href="#method-i-associate-label-3Aone_to_many+and+-3Aone_to_one">:one_to_many and :one_to_one</a></h3>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:key </td><td>
 <p>foreign key in associated model’s table that references current model’s primary key, as a symbol.  Defaults to :“#{self.name.underscore}_id”.  Can use an array of symbols for a composite key association.</p>
 </td></tr><tr><td class='label'>:key_method </td><td>
@@ -347,7 +347,7 @@ Project.association_reflection(:portfolio)
 <p>Do not raise exceptions for hook or validation failures when saving associated objects in the add/remove methods (return nil instead) [one_to_many only].</p>
 </td></tr></tbody></table>
 
-<h3 id="method-i-associate-label-3Amany_to_many+and+-3Aone_through_one">:many_to_many and :one_through_one<span><a href="#method-i-associate-label-3Amany_to_many+and+-3Aone_through_one">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="method-i-associate-label-3Amany_to_many+and+-3Aone_through_one"><a href="#method-i-associate-label-3Amany_to_many+and+-3Aone_through_one">:many_to_many and :one_through_one</a></h3>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:graph_join_table_block </td><td>
 <p>The block to pass to <code>join_table</code> for the join table when eagerly loading the association via <code>eager_graph</code>.</p>
 </td></tr><tr><td class='label'>:graph_join_table_conditions </td><td>
