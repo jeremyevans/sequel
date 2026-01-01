@@ -1,0 +1,19 @@
+= New Features
+
+* A single_statement_dataset_destroy plugin has been added. This
+  plugin will run the before_destroy hooks for all instances, then run
+  a DELETE statement on the dataset, then run the after_destroy hooks
+  for all instances. However, this optimized form will not be used if
+  the model uses a custom around_destroy hook.
+
+* The set_column_type schema modification method now supports a
+  :collate option on PostgreSQL 9.1+ and MySQL.
+
+= Other Improvements
+
+* The unused_associations plugin no longer reports associations with
+  the :is_used option as unused. Previously, the :is_used option only
+  disabled changes by the :modify_associations plugin option.
+
+* Postgres::PGRange#to_s is now an alias of #inspect, so it also uses 
+  the friendly inspect output added in 5.97.0.

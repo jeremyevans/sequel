@@ -1,4 +1,4 @@
-=== master
+=== 5.100.0 (2026-01-01)
 
 * Do not report associations with :is_used option as unused in the unused_associations plugin (jeremyevans)
 
