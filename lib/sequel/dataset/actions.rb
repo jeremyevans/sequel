@@ -372,6 +372,15 @@ module Sequel
     #   DB[:table].import([:x, :y], DB[:table2].select(:a, :b))
     #   # INSERT INTO table (x, y) SELECT a, b FROM table2 
     #
+    # The return value of this method is undefined and should not be used,
+    # except in two cases:
+    #
+    # * When the <tt>return: :primary_key</tt> option is used.
+    # * On PostgreSQL, when the dataset uses RETURNING. In this case, if
+    #   a single value is returned per row, the return value is an array
+    #   of those values. If multiple values are returned per row, the
+    #   return value is an array of hashes.
+    #
     # Options:
     # :commit_every :: Open a new transaction for every given number of
     #                  records. For example, if you provide a value of 50,
