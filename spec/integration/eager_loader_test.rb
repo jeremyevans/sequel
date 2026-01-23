@@ -59,7 +59,13 @@ describe "Eagerly loading a tree structure" do
       end)
     end
     
-    Node.insert(:parent_id=>1)
+    if DB.database_type == :mysql && !DB.mariadb? && DB.server_version >= 90600
+      # Work around regression in MySQL 9.6.0
+      Node.insert(:parent_id=>nil)
+      Node.dataset.update(:parent_id=>1)
+    else
+      Node.insert(:parent_id=>1)
+    end
     Node.insert(:parent_id=>1)
     Node.insert(:parent_id=>1)
     Node.insert(:parent_id=>2)
