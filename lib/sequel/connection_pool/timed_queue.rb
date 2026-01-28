@@ -42,7 +42,7 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
       while true
         conn = nil
         begin
-          break unless (conn = @queue.pop(timeout: 0)) && !conns[conn]
+          break unless (conn = available) && !conns[conn]
           conns[conn] = true
           yield conn
         ensure
@@ -59,7 +59,7 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
   def disconnect(opts=OPTS)
-    while conn = @queue.pop(timeout: 0)
+    while conn = available
       disconnect_connection(conn)
     end
     fill_queue
@@ -220,12 +220,25 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   #
   # Calling code should not have the mutex when calling this.
   def acquire(thread)
-    if conn = @queue.pop(timeout: 0) || try_make_new || @queue.pop(timeout: @timeout)
+    if conn = available || try_make_new || wait_until_available
       sync{@allocated[thread] = conn}
     else
       name = db.opts[:name]
       raise ::Sequel::PoolTimeout, "timeout: #{@timeout}#{", database name: #{name}" if name}"
     end
+  end
+
+  # Return the next connection in the pool if there is one available. Returns nil
+  # if no connection is currently available.
+  def available
+    @queue.pop(timeout: 0)
+  end
+
+  # Return the next connection in the pool if there is one available. If not, wait
+  # until the timeout for a connection to become available. If there is still no
+  # available connection, return nil.
+  def wait_until_available
+    @queue.pop(timeout: @timeout)
   end
 
   # Returns the connection owned by the supplied thread,

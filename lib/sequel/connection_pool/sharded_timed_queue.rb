@@ -71,7 +71,7 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
       while true
         conn = nil
         begin
-          break unless (conn = queue.pop(timeout: 0)) && !conns[conn]
+          break unless (conn = available(queue, server)) && !conns[conn]
           conns[conn] = true
           yield conn
         ensure
@@ -95,7 +95,7 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
   def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : sync{@servers.keys}).each do |server|
       raise Sequel::Error, "invalid server" unless queue = sync{@queues[server]}
-      while conn = queue.pop(timeout: 0)
+      while conn = available(queue, server)
         disconnect_pool_connection(conn, server)
       end
       fill_queue(server)
@@ -167,7 +167,7 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
 
         queue = @queues[server]
 
-        while conn = queue.pop(timeout: 0)
+        while conn = available(queue, server)
           @sizes[server] -= 1
           conns << conn
         end
@@ -311,12 +311,25 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
   # Calling code should not have the mutex when calling this.
   def acquire(thread, server)
     queue = sync{@queues[server]}
-    if conn = queue.pop(timeout: 0) || try_make_new(server) || queue.pop(timeout: @timeout)
+    if conn = available(queue, server) || try_make_new(server) || wait_until_available(queue, server)
       sync{@allocated[server][thread] = conn}
     else
       name = db.opts[:name]
       raise ::Sequel::PoolTimeout, "timeout: #{@timeout}, server: #{server}#{", database name: #{name}" if name}"
     end
+  end
+
+  # Return the next connection in the pool if there is one available. Returns nil
+  # if no connection is currently available.
+  def available(queue, _server)
+    queue.pop(timeout: 0)
+  end
+
+  # Return the next connection in the pool if there is one available. If not, wait
+  # until the timeout for a connection to become available. If there is still no
+  # available connection, return nil.
+  def wait_until_available(queue, _server)
+    queue.pop(timeout: @timeout)
   end
 
   # Returns the connection owned by the supplied thread for the given server,
