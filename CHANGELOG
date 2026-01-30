@@ -1,3 +1,7 @@
+=== master
+
+* Add connection_checkout_event_callback extension to assist in collecting telemetry information (jeremyevans)
+
 === 5.101.0 (2026-02-01)
 
 * Add detect_unnecessary_association_options plugin to warn/raise for unnecessary association options (jeremyevans)
