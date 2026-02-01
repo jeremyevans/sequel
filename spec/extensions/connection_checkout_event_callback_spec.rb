@@ -42,25 +42,21 @@ end
 
       q = Queue.new
       q2 = Queue.new
-      t = Thread.new do
+      db_thread = proc do
         db.synchronize do
           q2.push(true)
           _(q.pop(timeout: 1)).must_equal true
         end
         true
       end
+
+      t = Thread.new(&db_thread)
       q2.pop(timeout: 1).must_equal true
       events.must_equal [wrap(:immediately_available)]
       events.clear
 
-      t2 = Thread.new do
-        db.synchronize do
-          q2.push(true)
-          _(q.pop(timeout: 1)).must_equal true
-        end
-        true
-      end
-      10.times{Thread.pass}
+      t2 = Thread.new(&db_thread)
+      sleep 0.001 until db.pool.num_waiting > 0
       q.push(true)
       q2.pop(timeout: 1).must_equal true
       q.push(true)
