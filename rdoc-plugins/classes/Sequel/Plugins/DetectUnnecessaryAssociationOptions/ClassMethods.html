@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::DetectUnnecessaryAssociationOptions::ClassMethods</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::DetectUnnecessaryAssociationOptions::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/detect_unnecessary_association_options_rb.html">lib/sequel/plugins/detect_unnecessary_association_options.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-detect_unnecessary_association_options">detect_unnecessary_association_options</a></li>
+<li><a href="#method-i-finalize_associations">finalize_associations</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-detect_unnecessary_association_options'>
+<a name='method-i-detect_unnecessary_association_options'></a>
+<div class='synopsis'>
+<span class='name'>detect_unnecessary_association_options</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Check for unnecessary association options.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-detect_unnecessary_association_options-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-detect_unnecessary_association_options-source'>   <span class="ruby-comment"># File lib/sequel/plugins/detect_unnecessary_association_options.rb</span>
+<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">detect_unnecessary_association_options</span>
+<span class="line-num">68</span>   <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ref</span><span class="ruby-operator">|</span>
+<span class="line-num">69</span>     <span class="ruby-identifier">meth</span> = <span class="ruby-node">&quot;detect_unnecessary_association_options_#{ref[:type]}&quot;</span>
+<span class="line-num">70</span>     <span class="ruby-comment"># Expected to call private methods.</span>
+<span class="line-num">71</span>     <span class="ruby-comment"># Ignore unrecognized association types.</span>
+<span class="line-num">72</span>     <span class="ruby-comment"># External association types can define the appropriate method to</span>
+<span class="line-num">73</span>     <span class="ruby-comment"># support their own unnecessary association option checks.</span>
+<span class="line-num">74</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-keyword">true</span>)
+<span class="line-num">75</span>       <span class="ruby-comment"># All recognized association types need same class check</span>
+<span class="line-num">76</span>       <span class="ruby-identifier">_detect_unnecessary_association_options_class</span>(<span class="ruby-identifier">ref</span>)
+<span class="line-num">77</span>       <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">ref</span>)
+<span class="line-num">78</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">79</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">80</span> 
+<span class="line-num">81</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-finalize_associations'>
+<a name='method-i-finalize_associations'></a>
+<div class='synopsis'>
+<span class='name'>finalize_associations</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Implicitly check for unnecessary association options when finalizing associations.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-finalize_associations-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-finalize_associations-source'>   <span class="ruby-comment"># File lib/sequel/plugins/detect_unnecessary_association_options.rb</span>
+<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">finalize_associations</span>
+<span class="line-num">61</span>   <span class="ruby-identifier">res</span> = <span class="ruby-keyword">super</span>
+<span class="line-num">62</span>   <span class="ruby-identifier">detect_unnecessary_association_options</span>
+<span class="line-num">63</span>   <span class="ruby-identifier">res</span>
+<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

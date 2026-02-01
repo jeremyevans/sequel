@@ -1,4 +1,4 @@
-Thu, 01 Jan 2026 09:09:31 -0800
+Sun, 01 Feb 2026 09:16:56 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -133,6 +133,7 @@ lib/sequel/plugins/def_dataset_method.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/defaults_setter.rb	Thu, 25 Jul 2024 10:41:27 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/deprecated_associations.rb	Wed, 01 Oct 2025 09:18:52 -0700
+lib/sequel/plugins/detect_unnecessary_association_options.rb	Mon, 05 Jan 2026 09:27:00 -0800
 lib/sequel/plugins/dirty.rb	Fri, 21 Oct 2022 08:19:04 -0700
 lib/sequel/plugins/eager_each.rb	Fri, 16 Jun 2017 12:40:57 -0700
 lib/sequel/plugins/eager_graph_eager.rb	Mon, 06 Aug 2018 08:40:06 -0700

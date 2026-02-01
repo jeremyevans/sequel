@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.101.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.101.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.101.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
+<ul><li>
+<p>A detect_unnecessary_association_options plugin has been added, which warns or raises for unnecessary association options. For example, if you have an association such as:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">class:</span> <span class="ruby-value">:Artist</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:artist_id</span>
+</pre>
+
+<p>The plugin can inform you that the :class and :key options are unnecessary, since they are the same as Sequel’s defaults for the options. That allows you to remove the unnecessary options:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>
+</pre>
+
+<p>The following unnecessary options are detected:</p>
+<ul><li>
+<p>:class (all associations)</p>
+</li><li>
+<p>:key and :primary_key (associations without join tables)</p>
+</li><li>
+<p>:join_table, :left_key, :right_key, :left_primary_key, :right_primary_key (single join table associations)</p>
+</li><li>
+<p>:left_primary_key, :right_primary_key (*_through_many associations)</p>
+</li></ul>
+
+<p>To use the plugin, generally you would load it into the base model class before loading subclasses:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:detect_unnecessary_association_options</span>
+</pre>
+
+<p>After loading subclasses, you would call the detect_unnecessary_association_options method on the subclasses. If you are using the subclasses plugin, this can be done via:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">descendants</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:detect_unnecessary_association_options</span>)
+</pre>
+
+<p>Detection also happens implicitly when finalizing associations, so the following will also work with the subclasses plugin:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendants</span>
+</pre>
+
+<p>By default, the plugin warns for unnecessary association options. To have it raise an error instead:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:detect_unnecessary_association_options</span>, <span class="ruby-value">action:</span> <span class="ruby-value">:raise</span>
+</pre>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

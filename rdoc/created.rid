@@ -1,6 +1,6 @@
-Thu, 01 Jan 2026 09:09:02 -0800
+Sun, 01 Feb 2026 09:16:27 -0800
 README.rdoc	Sun, 23 Nov 2025 09:58:00 -0800
-CHANGELOG	Thu, 01 Jan 2026 08:57:49 -0800
+CHANGELOG	Sun, 01 Feb 2026 09:06:08 -0800
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Tue, 03 Jan 2023 11:20:51 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,14 +14,14 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Thu, 01 Jan 2026 08:57:49 -0800
+lib/sequel/version.rb	Sun, 01 Feb 2026 09:06:08 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Thu, 24 Jul 2025 11:17:44 -0700
 lib/sequel/connection_pool/single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/timed_queue.rb	Thu, 24 Jul 2025 11:17:44 -0700
-lib/sequel/dataset/actions.rb	Sun, 23 Nov 2025 09:58:00 -0800
+lib/sequel/dataset/actions.rb	Mon, 05 Jan 2026 11:38:03 -0800
 lib/sequel/dataset/dataset_module.rb	Wed, 13 Mar 2024 15:31:48 -0700
 lib/sequel/dataset/deprecated_singleton_class_methods.rb	Thu, 16 Jan 2025 09:58:39 -0800
 lib/sequel/dataset/features.rb	Fri, 29 Dec 2023 08:57:16 -0800
@@ -202,6 +202,7 @@ doc/release_notes/5.0.0.txt	Fri, 01 Sep 2017 17:57:51 -0700
 doc/release_notes/5.1.0.txt	Sun, 01 Oct 2017 09:19:35 -0700
 doc/release_notes/5.10.0.txt	Sun, 01 Jul 2018 09:35:21 -0700
 doc/release_notes/5.100.0.txt	Thu, 01 Jan 2026 08:57:49 -0800
+doc/release_notes/5.101.0.txt	Sun, 01 Feb 2026 09:06:08 -0800
 doc/release_notes/5.11.0.txt	Wed, 01 Aug 2018 08:13:54 -0700
 doc/release_notes/5.12.0.txt	Fri, 31 Aug 2018 08:39:42 -0700
 doc/release_notes/5.13.0.txt	Mon, 01 Oct 2018 07:21:49 -0700

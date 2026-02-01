@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::DetectUnnecessaryAssociationOptions</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::DetectUnnecessaryAssociationOptions
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/detect_unnecessary_association_options_rb.html">lib/sequel/plugins/detect_unnecessary_association_options.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The <a href="../../../files/lib/sequel/plugins/detect_unnecessary_association_options_rb.html">detect_unnecessary_association_options</a> plugin can detect unnecessary association options, and either warn or raise if they are detected. This allows you to find and remove the unnecessary options. Association options are considered unnecessary if they specify the same value as Sequel’s defaults.</p>
+
+<p>To detect unnecessary association options, you should load the plugin into your model base class (e.g. <a href="../Model.html"><code>Sequel::Model</code></a>) before loading your model classes. Then, after all models have been loaded, you can call the <a href="../../../files/lib/sequel/plugins/detect_unnecessary_association_options_rb.html">detect_unnecessary_association_options</a> on each to check for unnecessary association options. Additionally, if you are calling finalize_associations, it will automatically check for unnecessary association options.</p>
+
+<p>A typical usage would be to combine this with the subclasses plugin:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:detect_unnecessary_association_options</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>
+<span class="ruby-comment"># load model classes</span>
+
+<span class="ruby-comment"># implicitly check all subclasses when freezing descendants</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendants</span>
+
+<span class="ruby-comment"># or, if not freezing all descendants</span>
+<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">descendants</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:detect_unnecessary_association_options</span>)
+</pre>
+
+<p>By default, the plugin warns for every unnecessary association option. To raise an error instead, you can pass the <code>action: :raise</code> option when loading the plugin:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:detect_unnecessary_association_options</span>, <span class="ruby-value">action:</span> <span class="ruby-value">:raise</span>
+</pre>
+
+<p>This plugin only detects the most common unnecessary association options, such as:</p>
+<ul><li>
+<p>:class (all associations)</p>
+</li><li>
+<p>:key and :primary_key (associations without join tables)</p>
+</li><li>
+<p>:join_table, :left_key, :right_key, :left_primary_key, :right_primary_key (single join table associations)</p>
+</li><li>
+<p>:left_primary_key, :right_primary_key (*_through_many associations)</p>
+</li></ul>
+
+<p>Only association types supported by default or supported by a plugin that ships with <a href="../../Sequel.html"><code>Sequel</code></a> are supported by this plugin. Other association types are ignored.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="DetectUnnecessaryAssociationOptions/ClassMethods.html">Sequel::Plugins::DetectUnnecessaryAssociationOptions::ClassMethods</a></li>
+<li><a href="DetectUnnecessaryAssociationOptions/UnnecessaryAssociationOption.html">Sequel::Plugins::DetectUnnecessaryAssociationOptions::UnnecessaryAssociationOption</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span><span class='arguments'>(model, opts={})</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/detect_unnecessary_association_options.rb</span>
+<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>={})
+<span class="line-num">48</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@detect_unnecessary_association_options_action</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:action</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:warn</span>)
+<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
