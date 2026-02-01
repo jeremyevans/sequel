@@ -1,0 +1,43 @@
+= New Features
+
+* A detect_unnecessary_association_options plugin has been added,
+  which warns or raises for unnecessary association options. For
+  example, if you have an association such as:
+
+    Album.many_to_one :artist, class: :Artist, key: :artist_id
+
+  The plugin can inform you that the :class and :key options are
+  unnecessary, since they are the same as Sequel's defaults for
+  the options. That allows you to remove the unnecessary options:
+
+    Album.many_to_one :artist
+
+  The following unnecessary options are detected:
+
+  * :class (all associations)
+  * :key and :primary_key (associations without join tables)
+  * :join_table, :left_key, :right_key, :left_primary_key,
+    :right_primary_key (single join table associations)
+  * :left_primary_key, :right_primary_key (*_through_many
+    associations)
+
+  To use the plugin, generally you would load it into the base model
+  class before loading subclasses:
+
+    Sequel::Model.plugin :detect_unnecessary_association_options
+
+  After loading subclasses, you would call the 
+  detect_unnecessary_association_options method on the subclasses.
+  If you are using the subclasses plugin, this can be done via:
+
+    Sequel::Model.descendants.each(&:detect_unnecessary_association_options)
+
+  Detection also happens implicitly when finalizing associations,
+  so the following will also work with the subclasses plugin:
+
+    Sequel::Model.freeze_descendants
+
+  By default, the plugin warns for unnecessary association options.
+  To have it raise an error instead:
+
+    Sequel::Model.plugin :detect_unnecessary_association_options, action: :raise
