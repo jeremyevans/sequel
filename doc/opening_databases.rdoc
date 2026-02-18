@@ -66,7 +66,7 @@ Note that if you do not pass a block to Sequel.connect, Sequel will automaticall
 reference to the object in the <tt>Sequel::DATABASES</tt> array.  So calling +Sequel.connect+
 multiple times (say once per request), can result in a memory leak.  For any application where
 database access is needed for a long period of time, it's best to store the result of
-Sequel.connection in a constant, as recommended above.
++Sequel.connect+ in a constant, as recommended above.
 
 == Using the Sequel.connect method
 == General connection options
