@@ -395,7 +395,7 @@ The following additional options are supported:
 :readonly :: open database in read-only mode
 :timeout :: the busy timeout to use in milliseconds (default: 5000).
 :setup_regexp_function :: Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so
-                          allows you to use regexp support in dataset expressions.  If +:cached+ or <tt>"cached"</tt>+, caches each
+                          allows you to use regexp support in dataset expressions.  If +:cached+ or <tt>"cached"</tt>, caches each
                           unique regex (more efficient but risk of memory leak). If a Proc is provided, it will be called with
                           a string for the regexp and a string for the value to compare, and should return whether the regexp
                           string matches the string value to compare. The default Proc used does <tt>Regexp.new(regexp_str).match(str)</tt>.
