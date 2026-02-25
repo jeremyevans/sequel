@@ -225,6 +225,12 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
     conns.each{|conn| disconnect_connection(conn)}
   end
 
+  # Only for use by extension that need to disconnect a connection inside acquire.
+  # Takes the connection and any arguments accepted by acquire.
+  def disconnect_acquired_connection(conn, _, server)
+    disconnect_pool_connection(conn, server)
+  end
+
   # Decrement the current size of the pool for the server when disconnecting connections.
   #
   # Calling code should not have the mutex when calling this.

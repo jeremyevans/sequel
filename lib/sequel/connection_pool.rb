@@ -131,6 +131,12 @@ class Sequel::ConnectionPool
     db.disconnect_connection(conn)
   end
 
+  # Only for use by extension that need to disconnect a connection inside acquire.
+  # Takes the connection and any arguments accepted by acquire.
+  def disconnect_acquired_connection(conn, *)
+    disconnect_connection(conn)
+  end
+
   # Whether the given exception is a disconnect exception.
   def disconnect_error?(exception)
     exception.is_a?(Sequel::DatabaseDisconnectError) || db.send(:disconnect_error?, exception, OPTS)

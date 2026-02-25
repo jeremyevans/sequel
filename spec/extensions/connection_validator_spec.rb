@@ -53,6 +53,7 @@ connection_validator_specs = Module.new do
     c2 = @db.synchronize{|c| c}
     @db.sqls.must_equal ['SELECT NULL', 'disconnect']
     c2.wont_be_same_as(c1)
+    @db.pool.size.must_equal 1
   end
 
   it "should assume that exceptions raised during valid_connection mean the connection is not valid" do

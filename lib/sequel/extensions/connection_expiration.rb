@@ -91,7 +91,7 @@ module Sequel
             sync{@allocated.delete(Sequel.current)}
           end
 
-          disconnect_connection(conn)
+          disconnect_acquired_connection(conn, *a)
           redo
         end
       end

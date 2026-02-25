@@ -47,6 +47,7 @@ connection_expiration_specs = Module.new do
     c2 = @db.synchronize{|c| c}
     @db.sqls.must_equal ['disconnect']
     c2.wont_be_same_as(c1)
+    @db.pool.size.must_equal 1
   end
 
   it "should disconnect only expired connections among multiple" do
