@@ -525,6 +525,17 @@ concurrent_connection_pool_specs = Module.new do
     exceptions = []
     q, q1, q2, q3 = Queue.new, Queue.new, Queue.new, Queue.new
     b = @icpp
+
+    case @pool.pool_type
+    when :timed_queue, :sharded_timed_queue 
+      # Avoid nondeterministic behavior
+      @pool.define_singleton_method(:fill_queue) do |*a|
+        if thread = super(*a)
+          thread.join(1)
+        end
+      end
+    end
+
     @pool.db.singleton_class.send(:alias_method, :connect, :connect)
     @pool.db.define_singleton_method(:connect) do |server|
       b.call
