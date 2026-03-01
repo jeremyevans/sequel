@@ -91,14 +91,16 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
   # creates new connections to the database.
   #
   # If the :server option is provided, it should be a symbol or array of symbols,
-  # and then the method will only disconnect connectsion from those specified shards.
+  # and then the method will only disconnect connections from those specified shards.
   def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : sync{@servers.keys}).each do |server|
       raise Sequel::Error, "invalid server" unless queue = sync{@queues[server]}
+      nconns = 0
       while conn = available(queue, server)
+        nconns += 1
         disconnect_pool_connection(conn, server)
       end
-      fill_queue(server)
+      fill_queue(server, nconns)
     end
     nil
   end
@@ -132,7 +134,7 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
         conn = nil
         disconnect_pool_connection(oconn, server) if oconn
         sync{@allocated[server].delete(t)}
-        fill_queue(server)
+        fill_queue(server, 1)
       end
       raise
     ensure
@@ -250,11 +252,15 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
   # after disconnecting to potentially add new connections to the
   # pool, so the threads that are currently waiting for connections
   # do not timeout after the pool is no longer full.
-  def fill_queue(server)
+  #
+  # nconns specifies the maximum number of connections to add, which should
+  # be the number of connections that were disconnected.
+  def fill_queue(server, nconns)
     queue = sync{@queues[server]}
-    if queue.num_waiting > 0
+    if nconns > 0 && queue.num_waiting > 0
       Thread.new do
-        while queue.num_waiting > 0 && (conn = try_make_new(server))
+        while nconns > 0 && queue.num_waiting > 0 && (conn = try_make_new(server))
+          nconns -= 1
           queue.push(conn)
         end
       end
@@ -303,7 +309,7 @@ class Sequel::ShardedTimedQueueConnectionPool < Sequel::ConnectionPool
     ensure
       if to_disconnect
         to_disconnect.each{|conn| disconnect_pool_connection(conn, server)}
-        fill_queue(server)
+        fill_queue(server, to_disconnect.size)
       end
     end
   end

@@ -59,10 +59,12 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
   def disconnect(opts=OPTS)
+    nconns = 0
     while conn = available
+      nconns += 1
       disconnect_connection(conn)
     end
-    fill_queue
+    fill_queue(nconns)
     nil
   end
 
@@ -94,7 +96,7 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
         conn = nil
         disconnect_connection(oconn) if oconn
         sync{@allocated.delete(t)}
-        fill_queue
+        fill_queue(1)
       end
       raise
     ensure
@@ -156,10 +158,13 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
   # after disconnecting to potentially add new connections to the
   # pool, so the threads that are currently waiting for connections
   # do not timeout after the pool is no longer full.
-  def fill_queue
-    if @queue.num_waiting > 0
+  #
+  # nconns specifies the maximum number of connections to add, which should
+  # be the number of connections that were disconnected.
+  def fill_queue(nconns)
+    if nconns > 0 && @queue.num_waiting > 0
       Thread.new do
-        while @queue.num_waiting > 0 && (conn = try_make_new)
+        while nconns > 0 && @queue.num_waiting > 0 && (conn = try_make_new)
           @queue.push(conn)
         end
       end
@@ -207,7 +212,7 @@ class Sequel::TimedQueueConnectionPool < Sequel::ConnectionPool
     ensure
       if to_disconnect
         to_disconnect.each{|conn| disconnect_connection(conn)}
-        fill_queue
+        fill_queue(to_disconnect.size)
       end
     end
   end
