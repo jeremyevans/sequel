@@ -1,6 +1,6 @@
-=== master
+=== 5.102.0 (2026-03-01)
 
-* Make connection_validator and connection_expiration extensions correct handle shared_timed_queue connection pool (jeremyevans) (#2354)
+* Make connection_validator and connection_expiration extensions correct handle sharded_timed_queue connection pool (jeremyevans) (#2354)
 
 * Add connection_checkout_event_callback extension to assist in collecting telemetry information (jeremyevans)
 
@@ -102,7 +102,7 @@
 
 === 5.95.0 (2025-08-01)
 
-* Support num_waiting for the timed_queue and shared_timed_queue connection pools (jeremyevans)
+* Support num_waiting for the timed_queue and sharded_timed_queue connection pools (jeremyevans)
 
 * Add class_table_inheritance_constraint_validations plugin, supporting constraint validations for all of the model's tables (sterlzbd, jeremyevans) (#2316, #2319)
 

@@ -1,0 +1,46 @@
+= New Features
+
+* A connection_checkout_event_callback Database extension has been
+  added, which allows for collecting telemetry information about
+  connection checkouts. This can be used to create metrics to see how
+  well the connection pool is functioning, which allows you to better
+  determine whether the current pool size is working well for the
+  application.
+
+  After loading the extension:
+
+    DB.extension(:connection_checkout_event_callback)
+
+  You then set the callback proc, which is yielded either one of three
+  symbols, or a Float if the checkout request had to wait for a
+  connection to become available from the pool.
+
+    # |event, server| for sharded connection pools
+    DB.pool.on_checkout_event = proc do |event|
+      case event
+      when :immediately_available
+        # Connection immediately available from pool
+      when :not_immediately_available
+        # Connection not immediately available
+      when :new_connection
+        # New connection created (only happens after a connection is
+        # not immediately available)
+      else # event is a Float
+        # Seconds waiting for a connection (only happens after a
+        # connection is not immediately available and the pool is
+        # already at maximum size)
+      end
+    end
+
+  This extension is only supported if the timed_queue or
+  sharded_timed_queue connection pool is used. These are the default
+  connection pools on Ruby 3.2+.
+
+= Other Improvements
+
+* The connection_validator and connection_expiration extensions now
+  correctly handle the sharded_timed_queue connection pool.
+  Previously, usage of these extensions with the sharded_timed_queue
+  connection pool would result in the pool reducing concurrency
+  whenever a connection was disconnected, eventually resulting in an
+  empty pool that thought it was full.
