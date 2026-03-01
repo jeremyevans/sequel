@@ -1,4 +1,4 @@
-Sun, 01 Feb 2026 09:16:56 -0800
+Sun, 01 Mar 2026 11:14:54 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -10,8 +10,9 @@ lib/sequel/extensions/auto_literal_strings.rb	Fri, 21 Oct 2022 08:19:04 -0700
 lib/sequel/extensions/blank.rb	Fri, 29 Jan 2021 08:45:15 -0800
 lib/sequel/extensions/caller_logging.rb	Tue, 03 Jun 2025 09:09:55 -0700
 lib/sequel/extensions/columns_introspection.rb	Thu, 09 Jul 2020 12:21:33 -0700
-lib/sequel/extensions/connection_expiration.rb	Mon, 12 Jun 2023 13:05:49 -0700
-lib/sequel/extensions/connection_validator.rb	Mon, 03 Feb 2025 16:03:27 -0800
+lib/sequel/extensions/connection_checkout_event_callback.rb	Sun, 01 Feb 2026 09:32:42 -0800
+lib/sequel/extensions/connection_expiration.rb	Wed, 25 Feb 2026 08:34:12 -0800
+lib/sequel/extensions/connection_validator.rb	Wed, 25 Feb 2026 08:34:12 -0800
 lib/sequel/extensions/constant_sql_override.rb	Tue, 11 Sep 2018 10:35:39 -0700
 lib/sequel/extensions/constraint_validations.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/extensions/core_extensions.rb	Tue, 01 Aug 2017 08:12:00 -0700

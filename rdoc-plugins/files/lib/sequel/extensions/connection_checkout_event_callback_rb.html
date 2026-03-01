@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>connection_checkout_event_callback.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>connection_checkout_event_callback.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/connection_checkout_event_callback.rb
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The <a href="connection_checkout_event_callback_rb.html">connection_checkout_event_callback</a> extension modifies a database’s connection pool to allow for a checkout event callback. This callback is called with the following arguments:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:immediately_available </td><td>
+<p>Connection immediately available and returned</p>
+</td></tr><tr><td class='label'>:not_immediately_available </td><td>
+<p>Connection not immediately available</p>
+</td></tr><tr><td class='label'>:new_connection </td><td>
+<p>New connection created and returned</p>
+</td></tr><tr><td class='label'>Float </td><td>
+<p>Number of seconds waiting to acquire a connection</p>
+</td></tr></tbody></table>
+
+<p>This is a low-level extension that allows for building telemetry information. It doesn’t implement any telemetry reporting itself. The main reason for recording this information is to use it to determine the appropriate size for the connection pool. Having too large a connection pool can waste resources, while having too small a connection pool can result in substantial time to check out a connection. In general, you want to use as small a pool as possible while keeping the time to checkout a connection low.</p>
+
+<p>To use the connection checkout event callback, you must first load the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:connection_checkout_event_callback</span>)
+</pre>
+
+<p>By default, an empty proc is used as the callback so that loading the support doesn’t break anything. If you are using the extension, you should set the callback at some point during application startup:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">on_checkout_event</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">event</span><span class="ruby-operator">|</span>
+  <span class="ruby-comment"># ...</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>When using the sharded connection pool, the callback is also passed a second argument, the requested server shard (generally a symbol), allowing for collection of per-shard telemetry:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">on_checkout_event</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">event</span>, <span class="ruby-identifier">server</span><span class="ruby-operator">|</span>
+  <span class="ruby-comment"># ...</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Note that the callback may be called currently by multiple threads. You should use some form of concurrency control inside the callback, such as a mutex or queue.</p>
+
+<p>Below is a brief example of usage to determine the percentage of connection requests where a connection was immediately available:</p>
+
+<pre class="ruby"><span class="ruby-identifier">mutex</span> = <span class="ruby-constant">Mutex</span>.<span class="ruby-identifier">new</span>
+<span class="ruby-identifier">total</span> = <span class="ruby-identifier">immediates</span> = <span class="ruby-value">0</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">on_checkout_event</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">event</span><span class="ruby-operator">|</span>
+  <span class="ruby-keyword">case</span> <span class="ruby-identifier">event</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-value">:immediately_available</span>
+    <span class="ruby-identifier">mutex</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+      <span class="ruby-identifier">immediates</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-value">:not_immediately_available</span>
+    <span class="ruby-identifier">mutex</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">total</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-identifier">immediate_percentage</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">mutex</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-value">100.0</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">immediates</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">total</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>Note that this extension only works with the timed_queue and sharded_timed_queue connection pools (the default connection pools when using Ruby 3.2+).</p>
+
+<p>Related modules: <a href="../../../../classes/Sequel/ConnectionCheckoutEventCallbacks/TimedQueue.html"><code>Sequel::ConnectionCheckoutEventCallbacks::TimedQueue</code></a>, <a href="../../../../classes/Sequel/ConnectionCheckoutEventCallbacks/ShardedTimedQueue.html"><code>Sequel::ConnectionCheckoutEventCallbacks::ShardedTimedQueue</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

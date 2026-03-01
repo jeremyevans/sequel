@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.102.0.txt</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.102.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.102.0.txt
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features"><a href="#label-New+Features">New Features</a></h1>
+<ul><li>
+<p>A connection_checkout_event_callback Database extension has been added, which allows for collecting telemetry information about connection checkouts. This can be used to create metrics to see how well the connection pool is functioning, which allows you to better determine whether the current pool size is working well for the application.</p>
+
+<p>After loading the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:connection_checkout_event_callback</span>)
+</pre>
+
+<p>You then set the callback proc, which is yielded either one of three symbols, or a Float if the checkout request had to wait for a connection to become available from the pool.</p>
+
+<pre class="ruby"><span class="ruby-comment"># |event, server| for sharded connection pools</span>
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">on_checkout_event</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">event</span><span class="ruby-operator">|</span>
+  <span class="ruby-keyword">case</span> <span class="ruby-identifier">event</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-value">:immediately_available</span>
+    <span class="ruby-comment"># Connection immediately available from pool</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-value">:not_immediately_available</span>
+    <span class="ruby-comment"># Connection not immediately available</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-value">:new_connection</span>
+    <span class="ruby-comment"># New connection created (only happens after a connection is</span>
+    <span class="ruby-comment"># not immediately available)</span>
+  <span class="ruby-keyword">else</span> <span class="ruby-comment"># event is a Float</span>
+    <span class="ruby-comment"># Seconds waiting for a connection (only happens after a</span>
+    <span class="ruby-comment"># connection is not immediately available and the pool is</span>
+    <span class="ruby-comment"># already at maximum size)</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>This extension is only supported if the <a href="../../lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> or <a href="../../lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pool is used. These are the default connection pools on Ruby 3.2+.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements"><a href="#label-Other+Improvements">Other Improvements</a></h1>
+<ul><li>
+<p>The connection_validator and connection_expiration extensions now correctly handle the <a href="../../lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pool. Previously, usage of these extensions with the <a href="../../lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pool would result in the pool reducing concurrency whenever a connection was disconnected, eventually resulting in an empty pool that thought it was full.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

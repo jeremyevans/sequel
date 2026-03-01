@@ -87,7 +87,7 @@ doc/opening_databases.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}
 </pre>
 
-<p>Note that if you do not pass a block to Sequel.connect, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically retain a reference to the object in the <code>Sequel::DATABASES</code> array.  So calling <code>Sequel.connect</code> multiple times (say once per request), can result in a memory leak.  For any application where database access is needed for a long period of time, it’s best to store the result of Sequel.connection in a constant, as recommended above.</p>
+<p>Note that if you do not pass a block to Sequel.connect, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically retain a reference to the object in the <code>Sequel::DATABASES</code> array.  So calling <code>Sequel.connect</code> multiple times (say once per request), can result in a memory leak.  For any application where database access is needed for a long period of time, it’s best to store the result of <code>Sequel.connect</code> in a constant, as recommended above.</p>
 
 <h2 id="label-Using+the+Sequel.connect+method"><a href="#label-Using+the+Sequel.connect+method">Using the Sequel.connect method</a></h2>
 
@@ -402,7 +402,7 @@ jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
 </td></tr><tr><td class='label'>:timeout </td><td>
 <p>the busy timeout to use in milliseconds (default: 5000).</p>
 </td></tr><tr><td class='label'>:setup_regexp_function </td><td>
-<p>Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so allows you to use regexp support in dataset expressions.  If <code>:cached</code> or <code>&quot;cached&quot;</code>+, caches each unique regex (more efficient but risk of memory leak). If a Proc is provided, it will be called with a string for the regexp and a string for the value to compare, and should return whether the regexp string matches the string value to compare. The default Proc used does <code>Regexp.new(regexp_str).match(str)</code>.</p>
+<p>Whether to setup a REGEXP function in the underlying SQLite3::Database object. Doing so allows you to use regexp support in dataset expressions.  If <code>:cached</code> or <code>&quot;cached&quot;</code>, caches each unique regex (more efficient but risk of memory leak). If a Proc is provided, it will be called with a string for the regexp and a string for the value to compare, and should return whether the regexp string matches the string value to compare. The default Proc used does <code>Regexp.new(regexp_str).match(str)</code>.</p>
 </td></tr></tbody></table>
 
 <p>Note that SQLite memory databases are restricted to a single connection by default.  This is because SQLite does not allow multiple connections to a single memory database.  For this reason, <a href="../../classes/Sequel.html"><code>Sequel</code></a> sets the maximum number of connections in the connection pool to 1 by default when an SQLite memory database is used.  Attempts to force the use of more than 1 connection can result in weird behavior, since the connections will be to separate memory databases.</p>

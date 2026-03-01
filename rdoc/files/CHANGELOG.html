@@ -33,6 +33,13 @@ CHANGELOG
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.102.0+-282026-03-01-29"><a href="#label-5.102.0+-282026-03-01-29"><a href="doc/release_notes/5_102_0_txt.html">5.102.0</a> (2026-03-01)</a></h3>
+<ul><li>
+<p>Make connection_validator and connection_expiration extensions correct handle <a href="lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pool (jeremyevans) (#2354)</p>
+</li><li>
+<p>Add connection_checkout_event_callback extension to assist in collecting telemetry information (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.101.0+-282026-02-01-29"><a href="#label-5.101.0+-282026-02-01-29"><a href="doc/release_notes/5_101_0_txt.html">5.101.0</a> (2026-02-01)</a></h3>
 <ul><li>
 <p>Add detect_unnecessary_association_options plugin to warn/raise for unnecessary association options (jeremyevans)</p>
@@ -138,7 +145,7 @@ CHANGELOG
 
 <h3 id="label-5.95.0+-282025-08-01-29"><a href="#label-5.95.0+-282025-08-01-29"><a href="doc/release_notes/5_95_0_txt.html">5.95.0</a> (2025-08-01)</a></h3>
 <ul><li>
-<p>Support num_waiting for the <a href="lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> and shared_timed_queue connection pools (jeremyevans)</p>
+<p>Support num_waiting for the <a href="lib/sequel/connection_pool/timed_queue_rb.html">timed_queue</a> and <a href="lib/sequel/connection_pool/sharded_timed_queue_rb.html">sharded_timed_queue</a> connection pools (jeremyevans)</p>
 </li><li>
 <p>Add class_table_inheritance_constraint_validations plugin, supporting constraint validations for all of the model’s tables (sterlzbd, jeremyevans) (#2316, #2319)</p>
 </li><li>
