@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "../adapters/spec_helper"
 
 describe "Supported types" do

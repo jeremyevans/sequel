@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'visibility_checker'
 changes = VISIBILITY_CHANGES = []
 Minitest.after_run do

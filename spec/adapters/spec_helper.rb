@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 if ENV['COVERAGE']
   require_relative "../sequel_coverage"
   SimpleCov.sequel_coverage(:group=>%r{lib/sequel/adapters})

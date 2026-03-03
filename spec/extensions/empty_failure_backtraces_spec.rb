@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "spec_helper"
 
 describe "empty_failure_backtraces plugin" do

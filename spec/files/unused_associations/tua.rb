@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class TUA < Sequel::Model
   many_to_one :a1, :key=>:t_id, :class=>self, :is_used=>!!ENV['A1_IS_USED']
   one_to_many :a2s, :key=>:t_id, :class=>self

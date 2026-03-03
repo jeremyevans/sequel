@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 SEQUEL_ADAPTER_TEST = :mssql
 
 require_relative 'spec_helper'

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "spec_helper"
 
 describe "sql_log_normalizer extension" do

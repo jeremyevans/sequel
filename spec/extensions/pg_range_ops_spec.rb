@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "spec_helper"
 
 Sequel.extension :pg_array, :pg_range, :pg_multirange, :pg_range_ops

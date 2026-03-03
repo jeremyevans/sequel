@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "spec_helper"
 
 describe "primary_key_lookup_check_values plugin" do

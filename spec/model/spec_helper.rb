@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
 require_relative "../../lib/sequel"
 

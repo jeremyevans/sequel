@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "spec_helper"
 
 pool_types = [ :threaded, :sharded_threaded]

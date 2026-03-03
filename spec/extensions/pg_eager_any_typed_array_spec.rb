@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_eager_any_typed_array plugin" do

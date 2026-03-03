@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class CreateAlbums < Sequel::Migration
   def up
     create_table(:sm2233){Integer :smc23}

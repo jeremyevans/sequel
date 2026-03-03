@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 Sequel.migration do
   no_transaction
   change{create_table(:sm){Integer :smc1}}

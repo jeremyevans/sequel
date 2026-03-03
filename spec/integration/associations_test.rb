@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "../adapters/spec_helper"
 
 one_to_one_eager_limit_strategies = Module.new do

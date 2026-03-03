@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_auto_parameterize_in_array extension" do

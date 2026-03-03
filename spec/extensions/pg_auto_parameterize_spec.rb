@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_auto_parameterize extension" do
@@ -178,7 +179,9 @@ describe "pg_auto_parameterize extension" do
   end
 
   it "should use different parameters for different but equal objects" do
-    sql = @db[:a].select{foo("a").as("f")}.group{foo("a")}.sql
+    a1 = "a".dup
+    a2 = "a".dup
+    sql = @db[:a].select{foo(a1).as("f")}.group{foo(a2)}.sql
     sql.must_equal 'SELECT foo($1) AS "f" FROM "a" GROUP BY foo($2)'
     sql.args.must_equal ['a', 'a']
   end

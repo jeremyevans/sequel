@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
 class Minitest::HooksSpec

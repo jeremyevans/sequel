@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Minitest::Spec
   if ENV['SEQUEL_ASYNC_THREAD_POOL'] || ENV['SEQUEL_ASYNC_THREAD_POOL_PREEMPT'] || ENV['SEQUEL_EAGER_ASYNC']
     use_async = true

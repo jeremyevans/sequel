@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative 'spec_helper'
 
 {''=>false, ' with :preempt_async_thread Database option'=>true}.each do |desc, preempt_async_thread|

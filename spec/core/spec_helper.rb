@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 if ENV['COVERAGE']
   require_relative "../sequel_coverage"
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(\w+\.rb|(dataset|database|model|connection_pool)/\w+\.rb|adapters/mock\.rb)\z})

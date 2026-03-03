@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative 'spec_helper'
 
 describe "concurrent_eager_loading plugin" do
