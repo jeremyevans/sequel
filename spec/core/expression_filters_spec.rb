@@ -1064,7 +1064,7 @@ describe "Sequel core extension replacements" do
   end
 
   it "Sequel.lit should return the argument if given a single literal string" do
-    o = Sequel.lit('a')
+    o = Sequel.lit('a').freeze
     Sequel.lit(o).must_be_same_as(o)
   end
 
@@ -1216,7 +1216,7 @@ describe "Sequel core extension replacements" do
   end
 
   it "SQL::Blob should be convertable to a literal string by default" do
-    b = Sequel.blob('a ?')
+    b = Sequel.blob('a ?').freeze
     l(b.lit, "a ?")
     l(b.lit(1), "a 1")
   end

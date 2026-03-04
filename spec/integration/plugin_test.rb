@@ -3248,7 +3248,7 @@ describe "query_blocker extension" do
     "TRUNCATE" => proc{@ds.truncate},
     "bound variable" => proc{@ds.call(:select)},
     "prepared statement" => proc{@ds.prepare(:select, :select_query_blocker_test).call},
-    "arbitrary SQL" => proc{@db.run(@ds.select(1).sql)},
+    "arbitrary SQL" => proc{@db.run(@ds.select(1).sql.freeze)},
   }.each do |type, block|
     it "should block #{type} queries" do
       @db.block_queries do

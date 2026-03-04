@@ -56,7 +56,7 @@ describe "Simple Dataset operations" do
   end
 
   it "should have insert work correctly with static SQL" do
-    wait{@db["INSERT INTO #{@ds.literal(:items)} (#{@ds.literal(:number)}) VALUES (20)"].insert}
+    wait{@db["INSERT INTO #{@ds.literal(:items)} (#{@ds.literal(:number)}) VALUES (20)".freeze].insert}
     @ds.filter(:id=>2).first[:number].must_equal 20
   end
 

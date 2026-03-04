@@ -40,7 +40,7 @@ module Sequel
       end
 
       def commit_prepared_transaction(transaction_id, opts=OPTS)
-        run("XA COMMIT #{literal(transaction_id)}", opts)
+        run("XA COMMIT #{literal(transaction_id)}".freeze, opts)
       end
 
       def database_type
@@ -103,7 +103,7 @@ module Sequel
           sql += " FROM #{literal(schema)}"
         end
 
-        metadata_dataset.with_sql(sql).each do |r|
+        metadata_dataset.with_sql(sql.freeze).each do |r|
           name = r[:Key_name]
           next if name == 'PRIMARY'
           name = m.call(name)
@@ -115,7 +115,7 @@ module Sequel
       end
 
       def rollback_prepared_transaction(transaction_id, opts=OPTS)
-        run("XA ROLLBACK #{literal(transaction_id)}", opts)
+        run("XA ROLLBACK #{literal(transaction_id)}".freeze, opts)
       end
 
       # Whether the database is MariaDB and not MySQL
@@ -780,7 +780,8 @@ module Sequel
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
 
-        ds = db.send(:metadata_dataset).with_sql(((opts[:extended] && (db.mariadb? || db.server_version < 50700)) ? 'EXPLAIN EXTENDED ' : 'EXPLAIN ') + select_sql).naked
+        sql = ((opts[:extended] && (db.mariadb? || db.server_version < 50700)) ? 'EXPLAIN EXTENDED ' : 'EXPLAIN ') + select_sql
+        ds = db.send(:metadata_dataset).with_sql(sql.freeze).naked
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end

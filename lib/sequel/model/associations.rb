@@ -320,7 +320,7 @@ module Sequel
                 end
                 loader.append_sql(sql, *k)
               end
-              objects.concat(ds.with_sql(sql).to_a)
+              objects.concat(ds.with_sql(sql.freeze).to_a)
             end
             ds = ds.eager(cascade) if cascade
             ds.send(:post_load, objects)

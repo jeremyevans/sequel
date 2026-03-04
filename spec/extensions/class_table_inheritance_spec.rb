@@ -342,7 +342,7 @@ describe "class_table_inheritance plugin" do
       klass.instance_variable_set(:@cti_instance_dataset, klass.cti_instance_dataset.with_extend do
         def supports_insert_select?; true; end
         def insert_select(v)
-          db.run(insert_sql(v) + " RETURNING *")
+          db.run((insert_sql(v) + " RETURNING *").freeze)
           v.merge(:id=>1)
         end
       end)

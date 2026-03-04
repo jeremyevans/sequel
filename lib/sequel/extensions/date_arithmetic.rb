@@ -82,12 +82,12 @@ module Sequel
         DURATION_UNITS = [:years, :months, :days, :hours, :minutes, :seconds].freeze
         DEF_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s.freeze}).freeze
         POSTGRES_DURATION_UNITS = DURATION_UNITS.zip([:years, :months, :days, :hours, :mins, :secs].map{|s| s.to_s.freeze}).freeze
-        MYSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.upcase[0...-1]).freeze}).freeze
-        MSSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s[0...-1]).freeze}).freeze
+        MYSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.upcase[0...-1].freeze).freeze}).freeze
+        MSSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s[0...-1].freeze).freeze}).freeze
         H2_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s[0...-1].freeze}).freeze
-        DERBY_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit("SQL_TSI_#{s.to_s.upcase[0...-1]}").freeze}).freeze
+        DERBY_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit("SQL_TSI_#{s.to_s.upcase[0...-1]}".freeze).freeze}).freeze
         ACCESS_DURATION_UNITS = DURATION_UNITS.zip(%w'yyyy m d h n s'.map(&:freeze)).freeze
-        DB2_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s).freeze}).freeze
+        DB2_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.freeze).freeze}).freeze
 
         # Append the SQL fragment for the DateAdd expression to the SQL query.
         def date_add_sql_append(sql, da)
@@ -107,7 +107,7 @@ module Sequel
               placeholder = []
               vals = []
               each_valid_interval_unit(h, POSTGRES_DURATION_UNITS) do |value, sql_unit|
-                placeholder << "#{', ' unless placeholder.empty?}#{sql_unit} := "
+                placeholder << "#{', ' unless placeholder.empty?}#{sql_unit} := ".freeze
                 vals << value
               end
               interval = Sequel.function(:make_interval, Sequel.lit(placeholder, *vals)) unless vals.empty?
@@ -156,7 +156,7 @@ module Sequel
               expr = Sequel.cast_string(expr) + ' 00:00:00'
             end
             each_valid_interval_unit(h, DERBY_DURATION_UNITS) do |value, sql_unit|
-              expr = Sequel.lit(["{fn timestampadd(#{sql_unit}, ", ", timestamp(", "))}"], value, expr)
+              expr = Sequel.lit(["{fn timestampadd(#{sql_unit}, ".freeze, ", timestamp(", "))}"], value, expr)
             end
           when :oracle
             each_valid_interval_unit(h, MYSQL_DURATION_UNITS) do |value, sql_unit|

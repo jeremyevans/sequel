@@ -54,7 +54,7 @@ module Sequel
 
       # Set the bind arguments based on the hash and call super.
       def call(bind_vars=OPTS, &block)
-        sql = prepared_sql
+        sql = prepared_sql.freeze
         prepared_args.freeze
         ps = bind(bind_vars)
         ps.clone(:bind_arguments=>ps.map_to_prepared_args(ps.opts[:bind_vars]), :sql=>sql, :prepared_sql=>sql).run(&block)
@@ -223,7 +223,7 @@ module Sequel
       # with the prepared SQL, to ensure the prepared_sql_type is respected.
       def force_prepared_sql
         if prepared_sql_type != prepared_type
-          with_sql(prepared_sql)
+          with_sql(prepared_sql.freeze)
         else
           self
         end
@@ -287,7 +287,7 @@ module Sequel
 
       def run(&block)
         if @opts[:prepared_sql_frags]
-          sql = literal(Sequel::SQL::PlaceholderLiteralString.new(@opts[:prepared_sql_frags], @opts[:bind_arguments], false))
+          sql = literal(Sequel::SQL::PlaceholderLiteralString.new(@opts[:prepared_sql_frags], @opts[:bind_arguments], false)).freeze
           clone(:prepared_sql_frags=>nil, :sql=>sql, :prepared_sql=>sql).run(&block)
         else
           super
@@ -320,6 +320,9 @@ module Sequel
         end
 
         prepared_args.freeze
+        frags.freeze
+        frags.each(&:freeze)
+        prepared_sql.freeze
         clone(:prepared_sql_frags=>frags, :prepared_sql=>prepared_sql, :sql=>prepared_sql)
       end
 
@@ -409,7 +412,7 @@ module Sequel
         ps = ps.with_extend(EmulatePreparedStatementMethods)
         ps.send(:emulated_prepared_statement, type, name, values)
       else
-        sql = ps.prepared_sql
+        sql = ps.prepared_sql.freeze
         ps.prepared_args.freeze
         ps.clone(:prepared_sql=>sql, :sql=>sql)
       end

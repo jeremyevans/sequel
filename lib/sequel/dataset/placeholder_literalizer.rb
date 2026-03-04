@@ -117,6 +117,8 @@ module Sequel
           frags << final_sql
           prepared_sql << final_sql
 
+          frags.each(&:freeze)
+          frags.freeze
           [prepared_sql, frags]
         end
 
@@ -125,6 +127,7 @@ module Sequel
           @argn = -1
           @args = []
           ds = yield self, dataset
+          ds.opts[:sql].freeze
           sql = ds.clone(:placeholder_literalizer=>self).sql
 
           last_offset = 0

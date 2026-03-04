@@ -819,7 +819,7 @@ module Sequel
     # SELECT sql statement.
     def create_table_as(name, sql, options)
       sql = sql.sql if sql.is_a?(Sequel::Dataset)
-      run(create_table_as_sql(name, sql, options))
+      run(create_table_as_sql(name, sql, options).freeze)
     end
     
     # SQL statement for creating a table from the result of a SELECT statement.

@@ -99,7 +99,7 @@ module Sequel
         # Add an RETURNING clause to fetch the updated xmin when updating the row.
         def _update_without_checking(columns)
           ds = _update_dataset
-          rows = ds.clone(ds.send(:default_server_opts, :sql=>ds.returning(:xmin).update_sql(columns))).all
+          rows = ds.clone(ds.send(:default_server_opts, :sql=>ds.returning(:xmin).update_sql(columns).freeze)).all
           values[:xmin] = rows.first[:xmin] unless rows.empty?
           rows.length
         end

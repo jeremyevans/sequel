@@ -339,7 +339,7 @@ module Sequel
       end
 
       def commit_prepared_transaction(transaction_id, opts=OPTS)
-        run("COMMIT PREPARED #{literal(transaction_id)}", opts)
+        run("COMMIT PREPARED #{literal(transaction_id)}".freeze, opts)
       end
 
       # A hash of metadata for CHECK constraints on the table.
@@ -416,7 +416,7 @@ module Sequel
         return if already_identity
 
         transaction(server_hash) do
-          run("ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT", server_hash)
+          run("ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT".freeze, server_hash)
 
           ds.from(:pg_depend).
             where(:classid=>pg_class, :objid=>seq_oid, :objsubid=>0, :deptype=>'a').
@@ -453,7 +453,7 @@ module Sequel
       #                 often used here if :security_definer is used.
       #         :strict :: Makes the function return NULL when any argument is NULL.
       def create_function(name, definition, opts=OPTS)
-        self << create_function_sql(name, definition, opts)
+        self << create_function_sql(name, definition, opts).freeze
       end
 
       # Create the procedural language in the database. Arguments:
@@ -464,7 +464,7 @@ module Sequel
       #         :trusted :: Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
       #         :validator :: The name of previously registered function used as a validator of functions defined in this language.
       def create_language(name, opts=OPTS)
-        self << create_language_sql(name, opts)
+        self << create_language_sql(name, opts).freeze
       end
 
       # Create a schema in the database. Arguments:
@@ -473,7 +473,7 @@ module Sequel
       #         :if_not_exists :: Don't raise an error if the schema already exists (PostgreSQL 9.3+)
       #         :owner :: The owner to set for the schema (defaults to current user if not specified)
       def create_schema(name, opts=OPTS)
-        self << create_schema_sql(name, opts)
+        self << create_schema_sql(name, opts).freeze
       end
 
       # Support partitions of tables using the :partition_of option.
@@ -509,7 +509,7 @@ module Sequel
       #         :replace :: Replace the trigger with the same name if it already exists (PostgreSQL 14+).
       #         :when :: A filter to use for the trigger
       def create_trigger(table, name, function, opts=OPTS)
-        self << create_trigger_sql(table, name, function, opts)
+        self << create_trigger_sql(table, name, function, opts).freeze
       end
 
       def database_type
@@ -542,7 +542,7 @@ module Sequel
       #              default is plpgsql.  Can be specified as a string or a symbol.
       def do(code, opts=OPTS)
         language = opts[:language]
-        run "DO #{"LANGUAGE #{literal(language.to_s)} " if language}#{literal(code)}"
+        run "DO #{"LANGUAGE #{literal(language.to_s)} " if language}#{literal(code)}".freeze
       end
 
       # Drops the function from the database. Arguments:
@@ -552,7 +552,7 @@ module Sequel
       #         :cascade :: Drop other objects depending on this function.
       #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_function(name, opts=OPTS)
-        self << drop_function_sql(name, opts)
+        self << drop_function_sql(name, opts).freeze
       end
 
       # Drops a procedural language from the database.  Arguments:
@@ -561,7 +561,7 @@ module Sequel
       #         :cascade :: Drop other objects depending on this function.
       #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_language(name, opts=OPTS)
-        self << drop_language_sql(name, opts)
+        self << drop_language_sql(name, opts).freeze
       end
 
       # Drops a schema from the database.  Arguments:
@@ -570,7 +570,7 @@ module Sequel
       #         :cascade :: Drop all objects in this schema.
       #         :if_exists :: Don't raise an error if the schema doesn't exist.
       def drop_schema(name, opts=OPTS)
-        self << drop_schema_sql(name, opts)
+        self << drop_schema_sql(name, opts).freeze
         remove_all_cached_schemas
       end
 
@@ -581,7 +581,7 @@ module Sequel
       #         :cascade :: Drop other objects depending on this function.
       #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_trigger(table, name, opts=OPTS)
-        self << drop_trigger_sql(table, name, opts)
+        self << drop_trigger_sql(table, name, opts).freeze
       end
 
       # Return full foreign key information using the pg system tables, including
@@ -745,7 +745,7 @@ module Sequel
       # name :: Current name of the schema
       # opts :: New name for the schema
       def rename_schema(name, new_name)
-        self << rename_schema_sql(name, new_name)
+        self << rename_schema_sql(name, new_name).freeze
         remove_all_cached_schemas
       end
 
@@ -756,7 +756,7 @@ module Sequel
       #   DB.refresh_view(:items_view, concurrently: true)
       #   # REFRESH MATERIALIZED VIEW CONCURRENTLY items_view
       def refresh_view(name, opts=OPTS)
-        run "REFRESH MATERIALIZED VIEW#{' CONCURRENTLY' if opts[:concurrently]} #{quote_schema_table(name)}"
+        run "REFRESH MATERIALIZED VIEW#{' CONCURRENTLY' if opts[:concurrently]} #{quote_schema_table(name)}".freeze
       end
       
       # Reset the primary key sequence for the given table, basing it on the
@@ -769,7 +769,7 @@ module Sequel
         table = Sequel.qualify(s, t) if s
 
         if server_version >= 100000
-          seq_ds = metadata_dataset.from(:pg_sequence).where(:seqrelid=>regclass_oid(LiteralString.new(seq)))
+          seq_ds = metadata_dataset.from(:pg_sequence).where(:seqrelid=>regclass_oid(LiteralString.new(seq.freeze)))
           increment_by = :seqincrement
           min_value = :seqmin
         # :nocov:
@@ -784,7 +784,7 @@ module Sequel
       end
 
       def rollback_prepared_transaction(transaction_id, opts=OPTS)
-        run("ROLLBACK PREPARED #{literal(transaction_id)}", opts)
+        run("ROLLBACK PREPARED #{literal(transaction_id)}".freeze, opts)
       end
 
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
@@ -1469,7 +1469,7 @@ module Sequel
 
       def column_references_add_period(cols)
         cols= cols.dup
-        cols[-1] = Sequel.lit("PERIOD #{quote_identifier(cols[-1])}")
+        cols[-1] = Sequel.lit("PERIOD #{quote_identifier(cols[-1])}".freeze)
         cols
       end
   

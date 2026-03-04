@@ -388,7 +388,7 @@ module Sequel
         # SQLite uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
-          LiteralString.new("#{prepared_arg_placeholder}#{k.to_s.gsub('.', '__')}")
+          LiteralString.new("#{prepared_arg_placeholder}#{k.to_s.gsub('.', '__')}".freeze)
         end
       end
       

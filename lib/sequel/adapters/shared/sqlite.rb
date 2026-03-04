@@ -195,7 +195,7 @@ module Sequel
 
       # Dataset used for parsing schema
       def _parse_pragma_ds(table_name, opts)
-        metadata_dataset.with_sql("PRAGMA table_#{'x' if sqlite_version > 33100}info(?)", input_identifier_meth(opts[:dataset]).call(table_name))
+        metadata_dataset.with_sql("PRAGMA table_#{'x' if sqlite_version > 33100}info(?)".freeze, input_identifier_meth(opts[:dataset]).call(table_name))
       end
 
       # Run all alter_table commands in a transaction.  This is technically only
@@ -407,7 +407,7 @@ module Sequel
       def defined_columns_for(table)
         cols = parse_pragma(table, OPTS)
         cols.each do |c|
-          c[:default] = LiteralString.new(c[:default]) if c[:default]
+          c[:default] = LiteralString.new(c[:default]).freeze if c[:default]
           c[:type] = c[:db_type]
         end
         cols
@@ -684,7 +684,7 @@ module Sequel
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
 
-        ds = db.send(:metadata_dataset).clone(:sql=>"EXPLAIN #{select_sql}")
+        ds = db.send(:metadata_dataset).clone(:sql=>"EXPLAIN #{select_sql}".freeze)
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end

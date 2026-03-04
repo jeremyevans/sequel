@@ -30,9 +30,9 @@ module Sequel
     #   # GRANT SELECT ON "table" TO "user"
     def run
       if server = @opts[:server]
-        db.run(sql, :server=>server)
+        db.run(sql.freeze, :server=>server)
       else
-        db.run(sql)
+        db.run(sql.freeze)
       end
     end
   end

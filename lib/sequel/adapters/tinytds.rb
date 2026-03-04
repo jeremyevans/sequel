@@ -205,7 +205,7 @@ module Sequel
         private
         
         def prepared_arg(k)
-          LiteralString.new("@#{k.to_s.gsub('.', '__')}")
+          LiteralString.new("@#{k.to_s.gsub('.', '__')}".freeze)
         end
       end
       

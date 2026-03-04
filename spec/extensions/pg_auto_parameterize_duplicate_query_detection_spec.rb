@@ -193,7 +193,7 @@ MESSAGE
   it "should not raise for multiple different queries at same location" do
     @db.detect_duplicate_queries do
       3.times do |i|
-        @db["SELECT #{i}"].all
+        @db["SELECT #{i}".freeze].all
       end
     end
   end

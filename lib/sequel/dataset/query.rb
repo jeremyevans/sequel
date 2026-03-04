@@ -1301,7 +1301,7 @@ module Sequel
     # * truncate (if a TRUNCATE statement, with no arguments)
     def with_sql(sql, *args)
       if sql.is_a?(Symbol)
-        sql = public_send(sql, *args)
+        sql = public_send(sql, *args).freeze
       else
         sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
       end

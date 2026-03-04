@@ -388,8 +388,8 @@ describe "Sequel::IntegerMigrator" do
         super.with_extend do
           def count; @opts[:from] == ["count2"] ? 2 : 1; end
           def columns; db.columns_created end
-          def insert(h); db.versions.merge!(h); db.run insert_sql(h) end
-          def update(h); db.versions.merge!(h); db.run update_sql(h) end
+          def insert(h); db.versions.merge!(h); db.run insert_sql(h).freeze end
+          def update(h); db.versions.merge!(h); db.run update_sql(h).freeze end
           def fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
         end
       end

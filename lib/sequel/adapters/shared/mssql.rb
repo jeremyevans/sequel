@@ -106,7 +106,7 @@ module Sequel
           values << value
         end
 
-        sql = "DECLARE #{declarations.join(', ')}; EXECUTE @RC = #{name} #{values.join(', ')}; SELECT #{names.join(', ')}"
+        sql = "DECLARE #{declarations.join(', ')}; EXECUTE @RC = #{name} #{values.join(', ')}; SELECT #{names.join(', ')}".freeze
 
         ds = dataset.with_sql(sql)
         ds = ds.server(opts[:server]) if opts[:server]
@@ -400,7 +400,7 @@ module Sequel
       # Error if a string is given.
       def create_table_as(name, ds, options)
         raise(Error, "must provide dataset instance as value of create_table :as option on MSSQL") unless ds.is_a?(Sequel::Dataset)
-        run(ds.into(name).sql)
+        run(ds.into(name).sql.freeze)
       end
     
       DATABASE_ERROR_REGEXPS = {
@@ -878,7 +878,7 @@ module Sequel
         elsif @opts[:output]
           # no transaction: our multi_insert_sql_strategy should guarantee
           # that there's only ever a single statement.
-          sql = multi_insert_sql(columns, values)[0]
+          sql = multi_insert_sql(columns, values)[0].freeze
           naked.with_sql(sql).map{|v| v.length == 1 ? v.values.first : v}
         else
           super

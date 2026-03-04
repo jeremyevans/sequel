@@ -2276,7 +2276,7 @@ describe "Sequel::Postgres::Database" do
     @db.create_table!(:posts){Integer :a}
   end
   after do
-    @db.run("DROP PROCEDURE test_procedure_posts(#{@args || "int, int"})")
+    @db.run("DROP PROCEDURE test_procedure_posts(#{@args || "int, int"})".freeze)
     @db.drop_table?(:posts)
   end
 
@@ -6929,7 +6929,7 @@ describe "pg_auto_parameterize_duplicate_query_detection extension" do
   it "should not raise for multiple different queries at same location" do
     @db.detect_duplicate_queries do
       3.times do |i|
-        @db["SELECT #{i}"].all
+        @db["SELECT #{i}".freeze].all
       end
     end
   end

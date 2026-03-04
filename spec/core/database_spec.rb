@@ -895,7 +895,7 @@ database_transaction_specs = Module.new do
   it "should support transaction isolation levels" do
     @db.define_singleton_method(:supports_transaction_isolation_levels?){true}
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
-      @db.transaction(:isolation=>l){@db.run "DROP TABLE #{l}"}
+      @db.transaction(:isolation=>l){@db.run "DROP TABLE #{l}".freeze}
     end
     @db.sqls.must_equal ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'DROP TABLE committed', 'COMMIT',
@@ -907,7 +907,7 @@ database_transaction_specs = Module.new do
     @db.define_singleton_method(:supports_transaction_isolation_levels?){true}
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
       @db.transaction_isolation_level = l
-      @db.transaction{@db.run "DROP TABLE #{l}"}
+      @db.transaction{@db.run "DROP TABLE #{l}".freeze}
     end
     @db.sqls.must_equal ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
                        'BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'DROP TABLE committed', 'COMMIT',

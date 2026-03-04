@@ -727,7 +727,7 @@ module Sequel
               prepared_args << y
               i = prepared_args.length
             end
-            LiteralString.new("#{prepared_arg_placeholder}#{i}")
+            LiteralString.new("#{prepared_arg_placeholder}#{i}".freeze)
           end
         end
 

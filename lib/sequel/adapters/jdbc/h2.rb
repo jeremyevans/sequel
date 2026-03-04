@@ -18,7 +18,7 @@ module Sequel
         include AutoCastDateAndTime
 
         def commit_prepared_transaction(transaction_id, opts=OPTS)
-          run("COMMIT TRANSACTION #{transaction_id}", opts)
+          run("COMMIT TRANSACTION #{transaction_id}".freeze, opts)
         end
 
         def database_type
@@ -36,7 +36,7 @@ module Sequel
         end
 
         def rollback_prepared_transaction(transaction_id, opts=OPTS)
-          run("ROLLBACK TRANSACTION #{transaction_id}", opts)
+          run("ROLLBACK TRANSACTION #{transaction_id}".freeze, opts)
         end
 
         # H2 uses an IDENTITY type for primary keys

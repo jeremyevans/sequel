@@ -7,7 +7,7 @@ describe "pg_auto_parameterize extension" do
     @db.synchronize{|c| def c.escape_bytea(v) v*2 end}
     @db.extend_datasets{def use_cursor(*) self end}
     @db.extend(Module.new do
-      def copy_table(*a) run(copy_table_sql(*a)) end
+      def copy_table(*a) run(copy_table_sql(*a).freeze) end
       private
       def copy_table_sql(ds, *) "COPY TABLE #{ds.is_a?(Sequel::Dataset) ? ds.sql : ds}" end
     end)

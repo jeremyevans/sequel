@@ -127,7 +127,7 @@ module Sequel
 
       # Run the SQL on the database, reparsing the enum labels after it is run.
       def _process_enum_change_sql(sql)
-        run(sql)
+        run(sql.freeze)
         parse_enum_labels
         nil
       end
