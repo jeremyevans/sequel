@@ -69,13 +69,13 @@ describe "eval_inspect extension" do
       Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_DATE, :a),
       Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_TIMESTAMP, :a),
     ].each do |o|
-      v = eval(o.inspect)
+      v = eval("# frozen_string_literal: true\n#{o.inspect}")
       v.must_equal o
       @ds.literal(v).must_equal @ds.literal(o)
 
       ds = @ds
       @ds.db.create_table(:test) do
-        v = eval(o.inspect)
+        v = eval("# frozen_string_literal: true\n#{o.inspect}")
         v.must_equal o
         ds.literal(v).must_equal ds.literal(o)
       end
