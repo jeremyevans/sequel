@@ -36,6 +36,8 @@ def db.reset() sqls end
 def db.supports_schema_parsing?() true end
 Sequel::Model.db = DB = db
 
+Sequel::Database.extension :lit_require_frozen if ENV["SEQUEL_LIT_REQUIRE_FROZEN"]
+
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection
   Sequel::Database.extension :columns_introspection

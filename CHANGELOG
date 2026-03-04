@@ -1,5 +1,7 @@
 === master
 
+* Add lit_require_frozen extension, for disallowing usage of unfrozen strings as literal SQL (jeremyevans)
+
 * Avoid creating multiple strings when passing literal string to dataset filtering method (jeremyevans)
 
 === 5.102.0 (2026-03-01)

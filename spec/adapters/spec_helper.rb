@@ -71,6 +71,7 @@ DB.extension :error_sql if ENV['SEQUEL_ERROR_SQL']
 DB.extension :index_caching if ENV['SEQUEL_INDEX_CACHING']
 DB.extension :synchronize_sql if ENV['SEQUEL_SYNCHRONIZE_SQL']
 DB.extension :auto_cast_date_and_time if ENV['SEQUEL_AUTO_CAST_DATE_TIME']
+DB.extension :lit_require_frozen if ENV["SEQUEL_LIT_REQUIRE_FROZEN"]
 
 if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
   DB.extension :duplicate_columns_handler

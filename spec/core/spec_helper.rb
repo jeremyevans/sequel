@@ -14,6 +14,8 @@ require 'minitest/hooks/default'
 
 require_relative '../deprecation_helper'
 
+Sequel::Database.extension :lit_require_frozen if ENV["SEQUEL_LIT_REQUIRE_FROZEN"]
+
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection
   Sequel::Database.extension :columns_introspection

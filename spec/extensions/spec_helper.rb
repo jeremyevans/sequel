@@ -71,3 +71,4 @@ if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
   Sequel::Model.cache_associations = false
 end
 Sequel::Model.plugin :throw_failures if ENV['SEQUEL_MODEL_THROW_FAILURES']
+Sequel::Database.extension :lit_require_frozen if ENV["SEQUEL_LIT_REQUIRE_FROZEN"]
