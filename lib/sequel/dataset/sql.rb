@@ -53,7 +53,7 @@ module Sequel
       when String
         case v
         when LiteralString
-          sql << v
+          literal_literal_string_append(sql, v)
         when SQL::Blob
           literal_blob_append(sql, v)
         else
@@ -1422,6 +1422,11 @@ module Sequel
     # SQL fragment for Integer
     def literal_integer(v)
       v.to_s
+    end
+
+    # Append string to SQL string.
+    def literal_literal_string_append(sql, v)
+      sql << v
     end
 
     # SQL fragment for nil
