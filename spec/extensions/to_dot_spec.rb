@@ -106,7 +106,7 @@ END
   end
 
   it "should handle LiteralStrings" do
-    dot(@ds.filter(Sequel.lit('a'))).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"Sequel.lit(\\\"(a)\\\")\"];"]
+    dot(@ds.select(Sequel.lit('a'))).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Sequel.lit(\\\"a\\\")\"];"]
   end
 
   it "should handle true, false, nil" do

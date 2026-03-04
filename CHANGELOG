@@ -1,3 +1,7 @@
+=== master
+
+* Avoid creating multiple strings when passing literal string to dataset filtering method (jeremyevans)
+
 === 5.102.0 (2026-03-01)
 
 * Make connection_validator and connection_expiration extensions correct handle sharded_timed_queue connection pool (jeremyevans) (#2354)

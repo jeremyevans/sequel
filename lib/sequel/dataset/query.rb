@@ -1474,7 +1474,10 @@ module Sequel
     def default_join_table_qualification
       :symbol
     end
-    
+
+    PAREN_WRAPPER = ["(".freeze, ")".freeze].freeze
+    private_constant :PAREN_WRAPPER
+
     # SQL expression object based on the expr type.  See +where+.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == EMPTY_ARRAY
@@ -1495,7 +1498,7 @@ module Sequel
           raise Error, "Invalid filter expression: #{expr.inspect}"
         end
       when LiteralString
-        LiteralString.new("(#{expr})")
+        SQL::PlaceholderLiteralString.new(PAREN_WRAPPER, [expr])
       when Numeric, SQL::NumericExpression, SQL::StringExpression, Proc, String, Set
         raise Error, "Invalid filter expression: #{expr.inspect}"
       when TrueClass, FalseClass
