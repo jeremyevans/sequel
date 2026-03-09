@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+# SEQUEL6: Remove
+
 Sequel::JDBC.load_driver('Java::OrgApacheDerbyJdbc::EmbeddedDriver', :Derby)
 require_relative 'transactions'
 require_relative '../utils/columns_limit_1'
