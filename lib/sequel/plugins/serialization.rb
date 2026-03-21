@@ -30,6 +30,15 @@ module Sequel
     # Otherwise, it is possible that the default column accessors will take
     # precedence.
     #
+    # Note that use of an unsafe serialization method can result in an attack vector
+    # (potentially allowing remote code execution) if an attacker has the ability to
+    # store data directly in the underlying column. This would affect the marshal
+    # serialization format, and on older versions of Ruby, potentially the yaml and
+    # json serialization formats as well. It can also affect custom formats. You
+    # should ensure that attackers do not have access to store data directly in the
+    # underlying column when using this plugin (especially when using an unsafe
+    # serialization method).
+    #
     # == Example
     #
     #   # Require json if you plan to use it, as the plugin doesn't require it for you.
