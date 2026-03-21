@@ -97,7 +97,7 @@ module Sequel
       register_format(:marshal, lambda{|v| [Marshal.dump(v)].pack('m')},
         lambda do |v|
           # Handle unpacked marshalled data for backwards compat
-          v = v.unpack('m')[0] unless v[0..1] == "\x04\x08"
+          v = v.unpack('m')[0] unless v.start_with?("\x04\x08")
           Marshal.load(v)
         end)
       register_format(:yaml, :to_yaml.to_proc, lambda{|s| YAML.load(s)})
