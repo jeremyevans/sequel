@@ -15,7 +15,7 @@ describe "Sequel::Plugins::Dirty" do
     it "#[]= should work if given non-column value" do
       a = @o.changed_columns.dup
       @o[:nonexistent] = 1
-      @o.changed_columns.must_equal a
+      @o.changed_columns.must_equal(a << :nonexistent)
     end
 
     it "initial_value should be the current value if value has not changed" do
