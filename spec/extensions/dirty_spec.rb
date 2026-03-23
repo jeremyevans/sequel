@@ -12,6 +12,12 @@ describe "Sequel::Plugins::Dirty" do
   dirty_plugin_specs = Module.new do
     extend Minitest::Spec::DSL
 
+    it "#[]= should work if given non-column value" do
+      a = @o.changed_columns.dup
+      @o[:nonexistent] = 1
+      @o.changed_columns.must_equal a
+    end
+
     it "initial_value should be the current value if value has not changed" do
       @o.initial_value(:initial).must_equal 'i'
       @o.initial_value(:missing).must_be_nil

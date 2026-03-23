@@ -233,7 +233,7 @@ module Sequel
               _changed_columns.delete(column) unless missing_initial_values.include?(column)
               iv.delete(column)
             end
-          else
+          elsif db_schema[column]
             check_missing_initial_value(column)
             iv[column] = get_column_value(column)
             super
