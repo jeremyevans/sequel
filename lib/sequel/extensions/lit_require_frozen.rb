@@ -85,13 +85,14 @@ module Sequel
       # Check that placeholder string is frozen (or all entries
       # in placeholder array are frozen).
       def placeholder_literal_string_sql_append(sql, pls)
-        case str = pls.str
-        when String
-          _check_unfrozen_literal_string(str)
-        when Array
+        str = pls.str
+
+        if str.is_a?(Array)
           str.each do |s|
             _check_unfrozen_literal_string(s)
           end
+        else
+          _check_unfrozen_literal_string(str)
         end
 
         super
