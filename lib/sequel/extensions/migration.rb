@@ -186,22 +186,19 @@ module Sequel
     # and returns a new block that reverses the actions taken by
     # the given block.
     def reverse(&block)
-      begin
-        instance_exec(&block)
-      rescue
-        just_raise = true
-      end
-      if just_raise
-        Proc.new{raise Sequel::Error, "irreversible migration method used in #{block.source_location.first}, you may need to write your own down method"}
-      else
-        actions = @actions.reverse
-        Proc.new do
-          actions.each do |a|
-            pr = a.last.is_a?(Proc) ? a.pop : nil
-            # Allow calling private methods as the reversing methods are private
-            send(*a, &pr)
-          end
-        end
+      instance_exec(&block)
+    rescue NoMethodError => e
+      Proc.new{raise Sequel::Error, "irreversible migration method \"#{e.name}\" used in #{block.source_location.first}, you may need to write your own down method"}
+    rescue => e
+      Proc.new{raise Sequel::Error, "unable to reverse migration due to #{e.class} in #{block.source_location.first}, you may need to write your own down method"}
+    else
+      actions = @actions.reverse
+      Proc.new do
+       actions.each do |a|
+        pr = a.last.is_a?(Proc) ? a.pop : nil
+        # Allow calling private methods as the reversing methods are private
+        send(*a, &pr)
+       end
       end
     end
 
@@ -270,7 +267,7 @@ module Sequel
     end
 
     def add_primary_key(*args)
-      raise if args.first.is_a?(Array)
+      super if args.first.is_a?(Array)
       @actions << [:drop_column, args.first]
     end
 

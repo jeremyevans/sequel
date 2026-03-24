@@ -241,26 +241,29 @@ describe "Reversible/Revert Migrations with Sequel.migration{change|revert}" do
   it "should raise in the down direction if migration uses unsupported method" do
     m = Sequel.migration{change{run 'SQL'}}
     m.apply(@db, :up)
-    proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error).
+      message.must_match(/irreversible migration method "run" used in .*spec\/extensions\/migration_spec.rb/)
   end
   
   it "should raise in the down direction if migration uses add_primary_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_primary_key [:b]}}}
     m.apply(@db, :up)
-    proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error).
+      message.must_match(/irreversible migration method "add_primary_key" used in .*spec\/extensions\/migration_spec.rb/)
   end
   
-  it "should raise in the down direction if migration uses add_foreign_key with an array" do
+  it "should raise in the down direction with the name of the source file if migration is irreversible for reasons other than NoMethodError" do
     m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
     m.apply(@db, :up)
-    proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error).
+      message.must_match(/unable to reverse migration due to ArgumentError in .*spec\/extensions\/migration_spec.rb/)
   end
 
-  it "should raise in the down direction with the name of the source file if migration is irreversible" do
-    m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
+  it "should raise in the down direction if migration uses create_view with a dataset" do
+    m = Sequel.migration{change{create_view(:a, from(:b))}}
     m.apply(@db, :up)
-    error = proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
-    error.message.must_match(/irreversible migration method used in .*spec\/extensions\/migration_spec.rb/)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error).
+      message.must_match(/irreversible migration method "from" used in .*spec\/extensions\/migration_spec.rb/)
   end
 
   it "revert should apply down with given actions in given order" do

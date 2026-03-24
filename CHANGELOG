@@ -1,5 +1,7 @@
 === master
 
+* Show method name causing change migration to be irreversible in exception message (jeremyevans)
+
 * Make dirty plugin handle the Model#[]= calls with keys that are not model columns (jeremyevans) (#2357)
 
 * Soft-deprecate the jdbc/derby adapter, as Derby is no longer supported upstream (jeremyevans) 
