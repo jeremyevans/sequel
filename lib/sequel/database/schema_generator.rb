@@ -3,6 +3,33 @@
 module Sequel
   # The Schema module holds the schema generators.
   module Schema
+    module ColumnOptionMerger
+      private
+
+      # Merge given options into the column's default options. For backwards compatibility,
+      # the options take priority, but in cases where the option value overrides the argument
+      # value, and the values are different, we warn as this is likely to be an error in the
+      # code.
+      def _merge_column_options(defaults, opts)
+        defaults.merge!(opts) do |k, defv, v|
+          unless defv == v
+            # :nocov:
+            if RUBY_VERSION >= "3.2"
+            # :nocov:
+              caller_loc = Thread.each_caller_location do |loc|
+                break loc unless loc.path == __FILE__
+              end
+              caller_loc &&= "#{caller_loc.path}:#{caller_loc.lineno}: "
+            end
+            warn("#{caller_loc}#{k.inspect} option value (#{v.inspect}) overrides argument value (#{defv.inspect})")
+          end
+
+          v
+        end
+      end
+    end
+    private_constant :ColumnOptionMerger
+
     # Schema::CreateTableGenerator is an internal class that the user is not expected
     # to instantiate directly.  Instances are created by Database#create_table.
     # It is used to specify table creation parameters.  It takes a Database
@@ -17,6 +44,8 @@ module Sequel
     # For more information on Sequel's support for schema modification, see
     # the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     class CreateTableGenerator
+      include ColumnOptionMerger
+
       # Classes specifying generic types that Sequel will convert to database-specific types.
       GENERIC_TYPES=%w'String Integer Float Numeric BigDecimal Date DateTime Time File TrueClass FalseClass'.freeze
       
@@ -173,13 +202,13 @@ module Sequel
       # :clustered :: When using :primary_key or :unique, marks the primary key or unique
       #               constraint as CLUSTERED (if true), or NONCLUSTERED (if false).
       def column(name, type, opts = OPTS)
-        columns << {:name => name, :type => type}.merge!(opts)
+        columns << _merge_column_options({:name => name, :type => type}, opts)
         if index_opts = opts[:index]
           index(name, index_opts.is_a?(Hash) ? index_opts : OPTS)
         end
         nil
       end
-      
+
       # Adds a named CHECK constraint (or unnamed if name is nil),
       # with the given block or args. To provide options for the constraint, pass
       # a hash as the first argument.
@@ -246,7 +275,7 @@ module Sequel
           opts.merge(:table=>table)
         end
         return composite_foreign_key(name, opts) if name.is_a?(Array)
-        column(name, Integer, opts)
+        column(name, opts.fetch(:type, Integer), opts)
       end
 
       # Add a full text index on the given columns.
@@ -429,6 +458,8 @@ module Sequel
     # For more information on Sequel's support for schema modification, see
     # the {"Schema Modification" guide}[link:files/doc/schema_modification_rdoc.html].
     class AlterTableGenerator
+      include ColumnOptionMerger
+
       # An array of operations to perform
       attr_reader :operations
       
@@ -454,7 +485,7 @@ module Sequel
       # :after :: The name of an existing column that the new column should be positioned after
       # :first :: Create this new column before all other existing columns
       def add_column(name, type, opts = OPTS)
-        op = {:op => :add_column, :name => name, :type => type}.merge!(opts)
+        op = _merge_column_options({:op => :add_column, :name => name, :type => type}, opts)
         index_opts = op.delete(:index)
         @operations << op
         add_index(name, index_opts.is_a?(Hash) ? index_opts : OPTS) if index_opts
@@ -519,7 +550,7 @@ module Sequel
       #               sense when using an array of columns.
       def add_foreign_key(name, table, opts = OPTS)
         return add_composite_foreign_key(name, table, opts) if name.is_a?(Array)
-        add_column(name, Integer, {:table=>table}.merge!(opts))
+        add_column(name, opts.fetch(:type, Integer), {:table=>table}.merge!(opts))
       end
       
       # Add a full text index on the given columns.
