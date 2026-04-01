@@ -40,7 +40,7 @@ describe "arbtirary servers" do
       @db.synchronize(:host=>'host1', :database=>'db1') do |c2|
         c2.must_be_same_as(c)
       end
-      x.must_be_same_as(nil)
+      x.must_be_nil
     end
     x.must_be_same_as(x1)
   end

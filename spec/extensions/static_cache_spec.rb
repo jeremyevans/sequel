@@ -312,10 +312,8 @@ describe "Sequel::Plugins::StaticCache" do
       @c.set_primary_key([:id, :id2])
       @c.plugin :static_cache
       @db.sqls
-      @c1 = @c.cache[[1, 2]]
-      @c2 = @c.cache[[2, 1]]
-      @c[[1, 2]].must_be_same_as(@c1)
-      @c[[2, 1]].must_be_same_as(@c2)
+      @c[[1, 2]].must_be_nil
+      @c[[2, 1]].must_be_same_as(@c.cache[[2, 1]])
       @db.sqls.must_equal []
     end
 

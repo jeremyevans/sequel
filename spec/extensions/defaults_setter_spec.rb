@@ -132,7 +132,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
     o.a.must_be_nil
     o.values.must_be_empty
     o.a.must_be_nil
-    o.a.must_be_same_as(o.a)
+    o.a.must_be_nil
   end
 
   it "should not override a given value" do
