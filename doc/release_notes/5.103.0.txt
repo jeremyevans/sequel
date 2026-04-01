@@ -7,7 +7,7 @@
   string literals are frozen and are likely to be safe:
     
     # Probably safe, no exception raised
-    DB["SELECT * FROM t WHERE c > :v", v: user_provided_string)
+    DB["SELECT * FROM t WHERE c > :v", v: user_provided_string]
     
     # Potentially unsafe, raises Sequel::LitRequireFrozen::Error
     DB["SELECT * FROM t WHERE c > '#{user_provided_string}'"]
