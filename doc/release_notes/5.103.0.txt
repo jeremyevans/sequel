@@ -1,0 +1,85 @@
+= New Features
+
+* A lit_require_frozen extension has been added, which disallows the
+  use of unfrozen strings as literal SQL. This is designed for use on
+  Ruby 3+ with frozen string literals enabled, where interpolated
+  string literals are unfrozen and may not be safe, but uninterpolated
+  string literals are frozen and are likely to be safe:
+    
+    # Probably safe, no exception raised
+    DB["SELECT * FROM t WHERE c > :v", v: user_provided_string)
+    
+    # Potentially unsafe, raises Sequel::LitRequireFrozen::Error
+    DB["SELECT * FROM t WHERE c > '#{user_provided_string}'"]
+
+  A Database instance using the extension disallows the following:
+
+  * Sequel::LiteralString instances that are unfrozen and are not
+    based on a frozen string
+
+  * Sequel::SQL::PlaceholderLiteralString instances when the
+    placeholder string is not frozen
+
+  * Unfrozen strings passed to Database#<<, #run, #fetch, #[] or
+    Dataset#with_sql
+
+= Other Improvements
+
+* If a column or add_column schema generator method is passed a :name
+  or :type option with a value that differs from the value of the
+  related argument (name is the first argument, type is the second
+  argument), Sequel now emits a warning.  For backwards compatibility,
+  Sequel continues to use the value of the option, not the value of
+  the positional argument. This can alert you to problematic code such
+  as:
+
+    column :column_name, :table_name, type: :type_name
+
+  where the intent was probably to use foreign_key instead of column.
+
+* If a migration is irreversible due to an unsupported method, the
+  method that is unsupported is now included in the exception message.
+  If the migration is irreversible due to other reasons, the raised
+  exception class is included in the exception message.
+
+* The dirty plugin now handles Model#[] calls with keys that are not
+  model columns.
+
+* Sequel now avoids creating multiple strings when passing a
+  Sequel::LiteralString to a dataset filtering method. This is a
+  small performance improvement if you are passing large literal
+  strings.
+
+* In the timed_queue connection pools, if connections are
+  disconnected, Sequel will now only attempt to create as many new
+  connections as their were disconnections. Previously, the thread
+  spun up to create connections would continue creating connections
+  as long as there were threads needing connections and the pool
+  was not full. The main benefit of this change is that Sequel
+  will avoid spinning up a thread to create new connections in the
+  case that no existing connections were actually disconnected.
+
+= Backwards Compatibility
+
+* The private fill_queue method for the timed_queue connection pools
+  now requires an additional argument.
+
+* Sequel now freezes more internal objects, mostly to allow existing
+  code to work with the lit_require_frozen extension, including some:
+
+  * Interpolated literal strings (which would be frozen on
+    Ruby 2.3-2.7 anyway).
+
+  * Generated SQL queries.
+
+  * Placeholder literalizer and prepared statement internal state.
+
+  * Strings inside constants in the date_arithmetic extension.
+
+  It is not expected that this will break any applications using
+  Sequel unless they are overriding Sequel methods and mutating
+  arguments or internal state.
+
+* The jdbc/derby adapter is now soft-deprecated. While it does not yet
+  emit deprecation warnings, it will be removed in Sequel 6, as
+  upstream development of Apache Derby has ceased.
