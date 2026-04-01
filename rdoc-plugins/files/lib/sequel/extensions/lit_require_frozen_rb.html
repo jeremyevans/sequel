@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>lit_require_frozen.rb</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>lit_require_frozen.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/lit_require_frozen.rb
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The <a href="lit_require_frozen_rb.html">lit_require_frozen</a> extension disallows the use of unfrozen strings as literal strings in database and dataset methods. If you try to use an unfrozen string as a literal string for a dataset using this extension, an exception will be raised.</p>
+
+<p>While this works for all Ruby versions, it is designed for use on Ruby 3+ where all files are using the frozen-string-literal magic comment. In this case, uninterpolated literal strings are frozen, but interpolated strings are not frozen. This allows you to catch potentially dangerous code:</p>
+
+<pre># Probably safe, no exception raised
+DB[&quot;SELECT * FROM t WHERE c &gt; :v&quot;, v: user_provided_string)
+
+# Potentially unsafe, raises Sequel::LitRequireFrozen::Error
+DB[&quot;SELECT * FROM t WHERE c &gt; &#39;#{user_provided_string}&#39;&quot;]</pre>
+
+<p>The assumption made is that a frozen string is unlikely to contain unsafe input, while an unfrozen string has potentially been interpolated and may contain unsafe input.</p>
+
+<p>This disallows the the following cases:</p>
+<ul><li>
+<p><a href="../../../../classes/Sequel/LiteralString.html"><code>Sequel::LiteralString</code></a> instances that are unfrozen and are not based on a frozen string</p>
+</li><li>
+<p>Sequel::SQL::PlaceholderLiteralString instances when the placeholder string is not frozen</p>
+</li><li>
+<p>Unfrozen strings passed to Database#<< or [] or Dataset#with_sql</p>
+</li></ul>
+
+<p>To use this extension, load it into the database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:lit_require_frozen</span>
+</pre>
+
+<p>It can also be loaded into individual datasets:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:lit_require_frozen</span>)
+</pre>
+
+<p>Assuming you have good test coverage, it is recommended to only load this extension when testing.</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/LitRequireFrozen.html"><code>Sequel::LitRequireFrozen</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

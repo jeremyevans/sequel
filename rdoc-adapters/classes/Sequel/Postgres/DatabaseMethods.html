@@ -364,7 +364,7 @@ end_sql
 </a>
 <pre id='method-i-commit_prepared_transaction-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">341</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">342</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;COMMIT PREPARED #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">342</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;COMMIT PREPARED #{literal(transaction_id)}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">343</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -438,7 +438,7 @@ end_sql
 <span class="line-num">416</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">already_identity</span>
 <span class="line-num">417</span> 
 <span class="line-num">418</span>   <span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">server_hash</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">419</span>     <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT&quot;</span>, <span class="ruby-identifier">server_hash</span>)
+<span class="line-num">419</span>     <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">server_hash</span>)
 <span class="line-num">420</span> 
 <span class="line-num">421</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_depend</span>).
 <span class="line-num">422</span>       <span class="ruby-identifier">where</span>(<span class="ruby-value">:classid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:objid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">seq_oid</span>, <span class="ruby-value">:objsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>, <span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>).
@@ -508,7 +508,7 @@ end_sql
 </a>
 <pre id='method-i-create_function-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">455</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_function</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">456</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">456</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">457</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -543,7 +543,7 @@ end_sql
 </a>
 <pre id='method-i-create_language-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">466</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_language</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">467</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">467</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">468</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -574,7 +574,7 @@ end_sql
 </a>
 <pre id='method-i-create_schema-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">475</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">476</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">476</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">477</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -669,7 +669,7 @@ end_sql
 </a>
 <pre id='method-i-create_trigger-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">511</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">512</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">512</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">513</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -748,7 +748,7 @@ end_sql
 <pre id='method-i-do-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">543</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">do</span>(<span class="ruby-identifier ruby-title">code</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
 <span class="line-num">544</span>   <span class="ruby-identifier">language</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:language</span>]
-<span class="line-num">545</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;DO #{&quot;LANGUAGE #{literal(language.to_s)} &quot; if language}#{literal(code)}&quot;</span>
+<span class="line-num">545</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;DO #{&quot;LANGUAGE #{literal(language.to_s)} &quot; if language}#{literal(code)}&quot;</span>.<span class="ruby-identifier">freeze</span>
 <span class="line-num">546</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -781,7 +781,7 @@ end_sql
 </a>
 <pre id='method-i-drop_function-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">554</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_function</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">555</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">555</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">556</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -812,7 +812,7 @@ end_sql
 </a>
 <pre id='method-i-drop_language-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">563</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_language</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">564</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">564</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">565</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -843,7 +843,7 @@ end_sql
 </a>
 <pre id='method-i-drop_schema-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">572</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">573</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">573</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">574</span>   <span class="ruby-identifier">remove_all_cached_schemas</span>
 <span class="line-num">575</span> <span class="ruby-keyword">end</span></pre>
 </div>
@@ -877,7 +877,7 @@ end_sql
 </a>
 <pre id='method-i-drop_trigger-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">583</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">584</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">584</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">585</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -1187,7 +1187,7 @@ end_sql
 </a>
 <pre id='method-i-refresh_view-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">758</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">759</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;REFRESH MATERIALIZED VIEW#{&#39; CONCURRENTLY&#39; if opts[:concurrently]} #{quote_schema_table(name)}&quot;</span>
+<span class="line-num">759</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;REFRESH MATERIALIZED VIEW#{&#39; CONCURRENTLY&#39; if opts[:concurrently]} #{quote_schema_table(name)}&quot;</span>.<span class="ruby-identifier">freeze</span>
 <span class="line-num">760</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -1213,7 +1213,7 @@ end_sql
 </a>
 <pre id='method-i-rename_schema-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">747</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
-<span class="line-num">748</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">rename_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
+<span class="line-num">748</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">rename_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>).<span class="ruby-identifier">freeze</span>
 <span class="line-num">749</span>   <span class="ruby-identifier">remove_all_cached_schemas</span>
 <span class="line-num">750</span> <span class="ruby-keyword">end</span></pre>
 </div>
@@ -1242,7 +1242,7 @@ end_sql
 <span class="line-num">769</span>   <span class="ruby-identifier">table</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>
 <span class="line-num">770</span> 
 <span class="line-num">771</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100000</span>
-<span class="line-num">772</span>     <span class="ruby-identifier">seq_ds</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_sequence</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:seqrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">seq</span>)))
+<span class="line-num">772</span>     <span class="ruby-identifier">seq_ds</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_sequence</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:seqrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">seq</span>.<span class="ruby-identifier">freeze</span>)))
 <span class="line-num">773</span>     <span class="ruby-identifier">increment_by</span> = <span class="ruby-value">:seqincrement</span>
 <span class="line-num">774</span>     <span class="ruby-identifier">min_value</span> = <span class="ruby-value">:seqmin</span>
 <span class="line-num">775</span>   <span class="ruby-comment"># :nocov:</span>
@@ -1272,7 +1272,7 @@ end_sql
 </a>
 <pre id='method-i-rollback_prepared_transaction-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
 <span class="line-num">786</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">787</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ROLLBACK PREPARED #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">787</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ROLLBACK PREPARED #{literal(transaction_id)}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">788</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

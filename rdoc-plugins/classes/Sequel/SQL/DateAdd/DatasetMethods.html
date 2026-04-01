@@ -62,7 +62,7 @@ Sequel::SQL::DateAdd::DatasetMethods
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>DB2_DURATION_UNITS</td>
 <td>=</td>
-<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s).freeze}).freeze</td>
+<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.freeze).freeze}).freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
@@ -76,7 +76,7 @@ Sequel::SQL::DateAdd::DatasetMethods
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>DERBY_DURATION_UNITS</td>
 <td>=</td>
-<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit("SQL_TSI_#{s.to_s.upcase[0...-1]}").freeze}).freeze</td>
+<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit("SQL_TSI_#{s.to_s.upcase[0...-1]}".freeze).freeze}).freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
@@ -97,14 +97,14 @@ Sequel::SQL::DateAdd::DatasetMethods
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MSSQL_DURATION_UNITS</td>
 <td>=</td>
-<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s[0...-1]).freeze}).freeze</td>
+<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s[0...-1].freeze).freeze}).freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MYSQL_DURATION_UNITS</td>
 <td>=</td>
-<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.upcase[0...-1]).freeze}).freeze</td>
+<td class='context-item-value'>DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.upcase[0...-1].freeze).freeze}).freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
@@ -153,7 +153,7 @@ Sequel::SQL::DateAdd::DatasetMethods
 <span class="line-num">107</span>       <span class="ruby-identifier">placeholder</span> = []
 <span class="line-num">108</span>       <span class="ruby-identifier">vals</span> = []
 <span class="line-num">109</span>       <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">POSTGRES_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>
-<span class="line-num">110</span>         <span class="ruby-identifier">placeholder</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{&#39;, &#39; unless placeholder.empty?}#{sql_unit} := &quot;</span>
+<span class="line-num">110</span>         <span class="ruby-identifier">placeholder</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{&#39;, &#39; unless placeholder.empty?}#{sql_unit} := &quot;</span>.<span class="ruby-identifier">freeze</span>
 <span class="line-num">111</span>         <span class="ruby-identifier">vals</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">value</span>
 <span class="line-num">112</span>       <span class="ruby-keyword">end</span>
 <span class="line-num">113</span>       <span class="ruby-identifier">interval</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:make_interval</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-identifier">placeholder</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">vals</span>)) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">empty?</span>
@@ -202,7 +202,7 @@ Sequel::SQL::DateAdd::DatasetMethods
 <span class="line-num">156</span>       <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-identifier">expr</span>) <span class="ruby-operator">+</span> <span class="ruby-string">&#39; 00:00:00&#39;</span>
 <span class="line-num">157</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">158</span>     <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">DERBY_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>
-<span class="line-num">159</span>       <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-node">&quot;{fn timestampadd(#{sql_unit}, &quot;</span>, <span class="ruby-string">&quot;, timestamp(&quot;</span>, <span class="ruby-string">&quot;))}&quot;</span>], <span class="ruby-identifier">value</span>, <span class="ruby-identifier">expr</span>)
+<span class="line-num">159</span>       <span class="ruby-identifier">expr</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-node">&quot;{fn timestampadd(#{sql_unit}, &quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-string">&quot;, timestamp(&quot;</span>, <span class="ruby-string">&quot;))}&quot;</span>], <span class="ruby-identifier">value</span>, <span class="ruby-identifier">expr</span>)
 <span class="line-num">160</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">161</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:oracle</span>
 <span class="line-num">162</span>     <span class="ruby-identifier">each_valid_interval_unit</span>(<span class="ruby-identifier">h</span>, <span class="ruby-constant">MYSQL_DURATION_UNITS</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">sql_unit</span><span class="ruby-operator">|</span>

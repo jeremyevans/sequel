@@ -32,6 +32,9 @@ Sequel::LiteralString
 <a href="../../files/lib/sequel/extensions/is_distinct_from_rb.html">lib/sequel/extensions/is_distinct_from.rb</a>
 </li>
 <li class='other'>
+<a href="../../files/lib/sequel/extensions/lit_require_frozen_rb.html">lib/sequel/extensions/lit_require_frozen.rb</a>
+</li>
+<li class='other'>
 <a href="../../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
 </li>
 <li class='other'>
@@ -64,6 +67,17 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#attribute-i-source">source</a></li>
+</ol>
+</div>
 <div id='context'>
 <div id='includes'>
 <h2>Included modules</h2>
@@ -80,6 +94,45 @@ Superclass:
 </div>
 </div>
 <div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-source'>source</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The string used when creating the literal string (first argument to <a href="LiteralString.html#method-c-new"><code>Sequel::LiteralString.new</code></a>). This may be nil if no string was provided, or if the litral string was created before this extension was required.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(*a)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/extensions/lit_require_frozen.rb</span>
+<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)
+<span class="line-num">53</span>   <span class="ruby-ivar">@source</span> = <span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>
+<span class="line-num">54</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
 </div>
 
 </div>

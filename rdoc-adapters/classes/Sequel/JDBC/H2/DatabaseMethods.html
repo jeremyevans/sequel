@@ -97,7 +97,7 @@ Sequel::JDBC::H2::DatabaseMethods
 </a>
 <pre id='method-i-commit_prepared_transaction-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/h2.rb</span>
 <span class="line-num">20</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">21</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;COMMIT TRANSACTION #{transaction_id}&quot;</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">21</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;COMMIT TRANSACTION #{transaction_id}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">22</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
@@ -175,7 +175,7 @@ Sequel::JDBC::H2::DatabaseMethods
 </a>
 <pre id='method-i-rollback_prepared_transaction-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/h2.rb</span>
 <span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">39</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ROLLBACK TRANSACTION #{transaction_id}&quot;</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">39</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ROLLBACK TRANSACTION #{transaction_id}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
 <span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>

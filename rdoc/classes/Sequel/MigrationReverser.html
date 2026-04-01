@@ -95,24 +95,21 @@ Superclass:
 </a>
 <pre id='method-i-reverse-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>
 <span class="line-num">188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">189</span>   <span class="ruby-keyword">begin</span>
-<span class="line-num">190</span>     <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">191</span>   <span class="ruby-keyword">rescue</span>
-<span class="line-num">192</span>     <span class="ruby-identifier">just_raise</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">193</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">194</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">just_raise</span>
-<span class="line-num">195</span>     <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;irreversible migration method used in #{block.source_location.first}, you may need to write your own down method&quot;</span>}
-<span class="line-num">196</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">197</span>     <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>
-<span class="line-num">198</span>     <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>
-<span class="line-num">199</span>       <span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
-<span class="line-num">200</span>         <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">a</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Proc</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>
-<span class="line-num">201</span>         <span class="ruby-comment"># Allow calling private methods as the reversing methods are private</span>
-<span class="line-num">202</span>         <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>)
-<span class="line-num">203</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">204</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">205</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">206</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">189</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">190</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NoMethodError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">191</span>   <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;irreversible migration method \&quot;#{e.name}\&quot; used in #{block.source_location.first}, you may need to write your own down method&quot;</span>}
+<span class="line-num">192</span> <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>
+<span class="line-num">193</span>   <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unable to reverse migration due to #{e.class} in #{block.source_location.first}, you may need to write your own down method&quot;</span>}
+<span class="line-num">194</span> <span class="ruby-keyword">else</span>
+<span class="line-num">195</span>   <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>
+<span class="line-num">196</span>   <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>
+<span class="line-num">197</span>    <span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>
+<span class="line-num">198</span>     <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">a</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Proc</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>
+<span class="line-num">199</span>     <span class="ruby-comment"># Allow calling private methods as the reversing methods are private</span>
+<span class="line-num">200</span>     <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>)
+<span class="line-num">201</span>    <span class="ruby-keyword">end</span>
+<span class="line-num">202</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

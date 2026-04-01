@@ -856,7 +856,7 @@ Superclass:
 <span class="line-num">320</span>         <span class="ruby-keyword">end</span>
 <span class="line-num">321</span>         <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">append_sql</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">k</span>)
 <span class="line-num">322</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">323</span>       <span class="ruby-identifier">objects</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">to_a</span>)
+<span class="line-num">323</span>       <span class="ruby-identifier">objects</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>.<span class="ruby-identifier">freeze</span>).<span class="ruby-identifier">to_a</span>)
 <span class="line-num">324</span>     <span class="ruby-keyword">end</span>
 <span class="line-num">325</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-identifier">cascade</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">cascade</span>
 <span class="line-num">326</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:post_load</span>, <span class="ruby-identifier">objects</span>)
