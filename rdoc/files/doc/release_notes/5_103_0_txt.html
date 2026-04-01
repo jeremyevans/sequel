@@ -37,11 +37,12 @@ doc/release_notes/5.103.0.txt
 <ul><li>
 <p>A lit_require_frozen extension has been added, which disallows the use of unfrozen strings as literal SQL. This is designed for use on Ruby 3+ with frozen string literals enabled, where interpolated string literals are unfrozen and may not be safe, but uninterpolated string literals are frozen and are likely to be safe:</p>
 
-<pre># Probably safe, no exception raised
-DB[&quot;SELECT * FROM t WHERE c &gt; :v&quot;, v: user_provided_string)
+<pre class="ruby"><span class="ruby-comment"># Probably safe, no exception raised</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM t WHERE c &gt; :v&quot;</span>, <span class="ruby-value">v:</span> <span class="ruby-identifier">user_provided_string</span>]
 
-# Potentially unsafe, raises Sequel::LitRequireFrozen::Error
-DB[&quot;SELECT * FROM t WHERE c &gt; &#39;#{user_provided_string}&#39;&quot;]</pre>
+<span class="ruby-comment"># Potentially unsafe, raises Sequel::LitRequireFrozen::Error</span>
+<span class="ruby-constant">DB</span>[<span class="ruby-node">&quot;SELECT * FROM t WHERE c &gt; &#39;#{user_provided_string}&#39;&quot;</span>]
+</pre>
 
 <p>A Database instance using the extension disallows the following:</p>
 <ul><li>
