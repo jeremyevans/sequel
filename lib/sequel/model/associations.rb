@@ -1018,9 +1018,11 @@ module Sequel
       class OneToManyAssociationReflection < AssociationReflection
         ASSOCIATION_TYPES[:one_to_many] = self
         
-        # Support a correlated subquery limit strategy when using eager_graph.
+        # Support a lateral_subquery and correlated_subquery limit strategy when using eager_graph.
         def apply_eager_graph_limit_strategy(strategy, ds)
           case strategy
+          when :lateral_subquery
+            apply_lateral_subquery_eager_graph_limit_strategy(ds)
           when :correlated_subquery
             apply_correlated_subquery_limit_strategy(ds)
           else
@@ -1116,6 +1118,28 @@ module Sequel
             where(Array(qualify(cs_alias, key)).zip(Array(qualify(table_alias, key)))).
             limit(*limit_and_offset)
           ds.where(qualify(table_alias, primary_key)=>cs)
+        end
+
+        # Use a LATERAL subquery to limit the dataset.  Note that this will not
+        # work correctly if the associated dataset uses qualified identifers in the WHERE clause,
+        # as they would reference the containing query instead of the subquery.
+        #
+        # This does not contain the conditions that are necessary to join to the
+        # query, since the necessary qualifier is not passed as an argument.
+        def apply_lateral_subquery_eager_graph_limit_strategy(ds)
+          table_name = ds.first_source_alias
+          qualifier = ds.opts[:eager_options][:implicit_qualifier]
+          graph_conditions = self[:_graph_conditions]
+
+          unless Sequel.condition_specifier?(graph_conditions)
+            raise Error, "lateral_subquery eager graph limit strategy only supported when graph conditions are a hash or array of pairs"
+          end
+
+          ds.
+            limit(*limit_and_offset).
+            order(*self[:order]).
+            where(graph_conditions.map{|k, v| [qualify(table_name, k), qualify(qualifier, v)]}).
+            lateral
         end
 
         # Support correlated subquery strategy when filtering by limited associations.
@@ -2413,9 +2437,14 @@ module Sequel
           conditions = opts[:graph_conditions]
           opts[:cartesian_product_number] ||= one_to_one ? 0 : 1
           graph_block = opts[:graph_block]
+          graph_conditions = opts[:_graph_conditions] = use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(opts.apply_eager_graph_limit_strategy(eo[:limit_strategy], eager_graph_dataset(opts, eo)), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep), &graph_block)
+            graph_limit_strategy = eo[:limit_strategy]
+            egds = opts.apply_eager_graph_limit_strategy(graph_limit_strategy, eager_graph_dataset(opts, eo))
+            graph_conditions_true = true if graph_limit_strategy == :lateral_subquery
+
+            ds = ds.graph(egds, graph_conditions_true || graph_conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds
@@ -2498,6 +2527,9 @@ module Sequel
         # Return dataset to graph into given the association reflection, applying the :callback option if set.
         def eager_graph_dataset(opts, eager_options)
           ds = opts.associated_class.dataset
+          if eager_options[:limit_strategy] == :lateral_subquery
+            ds = ds.clone(:eager_options=>eager_options)
+          end
           if opts[:graph_use_association_block] && (b = opts[:block])
             ds = b.call(ds)
           end

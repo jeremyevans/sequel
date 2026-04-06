@@ -445,10 +445,13 @@ eager loading via #eager, not with #eager_graph.
 When eager loading an association via eager_graph (which uses JOINs), the
 situation is similar.  While the UNION-based strategy cannot be used as
 you don't know the records being eagerly loaded in advance, Sequel can use
-a variant of the other 3 strategies.  By default it retrieves all records
-and then does the array slice in ruby.  As eager_graph does not support
-options, to use an eager_graph limit strategy you have to use the
-eager_graph_with_options method with the :limit_strategy option.
+other strategies.
+
+By default Sequel retrieves all records and then does the array slice in ruby.
+As eager_graph does not support options, to use an eager_graph limit strategy
+you have to use the eager_graph_with_options method with the :limit_strategy option.
+
+The eager_graph limit strategies Sequel supports are described below.
 
 The :distinct_on strategy uses DISTINCT ON in a subquery and JOINs that
 subquery:
@@ -481,7 +484,7 @@ function:
   # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)
 
 The :correlated_subquery approach JOINs to a nested subquery using a correlated
-subquery:
+subquery (only supported for one_to_many/one_to_one):
 
   Artist.eager_graph_with_options(:first_10_albums, limit_strategy: :correlated_subquery).all
   # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
@@ -500,11 +503,32 @@ subquery:
   #   )
   # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)
 
+The :lateral_subquery uses a LATERAL JOIN to a subquery, and moves the conditions
+for the JOIN into the subquery, as that is required on some/all databases to make the query
+fast (only supported for one_to_many/one_to_one):
+
+  Artist.eager_graph_with_options(:first_10_albums, limit_strategy: :lateral_subquery).all
+  # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
+  #        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,
+  #        first_10_albums.release_date
+  # FROM artists 
+  # LEFT OUTER JOIN LATERAL (
+  #   SELECT *
+  #   FROM albums
+  #   WHERE (albums.artist_id = artists.id)
+  #   ORDER BY release_date
+  #   LIMIT 10
+  # ) AS first_10_albums ON true
+  # ORDER BY first_10_albums.release_date
+
 The reason that Sequel does not automatically use the :distinct_on, :window function
 or :correlated_subquery strategy for eager_graph is that it can perform much worse than the
 default of just doing the array slicing in ruby.  If you are only using eager_graph to
-return a few records, it may be cheaper to get all of their associated records and filter
+return a few of many records, it may be cheaper to get all of their associated records and filter
 them in ruby as opposed to computing the set of limited associated records for all rows.
+
+Sequel may in the future make the :lateral_subquery limit strategy the default strategy
+on the databases that support it.
 
 It's recommended to only use an eager_graph limit strategy if you have benchmarked
 it against the default behavior and found it is faster for your use case.
@@ -572,7 +596,7 @@ that don't support window functions and don't support multiple columns in IN.
 === Additional Association Types
 
 While the above examples for limited associations showed one_to_many and one_to_one associations,
-it's just because those are the simplest examples.  Sequel supports all of the same features for
+it's just because those are the simplest examples.  Sequel supports most of the same features for
 many_to_many and one_through_one associations that are enabled by default, as well as the
 many_through_many and one_through_many associations that are added by the many_through_many
 plugin.

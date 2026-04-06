@@ -1,3 +1,7 @@
+=== master
+
+* Support :lateral_subquery as an eager_graph limit strategy for one_to_many/one_to_one associations (jeremyevans)
+
 === 5.103.0 (2026-04-01)
 
 * Have column and add_column in the generators warn if option values override argument values (jeremyevans)

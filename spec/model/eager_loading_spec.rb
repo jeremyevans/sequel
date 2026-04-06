@@ -1711,7 +1711,6 @@ describe Sequel::Model, "#eager_graph" do
   it "should eagerly graph a single one_to_one association using the :correlated_subquery strategy" do
     sub = Class.new(GraphTrack)
     sub.dataset = sub.dataset.with_extend do
-      def supports_window_functions?; true end
       def columns; [:id, :album_id] end
     end
     GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub
@@ -1720,6 +1719,57 @@ describe Sequel::Model, "#eager_graph" do
     a = ds.with_fetch(:id=>1, :band_id=>2, :ltrack_id=>3, :album_id=>1).all
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
     a.first.ltrack.must_equal sub.load(:id => 3, :album_id=>1)
+  end
+  
+  it "should eagerly graph a single one_to_one association using the :lateral_subquery strategy" do
+    sub = Class.new(GraphTrack)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; [:id, :album_id] end
+    end
+    GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub
+    ds = GraphAlbum.eager_graph_with_options(:ltrack, :limit_strategy=>:lateral_subquery)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, ltrack.id AS ltrack_id, ltrack.album_id FROM albums LEFT OUTER JOIN LATERAL (SELECT * FROM tracks WHERE (tracks.album_id = albums.id) LIMIT 1) AS ltrack ON \'t\''
+    a = ds.with_fetch(:id=>1, :band_id=>2, :ltrack_id=>3, :album_id=>1).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.ltrack.must_equal sub.load(:id => 3, :album_id=>1)
+  end
+  
+  it "should eagerly graph a single one_to_one association using the :lateral_subquery strategy with composite keys and :primary_key" do
+    sub = Class.new(GraphTrack)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; [:id, :album_id] end
+    end
+    GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub, primary_key: [:id, :band_id], key: [:album_id, :id]
+    ds = GraphAlbum.eager_graph_with_options(:ltrack, :limit_strategy=>:lateral_subquery)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, ltrack.id AS ltrack_id, ltrack.album_id FROM albums LEFT OUTER JOIN LATERAL (SELECT * FROM tracks WHERE ((tracks.album_id = albums.id) AND (tracks.id = albums.band_id)) LIMIT 1) AS ltrack ON \'t\''
+    a = ds.with_fetch(:id=>1, :band_id=>2, :ltrack_id=>3, :album_id=>1).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.ltrack.must_equal sub.load(:id => 3, :album_id=>1)
+  end
+  
+  it "should eagerly graph a one_to_one and one_to_many association using the :lateral_subquery strategy" do
+    sub = Class.new(GraphTrack)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; [:id, :album_id] end
+    end
+    GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub
+    GraphAlbum.one_to_many :l2track, :clone=>:track, :class=>sub, :limit=>2
+    ds = GraphAlbum.
+      eager_graph_with_options(:ltrack, :limit_strategy=>:lateral_subquery).
+      eager_graph_with_options(:l2track, :limit_strategy=>:lateral_subquery)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, ltrack.id AS ltrack_id, ltrack.album_id, l2track.id AS l2track_id, l2track.album_id AS l2track_album_id FROM albums LEFT OUTER JOIN LATERAL (SELECT * FROM tracks WHERE (tracks.album_id = albums.id) LIMIT 1) AS ltrack ON \'t\' LEFT OUTER JOIN LATERAL (SELECT * FROM tracks WHERE (tracks.album_id = albums.id) LIMIT 2) AS l2track ON \'t\''
+    a = ds.with_fetch(:id=>1, :band_id=>2, :ltrack_id=>3, :album_id=>1).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.ltrack.must_equal sub.load(:id => 3, :album_id=>1)
+  end
+  
+  it "should raise error when using :lateral_subquery eager graph limit strategy when conditions are not compatible" do
+    sub = Class.new(GraphTrack)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; [:id, :album_id] end
+    end
+    GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub, :graph_only_conditions=>true
+    proc{GraphAlbum.eager_graph_with_options(:ltrack, :limit_strategy=>:lateral_subquery)}.must_raise Sequel::Error
   end
   
   it "should eagerly load a single one_to_many association" do
