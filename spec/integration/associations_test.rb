@@ -2009,8 +2009,8 @@ describe "Sequel::Model Simple Associations" do
 
     include one_to_one_eager_graph_limit_strategies
     include one_to_many_eager_graph_limit_strategies
-    #include filter_by_associations_one_to_one_limit_strategies
-    #include filter_by_associations_one_to_many_limit_strategies
+    include filter_by_associations_one_to_one_limit_strategies
+    include filter_by_associations_one_to_many_limit_strategies
   end if DB.dataset.supports_lateral_subqueries?
 
   it "should handle eager loading limited associations for many objects" do
@@ -2357,8 +2357,8 @@ describe "Sequel::Model Composite Key Associations" do
 
     include one_to_one_eager_graph_limit_strategies
     include one_to_many_eager_graph_limit_strategies
-    #include filter_by_associations_one_to_one_limit_strategies
-    #include filter_by_associations_one_to_many_limit_strategies
+    include filter_by_associations_one_to_one_limit_strategies
+    include filter_by_associations_one_to_many_limit_strategies
   end if DB.dataset.supports_lateral_subqueries? && DB.dataset.supports_multiple_column_in?
 
   it "should have add method accept hashes and create new records" do

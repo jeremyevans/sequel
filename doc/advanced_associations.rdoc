@@ -589,6 +589,23 @@ The :correlated_subquery strategy:
   #     LIMIT 1
   #   )) AND (albums.id = 1))))
 
+The :lateral_subquery strategy:
+
+  Artist.where(first_10_albums: Album[1]).all
+  # SELECT *
+  # FROM artists
+  # WHERE (artists.id IN (
+  #   SELECT artists.id
+  #   FROM artists
+  #   INNER JOIN LATERAL (
+  #     SELECT *
+  #     FROM albums
+  #     WHERE (artists.id = albums.artist_id)
+  #     ORDER BY release_date
+  #     LIMIT 1
+  #   ) AS albums ON (albums.id = 1))
+  #   WHERE (artists.id = 2))
+
 Note that filtering by limited associations does not work on MySQL, as MySQL does not support
 any of the strategies.  It's also not supported when using composite keys on databases
 that don't support window functions and don't support multiple columns in IN.

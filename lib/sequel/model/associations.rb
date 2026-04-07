@@ -366,7 +366,12 @@ module Sequel
         # filtered.  Works by using a subquery to test that the objects passed
         # also meet the association filter criteria.
         def filter_by_associations_conditions_expression(obj)
-          ds = filter_by_associations_conditions_dataset.where(filter_by_associations_conditions_subquery_conditions(obj))
+          ds = if filter_by_associations_limit_strategy == :lateral_subquery
+            apply_lateral_subquery_filter_limit_strategy(associated_eager_dataset, obj)
+          else
+            filter_by_associations_conditions_dataset.where(filter_by_associations_conditions_subquery_conditions(obj))
+          end
+
           {filter_by_associations_conditions_key=>ds}
         end
 
@@ -1140,6 +1145,42 @@ module Sequel
             order(*self[:order]).
             where(graph_conditions.map{|k, v| [qualify(table_name, k), qualify(qualifier, v)]}).
             lateral
+        end
+
+        def apply_lateral_subquery_filter_limit_strategy(ds, obj)
+          key = filter_by_associations_conditions_key
+          array_key = key.is_a?(Array)
+          keys = Array(key)
+
+          associated_cond = case obj
+          when Array
+            if array_key
+              key_methods = Array(self[:key_method])
+              {key=>obj.map{|o| key_methods.map{|meth| o.send(meth)}}}
+            else
+              key_method = self[:key_method]
+              {key=>obj.map{|o| o.send(key_method)}}
+            end
+          when Sequel::Dataset
+            {key=>obj.select(*Array(qualify(associated_class.table_name, self[:key])))}
+          else
+            if array_key
+              keys.zip(Array(self[:key_method]).map{|meth| obj.send(meth)})
+            else
+              {key=>obj.send(self[:key_method])}
+            end
+          end
+
+          ds = ds.
+            select_all.
+            limit(*limit_and_offset).
+            where(keys.zip(Array(filter_by_associations_conditions_associated_keys))).
+            lateral
+
+          self[:model].
+            select(*qualified_primary_key).
+            join(ds.as(associated_class.table_name), filter_by_associations_conditions_subquery_conditions(obj)).
+            where(associated_cond)
         end
 
         # Support correlated subquery strategy when filtering by limited associations.
