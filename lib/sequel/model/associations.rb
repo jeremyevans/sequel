@@ -298,7 +298,12 @@ module Sequel
             # Correlated subqueries are not supported for regular eager loading
             strategy = :ruby if strategy == :correlated_subquery
             strategy = nil if strategy == :ruby && assign_singular?
-            objects = apply_eager_limit_strategy(ds, strategy, eager_limit).all
+
+            objects = if strategy == :lateral_subquery
+              apply_lateral_subquery_eager_limit_strategy(ds, ids, eager_limit).all
+            else
+              apply_eager_limit_strategy(ds, strategy, eager_limit).all
+            end
 
             if strategy == :window_function
               delete_rn = ds.row_number_column 
@@ -781,7 +786,12 @@ module Sequel
                 end
               end
 
-              apply_eager_limit_strategy(ds.where(predicate_key=>arg), eager_limit_strategy)
+              strategy = eager_limit_strategy
+              if strategy == :lateral_subquery
+                apply_lateral_subquery_eager_limit_strategy(ds, arg, limit_and_offset)
+              else
+                apply_eager_limit_strategy(ds.where(predicate_key=>arg), strategy)
+              end
             end
           end
         end
@@ -1145,6 +1155,29 @@ module Sequel
             order(*self[:order]).
             where(graph_conditions.map{|k, v| [qualify(table_name, k), qualify(qualifier, v)]}).
             lateral
+        end
+
+        # Avoid setting duplicate predicate condition when using the lateral subquery
+        # eager limit strategy.
+        def eager_loading_set_predicate_condition(ds, eo)
+          eager_limit_strategy == :lateral_subquery ? ds : super
+        end
+
+        def apply_lateral_subquery_eager_limit_strategy(ds, ids, limit_and_offset)
+          table_name = self[:model].table_name
+          associated_table_name = associated_class.table_name
+
+          limited_ds = ds.
+            where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys))).
+            limit(*limit_and_offset).
+            lateral
+
+          associated_class.
+            from(table_name).
+            select_all(associated_table_name).
+            join(limited_ds.as(associated_table_name), true).
+            where(qualify(table_name, self[:primary_key]) => ids).
+            order(*self[:order])
         end
 
         def apply_lateral_subquery_filter_limit_strategy(ds, obj)

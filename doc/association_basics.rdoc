@@ -1841,6 +1841,8 @@ specify a symbol to manually choose a strategy.  The available strategies are:
                 offsets on PostgreSQL).
 :window_function :: Uses a ROW_NUMBER window functions to ensure the
                     correctly limited/offset records are returned.
+:lateral_subquery :: Uses a LATERAL subquery to ensure the correctly
+                     limited/offset records are returned.
 :ruby :: Uses ruby array slicing to emulate database limiting/offsetting.
 
 ==== :subqueries_per_union

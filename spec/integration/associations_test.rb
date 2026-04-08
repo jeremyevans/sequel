@@ -2007,6 +2007,8 @@ describe "Sequel::Model Simple Associations" do
       @els = {:eager_limit_strategy=>:lateral_subquery}
     end
 
+    include one_to_one_eager_limit_strategies
+    include one_to_many_eager_limit_strategies
     include one_to_one_eager_graph_limit_strategies
     include one_to_many_eager_graph_limit_strategies
     include filter_by_associations_one_to_one_limit_strategies
@@ -2355,6 +2357,8 @@ describe "Sequel::Model Composite Key Associations" do
       @els = {:eager_limit_strategy=>:lateral_subquery}
     end
 
+    include one_to_one_eager_limit_strategies
+    include one_to_many_eager_limit_strategies
     include one_to_one_eager_graph_limit_strategies
     include one_to_many_eager_graph_limit_strategies
     include filter_by_associations_one_to_one_limit_strategies

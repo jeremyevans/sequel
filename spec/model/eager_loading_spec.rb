@@ -242,6 +242,15 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should eagerly load a single one_to_one association using the :lateral_subquery strategy" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :eager_limit_strategy=>:lateral_subquery
+    a = EagerAlbum.eager(:track).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT tracks.* FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY name LIMIT 1) AS tracks ON 't' WHERE (albums.id IN (1)) ORDER BY name"]
+    a.first.track.must_equal EagerTrack.load(:id => 3, :album_id=>1)
+    DB.sqls.must_equal []
+  end
+  
   it "should eagerly load a single one_to_one association using the :window_function strategy on MySQL" do
     odb = DB
     db = Class.new do
@@ -1022,6 +1031,36 @@ describe Sequel::Model, "#eager" do
     a = EagerAlbum.eager(:tracks).all
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x >= 2)']
+    a.first.tracks.must_equal [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.must_equal []
+  end
+  
+  it "should eagerly load a one_to_many association using the :lateral_subquery strategy" do
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2, :eager_limit_strategy=>:lateral_subquery
+    a = EagerAlbum.eager(:tracks).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT tracks.* FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY name LIMIT 2) AS tracks ON 't' WHERE (albums.id IN (1)) ORDER BY name"]
+    a.first.tracks.must_equal [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.must_equal []
+  end
+  
+  it "should eagerly load a one_to_many association using the :lateral_subquery strategy using composite keys and :primary_key option" do
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>[:album_id, :id], :primary_key=>[:id, :band_id], :order=>:name, :limit=>2, :eager_limit_strategy=>:lateral_subquery
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 2, :album_id=>1}])
+    a = EagerAlbum.eager(:tracks).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT tracks.* FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE ((albums.id = tracks.album_id) AND (albums.band_id = tracks.id)) ORDER BY name LIMIT 2) AS tracks ON 't' WHERE ((albums.id, albums.band_id) IN ((1, 2))) ORDER BY name"]
+    a.first.tracks.must_equal [EagerTrack.load(:id => 2, :album_id=>1)]
+    DB.sqls.must_equal []
+  end
+  
+  it "should eagerly load a one_to_many association using the :lateral_subquery strategy set using eager block" do
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2, :eager_limit_strategy=>:window_function
+    a = EagerAlbum.eager(:tracks=>proc{|ds| ds.where(:foo).clone(eager_limit: 3, :eager_limit_strategy=>:lateral_subquery)}).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    # This currently duplicates the predicate conditions because eager_loading_set_predicate_condition is called before 
+    # the eager block is called, so it cannot detect the limit strategy override and avoid duplication.
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT tracks.* FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE ((tracks.album_id IN (1)) AND foo AND (albums.id = tracks.album_id)) ORDER BY name LIMIT 3) AS tracks ON 't' WHERE (albums.id IN (1)) ORDER BY name"]
     a.first.tracks.must_equal [EagerTrack.load(:id => 3, :album_id=>1)]
     DB.sqls.must_equal []
   end

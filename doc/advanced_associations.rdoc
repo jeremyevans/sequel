@@ -390,7 +390,7 @@ approach, so make sure you have an index on the key columns.  If you cannot add 
 index, you'll want to manually specify the :eager_limit_strategy option as shown below.
 
 On PostgreSQL, for *_one associations that don't use an offset, you can
-choose to use a the distinct on strategy:
+use the :distinct_on strategy:
 
   Artist.one_to_one :first_album, class: :Album, order: :release_date,
     eager_limit_strategy: :distinct_on
@@ -400,8 +400,7 @@ choose to use a the distinct on strategy:
   # WHERE (albums.artist_id IN (1, 2))
   # ORDER BY albums.artist_id, release_date
   
-Otherwise, if the database supports window functions, you can choose to use
-the window function strategy:
+If the database supports window functions, you can use the :window_function strategy:
 
   Artist.one_to_many :first_10_albums, class: :Album, order: :release_date, limit: 10,
     eager_limit_strategy: :window_function
@@ -412,6 +411,25 @@ the window function strategy:
   #   WHERE (albums.artist_id IN (1, 2))
   # ) AS t1
   # WHERE (x_sequel_row_number_x <= 10)
+
+If the database supports LATERAL subqueries, you can use the :lateral_subquery strategy:
+
+  Artist.one_to_many :first_10_albums, class: :Album, order: :release_date, limit: 10,
+    eager_limit_strategy: :lateral_subquery
+  # SELECT *
+  # FROM albums
+  # WHERE (albums.id IN (
+  #   SELECT albums.id
+  #   FROM artists
+  #   INNER JOIN LATERAL (
+  #     SELECT *
+  #     FROM albums
+  #     WHERE (artists.id = albums.artist_id)
+  #     ORDER BY release_date
+  #     LIMIT 10
+  #   ) AS albums ON true
+  #   WHERE (artists.id IN (1, 2))))
+  # ORDER BY release_date
   
 Alternatively, you can use the :ruby strategy, which will fall back to
 retrieving all records, and then will slice the resulting array to get
