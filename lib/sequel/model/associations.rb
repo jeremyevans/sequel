@@ -112,6 +112,8 @@ module Sequel
         # the dataset unmodified if no SQL limit strategy is needed.
         def apply_eager_graph_limit_strategy(strategy, ds)
           case strategy
+          when :lateral_subquery
+            apply_lateral_subquery_eager_graph_limit_strategy(ds)
           when :distinct_on
             apply_distinct_on_eager_limit_strategy(ds.order_prepend(*self[:order]))
           when :window_function
@@ -1036,8 +1038,6 @@ module Sequel
         # Support a lateral_subquery and correlated_subquery limit strategy when using eager_graph.
         def apply_eager_graph_limit_strategy(strategy, ds)
           case strategy
-          when :lateral_subquery
-            apply_lateral_subquery_eager_graph_limit_strategy(ds)
           when :correlated_subquery
             apply_correlated_subquery_limit_strategy(ds)
           else
@@ -1528,6 +1528,14 @@ module Sequel
           else
             super.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys), :qualify=>:deep)
           end
+        end
+
+        def apply_lateral_subquery_eager_graph_limit_strategy(ds)
+          ds.
+            limit(*limit_and_offset).
+            where(qualify(join_table_alias, self[:left_keys]).zip(qualify(ds.opts[:eager_options][:implicit_qualifier], self[:left_primary_key_columns]))).
+            order(*self[:order]).
+            lateral
         end
 
         # Use the right_keys from the eager loading options if

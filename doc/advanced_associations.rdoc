@@ -523,7 +523,7 @@ subquery (only supported for one_to_many/one_to_one):
 
 The :lateral_subquery uses a LATERAL JOIN to a subquery, and moves the conditions
 for the JOIN into the subquery, as that is required on some/all databases to make the query
-fast (only supported for one_to_many/one_to_one):
+fast:
 
   Artist.eager_graph_with_options(:first_10_albums, limit_strategy: :lateral_subquery).all
   # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,

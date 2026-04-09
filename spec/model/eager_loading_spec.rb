@@ -1919,6 +1919,32 @@ describe Sequel::Model, "#eager_graph" do
     a.first.lgenres.must_equal [sub.load(:id => 4)]
   end
   
+  it "should eagerly graph a single many_to_many association using the :lateral_subquery strategy" do
+    sub = Class.new(GraphGenre)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    end
+    GraphAlbum.many_to_many :lgenres, :clone=>:genres, :class=>sub, :limit=>2, :order=>:name
+    ds = GraphAlbum.eager_graph_with_options(:lgenres, :limit_strategy=>:lateral_subquery)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, lgenres.id AS lgenres_id FROM albums LEFT OUTER JOIN LATERAL (SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE (ag.album_id = albums.id) ORDER BY name LIMIT 2) AS lgenres ON (lgenres.x_foreign_key_x = albums.id) ORDER BY lgenres.name"
+    a = ds.with_fetch(:id=>1, :band_id=>2, :lgenres_id=>4).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.lgenres.must_equal [sub.load(:id => 4)]
+  end
+  
+  it "should eagerly graph a single many_to_many association using the :lateral_subquery strategy with composite keys" do
+    sub = Class.new(GraphGenre)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x, :x_foreign_key_x] : [:id, :x] end
+    end
+    GraphAlbum.many_to_many :lgenres, :clone=>:genres, :class=>sub, :limit=>2, :order=>:name, :left_primary_key=>[:id, :band_id], :left_key=>[:a_id, :a_b_id], :right_key=>[:g_id, :g_x], :right_primary_key=>[:id, :x]
+    ds = GraphAlbum.eager_graph_with_options(:lgenres, :limit_strategy=>:lateral_subquery)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, lgenres.id AS lgenres_id, lgenres.x FROM albums LEFT OUTER JOIN LATERAL (SELECT genres.*, ag.a_id AS x_foreign_key_0_x, ag.a_b_id AS x_foreign_key_1_x FROM genres INNER JOIN ag ON ((ag.g_id = genres.id) AND (ag.g_x = genres.x)) WHERE ((ag.a_id = albums.id) AND (ag.a_b_id = albums.band_id)) ORDER BY name LIMIT 2) AS lgenres ON ((lgenres.x_foreign_key_0_x = albums.id) AND (lgenres.x_foreign_key_1_x = albums.band_id)) ORDER BY lgenres.name"
+    a = ds.with_fetch(:id=>1, :band_id=>2, :lgenres_id=>4, :x=>5).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.lgenres.must_equal [sub.load(:id => 4, :x => 5)]
+  end
+  
   it "should eagerly load a single one_through_one association" do
     ds = GraphAlbum.eager_graph(:genre)
     ds.sql.must_equal 'SELECT albums.id, albums.band_id, genre.id AS genre_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS genre ON (genre.id = ag.genre_id)'
@@ -1950,6 +1976,19 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.one_through_one :lgenre, :clone=>:genre, :class=>sub
     ds = GraphAlbum.eager_graph_with_options(:lgenre, :limit_strategy=>true)
     ds.sql.must_equal 'SELECT albums.id, albums.band_id, lgenre.id AS lgenre_id FROM albums LEFT OUTER JOIN (SELECT id, x_foreign_key_x FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x, row_number() OVER (PARTITION BY ag.album_id) AS x_sequel_row_number_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id)) AS t1 WHERE (x_sequel_row_number_x = 1)) AS lgenre ON (lgenre.x_foreign_key_x = albums.id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :lgenre_id=>4).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.lgenre.must_equal sub.load(:id => 4)
+  end
+  
+  it "should eagerly graph a single one_through_one association using the :lateral_subquery strategy" do
+    sub = Class.new(GraphGenre)
+    sub.dataset = sub.dataset.with_extend do
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    end
+    GraphAlbum.one_through_one :lgenre, :clone=>:genre, :class=>sub, :order=>:name
+    ds = GraphAlbum.eager_graph_with_options(:lgenre, :limit_strategy=>:lateral_subquery)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, lgenre.id AS lgenre_id FROM albums LEFT OUTER JOIN LATERAL (SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE (ag.album_id = albums.id) ORDER BY name LIMIT 1) AS lgenre ON (lgenre.x_foreign_key_x = albums.id) ORDER BY lgenre.name"
     a = ds.with_fetch(:id=>1, :band_id=>2, :lgenre_id=>4).all
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
     a.first.lgenre.must_equal sub.load(:id => 4)

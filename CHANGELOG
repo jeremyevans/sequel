@@ -1,5 +1,7 @@
 === master
 
+* Support :lateral_subquery as an eager_graph limit strategy for many_to_many/one_through_one associations (jeremyevans)
+
 * Support :lateral_subquery as an eager limit strategy for one_to_many/one_to_one associations (jeremyevans)
 
 * Support :lateral_subquery as a filter by associations limit strategy for one_to_many/one_to_one associations (jeremyevans)
