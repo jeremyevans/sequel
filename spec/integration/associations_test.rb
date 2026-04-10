@@ -1096,32 +1096,9 @@ filter_by_associations_one_to_one_limit_strategies = Module.new do
   end
 end
 
-filter_by_associations_singular_limit_strategies = Module.new do
+filter_by_associations_one_through_one_limit_strategies = Module.new do
   extend Minitest::Spec::DSL
-  include filter_by_associations_one_to_one_limit_strategies
-
-  it "dataset associations with limited one_to_one associations should work correctly" do
-    Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
-    Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
-    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
-    @album.update(:artist => @artist)
-    diff_album = @diff_album.call
-    ar = @pr.call[1]
-    ds = Artist
-    
-    ds.where(@artist.pk_hash).first_albums.all.must_equal [@album]
-    ds.where(@artist.pk_hash).second_albums.all.must_equal [diff_album]
-    ds.where(@artist.pk_hash).last_albums.all.must_equal [diff_album]
-    ds.where(ar.pk_hash).first_albums.all.must_equal []
-    ds.where(ar.pk_hash).second_albums.all.must_equal []
-    ds.where(ar.pk_hash).last_albums.all.must_equal []
-
-    Artist.one_to_one :first_album, :clone=>:first_album do |ads| ads.where(Sequel[:albums][:name]=>diff_album.name) end
-    ar.add_album(diff_album)
-    ds.where(@artist.pk_hash).first_albums.all.must_equal []
-    ds.where(ar.pk_hash).first_albums.all.must_equal [diff_album]
-  end
-
+  
   it "filter by associations with limited one_through_one associations should work correctly" do
     Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els)
     Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
@@ -1162,38 +1139,11 @@ filter_by_associations_singular_limit_strategies = Module.new do
     ds.where(:second_tag=>[tv, tu]).all.must_equal [@album, al]
     ds.exclude(:second_tag=>[tv, tu]).all.must_equal []
   end
+end
 
-  it "dataset associations with limited one_through_one associations should work correctly" do
-    Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els)
-    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
-    Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els)
-    tu, tv = @other_tags.call
-    al = @pr.call.first
-    ds = Album
-    al.add_tag(tu)
-    
-    ds.where(@album.pk_hash).first_tags.all.must_equal [@tag]
-    ds.where(@album.pk_hash).second_tags.all.must_equal [tu]
-    ds.where(@album.pk_hash).last_tags.all.must_equal [tv]
-    ds.where(al.pk_hash).first_tags.all.must_equal [tu]
-    ds.where(al.pk_hash).second_tags.all.must_equal []
-    ds.where(al.pk_hash).last_tags.all.must_equal [tu]
-
-    Album.one_through_one :first_tag, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
-    Album.one_through_one :second_tag, :clone=>:second_tag do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
-
-    ds.where(@album.pk_hash).first_tags.all.must_equal [tu]
-    ds.where(@album.pk_hash).second_tags.all.must_equal [tv]
-    ds.where(al.pk_hash).first_tags.all.must_equal [tu]
-    ds.where(al.pk_hash).second_tags.all.must_equal []
-
-    al.add_tag(tv)
-    ds.where(@album.pk_hash).first_tags.all.must_equal [tu]
-    ds.where(@album.pk_hash).second_tags.all.must_equal [tv]
-    ds.where(al.pk_hash).first_tags.all.must_equal [tu]
-    ds.where(al.pk_hash).second_tags.all.must_equal [tv]
-  end
-
+filter_by_associations_one_through_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+  
   it "filter by associations with limited one_through_many associations should work correctly" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els)
     Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
@@ -1236,6 +1186,71 @@ filter_by_associations_singular_limit_strategies = Module.new do
     ds.where(:second_tag=>[tv, tu]).all.must_equal [@artist, ar]
     ds.exclude(:second_tag=>[tv, tu]).all.must_equal []
   end
+end
+
+dataset_associations_one_to_one_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
+  it "dataset associations with limited one_to_one associations should work correctly" do
+    Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
+    Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
+    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
+    @album.update(:artist => @artist)
+    diff_album = @diff_album.call
+    ar = @pr.call[1]
+    ds = Artist
+    
+    ds.where(@artist.pk_hash).first_albums.all.must_equal [@album]
+    ds.where(@artist.pk_hash).second_albums.all.must_equal [diff_album]
+    ds.where(@artist.pk_hash).last_albums.all.must_equal [diff_album]
+    ds.where(ar.pk_hash).first_albums.all.must_equal []
+    ds.where(ar.pk_hash).second_albums.all.must_equal []
+    ds.where(ar.pk_hash).last_albums.all.must_equal []
+
+    Artist.one_to_one :first_album, :clone=>:first_album do |ads| ads.where(Sequel[:albums][:name]=>diff_album.name) end
+    ar.add_album(diff_album)
+    ds.where(@artist.pk_hash).first_albums.all.must_equal []
+    ds.where(ar.pk_hash).first_albums.all.must_equal [diff_album]
+  end
+end
+
+dataset_associations_one_through_one_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
+  it "dataset associations with limited one_through_one associations should work correctly" do
+    Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els)
+    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
+    Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els)
+    tu, tv = @other_tags.call
+    al = @pr.call.first
+    ds = Album
+    al.add_tag(tu)
+    
+    ds.where(@album.pk_hash).first_tags.all.must_equal [@tag]
+    ds.where(@album.pk_hash).second_tags.all.must_equal [tu]
+    ds.where(@album.pk_hash).last_tags.all.must_equal [tv]
+    ds.where(al.pk_hash).first_tags.all.must_equal [tu]
+    ds.where(al.pk_hash).second_tags.all.must_equal []
+    ds.where(al.pk_hash).last_tags.all.must_equal [tu]
+
+    Album.one_through_one :first_tag, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Album.one_through_one :second_tag, :clone=>:second_tag do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
+
+    ds.where(@album.pk_hash).first_tags.all.must_equal [tu]
+    ds.where(@album.pk_hash).second_tags.all.must_equal [tv]
+    ds.where(al.pk_hash).first_tags.all.must_equal [tu]
+    ds.where(al.pk_hash).second_tags.all.must_equal []
+
+    al.add_tag(tv)
+    ds.where(@album.pk_hash).first_tags.all.must_equal [tu]
+    ds.where(@album.pk_hash).second_tags.all.must_equal [tv]
+    ds.where(al.pk_hash).first_tags.all.must_equal [tu]
+    ds.where(al.pk_hash).second_tags.all.must_equal [tv]
+  end
+end
+
+dataset_associations_one_through_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
 
   it "dataset associations with limited one_through_many associations should work correctly" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els)
@@ -1269,6 +1284,16 @@ filter_by_associations_singular_limit_strategies = Module.new do
     ds.where(ar.pk_hash).first_tags.all.must_equal [tu]
     ds.where(ar.pk_hash).second_tags.all.must_equal [tv]
   end
+end
+
+filter_by_associations_singular_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+  include filter_by_associations_one_to_one_limit_strategies
+  include filter_by_associations_one_through_one_limit_strategies
+  include filter_by_associations_one_through_many_limit_strategies
+  include dataset_associations_one_to_one_limit_strategies
+  include dataset_associations_one_through_one_limit_strategies
+  include dataset_associations_one_through_many_limit_strategies
 end
 
 filter_by_associations_one_to_many_limit_strategies = Module.new do
@@ -1314,36 +1339,8 @@ filter_by_associations_one_to_many_limit_strategies = Module.new do
   end
 end
 
-filter_by_associations_limit_strategies = Module.new do
+filter_by_associations_many_to_many_limit_strategies = Module.new do
   extend Minitest::Spec::DSL
-  include filter_by_associations_singular_limit_strategies
-  include filter_by_associations_one_to_many_limit_strategies
-
-  it "dataset associations with limited one_to_many associations should work correctly" do
-    Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els)
-    Artist.one_to_many :second_two_albums, {:clone=>:second_two_albums}.merge(@els)
-    Artist.one_to_many :not_first_albums, {:clone=>:not_first_albums}.merge(@els)
-    Artist.one_to_many :last_two_albums, {:clone=>:last_two_albums}.merge(@els)
-    @album.update(:artist => @artist)
-    middle_album = @middle_album.call
-    diff_album = @diff_album.call
-    ar = @pr.call[1]
-    ds = Artist.order(:name)
-
-    ds.where(@artist.pk_hash).first_two_albums.all.must_equal [@album, middle_album]
-    ds.where(@artist.pk_hash).second_two_albums.all.must_equal [middle_album, diff_album]
-    ds.where(@artist.pk_hash).not_first_albums.all.must_equal [middle_album, diff_album]
-    ds.where(@artist.pk_hash).last_two_albums.all.must_equal [diff_album, middle_album]
-    ds.where(ar.pk_hash).first_two_albums.all.must_equal []
-    ds.where(ar.pk_hash).second_two_albums.all.must_equal []
-    ds.where(ar.pk_hash).not_first_albums.all.must_equal []
-    ds.where(ar.pk_hash).last_two_albums.all.must_equal []
-
-    Artist.one_to_one :first_two_albums, :clone=>:first_two_albums do |ads| ads.where(Sequel[:albums][:name]=>[diff_album.name, middle_album.name]) end
-    ar.add_album(diff_album)
-    ds.where(@artist.pk_hash).first_two_albums.all.must_equal [middle_album]
-    ds.where(ar.pk_hash).first_two_albums.all.must_equal [diff_album]
-  end
 
   it "filter by associations with limited many_to_many associations should work correctly" do
     Album.send :many_to_many, :first_two_tags, {:clone=>:first_two_tags}.merge(@els)
@@ -1393,40 +1390,10 @@ filter_by_associations_limit_strategies = Module.new do
     ds.where(:second_two_tags=>[tv, tu]).all.must_equal [@album, al]
     ds.exclude(:second_two_tags=>[tv, tu]).all.must_equal []
   end
+end
 
-  it "dataset associations with limited many_to_many associations should work correctly" do
-    Album.send :many_to_many, :first_two_tags, {:clone=>:first_two_tags}.merge(@els)
-    Album.send :many_to_many, :second_two_tags, {:clone=>:second_two_tags}.merge(@els)
-    Album.send :many_to_many, :not_first_tags, {:clone=>:not_first_tags}.merge(@els)
-    Album.send :many_to_many, :last_two_tags, {:clone=>:last_two_tags}.merge(@els)
-    tu, tv = @other_tags.call
-    al = @pr.call.first
-    al.add_tag(tu)
-    ds = Album.order(:name)
-    
-    ds.where(@album.pk_hash).first_two_tags.all.must_equal [@tag, tu]
-    ds.where(@album.pk_hash).second_two_tags.all.must_equal [tu, tv]
-    ds.where(@album.pk_hash).not_first_tags.all.must_equal [tu, tv]
-    ds.where(@album.pk_hash).last_two_tags.all.must_equal [tv, tu]
-    ds.where(al.pk_hash).first_two_tags.all.must_equal [tu]
-    ds.where(al.pk_hash).second_two_tags.all.must_equal []
-    ds.where(al.pk_hash).not_first_tags.all.must_equal []
-    ds.where(al.pk_hash).last_two_tags.all.must_equal [tu]
-
-    Album.many_to_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
-    Album.many_to_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
-
-    ds.where(@album.pk_hash).first_two_tags.all.must_equal [tu]
-    ds.where(@album.pk_hash).second_two_tags.all.must_equal [tv]
-    ds.where(al.pk_hash).first_two_tags.all.must_equal [tu]
-    ds.where(al.pk_hash).second_two_tags.all.must_equal []
-
-    al.add_tag(tv)
-    ds.where(@album.pk_hash).first_two_tags.all.must_equal [tu]
-    ds.where(@album.pk_hash).second_two_tags.all.must_equal [tv]
-    ds.where(al.pk_hash).first_two_tags.all.must_equal [tu]
-    ds.where(al.pk_hash).second_two_tags.all.must_equal [tv]
-  end
+filter_by_associations_many_through_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
 
   it "filter by associations with limited many_through_many associations should work correctly" do
     Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els)
@@ -1478,6 +1445,78 @@ filter_by_associations_limit_strategies = Module.new do
     ds.where(:second_two_tags=>[tv, tu]).all.must_equal [@artist, ar]
     ds.exclude(:second_two_tags=>[tv, tu]).all.must_equal []
   end
+end
+
+dataset_associations_one_to_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
+  it "dataset associations with limited one_to_many associations should work correctly" do
+    Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els)
+    Artist.one_to_many :second_two_albums, {:clone=>:second_two_albums}.merge(@els)
+    Artist.one_to_many :not_first_albums, {:clone=>:not_first_albums}.merge(@els)
+    Artist.one_to_many :last_two_albums, {:clone=>:last_two_albums}.merge(@els)
+    @album.update(:artist => @artist)
+    middle_album = @middle_album.call
+    diff_album = @diff_album.call
+    ar = @pr.call[1]
+    ds = Artist.order(:name)
+
+    ds.where(@artist.pk_hash).first_two_albums.all.must_equal [@album, middle_album]
+    ds.where(@artist.pk_hash).second_two_albums.all.must_equal [middle_album, diff_album]
+    ds.where(@artist.pk_hash).not_first_albums.all.must_equal [middle_album, diff_album]
+    ds.where(@artist.pk_hash).last_two_albums.all.must_equal [diff_album, middle_album]
+    ds.where(ar.pk_hash).first_two_albums.all.must_equal []
+    ds.where(ar.pk_hash).second_two_albums.all.must_equal []
+    ds.where(ar.pk_hash).not_first_albums.all.must_equal []
+    ds.where(ar.pk_hash).last_two_albums.all.must_equal []
+
+    Artist.one_to_one :first_two_albums, :clone=>:first_two_albums do |ads| ads.where(Sequel[:albums][:name]=>[diff_album.name, middle_album.name]) end
+    ar.add_album(diff_album)
+    ds.where(@artist.pk_hash).first_two_albums.all.must_equal [middle_album]
+    ds.where(ar.pk_hash).first_two_albums.all.must_equal [diff_album]
+  end
+end
+
+dataset_associations_many_to_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+
+  it "dataset associations with limited many_to_many associations should work correctly" do
+    Album.send :many_to_many, :first_two_tags, {:clone=>:first_two_tags}.merge(@els)
+    Album.send :many_to_many, :second_two_tags, {:clone=>:second_two_tags}.merge(@els)
+    Album.send :many_to_many, :not_first_tags, {:clone=>:not_first_tags}.merge(@els)
+    Album.send :many_to_many, :last_two_tags, {:clone=>:last_two_tags}.merge(@els)
+    tu, tv = @other_tags.call
+    al = @pr.call.first
+    al.add_tag(tu)
+    ds = Album.order(:name)
+    
+    ds.where(@album.pk_hash).first_two_tags.all.must_equal [@tag, tu]
+    ds.where(@album.pk_hash).second_two_tags.all.must_equal [tu, tv]
+    ds.where(@album.pk_hash).not_first_tags.all.must_equal [tu, tv]
+    ds.where(@album.pk_hash).last_two_tags.all.must_equal [tv, tu]
+    ds.where(al.pk_hash).first_two_tags.all.must_equal [tu]
+    ds.where(al.pk_hash).second_two_tags.all.must_equal []
+    ds.where(al.pk_hash).not_first_tags.all.must_equal []
+    ds.where(al.pk_hash).last_two_tags.all.must_equal [tu]
+
+    Album.many_to_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Album.many_to_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
+
+    ds.where(@album.pk_hash).first_two_tags.all.must_equal [tu]
+    ds.where(@album.pk_hash).second_two_tags.all.must_equal [tv]
+    ds.where(al.pk_hash).first_two_tags.all.must_equal [tu]
+    ds.where(al.pk_hash).second_two_tags.all.must_equal []
+
+    al.add_tag(tv)
+    ds.where(@album.pk_hash).first_two_tags.all.must_equal [tu]
+    ds.where(@album.pk_hash).second_two_tags.all.must_equal [tv]
+    ds.where(al.pk_hash).first_two_tags.all.must_equal [tu]
+    ds.where(al.pk_hash).second_two_tags.all.must_equal [tv]
+  end
+end
+
+dataset_associations_many_through_many_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
 
   it "dataset associations with limited many_through_many associations should work correctly" do
     Artist.many_through_many :first_two_tags, {:clone=>:first_two_tags}.merge(@els)
@@ -1514,6 +1553,17 @@ filter_by_associations_limit_strategies = Module.new do
     ds.where(ar.pk_hash).first_two_tags.all.must_equal [tu]
     ds.where(ar.pk_hash).second_two_tags.all.must_equal [tv]
   end
+end
+
+filter_by_associations_limit_strategies = Module.new do
+  extend Minitest::Spec::DSL
+  include filter_by_associations_singular_limit_strategies
+  include filter_by_associations_one_to_many_limit_strategies
+  include filter_by_associations_many_to_many_limit_strategies
+  include filter_by_associations_many_through_many_limit_strategies
+  include dataset_associations_one_to_many_limit_strategies
+  include dataset_associations_many_to_many_limit_strategies
+  include dataset_associations_many_through_many_limit_strategies
 end
 
 basic_regular_and_composite_key_associations = lambda do
