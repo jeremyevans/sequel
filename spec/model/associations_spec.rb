@@ -3877,6 +3877,8 @@ describe "Filtering by associations" do
       one_to_one :al_track, :clone=>:l_track, :conditions=>c
       many_to_many :al_tags, :clone=>:l_tags, :conditions=>c
       one_through_one :al_tag, :clone=>:l_tag, :conditions=>c
+      many_to_many :al_ltags, :clone=>:l_tags, :conditions=>c, :filter_limit_strategy=>:lateral_subquery
+      one_through_one :al_ltag, :clone=>:l_tag, :conditions=>c, :filter_limit_strategy=>:lateral_subquery
 
       many_to_one :cartist, :class=>artist, :key=>[:artist_id1, :artist_id2], :primary_key=>[:id1, :id2]
       one_to_many :ctracks, :class=>track, :key=>[:album_id1, :album_id2], :primary_key=>[:id1, :id2]
@@ -3902,6 +3904,8 @@ describe "Filtering by associations" do
       one_to_one :al_ctrack, :clone=>:l_ctrack, :conditions=>c
       many_to_many :al_ctags, :clone=>:l_ctags, :conditions=>c
       one_through_one :al_ctag, :clone=>:l_ctag, :conditions=>c
+      many_to_many :al_lctags, :clone=>:l_ctags, :conditions=>c, :filter_limit_strategy=>:lateral_subquery
+      one_through_one :al_lctag, :clone=>:l_ctag, :conditions=>c, :filter_limit_strategy=>:lateral_subquery
     end
   end
   after do
@@ -4062,6 +4066,14 @@ describe "Filtering by associations" do
     @Album.filter(:al_tag=>@Tag.load(:id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums_tags.album_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'A') AND (albums_tags.album_id IS NOT NULL) AND ((albums_tags.album_id, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id) albums_tags.album_id, tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (name = 'A') ORDER BY albums_tags.album_id, name)) AND (tags.id = 3))))"
   end
 
+  it "should be able to filter on many_to_many associations with :limit and :conditions using :lateral_subquery limit strategy" do
+    @Album.filter(:al_ltags=>@Tag.load(:id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'A') AND (albums.id = albums_tags.album_id)) LIMIT 10) AS tags ON (tags.id = 3) WHERE (albums.id IN (SELECT album_id FROM albums_tags WHERE (tag_id = 3)))))"
+  end
+
+  it "should be able to filter on one_through_one associations with :order and :conditions using :lateral_subquery limit strategy" do
+    @Album.filter(:al_ltag=>@Tag.load(:id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((name = 'A') AND (albums.id = albums_tags.album_id)) ORDER BY name LIMIT 1) AS tags ON (tags.id = 3) WHERE (albums.id IN (SELECT album_id FROM albums_tags WHERE (tag_id = 3)))))"
+  end
+
   it "should be able to filter on many_to_one associations with composite keys" do
     @Album.filter(:cartist=>@Artist.load(:id1=>3, :id2=>4)).sql.must_equal 'SELECT * FROM albums WHERE ((albums.artist_id1 = 3) AND (albums.artist_id2 = 4))'
   end
@@ -4160,6 +4172,14 @@ describe "Filtering by associations" do
 
   it "should be able to filter on one_through_one associations with :order and :conditions and composite keys" do
     @Album.filter(:al_ctag=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums_tags.album_id1, albums_tags.album_id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((name = 'A') AND (albums_tags.album_id1 IS NOT NULL) AND (albums_tags.album_id2 IS NOT NULL) AND ((albums_tags.album_id1, albums_tags.album_id2, tags.id) IN (SELECT DISTINCT ON (albums_tags.album_id1, albums_tags.album_id2) albums_tags.album_id1, albums_tags.album_id2, tags.id FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE (name = 'A') ORDER BY albums_tags.album_id1, albums_tags.album_id2, name)) AND (tags.id = 5))))"
+  end
+
+  it "should be able to filter on many_to_many associations with :limit and :conditions and composite keys using :lateral_subquery limit strategy" do
+    @Album.filter(:al_lctags=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT tags.id FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((name = 'A') AND (albums.id1 = albums_tags.album_id1) AND (albums.id2 = albums_tags.album_id2)) LIMIT 10) AS tags ON (tags.id = 5) WHERE ((albums.id1, albums.id2) IN (SELECT album_id1, album_id2 FROM albums_tags WHERE ((tag_id1 = 3) AND (tag_id2 = 4))))))"
+  end
+
+  it "should be able to filter on one_through_one associations with :order and :conditions and composite keys using :lateral_subquery limit strategy" do
+    @Album.filter(:al_lctag=>@Tag.load(:id=>5, :tid1=>3, :tid2=>4)).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT tags.id FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id1 = tags.tid1) AND (albums_tags.tag_id2 = tags.tid2)) WHERE ((name = 'A') AND (albums.id1 = albums_tags.album_id1) AND (albums.id2 = albums_tags.album_id2)) ORDER BY name LIMIT 1) AS tags ON (tags.id = 5) WHERE ((albums.id1, albums.id2) IN (SELECT album_id1, album_id2 FROM albums_tags WHERE ((tag_id1 = 3) AND (tag_id2 = 4))))))"
   end
 
   it "should work inside a complex filter" do

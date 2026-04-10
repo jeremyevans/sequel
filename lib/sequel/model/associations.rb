@@ -1530,6 +1530,48 @@ module Sequel
           end
         end
 
+        def apply_lateral_subquery_filter_limit_strategy(ds, obj)
+          key = filter_by_associations_conditions_key
+          array_key = key.is_a?(Array)
+          keys = Array(key)
+
+          associated_cond_value = case obj
+          when Array
+            if array_key
+              key_methods = Array(right_primary_key_method)
+              obj.map{|o| key_methods.map{|meth| o.send(meth)}}
+            else
+              key_method = right_primary_key_method
+              obj.map{|o| o.send(key_method)}
+            end
+          when Sequel::Dataset
+            obj.select(*Array(qualify(associated_class.table_name, right_primary_key)))
+          else
+            if array_key
+              associated_cond = self[:right_key].zip(Array(right_primary_key_method).map{|meth| obj.send(meth)})
+            else
+              obj.send(right_primary_key_method)
+            end
+          end
+
+          associated_cond ||= {self[:right_key] => associated_cond_value}
+
+          join_table_ds = ds.db.from(self[:join_table])
+
+          ds = ds.
+            select(*qualify(associated_class.table_name, associated_class.primary_key)).
+            limit(*limit_and_offset).
+            where(keys.zip(Array(filter_by_associations_conditions_associated_keys))).
+            lateral
+
+          self[:model].
+            select(*qualify(self[:model].table_name, self[:left_primary_key])).
+            join(ds.as(associated_class.table_name), filter_by_associations_conditions_subquery_conditions(obj)).
+            where(key => join_table_ds.
+              select(*self[:left_key]).
+              where(associated_cond))
+        end
+
         def apply_lateral_subquery_eager_graph_limit_strategy(ds)
           ds.
             limit(*limit_and_offset).
