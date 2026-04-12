@@ -419,6 +419,15 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should eagerly load a single one_through_one association using the :lateral_subquery strategy" do
+    EagerAlbum.one_through_one :genre, :clone=>:genre, :eager_limit_strategy=>:lateral_subquery
+    a = EagerAlbum.eager(:genre).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT genres.*, albums.id AS x_foreign_key_x FROM albums INNER JOIN LATERAL (SELECT genres.* FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE (albums.id = ag.album_id) LIMIT 1) AS genres ON 't' WHERE (albums.id IN (1))"]
+    a.first.genre.must_equal EagerGenre.load(:id=>4)
+    DB.sqls.must_equal []
+  end
+  
   it "should automatically use an eager limit stategy if the association has an offset" do
     EagerGenre.dataset = EagerGenre.dataset.with_fetch([{:id => 3, :x_foreign_key_x=>1}, {:id => 4, :x_foreign_key_x=>1}])
     a = EagerAlbum.eager(:genre).all
@@ -1154,6 +1163,26 @@ describe Sequel::Model, "#eager" do
     EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[nil, 1], :order=>:name, :eager_limit_strategy=>:window_function
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.must_equal ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x, row_number() OVER (PARTITION BY ag.album_id ORDER BY name) AS x_sequel_row_number_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE (ag.album_id IN (2))) AS t1 WHERE (x_sequel_row_number_x >= 2)"]
+    as.length.must_equal 1
+    as.first.first_two_genres.must_equal [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
+  end
+
+  it "should respect the limit option on a many_to_many association using the :lateral_subquery strategy" do
+    EagerGenre.dataset = EagerGenre.dataset.with_fetch([{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}])
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2, :order=>:name, :eager_limit_strategy=>:lateral_subquery
+    as = EagerAlbum.eager(:first_two_genres).all
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT genres.*, albums.band_id AS x_foreign_key_x FROM albums INNER JOIN LATERAL (SELECT genres.* FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE (albums.band_id = ag.album_id) ORDER BY name LIMIT 2) AS genres ON 't' WHERE (albums.band_id IN (2)) ORDER BY name"]
+    as.length.must_equal 1
+    as.first.first_two_genres.must_equal [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
+  end
+
+  it "should respect the limit option on a many_to_many association using the :lateral_subquery strategy with composite keys" do
+    EagerGenre.dataset = EagerGenre.dataset.with_fetch([{:x_foreign_key_0_x=>2, :x_foreign_key_1_x=>3, :id=>5}, {:x_foreign_key_0_x=>2, :x_foreign_key_1_x=>3, :id=>6}])
+    EagerAlbum.dataset = EagerAlbum.dataset.with_fetch([{:id=>1, :band_id=>2, :x=>3}])
+    EagerAlbum.columns :id, :band_id, :x
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>[:band_id, :x], :left_key=>[:album_id, :y], :right_key=>[:genre_id, :z], :right_primary_key=>[:id, :zz], :join_table=>:ag, :limit=>2, :order=>:name, :eager_limit_strategy=>:lateral_subquery
+    as = EagerAlbum.eager(:first_two_genres).all
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT genres.*, albums.band_id AS x_foreign_key_0_x, albums.x AS x_foreign_key_1_x FROM albums INNER JOIN LATERAL (SELECT genres.* FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.z = genres.zz)) WHERE ((albums.band_id = ag.album_id) AND (albums.x = ag.y)) ORDER BY name LIMIT 2) AS genres ON 't' WHERE ((albums.band_id, albums.x) IN ((2, 3))) ORDER BY name"]
     as.length.must_equal 1
     as.first.first_two_genres.must_equal [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
   end

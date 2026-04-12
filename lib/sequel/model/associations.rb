@@ -1572,6 +1572,26 @@ module Sequel
               where(associated_cond))
         end
 
+        def apply_lateral_subquery_eager_limit_strategy(ds, ids, limit_and_offset)
+          table_name = self[:model].table_name
+          associated_table_name = associated_class.table_name
+          associated_key_aliases = Array(self[:left_key_alias])
+
+          limited_ds = ds.
+            clone(:select=>ds.opts[:select][0...-associated_key_aliases.length]).
+            where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys))).
+            limit(*limit_and_offset).
+            lateral
+
+          associated_class.
+            from(table_name).
+            select_all(associated_table_name).
+            select_append(*qualify(table_name, self[:left_primary_keys]).zip(associated_key_aliases).map{|id, aliaz| Sequel.as(id, aliaz)}).
+            join(limited_ds.as(associated_table_name), true).
+            where(qualify(table_name, self[:left_primary_key]) => ids).
+            order(*self[:order])
+        end
+
         def apply_lateral_subquery_eager_graph_limit_strategy(ds)
           ds.
             limit(*limit_and_offset).
