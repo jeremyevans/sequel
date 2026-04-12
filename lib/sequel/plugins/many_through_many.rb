@@ -146,6 +146,54 @@ module Sequel
           ds
         end
 
+        def apply_lateral_subquery_filter_limit_strategy(ds, obj)
+          key = qualify(reverse_edges.first[:table], reverse_edges.first[:left])
+          array_key = key.is_a?(Array)
+          keys = Array(key)
+
+          associated_cond_value = case obj
+          when Array
+            if array_key
+              key_methods = Array(right_primary_key_method)
+              obj.map{|o| key_methods.map{|meth| o.send(meth)}}
+            else
+              key_method = right_primary_key_method
+              obj.map{|o| o.send(key_method)}
+            end
+          when Sequel::Dataset
+            obj.select(*Array(qualify(associated_class.table_name, right_primary_key)))
+          else
+            if array_key
+              Array(right_primary_key_method).map{|meth| obj.send(meth)}
+              associated_cond = keys.zip(Array(right_primary_key_method).map{|meth| obj.send(meth)})
+            else
+              obj.send(right_primary_key_method)
+            end
+          end
+
+          associated_cond ||= {key => associated_cond_value}
+
+          first_edge, *remaining_edges = edges
+          filter_ds = ds.db.from(first_edge[:table]).
+            select(*qualify(first_edge[:table], first_edge[:right])).
+            where(associated_cond)
+
+          remaining_edges.each do |edge|
+            filter_ds = filter_ds.join(edge[:table], Array(edge[:right]).zip(Array(edge[:left])))
+          end
+
+          lateral_ds = ds.
+            select(*qualify(associated_class.table_name, associated_class.primary_key)).
+            where(Array(qualify(edges.first[:table], edges.first[:right])).zip(Array(qualify(self[:model].table_name, edges.first[:left])))).
+            limit(*limit_and_offset).
+            lateral
+
+          self[:model].
+            select(*qualify(self[:model].table_name, self[:left_primary_keys])).
+            join(lateral_ds.as(associated_class.table_name), filter_by_associations_conditions_subquery_conditions(obj)).
+            where(qualify(self[:model].table_name, self[:left_primary_key]) => filter_ds)
+        end
+
         # Make sure to use unique table aliases when lazy loading or eager loading
         def calculate_reverse_edge_aliases(reverse_edges)
           aliases = [associated_class.table_name]
