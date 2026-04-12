@@ -807,7 +807,7 @@ describe "many_through_many eager loading methods" do
 
   it "should respect the :limit option on a many_through_many association with composite primary keys on the main table" do
     @c1.dataset = @c1.dataset.with_fetch([{:id1=>1, :id2=>2}])
-    Tag.dataset = Tag.dataset.with_fetch([{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}]).with_extend{def supports_window_functions?; true end}
+    Tag.dataset = Tag.dataset.with_fetch([{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}])
     @c1.set_primary_key([:id1, :id2])
     @c1.columns :id1, :id2
     @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :order=>:name
@@ -948,6 +948,31 @@ describe "many_through_many eager loading methods" do
     a.must_equal [@c1.load(:id=>1)]
     DB.sqls.must_equal ['SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN (SELECT id, x_foreign_key_x FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x, row_number() OVER (PARTITION BY albums_artists.artist_id) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id)) AS t1 WHERE (x_sequel_row_number_x <= 2)) AS tags ON (tags.x_foreign_key_x = artists.id)']
     a.first.tags.must_equal [Tag.load(:id=>2)]
+    DB.sqls.length.must_equal 0
+  end
+
+  it "should eagerly graph a single many_through_many association using the :lateral_subquery strategy" do
+    Tag.dataset = Tag.dataset.with_extend do
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    end
+    @c1.many_through_many :tags, :clone=>:tags, :limit=>2
+    a = @c1.eager_graph_with_options(:tags, :limit_strategy=>:lateral_subquery).with_fetch(:id=>1, :tags_id=>2).all
+    a.must_equal [@c1.load(:id=>1)]
+    DB.sqls.must_equal ["SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN LATERAL (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = artists.id) LIMIT 2) AS tags ON (tags.x_foreign_key_x = artists.id)"]
+    a.first.tags.must_equal [Tag.load(:id=>2)]
+    DB.sqls.length.must_equal 0
+  end
+
+  it "should eagerly graph a single many_through_many association using the :lateral_subquery strategy with composite keys" do
+    @c1.many_through_many :tags, [[:albums_artists, [:b1, :b2], [:c1, :c2]], [:albums, [:d1, :d2], [:e1, :e2]], [:albums_tags, [:f1, :f2], [:g1, :g2]]], :right_primary_key=>[:id, :tag_id], :left_primary_key=>[:id, :yyy], :limit=>2
+    @c1.dataset = @c1.dataset.with_extend{def columns; [:id, :yyy] end}
+    Tag.dataset = Tag.dataset.with_extend do
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :tag_id, :x_foreign_key_x] : [:id, :tag_id] end
+    end
+    a = @c1.eager_graph_with_options(:tags, :limit_strategy=>:lateral_subquery).with_fetch(:id=>1, :yyy=>3, :tags_id=>2, :tag_id=>4).all
+    a.must_equal [@c1.load(:id=>1, :yyy=>3)]
+    DB.sqls.must_equal ["SELECT artists.id, artists.yyy, tags.id AS tags_id, tags.tag_id FROM artists LEFT OUTER JOIN LATERAL (SELECT tags.*, albums_artists.b1 AS x_foreign_key_0_x, albums_artists.b2 AS x_foreign_key_1_x FROM tags INNER JOIN albums_tags ON ((albums_tags.g1 = tags.id) AND (albums_tags.g2 = tags.tag_id)) INNER JOIN albums ON ((albums.e1 = albums_tags.f1) AND (albums.e2 = albums_tags.f2)) INNER JOIN albums_artists ON ((albums_artists.c1 = albums.d1) AND (albums_artists.c2 = albums.d2)) WHERE ((albums_artists.b1 = artists.id) AND (albums_artists.b2 = artists.yyy)) LIMIT 2) AS tags ON ((tags.x_foreign_key_0_x = artists.id) AND (tags.x_foreign_key_1_x = artists.yyy))"]
+    a.first.tags.must_equal [Tag.load(:id=>2, :tag_id=>4)]
     DB.sqls.length.must_equal 0
   end
 
