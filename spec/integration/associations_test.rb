@@ -233,7 +233,7 @@ end
 many_to_many_eager_graph_limit_strategies = Module.new do
   extend Minitest::Spec::DSL
 
-  it "should correctly handle limits and offsets when eager loading many_to_many associations" do
+  it "should correctly handle limits and offsets when eager graphing many_to_many associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
     al.add_tag(tu)
@@ -302,7 +302,7 @@ end
 many_through_many_eager_graph_limit_strategies = Module.new do
   extend Minitest::Spec::DSL
 
-  it "should correctly handle limits and offsets when eager loading many_through_many associations" do
+  it "should correctly handle limits and offsets when eager graphing many_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
     al, ar, _ = @pr.call
