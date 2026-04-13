@@ -4017,29 +4017,29 @@ describe "Filtering by associations" do
 
   it "should be able to filter on one_to_one associations with :filter_limit_strategy :lateral_subquery" do
     @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:lateral_subquery, :order=>:foo
-    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE (albums.id = 3)))"
+    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE (albums.id = 3)))"
   end
 
   it "should be able to filter on one_to_one associations with :filter_limit_strategy :lateral_subquery and conditions" do
     @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:lateral_subquery, :order=>:foo, conditions: :bar
-    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (bar AND (albums.id = tracks.album_id)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE (albums.id = 3)))"
+    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE (bar AND (albums.id = tracks.album_id)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE (albums.id = 3)))"
   end
 
   it "should be able to filter on one_to_one associations with :filter_limit_strategy :lateral_subquery and block" do
     @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:lateral_subquery, :order=>:foo do |ds|
       ds.where(:bar)
     end
-    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (bar AND (albums.id = tracks.album_id)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE (albums.id = 3)))"
+    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE (bar AND (albums.id = tracks.album_id)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE (albums.id = 3)))"
   end
 
   it "should be able to filter on one_to_one associations with :filter_limit_strategy :lateral_subquery and array of objects" do
     @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:lateral_subquery, :order=>:foo
-    @Album.filter(:l_track2=>[@Track.load(:id=>5, :album_id=>3), @Track.load(:id=>6, :album_id=>4)]).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (5, 6)) WHERE (albums.id IN (3, 4))))"
+    @Album.filter(:l_track2=>[@Track.load(:id=>5, :album_id=>3), @Track.load(:id=>6, :album_id=>4)]).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (5, 6)) WHERE (albums.id IN (3, 4))))"
   end
 
   it "should be able to filter on one_to_one associations with :filter_limit_strategy :lateral_subquery and dataset of objects" do
     @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:lateral_subquery, :order=>:foo
-    @Album.filter(:l_track2=>@Track.where(:id=>[5,6])).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (SELECT tracks.id FROM tracks WHERE (id IN (5, 6)))) WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE (id IN (5, 6))))))"
+    @Album.filter(:l_track2=>@Track.where(:id=>[5,6])).sql.must_equal "SELECT * FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE (albums.id = tracks.album_id) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (SELECT tracks.id FROM tracks WHERE (id IN (5, 6)))) WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE (id IN (5, 6))))))"
   end
 
   it "should be able to filter on many_to_many associations with :limit" do
@@ -4133,17 +4133,17 @@ describe "Filtering by associations" do
 
   it "should be able to filter on one_to_many associations with composite keys and :filter_limit_strategy :lateral_subquery" do
     @Album.one_to_one :l_ctracks2, :clone=>:l_ctracks, :filter_limit_strategy=>:lateral_subquery, :order=>:foo
-    @Album.filter(:l_ctracks2=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE ((albums.id1 = tracks.album_id1) AND (albums.id2 = tracks.album_id2)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE ((albums.id1 = 3) AND (albums.id2 = 4))))"
+    @Album.filter(:l_ctracks2=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE ((albums.id1 = tracks.album_id1) AND (albums.id2 = tracks.album_id2)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id = 5) WHERE ((albums.id1 = 3) AND (albums.id2 = 4))))"
   end
 
   it "should be able to filter on one_to_many associations with composite keys and :filter_limit_strategy :lateral_subquery with an array" do
     @Album.one_to_one :l_ctracks2, :clone=>:l_ctracks, :filter_limit_strategy=>:lateral_subquery, :order=>:foo
-    @Album.filter(:l_ctracks2=>[@Track.load(:id=>5, :album_id1=>3, :album_id2=>4), @Track.load(:id=>6, :album_id1=>7, :album_id2=>8)]).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE ((albums.id1 = tracks.album_id1) AND (albums.id2 = tracks.album_id2)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (5, 6)) WHERE ((albums.id1, albums.id2) IN ((3, 4), (7, 8)))))"
+    @Album.filter(:l_ctracks2=>[@Track.load(:id=>5, :album_id1=>3, :album_id2=>4), @Track.load(:id=>6, :album_id1=>7, :album_id2=>8)]).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE ((albums.id1 = tracks.album_id1) AND (albums.id2 = tracks.album_id2)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (5, 6)) WHERE ((albums.id1, albums.id2) IN ((3, 4), (7, 8)))))"
   end
 
   it "should be able to filter on one_to_many associations with composite keys and :filter_limit_strategy :lateral_subquery with a dataset" do
     @Album.one_to_one :l_ctracks2, :clone=>:l_ctracks, :filter_limit_strategy=>:lateral_subquery, :order=>:foo
-    @Album.filter(:l_ctracks2=>@Track.where(:id=>[5, 6])).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT * FROM tracks WHERE ((albums.id1 = tracks.album_id1) AND (albums.id2 = tracks.album_id2)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (SELECT tracks.id FROM tracks WHERE (id IN (5, 6)))) WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE (id IN (5, 6))))))"
+    @Album.filter(:l_ctracks2=>@Track.where(:id=>[5, 6])).sql.must_equal "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT albums.id1, albums.id2 FROM albums INNER JOIN LATERAL (SELECT tracks.id FROM tracks WHERE ((albums.id1 = tracks.album_id1) AND (albums.id2 = tracks.album_id2)) ORDER BY foo LIMIT 1) AS tracks ON (tracks.id IN (SELECT tracks.id FROM tracks WHERE (id IN (5, 6)))) WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE (id IN (5, 6))))))"
   end
 
   it "should be able to filter on one_to_one associations with :order and composite keys" do

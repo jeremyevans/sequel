@@ -766,6 +766,43 @@ module Sequel
           end
         end
 
+        # Return an expression to filter the filter by associations dataset to only
+        # rows related to given objects.
+        def _lateral_subquery_filter_limit_strategy_conditions(obj, key, value_method, value_column)
+          value = case obj
+          when Array
+            if key.is_a?(Array)
+              key_methods = Array(value_method)
+              obj.map{|o| key_methods.map{|meth| o.send(meth)}}
+            else
+              obj.map{|o| o.send(value_method)}
+            end
+          when Sequel::Dataset
+            obj.select(*Array(qualify(associated_class.table_name, value_column)))
+          else
+            if key.is_a?(Array)
+              return Array(key).zip(Array(value_method).map{|meth| obj.send(meth)})
+            else
+              obj.send(value_method)
+            end
+          end
+
+          {key => value}
+        end
+
+        def lateral_subquery_filter_limit_strategy_lateral_dataset(ds, obj)
+          lateral_subquery_filter_limit_strategy_filter_lateral_dataset(ds.
+            select(*qualify(associated_class.table_name, associated_class.primary_key)).
+            limit(*limit_and_offset).
+            lateral)
+        end
+
+        def apply_lateral_subquery_filter_limit_strategy(ds, obj)
+          lateral_subquery_filter_limit_strategy_filter_dataset(self[:model].
+            select(*lateral_subquery_filter_limit_strategy_lateral_dataset_select).
+            join(lateral_subquery_filter_limit_strategy_lateral_dataset(ds, obj).as(associated_class.table_name), filter_by_associations_conditions_subquery_conditions(obj)), obj)
+        end
+
         # Whether to limit the associated dataset to a single row.
         def limit_to_single_row?
           !returns_array?
@@ -1180,40 +1217,20 @@ module Sequel
             order(*self[:order])
         end
 
-        def apply_lateral_subquery_filter_limit_strategy(ds, obj)
-          key = filter_by_associations_conditions_key
-          array_key = key.is_a?(Array)
-          keys = Array(key)
+        def lateral_subquery_filter_limit_strategy_conditions(obj)
+          _lateral_subquery_filter_limit_strategy_conditions(obj, filter_by_associations_conditions_key, self[:key_method], self[:key])
+        end
 
-          associated_cond = case obj
-          when Array
-            if array_key
-              key_methods = Array(self[:key_method])
-              {key=>obj.map{|o| key_methods.map{|meth| o.send(meth)}}}
-            else
-              key_method = self[:key_method]
-              {key=>obj.map{|o| o.send(key_method)}}
-            end
-          when Sequel::Dataset
-            {key=>obj.select(*Array(qualify(associated_class.table_name, self[:key])))}
-          else
-            if array_key
-              keys.zip(Array(self[:key_method]).map{|meth| obj.send(meth)})
-            else
-              {key=>obj.send(self[:key_method])}
-            end
-          end
+        def lateral_subquery_filter_limit_strategy_filter_lateral_dataset(ds)
+          ds.where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys)))
+        end
 
-          ds = ds.
-            select_all.
-            limit(*limit_and_offset).
-            where(keys.zip(Array(filter_by_associations_conditions_associated_keys))).
-            lateral
+        def lateral_subquery_filter_limit_strategy_filter_dataset(ds, obj)
+          ds.where(lateral_subquery_filter_limit_strategy_conditions(obj))
+        end
 
-          self[:model].
-            select(*qualified_primary_key).
-            join(ds.as(associated_class.table_name), filter_by_associations_conditions_subquery_conditions(obj)).
-            where(associated_cond)
+        def lateral_subquery_filter_limit_strategy_lateral_dataset_select
+          qualified_primary_key
         end
 
         # Support correlated subquery strategy when filtering by limited associations.
@@ -1530,46 +1547,26 @@ module Sequel
           end
         end
 
-        def apply_lateral_subquery_filter_limit_strategy(ds, obj)
-          key = filter_by_associations_conditions_key
-          array_key = key.is_a?(Array)
-          keys = Array(key)
+        def lateral_subquery_filter_limit_strategy_conditions(obj)
+          _lateral_subquery_filter_limit_strategy_conditions(obj, lateral_subquery_filter_limit_strategy_conditions_key, right_primary_key_method, right_primary_key)
+        end
 
-          associated_cond_value = case obj
-          when Array
-            if array_key
-              key_methods = Array(right_primary_key_method)
-              obj.map{|o| key_methods.map{|meth| o.send(meth)}}
-            else
-              key_method = right_primary_key_method
-              obj.map{|o| o.send(key_method)}
-            end
-          when Sequel::Dataset
-            obj.select(*Array(qualify(associated_class.table_name, right_primary_key)))
-          else
-            if array_key
-              associated_cond = self[:right_key].zip(Array(right_primary_key_method).map{|meth| obj.send(meth)})
-            else
-              obj.send(right_primary_key_method)
-            end
-          end
+        def lateral_subquery_filter_limit_strategy_conditions_key
+          self[:right_key]
+        end
 
-          associated_cond ||= {self[:right_key] => associated_cond_value}
+        def lateral_subquery_filter_limit_strategy_filter_lateral_dataset(ds)
+          ds.where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys)))
+        end
 
-          join_table_ds = ds.db.from(self[:join_table])
+        def lateral_subquery_filter_limit_strategy_filter_dataset(ds, obj)
+          ds.where(filter_by_associations_conditions_key => ds.db.from(self[:join_table]).
+            select(*self[:left_key]).
+            where(lateral_subquery_filter_limit_strategy_conditions(obj)))
+        end
 
-          ds = ds.
-            select(*qualify(associated_class.table_name, associated_class.primary_key)).
-            limit(*limit_and_offset).
-            where(keys.zip(Array(filter_by_associations_conditions_associated_keys))).
-            lateral
-
-          self[:model].
-            select(*qualify(self[:model].table_name, self[:left_primary_key])).
-            join(ds.as(associated_class.table_name), filter_by_associations_conditions_subquery_conditions(obj)).
-            where(key => join_table_ds.
-              select(*self[:left_key]).
-              where(associated_cond))
+        def lateral_subquery_filter_limit_strategy_lateral_dataset_select
+          qualify(self[:model].table_name, self[:left_primary_key])
         end
 
         def apply_lateral_subquery_eager_limit_strategy(ds, ids, limit_and_offset)
