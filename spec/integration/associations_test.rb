@@ -1861,6 +1861,16 @@ regular_and_composite_key_associations = lambda do
     include filter_by_associations_limit_strategies
   end if DB.dataset.supports_window_functions?
 
+  describe "with :lateral_subquery limit strategy" do
+    before do
+      @els = {:eager_limit_strategy=>:lateral_subquery}
+    end
+
+    include eager_limit_strategies
+    include eager_graph_limit_strategies
+    include filter_by_associations_limit_strategies
+  end if DB.dataset.supports_lateral_subqueries?
+
   it "should work with a many_through_many association" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -2051,40 +2061,6 @@ describe "Sequel::Model Simple Associations" do
     include filter_by_associations_one_to_one_limit_strategies
     include filter_by_associations_one_to_many_limit_strategies
   end if DB.dataset.supports_limits_in_correlated_subqueries?
-
-  describe "with :lateral_subquery limit strategy" do
-    before do
-      @els = {:eager_limit_strategy=>:lateral_subquery}
-    end
-
-    include one_to_one_eager_limit_strategies
-    include one_to_many_eager_limit_strategies
-    include one_to_one_eager_graph_limit_strategies
-    include one_to_many_eager_graph_limit_strategies
-    include filter_by_associations_one_to_one_limit_strategies
-    include filter_by_associations_one_to_many_limit_strategies
-
-    include one_through_one_eager_limit_strategies
-    include many_to_many_eager_limit_strategies
-    include one_through_one_eager_graph_limit_strategies
-    include many_to_many_eager_graph_limit_strategies
-    include filter_by_associations_one_through_one_limit_strategies
-    include filter_by_associations_many_to_many_limit_strategies
-
-    include many_through_many_eager_limit_strategies
-    include one_through_many_eager_limit_strategies
-    include many_through_many_eager_graph_limit_strategies
-    include one_through_many_eager_graph_limit_strategies
-    include filter_by_associations_many_through_many_limit_strategies
-    include filter_by_associations_one_through_many_limit_strategies
-
-    include dataset_associations_one_to_one_limit_strategies
-    include dataset_associations_one_to_many_limit_strategies
-    include dataset_associations_one_through_one_limit_strategies
-    include dataset_associations_many_to_many_limit_strategies
-    include dataset_associations_one_through_many_limit_strategies
-    include dataset_associations_many_through_many_limit_strategies
-  end if DB.dataset.supports_lateral_subqueries?
 
   it "should handle eager loading limited associations for many objects" do
     @db[:artists].import([:name], (1..99).map{|i| [i.to_s]})
@@ -2422,40 +2398,6 @@ describe "Sequel::Model Composite Key Associations" do
     include filter_by_associations_one_to_one_limit_strategies
     include filter_by_associations_one_to_many_limit_strategies
   end if DB.dataset.supports_limits_in_correlated_subqueries? && DB.dataset.supports_multiple_column_in?
-
-  describe "with :lateral_subquery limit strategy" do
-    before do
-      @els = {:eager_limit_strategy=>:lateral_subquery}
-    end
-
-    include one_to_one_eager_limit_strategies
-    include one_to_many_eager_limit_strategies
-    include one_to_one_eager_graph_limit_strategies
-    include one_to_many_eager_graph_limit_strategies
-    include filter_by_associations_one_to_one_limit_strategies
-    include filter_by_associations_one_to_many_limit_strategies
-
-    include one_through_one_eager_limit_strategies
-    include many_to_many_eager_limit_strategies
-    include one_through_one_eager_graph_limit_strategies
-    include many_to_many_eager_graph_limit_strategies
-    include filter_by_associations_one_through_one_limit_strategies
-    include filter_by_associations_many_to_many_limit_strategies
-
-    include many_through_many_eager_limit_strategies
-    include one_through_many_eager_limit_strategies
-    include many_through_many_eager_graph_limit_strategies
-    include one_through_many_eager_graph_limit_strategies
-    include filter_by_associations_many_through_many_limit_strategies
-    include filter_by_associations_one_through_many_limit_strategies
-
-    include dataset_associations_one_to_one_limit_strategies
-    include dataset_associations_one_to_many_limit_strategies
-    include dataset_associations_one_through_one_limit_strategies
-    include dataset_associations_many_to_many_limit_strategies
-    include dataset_associations_one_through_many_limit_strategies
-    include dataset_associations_many_through_many_limit_strategies
-  end if DB.dataset.supports_lateral_subqueries? && DB.dataset.supports_multiple_column_in?
 
   it "should have add method accept hashes and create new records" do
     @artist.remove_all_albums
