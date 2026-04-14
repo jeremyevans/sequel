@@ -830,6 +830,33 @@ describe "many_through_many eager loading methods" do
     DB.sqls.length.must_equal 0
   end
 
+  it "should respect the :limit option on a many_through_many association using a :lateral_subquery strategy" do
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :order=>:name, :eager_limit_strategy=>:lateral_subquery
+    Tag.dataset = Tag.dataset.with_fetch([{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}])
+    a = @c1.eager(:first_two_tags).all
+    a.must_equal [@c1.load(:id=>1)]
+    DB.sqls.must_equal ['SELECT * FROM artists',
+    "SELECT tags.*, artists.id AS x_foreign_key_x FROM artists INNER JOIN LATERAL (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (artists.id = albums_artists.artist_id) ORDER BY name LIMIT 2) AS tags ON 't' WHERE (artists.id IN (1)) ORDER BY name"]
+    a.first.first_two_tags.must_equal [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.must_equal 0
+
+    @c1.many_through_many :first_two_tags, :clone=>:first_two_tags, :limit=>[2,1]
+    a = @c1.eager(:first_two_tags).all
+    a.must_equal [@c1.load(:id=>1)]
+    DB.sqls.must_equal ['SELECT * FROM artists',
+    "SELECT tags.*, artists.id AS x_foreign_key_x FROM artists INNER JOIN LATERAL (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (artists.id = albums_artists.artist_id) ORDER BY name LIMIT 2 OFFSET 1) AS tags ON 't' WHERE (artists.id IN (1)) ORDER BY name"]
+    a.first.first_two_tags.must_equal [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.must_equal 0
+
+    @c1.many_through_many :first_two_tags, :clone=>:first_two_tags, :limit=>[nil,1]
+    a = @c1.eager(:first_two_tags).all
+    a.must_equal [@c1.load(:id=>1)]
+    DB.sqls.must_equal ['SELECT * FROM artists',
+    "SELECT tags.*, artists.id AS x_foreign_key_x FROM artists INNER JOIN LATERAL (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (artists.id = albums_artists.artist_id) ORDER BY name OFFSET 1) AS tags ON 't' WHERE (artists.id IN (1)) ORDER BY name"]
+    a.first.first_two_tags.must_equal [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.must_equal 0
+  end
+
   it "should respect the :limit option on a many_through_many association with composite primary keys on the main table" do
     @c1.dataset = @c1.dataset.with_fetch([{:id1=>1, :id2=>2}])
     Tag.dataset = Tag.dataset.with_fetch([{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}])
@@ -870,6 +897,20 @@ describe "many_through_many eager loading methods" do
     a.must_equal [@c1.load(:id1=>1, :id2=>2)]
     DB.sqls.must_equal ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x, row_number() OVER (PARTITION BY albums_artists.artist_id1, albums_artists.artist_id2 ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((albums_artists.artist_id1, albums_artists.artist_id2) IN ((1, 2)))) AS t1 WHERE ((x_sequel_row_number_x >= 2) AND (x_sequel_row_number_x < 4))']
+    a.first.first_two_tags.must_equal [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.must_equal 0
+  end
+
+  it "should respect the :limit option on a many_through_many association with composite primary keys on the main table using a :lateral_subquery strategy" do
+    @c1.dataset = @c1.dataset.with_fetch([{:id1=>1, :id2=>2}])
+    Tag.dataset = Tag.dataset.with_fetch([{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}])
+    @c1.set_primary_key([:id1, :id2])
+    @c1.columns :id1, :id2
+    @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :order=>:name, :eager_limit_strategy=>:lateral_subquery
+    a = @c1.eager(:first_two_tags).all
+    a.must_equal [@c1.load(:id1=>1, :id2=>2)]
+    DB.sqls.must_equal ['SELECT * FROM artists',
+      "SELECT tags.*, artists.id1 AS x_foreign_key_0_x, artists.id2 AS x_foreign_key_1_x FROM artists INNER JOIN LATERAL (SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((artists.id1 = albums_artists.artist_id1) AND (artists.id2 = albums_artists.artist_id2)) ORDER BY name LIMIT 2) AS tags ON 't' WHERE ((artists.id1, artists.id2) IN ((1, 2))) ORDER BY name"]
     a.first.first_two_tags.must_equal [Tag.load(:id=>5), Tag.load(:id=>6)]
     DB.sqls.length.must_equal 0
   end

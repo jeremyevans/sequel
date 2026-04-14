@@ -2071,6 +2071,8 @@ describe "Sequel::Model Simple Associations" do
     include filter_by_associations_one_through_one_limit_strategies
     include filter_by_associations_many_to_many_limit_strategies
 
+    include many_through_many_eager_limit_strategies
+    include one_through_many_eager_limit_strategies
     include many_through_many_eager_graph_limit_strategies
     include one_through_many_eager_graph_limit_strategies
     include filter_by_associations_many_through_many_limit_strategies
@@ -2433,6 +2435,8 @@ describe "Sequel::Model Composite Key Associations" do
     include filter_by_associations_one_through_one_limit_strategies
     include filter_by_associations_many_to_many_limit_strategies
 
+    include many_through_many_eager_limit_strategies
+    include one_through_many_eager_limit_strategies
     include many_through_many_eager_graph_limit_strategies
     include one_through_many_eager_graph_limit_strategies
     include filter_by_associations_many_through_many_limit_strategies
