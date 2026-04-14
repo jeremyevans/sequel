@@ -766,6 +766,24 @@ module Sequel
           end
         end
 
+        def lateral_subquery_eager_limit_strategy_lateral_dataset(ds, limit_and_offset)
+          ds.
+            where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys))).
+            limit(*limit_and_offset).
+            lateral
+        end
+
+        def apply_lateral_subquery_eager_limit_strategy(ds, ids, limit_and_offset)
+          table_name = self[:model].table_name
+          associated_table_name = associated_class.table_name
+
+          associated_class.
+            from(table_name).
+            select_all(associated_table_name).
+            join(lateral_subquery_eager_limit_strategy_lateral_dataset(ds, limit_and_offset).as(associated_table_name), true).
+            order(*self[:order])
+        end
+
         # Return an expression to filter the filter by associations dataset to only
         # rows related to given objects.
         def _lateral_subquery_filter_limit_strategy_conditions(obj, key, value_method, value_column)
@@ -1201,20 +1219,7 @@ module Sequel
         end
 
         def apply_lateral_subquery_eager_limit_strategy(ds, ids, limit_and_offset)
-          table_name = self[:model].table_name
-          associated_table_name = associated_class.table_name
-
-          limited_ds = ds.
-            where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys))).
-            limit(*limit_and_offset).
-            lateral
-
-          associated_class.
-            from(table_name).
-            select_all(associated_table_name).
-            join(limited_ds.as(associated_table_name), true).
-            where(qualify(table_name, self[:primary_key]) => ids).
-            order(*self[:order])
+          super.where(qualify(self[:model].table_name, self[:primary_key]) => ids)
         end
 
         def lateral_subquery_filter_limit_strategy_conditions(obj)
@@ -1569,24 +1574,20 @@ module Sequel
           qualify(self[:model].table_name, self[:left_primary_key])
         end
 
+        def lateral_subquery_eager_limit_strategy_lateral_dataset(ds, limit_and_offset)
+          ds = super
+          select = ds.opts[:select].dup
+          left_key_alias = self[:left_key_alias]
+          select.pop while (s = select.last).is_a?(Sequel::SQL::AliasedExpression) && (left_key_alias.is_a?(Array) ? left_key_alias.include?(s.alias) : s.alias == left_key_alias)
+          ds = ds.clone(:select=>select)
+        end
+
         def apply_lateral_subquery_eager_limit_strategy(ds, ids, limit_and_offset)
           table_name = self[:model].table_name
-          associated_table_name = associated_class.table_name
-          associated_key_aliases = Array(self[:left_key_alias])
-
-          limited_ds = ds.
-            clone(:select=>ds.opts[:select][0...-associated_key_aliases.length]).
-            where(Array(filter_by_associations_conditions_key).zip(Array(filter_by_associations_conditions_associated_keys))).
-            limit(*limit_and_offset).
-            lateral
-
-          associated_class.
-            from(table_name).
-            select_all(associated_table_name).
-            select_append(*qualify(table_name, self[:left_primary_keys]).zip(associated_key_aliases).map{|id, aliaz| Sequel.as(id, aliaz)}).
-            join(limited_ds.as(associated_table_name), true).
-            where(qualify(table_name, self[:left_primary_key]) => ids).
-            order(*self[:order])
+          super.
+            select_all(associated_class.table_name).
+            select_append(*qualify(table_name, self[:left_primary_keys]).zip(Array(self[:left_key_alias])).map{|id, aliaz| Sequel.as(id, aliaz)}).
+            where(qualify(table_name, self[:left_primary_key]) => ids)
         end
 
         def apply_lateral_subquery_eager_graph_limit_strategy(ds)
