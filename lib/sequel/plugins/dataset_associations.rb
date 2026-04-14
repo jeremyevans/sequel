@@ -82,8 +82,27 @@ module Sequel
         # database supports window functions.
         def associated(name)
           raise Error, "unrecognized association name: #{name.inspect}" unless r = model.association_reflection(name)
-          ds = r.associated_class.dataset
+          klass = r.associated_class
           sds = opts[:limit] ? self : unordered
+
+          if r.send(:filter_by_associations_limit_strategy) == :lateral_subquery
+            ds = r.send(:associated_eager_dataset)
+
+            case r[:type]
+            when :one_to_one, :one_to_many
+              sds = sds.select(*Array(r.qualified_primary_key))
+            else
+              sds = sds.select(*r[:left_primary_keys])
+              ds = ds.select_all(klass.table_name)
+              update_select = true
+            end
+
+            ds = r.send(:apply_lateral_subquery_eager_limit_strategy, ds, sds, r.limit_and_offset)
+            ds = ds.clone(:select=>ds.opts[:select][0,1]) if update_select
+            return ds.clone(:eager=>nil, :eager_graph=>nil)
+          end
+
+          ds = klass.dataset
           ds = case r[:type]
           when :many_to_one
             ds.where(r.qualified_primary_key=>sds.select(*Array(r[:qualified_key])))
