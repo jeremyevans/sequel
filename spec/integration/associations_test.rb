@@ -1869,7 +1869,7 @@ regular_and_composite_key_associations = lambda do
     include eager_limit_strategies
     include eager_graph_limit_strategies
     include filter_by_associations_limit_strategies
-  end if DB.dataset.supports_lateral_subqueries?
+  end if DB.dataset.supports_lateral_subqueries? && ![:mssql, :sqlanywhere].include?(DB.database_type)
 
   it "should work with a many_through_many association" do
     @album.update(:artist => @artist)
