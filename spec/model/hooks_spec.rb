@@ -23,7 +23,8 @@ describe "Model#before_create && Model#after_create" do
 
   it ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
     @c.send(:define_method, :before_create){cancel_action 'not good'}
-    proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed, 'not good')
+    err = proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed)
+    err.message.must_equal('not good')
     DB.sqls.must_equal []
     @c.load(:id => 2233).save
   end

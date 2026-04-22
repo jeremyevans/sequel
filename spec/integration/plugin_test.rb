@@ -1090,7 +1090,8 @@ describe "Instance Filters plugin" do
   
   it "should not raise an error if deleting only deletes one row" do
     @i.destroy
-    proc{@i.refresh}.must_raise(Sequel::Error, 'Record not found')
+    err = proc{@i.refresh}.must_raise(Sequel::Error)
+    err.message.must_equal('Record not found')
   end
   
   it "should raise error if destroying doesn't delete a row" do
