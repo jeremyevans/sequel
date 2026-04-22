@@ -148,7 +148,8 @@ describe Sequel::Model do
   end
 
   it "should allow raising of ValidationFailed with a string" do
-    proc{raise Sequel::ValidationFailed, "no reason"}.must_raise(Sequel::ValidationFailed, "no reason")
+    err = proc{raise Sequel::ValidationFailed, "no reason"}.must_raise(Sequel::ValidationFailed)
+    err.message.must_equal "no reason"
   end
 end
 

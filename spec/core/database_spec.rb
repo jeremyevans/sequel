@@ -3287,9 +3287,10 @@ describe "Database.after_initialize" do
   end
 
   it "should raise an error if registration is called without a block" do
-    proc {
+    err = proc {
       Sequel::Database.after_initialize
-    }.must_raise(Sequel::Error, /must provide block/i)
+    }.must_raise Sequel::Error
+    err.message.must_match(/must provide block/i)
   end
 end
 

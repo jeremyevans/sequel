@@ -844,9 +844,10 @@ describe "PostgreSQL temporary table/view support" do
   end
 
   it "should not allow to pass both :temp and :unlogged" do
-    proc do
+    err = proc do
       @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}
-    end.must_raise(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
+    end.must_raise(Sequel::Error)
+    err.message.must_equal("can't provide both :temp and :unlogged to create_table")
   end
 
   it "should support temporary views" do
@@ -1669,7 +1670,8 @@ describe "A PostgreSQL dataset" do
   end
 
   it "should raise an error if attempting to update a joined dataset with a single FROM table" do
-    proc{@db[:test].join(:test, [:name]).update(:name=>'a')}.must_raise(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
+    err = proc{@db[:test].join(:test, [:name]).update(:name=>'a')}.must_raise Sequel::Error
+    err.message.must_equal("Need multiple FROM tables if updating/deleting a dataset with JOINs")
   end
 
   it "should truncate with options" do
