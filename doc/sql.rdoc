@@ -374,7 +374,7 @@ A common use of virtual rows is to handle inequality operators:
 
   DB[:albums].where{col1 > col2} # SELECT * FROM "albums" WHERE ("col1" > "col2")
 
-=== Standard Mathematical Operators (+ - * /)
+=== Standard Mathematical Operators (+ - * / **)
 
 The standard mathematical operates are defined on most Sequel-specific expression objects:
 
@@ -464,7 +464,7 @@ You can also use the <tt>Sequel.cast</tt> method:
 
   Sequel.cast(:name, :text) # CAST("name" AS text)
 
-=== Bitwise Mathematical Operators (& | ^ << >> ~)
+=== Bitwise Mathematical Operators (& | ^ << >> ~ %)
 
 Sequel allows the use of bitwise mathematical operators on Sequel::SQL::NumericExpression objects:
 
@@ -476,6 +476,7 @@ As you can see, when you use the + operator on a symbol, you get a NumericExpres
   Sequel[:number].sql_number | 5 # ("number" | 5)
   Sequel.function(:func).sql_number << 7 # (func() << 7)
   Sequel.cast(:name, :integer).sql_number >> 8 # (CAST("name" AS integer) >> 8)
+  (Sequel[:number] + 1) % 10 # (("number" + 1) % 10)
 
 Sequel allows you to do the cast and conversion at the same time via +cast_numeric+:
 
@@ -496,11 +497,11 @@ Just like for the bitwise operators, Sequel allows you to do the cast and conver
 
   Sequel[:number].cast_string + ' - Number' # (CAST(number AS varchar(255)) || ' - Number')
 
-Note that similar to the mathematical operators, you cannot switch the order the expression and have it work:
+Note that unlike the mathematical operators, you cannot switch the order the expression and have it work:
 
   'Name - ' + Sequel[:name].sql_string # raises TypeError
 
-Just like for the mathematical operators, you can use <tt>Sequel.[]</tt> to wrap the object:
+You can use <tt>Sequel.[]</tt> to wrap the object:
 
   Sequel['Name - '] + :name # ('Name - ' || "name")
   
