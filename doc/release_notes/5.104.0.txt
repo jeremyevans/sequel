@@ -1,0 +1,39 @@
+= New Features
+
+* Sequel now supports :lateral_subquery as a strategy when eager
+  loading, eager graphing, and filtering by limited associations.
+  For eager graphing and filtering, this strategy is likely to be
+  the fastest strategy.  Example with eager_graph:
+
+    Artist.eager_graph_with_options(:first_10_albums,
+      limit_strategy: :lateral_subquery).all
+    # SELECT artists.id, artists.name,
+    #        first_10_albums.id AS first_10_albums_id,
+    #        first_10_albums.name AS first_10_albums_name,
+    #        first_10_albums.artist_id,
+    #        first_10_albums.release_date
+    # FROM artists
+    # LEFT OUTER JOIN LATERAL (
+    #   SELECT *
+    #   FROM albums
+    #   WHERE (first_10_albums.artist_id = artists.id)
+    #   ORDER BY release_date
+    #   LIMIT 10
+    # ) AS first_10_albums ON true
+    # ORDER BY first_10_albums.release_date
+
+  This is supported on all association types supporting limited
+  associations:
+
+  * one_to_many/one_to_one
+  * many_to_many/one_through_one
+  * many_through_many/one_through_many (many_through_many plugin)
+
+  This requires native support for LATERAL subqueries, so it works on
+  PostgreSQL, DB2, and HSQLDB. It does not work on MSSQL or
+  SQLAnywhere, even with the LATERAL emulation offered by the
+  mssql_emulate_lateral_with_apply extension.
+
+  This is not currently used as the default eager_graph and filter by
+  associations limit strategy on databases that support it. That
+  change will likely be made in a future Sequel release.

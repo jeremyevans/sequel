@@ -1,4 +1,4 @@
-=== master
+=== 5.104.0 (2026-05-01)
 
 * Support :lateral_subquery as a filter by associations limit strategy in the dataset associations plugin (jeremyevans)
 
