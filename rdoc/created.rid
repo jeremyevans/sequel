@@ -1,6 +1,6 @@
-Wed, 01 Apr 2026 09:24:44 -0700
+Fri, 01 May 2026 09:09:05 -0700
 README.rdoc	Sun, 23 Nov 2025 09:58:00 -0800
-CHANGELOG	Wed, 01 Apr 2026 09:09:41 -0700
+CHANGELOG	Fri, 01 May 2026 08:59:13 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Sat, 14 Mar 2026 13:20:19 -0700
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Tue, 04 Aug 2020 18:11:34 -0700
 lib/sequel/sql.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Wed, 01 Apr 2026 09:09:41 -0700
+lib/sequel/version.rb	Fri, 01 May 2026 08:59:13 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Sun, 01 Mar 2026 15:10:02 -0800
@@ -41,7 +41,7 @@ lib/sequel/database/query.rb	Tue, 03 Jun 2025 09:09:55 -0700
 lib/sequel/database/schema_generator.rb	Thu, 26 Mar 2026 13:59:36 -0700
 lib/sequel/database/schema_methods.rb	Tue, 03 Mar 2026 21:13:26 -0800
 lib/sequel/database/transactions.rb	Thu, 21 Sep 2023 15:53:42 -0700
-lib/sequel/model/associations.rb	Tue, 03 Mar 2026 21:13:26 -0800
+lib/sequel/model/associations.rb	Wed, 15 Apr 2026 20:16:19 -0700
 lib/sequel/model/base.rb	Sun, 23 Nov 2025 18:29:09 -0800
 lib/sequel/model/dataset_module.rb	Fri, 11 Oct 2024 15:23:15 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -50,8 +50,8 @@ lib/sequel/model/exceptions.rb	Mon, 18 Sep 2023 12:32:33 -0700
 lib/sequel/model/inflections.rb	Fri, 02 Sep 2022 09:11:30 -0700
 lib/sequel/model/plugins.rb	Fri, 04 Dec 2020 13:44:07 -0800
 lib/sequel/extensions/migration.rb	Tue, 24 Mar 2026 17:10:46 -0700
-doc/advanced_associations.rdoc	Mon, 20 Oct 2025 09:42:37 -0700
-doc/association_basics.rdoc	Fri, 27 Jan 2023 07:36:40 -0800
+doc/advanced_associations.rdoc	Wed, 15 Apr 2026 20:16:19 -0700
+doc/association_basics.rdoc	Wed, 15 Apr 2026 20:16:19 -0700
 doc/bin_sequel.rdoc	Thu, 10 Aug 2017 09:06:47 -0700
 doc/cheat_sheet.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/code_order.rdoc	Sat, 11 May 2024 10:53:18 -0700
@@ -75,7 +75,7 @@ doc/reflection.rdoc	Mon, 11 Nov 2024 14:55:11 -0800
 doc/schema_modification.rdoc	Thu, 01 Feb 2024 15:00:17 -0800
 doc/security.rdoc	Tue, 26 Aug 2025 15:04:09 -0700
 doc/sharding.rdoc	Thu, 23 Jan 2025 15:31:26 -0800
-doc/sql.rdoc	Wed, 18 Jan 2023 15:13:59 -0800
+doc/sql.rdoc	Mon, 27 Apr 2026 16:50:46 -0700
 doc/testing.rdoc	Tue, 03 Mar 2026 21:13:26 -0800
 doc/thread_safety.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/transactions.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
@@ -205,6 +205,7 @@ doc/release_notes/5.100.0.txt	Thu, 01 Jan 2026 08:57:49 -0800
 doc/release_notes/5.101.0.txt	Sun, 01 Feb 2026 09:06:08 -0800
 doc/release_notes/5.102.0.txt	Sun, 01 Mar 2026 11:02:45 -0800
 doc/release_notes/5.103.0.txt	Wed, 01 Apr 2026 09:24:31 -0700
+doc/release_notes/5.104.0.txt	Fri, 01 May 2026 08:59:13 -0700
 doc/release_notes/5.11.0.txt	Wed, 01 Aug 2018 08:13:54 -0700
 doc/release_notes/5.12.0.txt	Fri, 31 Aug 2018 08:39:42 -0700
 doc/release_notes/5.13.0.txt	Mon, 01 Oct 2018 07:21:49 -0700

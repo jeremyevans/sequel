@@ -1595,6 +1595,8 @@ doc/association_basics.rdoc
 <p>Uses DISTINCT ON to ensure only the first matching record is loaded (only used for one_*_one associations without offsets on PostgreSQL).</p>
 </td></tr><tr><td class='label'>:window_function </td><td>
 <p>Uses a ROW_NUMBER window functions to ensure the correctly limited/offset records are returned.</p>
+</td></tr><tr><td class='label'>:lateral_subquery </td><td>
+<p>Uses a LATERAL subquery to ensure the correctly limited/offset records are returned.</p>
 </td></tr><tr><td class='label'>:ruby </td><td>
 <p>Uses ruby array slicing to emulate database limiting/offsetting.</p>
 </td></tr></tbody></table>
@@ -1605,7 +1607,7 @@ doc/association_basics.rdoc
 
 <h4 id="label-3Afilter_limit_strategy"><a href="#label-3Afilter_limit_strategy">:filter_limit_strategy</a></h4>
 
-<p>The strategy to use when filtering by limited associations.  In general <a href="../../classes/Sequel.html"><code>Sequel</code></a> will choose either a :distinct_on, :window_function, or :correlated_subquery strategy based on the association type and what the database supports, but you can override that if necessary using this option.</p>
+<p>The strategy to use when filtering by limited associations.  In general <a href="../../classes/Sequel.html"><code>Sequel</code></a> will choose either a :distinct_on, :window_function, :correlated_subquery, or :lateral_subquery strategy based on the association type and what the database supports, but you can override that if necessary using this option (or the :eager_limit_strategy option).</p>
 </div>
 <div id='context'>
 </div>

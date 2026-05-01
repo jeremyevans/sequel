@@ -464,7 +464,7 @@ doc/sql.rdoc
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">col1</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">col2</span>} <span class="ruby-comment"># SELECT * FROM &quot;albums&quot; WHERE (&quot;col1&quot; &gt; &quot;col2&quot;)</span>
 </pre>
 
-<h3 id="label-Standard+Mathematical+Operators+-28-2B+-+-2A+-2F-29"><a href="#label-Standard+Mathematical+Operators+-28-2B+-+-2A+-2F-29">Standard Mathematical Operators (+ - * /)</a></h3>
+<h3 id="label-Standard+Mathematical+Operators+-28-2B+-+-2A+-2F+-2A-2A-29"><a href="#label-Standard+Mathematical+Operators+-28-2B+-+-2A+-2F+-2A-2A-29">Standard Mathematical Operators (+ - * / **)</a></h3>
 
 <p>The standard mathematical operates are defined on most Sequel-specific expression objects:</p>
 
@@ -564,7 +564,7 @@ doc/sql.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:text</span>) <span class="ruby-comment"># CAST(&quot;name&quot; AS text)</span>
 </pre>
 
-<h3 id="label-Bitwise+Mathematical+Operators+-28-26+-7C+-5E+-3C-3C+-3E-3E+~-29"><a href="#label-Bitwise+Mathematical+Operators+-28-26+-7C+-5E+-3C-3C+-3E-3E+~-29">Bitwise Mathematical Operators (&amp; | ^ &lt;&lt; &gt;&gt; ~)</a></h3>
+<h3 id="label-Bitwise+Mathematical+Operators+-28-26+-7C+-5E+-3C-3C+-3E-3E+~+-25-29"><a href="#label-Bitwise+Mathematical+Operators+-28-26+-7C+-5E+-3C-3C+-3E-3E+~+-25-29">Bitwise Mathematical Operators (&amp; | ^ &lt;&lt; &gt;&gt; ~ %)</a></h3>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> allows the use of bitwise mathematical operators on <a href="../../classes/Sequel/SQL/NumericExpression.html"><code>Sequel::SQL::NumericExpression</code></a> objects:</p>
 
@@ -577,6 +577,7 @@ doc/sql.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:number</span>].<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">|</span> <span class="ruby-value">5</span> <span class="ruby-comment"># (&quot;number&quot; | 5)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">7</span> <span class="ruby-comment"># (func() &lt;&lt; 7)</span>
 <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:integer</span>).<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">&gt;&gt;</span> <span class="ruby-value">8</span> <span class="ruby-comment"># (CAST(&quot;name&quot; AS integer) &gt;&gt; 8)</span>
+(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:number</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">%</span> <span class="ruby-value">10</span> <span class="ruby-comment"># ((&quot;number&quot; + 1) % 10)</span>
 </pre>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> allows you to do the cast and conversion at the same time via <code>cast_numeric</code>:</p>
@@ -602,12 +603,12 @@ doc/sql.rdoc
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:number</span>].<span class="ruby-identifier">cast_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; - Number&#39;</span> <span class="ruby-comment"># (CAST(number AS varchar(255)) || &#39; - Number&#39;)</span>
 </pre>
 
-<p>Note that similar to the mathematical operators, you cannot switch the order the expression and have it work:</p>
+<p>Note that unlike the mathematical operators, you cannot switch the order the expression and have it work:</p>
 
 <pre class="ruby"><span class="ruby-string">&#39;Name - &#39;</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:name</span>].<span class="ruby-identifier">sql_string</span> <span class="ruby-comment"># raises TypeError</span>
 </pre>
 
-<p>Just like for the mathematical operators, you can use <code>Sequel.[]</code> to wrap the object:</p>
+<p>You can use <code>Sequel.[]</code> to wrap the object:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-string">&#39;Name - &#39;</span>] <span class="ruby-operator">+</span> <span class="ruby-value">:name</span> <span class="ruby-comment"># (&#39;Name - &#39; || &quot;name&quot;)</span>
 </pre>

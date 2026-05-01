@@ -1,4 +1,4 @@
-Wed, 01 Apr 2026 09:25:13 -0700
+Fri, 01 May 2026 09:09:34 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 11 Oct 2022 13:37:12 -0700
 lib/sequel/extensions/_pretty_table.rb	Mon, 17 Oct 2022 09:39:14 -0700
@@ -130,7 +130,7 @@ lib/sequel/plugins/composition.rb	Thu, 16 Jan 2025 10:44:13 -0800
 lib/sequel/plugins/concurrent_eager_loading.rb	Fri, 21 Oct 2022 08:19:04 -0700
 lib/sequel/plugins/constraint_validations.rb	Wed, 23 Jul 2025 17:38:57 -0700
 lib/sequel/plugins/csv_serializer.rb	Wed, 01 Jul 2020 11:28:34 -0700
-lib/sequel/plugins/dataset_associations.rb	Fri, 04 Dec 2020 13:44:07 -0800
+lib/sequel/plugins/dataset_associations.rb	Wed, 15 Apr 2026 20:16:19 -0700
 lib/sequel/plugins/def_dataset_method.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/defaults_setter.rb	Thu, 25 Jul 2024 10:41:27 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -157,7 +157,7 @@ lib/sequel/plugins/inverted_subsets.rb	Thu, 16 Jan 2025 11:35:28 -0800
 lib/sequel/plugins/json_serializer.rb	Tue, 26 Aug 2025 15:04:09 -0700
 lib/sequel/plugins/lazy_attributes.rb	Thu, 16 Jan 2025 10:45:19 -0800
 lib/sequel/plugins/list.rb	Fri, 05 Jan 2024 07:59:37 -0800
-lib/sequel/plugins/many_through_many.rb	Mon, 12 Dec 2022 21:25:25 -0800
+lib/sequel/plugins/many_through_many.rb	Wed, 15 Apr 2026 20:16:19 -0700
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Tue, 03 Mar 2026 21:13:26 -0800
 lib/sequel/plugins/nested_attributes.rb	Wed, 05 Mar 2025 15:15:59 -0800
