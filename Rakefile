@@ -78,7 +78,7 @@ desc "Generate rdoc for plugins/extensions for Sequel website"
 task :website_rdoc_plugins do
   rdoc_task("www/public/rdoc-plugins", 'Sequel',
     Dir["lib/sequel/{extensions,plugins}/**/*.rb"] +
-    Dir["doc/core_*"]
+    Dir["doc/{advanced_associations,association_basics,core_extensions,reflection,schema_modification}.rdoc"]
   )
 end
 
