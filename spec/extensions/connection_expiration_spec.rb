@@ -93,6 +93,25 @@ connection_expiration_specs = Module.new do
     @db.pool.instance_variable_get(:@connection_expiration_timestamps).size.must_equal 0
   end
 
+  it "should record expiration timestamps for connections opened before the extension was loaded" do
+    @db = db
+    c1 = @db.synchronize{|c| c}
+    @db.pool.instance_variable_get(:@connection_expiration_timestamps).must_be_nil
+    @db.extension(:connection_expiration)
+    timestamps = @db.pool.instance_variable_get(:@connection_expiration_timestamps)
+    timestamps.must_include(c1)
+    timestamps[c1].last.must_equal 14400
+  end
+
+  it "should record expiration timestamps for held connections when loading the extension" do
+    @db = db
+    @db.synchronize do |c|
+      @db.pool.instance_variable_get(:@connection_expiration_timestamps).must_be_nil
+      @db.extension(:connection_expiration)
+      @db.pool.instance_variable_get(:@connection_expiration_timestamps).must_include(c)
+    end
+  end
+
   it "should not vary expiration timestamps by default" do
     c1 = @db.synchronize{|c| c}
     @db.pool.instance_variable_get(:@connection_expiration_timestamps)[c1].last.must_equal 2
