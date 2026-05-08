@@ -59,7 +59,21 @@ module Sequel
           # Record an expiration timestamp for any connections that already
           # exist in the pool, so that a connection opened before the extension
           # was loaded (e.g. via Sequel.connect) will eventually be expired.
-          register = method(:register_connection)
+          register = method(:register_connection_expiration_time)
+
+          case pool_type
+          when :timed_queue, :sharded_timed_queue
+            register_queued_connections = lambda do |queue|
+              conns = []
+              while conn = queue.pop(timeout: 0)
+                conns << conn
+              end
+              conns.each do |conn|
+                queue.push(register_connection_expiration_time(conn))
+              end
+            end
+          end
+
           case pool_type
           when :threaded
             @available_connections.each(&register)
@@ -68,10 +82,10 @@ module Sequel
             @available_connections.each_value{|conns| conns.each(&register)}
             @allocated.each_value{|threads| threads.each_value(&register)}
           when :timed_queue
-            register_queued_connections(@queue, register)
+            register_queued_connections.call(@queue)
             @allocated.each_value(&register)
           when :sharded_timed_queue
-            @queues.each_value{|queue| register_queued_connections(queue, register)}
+            @queues.each_value(&register_queued_connections)
             @allocated.each_value{|threads| threads.each_value(&register)}
           end
         end
@@ -79,17 +93,6 @@ module Sequel
     end
 
     private
-
-    # Drain the given queue, yield each connection to the registration callable,
-    # then push the connections back onto the queue.
-    def register_queued_connections(queue, register)
-      conns = []
-      while conn = queue.pop(timeout: 0)
-        conns << conn
-      end
-      conns.each(&register)
-      conns.each{|conn| queue.push(conn)}
-    end
 
     # Clean up expiration timestamps during disconnect.
     def disconnect_connection(conn)
@@ -99,14 +102,13 @@ module Sequel
 
     # Record the time the connection was created.
     def make_new(*)
-      conn = super
-      register_connection(conn)
-      conn
+      register_connection_expiration_time(super)
     end
 
-    # Record an expiration entry for a connection
-    def register_connection(conn)
+    # Record an expiration entry for a connection, returns the connection.
+    def register_connection_expiration_time(conn)
       @connection_expiration_timestamps[conn] ||= [Sequel.start_timer, @connection_expiration_timeout + (rand * @connection_expiration_random_delay)].freeze
+      conn
     end
 
     # When acquiring a connection, check if the connection is expired.

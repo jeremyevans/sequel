@@ -1,3 +1,7 @@
+=== master
+
+* Make connection_expiration extension set expiration time on connections in the pool when it is loaded (cooljacob204, jeremyevans) (#2365, #2366)
+
 === 5.104.0 (2026-05-01)
 
 * Support :lateral_subquery as a filter by associations limit strategy in the dataset associations plugin (jeremyevans)
