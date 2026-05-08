@@ -34,6 +34,8 @@ module Sequel
     #   Album.plugin :modification_detection
     module ModificationDetection
       module ClassMethods
+        Plugins.model_instance_variables(self, :@values_hashes)
+
         # Calculate the hashes for all of the column values, so that they
         # can be compared later to determine if the column value has changed.
         def call(_)

@@ -118,6 +118,7 @@ module Sequel
       end
 
       module ClassMethods
+        Plugins.model_instance_variables(self, :@forbid_lazy_load)
         Plugins.def_dataset_methods(self, :forbid_lazy_load)
 
         # If the static_cache plugin is used by the associated class for

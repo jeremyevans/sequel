@@ -84,6 +84,10 @@ module Sequel
       # underlying table doesn't exist.
       attr_accessor :require_valid_table
 
+      # Whether the model uses a shape friendly design (initializing all potentially
+      # used instance variables to nil).
+      attr_reader :shape_friendly
+
       # Should be the literal primary key column name if this Model's table has a simple primary key, or
       # nil if the model has a compound primary key or no primary key.
       attr_reader :simple_pk
@@ -221,9 +225,7 @@ module Sequel
       # Requires that values be a hash where all keys are symbols. It
       # probably should not be used by external code.
       def call(values)
-        o = allocate
-        o.instance_variable_set(:@values, values)
-        o
+        allocate.initialize_from_db(values)
       end
       
       # Clear the setter_methods cache
@@ -501,7 +503,13 @@ module Sequel
         unless @plugins.include?(m)
           @plugins << m
           m.apply(self, *args, &block) if m.respond_to?(:apply)
-          extend(m::ClassMethods) if m.const_defined?(:ClassMethods, false)
+          if m.const_defined?(:ClassMethods, false)
+            class_methods = m::ClassMethods
+            extend(class_methods)
+            if class_methods.private_method_defined?(:each_model_instance_variable)
+              def_initialize_nil_instance_variables
+            end
+          end
           include(m::InstanceMethods) if m.const_defined?(:InstanceMethods, false)
           if m.const_defined?(:DatasetMethods, false)
             dataset_extend(m::DatasetMethods, :create_class_methods=>false)
@@ -631,6 +639,13 @@ module Sequel
         self
       end
 
+      # Set instance variables used by instances of this model class.
+      # Only has an effect if shape_friendly is true.
+      def set_model_instance_variables(*ivs)
+        Plugins.model_instance_variables(singleton_class, *ivs)
+        def_initialize_nil_instance_variables
+      end
+
       # Sets the primary key for this model. You can use either a regular 
       # or a composite primary key.  To not use a primary key, set to nil
       # or use +no_primary_key+. On most adapters, Sequel can automatically
@@ -663,6 +678,12 @@ module Sequel
       # Cache of setter methods to allow by default, in order to speed up mass assignment.
       def setter_methods
         @setter_methods || (@setter_methods = get_setter_methods)
+      end
+
+      # Set whether the model should be shape friendly.
+      def shape_friendly=(v)
+        @shape_friendly = v
+        def_initialize_nil_instance_variables
       end
 
       # Returns name of primary table for the dataset. If the table for the dataset
@@ -814,6 +835,60 @@ END
         mod.send(:alias_method, meth, meth)
       end
 
+      # Defines the private _initialize_nil_instance_variables method.
+      # If shape_friendly is true, defines a method that initials the
+      # model's instance variables to nil. If shape_friendly is not
+      # true, does nothing.
+      def def_initialize_nil_instance_variables
+        if @shape_friendly
+          ivs = []
+          each_model_instance_variable do |iv|
+            unless iv.match(/\A@[a-z_][a-z0-9_]*\z/)
+              raise Error, "invalid model instance variable used"
+            end
+
+            ivs << iv
+          end
+          ivs.uniq!
+          ivs = ivs.reverse.join(" = ")
+          new_method_content = "#{ivs} = nil"
+          new_from_db_method_content = "#{ivs} = @new = @modified = nil"
+        end
+
+        class_eval(<<-RUBY, __FILE__, __LINE__+1)
+          def _initialize_nil_instance_variables
+            #{new_method_content}
+          end
+          def _initialize_from_db_nil_instance_variables
+            #{new_from_db_method_content}
+          end
+        RUBY
+        private :_initialize_nil_instance_variables, :_initialize_from_db_nil_instance_variables
+        alias_method :_initialize_nil_instance_variables, :_initialize_nil_instance_variables
+        alias_method :_initialize_from_db_nil_instance_variables, :_initialize_from_db_nil_instance_variables
+        nil
+      end
+
+      # Yield the default model instance variables. Designed only for
+      # use by def_initialize_nil_instance_variables.
+      def each_model_instance_variable
+        [
+          :@changed_columns,
+          :@errors,
+          :@raise_on_save_failure,
+          :@raise_on_typecast_failure,
+          :@require_modification,
+          :@server,
+          :@singleton_setter_added,
+          :@skip_validation_on_next_save,
+          :@strict_param_setting,
+          :@this,
+          :@typecast_empty_string_to_nil,
+          :@typecast_on_assignment,
+          :@use_transactions,
+        ].each{|iv| yield iv}
+      end
+
       # Get the schema from the database, fall back on checking the columns
       # via the database if that will return inaccurate results or if
       # it raises an error.
@@ -937,6 +1012,7 @@ END
           :@require_valid_table=>nil,
           :@restrict_primary_key=>nil,
           :@setter_methods=>nil,
+          :@shape_friendly=>nil,
           :@simple_pk=>nil,
           :@simple_table=>nil,
           :@strict_param_setting=>nil,
@@ -1094,7 +1170,7 @@ END
       # standard attr_writer method for modifying that instance variable.
       [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, 
         :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions].each do |meth|
-        class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)
+        class_eval("def #{meth}; @#{meth}.nil? ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)
         attr_writer(meth)
       end
 
@@ -1135,11 +1211,21 @@ END
       #   end
       def initialize(values = OPTS)
         @values = {}
-        @new = true
-        @modified = true
+        @new = @modified = true
+        _initialize_nil_instance_variables
+
         initialize_set(values)
         _clear_changed_columns(:initialize)
         yield self if defined?(yield)
+      end
+
+      # Initialize a new record using values retrieved from a database.
+      # This should not be called directly, only via Model.call.
+      def initialize_from_db(values) # :nodoc:
+        @values = values
+        _initialize_from_db_nil_instance_variables
+
+        self
       end
 
       # Returns value of the column's attribute.
@@ -1445,7 +1531,7 @@ END
       #   Artist.new.new? # => true
       #   Artist[1].new? # => false
       def new?
-        defined?(@new) ? @new : (@new = false)
+        @new || false
       end
       
       # Returns the primary key value identifying the model instance.
@@ -2337,6 +2423,7 @@ END
 
     extend ClassMethods
     plugin self
+    def_initialize_nil_instance_variables
 
     singleton_class.send(:undef_method, :dup, :clone, :initialize_copy)
     # :nocov:

@@ -26,6 +26,10 @@ module Sequel
     #   # Make the Album instances record accessed columns
     #   Album.plugin :accessed_columns
     module AccessedColumns
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@accessed_columns)
+      end
+
       module InstanceMethods
         # Record the column access before retrieving the value.
         def [](c)

@@ -66,6 +66,8 @@ module Sequel
       end
 
       module ClassMethods
+        Plugins.model_instance_variables(self, :@compositions)
+
         # A hash with composition name keys and composition reflection
         # hash values.
         attr_reader :compositions

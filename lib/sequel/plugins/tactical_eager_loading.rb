@@ -124,6 +124,10 @@ module Sequel
     #   # Make the Album class use tactical eager loading
     #   Album.plugin :tactical_eager_loading
     module TacticalEagerLoading
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@retrieved_by, :@retrieved_with)
+      end
+
       module InstanceMethods
         # The dataset that retrieved this object, set if the object was
         # reteived via Dataset#all.

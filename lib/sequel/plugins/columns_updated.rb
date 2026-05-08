@@ -15,6 +15,10 @@ module Sequel
     #   # Make the Album class store the columns hash used for updating
     #   Album.plugin :columns_updated
     module ColumnsUpdated
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@columns_updated)
+      end
+
       module InstanceMethods
         private
 

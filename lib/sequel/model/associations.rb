@@ -2174,6 +2174,7 @@ module Sequel
           associate(:one_to_one, name, opts, &block)
         end
 
+        Plugins.model_instance_variables(self, :@associations, :@set_associated_object_if_same)
         Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_association_options=>:dup, :@default_association_type_options=>:hash_dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
         Plugins.def_dataset_methods(self, [:eager, :eager_graph, :eager_graph_with_options, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         

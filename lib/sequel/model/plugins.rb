@@ -38,12 +38,23 @@ module Sequel
     end
 
     # Add method to +mod+ that overrides inherited_instance_variables to include the
-    # values in this hash.
+    # values in this hash. These affects how class instance variables will be treated
+    # during subclassing.
     def self.inherited_instance_variables(mod, hash)
       mod.send(:define_method, :inherited_instance_variables) do ||
         super().merge!(hash)
       end
       mod.send(:private, :inherited_instance_variables)
+    end
+
+    # Sets the model instance variables used by the plugin. These instance variables
+    # will be initialized to nil for created model objects.
+    def self.model_instance_variables(mod, *ivs)
+      mod.send(:define_method, :each_model_instance_variable) do |&block|
+        super(&block)
+        ivs.each(&block)
+      end
+      mod.send(:private, :each_model_instance_variable)
     end
 
     # Add method to +mod+ that overrides set_dataset to call the method afterward.

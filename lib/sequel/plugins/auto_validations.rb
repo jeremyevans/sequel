@@ -131,6 +131,8 @@ module Sequel
       end
 
       module ClassMethods
+        Plugins.model_instance_variables(self, :@_skip_auto_validations)
+
         # The columns with automatic no_null_byte validations
         attr_reader :auto_validate_no_null_byte_columns
 

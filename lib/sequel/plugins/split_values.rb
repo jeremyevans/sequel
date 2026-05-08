@@ -36,6 +36,8 @@ module Sequel
     #   Album.plugin :split_values
     module SplitValues
       module ClassMethods
+        Plugins.model_instance_variables(self, :@noncolumn_values)
+
         # Split the noncolumn values when creating a new object retrieved from
         # the database.
         def call(_)

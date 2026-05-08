@@ -162,6 +162,8 @@ module Sequel
       end
 
       module ClassMethods
+        Plugins.model_instance_variables(self, :@json_serializer_opts)
+
         # The default opts to use when serializing model objects to JSON.
         attr_reader :json_serializer_opts
 

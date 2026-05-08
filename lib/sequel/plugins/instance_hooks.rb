@@ -28,6 +28,10 @@ module Sequel
     #   # Add the instance hook methods just to Album instances
     #   Album.plugin :instance_hooks
     module InstanceHooks
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@instance_hooks)
+      end
+
       module InstanceMethods 
         Sequel::Model::HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
           def #{h}_hook(&block)

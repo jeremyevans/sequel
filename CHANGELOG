@@ -1,5 +1,11 @@
 === master
 
+* Add Plugin.model_instance_variables to set instance variables used by instances of model using a plugin (jeremyevans)
+
+* Add Model.set_model_instance_variables to set instance variables used by instances of a specific model class (jeremyevans)
+
+* Support shape-friendly Model instances via Model.shape_friendly = true (jeremyevans)
+
 * Make connection_expiration extension set expiration time on connections in the pool when it is loaded (cooljacob204, jeremyevans) (#2365, #2366)
 
 === 5.104.0 (2026-05-01)

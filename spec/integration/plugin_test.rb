@@ -649,6 +649,9 @@ describe "Serialization plugin" do
       String :stuff
     end
     class ::Item < Sequel::Model(@db)
+      # Work around issues with instance variables making object
+      # too large to fit in the column.
+      self.shape_friendly = false
       plugin :serialization, :marshal, :stuff
     end
   end

@@ -1,6 +1,45 @@
 # frozen_string_literal: true
 require_relative "spec_helper"
 
+describe "Model shape friendliness" do
+  it ".shape_friendly should be inherited" do
+    c = Class.new(Sequel::Model)
+    c.shape_friendly = true
+    Class.new(c).shape_friendly.must_equal true
+    c.shape_friendly = false
+    Class.new(c).shape_friendly.must_equal false
+  end
+
+  it ".shape_friendly= should change shape friendliness" do
+    sf = Class.new(Sequel::Model)
+    sf.shape_friendly = true
+    nsf = Class.new(Sequel::Model)
+    nsf.shape_friendly = false
+    sf.new.instance_variables.length.must_be :>, nsf.new.instance_variables.length
+    sf.call({}).instance_variables.length.must_be :>, nsf.call({}).instance_variables.length
+    sf.call({}).instance_variables.length.must_equal sf.new.instance_variables.length
+  end
+
+  it ".set_model_instance_variables set instances variable to initialize to nil if model is shape friendly" do
+    c = Class.new(Sequel::Model)
+    c.set_model_instance_variables(:@one, :@two)
+    c.shape_friendly = true
+    c.new.instance_variable_defined?(:@one).must_equal true
+    c.new.instance_variable_defined?(:@two).must_equal true
+    c.new.instance_variable_get(:@one).must_be_nil
+    c.new.instance_variable_get(:@two).must_be_nil
+    c.shape_friendly = false
+    c.new.instance_variable_defined?(:@one).must_equal false
+    c.new.instance_variable_defined?(:@two).must_equal false
+  end
+
+  it ".set_model_instance_variables raises for invalid instance variable names" do
+    c = Class.new(Sequel::Model)
+    c.shape_friendly = true
+    proc{c.set_model_instance_variables(:@one, :two)}.must_raise Sequel::Error
+  end
+end
+
 describe "Model attribute setters" do
   before do
     @c = Class.new(Sequel::Model(:items)) do

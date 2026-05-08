@@ -22,6 +22,10 @@ module Sequel
     #   # Make the Album class support primary key updates
     #   Album.plugin :update_primary_key
     module UpdatePrimaryKey
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@pk_hash)
+      end
+
       module InstanceMethods
         # Clear the cached primary key.
         def after_update

@@ -30,6 +30,10 @@ module Sequel
       def self.apply(model)
         model.plugin :serialization
       end
+
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@original_deserialized_values)
+      end
       
       module InstanceMethods
         # Clear the cache of original deserialized values after saving so that it doesn't

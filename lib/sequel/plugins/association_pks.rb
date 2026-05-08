@@ -67,6 +67,8 @@ module Sequel
     #   Album.plugin :association_pks
     module AssociationPks
       module ClassMethods
+        Plugins.model_instance_variables(self, :@_association_pks)
+
         private
 
         # Define a association_pks method using the block for the association reflection 

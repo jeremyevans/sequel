@@ -44,6 +44,7 @@ require_relative "../visibility_checking" if ENV['CHECK_METHOD_VISIBILITY']
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 Sequel::Model.plugin :pg_eager_any_typed_array if ENV['SEQUEL_PG_EAGER_ANY_TYPED_ARRAY']
+Sequel::Model.shape_friendly = true if ENV["SEQUEL_MODEL_SHAPE_FRIENDLY"]
 
 if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type == :access)
   def DB.drop_table(*tables)

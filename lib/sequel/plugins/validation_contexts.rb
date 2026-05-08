@@ -29,6 +29,10 @@ module Sequel
     # of that model, you can no longer specify a validation context when
     # validating the instance.
     module ValidationContexts
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@validation_context)
+      end
+
       module InstanceMethods 
         # The validation context to use for the current validation.
         # Set via the :validation_context option passed to save/valid?.

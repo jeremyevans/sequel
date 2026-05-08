@@ -334,6 +334,23 @@ describe Sequel::Plugins do
     Class.new(@c).one.must_equal 1
   end
   
+  it "should have model_instance_variables set instance variables to be used" do
+    m = Module.new do
+      module self::ClassMethods
+        Sequel::Plugins.model_instance_variables(self, :@one, :@two)
+      end
+    end
+    @c.plugin m
+    @c.shape_friendly = true
+    @c.new.instance_variable_defined?(:@one).must_equal true
+    @c.new.instance_variable_defined?(:@two).must_equal true
+    @c.new.instance_variable_get(:@one).must_be_nil
+    @c.new.instance_variable_get(:@two).must_be_nil
+    @c.shape_friendly = false
+    @c.new.instance_variable_defined?(:@one).must_equal false
+    @c.new.instance_variable_defined?(:@two).must_equal false
+  end
+  
   it "should have after_set_dataset add a method to call after set_dataset" do
     m = Module.new do
       module self::ClassMethods

@@ -63,6 +63,10 @@ module Sequel
     #   # Make the Album class record previous values
     #   Album.plugin :dirty
     module Dirty
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@previous_changes, :@initial_values, :@missing_initial_values)
+      end
+
       module InstanceMethods
         # A hash of previous changes before the object was
         # saved, in the same format as #column_changes.

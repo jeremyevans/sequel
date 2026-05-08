@@ -50,6 +50,10 @@ module Sequel
         model.require_modification = true
       end
 
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@instance_filters)
+      end
+
       module InstanceMethods
         # Clear the instance filters after successfully destroying the object.
         def after_destroy

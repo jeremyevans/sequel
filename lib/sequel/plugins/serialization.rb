@@ -113,6 +113,8 @@ module Sequel
       register_format(:json, Sequel.method(:object_to_json), Sequel.method(:parse_json))
 
       module ClassMethods
+        Plugins.model_instance_variables(self, :@deserialized_values)
+
         # A hash with column name symbols and callable values, with the value
         # called to deserialize the column.
         attr_reader :deserialization_map

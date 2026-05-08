@@ -42,6 +42,10 @@ module Sequel
         end
       end
 
+      module ClassMethods
+        Plugins.model_instance_variables(self, :@insert_conflict_opts)
+      end
+
       module InstanceMethods
         # Set the insert_conflict options to pass to the dataset when inserting. 
         def insert_conflict(opts=OPTS)

@@ -55,6 +55,7 @@ module Sequel
     @require_valid_table = true
     @restrict_primary_key = true
     @setter_methods = nil
+    @shape_friendly = false
     @simple_pk = nil
     @simple_table = nil
     @strict_param_setting = true

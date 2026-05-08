@@ -189,6 +189,7 @@ SEQUEL_INDEX_CACHING :: Use the index_caching extension when running the specs
 SEQUEL_INTEGER64 :: Use the integer64 extension when running the adapter or integration specs
 SEQUEL_LIT_REQUIRE_FROZEN :: Use the lit_require_frozen extension when running the specs
 SEQUEL_MODEL_PREPARED_STATEMENTS :: Use the prepared_statements plugin when running the specs
+SEQUEL_MODEL_SHAPE_FRIENDLY :: Set Sequel::Model.shape_friendly to true when running the specs
 SEQUEL_MODEL_THROW_FAILURES :: Use the throw_failures plugin when running the specs
 SEQUEL_NO_CACHE_ASSOCIATIONS :: Don't cache association metadata when running the specs
 SEQUEL_NO_PENDING :: Don't skip any specs, try running all specs (note, can cause lockups for some adapters)

@@ -29,6 +29,8 @@ module Sequel
       module ClassMethods
         include ::ActiveModel::Naming
 
+        Plugins.model_instance_variables(self, :@destroyed, :@rollback_checker)
+
         # Cache model_name and to_partial path value before freezing.
         def freeze
           model_name
@@ -58,13 +60,10 @@ module Sequel
 
         # False if the object is new? or has been destroyed, true otherwise.
         def persisted?
-          return false if new?
-          return false if defined?(@destroyed)
+          return false if new? || @destroyed
 
-          if defined?(@rollback_checker)
-            if @rollback_checker.call
-              return false
-            end
+          if @rollback_checker && @rollback_checker.call
+            return false
           end
           
           true

@@ -54,6 +54,7 @@ end
 Sequel::DB = nil
 Sequel::Model.use_transactions = false
 Sequel::Model.cache_anonymous_models = false
+Sequel::Model.shape_friendly = true if ENV["SEQUEL_MODEL_SHAPE_FRIENDLY"]
 
 db = Sequel.mock(:fetch=>{:id => 1, :x => 1}, :numrows=>1, :autoid=>proc{|sql| 10})
 def db.schema(*) [[:id, {:primary_key=>true}]] end
