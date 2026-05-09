@@ -7,6 +7,18 @@ require_relative 'spec_helper'
       @db = Sequel.mock(:extensions=>'async_thread_pool', :fetch=>{:v=>1}, :keep_reference=>false, :num_async_threads=>1, :preempt_async_thread=>preempt_async_thread)
     end
 
+    it 'JobProcessor.run_finalizer should work' do
+      q = Queue.new
+      jp = Sequel::Database::AsyncThreadPool::JobProcessor.new(q)
+      t1 = Thread.new{q.pop; 1}
+      t2 = Thread.new{q.pop; 2}
+      pool = [jp, t1, t2]
+      Sequel::Database::AsyncThreadPool::JobProcessor.send(:run_finalizer, q , pool)
+      pool.empty?.must_equal true
+      t1.value.must_equal 1
+      t2.value.must_equal 2
+    end
+
     it 'should allow running queries in async threads' do
       t = Thread.current
       t2 = nil
