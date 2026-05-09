@@ -46,8 +46,10 @@ module Sequel
     # Initialize the data structures used by this extension.
     def self.extended(pool)
       case pool.pool_type
-      when :single, :sharded_single
-        raise Error, "cannot load connection_expiration extension if using single or sharded_single connection pool"
+      when :threaded, :sharded_threaded, :timed_queue, :sharded_timed_queue
+        nil
+      else
+        raise Error, "cannot load connection_expiration extension if using single or sharded_single connection pool (or other unsupported connection pool)"
       end
 
       pool.instance_exec do
@@ -84,7 +86,7 @@ module Sequel
           when :timed_queue
             register_queued_connections.call(@queue)
             @allocated.each_value(&register)
-          when :sharded_timed_queue
+          else # when :sharded_timed_queue
             @queues.each_value(&register_queued_connections)
             @allocated.each_value{|threads| threads.each_value(&register)}
           end
