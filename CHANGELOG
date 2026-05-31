@@ -100,7 +100,7 @@
 
 * Add support for Database#add_index :only option on PostgreSQL 11+ (KirIgor) (#2343)
 
-* Add support for Database#indexes :invalid option on PostgresSQL (KirIgor, jeremyevans) (#2343)
+* Add support for Database#indexes :invalid option on PostgreSQL (KirIgor, jeremyevans) (#2343)
 
 === 5.98.0 (2025-11-01)
 
@@ -630,7 +630,7 @@
 
 * Add Database#check_string_typecast_bytesize for checking bytesize of strings before typecasting (jeremyevans)
 
-* Treat negative hexidecimal strings similar to positive hexidecimal strings when typecasting to integer (jeremyevans)
+* Treat negative hexadecimal strings similar to positive hexadecimal strings when typecasting to integer (jeremyevans)
 
 * Remove is_json and is_not_json methods from the pg_json_ops extension, as the support was removed in PostgreSQL 15 beta 4 (jeremyevans)
 
