@@ -1,0 +1,48 @@
+= New Features
+
+* A Sequel::Model.shape_friendly accessor has been added. If it is set
+  to true, then Sequel::Model instances use shape-friendly
+  initialization, setting all possible instance variables used by all
+  plugins to nil.
+
+  This can significantly improve performance in many cases. However,
+  there are other cases where it can decrease performance. Currently,
+  shape-friendly behavior is opt-in, and users are encouraged to test
+  it and see what performance effect is has in their application.
+  Depending on feedback, shape friendliness may be made the default in
+  a future Sequel version. If you would like to test out shape
+  friendliness, set the following before creating model classes:
+
+    Sequel::Model.shape_friendly = true
+
+  If your Sequel model uses custom instance variables, you should
+  register them inside the model:
+
+    set_model_instance_variables(:@iv1, :@iv2)
+
+  If you develop a Sequel plugin, and that plugin sets instance
+  variables for model instances, you should register those instance
+  variables inside the plugin's ClassMethods module (you may have to
+  add a ClassMethods module if the plugin currently has
+  InstanceMethods but not ClassMethods):
+
+    module ClassMethods
+      Plugins.model_instance_variable(self, :@iv1, :@iv2)
+    end
+
+  Shape friendliness can increase the size of marshallabled
+  objects, which has the potential to break things if you are storing
+  the marshalled object in location with a fixed maximum size.
+
+= Other Improvements
+
+* The connection_expiration extension now sets up expiration for
+  connections already in the pool. Previously, it only setup
+  expiration for new connections.
+
+= Backwards Compatibility
+
+* If you are currently expecting that Sequel::Model internal instance
+  variables may not be defined, you should update your code to work
+  with shape-friendly models, which will set the instance variables to
+  nil during initialization.

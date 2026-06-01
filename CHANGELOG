@@ -1,4 +1,4 @@
-=== master
+=== 5.105.0 (2026-06-01)
 
 * Add Plugin.model_instance_variables to set instance variables used by instances of model using a plugin (jeremyevans)
 
