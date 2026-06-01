@@ -65,10 +65,10 @@ Sequel::Plugins::UpdatePrimaryKey::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_primary_key.rb</span>
-<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>
-<span class="line-num">28</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">29</span>   <span class="ruby-ivar">@pk_hash</span> = <span class="ruby-keyword">nil</span>
-<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>
+<span class="line-num">32</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">33</span>   <span class="ruby-ivar">@pk_hash</span> = <span class="ruby-keyword">nil</span>
+<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pk_hash'>
@@ -87,9 +87,9 @@ Sequel::Plugins::UpdatePrimaryKey::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-pk_hash-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_primary_key.rb</span>
-<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk_hash</span>
-<span class="line-num">34</span>   <span class="ruby-ivar">@pk_hash</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>
-<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">37</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pk_hash</span>
+<span class="line-num">38</span>   <span class="ruby-ivar">@pk_hash</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>
+<span class="line-num">39</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

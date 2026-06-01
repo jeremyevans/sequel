@@ -67,10 +67,10 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-after_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>
-<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>
-<span class="line-num">56</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">57</span>   <span class="ruby-identifier">clear_instance_filters</span>
-<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>
+<span class="line-num">60</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">61</span>   <span class="ruby-identifier">clear_instance_filters</span>
+<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-after_update'>
@@ -89,10 +89,10 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>
-<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>
-<span class="line-num">62</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">63</span>   <span class="ruby-identifier">clear_instance_filters</span>
-<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>
+<span class="line-num">66</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">67</span>   <span class="ruby-identifier">clear_instance_filters</span>
+<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -111,10 +111,10 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>
-<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">68</span>   <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">69</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">70</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">71</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">72</span>   <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">73</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-instance_filter'>
@@ -133,9 +133,9 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 [show source]
 </a>
 <pre id='method-i-instance_filter-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>
-<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">76</span>   <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]
-<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">80</span>   <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]
+<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

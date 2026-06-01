@@ -102,18 +102,53 @@ Sequel::ConnectionExpiration
 <pre id='method-c-extended-source'>   <span class="ruby-comment"># File lib/sequel/extensions/connection_expiration.rb</span>
 <span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">pool</span>)
 <span class="line-num">48</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">pool_type</span>
-<span class="line-num">49</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:single</span>, <span class="ruby-value">:sharded_single</span>
-<span class="line-num">50</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot load connection_expiration extension if using single or sharded_single connection pool&quot;</span>
-<span class="line-num">51</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">52</span> 
-<span class="line-num">53</span>   <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
-<span class="line-num">54</span>     <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
-<span class="line-num">55</span>       <span class="ruby-ivar">@connection_expiration_timestamps</span> <span class="ruby-operator">||=</span> {}
-<span class="line-num">56</span>       <span class="ruby-ivar">@connection_expiration_timeout</span> <span class="ruby-operator">||=</span> <span class="ruby-value">14400</span>
-<span class="line-num">57</span>       <span class="ruby-ivar">@connection_expiration_random_delay</span> <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
-<span class="line-num">58</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">59</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">49</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:threaded</span>, <span class="ruby-value">:sharded_threaded</span>, <span class="ruby-value">:timed_queue</span>, <span class="ruby-value">:sharded_timed_queue</span>
+<span class="line-num">50</span>     <span class="ruby-keyword">nil</span>
+<span class="line-num">51</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">52</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot load connection_expiration extension if using single or sharded_single connection pool (or other unsupported connection pool)&quot;</span>
+<span class="line-num">53</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">54</span> 
+<span class="line-num">55</span>   <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>
+<span class="line-num">56</span>     <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>
+<span class="line-num">57</span>       <span class="ruby-ivar">@connection_expiration_timestamps</span> <span class="ruby-operator">||=</span> {}
+<span class="line-num">58</span>       <span class="ruby-ivar">@connection_expiration_timeout</span> <span class="ruby-operator">||=</span> <span class="ruby-value">14400</span>
+<span class="line-num">59</span>       <span class="ruby-ivar">@connection_expiration_random_delay</span> <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+<span class="line-num">60</span> 
+<span class="line-num">61</span>       <span class="ruby-comment"># Record an expiration timestamp for any connections that already</span>
+<span class="line-num">62</span>       <span class="ruby-comment"># exist in the pool, so that a connection opened before the extension</span>
+<span class="line-num">63</span>       <span class="ruby-comment"># was loaded (e.g. via Sequel.connect) will eventually be expired.</span>
+<span class="line-num">64</span>       <span class="ruby-identifier">register</span> = <span class="ruby-identifier">method</span>(<span class="ruby-value">:register_connection_expiration_time</span>)
+<span class="line-num">65</span> 
+<span class="line-num">66</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool_type</span>
+<span class="line-num">67</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:timed_queue</span>, <span class="ruby-value">:sharded_timed_queue</span>
+<span class="line-num">68</span>         <span class="ruby-identifier">register_queued_connections</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">queue</span><span class="ruby-operator">|</span>
+<span class="line-num">69</span>           <span class="ruby-identifier">conns</span> = []
+<span class="line-num">70</span>           <span class="ruby-keyword">while</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">queue</span>.<span class="ruby-identifier">pop</span>(<span class="ruby-value">timeout:</span> <span class="ruby-value">0</span>)
+<span class="line-num">71</span>             <span class="ruby-identifier">conns</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">conn</span>
+<span class="line-num">72</span>           <span class="ruby-keyword">end</span>
+<span class="line-num">73</span>           <span class="ruby-identifier">conns</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>
+<span class="line-num">74</span>             <span class="ruby-identifier">queue</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">register_connection_expiration_time</span>(<span class="ruby-identifier">conn</span>))
+<span class="line-num">75</span>           <span class="ruby-keyword">end</span>
+<span class="line-num">76</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">77</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">78</span> 
+<span class="line-num">79</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">pool_type</span>
+<span class="line-num">80</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:threaded</span>
+<span class="line-num">81</span>         <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register</span>)
+<span class="line-num">82</span>         <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register</span>)
+<span class="line-num">83</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:sharded_threaded</span>
+<span class="line-num">84</span>         <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conns</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register</span>)}
+<span class="line-num">85</span>         <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">threads</span><span class="ruby-operator">|</span> <span class="ruby-identifier">threads</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register</span>)}
+<span class="line-num">86</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:timed_queue</span>
+<span class="line-num">87</span>         <span class="ruby-identifier">register_queued_connections</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@queue</span>)
+<span class="line-num">88</span>         <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register</span>)
+<span class="line-num">89</span>       <span class="ruby-keyword">else</span> <span class="ruby-comment"># when :sharded_timed_queue</span>
+<span class="line-num">90</span>         <span class="ruby-ivar">@queues</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register_queued_connections</span>)
+<span class="line-num">91</span>         <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">threads</span><span class="ruby-operator">|</span> <span class="ruby-identifier">threads</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">register</span>)}
+<span class="line-num">92</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">93</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">94</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
