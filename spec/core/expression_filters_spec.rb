@@ -646,6 +646,10 @@ describe Sequel::SQL::VirtualRow do
     @d.l{rank.function.over}.must_equal 'rank() OVER ()'
   end
 
+  it "should handle method.function.over(:ignore_nulls) as a window function call" do
+    @d.l{first_value(:i).over(:ignore_nulls=>true)}.must_equal 'first_value("i") IGNORE NULLS OVER ()'
+  end
+
   it "should handle method.function.over(:partition) as a window function call" do
     @d.l{rank.function.over(:partition=>column1)}.must_equal 'rank() OVER (PARTITION BY "column1")'
     @d.l{rank.function.over(:partition=>[column1, column2])}.must_equal 'rank() OVER (PARTITION BY "column1", "column2")'

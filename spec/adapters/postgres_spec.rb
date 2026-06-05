@@ -242,6 +242,14 @@ describe 'A PostgreSQL database' do
     ds.all.must_be_empty
   end if DB.server_version >= 190000
 
+  it "should support IGNORE NULLS for window functions" do
+    DB.create_table(:test){Integer :i}
+    DB[:test].insert(nil)
+    DB[:test].insert(1)
+    DB[:test].get{first_value(:i).over(:frame=>:all, :order=>Sequel.asc(:i, :nulls=>:first))}.must_be_nil
+    DB[:test].get{first_value(:i).over(:frame=>:all, :ignore_nulls=>true, :order=>Sequel.asc(:i, :nulls=>:first))}.must_equal 1
+  end if DB.server_version >= 190000
+
   it "should provide a list of existing ordinary tables" do
     @db.create_table(:test){Integer :id}
     @db.tables.must_include :test

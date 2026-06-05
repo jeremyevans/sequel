@@ -562,6 +562,7 @@ module Sequel
       end
 
       if window = opts[:over]
+        sql << ' IGNORE NULLS' if window.opts[:ignore_nulls]
         sql << ' OVER '
         window_sql_append(sql, window.opts)
       end

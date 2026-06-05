@@ -1992,6 +1992,8 @@ module Sequel
       #                           for rows following
       #                   :exclude :: Which rows to exclude.  Possible values are :current, :ties, :group
       #                               :no_others.
+      # :ignore_nulls :: Can be set to :ignore for IGNORE NULLS (supported on PostgreSQL 19+ for
+      #                  a subset of default window functions)
       # :order :: order on the column(s) given
       # :partition :: partition/group on the column(s) given
       # :window :: base results on a previously specified named window
