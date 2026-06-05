@@ -2133,6 +2133,26 @@ module Sequel
         cached_lock_style_dataset(:_for_key_share_ds, :key_share)
       end
 
+      # Set FOR PORTION OF clause for UPDATE and DELETE statements.
+      # The first argument is the range or multirange column. If two arguments
+      # are provided, the second argument is an expression with the same
+      # database type as the first argument. If three arguments are provided,
+      # the second specifies the inclusive start of the portion to update and the third
+      # specifies the exclusive end of portion to update. When using the three argument
+      # form, nil can be provided as the second or third argument to have the start or
+      # end of the portion be unbounded.  Supported on PostgreSQL 19+.
+      # Example:
+      #
+      #   DB[:t].for_portion_of(:rc, Sequel.function(:int4range, 1, 2)).update(c: 3)
+      #   # UPDATE t FOR PORTION OF rc (int4range(1, 2)) SET c = 3
+      #   
+      #   DB[:t].for_portion_of(:rc, 1, 2).update(c: 3)
+      #   # UPDATE t FOR PORTION OF rc FROM 1 TO 2 SET c = 3
+      def for_portion_of(column, range, to=(arg_not_given=true))
+        range = [range, to].freeze unless arg_not_given
+        clone(:for_portion_of => [column, range].freeze)
+      end
+
       # Return a cloned dataset which will use FOR NO KEY UPDATE to lock returned rows.
       # This is generally a better choice than using for_update on PostgreSQL, unless
       # you will be deleting the row or modifying a key column. Supported on PostgreSQL 9.3+.
@@ -2635,10 +2655,11 @@ module Sequel
         "'%Y-%m-%d %H:%M:%S.%6N%z'"
       end
 
-      # Only include the primary table in the main delete clause
+      # Only include the primary table in the main delete clause.
+      # Support FOR PORTION OF.
       def delete_from_sql(sql)
         sql << ' FROM '
-        source_list_append(sql, @opts[:from][0..0])
+        table_for_portion_of_sql_append(sql)
       end
 
       # Use USING to specify additional tables in a delete query
@@ -2721,6 +2742,30 @@ module Sequel
 
         origin << ') ' unless paren
         origin
+      end
+
+      # Add FOR PORTION OF SQL if the dataset uses it.
+      def table_for_portion_of_sql_append(sql)
+        table, aliaz = split_alias(@opts[:from].first)
+        source_list_append(sql, [table])
+        fpo_column, fpo_range = @opts[:for_portion_of]
+        if fpo_column
+          sql << ' FOR PORTION OF '
+          literal_append(sql, fpo_column)
+
+          if fpo_range.is_a?(Array)
+            fpo_start, fpo_end = fpo_range
+            sql << ' FROM '
+            literal_append(sql, fpo_start)
+            sql << ' TO '
+            literal_append(sql, fpo_end)
+          else
+            sql << ' ('
+            literal_append(sql, fpo_range)
+            sql << ')'
+          end
+        end
+        as_sql_append(sql, aliaz) if aliaz
       end
 
       # Add ON CONFLICT clause if it should be used
@@ -3012,10 +3057,10 @@ module Sequel
         join_from_sql(:FROM, sql)
       end
 
-      # Only include the primary table in the main update clause
+      # Support FOR PORTION OF.
       def update_table_sql(sql)
         sql << ' '
-        source_list_append(sql, @opts[:from][0..0])
+        table_for_portion_of_sql_append(sql)
       end
     end
   end

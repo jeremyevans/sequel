@@ -184,6 +184,64 @@ describe 'A PostgreSQL database' do
       update(:id=>2).must_equal([{:x=>1, :y=>2}])
   end if DB.server_version >= 180000
 
+  it "should support UPDATE/DELETE FOR PORTION OF" do
+    DB.create_table(:test){Integer :a; int4range :r}
+    ds = DB[:test]
+    ds.insert(1, Sequel.function(:int4range, 1, 10))
+    ds.for_portion_of(:r, Sequel.function(:int4range, 2, 4)).update(a: 2)
+    ds.for_portion_of(:r, 6, 8).update(a: 3)
+    ds.order(:r).
+      select_map{[:a, Sequel.function(:lower, :r).as(:l), Sequel.function(:upper, :r).as(:u)]}.
+      must_equal [
+        [1, 1, 2],
+        [2, 2, 4],
+        [1, 4, 6],
+        [3, 6, 8],
+        [1, 8, 10]
+      ]
+    ds.for_portion_of(:r, Sequel.function(:int4range, 3, 5)).delete
+    ds.for_portion_of(:r, 7, 9).delete
+    ds.order(:r).
+      select_map{[:a, Sequel.function(:lower, :r).as(:l), Sequel.function(:upper, :r).as(:u)]}.
+      must_equal [
+        [1, 1, 2],
+        [2, 2, 3],
+        [1, 5, 6],
+        [3, 6, 7],
+        [1, 9, 10]
+      ]
+    ds.for_portion_of(:r, nil, 3).update(a: 4)
+    ds.for_portion_of(:r, 8, nil).update(a: 5)
+    ds.order(:r).
+      select_map{[:a, Sequel.function(:lower, :r).as(:l), Sequel.function(:upper, :r).as(:u)]}.
+      must_equal [
+        [4, 1, 2],
+        [4, 2, 3],
+        [1, 5, 6],
+        [3, 6, 7],
+        [5, 9, 10]
+      ]
+    ds.for_portion_of(:r, nil, 2).delete
+    ds.for_portion_of(:r, 7, nil).delete
+    ds.order(:r).
+      select_map{[:a, Sequel.function(:lower, :r).as(:l), Sequel.function(:upper, :r).as(:u)]}.
+      must_equal [
+        [4, 2, 3],
+        [1, 5, 6],
+        [3, 6, 7],
+      ]
+    ds.for_portion_of(:r, nil, nil).update(a: 6)
+    ds.order(:r).
+      select_map{[:a, Sequel.function(:lower, :r).as(:l), Sequel.function(:upper, :r).as(:u)]}.
+      must_equal [
+        [6, 2, 3],
+        [6, 5, 6],
+        [6, 6, 7],
+      ]
+    ds.for_portion_of(:r, nil, nil).delete
+    ds.all.must_be_empty
+  end if DB.server_version >= 190000
+
   it "should provide a list of existing ordinary tables" do
     @db.create_table(:test){Integer :id}
     @db.tables.must_include :test
