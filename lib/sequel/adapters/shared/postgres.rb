@@ -2746,10 +2746,10 @@ module Sequel
 
       # Add FOR PORTION OF SQL if the dataset uses it.
       def table_for_portion_of_sql_append(sql)
-        table, aliaz = split_alias(@opts[:from].first)
-        source_list_append(sql, [table])
         fpo_column, fpo_range = @opts[:for_portion_of]
         if fpo_column
+          table, aliaz = split_alias(@opts[:from].first)
+          source_list_append(sql, [table])
           sql << ' FOR PORTION OF '
           literal_append(sql, fpo_column)
 
@@ -2764,8 +2764,10 @@ module Sequel
             literal_append(sql, fpo_range)
             sql << ')'
           end
+          as_sql_append(sql, aliaz) if aliaz
+        else
+          source_list_append(sql, @opts[:from][0..0])
         end
-        as_sql_append(sql, aliaz) if aliaz
       end
 
       # Add ON CONFLICT clause if it should be used
