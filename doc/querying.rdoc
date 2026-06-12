@@ -34,7 +34,7 @@ Sequel offers quite a few ways to to retrieve a single object.
 
 ==== Using a Primary Key [Sequel::Model]
 
-The <tt>Sequel::Model.[]</tt> is the easiest method to use to find a model instance
+<tt>Sequel::Model.[]</tt> is the shortest method to use to find a model instance
 by its primary key value:
 
   # Find artist with primary key (id) 1
@@ -42,7 +42,12 @@ by its primary key value:
   # SELECT * FROM artists WHERE (id = 1)
   # => #<Artist @values={:name=>"YJM", :id=>1}>
 
-If there is no record with the given primary key, nil will be returned. If you want
+<tt>Sequel::Model.[]</tt> also supports passing a hash for non-primary key querying. If you
+want a method that always does a primary key lookup, you can use <tt>Sequel::Model.with_pk</tt>:
+
+  artist = Artist.with_pk(1)
+
+For both methods, if is no record with the given primary key, +nil+ will be returned. If you want
 to raise an exception if no record is found, you can use <tt>Sequel::Model.with_pk!</tt>:
 
   artist = Artist.with_pk!(1)
