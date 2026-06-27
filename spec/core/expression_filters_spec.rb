@@ -376,6 +376,7 @@ describe "Blockless Ruby Filters" do
     @d.l({:x => Sequel::SQLTRUE}).must_equal '(x IS TRUE)'
     @d.l({:x => Sequel::SQLFALSE}).must_equal '(x IS FALSE)'
 
+    @d.l({:x => Sequel::ALL}).must_equal '(x = ALL)'
     @d.l({:x => Sequel::CURRENT_DATE}).must_equal '(x = CURRENT_DATE)'
     @d.l({:x => Sequel::CURRENT_TIME}).must_equal '(x = CURRENT_TIME)'
     @d.l({:x => Sequel::CURRENT_TIMESTAMP}).must_equal '(x = CURRENT_TIMESTAMP)'

@@ -1323,6 +1323,7 @@ module Sequel
     # in this module which can be required at the top level to get
     # direct access to the constants.
     module Constants
+      ALL = Constant.new(:ALL)
       CURRENT_DATE = Constant.new(:CURRENT_DATE)
       CURRENT_TIME = Constant.new(:CURRENT_TIME)
       CURRENT_TIMESTAMP = Constant.new(:CURRENT_TIMESTAMP)

@@ -1181,6 +1181,16 @@ describe "A PostgreSQL database" do
     end
   end
 
+  it "should support GROUP BY ALL" do
+    @db.values([[1, 2, 3], [1, 2, 4], [5, 6, 7]]).
+      from_self.
+      select(:column1, :column2){sum(:column3)}.
+      group(Sequel::ALL).
+      order(:column1).
+      map([:column1, :column2, :sum]).
+      must_equal [[1, 2, 7], [5, 6, 7]]
+  end if DB.server_version >= 190000
+
   it "should handle double underscores in tables when using the qualify option" do
     @db.create_table!(Sequel.qualify(:public, 'test__fk')){Integer :a}
     @db.tables(:qualify=>true).must_include(Sequel.qualify('public', 'test__fk'))
