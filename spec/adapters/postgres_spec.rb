@@ -188,7 +188,7 @@ describe 'A PostgreSQL database' do
     DB.create_table(:test){Integer :a; int4range :r}
     ds = DB[:test]
     ds.insert(1, Sequel.function(:int4range, 1, 10))
-    ds.for_portion_of(:r, Sequel.function(:int4range, 2, 4)).update(a: 2)
+    ds.from(Sequel[:test].as(:t)).for_portion_of(:r, Sequel.function(:int4range, 2, 4)).update(a: 2)
     ds.for_portion_of(:r, 6, 8).update(a: 3)
     ds.order(:r).
       select_map{[:a, Sequel.function(:lower, :r).as(:l), Sequel.function(:upper, :r).as(:u)]}.
