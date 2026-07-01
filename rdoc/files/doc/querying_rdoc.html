@@ -57,7 +57,7 @@ doc/querying.rdoc
 
 <h4 id="label-Using+a+Primary+Key+-5BSequel-3A-3AModel-5D"><a href="#label-Using+a+Primary+Key+-5BSequel-3A-3AModel-5D">Using a Primary Key [Sequel::Model]</a></h4>
 
-<p>The <code>Sequel::Model.[]</code> is the easiest method to use to find a model instance by its primary key value:</p>
+<p><code>Sequel::Model.[]</code> is the shortest method to use to find a model instance by its primary key value:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Find artist with primary key (id) 1</span>
 <span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]
@@ -65,7 +65,12 @@ doc/querying.rdoc
 <span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>
 </pre>
 
-<p>If there is no record with the given primary key, nil will be returned. If you want to raise an exception if no record is found, you can use <code>Sequel::Model.with_pk!</code>:</p>
+<p><code>Sequel::Model.[]</code> also supports passing a hash for non-primary key querying. If you want a method that always does a primary key lookup, you can use <code>Sequel::Model.with_pk</code>:</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)
+</pre>
+
+<p>For both methods, if is no record with the given primary key, <code>nil</code> will be returned. If you want to raise an exception if no record is found, you can use <code>Sequel::Model.with_pk!</code>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">with_pk!</span>(<span class="ruby-value">1</span>)
 </pre>

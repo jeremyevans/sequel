@@ -129,6 +129,8 @@ Superclass:
 <p>Which rows to exclude.  Possible values are :current, :ties, :group :no_others.</p>
 </td></tr></tbody></table>
 </td></tr></tbody></table>
+</td></tr><tr><td class='label'>:ignore_nulls </td><td>
+<p>Can be set to :ignore for IGNORE NULLS (supported on PostgreSQL 19+ for a subset of default window functions)</p>
 </td></tr><tr><td class='label'>:order </td><td>
 <p>order on the column(s) given</p>
 </td></tr><tr><td class='label'>:partition </td><td>
@@ -159,10 +161,10 @@ Superclass:
 [show source]
 </a>
 <pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>
-<span class="line-num">2001</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">2002</span>   <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">frozen?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">opts</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
-<span class="line-num">2003</span>   <span class="ruby-identifier">freeze</span>
-<span class="line-num">2004</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">2004</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">2005</span>   <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">frozen?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">opts</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">2006</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">2007</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

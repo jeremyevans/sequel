@@ -1,6 +1,6 @@
-Mon, 01 Jun 2026 08:32:00 -0700
+Wed, 01 Jul 2026 09:37:28 -0700
 README.rdoc	Sun, 23 Nov 2025 09:58:00 -0800
-CHANGELOG	Mon, 01 Jun 2026 07:29:30 -0700
+CHANGELOG	Wed, 01 Jul 2026 08:47:04 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Sat, 14 Mar 2026 13:20:19 -0700
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -12,9 +12,9 @@ lib/sequel/dataset.rb	Fri, 31 Mar 2023 14:57:15 -0700
 lib/sequel/deprecated.rb	Tue, 14 Jul 2020 12:33:56 -0700
 lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Sat, 09 May 2026 16:25:16 -0700
-lib/sequel/sql.rb	Sun, 23 Nov 2025 09:58:00 -0800
+lib/sequel/sql.rb	Sat, 27 Jun 2026 13:19:27 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Mon, 01 Jun 2026 07:29:30 -0700
+lib/sequel/version.rb	Wed, 01 Jul 2026 08:47:04 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Sun, 01 Mar 2026 15:10:02 -0800
@@ -30,7 +30,7 @@ lib/sequel/dataset/misc.rb	Mon, 23 Jan 2023 11:36:37 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Tue, 03 Mar 2026 21:13:26 -0800
 lib/sequel/dataset/prepared_statements.rb	Tue, 03 Mar 2026 21:13:26 -0800
 lib/sequel/dataset/query.rb	Tue, 03 Mar 2026 21:13:26 -0800
-lib/sequel/dataset/sql.rb	Tue, 03 Mar 2026 21:13:26 -0800
+lib/sequel/dataset/sql.rb	Fri, 05 Jun 2026 16:17:48 -0700
 lib/sequel/database/connecting.rb	Thu, 08 Aug 2024 09:05:13 -0700
 lib/sequel/database/dataset.rb	Tue, 28 Mar 2023 14:16:05 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 22 Apr 2025 00:20:10 -0700
@@ -70,7 +70,7 @@ doc/object_model.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/opening_databases.rdoc	Tue, 17 Feb 2026 20:42:40 -0800
 doc/postgresql.rdoc	Sat, 08 Nov 2025 14:52:11 -0800
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/querying.rdoc	Sun, 23 Nov 2025 09:58:00 -0800
+doc/querying.rdoc	Fri, 12 Jun 2026 07:53:57 -0700
 doc/reflection.rdoc	Mon, 11 Nov 2024 14:55:11 -0800
 doc/schema_modification.rdoc	Thu, 01 Feb 2024 15:00:17 -0800
 doc/security.rdoc	Tue, 26 Aug 2025 15:04:09 -0700
@@ -207,6 +207,7 @@ doc/release_notes/5.102.0.txt	Sun, 01 Mar 2026 11:02:45 -0800
 doc/release_notes/5.103.0.txt	Wed, 01 Apr 2026 09:24:31 -0700
 doc/release_notes/5.104.0.txt	Fri, 01 May 2026 08:59:13 -0700
 doc/release_notes/5.105.0.txt	Mon, 01 Jun 2026 07:29:30 -0700
+doc/release_notes/5.106.0.txt	Wed, 01 Jul 2026 08:47:04 -0700
 doc/release_notes/5.11.0.txt	Wed, 01 Aug 2018 08:13:54 -0700
 doc/release_notes/5.12.0.txt	Fri, 31 Aug 2018 08:39:42 -0700
 doc/release_notes/5.13.0.txt	Mon, 01 Oct 2018 07:21:49 -0700
