@@ -1,0 +1,44 @@
+= New Features
+
+* Dataset#for_portion_of has been added on PostgreSQL to support the
+  UPDATE/DELETE FOR PORTION OF clause added in PostgreSQL 19. This
+  allows for updating a portion of the dataset. It can update
+  multiple rows and potentially split existing rows.
+
+  There are two ways to call it, one by providing the range itself:
+
+    DB[:t].for_portion_of(:rc, Sequel.function(:int4range, 1, 2)).
+      update(c: 3)
+    # UPDATE t FOR PORTION OF rc (int4range(1, 2)) SET c = 3
+
+  And one by providing the inclusive start and exclusive end of the
+  range:
+
+    DB[:t].for_portion_of(:rc, 1, 2).update(c: 3)
+    # UPDATE t FOR PORTION OF rc FROM 1 TO 2 SET c = 3
+
+  This support is typically used with temporal data (date and
+  timestamp ranges), though as shown above, it works on other
+  range types as well.
+
+* Sequel::Constants::ALL has been added to allow you to use the
+  GROUP BY ALL clause supported in PostgreSQL 19, which groups
+  on all non-aggregate expressions:
+
+    DB[:t].select(:c1, :c2){sum(:c3)}.group(Sequel::ALL)
+    # SELECT c1, c2, sum(c3) FROM t GROUP BY ALL
+
+* The :ignore_nulls window function option is now supported on
+  PostgreSQL 19+. This allows the use of the IGNORE NULLS clause:
+
+    DB[:t].select do
+      first_value(:i).
+        over(frame: :all, ignore_nulls: true, order: :i)
+    end
+    # SELECT first_value(i) IGNORE NULLS OVER (
+    #   ORDER BY i
+    #   ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    # )
+    # FROM t
+
+  Note that only a subset of window functions support this clause.
