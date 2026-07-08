@@ -39,7 +39,10 @@ describe "caller_logging extension" do
     @log_stream.rewind
     lines = @log_stream.read.split("\n")
     lines.length.must_equal 1
-    lines[0].must_match(/ \(source: #{__FILE__}:#{line}:in [`']block.+\) SELECT \* FROM items\z/)
+
+    # TruffleRuby names block frames after the compiled/optimized test method name
+    # (e.g. test_0003_...) instead of 'block'.
+    lines[0].must_match(/ \(source: #{__FILE__}:#{line}:in [`'](block|test_).+\) SELECT \* FROM items\z/)
   end
 
   it "should not log caller information if all callers lines are filtered" do

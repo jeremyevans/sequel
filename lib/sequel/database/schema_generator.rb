@@ -17,7 +17,9 @@ module Sequel
             if RUBY_VERSION >= "3.2"
             # :nocov:
               caller_loc = Thread.each_caller_location do |loc|
-                break loc unless loc.path == __FILE__
+                # Skip core library methods implemented in Ruby
+                path = loc.path
+                break loc unless path == __FILE__ || (path && path.start_with?('<internal:'))
               end
               caller_loc &&= "#{caller_loc.path}:#{caller_loc.lineno}: "
             end
