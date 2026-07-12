@@ -242,6 +242,143 @@ describe 'A PostgreSQL database' do
     ds.all.must_be_empty
   end if DB.server_version >= 190000
 
+  it "should support creating and dropping property graphs" do
+    @db.create_table(:people){primary_key :id; String :name}
+    @db.create_table(:companies){primary_key :id; String :name; Integer :revenue}
+    @db.create_table(:works_at) do
+      foreign_key :person_id, :people
+      foreign_key :company_id, :companies
+      primary_key [:person_id, :company_id]
+      String :role
+    end
+
+    begin
+      @db.create_property_graph(:graph) do
+        vertex :people
+
+        vertex Sequel.as(:companies, :comp) do
+          key :id
+          label :company, [
+            :name, 
+            (Sequel[:revenue] * 1000).as(:revenue_cents)
+          ]
+        end
+
+        vertex Sequel.as(:people, :people2), :properties=>[]
+
+        vertex Sequel.as(:people, :people3)
+
+        vertex Sequel.as(:people, :people4) do
+          label :person, [:id]
+        end
+
+        edge :works_at do
+          source :people
+          destination :comp
+        end
+
+        edge Sequel.as(:works_at, :works_at2) do
+          key [:person_id, :company_id]
+          source(:people) do
+            key :person_id
+            references :id
+          end
+          destination(:comp) do
+            key :company_id
+            references :id
+          end
+          label :employment, [:role]
+          label :e2, false
+          label :e3, :none
+          label :e4, :all
+        end
+      end
+      @db.drop_property_graph(:graph)
+
+      @db.create_property_graph(:graph) do
+        vertex :people
+      end
+      @db.drop_property_graph(:graph)
+
+      @db.create_property_graph(:graph, :temp=>true){}
+      @db.drop_property_graph(:graph)
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people, :properties=>:all do
+            label :foo
+          end
+        end
+      end.must_raise Sequel::Error
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people, :properties=>false do
+            label :foo
+          end
+        end
+      end.must_raise Sequel::Error
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people
+          vertex :companies
+          edge :works_at do
+          end
+        end
+      end.must_raise Sequel::Error
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people
+          vertex :companies
+          edge :works_at do
+            source :people
+          end
+        end
+      end.must_raise Sequel::Error
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people
+          vertex :companies
+          edge :works_at do
+            destination :companies
+          end
+        end
+      end.must_raise Sequel::Error
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people
+          vertex Sequel.as(:people, :p)
+          vertex :companies
+          edge :works_at do
+            source :people
+            destination :people
+            source :p
+          end
+        end
+      end.must_raise Sequel::Error
+
+      proc do
+        @db.create_property_graph(:graph) do
+          vertex :people
+          vertex Sequel.as(:people, :p)
+          vertex :company
+          edge :works_at do
+            source :people
+            destination :companies
+            destination :p
+          end
+        end
+      end.must_raise Sequel::Error
+    ensure
+      @db.drop_property_graph(:graph, :if_exists=>true, :cascade=>true)
+      @db.drop_table?(:works_at, :companies, :people)
+    end
+  end if DB.server_version >= 190000
+
   it "should support IGNORE NULLS for window functions" do
     DB.create_table(:test){Integer :i}
     DB[:test].insert(nil)

@@ -256,6 +256,200 @@ module Sequel
       end
     end
 
+    module PropertyGraph
+      # Base class for all Generator DSL classes. This uses a design where
+      # The DSL class is only used for the evaluation of the block, and new
+      # returns a frozen struct.
+      class Generator
+        # Instead of returning the Generator instance, return a frozen struct
+        # with data from the generator. This prevents accidentally calling the
+        # generator methods, and makes it possible for the generator class and
+        # result class to use the same method name in two different ways, with
+        # the generator setting data and the frozen struct method returning it.
+        # The frozen struct classes use the constant Data under each generator
+        # subclass.
+        def self.new(*args, &block)
+          super(*args, &block).data
+        end
+
+        # Base class for Vertex and Edge. 
+        class Element < self
+          Data = Struct.new(:name, :key, :labels)
+
+          # +name+ specifies the name of the vertex or edge. It can be an
+          # SQL::AliasedExpression to use an alias. Options:
+          # :properties :: Specifies fixed properties for the vertex or edge.
+          #                If this is given, you cannot use the label method
+          #                inside the block.
+          def initialize(name, opts=OPTS, &block)
+            @name = name
+            @labels = []
+            if opts.key?(:properties)
+              @labels << [nil, opts[:properties]].freeze
+              @labels.freeze
+            end
+            instance_exec(&block) if block
+            @labels.freeze
+            freeze
+          end
+
+          def data
+            Data.new(@name, @key, @labels).freeze
+          end
+
+          # Set the column(s) to use for the KEY clause, which are the columns
+          # that uniquely identify rows in the table:
+          #
+          #   key(:id)
+          #   # KEY (id)
+          #
+          #   key([:id1, :id2])
+          #   # KEY (id1, id2)
+          def key(columns)
+            @key = Array(columns)
+          end
+
+          # Add a label and properties for the label for this vertex/edge.  
+          # A vertex or edge can have multiple labels with separate properties,
+          # if it wasn't created with fixed properties. The +name+ argument
+          # specifies the label name. The +properties+ argument specifies the
+          # properties:
+          # nil, :all :: PROPERTIES ALL COLUMNS
+          # false, :none, [] :: NO PROPERTIES
+          # Array :: Array of specific properties. Each element should be a Symbol,
+          #          SQL::Identifier, or SQL::AliasedExpression.
+          #
+          #   label(:label_name)
+          #   # LABEL label_name PROPERTIES ALL COLUMNS
+          #
+          #   label(:label_name, [])
+          #   # LABEL label_name NO PROPERTIES
+          #
+          #   label(:label_name, [:c, Sequel[:b].as(:d)], Sequel[:e])
+          #   # LABEL label_name PROPERTIES (c, b AS d, e)
+          def label(name, properties=:all)
+            if @labels.frozen?
+              raise Error, "cannot specify label for property graph vertex or edge with fixed properties"
+            end
+            @labels << [name, properties].freeze
+            nil
+          end
+        end
+
+        # Vertex is used for the block passed to Create#vertex, used to configure
+        # vertices in the property graph. It doesn't have any additional behavior
+        # compared to the Element class, so this is an alias instead of a subclass.
+        Vertex = Element
+
+        # Target is used for the block passed to Edge#source and Edge#destination,
+        # used to configure the source and destination of property graph edges.
+        class Target < self
+          Data = Struct.new(:name, :key, :references)
+
+          # +name+ specifies the name of the source or destination.
+          def initialize(name, &block)
+            @name = name
+            @key = nil
+            @references = nil
+            instance_exec(&block) if block
+            freeze
+          end
+
+          def data
+            Data.new(@name, @key, @references).freeze
+          end
+
+          # Set the column(s) to use for the KEY clause, which are the columns
+          # in the edge table that reference columns in the source or destination.
+          # Should be combined with #references to specify the columns being
+          # referenced.
+          #
+          #   key(:vertex_id)
+          #   # KEY (vertex_id)
+          #
+          #   key([:vertex_id1, :vertex_id2])
+          #   # KEY (vertex_id1, vertex_id2)
+          def key(keys)
+            @key = Array(keys)
+          end
+
+          # Set the column(s) to use for the REFERENCES clause, which are the columns
+          # in the source or destination table that are referenced by the edge table.
+          # Should be combined with #key to specify the columns doing the referencing.
+          #
+          #   references(:id)
+          #   # REFERENCES (id)
+          #
+          #   references([:id1, :id2])
+          #   # REFERENCES (id1, id2)
+          def references(refs)
+            @references = Array(refs)
+          end
+        end
+
+        # Edge is used for block passed to Create#edge, used to configure edges
+        # in the property graph.
+        class Edge < Element
+          Data = Struct.new(:name, :key, :labels, :source, :destination)
+
+          # In addition to inherited behavior, raises an error if a block
+          # is not passed or source or destination is not called in the block.
+          def initialize(name, opts=OPTS, &block)
+            super
+
+            unless @source && @destination
+              raise Error, "source and/or destination not defined for property graph edge"
+            end
+          end
+
+          def data
+            Data.new(@name, @key, @labels, @source, @destination).freeze
+          end
+
+          # Specify the source for the edge, with block evaluted by Target.
+          def source(name, &block)
+            raise Error, "cannot specify multiple sources for a property graph edge" if @source
+            @source = Target.new(name, &block)
+          end
+
+          # Specify the destination for the edge, with block evaluted by Target.
+          def destination(name, &block)
+            raise Error, "cannot specify multiple destinations for a property graph edge" if @destination
+            @destination = Target.new(name, &block)
+          end
+        end
+
+        # Create is used to evaluate the block given to DatabaseMethods#create_property_graph,
+        # used to specify the vertices and edges in the property graph.
+        class Create < self
+          Data = Struct.new(:vertices, :edges)
+
+          def initialize(&block)
+            @vertices = []
+            @edges = []
+            instance_exec(&block)
+            @vertices.freeze
+            @edges.freeze
+            freeze
+          end
+
+          def data
+            Data.new(@vertices, @edges).freeze
+          end
+
+          # Adds a vertex to the property graph, with the block evaluted by Vertex.
+          def vertex(name, opts=OPTS, &block)
+            @vertices << Vertex.new(name, opts, &block)
+          end
+
+          # Adds an edge to the property graph, with the block evaluted by Edge.
+          def edge(name, opts=OPTS, &block)
+            @edges << Edge.new(name, opts, &block)
+          end
+        end
+      end
+    end
+
     # Error raised when Sequel determines a PostgreSQL exclusion constraint has been violated.
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
 
@@ -467,6 +661,67 @@ module Sequel
         self << create_language_sql(name, opts).freeze
       end
 
+      # Create a property graph in the database, supported on PostgreSQL 19+.
+      #
+      # Arguments:
+      # name :: Name of the property graph
+      # opts :: options hash:
+      #         :temp :: Create the property graph as a temporary property graph.
+      #
+      # The block uses a DSL, with classes under PropertyGraph::Generator:
+      #
+      #   DB.create_property_graph(:my_graph) do
+      #     # PropertyGraph::Generator::Create
+      #     vertex :people
+      #
+      #     vertex Sequel.as(:people, :p), properties: []
+      #
+      #     vertex Sequel.as(:companies, :c) do
+      #       # PropertyGraph::Generator::Vertex
+      #       key :id
+      #       label :company
+      #       label :c, [:name, (Sequel[:revenue] / 1000).as(:revenue_thousands)]
+      #     end
+      #
+      #     edge :works_at do
+      #       # PropertyGraph::Generator::Edge
+      #       source :people
+      #       destination :c
+      #     end
+      #
+      #     edge Sequel.as(:employment, :e) do
+      #       source :people do
+      #         # PropertyGraph::Generator::Target
+      #         key :person_id
+      #         references :id
+      #       end
+      #       destination :c do
+      #         # PropertyGraph::Generator::Target
+      #         key :company_id
+      #         references :id
+      #       end
+      #       label :employment
+      #     end
+      #   end
+      #   # CREATE PROPERTY GRAPH "my_graph"
+      #   # VERTEX TABLES (
+      #   #   "people",
+      #   #   "people" AS "p" NO PROPERTIES,
+      #   #   "companies" AS "c" KEY ("id")
+      #   #     LABEL "company" PROPERTIES ALL COLUMNS
+      #   #     LABEL "c" PROPERTIES ("name", ("revenue" / 1000) AS "revenue_thousands"))
+      #   # EDGE TABLES (
+      #   #   "works_at"
+      #   #     SOURCE "people"
+      #   #     DESTINATION "c",
+      #   #   "employment" AS "e"
+      #   #     SOURCE KEY ("person_id") REFERENCES "people" ("id")
+      #   #     DESTINATION KEY ("company_id") REFERENCES "c" ("id")
+      #   #   LABEL "employment" PROPERTIES ALL COLUMNS)
+      def create_property_graph(name, opts=OPTS, &block)
+        execute_ddl(create_property_graph_sql(name, PropertyGraph::Generator::Create.new(&block), opts))
+      end
+
       # Create a schema in the database. Arguments:
       # name :: Name of the schema (e.g. admin)
       # opts :: options hash:
@@ -562,6 +817,15 @@ module Sequel
       #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_language(name, opts=OPTS)
         self << drop_language_sql(name, opts).freeze
+      end
+
+      # Drops a property graph from the database. Arguments:
+      # name :: name of the property graph to drop
+      # opts :: options hash:
+      #         :cascade :: Drop other objects depending on this property_graph.
+      #         :if_exists :: Don't raise an error if the property graph doesn't exist.
+      def drop_property_graph(name, opts=OPTS)
+        self << drop_property_graph_sql(name, opts).freeze
       end
 
       # Drops a schema from the database.  Arguments:
@@ -1597,6 +1861,87 @@ module Sequel
         sql
       end
 
+      # SQL statement for creating a property graph.
+      def create_property_graph_sql(name, data, opts=OPTS)
+        sql = String.new
+        sql << "CREATE "
+        sql << "TEMPORARY " if opts[:temp]
+        sql << "PROPERTY GRAPH "
+        sql << quote_schema_table(name)
+
+        unless data.vertices.empty?
+          sql << " VERTEX TABLES ("
+          sql << data.vertices.map do |vertex|
+            create_property_graph_table_sql(vertex) <<
+              create_property_graph_labels_sql(vertex.labels)
+          end.join(', ')
+          sql << ")"
+        end
+
+        unless data.edges.empty?
+          sql << " EDGE TABLES ("
+          sql << data.edges.map do |edge|
+            create_property_graph_table_sql(edge) <<
+              " SOURCE " << create_property_graph_edge_side_sql(edge.source) <<
+              " DESTINATION " << create_property_graph_edge_side_sql(edge.destination) <<
+              create_property_graph_labels_sql(edge.labels)
+          end.join(', ')
+          sql << ")"
+        end
+
+        sql
+      end
+
+      # SQL fragment for the SOURCE or DESTINATION clause of an edge in a property graph.
+      def create_property_graph_edge_side_sql(side)
+        sql = String.new
+        if side.key
+          sql << "KEY " << literal(side.key) << " REFERENCES "
+        end
+        sql << quote_identifier(side.name)
+        if side.references
+          sql << " " << literal(side.references)
+        end
+        sql
+      end
+
+      # SQL fragment for the table name and KEY clause used for vertices and edges in
+      # a property graph.
+      def create_property_graph_table_sql(element)
+        sql = String.new
+        sql << literal(element.name)
+
+        if key = element.key
+          sql << " KEY " << literal(key)
+        end
+
+        sql
+      end
+
+      # SQL fragment for the LABEL/PROPERTIES clauses used for vertices and
+      # edges in a property graph.
+      def create_property_graph_labels_sql(labels)
+        labels.map do |name, properties|
+          sql = String.new
+          sql << " LABEL " << quote_identifier(name) if name
+          sql << create_property_graph_properties_clause_sql(properties)
+          sql
+        end.join
+      end
+
+      # SQL fragment for the  NO PROPERTIES, PROPERTIES ALL COLUMNS, or
+      # PROPERTIES (...) clause for a property graph element or label.
+      def create_property_graph_properties_clause_sql(properties)
+        case properties
+        when nil, :all
+          " PROPERTIES ALL COLUMNS"
+        when false, :none, [].freeze
+          " NO PROPERTIES"
+        else
+          " PROPERTIES #{literal(properties)}"
+        end
+      end
+
       # SQL for creating a schema.
       def create_schema_sql(name, opts=OPTS)
         "CREATE SCHEMA #{'IF NOT EXISTS ' if opts[:if_not_exists]}#{quote_identifier(name)}#{" AUTHORIZATION #{literal(opts[:owner])}" if opts[:owner]}"
@@ -1708,6 +2053,11 @@ module Sequel
       # SQL for dropping a procedural language from the database.
       def drop_language_sql(name, opts=OPTS)
         "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+      end
+
+      # SQL for dropping a property graph from the database.
+      def drop_property_graph_sql(name, opts=OPTS)
+        "DROP PROPERTY GRAPH#{' IF EXISTS' if opts[:if_exists]} #{literal(name)}#{' CASCADE' if opts[:cascade]}"
       end
 
       # SQL for dropping a schema from the database.

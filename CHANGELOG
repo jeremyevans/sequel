@@ -1,3 +1,7 @@
+=== master
+
+* Add Database#{create,drop}_property_graph to support {CREATE,DROP} PROPERTY GRAPH on PostgreSQL 19+ (jeremyevans)
+
 === 5.106.0 (2026-07-01)
 
 * Add Sequel::Constants::ALL to support GROUP BY ALL via group(Sequel::ALL) on PostgreSQL 19+ (jeremyevans)

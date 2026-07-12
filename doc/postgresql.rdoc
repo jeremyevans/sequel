@@ -268,6 +268,26 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
 
 However, you may want to consider just use <tt>Database#run</tt> with the necessary SQL code, at least for functions and triggers.
 
+=== Creating/Dropping Property Graphs (PostgreSQL 19+)
+
+Sequel supports +create_property_graph+ and +drop_property_graph+ for creating and dropping property graphs:
+
+  DB.create_property_graph(:g) do
+    vertex :people
+    vertex :companies
+
+    edge :employment do
+      source :people
+      destination :companies
+    end
+  end
+  # CREATE PROPERTY GRAPH g
+  #   VERTEX TABLES (people, companies)
+  #   EDGE TABLES (employment SOURCE people DESTINATION companies)
+
+  DB.drop_property_graph(:g)
+  # DROP PROPERTY GRAPH g
+
 === Parsing Check Constraints
 
 Sequel has support for parsing CHECK constraints on PostgreSQL using <tt>Sequel::Database#check_constraints</tt>:
