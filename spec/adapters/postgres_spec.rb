@@ -379,6 +379,95 @@ describe 'A PostgreSQL database' do
     end
   end if DB.server_version >= 190000
 
+  it "should support querying property graphs using GRAPH_TABLE via Database#graph_table" do
+    @db.create_table(:people){primary_key :id; String :name}
+    @db.create_table(:companies){primary_key :id; String :name}
+    @db.create_table(:works_at) do
+      foreign_key :person_id, :people
+      foreign_key :company_id, :companies
+      primary_key [:person_id, :company_id]
+      String :role
+    end
+
+    @db[:people].insert(:id=>1, :name=>'Alice')
+    @db[:people].insert(:id=>2, :name=>'Bob')
+    @db[:companies].insert(:id=>1, :name=>'Acme')
+    @db[:works_at].insert(:person_id=>1, :company_id=>1, :role=>'Manager')
+    @db[:works_at].insert(:person_id=>2, :company_id=>1, :role=>'Engineer')
+
+    begin
+      @db.create_property_graph(:graph) do
+        vertex :people
+        vertex :companies
+        edge :works_at do
+          source :people
+          destination :companies
+        end
+      end
+
+      gt = @db.graph_table(:graph, :people, :var=>:p)
+      proc{@db.from(gt).sql}.must_raise Sequel::Error
+      proc{@db.from(gt.columns).sql}.must_raise Sequel::Error
+      gt = gt.columns(Sequel[:p][:name])
+      proc{@db.from(gt.to(:companies)).sql}.must_raise Sequel::Error
+
+      gt.name.must_equal :graph
+      gt.elements.first.label.must_equal :people
+      gt.columns_used.must_equal [Sequel[:p][:name]]
+
+      gt = @db.graph_table(:graph, :people, :var=>:p).
+        link(:works_at, :var=>:w).
+        to(:companies, :var=>:c).
+        columns(Sequel[:p][:name].as(:person_name)).
+        add_columns(Sequel[:c][:name].as(:company_name)).
+        add_columns(Sequel[:w][:role].as(:role))
+      @db.from(gt).order(:person_name).all.must_equal [
+        {:person_name=>'Alice', :company_name=>'Acme', :role=>'Manager'},
+        {:person_name=>'Bob', :company_name=>'Acme', :role=>'Engineer'}
+      ]
+
+      gt = @db.graph_table(:graph, :companies, :var=>:c).
+        from(:works_at, :var=>:w).
+        link(:people, :var=>:p, :where=>{Sequel[:p][:name]=>'Alice'}).
+        columns(Sequel[:p][:name].as(:person_name), Sequel[:w][:role].as(:role))
+      @db.from(gt).all.must_equal [{:person_name=>'Alice', :role=>'Manager'}]
+
+      gt = @db.graph_table(:graph, nil, :var=>:p).
+        link(:works_at).
+        to(:companies, :var=>:c, :where=>[[Sequel[:c][:name], 'Acme']]).
+        columns(Sequel[:c][:name].as(:company_name))
+      @db.from(gt).all.must_equal [{:company_name=>'Acme'}, {:company_name=>'Acme'}]
+
+      gt = @db.graph_table(:graph, :people, :var=>:p).
+        to(nil, :vertex=>true).
+        columns(Sequel[:p][:name].as(:person_name))
+      @db.from(gt).order(:person_name).all.must_equal [{:person_name=>'Alice'}, {:person_name=>'Bob'}]
+
+      gt = @db.graph_table(:graph, :companies, :var=>:c).
+        link(:people, :var=>:p, :vertex=>true).
+        columns(Sequel[:p][:name].as(:person_name))
+      @db.from(gt).order(:person_name).all.must_equal [{:person_name=>'Alice'}, {:person_name=>'Bob'}]
+
+      gt2 = @db.graph_table(:graph, :companies, :var=>:c).
+        from([:people], :var=>:p, :vertex=>true).
+        columns(Sequel[:p][:name].as(:person_name))
+      @db.from(gt2).order(:person_name).all.must_equal [{:person_name=>'Alice'}, {:person_name=>'Bob'}]
+
+      @db.from(gt).join(gt2.as(:gt), [:person_name]).distinct.select_order_map(:person_name).must_equal %w[Alice Bob]
+
+      gt = @db.graph_table(:graph, nil, :where=>true).
+        columns(Sequel[1].as(:one))
+      @db.from(gt).all.must_equal [{:one=>1}, {:one=>1}, {:one=>1}]
+
+      gt = @db.graph_table(:graph, [:people, :companies].freeze, :where=>true).
+        columns(Sequel[1].as(:one))
+      @db.from(gt).all.must_equal [{:one=>1}, {:one=>1}, {:one=>1}]
+    ensure
+      @db.drop_property_graph(:graph, :if_exists=>true, :cascade=>true)
+      @db.drop_table?(:works_at, :companies, :people)
+    end
+  end if DB.server_version >= 190000
+
   it "should support IGNORE NULLS for window functions" do
     DB.create_table(:test){Integer :i}
     DB[:test].insert(nil)

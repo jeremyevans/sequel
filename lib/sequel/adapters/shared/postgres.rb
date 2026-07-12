@@ -448,6 +448,193 @@ module Sequel
           end
         end
       end
+
+      # Represents a GRAPH_TABLE expression, used to query a property graph
+      # via graph pattern matching. This is used in place of a table name
+      # expression or dataset in a SELECT query. These are created by calling
+      # #graph_table on the related Database object.
+      #
+      # Table uses a method chaining design, similar to Dataset, where methods
+      # return modified frozen copies of the object.
+      class Table
+        include SQL::AliasMethods
+
+        # Internal struct for a single element (vertex or edge) in the graph pattern:
+        # +type+ :: Either :vertex or :edge.
+        # +marker+ :: Connector string to use for the element (empty for initial vertex).
+        # +label+ :: Label restriction symbol or SQL::Identifier for the element, if any.
+        #            Can be an array or set to match multiple labels.
+        # +var+ :: Graph pattern variable symbol for the element, if any.
+        # +where+ :: WHERE condition for the element, if any.
+        Element = Struct.new(:type, :marker, :label, :var, :where) do
+          # Method used to create elements, used instead of new
+          # to ensure that the returned elements are frozen.
+          def self.create(type, marker, label, opts)
+            case label
+            when Array, Set
+              label = label.dup.freeze unless label.frozen?
+            end
+
+            case where = opts[:where]
+            when Hash, Array
+              where = SQL::BooleanExpression.from_value_pairs(where)
+            end
+
+            new(type, marker, label, opts[:var], where).freeze
+          end
+
+          private_class_method :new
+        end
+        private_constant :Element
+
+        # The name of the property graph the table is querying.
+        attr_reader :name
+
+        # A frozen array of Element instances, representing the vertices and
+        # edges in the graph pattern.
+        attr_reader :elements
+
+        # A frozen array of the columns used in the COLUMNS clause (aliased
+        # as columns_used, as #columns is used to modify the columns).
+        attr_reader :columns
+        alias columns_used columns
+
+        # Create a new Table with the given +graph_name+, with +initial_vertex_label+
+        # and +initial_vertex_opts+ being used to create the initial vertex.
+        # See Table#link for which options are supported for the initial vertex.
+        def self.create(graph_name, initial_vertex_label, initial_vertex_opts)
+          vertex = Element.create(:vertex, "", initial_vertex_label, initial_vertex_opts)
+          new(graph_name, [vertex].freeze, [].freeze)
+        end
+
+        def initialize(name, elements, columns)
+          @name = name
+          @elements = elements
+          @columns = columns
+          freeze
+        end
+
+        # Return a modified copy with an element added using a bidirectional link
+        # (<tt>-</tt> in the graph pattern).
+        # +label+ specifies the label restriction for the element. This can be
+        # nil for no label restriction, or an array or set to restrict to the
+        # given labels.
+        #
+        # Options supported:
+        # +:var+ :: Specifies a graph pattern variable name for the element,
+        #           usable in the WHERE or COLUMNS clauses.
+        # +:vertex+ :: Specifies that the element being linked to is a vertex.
+        #              This allows for direct vertex<->vertex linking, instead of
+        #              the default vertex<->edge<->vertex linking.
+        # +:where+ :: An expression to use for the WHERE clause for the element.
+        #
+        #   DB.graph_table(:gn, :v).link(:e)
+        #   # GRAPH_TABLE (gn MATCH (IS v)-[IS e])
+        def link(label, opts=OPTS)
+          append_element('-', label, opts)
+        end
+
+        # Similar to #link, but uses a directed link from the previous element
+        # to the new element (<tt>-></tt> in the graph pattern). Accepts same
+        # arguments and options as #link.
+        #
+        #   DB.graph_table(:gn, :v).to(:e)
+        #   # GRAPH_TABLE (gn MATCH (IS v)->[IS e])
+        def to(label, opts=OPTS)
+          append_element('->', label, opts)
+        end
+
+        # Similar to #link, but uses a directed link from the new element
+        # to the previous element (<tt><-</tt> in the graph pattern). Accepts
+        # same arguments and options as #link.
+        #
+        #   DB.graph_table(:gn, :v).from(:e)
+        #   # GRAPH_TABLE (gn MATCH (IS v)<-[IS e])
+        def from(label, opts=OPTS)
+          append_element('<-', label, opts)
+        end
+
+        # Return a modifies copy that uses the given columns. A graph table
+        # must have a least one column set before it is used in a query.
+        #
+        #   DB.graph_table(:gn, :v).columns(:a, Sequel[:b].as(:c))
+        #   # GRAPH_TABLE (gn MATCH (IS v) COLUMNS (a, b AS c))
+        def columns(*cols)
+          self.class.new(@name, @elements, cols.freeze)
+        end
+
+        # Return a modified copy that adds the given columns to the existing
+        # list of columns for the graph table.
+        def add_columns(*cols)
+          columns(*@columns, *cols)
+        end
+
+        # Append the SQL for the GRAPH_TABLE expression to the given SQL string.
+        # Requires graph table have at least one column set.
+        def sql_literal_append(ds, sql)
+          if @columns.empty?
+            raise Error, "cannot use graph_table in a query if it does not return any columns"
+          end
+          if @elements.last.type == :edge
+            raise Error, "cannot use graph_table in a query if the last element is an edge"
+          end
+
+          sql << "GRAPH_TABLE ("
+          ds.literal_append(sql, @name)
+          sql << " MATCH "
+
+          @elements.each do |element|
+            marker = element.marker
+            var = element.var
+            label = element.label
+            where = element.where
+            vertex = element.type == :vertex
+
+            sql << marker
+            sql << (vertex ? '(' : '[')
+
+            ds.literal_append(sql, var) if var
+            if label 
+              sql << (var ? " IS " : "IS ")
+              if label.is_a?(Array)
+                label_sep = ""
+                label.each do |l|
+                  sql << label_sep
+                  label_sep = "|" if label_sep.empty?
+                  ds.literal_append(sql, l)
+                end
+              else
+                ds.literal_append(sql, label)
+              end
+            end
+
+            if where
+              sql << ((var || label) ? " WHERE " : "WHERE ")
+              ds.literal_append(sql, where)
+            end
+
+            sql << (vertex ? ')' : ']')
+          end
+
+          sql << " COLUMNS "
+          ds.literal_append(sql, @columns)
+          sql << ")"
+        end
+
+        private
+
+        # Internals of #link, #to, and #from.
+        def append_element(marker, label, opts)
+          node_type = if opts[:vertex] 
+            :vertex
+          else
+            @elements.last.type == :vertex ? :edge : :vertex
+          end
+
+          element = Element.create(node_type, marker, label, opts)
+          self.class.new(@name, (@elements.dup << element).freeze, @columns)
+        end
+      end
     end
 
     # Error raised when Sequel determines a PostgreSQL exclusion constraint has been violated.
@@ -913,6 +1100,82 @@ module Sequel
         _reverse_foreign_key_list_ds
         @conversion_procs.freeze
         super
+      end
+
+      # Return a PropertyGraph::Table instance for a property graph search
+      # (a GRAPH_TABLE clause for a SELECT query). Supported on PostgreSQL 19+.
+      #
+      # Arguments:
+      # +property_graph_name+ :: The property graph to query
+      # +initial_vertex_label+ :: The label restriction for the initial vertex for the
+      #                           graph pattern (can be nil for no label, or an array
+      #                           or set for restricting to one of multiple labels).
+      # +initial_vertex_opts+ :: The options for the initial vertex, see
+      #                          PropertyGraph::Table#link for available options.
+      # 
+      # The returned instance should be further modified by calling methods on it,
+      # using a similar approach to how datasets work, where the methods return a
+      # modified copy of the receiver. The available methods:
+      #
+      # link :: Add a bidirectional link to a new element (vertex or edge)
+      # to :: Add a directional link from the last element to the new element
+      # from :: Add a direciton link from the new element to last element
+      # columns :: Replace the columns the graph table returns
+      # add_columns :: Append to the columns the graph table returns.
+      #
+      # See PropertyGraph::Table for the details of these methods and the arguments
+      # and options they support. Note that for a graph table to be usable in a query,
+      # it must return at least one column, and the last element in the graph pattern
+      # must be a vertex.
+      #
+      #   gt = DB.graph_table(:pgn, :iv)
+      #   # Not yet usable, does not return any columns
+      #
+      #   # Set columns for graph table
+      #   gt = gt.columns(:c, Sequel[1].as(:d))
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv") COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Adds directional link to edge, since last (initial) element was a vertex
+      #   gt = gt.link(:e1)
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"] COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Adds directional link from edge to vertex, since last element was an edge
+      #   gt = gt.to(:v2)
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2") COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Adds bidirection link from vertex to vertex (overriding the default)
+      #   gt = gt.link(:v3, vertex: true)
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2")-(IS "v3") COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Adds directional link from new edge to last vertex, since last element was an vertex.
+      #   # Sets graph pattern variable name and uses it in a WHERE clause for the added element.
+      #   gt = gt.from(:e2, var: :a2, where: {Sequel[:a2][:c] => 1})
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2")-(IS "v3")
+      #   #   <-["a2" IS "e2" WHERE ("a2"."c" = 1)] COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Can use nil as a label for no label restriction, both with and without a variable name
+      #   gt = gt.to(nil).to(nil, var: :a3)
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2")-(IS "v3")
+      #   #   <-["a2" IS "e2" WHERE ("a2"."c" = 1)]->[]->("a3") COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Can restrict to a one of a set of labels
+      #   gt = gt.from([:x, :y], var: :a6)
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2")-(IS "v3")
+      #   #   <-["a2" IS "e2" WHERE ("a2"."c" = 1)]->[]->("a3")->["a6" IS "x"|"y"] COLUMNS ("c", 1 AS "d"))
+      #
+      #   # Add column(s) to the graph table
+      #   gt = gt.add_columns(:y)
+      #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2")-(IS "v3")
+      #   #   <-["a2" IS "e2" WHERE ("a2"."c" = 1)]->[]->("a3")->["a6" IS "x"|"y"]
+      #   #   COLUMNS ("c", 1 AS "d", "y"))
+      #
+      #   DB.from(gt)
+      #   # SELECT * FROM GRAPH_TABLE (...)
+      #
+      #   DB.from(:x).cross_join(gt)
+      #   # SELECT * FROM "x" CROSS JOIN GRAPH_TABLE (...)
+      def graph_table(property_graph_name, initial_vertex_label, initial_vertex_opts=OPTS)
+        PropertyGraph::Table.create(property_graph_name, initial_vertex_label, initial_vertex_opts)
       end
 
       # Immediately apply deferrable constraints.

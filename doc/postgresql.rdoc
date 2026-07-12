@@ -573,6 +573,23 @@ handle locking:
   # INSERT INTO "table" ("id") VALUES (2) RETURNING NULL;
   # COMMIT;
 
+=== GRAPH_TABLE support (PostgresSQL 19+)
+
++graph_table+ is supported on PostgreSQL Database objects. It returns a
+Sequel::PropertyGraph::Table object that uses a method chaining approach to
+build the GRAPH_TABLE expression, similarly to how Datasets are created via
+method chaining:
+
+  gt = DB.graph_table(:graph, :companies, var: :c).
+    from(:works_at, var: :w).
+    link(:people, var: :p, where: {Sequel[:p][:name] => 'Alice'}).
+    columns(Sequel[:p][:name].as(:person_name), Sequel[:w][:role].as(:role))
+  DB.from(gt).sql
+  # SELECT * FROM GRAPH_TABLE (graph
+  #   MATCH (c IS companies)<-[w IS works_at]-(p IS people WHERE (p.name = 'Alice'))
+  #   COLUMNS (p.name AS person_name, w.role AS role)
+  # )
+
 == PostgreSQL-specific reflection Support
 
 The Database#indexes method supports the options :include_partial and :invalid.
