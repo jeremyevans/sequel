@@ -600,6 +600,13 @@ option to +foreign_key_list+:
   #  {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public}
   # ]
 
+=== Listing Property Graphs
+
+You can get a array of the Database's property graphs using the +property_graphs+ method:
+
+  DB.property_graphs
+  # => [:property_graph_name_1, :property_graph_name_2]
+
 == Extended Error Info (<tt>postgres/pg only</tt>)
 
 If you run a query that raises a Sequel::DatabaseError, you can pass the exception object to

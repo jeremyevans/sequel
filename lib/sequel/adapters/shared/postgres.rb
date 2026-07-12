@@ -1268,6 +1268,20 @@ module Sequel
         Sequel.synchronize{@primary_key_sequences[quoted_table] = value} if value
       end
 
+      # Array of symbols specifying property graphs in the current database.
+      # The dataset used is yielded to the block if one is provided,
+      # otherwise, an array of symbols of property graph names is returned.
+      # Supported on PostgreSQL 19+, will be an empty array on lower versions.
+      #
+      # Options:
+      # :qualify :: Return the property graph names as Sequel::SQL::QualifiedIdentifier
+      #             instances, using the schema the property graph is located in as the qualifier.
+      # :schema :: The schema to search
+      # :server :: The server to use
+      def property_graphs(opts=OPTS, &block)
+        pg_class_relname('g', opts, &block)
+      end
+
       # Rename a schema in the database. Arguments:
       # name :: Current name of the schema
       # opts :: New name for the schema

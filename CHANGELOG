@@ -1,5 +1,7 @@
 === master
 
+* Add Database#property_graphs to return an array of property graph name symbols on PostgreSQL 19+ (jeremyevans)
+
 * Add Database#graph_table to support GRAPH_TABLE expressions on PostgreSQL 19+ (jeremyevans)
 
 * Add Database#{create,drop}_property_graph to support {CREATE,DROP} PROPERTY GRAPH on PostgreSQL 19+ (jeremyevans)

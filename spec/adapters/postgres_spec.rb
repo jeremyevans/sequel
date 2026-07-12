@@ -293,7 +293,9 @@ describe 'A PostgreSQL database' do
           label :e4, :all
         end
       end
+      @db.property_graphs.must_include :graph
       @db.drop_property_graph(:graph)
+      @db.property_graphs.wont_include :graph
 
       @db.create_property_graph(:graph) do
         vertex :people
