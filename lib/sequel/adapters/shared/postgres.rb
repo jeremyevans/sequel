@@ -447,6 +447,183 @@ module Sequel
             @edges << Edge.new(name, opts, &block)
           end
         end
+
+        # AlterElement is used to evaluate the block passed to
+        # Alter#alter_vertex_table and Alter#alter_edge_table.
+        class AlterElement < self
+          # +kind+ is +:vertex+ or +:edge+. +name+ is the alias of the
+          # vertex or edge table to alter.
+          def initialize(kind, name, &block)
+            @kind = kind
+            @name = name
+            @labels = []
+            @operations = []
+            instance_exec(&block)
+
+            # All labels added via #add_label are combined into a single
+            # ADD LABEL operation, as PostgreSQL supports adding multiple
+            # labels in a single ALTER ... ADD LABEL statement.
+            unless @labels.empty?
+              @operations << {:op=>:add_label, :kind=>kind, :name=>name, :labels=>@labels.freeze}
+            end
+
+            @operations.each(&:freeze)
+            @operations.freeze
+            freeze
+          end
+
+          def data
+            @operations
+          end
+
+          # Add a label (and optional properties) to the vertex/edge table.
+          # Takes the same arguments as Element#label. Can be called multiple
+          # times to add multiple labels.
+          #
+          #   add_label(:l)
+          #   # ADD LABEL l PROPERTIES ALL COLUMNS
+          def add_label(name, properties=:all)
+            @labels << [name, properties].freeze
+            nil
+          end
+
+          # Remove a label from the vertex/edge table. Options:
+          # :cascade :: Use CASCADE to drop dependent objects.
+          #
+          #   drop_label(:l)
+          #   # DROP LABEL l
+          def drop_label(name, opts=OPTS)
+            @operations << {:op=>:drop_label, :kind=>@kind, :name=>@name, :label=>name, :cascade=>opts[:cascade]}
+            nil
+          end
+
+          # Add properties to an existing label on the vertex/edge table.
+          # +properties+ is an expression, or array of expressions, the same
+          # as the explicit array form of the +properties+ argument to
+          # Element#label.
+          #
+          #   add_properties(:l, [:c1, Sequel[:c2].as(:c3)])
+          #   # ALTER LABEL l ADD PROPERTIES (c1, c2 AS c3)
+          def add_properties(label, properties)
+            @operations << {:op=>:add_properties, :kind=>@kind, :name=>@name, :label=>label, :properties=>Array(properties)}
+            nil
+          end
+
+          # Remove properties from an existing label on the vertex/edge table.
+          # +properties+ is a column name, or array of column names. Options:
+          # :cascade :: Use CASCADE to drop dependent objects.
+          #
+          #   drop_properties(:l, [:c1])
+          #   # ALTER LABEL l DROP PROPERTIES (c1)
+          def drop_properties(label, properties, opts=OPTS)
+            @operations << {:op=>:drop_properties, :kind=>@kind, :name=>@name, :label=>label, :properties=>Array(properties), :cascade=>opts[:cascade]}
+            nil
+          end
+        end
+
+        # Alter is used to evaluate the block given to DatabaseMethods#alter_property_graph,
+        # used to specify changes to an existing property graph.
+        class Alter < self
+          def initialize(&block)
+            @operations = []
+            instance_exec(&block)
+
+            @operations.each do |op|
+              case op[:op]
+              when :add_vertex_tables, :add_edge_tables
+                op[:tables].freeze
+              end
+              op.freeze
+            end
+            @operations.freeze
+            freeze
+          end
+
+          def data
+            @operations
+          end
+
+          # Add a vertex to the property graph, with the block used to configure the
+          # vertex.
+          #
+          #   alter_property_graph.add_vertex(:v)
+          #   # ADD VERTEX TABLES (v)
+          def add_vertex(name, opts=OPTS, &block)
+            add_tables_operation(:add_vertex_tables) << Vertex.new(name, opts, &block)
+            nil
+          end
+
+          # Add an edge to the property graph, with the block used to configure the edge.
+          #
+          #   alter_property_graph.add_edge(:e){source :v1; destination :v2}
+          #   # ADD EDGE TABLES (e SOURCE v1 DESTINATION v2)
+          def add_edge(name, opts=OPTS, &block)
+            add_tables_operation(:add_edge_tables) << Edge.new(name, opts, &block)
+            nil
+          end
+
+          # Remove vertex tables (referenced by their aliases) from the
+          # property graph. +aliases+ can be a single alias or an array.
+          # Options:
+          # :cascade :: Use CASCADE instead of the default RESTRICT.
+          #
+          #   alter_property_graph.drop_vertex_tables([:v1, :v2])
+          #   # DROP VERTEX TABLES (v1, v2)
+          def drop_vertex_tables(aliases, opts=OPTS)
+            @operations << {:op=>:drop_vertex_tables, :aliases=>Array(aliases), :cascade=>opts[:cascade]}
+            nil
+          end
+
+          # Remove edge tables (referenced by their aliases) from the property
+          # graph. See #drop_vertex_tables.
+          #
+          #   alter_property_graph.drop_edge_tables([:e1, :e2])
+          #   # DROP EDGE TABLES (e1, e2)
+          def drop_edge_tables(aliases, opts=OPTS)
+            @operations << {:op=>:drop_edge_tables, :aliases=>Array(aliases), :cascade=>opts[:cascade]}
+            nil
+          end
+
+          # Modify an existing vertex table (referenced by its alias).
+          #
+          #   alter_property_graph.alter_vertex_table(:v){add_label :l}
+          #   # ALTER VERTEX TABLE v ADD LABEL l PROPERTIES ALL COLUMNS
+          def alter_vertex_table(name, &block)
+            @operations.concat(AlterElement.new(:vertex, name, &block))
+            nil
+          end
+
+          # Modify an existing edge table (referenced by its alias).
+          #
+          #   alter_property_graph.alter_edge_table(:e, properties: :none){drop_label :l}
+          #   # ALTER VERTEX TABLE e DROP LABEL l
+          def alter_edge_table(name, &block)
+            @operations.concat(AlterElement.new(:edge, name, &block))
+            nil
+          end
+
+          # Change the owner of the property graph. +new_owner+ is usually a
+          # Symbol or SQL::Identifier for the role name, but can be
+          # <tt>Sequel.lit('CURRENT_USER')</tt> or
+          # <tt>Sequel.lit('SESSION_USER')</tt>.
+          #
+          #   alter_property_graph.owner_to(:new_owner)
+          #   # OWNER TO new_owner
+          def set_owner(new_owner)
+            @operations << {:op=>:set_owner, :owner=>new_owner}
+            nil
+          end
+
+          private
+
+          # Internals of add_vertex and add_edge.
+          def add_tables_operation(op_name)
+            unless op = @operations.find{|o| o[:op] == op_name}
+              @operations << (op = {:op=>op_name, :tables=>[]})
+            end
+            op[:tables]
+          end
+        end
       end
 
       # Represents a GRAPH_TABLE expression, used to query a property graph
@@ -717,6 +894,64 @@ module Sequel
           raise Error, "No matching type in pg_type for #{name.inspect}"
         end
         add_conversion_proc(oid, block)
+      end
+
+      # Alter the property graph with the given +name+, supported on PostgreSQL 19+.
+      # The block uses a DSL, evaluated by PropertyGraph::Generator::Alter. Example:
+      #
+      #   DB.alter_property_graph(:my_graph) do
+      #     # PropertyGraph::Generator::Alter
+      #     add_vertex :companies2
+      #     # ALTER PROPERTY GRAPH "my_graph" ADD VERTEX TABLES ("companies2")
+      #
+      #     add_edge :works_at2 do
+      #       # PropertyGraph::Generator::Edge
+      #       source :people
+      #       destination :companies2
+      #     end
+      #     # ALTER PROPERTY GRAPH "my_graph" ADD EDGE TABLES
+      #     #   ("works_at2" SOURCE "people" DESTINATION "companies2")
+      #
+      #     drop_vertex_tables [:p2], cascade: true
+      #     # ALTER PROPERTY GRAPH "my_graph" DROP VERTEX TABLES ("p2") CASCADE
+      #
+      #     drop_edge_tables :e2
+      #     # ALTER PROPERTY GRAPH "my_graph" DROP EDGE TABLES ("e2")
+      #
+      #     alter_vertex_table :companies do
+      #       # PropertyGraph::Generator::AlterElement
+      #       add_label :public_company, [:name, :symbol]
+      #       # ALTER PROPERTY GRAPH "my_graph" ALTER VERTEX TABLE "companies"
+      #       #   ADD LABEL "public_company" PROPERTIES ("name", "symbol")
+      #
+      #       drop_label :private_company
+      #       # ALTER PROPERTY GRAPH "my_graph" ALTER VERTEX TABLE "companies"
+      #       #   DROP LABEL "private_company"
+      #
+      #       add_properties :company, :revenue
+      #       # ALTER PROPERTY GRAPH "my_graph" ALTER VERTEX TABLE "companies"
+      #       #   ALTER LABEL "company" ADD PROPERTIES ("revenue")
+      #
+      #       drop_properties :company, :internal_id, cascade: true
+      #       # ALTER PROPERTY GRAPH "my_graph" ALTER VERTEX TABLE "companies"
+      #       #   ALTER LABEL "company" DROP PROPERTIES ("internal_id") CASCADE
+      #     end
+      #
+      #     alter_edge_table :works_at do
+      #       # PropertyGraph::Generator::AlterElement
+      #       add_label :employment
+      #     end
+      #     # ALTER PROPERTY GRAPH "my_graph" ALTER EDGE TABLE "works_at"
+      #     #   ADD LABEL "employment" PROPERTIES ALL COLUMNS
+      #
+      #     owner_to :new_owner
+      #     # ALTER PROPERTY GRAPH "my_graph" OWNER TO "new_owner"
+      #   end
+      def alter_property_graph(name, &block)
+        PropertyGraph::Generator::Alter.new(&block).each do |op|
+          execute_ddl(alter_property_graph_op_sql(name, op).freeze)
+        end
+        nil
       end
 
       def commit_prepared_transaction(transaction_id, opts=OPTS)
@@ -1282,6 +1517,14 @@ module Sequel
         pg_class_relname('g', opts, &block)
       end
 
+      # Rename a property graph.
+      #
+      #   DB.rename_property_graph(:x, :y)
+      #   # ALTER PROPERTY GRAPH x RENAME TO y
+      def rename_property_graph(old_name, new_name)
+        execute_ddl("ALTER PROPERTY GRAPH #{literal(old_name)} RENAME TO #{literal(new_name)}".freeze)
+      end
+
       # Rename a schema in the database. Arguments:
       # name :: Current name of the schema
       # opts :: New name for the schema
@@ -1343,6 +1586,16 @@ module Sequel
         ds = dataset
         ds = ds.server(server) if server
         @server_version = swallow_database_error{ds.with_sql("SELECT CAST(current_setting('server_version_num') AS integer) AS v").single_value} || 0
+      end
+
+      # Change the schema for a property graph. Options:
+      # :if_exists :: Use the IF EXISTS clause to not raise an error if the
+      #               property graph does not exist.
+      #
+      #   DB.set_property_graph_schema(:x, :y)
+      #   # ALTER PROPERTY GRAPH x SET SCHEMA y
+      def set_property_graph_schema(old_name, new_name, opts=OPTS)
+        execute_ddl("ALTER PROPERTY GRAPH#{" IF EXISTS" if opts[:if_exists]} #{literal(old_name)} SET SCHEMA #{literal(new_name)}".freeze)
       end
 
       # PostgreSQL supports CREATE TABLE IF NOT EXISTS on 9.1+
@@ -1745,6 +1998,62 @@ module Sequel
         raise e unless /canceling statement due to (?:statement|lock) timeout/ =~ e.message 
       end
     
+      # SQL statement for a single ALTER PROPERTY GRAPH operation.
+      def alter_property_graph_op_sql(name, op)
+        sql = String.new << "ALTER PROPERTY GRAPH " << quote_schema_table(name) << " "
+
+        case op_type = op[:op]
+        when :add_vertex_tables
+          sql << "ADD VERTEX TABLES (" <<
+            op[:tables].map do |vertex|
+              create_property_graph_table_sql(vertex) <<
+                create_property_graph_labels_sql(vertex.labels)
+            end.join(', ') << ")"
+        when :add_edge_tables
+          sql << "ADD EDGE TABLES (" <<
+            op[:tables].map do |edge|
+              create_property_graph_table_sql(edge) <<
+                " SOURCE " << create_property_graph_edge_side_sql(edge.source) <<
+                " DESTINATION " << create_property_graph_edge_side_sql(edge.destination) <<
+                create_property_graph_labels_sql(edge.labels)
+            end.join(', ') << ")"
+        when :drop_vertex_tables, :drop_edge_tables
+          sql << (op_type == :drop_vertex_tables ? "DROP VERTEX TABLES " : "DROP EDGE TABLES ") <<
+            literal(op[:aliases])
+        when :add_label
+          sql << alter_property_graph_element_table_sql(op)
+          op[:labels].each do |label_name, properties|
+            sql << " ADD LABEL " << quote_identifier(label_name) <<
+              create_property_graph_properties_clause_sql(properties)
+          end
+        when :drop_label
+          sql << alter_property_graph_element_table_sql(op) <<
+            " DROP LABEL " << quote_identifier(op[:label])
+        when :add_properties
+          sql << alter_property_graph_element_table_sql(op) <<
+            " ALTER LABEL " << quote_identifier(op[:label]) << " ADD PROPERTIES " <<
+            literal(op[:properties])
+        when :drop_properties
+          sql << alter_property_graph_element_table_sql(op) <<
+            " ALTER LABEL " << quote_identifier(op[:label]) << " DROP PROPERTIES " <<
+            literal(op[:properties])
+        else # when :set_owner
+          sql << "OWNER TO " << literal(op[:owner])
+        end
+
+        case op_type
+        when :drop_vertex_tables, :drop_edge_tables, :drop_label, :drop_properties
+          sql << " CASCADE" if op[:cascade]
+        end
+
+        sql
+      end
+
+      # SQL fragment for the ALTER PROPERTY GRAPH ALTER {VERTEX|EDGE} TABLE prefix 
+      def alter_property_graph_element_table_sql(op)
+        "ALTER #{op[:kind] == :vertex ? 'VERTEX' : 'EDGE'} TABLE #{quote_identifier(op[:name])}"
+      end
+
       def alter_table_add_column_sql(table, op)
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
       end

@@ -268,9 +268,9 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
 
 However, you may want to consider just use <tt>Database#run</tt> with the necessary SQL code, at least for functions and triggers.
 
-=== Creating/Dropping Property Graphs (PostgreSQL 19+)
+=== Creating/Altering/Dropping Property Graphs (PostgreSQL 19+)
 
-Sequel supports +create_property_graph+ and +drop_property_graph+ for creating and dropping property graphs:
+Sequel supports +create_property_graph+, +alter_property_graph+, +rename_property_graph+, +set_property_graph_schema+, and +drop_property_graph+ for creating, altering, and dropping property graphs:
 
   DB.create_property_graph(:g) do
     vertex :people
@@ -285,8 +285,19 @@ Sequel supports +create_property_graph+ and +drop_property_graph+ for creating a
   #   VERTEX TABLES (people, companies)
   #   EDGE TABLES (employment SOURCE people DESTINATION companies)
 
-  DB.drop_property_graph(:g)
-  # DROP PROPERTY GRAPH g
+  DB.alter_property_graph(:g) do
+    add_vertex :v
+  end
+  # ALTER PROPERTY GRAPH g ADD VERTEX TABLES (v)
+
+  DB.rename_property_graph(:g, :g2)
+  # ALTER PROPERTY GRAPH g RENAME TO g2
+
+  DB.set_property_graph_schema(:g2, :other_schema, if_exists: true)
+  # ALTER PROPERTY GRAPH IF EXISTS g2 SET SCHEMA other_schema
+
+  DB.drop_property_graph(Sequel[:other_schema][:g2])
+  # DROP PROPERTY GRAPH other_schema.g2
 
 == PostgreSQL-specific DML Support
 

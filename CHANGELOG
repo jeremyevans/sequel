@@ -1,5 +1,11 @@
 === master
 
+* Add Database#set_property_graph_schema to support changing the schema for a property graph on PostgreSQL 19+ (jeremyevans)
+
+* Add Database#rename_property_graph to support renaming property graphs on PostgreSQL 19+ (jeremyevans)
+
+* Add Database#alter_property_graph to support ALTER PROPERTY GRAPH on PostgreSQL 19+ (jeremyevans)
+
 * Add Database#property_graphs to return an array of property graph name symbols on PostgreSQL 19+ (jeremyevans)
 
 * Add Database#graph_table to support GRAPH_TABLE expressions on PostgreSQL 19+ (jeremyevans)

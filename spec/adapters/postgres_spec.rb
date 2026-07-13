@@ -470,6 +470,180 @@ describe 'A PostgreSQL database' do
     end
   end if DB.server_version >= 190000
 
+  it "should support altering property graphs" do
+    @db.transaction(:rollback => :always) do
+      @db.create_table(:people){primary_key :id; String :name}
+      @db.create_table(:companies){primary_key :id; String :name; Integer :revenue; Integer :internal_id}
+      @db.create_table(:companies2){primary_key :id; String :name}
+      @db.create_table(:works_at) do
+        foreign_key :person_id, :people
+        foreign_key :company_id, :companies
+        primary_key [:person_id, :company_id]
+        String :role
+      end
+      @db.create_table(:extra_edge) do
+        foreign_key :person_id, :people
+        foreign_key :company_id, :companies
+        primary_key [:person_id, :company_id]
+      end
+      @db.create_table(:works_at2) do
+        foreign_key :person_id, :people
+        foreign_key :company_id, :companies2
+        primary_key [:person_id, :company_id]
+        String :role
+      end
+
+      @db[:people].insert(:id=>1, :name=>'Alice')
+      @db[:people].insert(:id=>2, :name=>'Bob')
+      @db[:companies].insert(:id=>1, :name=>'Acme', :internal_id=>99)
+      @db[:companies2].insert(:id=>1, :name=>'Umbrella')
+      @db[:works_at].insert(:person_id=>1, :company_id=>1, :role=>'Manager')
+      @db[:works_at].insert(:person_id=>2, :company_id=>1, :role=>'Engineer')
+      @db[:works_at2].insert(:person_id=>1, :company_id=>1, :role=>'Consultant')
+      @db[:extra_edge].insert(:person_id=>1, :company_id=>1)
+
+      begin
+        @db.create_property_graph(:graph) do
+          vertex :people
+          vertex :companies do
+            label :company, [:name, :internal_id]
+            label :private_company, []
+          end
+          edge :works_at, :properties=>[] do
+            source :people
+            destination :companies
+          end
+          edge :extra_edge, :properties=>[] do
+            source :people
+            destination :companies
+          end
+        end
+
+        @db.alter_property_graph(:graph) do
+          add_vertex :companies2
+          add_vertex Sequel[:companies2].as(:companies3)
+
+          add_edge :works_at2 do
+            source :people
+            destination :companies2
+          end
+        end
+        gt = @db.graph_table(:graph, :people, :var=>:p).
+          link(:works_at2, :var=>:w).
+          to(:companies2, :var=>:c).
+          columns(Sequel[:p][:name].as(:person_name), Sequel[:w][:role].as(:role), Sequel[:c][:name].as(:company_name))
+        @db.from(gt).all.must_equal [{:person_name=>'Alice', :role=>'Consultant', :company_name=>'Umbrella'}]
+
+        @db.alter_property_graph(:graph) do
+          alter_vertex_table :companies do
+            add_label :public_company, [:name]
+          end
+        end
+        gt = @db.graph_table(:graph, :public_company, :var=>:c).columns(Sequel[:c][:name])
+        @db.from(gt).all.must_equal [{:name=>'Acme'}]
+
+        @db.alter_property_graph(:graph) do
+          alter_vertex_table :companies do
+            drop_label :private_company
+          end
+        end
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph, :private_company).columns(Sequel[1])).all
+          end
+        end.must_raise Sequel::DatabaseError
+
+        @db.alter_property_graph(:graph) do
+          alter_vertex_table :companies do
+            add_properties :company, [Sequel[:internal_id].as(:internal_id2)]
+          end
+        end
+        gt = @db.graph_table(:graph, :company, :var=>:c).columns(Sequel[:c][:internal_id2])
+        @db.from(gt).all.must_equal [{:internal_id2=>99}]
+
+        @db.alter_property_graph(:graph) do
+          alter_vertex_table :companies do
+            drop_properties :company, [:internal_id]
+          end
+        end
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph, :company, :var=>:c).columns(Sequel[:c][:internal_id])).all
+          end
+        end.must_raise Sequel::DatabaseError
+
+        @db.alter_property_graph(:graph) do
+          alter_edge_table :works_at do
+            add_label :employment, [:role]
+          end
+        end
+        gt = @db.graph_table(:graph, :people, :var=>:p).
+          link(:employment, :var=>:e).
+          to(:public_company).
+          columns(Sequel[:p][:name].as(:person_name), Sequel[:e][:role])
+        @db.from(gt).order(:person_name).all.must_equal [
+          {:person_name=>'Alice', :role=>'Manager'},
+          {:person_name=>'Bob', :role=>'Engineer'}
+        ]
+
+        @db.alter_property_graph(:graph) do
+          alter_edge_table :works_at do
+            drop_label :employment
+          end
+        end
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph, :people).link(:employment).to(nil).columns(Sequel[1])).all
+          end
+        end.must_raise Sequel::DatabaseError
+
+        @db.alter_property_graph(:graph) do
+          drop_edge_tables [:extra_edge]
+        end
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph, :people).link(:extra_edge).to(nil).columns(Sequel[1])).all
+          end
+        end.must_raise Sequel::DatabaseError
+
+        @db.alter_property_graph(:graph) do
+          drop_vertex_tables [:companies2], :cascade=>true
+        end
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph, :companies2).columns(Sequel[1])).all
+          end
+        end.must_raise Sequel::DatabaseError
+
+        @db.alter_property_graph(:graph) do
+          set_owner Sequel.lit("CURRENT_USER")
+        end
+        gt = @db.graph_table(:graph, :public_company, :var=>:c).columns(Sequel[:c][:name])
+        @db.from(gt).all.must_equal [{:name=>'Acme'}]
+
+        @db.rename_property_graph(:graph, :graph2)
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph, :public_company).columns(Sequel[1])).all
+          end
+        end.must_raise Sequel::DatabaseError
+        gt = @db.graph_table(:graph2, :public_company, :var=>:c).columns(Sequel[:c][:name])
+        @db.from(gt).all.must_equal [{:name=>'Acme'}]
+
+        @db.create_schema(:sequel_test_pg_schema)
+        @db.set_property_graph_schema(:graph3, :sequel_test_pg_schema, :if_exists=>true)
+        @db.set_property_graph_schema(:graph2, :sequel_test_pg_schema)
+        proc do
+          @db.transaction(:savepoint=>true) do
+            @db.from(@db.graph_table(:graph2, :public_company).columns(Sequel[1])).all
+          end
+        end.must_raise Sequel::DatabaseError
+        gt = @db.graph_table(Sequel[:sequel_test_pg_schema][:graph2], :public_company, :var=>:c).columns(Sequel[:c][:name])
+        @db.from(gt).all.must_equal [{:name=>'Acme'}]
+      end
+    end
+  end if DB.server_version >= 190000
+
   it "should support IGNORE NULLS for window functions" do
     DB.create_table(:test){Integer :i}
     DB[:test].insert(nil)
