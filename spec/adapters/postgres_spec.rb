@@ -302,8 +302,10 @@ describe 'A PostgreSQL database' do
       end
       @db.drop_property_graph(:graph)
 
-      @db.create_property_graph(:graph, :temp=>true){}
-      @db.drop_property_graph(:graph)
+      @db.synchronize do
+        @db.create_property_graph(:graph, :temp=>true){}
+        @db.drop_property_graph(:graph)
+      end
 
       proc do
         @db.create_property_graph(:graph) do
