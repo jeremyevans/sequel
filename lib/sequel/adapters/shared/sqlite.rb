@@ -677,14 +677,15 @@ module Sequel
         super
       end
 
-      # Return an array of strings specifying a query explanation for a SELECT of the
-      # current dataset. Currently, the options are ignored, but it accepts options
-      # to be compatible with other adapters.
+      # Return a string specifying a query explanation for a SELECT of the
+      # current dataset. Options:
+      # :query_plan :: Use EXPLAIN QUERY PLAN instead of EXPLAIN if true.
       def explain(opts=nil)
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
 
-        ds = db.send(:metadata_dataset).clone(:sql=>"EXPLAIN #{select_sql}".freeze)
+        keyword = (opts && opts[:query_plan]) ? "EXPLAIN QUERY PLAN" : "EXPLAIN"
+        ds = db.send(:metadata_dataset).clone(:sql=>"#{keyword} #{select_sql}".freeze)
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end
