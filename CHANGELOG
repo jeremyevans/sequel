@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#explain :query_plan option on SQLite, for EXPLAIN QUERY PLAN (cllns)
+
 * Add Database#set_property_graph_schema to support changing the schema for a property graph on PostgreSQL 19+ (jeremyevans)
 
 * Add Database#rename_property_graph to support renaming property graphs on PostgreSQL 19+ (jeremyevans)

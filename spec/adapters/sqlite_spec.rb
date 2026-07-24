@@ -515,6 +515,13 @@ describe "SQLite dataset" do
   it "should support #explain" do
     DB[:test].explain.must_be_kind_of(String)
   end
+
+  it "should support #explain with :query_plan option" do
+    ds = DB[:test]
+    plan = ds.explain(:query_plan=>true)
+    plan.must_be_kind_of(String)
+    plan.wont_equal ds.explain
+  end
   
   it "should have #explain work when identifier_output_method is modified" do
     DB[:test].with_identifier_output_method(:upcase).explain.must_be_kind_of(String)
