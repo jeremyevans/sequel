@@ -42,12 +42,14 @@ Sequel::Postgres::DatabaseMethods
 <ol>
 <li><a href="#method-i-add_conversion_proc">add_conversion_proc</a></li>
 <li><a href="#method-i-add_named_conversion_proc">add_named_conversion_proc</a></li>
+<li><a href="#method-i-alter_property_graph">alter_property_graph</a></li>
 <li><a href="#method-i-check_constraints">check_constraints</a></li>
 <li><a href="#method-i-commit_prepared_transaction">commit_prepared_transaction</a></li>
 <li><a href="#attribute-i-conversion_procs">conversion_procs</a></li>
 <li><a href="#method-i-convert_serial_to_identity">convert_serial_to_identity</a></li>
 <li><a href="#method-i-create_function">create_function</a></li>
 <li><a href="#method-i-create_language">create_language</a></li>
+<li><a href="#method-i-create_property_graph">create_property_graph</a></li>
 <li><a href="#method-i-create_schema">create_schema</a></li>
 <li><a href="#method-i-create_table">create_table</a></li>
 <li><a href="#method-i-create_table-3F">create_table?</a></li>
@@ -57,22 +59,27 @@ Sequel::Postgres::DatabaseMethods
 <li><a href="#method-i-do">do</a></li>
 <li><a href="#method-i-drop_function">drop_function</a></li>
 <li><a href="#method-i-drop_language">drop_language</a></li>
+<li><a href="#method-i-drop_property_graph">drop_property_graph</a></li>
 <li><a href="#method-i-drop_schema">drop_schema</a></li>
 <li><a href="#method-i-drop_trigger">drop_trigger</a></li>
 <li><a href="#method-i-foreign_key_list">foreign_key_list</a></li>
 <li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#method-i-graph_table">graph_table</a></li>
 <li><a href="#method-i-immediate_constraints">immediate_constraints</a></li>
 <li><a href="#method-i-indexes">indexes</a></li>
 <li><a href="#method-i-locks">locks</a></li>
 <li><a href="#method-i-notify">notify</a></li>
 <li><a href="#method-i-primary_key">primary_key</a></li>
 <li><a href="#method-i-primary_key_sequence">primary_key_sequence</a></li>
+<li><a href="#method-i-property_graphs">property_graphs</a></li>
 <li><a href="#method-i-refresh_view">refresh_view</a></li>
+<li><a href="#method-i-rename_property_graph">rename_property_graph</a></li>
 <li><a href="#method-i-rename_schema">rename_schema</a></li>
 <li><a href="#method-i-reset_primary_key_sequence">reset_primary_key_sequence</a></li>
 <li><a href="#method-i-rollback_prepared_transaction">rollback_prepared_transaction</a></li>
 <li><a href="#method-i-serial_primary_key_options">serial_primary_key_options</a></li>
 <li><a href="#method-i-server_version">server_version</a></li>
+<li><a href="#method-i-set_property_graph_schema">set_property_graph_schema</a></li>
 <li><a href="#method-i-supports_create_table_if_not_exists-3F">supports_create_table_if_not_exists?</a></li>
 <li><a href="#method-i-supports_deferrable_constraints-3F">supports_deferrable_constraints?</a></li>
 <li><a href="#method-i-supports_deferrable_foreign_key_constraints-3F">supports_deferrable_foreign_key_constraints?</a></li>
@@ -285,9 +292,9 @@ end_sql
 [show source]
 </a>
 <pre id='method-i-add_conversion_proc-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">327</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_conversion_proc</span>(<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">callable</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">328</span>   <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">callable</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">block</span>
-<span class="line-num">329</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">885</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_conversion_proc</span>(<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">callable</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">886</span>   <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">callable</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">block</span>
+<span class="line-num">887</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-add_named_conversion_proc'>
@@ -306,12 +313,86 @@ end_sql
 [show source]
 </a>
 <pre id='method-i-add_named_conversion_proc-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">334</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_named_conversion_proc</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">335</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">oid</span> = <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_type</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:typtype</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;b&#39;</span>, <span class="ruby-string">&#39;e&#39;</span>], <span class="ruby-value">:typname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:oid</span>)
-<span class="line-num">336</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;No matching type in pg_type for #{name.inspect}&quot;</span>
-<span class="line-num">337</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">338</span>   <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">block</span>)
-<span class="line-num">339</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">892</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_named_conversion_proc</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">893</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">oid</span> = <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_type</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:typtype</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;b&#39;</span>, <span class="ruby-string">&#39;e&#39;</span>], <span class="ruby-value">:typname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:oid</span>)
+<span class="line-num">894</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;No matching type in pg_type for #{name.inspect}&quot;</span>
+<span class="line-num">895</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">896</span>   <span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">block</span>)
+<span class="line-num">897</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-alter_property_graph'>
+<a name='method-i-alter_property_graph'></a>
+<div class='synopsis'>
+<span class='name'>alter_property_graph</span><span class='arguments'>(name, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Alter the property graph with the given <code>name</code>, supported on PostgreSQL 19+. The block uses a DSL, evaluated by <a href="PropertyGraph/Generator/Alter.html"><code>PropertyGraph::Generator::Alter</code></a>. Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_property_graph</span>(<span class="ruby-value">:my_graph</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># PropertyGraph::Generator::Alter</span>
+  <span class="ruby-identifier">add_vertex</span> <span class="ruby-value">:companies2</span>
+  <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ADD VERTEX TABLES (&quot;companies2&quot;)</span>
+
+  <span class="ruby-identifier">add_edge</span> <span class="ruby-value">:works_at2</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># PropertyGraph::Generator::Edge</span>
+    <span class="ruby-identifier">source</span> <span class="ruby-value">:people</span>
+    <span class="ruby-identifier">destination</span> <span class="ruby-value">:companies2</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ADD EDGE TABLES</span>
+  <span class="ruby-comment">#   (&quot;works_at2&quot; SOURCE &quot;people&quot; DESTINATION &quot;companies2&quot;)</span>
+
+  <span class="ruby-identifier">drop_vertex_tables</span> [<span class="ruby-value">:p2</span>], <span class="ruby-value">cascade:</span> <span class="ruby-keyword">true</span>
+  <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; DROP VERTEX TABLES (&quot;p2&quot;) CASCADE</span>
+
+  <span class="ruby-identifier">drop_edge_tables</span> <span class="ruby-value">:e2</span>
+  <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; DROP EDGE TABLES (&quot;e2&quot;)</span>
+
+  <span class="ruby-identifier">alter_vertex_table</span> <span class="ruby-value">:companies</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># PropertyGraph::Generator::AlterElement</span>
+    <span class="ruby-identifier">add_label</span> <span class="ruby-value">:public_company</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:symbol</span>]
+    <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ALTER VERTEX TABLE &quot;companies&quot;</span>
+    <span class="ruby-comment">#   ADD LABEL &quot;public_company&quot; PROPERTIES (&quot;name&quot;, &quot;symbol&quot;)</span>
+
+    <span class="ruby-identifier">drop_label</span> <span class="ruby-value">:private_company</span>
+    <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ALTER VERTEX TABLE &quot;companies&quot;</span>
+    <span class="ruby-comment">#   DROP LABEL &quot;private_company&quot;</span>
+
+    <span class="ruby-identifier">add_properties</span> <span class="ruby-value">:company</span>, <span class="ruby-value">:revenue</span>
+    <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ALTER VERTEX TABLE &quot;companies&quot;</span>
+    <span class="ruby-comment">#   ALTER LABEL &quot;company&quot; ADD PROPERTIES (&quot;revenue&quot;)</span>
+
+    <span class="ruby-identifier">drop_properties</span> <span class="ruby-value">:company</span>, <span class="ruby-value">:internal_id</span>, <span class="ruby-value">cascade:</span> <span class="ruby-keyword">true</span>
+    <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ALTER VERTEX TABLE &quot;companies&quot;</span>
+    <span class="ruby-comment">#   ALTER LABEL &quot;company&quot; DROP PROPERTIES (&quot;internal_id&quot;) CASCADE</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">alter_edge_table</span> <span class="ruby-value">:works_at</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># PropertyGraph::Generator::AlterElement</span>
+    <span class="ruby-identifier">add_label</span> <span class="ruby-value">:employment</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; ALTER EDGE TABLE &quot;works_at&quot;</span>
+  <span class="ruby-comment">#   ADD LABEL &quot;employment&quot; PROPERTIES ALL COLUMNS</span>
+
+  <span class="ruby-identifier">owner_to</span> <span class="ruby-value">:new_owner</span>
+  <span class="ruby-comment"># ALTER PROPERTY GRAPH &quot;my_graph&quot; OWNER TO &quot;new_owner&quot;</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-alter_property_graph-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-alter_property_graph-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">950</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_property_graph</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">951</span>   <span class="ruby-constant">PropertyGraph</span><span class="ruby-operator">::</span><span class="ruby-constant">Generator</span><span class="ruby-operator">::</span><span class="ruby-constant">Alter</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">op</span><span class="ruby-operator">|</span>
+<span class="line-num">952</span>     <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">alter_property_graph_op_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">op</span>).<span class="ruby-identifier">freeze</span>)
+<span class="line-num">953</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">954</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">955</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-check_constraints'>
@@ -335,18 +416,18 @@ end_sql
 [show source]
 </a>
 <pre id='method-i-check_constraints-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">350</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_constraints</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">351</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>
-<span class="line-num">352</span> 
-<span class="line-num">353</span>   <span class="ruby-identifier">hash</span> = {}
-<span class="line-num">354</span>   <span class="ruby-identifier">_check_constraints_ds</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-value">:conrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
-<span class="line-num">355</span>     <span class="ruby-identifier">constraint</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:constraint</span>])
-<span class="line-num">356</span>     <span class="ruby-identifier">entry</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">constraint</span>] <span class="ruby-operator">||=</span> {<span class="ruby-value">:definition</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:definition</span>], <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:validated</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:validated</span>], <span class="ruby-value">:enforced</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:enforced</span>]}
-<span class="line-num">357</span>     <span class="ruby-identifier">entry</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>]
-<span class="line-num">358</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">359</span>   
-<span class="line-num">360</span>   <span class="ruby-identifier">hash</span>
-<span class="line-num">361</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">966</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_constraints</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">967</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>
+<span class="line-num">968</span> 
+<span class="line-num">969</span>   <span class="ruby-identifier">hash</span> = {}
+<span class="line-num">970</span>   <span class="ruby-identifier">_check_constraints_ds</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-value">:conrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
+<span class="line-num">971</span>     <span class="ruby-identifier">constraint</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:constraint</span>])
+<span class="line-num">972</span>     <span class="ruby-identifier">entry</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">constraint</span>] <span class="ruby-operator">||=</span> {<span class="ruby-value">:definition</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:definition</span>], <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:validated</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:validated</span>], <span class="ruby-value">:enforced</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:enforced</span>]}
+<span class="line-num">973</span>     <span class="ruby-identifier">entry</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>]
+<span class="line-num">974</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">975</span>   
+<span class="line-num">976</span>   <span class="ruby-identifier">hash</span>
+<span class="line-num">977</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-commit_prepared_transaction'>
@@ -363,9 +444,9 @@ end_sql
 [show source]
 </a>
 <pre id='method-i-commit_prepared_transaction-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">341</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">342</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;COMMIT PREPARED #{literal(transaction_id)}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">343</span> <span class="ruby-keyword">end</span></pre>
+<span class="line-num">957</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">958</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;COMMIT PREPARED #{literal(transaction_id)}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">959</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-convert_serial_to_identity'>
@@ -399,59 +480,59 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-convert_serial_to_identity-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-convert_serial_to_identity-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">381</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_serial_to_identity</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">382</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;convert_serial_to_identity is only supported on PostgreSQL 10.2+&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100002</span>
-<span class="line-num">383</span> 
-<span class="line-num">384</span>   <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
-<span class="line-num">385</span>   <span class="ruby-identifier">server_hash</span> = <span class="ruby-identifier">server</span> <span class="ruby-operator">?</span> {<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">server</span>} <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>
-<span class="line-num">386</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
-<span class="line-num">387</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span>
-<span class="line-num">388</span> 
-<span class="line-num">389</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;convert_serial_to_identity requires superuser permissions&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">current_setting</span>(<span class="ruby-string">&#39;is_superuser&#39;</span>)} <span class="ruby-operator">==</span> <span class="ruby-string">&#39;on&#39;</span>
-<span class="line-num">390</span> 
-<span class="line-num">391</span>   <span class="ruby-identifier">table_oid</span> = <span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">392</span>   <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>
-<span class="line-num">393</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">column</span> = (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> ((<span class="ruby-identifier">sch</span> = <span class="ruby-identifier">schema</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">sc</span><span class="ruby-operator">|</span> <span class="ruby-identifier">sc</span>[<span class="ruby-value">:primary_key</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">sc</span>[<span class="ruby-value">:auto_increment</span>]}) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">sch</span>[<span class="ruby-value">0</span>]))
-<span class="line-num">394</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;could not determine column to convert from serial to identity automatically&quot;</span>
-<span class="line-num">395</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">396</span>   <span class="ruby-identifier">column</span> = <span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">column</span>)
-<span class="line-num">397</span> 
-<span class="line-num">398</span>   <span class="ruby-identifier">column_num</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_attribute</span>).
-<span class="line-num">399</span>     <span class="ruby-identifier">where</span>(<span class="ruby-value">:attrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table_oid</span>, <span class="ruby-value">:attname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column</span>).
-<span class="line-num">400</span>     <span class="ruby-identifier">get</span>(<span class="ruby-value">:attnum</span>)
-<span class="line-num">401</span> 
-<span class="line-num">402</span>   <span class="ruby-identifier">pg_class</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;pg_class&#39;</span>, <span class="ruby-value">:regclass</span>)
-<span class="line-num">403</span>   <span class="ruby-identifier">res</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_depend</span>).
-<span class="line-num">404</span>     <span class="ruby-identifier">where</span>(<span class="ruby-value">:refclassid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:refobjid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table_oid</span>, <span class="ruby-value">:refobjsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column_num</span>, <span class="ruby-value">:classid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:objsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>, <span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">%w&#39;a i&#39;</span>).
-<span class="line-num">405</span>     <span class="ruby-identifier">select_map</span>([<span class="ruby-value">:objid</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>({<span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;i&#39;</span>}, <span class="ruby-value">:v</span>)])
-<span class="line-num">406</span> 
-<span class="line-num">407</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">res</span>.<span class="ruby-identifier">length</span>
-<span class="line-num">408</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">0</span>
-<span class="line-num">409</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;unable to find related sequence when converting serial to identity&quot;</span>
-<span class="line-num">410</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">1</span>
-<span class="line-num">411</span>     <span class="ruby-identifier">seq_oid</span>, <span class="ruby-identifier">already_identity</span> = <span class="ruby-identifier">res</span>.<span class="ruby-identifier">first</span>
-<span class="line-num">412</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">413</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;more than one linked sequence found when converting serial to identity&quot;</span>
-<span class="line-num">414</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">415</span> 
-<span class="line-num">416</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">already_identity</span>
-<span class="line-num">417</span> 
-<span class="line-num">418</span>   <span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">server_hash</span>) <span class="ruby-keyword">do</span>
-<span class="line-num">419</span>     <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">server_hash</span>)
-<span class="line-num">420</span> 
-<span class="line-num">421</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_depend</span>).
-<span class="line-num">422</span>       <span class="ruby-identifier">where</span>(<span class="ruby-value">:classid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:objid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">seq_oid</span>, <span class="ruby-value">:objsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>, <span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>).
-<span class="line-num">423</span>       <span class="ruby-identifier">update</span>(<span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;i&#39;</span>)
-<span class="line-num">424</span> 
-<span class="line-num">425</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_attribute</span>).
-<span class="line-num">426</span>       <span class="ruby-identifier">where</span>(<span class="ruby-value">:attrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table_oid</span>, <span class="ruby-value">:attname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column</span>).
-<span class="line-num">427</span>       <span class="ruby-identifier">update</span>(<span class="ruby-value">:attidentity</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;d&#39;</span>)
-<span class="line-num">428</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">429</span> 
-<span class="line-num">430</span>   <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">431</span>   <span class="ruby-keyword">nil</span>
-<span class="line-num">432</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-convert_serial_to_identity-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num"> 997</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_serial_to_identity</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num"> 998</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;convert_serial_to_identity is only supported on PostgreSQL 10.2+&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100002</span>
+<span class="line-num"> 999</span> 
+<span class="line-num">1000</span>   <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">1001</span>   <span class="ruby-identifier">server_hash</span> = <span class="ruby-identifier">server</span> <span class="ruby-operator">?</span> {<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">server</span>} <span class="ruby-operator">:</span> <span class="ruby-constant">OPTS</span>
+<span class="line-num">1002</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
+<span class="line-num">1003</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span>
+<span class="line-num">1004</span> 
+<span class="line-num">1005</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;convert_serial_to_identity requires superuser permissions&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">current_setting</span>(<span class="ruby-string">&#39;is_superuser&#39;</span>)} <span class="ruby-operator">==</span> <span class="ruby-string">&#39;on&#39;</span>
+<span class="line-num">1006</span> 
+<span class="line-num">1007</span>   <span class="ruby-identifier">table_oid</span> = <span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1008</span>   <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>
+<span class="line-num">1009</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">column</span> = (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> ((<span class="ruby-identifier">sch</span> = <span class="ruby-identifier">schema</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">sc</span><span class="ruby-operator">|</span> <span class="ruby-identifier">sc</span>[<span class="ruby-value">:primary_key</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">sc</span>[<span class="ruby-value">:auto_increment</span>]}) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">sch</span>[<span class="ruby-value">0</span>]))
+<span class="line-num">1010</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;could not determine column to convert from serial to identity automatically&quot;</span>
+<span class="line-num">1011</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1012</span>   <span class="ruby-identifier">column</span> = <span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">column</span>)
+<span class="line-num">1013</span> 
+<span class="line-num">1014</span>   <span class="ruby-identifier">column_num</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_attribute</span>).
+<span class="line-num">1015</span>     <span class="ruby-identifier">where</span>(<span class="ruby-value">:attrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table_oid</span>, <span class="ruby-value">:attname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column</span>).
+<span class="line-num">1016</span>     <span class="ruby-identifier">get</span>(<span class="ruby-value">:attnum</span>)
+<span class="line-num">1017</span> 
+<span class="line-num">1018</span>   <span class="ruby-identifier">pg_class</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;pg_class&#39;</span>, <span class="ruby-value">:regclass</span>)
+<span class="line-num">1019</span>   <span class="ruby-identifier">res</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_depend</span>).
+<span class="line-num">1020</span>     <span class="ruby-identifier">where</span>(<span class="ruby-value">:refclassid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:refobjid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table_oid</span>, <span class="ruby-value">:refobjsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column_num</span>, <span class="ruby-value">:classid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:objsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>, <span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">%w&#39;a i&#39;</span>).
+<span class="line-num">1021</span>     <span class="ruby-identifier">select_map</span>([<span class="ruby-value">:objid</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>({<span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;i&#39;</span>}, <span class="ruby-value">:v</span>)])
+<span class="line-num">1022</span> 
+<span class="line-num">1023</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">res</span>.<span class="ruby-identifier">length</span>
+<span class="line-num">1024</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">0</span>
+<span class="line-num">1025</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;unable to find related sequence when converting serial to identity&quot;</span>
+<span class="line-num">1026</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">1</span>
+<span class="line-num">1027</span>     <span class="ruby-identifier">seq_oid</span>, <span class="ruby-identifier">already_identity</span> = <span class="ruby-identifier">res</span>.<span class="ruby-identifier">first</span>
+<span class="line-num">1028</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1029</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;more than one linked sequence found when converting serial to identity&quot;</span>
+<span class="line-num">1030</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1031</span> 
+<span class="line-num">1032</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">already_identity</span>
+<span class="line-num">1033</span> 
+<span class="line-num">1034</span>   <span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">server_hash</span>) <span class="ruby-keyword">do</span>
+<span class="line-num">1035</span>     <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">server_hash</span>)
+<span class="line-num">1036</span> 
+<span class="line-num">1037</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_depend</span>).
+<span class="line-num">1038</span>       <span class="ruby-identifier">where</span>(<span class="ruby-value">:classid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pg_class</span>, <span class="ruby-value">:objid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">seq_oid</span>, <span class="ruby-value">:objsubid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">0</span>, <span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>).
+<span class="line-num">1039</span>       <span class="ruby-identifier">update</span>(<span class="ruby-value">:deptype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;i&#39;</span>)
+<span class="line-num">1040</span> 
+<span class="line-num">1041</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_attribute</span>).
+<span class="line-num">1042</span>       <span class="ruby-identifier">where</span>(<span class="ruby-value">:attrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">table_oid</span>, <span class="ruby-value">:attname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column</span>).
+<span class="line-num">1043</span>       <span class="ruby-identifier">update</span>(<span class="ruby-value">:attidentity</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;d&#39;</span>)
+<span class="line-num">1044</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1045</span> 
+<span class="line-num">1046</span>   <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1047</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">1048</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_function'>
@@ -506,10 +587,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_function-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_function-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">455</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_function</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">456</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">457</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_function-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1071</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_function</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1072</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">definition</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1073</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_language'>
@@ -541,10 +622,93 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_language-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_language-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">466</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_language</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">467</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">468</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_language-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1082</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_language</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1083</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1084</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-create_property_graph'>
+<a name='method-i-create_property_graph'></a>
+<div class='synopsis'>
+<span class='name'>create_property_graph</span><span class='arguments'>(name, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Create a property graph in the database, supported on PostgreSQL 19+.</p>
+
+<p>Arguments:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>name </td><td>
+<p>Name of the property graph</p>
+</td></tr><tr><td class='label'>opts </td><td>
+<p>options hash:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:temp </td><td>
+<p>Create the property graph as a temporary property graph.</p>
+</td></tr></tbody></table>
+</td></tr></tbody></table>
+
+<p>The block uses a DSL, with classes under <a href="PropertyGraph/Generator.html"><code>PropertyGraph::Generator</code></a>:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_property_graph</span>(<span class="ruby-value">:my_graph</span>) <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># PropertyGraph::Generator::Create</span>
+  <span class="ruby-identifier">vertex</span> <span class="ruby-value">:people</span>
+
+  <span class="ruby-identifier">vertex</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:people</span>, <span class="ruby-value">:p</span>), <span class="ruby-value">properties:</span> []
+
+  <span class="ruby-identifier">vertex</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:companies</span>, <span class="ruby-value">:c</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># PropertyGraph::Generator::Vertex</span>
+    <span class="ruby-identifier">key</span> <span class="ruby-value">:id</span>
+    <span class="ruby-identifier">label</span> <span class="ruby-value">:company</span>
+    <span class="ruby-identifier">label</span> <span class="ruby-value">:c</span>, [<span class="ruby-value">:name</span>, (<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:revenue</span>] <span class="ruby-operator">/</span> <span class="ruby-value">1000</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:revenue_thousands</span>)]
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">edge</span> <span class="ruby-value">:works_at</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># PropertyGraph::Generator::Edge</span>
+    <span class="ruby-identifier">source</span> <span class="ruby-value">:people</span>
+    <span class="ruby-identifier">destination</span> <span class="ruby-value">:c</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">edge</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:employment</span>, <span class="ruby-value">:e</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">source</span> <span class="ruby-value">:people</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-comment"># PropertyGraph::Generator::Target</span>
+      <span class="ruby-identifier">key</span> <span class="ruby-value">:person_id</span>
+      <span class="ruby-identifier">references</span> <span class="ruby-value">:id</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">destination</span> <span class="ruby-value">:c</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-comment"># PropertyGraph::Generator::Target</span>
+      <span class="ruby-identifier">key</span> <span class="ruby-value">:company_id</span>
+      <span class="ruby-identifier">references</span> <span class="ruby-value">:id</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">label</span> <span class="ruby-value">:employment</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+<span class="ruby-comment"># CREATE PROPERTY GRAPH &quot;my_graph&quot;</span>
+<span class="ruby-comment"># VERTEX TABLES (</span>
+<span class="ruby-comment">#   &quot;people&quot;,</span>
+<span class="ruby-comment">#   &quot;people&quot; AS &quot;p&quot; NO PROPERTIES,</span>
+<span class="ruby-comment">#   &quot;companies&quot; AS &quot;c&quot; KEY (&quot;id&quot;)</span>
+<span class="ruby-comment">#     LABEL &quot;company&quot; PROPERTIES ALL COLUMNS</span>
+<span class="ruby-comment">#     LABEL &quot;c&quot; PROPERTIES (&quot;name&quot;, (&quot;revenue&quot; / 1000) AS &quot;revenue_thousands&quot;))</span>
+<span class="ruby-comment"># EDGE TABLES (</span>
+<span class="ruby-comment">#   &quot;works_at&quot;</span>
+<span class="ruby-comment">#     SOURCE &quot;people&quot;</span>
+<span class="ruby-comment">#     DESTINATION &quot;c&quot;,</span>
+<span class="ruby-comment">#   &quot;employment&quot; AS &quot;e&quot;</span>
+<span class="ruby-comment">#     SOURCE KEY (&quot;person_id&quot;) REFERENCES &quot;people&quot; (&quot;id&quot;)</span>
+<span class="ruby-comment">#     DESTINATION KEY (&quot;company_id&quot;) REFERENCES &quot;c&quot; (&quot;id&quot;)</span>
+<span class="ruby-comment">#   LABEL &quot;employment&quot; PROPERTIES ALL COLUMNS)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_property_graph-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-create_property_graph-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1143</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_property_graph</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1144</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">create_property_graph_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">PropertyGraph</span><span class="ruby-operator">::</span><span class="ruby-constant">Generator</span><span class="ruby-operator">::</span><span class="ruby-constant">Create</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>), <span class="ruby-identifier">opts</span>))
+<span class="line-num">1145</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_schema'>
@@ -572,10 +736,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_schema-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_schema-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">475</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">476</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">477</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_schema-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1152</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1153</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1154</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_table'>
@@ -593,15 +757,15 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_table-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_table-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">480</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">481</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:partition_of</span>]
-<span class="line-num">482</span>     <span class="ruby-identifier">create_partition_of_table_from_generator</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">CreatePartitionOfTableGenerator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>), <span class="ruby-identifier">options</span>)
-<span class="line-num">483</span>     <span class="ruby-keyword">return</span>
-<span class="line-num">484</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">485</span> 
-<span class="line-num">486</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">487</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_table-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1157</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1158</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:partition_of</span>]
+<span class="line-num">1159</span>     <span class="ruby-identifier">create_partition_of_table_from_generator</span>(<span class="ruby-identifier">name</span>, <span class="ruby-constant">CreatePartitionOfTableGenerator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>), <span class="ruby-identifier">options</span>)
+<span class="line-num">1160</span>     <span class="ruby-keyword">return</span>
+<span class="line-num">1161</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1162</span> 
+<span class="line-num">1163</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1164</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_table-3F'>
@@ -619,15 +783,15 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_table-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_table-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">490</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_table?</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">491</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:partition_of</span>]
-<span class="line-num">492</span>     <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:if_not_exists</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">493</span>     <span class="ruby-keyword">return</span>
-<span class="line-num">494</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">495</span> 
-<span class="line-num">496</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">497</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_table-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1167</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_table?</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1168</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:partition_of</span>]
+<span class="line-num">1169</span>     <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:if_not_exists</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1170</span>     <span class="ruby-keyword">return</span>
+<span class="line-num">1171</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1172</span> 
+<span class="line-num">1173</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_trigger'>
@@ -667,10 +831,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_trigger-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_trigger-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">511</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">512</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">513</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_trigger-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1189</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">function</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1190</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-database_type'>
@@ -686,10 +850,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-database_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-database_type-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">515</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>
-<span class="line-num">516</span>   <span class="ruby-value">:postgres</span>
-<span class="line-num">517</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-database_type-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>
+<span class="line-num">1193</span>   <span class="ruby-value">:postgres</span>
+<span class="line-num">1194</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-defer_constraints'>
@@ -721,10 +885,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-defer_constraints-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-defer_constraints-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">534</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">defer_constraints</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">535</span>   <span class="ruby-identifier">_set_constraints</span>(<span class="ruby-string">&#39; DEFERRED&#39;</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">536</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-defer_constraints-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1211</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">defer_constraints</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1212</span>   <span class="ruby-identifier">_set_constraints</span>(<span class="ruby-string">&#39; DEFERRED&#39;</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1213</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-do'>
@@ -745,11 +909,11 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-do-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-do-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">543</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">do</span>(<span class="ruby-identifier ruby-title">code</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">544</span>   <span class="ruby-identifier">language</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:language</span>]
-<span class="line-num">545</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;DO #{&quot;LANGUAGE #{literal(language.to_s)} &quot; if language}#{literal(code)}&quot;</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">546</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-do-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1220</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">do</span>(<span class="ruby-identifier ruby-title">code</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1221</span>   <span class="ruby-identifier">language</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:language</span>]
+<span class="line-num">1222</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;DO #{&quot;LANGUAGE #{literal(language.to_s)} &quot; if language}#{literal(code)}&quot;</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1223</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_function'>
@@ -779,10 +943,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_function-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop_function-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">554</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_function</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">555</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">556</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop_function-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_function</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1232</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_function_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1233</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_language'>
@@ -810,10 +974,41 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_language-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop_language-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">563</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_language</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">564</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">565</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop_language-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1240</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_language</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1241</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_language_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1242</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-drop_property_graph'>
+<a name='method-i-drop_property_graph'></a>
+<div class='synopsis'>
+<span class='name'>drop_property_graph</span><span class='arguments'>(name, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Drops a property graph from the database. Arguments:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>name </td><td>
+<p>name of the property graph to drop</p>
+</td></tr><tr><td class='label'>opts </td><td>
+<p>options hash:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:cascade </td><td>
+<p>Drop other objects depending on this property_graph.</p>
+</td></tr><tr><td class='label'>:if_exists </td><td>
+<p>Don’t raise an error if the property graph doesn’t exist.</p>
+</td></tr></tbody></table>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_property_graph-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-drop_property_graph-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1249</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_property_graph</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1250</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_property_graph_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1251</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_schema'>
@@ -841,11 +1036,11 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_schema-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop_schema-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">572</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">573</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">574</span>   <span class="ruby-identifier">remove_all_cached_schemas</span>
-<span class="line-num">575</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop_schema-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1258</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1259</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1260</span>   <span class="ruby-identifier">remove_all_cached_schemas</span>
+<span class="line-num">1261</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_trigger'>
@@ -875,10 +1070,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_trigger-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop_trigger-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">583</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">584</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">585</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop_trigger-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1269</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_trigger</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1270</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">drop_trigger_sql</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1271</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-foreign_key_list'>
@@ -903,48 +1098,48 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-foreign_key_list-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-foreign_key_list-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">597</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">598</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>
-<span class="line-num">599</span>   <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">_</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:schema</span>, <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table</span>))
-<span class="line-num">600</span> 
-<span class="line-num">601</span>   <span class="ruby-identifier">h</span> = {}
-<span class="line-num">602</span>   <span class="ruby-identifier">fklod_map</span> = <span class="ruby-constant">FOREIGN_KEY_LIST_ON_DELETE_MAP</span> 
-<span class="line-num">603</span>   <span class="ruby-identifier">reverse</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:reverse</span>]
-<span class="line-num">604</span> 
-<span class="line-num">605</span>   (<span class="ruby-identifier">reverse</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">_reverse_foreign_key_list_ds</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">_foreign_key_list_ds</span>).<span class="ruby-identifier">where_each</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:cl</span>][<span class="ruby-value">:oid</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
-<span class="line-num">606</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">reverse</span>
-<span class="line-num">607</span>       <span class="ruby-identifier">key</span> = [<span class="ruby-identifier">row</span>[<span class="ruby-value">:schema</span>], <span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>], <span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]]
-<span class="line-num">608</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">609</span>       <span class="ruby-identifier">key</span> = <span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]
-<span class="line-num">610</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">611</span> 
-<span class="line-num">612</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">key</span>]
-<span class="line-num">613</span>       <span class="ruby-identifier">r</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])
-<span class="line-num">614</span>       <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:refcolumn</span>])
-<span class="line-num">615</span>     <span class="ruby-keyword">else</span>
-<span class="line-num">616</span>       <span class="ruby-identifier">entry</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">key</span>] = {
-<span class="line-num">617</span>         <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]),
-<span class="line-num">618</span>         <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])],
-<span class="line-num">619</span>         <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:refcolumn</span>])],
-<span class="line-num">620</span>         <span class="ruby-value">:on_update</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">fklod_map</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_update</span>]],
-<span class="line-num">621</span>         <span class="ruby-value">:on_delete</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">fklod_map</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_delete</span>]],
-<span class="line-num">622</span>         <span class="ruby-value">:deferrable</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:deferrable</span>],
-<span class="line-num">623</span>         <span class="ruby-value">:validated</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:validated</span>],
-<span class="line-num">624</span>         <span class="ruby-value">:enforced</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:enforced</span>],
-<span class="line-num">625</span>         <span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">schema</span> <span class="ruby-operator">?</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:schema</span>]), <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>])) <span class="ruby-operator">:</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>]),
-<span class="line-num">626</span>       }
-<span class="line-num">627</span> 
-<span class="line-num">628</span>       <span class="ruby-keyword">unless</span> <span class="ruby-identifier">schema</span>
-<span class="line-num">629</span>         <span class="ruby-comment"># If not combining schema information into the :table entry</span>
-<span class="line-num">630</span>         <span class="ruby-comment"># include it as a separate entry.</span>
-<span class="line-num">631</span>         <span class="ruby-identifier">entry</span>[<span class="ruby-value">:schema</span>] = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:schema</span>])
-<span class="line-num">632</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">633</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">634</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">635</span> 
-<span class="line-num">636</span>   <span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>
-<span class="line-num">637</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-foreign_key_list-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1283</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1284</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>
+<span class="line-num">1285</span>   <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">_</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:schema</span>, <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table</span>))
+<span class="line-num">1286</span> 
+<span class="line-num">1287</span>   <span class="ruby-identifier">h</span> = {}
+<span class="line-num">1288</span>   <span class="ruby-identifier">fklod_map</span> = <span class="ruby-constant">FOREIGN_KEY_LIST_ON_DELETE_MAP</span> 
+<span class="line-num">1289</span>   <span class="ruby-identifier">reverse</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:reverse</span>]
+<span class="line-num">1290</span> 
+<span class="line-num">1291</span>   (<span class="ruby-identifier">reverse</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">_reverse_foreign_key_list_ds</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">_foreign_key_list_ds</span>).<span class="ruby-identifier">where_each</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:cl</span>][<span class="ruby-value">:oid</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>
+<span class="line-num">1292</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">reverse</span>
+<span class="line-num">1293</span>       <span class="ruby-identifier">key</span> = [<span class="ruby-identifier">row</span>[<span class="ruby-value">:schema</span>], <span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>], <span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]]
+<span class="line-num">1294</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">1295</span>       <span class="ruby-identifier">key</span> = <span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]
+<span class="line-num">1296</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1297</span> 
+<span class="line-num">1298</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">key</span>]
+<span class="line-num">1299</span>       <span class="ruby-identifier">r</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])
+<span class="line-num">1300</span>       <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:refcolumn</span>])
+<span class="line-num">1301</span>     <span class="ruby-keyword">else</span>
+<span class="line-num">1302</span>       <span class="ruby-identifier">entry</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">key</span>] = {
+<span class="line-num">1303</span>         <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]),
+<span class="line-num">1304</span>         <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])],
+<span class="line-num">1305</span>         <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:refcolumn</span>])],
+<span class="line-num">1306</span>         <span class="ruby-value">:on_update</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">fklod_map</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_update</span>]],
+<span class="line-num">1307</span>         <span class="ruby-value">:on_delete</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">fklod_map</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_delete</span>]],
+<span class="line-num">1308</span>         <span class="ruby-value">:deferrable</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:deferrable</span>],
+<span class="line-num">1309</span>         <span class="ruby-value">:validated</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:validated</span>],
+<span class="line-num">1310</span>         <span class="ruby-value">:enforced</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">row</span>[<span class="ruby-value">:enforced</span>],
+<span class="line-num">1311</span>         <span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">schema</span> <span class="ruby-operator">?</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:schema</span>]), <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>])) <span class="ruby-operator">:</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>]),
+<span class="line-num">1312</span>       }
+<span class="line-num">1313</span> 
+<span class="line-num">1314</span>       <span class="ruby-keyword">unless</span> <span class="ruby-identifier">schema</span>
+<span class="line-num">1315</span>         <span class="ruby-comment"># If not combining schema information into the :table entry</span>
+<span class="line-num">1316</span>         <span class="ruby-comment"># include it as a separate entry.</span>
+<span class="line-num">1317</span>         <span class="ruby-identifier">entry</span>[<span class="ruby-value">:schema</span>] = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:schema</span>])
+<span class="line-num">1318</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">1319</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1320</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1321</span> 
+<span class="line-num">1322</span>   <span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>
+<span class="line-num">1323</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -960,21 +1155,114 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">639</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
-<span class="line-num">640</span>   <span class="ruby-identifier">server_version</span>
-<span class="line-num">641</span>   <span class="ruby-identifier">supports_prepared_transactions?</span>
-<span class="line-num">642</span>   <span class="ruby-identifier">_schema_ds</span>
-<span class="line-num">643</span>   <span class="ruby-identifier">_select_serial_sequence_ds</span>
-<span class="line-num">644</span>   <span class="ruby-identifier">_select_custom_sequence_ds</span>
-<span class="line-num">645</span>   <span class="ruby-identifier">_select_pk_ds</span>
-<span class="line-num">646</span>   <span class="ruby-identifier">_indexes_ds</span>
-<span class="line-num">647</span>   <span class="ruby-identifier">_check_constraints_ds</span>
-<span class="line-num">648</span>   <span class="ruby-identifier">_foreign_key_list_ds</span>
-<span class="line-num">649</span>   <span class="ruby-identifier">_reverse_foreign_key_list_ds</span>
-<span class="line-num">650</span>   <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">651</span>   <span class="ruby-keyword">super</span>
-<span class="line-num">652</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1325</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>
+<span class="line-num">1326</span>   <span class="ruby-identifier">server_version</span>
+<span class="line-num">1327</span>   <span class="ruby-identifier">supports_prepared_transactions?</span>
+<span class="line-num">1328</span>   <span class="ruby-identifier">_schema_ds</span>
+<span class="line-num">1329</span>   <span class="ruby-identifier">_select_serial_sequence_ds</span>
+<span class="line-num">1330</span>   <span class="ruby-identifier">_select_custom_sequence_ds</span>
+<span class="line-num">1331</span>   <span class="ruby-identifier">_select_pk_ds</span>
+<span class="line-num">1332</span>   <span class="ruby-identifier">_indexes_ds</span>
+<span class="line-num">1333</span>   <span class="ruby-identifier">_check_constraints_ds</span>
+<span class="line-num">1334</span>   <span class="ruby-identifier">_foreign_key_list_ds</span>
+<span class="line-num">1335</span>   <span class="ruby-identifier">_reverse_foreign_key_list_ds</span>
+<span class="line-num">1336</span>   <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1337</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">1338</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-graph_table'>
+<a name='method-i-graph_table'></a>
+<div class='synopsis'>
+<span class='name'>graph_table</span><span class='arguments'>(property_graph_name, initial_vertex_label, initial_vertex_opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return a <a href="PropertyGraph/Table.html"><code>PropertyGraph::Table</code></a> instance for a property graph search (a GRAPH_TABLE clause for a SELECT query). Supported on PostgreSQL 19+.</p>
+
+<p>Arguments:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'><code>property_graph_name</code> </td><td>
+<p>The property graph to query</p>
+</td></tr><tr><td class='label'><code>initial_vertex_label</code> </td><td>
+<p>The label restriction for the initial vertex for the graph pattern (can be nil for no label, or an array or set for restricting to one of multiple labels).</p>
+</td></tr><tr><td class='label'><code>initial_vertex_opts</code> </td><td>
+<p>The options for the initial vertex, see <a href="PropertyGraph/Table.html#method-i-link"><code>PropertyGraph::Table#link</code></a> for available options.</p>
+</td></tr></tbody></table>
+
+<p>The returned instance should be further modified by calling methods on it, using a similar approach to how datasets work, where the methods return a modified copy of the receiver. The available methods:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>link </td><td>
+<p>Add a bidirectional link to a new element (vertex or edge)</p>
+</td></tr><tr><td class='label'>to </td><td>
+<p>Add a directional link from the last element to the new element</p>
+</td></tr><tr><td class='label'>from </td><td>
+<p>Add a direciton link from the new element to last element</p>
+</td></tr><tr><td class='label'>columns </td><td>
+<p>Replace the columns the graph table returns</p>
+</td></tr><tr><td class='label'>add_columns </td><td>
+<p>Append to the columns the graph table returns.</p>
+</td></tr></tbody></table>
+
+<p>See <a href="PropertyGraph/Table.html"><code>PropertyGraph::Table</code></a> for the details of these methods and the arguments and options they support. Note that for a graph table to be usable in a query, it must return at least one column, and the last element in the graph pattern must be a vertex.</p>
+
+<pre class="ruby"><span class="ruby-identifier">gt</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">graph_table</span>(<span class="ruby-value">:pgn</span>, <span class="ruby-value">:iv</span>)
+<span class="ruby-comment"># Not yet usable, does not return any columns</span>
+
+<span class="ruby-comment"># Set columns for graph table</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">columns</span>(<span class="ruby-value">:c</span>, <span class="ruby-constant">Sequel</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:d</span>))
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;) COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Adds directional link to edge, since last (initial) element was a vertex</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">link</span>(<span class="ruby-value">:e1</span>)
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;] COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Adds directional link from edge to vertex, since last element was an edge</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">to</span>(<span class="ruby-value">:v2</span>)
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;]-&gt;(IS &quot;v2&quot;) COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Adds bidirection link from vertex to vertex (overriding the default)</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">link</span>(<span class="ruby-value">:v3</span>, <span class="ruby-value">vertex:</span> <span class="ruby-keyword">true</span>)
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;]-&gt;(IS &quot;v2&quot;)-(IS &quot;v3&quot;) COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Adds directional link from new edge to last vertex, since last element was an vertex.</span>
+<span class="ruby-comment"># Sets graph pattern variable name and uses it in a WHERE clause for the added element.</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:e2</span>, <span class="ruby-value">var:</span> <span class="ruby-value">:a2</span>, <span class="ruby-value">where:</span> {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a2</span>][<span class="ruby-value">:c</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>})
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;]-&gt;(IS &quot;v2&quot;)-(IS &quot;v3&quot;)</span>
+<span class="ruby-comment">#   &lt;-[&quot;a2&quot; IS &quot;e2&quot; WHERE (&quot;a2&quot;.&quot;c&quot; = 1)] COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Can use nil as a label for no label restriction, both with and without a variable name</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">to</span>(<span class="ruby-keyword">nil</span>).<span class="ruby-identifier">to</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-value">var:</span> <span class="ruby-value">:a3</span>)
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;]-&gt;(IS &quot;v2&quot;)-(IS &quot;v3&quot;)</span>
+<span class="ruby-comment">#   &lt;-[&quot;a2&quot; IS &quot;e2&quot; WHERE (&quot;a2&quot;.&quot;c&quot; = 1)]-&gt;[]-&gt;(&quot;a3&quot;) COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Can restrict to a one of a set of labels</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">from</span>([<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>], <span class="ruby-value">var:</span> <span class="ruby-value">:a6</span>)
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;]-&gt;(IS &quot;v2&quot;)-(IS &quot;v3&quot;)</span>
+<span class="ruby-comment">#   &lt;-[&quot;a2&quot; IS &quot;e2&quot; WHERE (&quot;a2&quot;.&quot;c&quot; = 1)]-&gt;[]-&gt;(&quot;a3&quot;)-&gt;[&quot;a6&quot; IS &quot;x&quot;|&quot;y&quot;] COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;))</span>
+
+<span class="ruby-comment"># Add column(s) to the graph table</span>
+<span class="ruby-identifier">gt</span> = <span class="ruby-identifier">gt</span>.<span class="ruby-identifier">add_columns</span>(<span class="ruby-value">:y</span>)
+<span class="ruby-comment"># GRAPH_TABLE (&quot;pgn&quot; MATCH (IS &quot;iv&quot;)-[IS &quot;e1&quot;]-&gt;(IS &quot;v2&quot;)-(IS &quot;v3&quot;)</span>
+<span class="ruby-comment">#   &lt;-[&quot;a2&quot; IS &quot;e2&quot; WHERE (&quot;a2&quot;.&quot;c&quot; = 1)]-&gt;[]-&gt;(&quot;a3&quot;)-&gt;[&quot;a6&quot; IS &quot;x&quot;|&quot;y&quot;]</span>
+<span class="ruby-comment">#   COLUMNS (&quot;c&quot;, 1 AS &quot;d&quot;, &quot;y&quot;))</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">gt</span>)
+<span class="ruby-comment"># SELECT * FROM GRAPH_TABLE (...)</span>
+
+<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:x</span>).<span class="ruby-identifier">cross_join</span>(<span class="ruby-identifier">gt</span>)
+<span class="ruby-comment"># SELECT * FROM &quot;x&quot; CROSS JOIN GRAPH_TABLE (...)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-graph_table-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-graph_table-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1412</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">graph_table</span>(<span class="ruby-identifier">property_graph_name</span>, <span class="ruby-identifier">initial_vertex_label</span>, <span class="ruby-identifier">initial_vertex_opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1413</span>   <span class="ruby-constant">PropertyGraph</span><span class="ruby-operator">::</span><span class="ruby-constant">Table</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">property_graph_name</span>, <span class="ruby-identifier">initial_vertex_label</span>, <span class="ruby-identifier">initial_vertex_opts</span>)
+<span class="line-num">1414</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-immediate_constraints'>
@@ -1006,10 +1294,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-immediate_constraints-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-immediate_constraints-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">668</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">immediate_constraints</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">669</span>   <span class="ruby-identifier">_set_constraints</span>(<span class="ruby-string">&#39; IMMEDIATE&#39;</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">670</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-immediate_constraints-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1430</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">immediate_constraints</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1431</span>   <span class="ruby-identifier">_set_constraints</span>(<span class="ruby-string">&#39; IMMEDIATE&#39;</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1432</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-indexes'>
@@ -1032,28 +1320,28 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-indexes-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-indexes-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">678</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">679</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>
-<span class="line-num">680</span>   <span class="ruby-identifier">cond</span> = {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:tab</span>][<span class="ruby-value">:oid</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)}
-<span class="line-num">681</span>   <span class="ruby-identifier">cond</span>[<span class="ruby-value">:indpred</span>] = <span class="ruby-keyword">nil</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:include_partial</span>]
-<span class="line-num">682</span> 
-<span class="line-num">683</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:invalid</span>]
-<span class="line-num">684</span>   <span class="ruby-keyword">when</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:only</span>
-<span class="line-num">685</span>     <span class="ruby-identifier">cond</span>[<span class="ruby-value">:indisvalid</span>] = <span class="ruby-keyword">false</span>
-<span class="line-num">686</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:include</span>
-<span class="line-num">687</span>     <span class="ruby-comment"># nothing</span>
-<span class="line-num">688</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">689</span>     <span class="ruby-identifier">cond</span>[<span class="ruby-value">:indisvalid</span>] = <span class="ruby-keyword">true</span>
-<span class="line-num">690</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">691</span> 
-<span class="line-num">692</span>   <span class="ruby-identifier">indexes</span> = {}
-<span class="line-num">693</span>   <span class="ruby-identifier">_indexes_ds</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-identifier">cond</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
-<span class="line-num">694</span>     <span class="ruby-identifier">i</span> = <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>])] <span class="ruby-operator">||=</span> {<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:unique</span>], <span class="ruby-value">:deferrable</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:deferrable</span>]}
-<span class="line-num">695</span>     <span class="ruby-identifier">i</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:column</span>])
-<span class="line-num">696</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">697</span>   <span class="ruby-identifier">indexes</span>
-<span class="line-num">698</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-indexes-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1440</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1441</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>
+<span class="line-num">1442</span>   <span class="ruby-identifier">cond</span> = {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:tab</span>][<span class="ruby-value">:oid</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)}
+<span class="line-num">1443</span>   <span class="ruby-identifier">cond</span>[<span class="ruby-value">:indpred</span>] = <span class="ruby-keyword">nil</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:include_partial</span>]
+<span class="line-num">1444</span> 
+<span class="line-num">1445</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:invalid</span>]
+<span class="line-num">1446</span>   <span class="ruby-keyword">when</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:only</span>
+<span class="line-num">1447</span>     <span class="ruby-identifier">cond</span>[<span class="ruby-value">:indisvalid</span>] = <span class="ruby-keyword">false</span>
+<span class="line-num">1448</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:include</span>
+<span class="line-num">1449</span>     <span class="ruby-comment"># nothing</span>
+<span class="line-num">1450</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1451</span>     <span class="ruby-identifier">cond</span>[<span class="ruby-value">:indisvalid</span>] = <span class="ruby-keyword">true</span>
+<span class="line-num">1452</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1453</span> 
+<span class="line-num">1454</span>   <span class="ruby-identifier">indexes</span> = {}
+<span class="line-num">1455</span>   <span class="ruby-identifier">_indexes_ds</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-identifier">cond</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>
+<span class="line-num">1456</span>     <span class="ruby-identifier">i</span> = <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>])] <span class="ruby-operator">||=</span> {<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:unique</span>], <span class="ruby-value">:deferrable</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:deferrable</span>]}
+<span class="line-num">1457</span>     <span class="ruby-identifier">i</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:column</span>])
+<span class="line-num">1458</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1459</span>   <span class="ruby-identifier">indexes</span>
+<span class="line-num">1460</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-locks'>
@@ -1071,10 +1359,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-locks-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-locks-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">701</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">locks</span>
-<span class="line-num">702</span>   <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).<span class="ruby-identifier">join</span>(<span class="ruby-value">:pg_locks</span>, <span class="ruby-value">:relation</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:relfilenode</span>).<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">pg_class</span>[<span class="ruby-value">:relname</span>], <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:pg_locks</span>)]}
-<span class="line-num">703</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-locks-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1463</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">locks</span>
+<span class="line-num">1464</span>   <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).<span class="ruby-identifier">join</span>(<span class="ruby-value">:pg_locks</span>, <span class="ruby-value">:relation</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:relfilenode</span>).<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">pg_class</span>[<span class="ruby-value">:relname</span>], <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:pg_locks</span>)]}
+<span class="line-num">1465</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-notify'>
@@ -1097,17 +1385,17 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-notify-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-notify-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">711</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">notify</span>(<span class="ruby-identifier">channel</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">712</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
-<span class="line-num">713</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;NOTIFY &quot;</span>
-<span class="line-num">714</span>   <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:identifier_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">channel</span>)
-<span class="line-num">715</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">payload</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:payload</span>]
-<span class="line-num">716</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;, &quot;</span>
-<span class="line-num">717</span>     <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">payload</span>.<span class="ruby-identifier">to_s</span>)
-<span class="line-num">718</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">719</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">720</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-notify-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1473</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">notify</span>(<span class="ruby-identifier">channel</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1474</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>
+<span class="line-num">1475</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;NOTIFY &quot;</span>
+<span class="line-num">1476</span>   <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:identifier_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">channel</span>)
+<span class="line-num">1477</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">payload</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:payload</span>]
+<span class="line-num">1478</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;, &quot;</span>
+<span class="line-num">1479</span>     <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">payload</span>.<span class="ruby-identifier">to_s</span>)
+<span class="line-num">1480</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1481</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1482</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-primary_key'>
@@ -1125,13 +1413,13 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-primary_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-primary_key-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">723</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">724</span>   <span class="ruby-identifier">quoted_table</span> = <span class="ruby-identifier">quote_schema_table</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">725</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@primary_keys</span>[<span class="ruby-identifier">quoted_table</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@primary_keys</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">quoted_table</span>)}
-<span class="line-num">726</span>   <span class="ruby-identifier">value</span> = <span class="ruby-identifier">_select_pk_ds</span>.<span class="ruby-identifier">where_single_value</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:pg_class</span>][<span class="ruby-value">:oid</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
-<span class="line-num">727</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@primary_keys</span>[<span class="ruby-identifier">quoted_table</span>] = <span class="ruby-identifier">value</span>}
-<span class="line-num">728</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-primary_key-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1485</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1486</span>   <span class="ruby-identifier">quoted_table</span> = <span class="ruby-identifier">quote_schema_table</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1487</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@primary_keys</span>[<span class="ruby-identifier">quoted_table</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@primary_keys</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">quoted_table</span>)}
+<span class="line-num">1488</span>   <span class="ruby-identifier">value</span> = <span class="ruby-identifier">_select_pk_ds</span>.<span class="ruby-identifier">where_single_value</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:pg_class</span>][<span class="ruby-value">:oid</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>))
+<span class="line-num">1489</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@primary_keys</span>[<span class="ruby-identifier">quoted_table</span>] = <span class="ruby-identifier">value</span>}
+<span class="line-num">1490</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-primary_key_sequence'>
@@ -1149,19 +1437,49 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-primary_key_sequence-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-primary_key_sequence-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">731</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key_sequence</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">732</span>   <span class="ruby-identifier">quoted_table</span> = <span class="ruby-identifier">quote_schema_table</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">733</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@primary_key_sequences</span>[<span class="ruby-identifier">quoted_table</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@primary_key_sequences</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">quoted_table</span>)}
-<span class="line-num">734</span>   <span class="ruby-identifier">cond</span> = {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:t</span>][<span class="ruby-value">:oid</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)}
-<span class="line-num">735</span>   <span class="ruby-identifier">value</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">pks</span> = <span class="ruby-identifier">_select_serial_sequence_ds</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">cond</span>)
-<span class="line-num">736</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">pks</span>[<span class="ruby-value">:schema</span>], <span class="ruby-identifier">pks</span>[<span class="ruby-value">:sequence</span>]))
-<span class="line-num">737</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">pks</span> = <span class="ruby-identifier">_select_custom_sequence_ds</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">cond</span>)
-<span class="line-num">738</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">pks</span>[<span class="ruby-value">:schema</span>], <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">pks</span>[<span class="ruby-value">:sequence</span>])))
-<span class="line-num">739</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">740</span> 
-<span class="line-num">741</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@primary_key_sequences</span>[<span class="ruby-identifier">quoted_table</span>] = <span class="ruby-identifier">value</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>
-<span class="line-num">742</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-primary_key_sequence-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1493</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">primary_key_sequence</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1494</span>   <span class="ruby-identifier">quoted_table</span> = <span class="ruby-identifier">quote_schema_table</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1495</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@primary_key_sequences</span>[<span class="ruby-identifier">quoted_table</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@primary_key_sequences</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">quoted_table</span>)}
+<span class="line-num">1496</span>   <span class="ruby-identifier">cond</span> = {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:t</span>][<span class="ruby-value">:oid</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)}
+<span class="line-num">1497</span>   <span class="ruby-identifier">value</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">pks</span> = <span class="ruby-identifier">_select_serial_sequence_ds</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">cond</span>)
+<span class="line-num">1498</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">pks</span>[<span class="ruby-value">:schema</span>], <span class="ruby-identifier">pks</span>[<span class="ruby-value">:sequence</span>]))
+<span class="line-num">1499</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">pks</span> = <span class="ruby-identifier">_select_custom_sequence_ds</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">cond</span>)
+<span class="line-num">1500</span>     <span class="ruby-identifier">literal</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">pks</span>[<span class="ruby-value">:schema</span>], <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">pks</span>[<span class="ruby-value">:sequence</span>])))
+<span class="line-num">1501</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1502</span> 
+<span class="line-num">1503</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@primary_key_sequences</span>[<span class="ruby-identifier">quoted_table</span>] = <span class="ruby-identifier">value</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>
+<span class="line-num">1504</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-property_graphs'>
+<a name='method-i-property_graphs'></a>
+<div class='synopsis'>
+<span class='name'>property_graphs</span><span class='arguments'>(opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Array of symbols specifying property graphs in the current database. The dataset used is yielded to the block if one is provided, otherwise, an array of symbols of property graph names is returned. Supported on PostgreSQL 19+, will be an empty array on lower versions.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:qualify </td><td>
+<p>Return the property graph names as Sequel::SQL::QualifiedIdentifier instances, using the schema the property graph is located in as the qualifier.</p>
+</td></tr><tr><td class='label'>:schema </td><td>
+<p>The schema to search</p>
+</td></tr><tr><td class='label'>:server </td><td>
+<p>The server to use</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-property_graphs-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-property_graphs-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1516</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">property_graphs</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1517</span>   <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-string">&#39;g&#39;</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1518</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-refresh_view'>
@@ -1185,10 +1503,35 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-refresh_view-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-refresh_view-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">758</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">759</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;REFRESH MATERIALIZED VIEW#{&#39; CONCURRENTLY&#39; if opts[:concurrently]} #{quote_schema_table(name)}&quot;</span>.<span class="ruby-identifier">freeze</span>
-<span class="line-num">760</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-refresh_view-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1542</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1543</span>   <span class="ruby-identifier">run</span> <span class="ruby-node">&quot;REFRESH MATERIALIZED VIEW#{&#39; CONCURRENTLY&#39; if opts[:concurrently]} #{quote_schema_table(name)}&quot;</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">1544</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-rename_property_graph'>
+<a name='method-i-rename_property_graph'></a>
+<div class='synopsis'>
+<span class='name'>rename_property_graph</span><span class='arguments'>(old_name, new_name)</span>
+
+</div>
+<div class='description'>
+
+<p>Rename a property graph.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_property_graph</span>(<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>)
+<span class="ruby-comment"># ALTER PROPERTY GRAPH x RENAME TO y</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-rename_property_graph-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-rename_property_graph-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1524</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_property_graph</span>(<span class="ruby-identifier">old_name</span>, <span class="ruby-identifier">new_name</span>)
+<span class="line-num">1525</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-node">&quot;ALTER PROPERTY GRAPH #{literal(old_name)} RENAME TO #{literal(new_name)}&quot;</span>.<span class="ruby-identifier">freeze</span>)
+<span class="line-num">1526</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rename_schema'>
@@ -1211,11 +1554,11 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-rename_schema-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-rename_schema-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">747</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
-<span class="line-num">748</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">rename_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>).<span class="ruby-identifier">freeze</span>
-<span class="line-num">749</span>   <span class="ruby-identifier">remove_all_cached_schemas</span>
-<span class="line-num">750</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-rename_schema-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1531</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_schema</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)
+<span class="line-num">1532</span>   <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">rename_schema_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">1533</span>   <span class="ruby-identifier">remove_all_cached_schemas</span>
+<span class="line-num">1534</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-reset_primary_key_sequence'>
@@ -1233,28 +1576,28 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-reset_primary_key_sequence-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-reset_primary_key_sequence-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">764</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reset_primary_key_sequence</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">765</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">seq</span> = <span class="ruby-identifier">primary_key_sequence</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">766</span>   <span class="ruby-identifier">pk</span> = <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">primary_key</span>(<span class="ruby-identifier">table</span>))
-<span class="line-num">767</span>   <span class="ruby-identifier">db</span> = <span class="ruby-keyword">self</span>
-<span class="line-num">768</span>   <span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table</span>)
-<span class="line-num">769</span>   <span class="ruby-identifier">table</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>
-<span class="line-num">770</span> 
-<span class="line-num">771</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100000</span>
-<span class="line-num">772</span>     <span class="ruby-identifier">seq_ds</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_sequence</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:seqrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">seq</span>.<span class="ruby-identifier">freeze</span>)))
-<span class="line-num">773</span>     <span class="ruby-identifier">increment_by</span> = <span class="ruby-value">:seqincrement</span>
-<span class="line-num">774</span>     <span class="ruby-identifier">min_value</span> = <span class="ruby-value">:seqmin</span>
-<span class="line-num">775</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">776</span>   <span class="ruby-keyword">else</span>
-<span class="line-num">777</span>     <span class="ruby-identifier">seq_ds</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">seq</span>))
-<span class="line-num">778</span>     <span class="ruby-identifier">increment_by</span> = <span class="ruby-value">:increment_by</span>
-<span class="line-num">779</span>     <span class="ruby-identifier">min_value</span> = <span class="ruby-value">:min_value</span>
-<span class="line-num">780</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">781</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">782</span> 
-<span class="line-num">783</span>   <span class="ruby-identifier">get</span>{<span class="ruby-identifier">setval</span>(<span class="ruby-identifier">seq</span>, <span class="ruby-identifier">db</span>[<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">coalesce</span>(<span class="ruby-identifier">max</span>(<span class="ruby-identifier">pk</span>)<span class="ruby-operator">+</span><span class="ruby-identifier">seq_ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-identifier">increment_by</span>), <span class="ruby-identifier">seq_ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-identifier">min_value</span>))), <span class="ruby-keyword">false</span>)}
-<span class="line-num">784</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-reset_primary_key_sequence-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1548</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reset_primary_key_sequence</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1549</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">seq</span> = <span class="ruby-identifier">primary_key_sequence</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1550</span>   <span class="ruby-identifier">pk</span> = <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">primary_key</span>(<span class="ruby-identifier">table</span>))
+<span class="line-num">1551</span>   <span class="ruby-identifier">db</span> = <span class="ruby-keyword">self</span>
+<span class="line-num">1552</span>   <span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table</span>)
+<span class="line-num">1553</span>   <span class="ruby-identifier">table</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">t</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>
+<span class="line-num">1554</span> 
+<span class="line-num">1555</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100000</span>
+<span class="line-num">1556</span>     <span class="ruby-identifier">seq_ds</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_sequence</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:seqrelid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">seq</span>.<span class="ruby-identifier">freeze</span>)))
+<span class="line-num">1557</span>     <span class="ruby-identifier">increment_by</span> = <span class="ruby-value">:seqincrement</span>
+<span class="line-num">1558</span>     <span class="ruby-identifier">min_value</span> = <span class="ruby-value">:seqmin</span>
+<span class="line-num">1559</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">1560</span>   <span class="ruby-keyword">else</span>
+<span class="line-num">1561</span>     <span class="ruby-identifier">seq_ds</span> = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">seq</span>))
+<span class="line-num">1562</span>     <span class="ruby-identifier">increment_by</span> = <span class="ruby-value">:increment_by</span>
+<span class="line-num">1563</span>     <span class="ruby-identifier">min_value</span> = <span class="ruby-value">:min_value</span>
+<span class="line-num">1564</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">1565</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1566</span> 
+<span class="line-num">1567</span>   <span class="ruby-identifier">get</span>{<span class="ruby-identifier">setval</span>(<span class="ruby-identifier">seq</span>, <span class="ruby-identifier">db</span>[<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">coalesce</span>(<span class="ruby-identifier">max</span>(<span class="ruby-identifier">pk</span>)<span class="ruby-operator">+</span><span class="ruby-identifier">seq_ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-identifier">increment_by</span>), <span class="ruby-identifier">seq_ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-identifier">min_value</span>))), <span class="ruby-keyword">false</span>)}
+<span class="line-num">1568</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rollback_prepared_transaction'>
@@ -1270,10 +1613,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-rollback_prepared_transaction-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-rollback_prepared_transaction-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">786</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">787</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ROLLBACK PREPARED #{literal(transaction_id)}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">788</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-rollback_prepared_transaction-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1570</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1571</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;ROLLBACK PREPARED #{literal(transaction_id)}&quot;</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1572</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -1291,13 +1634,13 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-serial_primary_key_options-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-serial_primary_key_options-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">792</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>
-<span class="line-num">793</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">794</span>   <span class="ruby-identifier">auto_increment_key</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100002</span> <span class="ruby-operator">?</span> <span class="ruby-value">:identity</span> <span class="ruby-operator">:</span> <span class="ruby-value">:serial</span>
-<span class="line-num">795</span>   <span class="ruby-comment"># :nocov:</span>
-<span class="line-num">796</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-identifier">auto_increment_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Integer</span>}
-<span class="line-num">797</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-serial_primary_key_options-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1576</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>
+<span class="line-num">1577</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">1578</span>   <span class="ruby-identifier">auto_increment_key</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100002</span> <span class="ruby-operator">?</span> <span class="ruby-value">:identity</span> <span class="ruby-operator">:</span> <span class="ruby-value">:serial</span>
+<span class="line-num">1579</span>   <span class="ruby-comment"># :nocov:</span>
+<span class="line-num">1580</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-identifier">auto_increment_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Integer</span>}
+<span class="line-num">1581</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-server_version'>
@@ -1315,13 +1658,41 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-server_version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-server_version-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">800</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
-<span class="line-num">801</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@server_version</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@server_version</span>
-<span class="line-num">802</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
-<span class="line-num">803</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span>
-<span class="line-num">804</span>   <span class="ruby-ivar">@server_version</span> = <span class="ruby-identifier">swallow_database_error</span>{<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT CAST(current_setting(&#39;server_version_num&#39;) AS integer) AS v&quot;</span>).<span class="ruby-identifier">single_value</span>} <span class="ruby-operator">||</span> <span class="ruby-value">0</span>
-<span class="line-num">805</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-server_version-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1584</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)
+<span class="line-num">1585</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@server_version</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@server_version</span>
+<span class="line-num">1586</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
+<span class="line-num">1587</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span>
+<span class="line-num">1588</span>   <span class="ruby-ivar">@server_version</span> = <span class="ruby-identifier">swallow_database_error</span>{<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT CAST(current_setting(&#39;server_version_num&#39;) AS integer) AS v&quot;</span>).<span class="ruby-identifier">single_value</span>} <span class="ruby-operator">||</span> <span class="ruby-value">0</span>
+<span class="line-num">1589</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-set_property_graph_schema'>
+<a name='method-i-set_property_graph_schema'></a>
+<div class='synopsis'>
+<span class='name'>set_property_graph_schema</span><span class='arguments'>(old_name, new_name, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Change the schema for a property graph. Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:if_exists </td><td>
+<p>Use the IF EXISTS clause to not raise an error if the property graph does not exist.</p>
+</td></tr></tbody></table>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">set_property_graph_schema</span>(<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>)
+<span class="ruby-comment"># ALTER PROPERTY GRAPH x SET SCHEMA y</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_property_graph_schema-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set_property_graph_schema-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1597</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_property_graph_schema</span>(<span class="ruby-identifier">old_name</span>, <span class="ruby-identifier">new_name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1598</span>   <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-node">&quot;ALTER PROPERTY GRAPH#{&quot; IF EXISTS&quot; if opts[:if_exists]} #{literal(old_name)} SET SCHEMA #{literal(new_name)}&quot;</span>.<span class="ruby-identifier">freeze</span>)
+<span class="line-num">1599</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>
@@ -1339,10 +1710,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_create_table_if_not_exists-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_create_table_if_not_exists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">808</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_create_table_if_not_exists?</span>
-<span class="line-num">809</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90100</span>
-<span class="line-num">810</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_create_table_if_not_exists-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1602</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_create_table_if_not_exists?</span>
+<span class="line-num">1603</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90100</span>
+<span class="line-num">1604</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_deferrable_constraints-3F'>
@@ -1360,10 +1731,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_deferrable_constraints-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_deferrable_constraints-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">813</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_deferrable_constraints?</span>
-<span class="line-num">814</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>
-<span class="line-num">815</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_deferrable_constraints-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1607</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_deferrable_constraints?</span>
+<span class="line-num">1608</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>
+<span class="line-num">1609</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_deferrable_foreign_key_constraints-3F'>
@@ -1381,10 +1752,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_deferrable_foreign_key_constraints-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_deferrable_foreign_key_constraints-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">818</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_deferrable_foreign_key_constraints?</span>
-<span class="line-num">819</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">820</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_deferrable_foreign_key_constraints-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1612</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_deferrable_foreign_key_constraints?</span>
+<span class="line-num">1613</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">1614</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_drop_table_if_exists-3F'>
@@ -1402,10 +1773,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_drop_table_if_exists-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_drop_table_if_exists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">823</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_drop_table_if_exists?</span>
-<span class="line-num">824</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">825</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_drop_table_if_exists-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1617</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_drop_table_if_exists?</span>
+<span class="line-num">1618</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">1619</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_partial_indexes-3F'>
@@ -1423,10 +1794,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_partial_indexes-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_partial_indexes-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">828</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_partial_indexes?</span>
-<span class="line-num">829</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">830</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_partial_indexes-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1622</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_partial_indexes?</span>
+<span class="line-num">1623</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">1624</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_prepared_transactions-3F'>
@@ -1444,11 +1815,11 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_prepared_transactions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_prepared_transactions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">839</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_prepared_transactions?</span>
-<span class="line-num">840</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_prepared_transactions</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_prepared_transactions</span>)
-<span class="line-num">841</span>   <span class="ruby-ivar">@supports_prepared_transactions</span> = <span class="ruby-keyword">self</span>[<span class="ruby-string">&#39;SHOW max_prepared_transactions&#39;</span>].<span class="ruby-identifier">get</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-<span class="line-num">842</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_prepared_transactions-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1633</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_prepared_transactions?</span>
+<span class="line-num">1634</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_prepared_transactions</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_prepared_transactions</span>)
+<span class="line-num">1635</span>   <span class="ruby-ivar">@supports_prepared_transactions</span> = <span class="ruby-keyword">self</span>[<span class="ruby-string">&#39;SHOW max_prepared_transactions&#39;</span>].<span class="ruby-identifier">get</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+<span class="line-num">1636</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
@@ -1466,10 +1837,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_savepoints-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_savepoints-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">845</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints?</span>
-<span class="line-num">846</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">847</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_savepoints-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1639</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints?</span>
+<span class="line-num">1640</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">1641</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_transaction_isolation_levels-3F'>
@@ -1487,10 +1858,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_transaction_isolation_levels-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_transaction_isolation_levels-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">850</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transaction_isolation_levels?</span>
-<span class="line-num">851</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">852</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_transaction_isolation_levels-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1644</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transaction_isolation_levels?</span>
+<span class="line-num">1645</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">1646</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_transactional_ddl-3F'>
@@ -1508,10 +1879,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_transactional_ddl-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_transactional_ddl-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">855</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transactional_ddl?</span>
-<span class="line-num">856</span>   <span class="ruby-keyword">true</span>
-<span class="line-num">857</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_transactional_ddl-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1649</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transactional_ddl?</span>
+<span class="line-num">1650</span>   <span class="ruby-keyword">true</span>
+<span class="line-num">1651</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_trigger_conditions-3F'>
@@ -1529,10 +1900,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_trigger_conditions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_trigger_conditions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">833</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_trigger_conditions?</span>
-<span class="line-num">834</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>
-<span class="line-num">835</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_trigger_conditions-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1627</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_trigger_conditions?</span>
+<span class="line-num">1628</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>
+<span class="line-num">1629</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-tables'>
@@ -1559,10 +1930,10 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-tables-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-tables-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">868</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">869</span>   <span class="ruby-identifier">pg_class_relname</span>([<span class="ruby-string">&#39;r&#39;</span>, <span class="ruby-string">&#39;p&#39;</span>], <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
-<span class="line-num">870</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-tables-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1662</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1663</span>   <span class="ruby-identifier">pg_class_relname</span>([<span class="ruby-string">&#39;r&#39;</span>, <span class="ruby-string">&#39;p&#39;</span>], <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">1664</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-type_supported-3F'>
@@ -1580,12 +1951,12 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-type_supported-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-type_supported-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">874</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type_supported?</span>(<span class="ruby-identifier">type</span>)
-<span class="line-num">875</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@supported_types</span>[<span class="ruby-identifier">type</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@supported_types</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">type</span>)}
-<span class="line-num">876</span>   <span class="ruby-identifier">supported</span> = <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_type</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:typtype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;b&#39;</span>, <span class="ruby-value">:typname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">count</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-<span class="line-num">877</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@supported_types</span>[<span class="ruby-identifier">type</span>] = <span class="ruby-identifier">supported</span>}
-<span class="line-num">878</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-type_supported-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1668</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type_supported?</span>(<span class="ruby-identifier">type</span>)
+<span class="line-num">1669</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@supported_types</span>[<span class="ruby-identifier">type</span>] <span class="ruby-keyword">if</span> <span class="ruby-ivar">@supported_types</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">type</span>)}
+<span class="line-num">1670</span>   <span class="ruby-identifier">supported</span> = <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_type</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:typtype</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;b&#39;</span>, <span class="ruby-value">:typname</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">count</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+<span class="line-num">1671</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">return</span> <span class="ruby-ivar">@supported_types</span>[<span class="ruby-identifier">type</span>] = <span class="ruby-identifier">supported</span>}
+<span class="line-num">1672</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-values'>
@@ -1610,11 +1981,11 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-values-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-values-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">887</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>(<span class="ruby-identifier">v</span>)
-<span class="line-num">888</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide an empty array for values&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>
-<span class="line-num">889</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
-<span class="line-num">890</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-values-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1681</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>(<span class="ruby-identifier">v</span>)
+<span class="line-num">1682</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide an empty array for values&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">1683</span>   <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)
+<span class="line-num">1684</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-views'>
@@ -1643,11 +2014,11 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-views-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-views-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">900</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">901</span>   <span class="ruby-identifier">relkind</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:materialized</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;m&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;v&#39;</span>
-<span class="line-num">902</span>   <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-identifier">relkind</span>, <span class="ruby-identifier">opts</span>)
-<span class="line-num">903</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-views-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1694</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1695</span>   <span class="ruby-identifier">relkind</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:materialized</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;m&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;v&#39;</span>
+<span class="line-num">1696</span>   <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-identifier">relkind</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">1697</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_advisory_lock'>
@@ -1676,30 +2047,30 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_advisory_lock-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_advisory_lock-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
-<span class="line-num">916</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
-<span class="line-num">917</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
-<span class="line-num">918</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
-<span class="line-num">919</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>)
-<span class="line-num">920</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">921</span> 
-<span class="line-num">922</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
-<span class="line-num">923</span>     <span class="ruby-keyword">begin</span>
-<span class="line-num">924</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:wait</span>]
-<span class="line-num">925</span>         <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>)}
-<span class="line-num">926</span>         <span class="ruby-identifier">locked</span> = <span class="ruby-keyword">true</span>
-<span class="line-num">927</span>       <span class="ruby-keyword">else</span>
-<span class="line-num">928</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">locked</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_try_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>)}
-<span class="line-num">929</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdvisoryLockError</span>, <span class="ruby-node">&quot;unable to acquire advisory lock #{lock_id.inspect}&quot;</span>
-<span class="line-num">930</span>         <span class="ruby-keyword">end</span>
-<span class="line-num">931</span>       <span class="ruby-keyword">end</span>
-<span class="line-num">932</span> 
-<span class="line-num">933</span>       <span class="ruby-keyword">yield</span>
-<span class="line-num">934</span>     <span class="ruby-keyword">ensure</span>
-<span class="line-num">935</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_advisory_unlock</span>(<span class="ruby-identifier">lock_id</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">locked</span>
-<span class="line-num">936</span>     <span class="ruby-keyword">end</span>
-<span class="line-num">937</span>   <span class="ruby-keyword">end</span>
-<span class="line-num">938</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_advisory_lock-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">1710</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">1711</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">dataset</span>
+<span class="line-num">1712</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]
+<span class="line-num">1713</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>)
+<span class="line-num">1714</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1715</span> 
+<span class="line-num">1716</span>   <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>
+<span class="line-num">1717</span>     <span class="ruby-keyword">begin</span>
+<span class="line-num">1718</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:wait</span>]
+<span class="line-num">1719</span>         <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>)}
+<span class="line-num">1720</span>         <span class="ruby-identifier">locked</span> = <span class="ruby-keyword">true</span>
+<span class="line-num">1721</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">1722</span>         <span class="ruby-keyword">unless</span> <span class="ruby-identifier">locked</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_try_advisory_lock</span>(<span class="ruby-identifier">lock_id</span>)}
+<span class="line-num">1723</span>           <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdvisoryLockError</span>, <span class="ruby-node">&quot;unable to acquire advisory lock #{lock_id.inspect}&quot;</span>
+<span class="line-num">1724</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">1725</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">1726</span> 
+<span class="line-num">1727</span>       <span class="ruby-keyword">yield</span>
+<span class="line-num">1728</span>     <span class="ruby-keyword">ensure</span>
+<span class="line-num">1729</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>{<span class="ruby-identifier">pg_advisory_unlock</span>(<span class="ruby-identifier">lock_id</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">locked</span>
+<span class="line-num">1730</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">1731</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">1732</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

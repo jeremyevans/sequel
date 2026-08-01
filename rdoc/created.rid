@@ -1,6 +1,6 @@
-Wed, 01 Jul 2026 09:37:28 -0700
+Sat, 01 Aug 2026 09:25:33 -0700
 README.rdoc	Sun, 23 Nov 2025 09:58:00 -0800
-CHANGELOG	Wed, 01 Jul 2026 08:47:04 -0700
+CHANGELOG	Sat, 01 Aug 2026 09:14:16 -0700
 doc/CHANGELOG.old	Tue, 04 Aug 2020 18:11:34 -0700
 MIT-LICENSE	Sat, 14 Mar 2026 13:20:19 -0700
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Fri, 02 Feb 2024 13:06:09 -0800
 lib/sequel/model.rb	Sat, 09 May 2026 16:25:16 -0700
 lib/sequel/sql.rb	Sat, 27 Jun 2026 13:19:27 -0700
 lib/sequel/timezones.rb	Fri, 17 Dec 2021 16:59:47 -0800
-lib/sequel/version.rb	Wed, 01 Jul 2026 08:47:04 -0700
+lib/sequel/version.rb	Sat, 01 Aug 2026 09:14:16 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 17 Dec 2021 16:59:47 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 28 Jun 2024 09:03:32 -0700
 lib/sequel/connection_pool/sharded_timed_queue.rb	Sun, 01 Mar 2026 15:10:02 -0800
@@ -38,7 +38,7 @@ lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
 lib/sequel/database/misc.rb	Sun, 23 Nov 2025 09:58:00 -0800
 lib/sequel/database/query.rb	Tue, 03 Jun 2025 09:09:55 -0700
-lib/sequel/database/schema_generator.rb	Thu, 26 Mar 2026 13:59:36 -0700
+lib/sequel/database/schema_generator.rb	Wed, 08 Jul 2026 13:42:44 -0700
 lib/sequel/database/schema_methods.rb	Tue, 03 Mar 2026 21:13:26 -0800
 lib/sequel/database/transactions.rb	Thu, 21 Sep 2023 15:53:42 -0700
 lib/sequel/model/associations.rb	Sat, 09 May 2026 16:25:16 -0700
@@ -68,7 +68,7 @@ doc/model_plugins.rdoc	Mon, 31 Aug 2020 08:10:12 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Fri, 21 Oct 2022 08:19:04 -0700
 doc/opening_databases.rdoc	Tue, 17 Feb 2026 20:42:40 -0800
-doc/postgresql.rdoc	Sat, 08 Nov 2025 14:52:11 -0800
+doc/postgresql.rdoc	Sun, 12 Jul 2026 20:27:36 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Fri, 12 Jun 2026 07:53:57 -0700
 doc/reflection.rdoc	Mon, 11 Nov 2024 14:55:11 -0800
@@ -208,6 +208,7 @@ doc/release_notes/5.103.0.txt	Wed, 01 Apr 2026 09:24:31 -0700
 doc/release_notes/5.104.0.txt	Fri, 01 May 2026 08:59:13 -0700
 doc/release_notes/5.105.0.txt	Mon, 01 Jun 2026 07:29:30 -0700
 doc/release_notes/5.106.0.txt	Wed, 01 Jul 2026 08:47:04 -0700
+doc/release_notes/5.107.0.txt	Sat, 01 Aug 2026 09:14:16 -0700
 doc/release_notes/5.11.0.txt	Wed, 01 Aug 2018 08:13:54 -0700
 doc/release_notes/5.12.0.txt	Fri, 31 Aug 2018 08:39:42 -0700
 doc/release_notes/5.13.0.txt	Mon, 01 Oct 2018 07:21:49 -0700

@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::PropertyGraph::Generator::Create</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PropertyGraph::Generator::Create
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>self</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="Create.html"><code>Create</code></a> is used to evaluate the block given to <a href="../../DatabaseMethods.html#method-i-create_property_graph"><code>DatabaseMethods#create_property_graph</code></a>, used to specify the vertices and edges in the property graph.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-data">data</a></li>
+<li><a href="#method-i-edge">edge</a></li>
+<li><a href="#method-i-vertex">vertex</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>Data</td>
+<td>=</td>
+<td class='context-item-value'>Struct.new(:vertices, :edges)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">427</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">428</span>   <span class="ruby-ivar">@vertices</span> = []
+<span class="line-num">429</span>   <span class="ruby-ivar">@edges</span> = []
+<span class="line-num">430</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">431</span>   <span class="ruby-ivar">@vertices</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">432</span>   <span class="ruby-ivar">@edges</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">433</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">434</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-data'>
+<a name='method-i-data'></a>
+<div class='synopsis'>
+<span class='name'>data</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-data-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-data-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">436</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">data</span>
+<span class="line-num">437</span>   <span class="ruby-constant">Data</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@vertices</span>, <span class="ruby-ivar">@edges</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">438</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-edge'>
+<a name='method-i-edge'></a>
+<div class='synopsis'>
+<span class='name'>edge</span><span class='arguments'>(name, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Adds an edge to the property graph, with the block evaluted by <a href="Edge.html"><code>Edge</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-edge-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-edge-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">446</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">edge</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">447</span>   <span class="ruby-ivar">@edges</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Edge</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">448</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-vertex'>
+<a name='method-i-vertex'></a>
+<div class='synopsis'>
+<span class='name'>vertex</span><span class='arguments'>(name, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Adds a vertex to the property graph, with the block evaluted by <a href="Element.html"><code>Vertex</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-vertex-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-vertex-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">441</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">vertex</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">442</span>   <span class="ruby-ivar">@vertices</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Vertex</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">443</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

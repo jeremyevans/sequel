@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::PropertyGraph::Generator</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PropertyGraph::Generator
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Object</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Base class for all <a href="Generator.html"><code>Generator</code></a> DSL classes. This uses a design where The DSL class is only used for the evaluation of the block, and new returns a frozen struct.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Generator/Alter.html">Sequel::Postgres::PropertyGraph::Generator::Alter</a></li>
+<li><a href="Generator/AlterElement.html">Sequel::Postgres::PropertyGraph::Generator::AlterElement</a></li>
+<li><a href="Generator/Create.html">Sequel::Postgres::PropertyGraph::Generator::Create</a></li>
+<li><a href="Generator/Edge.html">Sequel::Postgres::PropertyGraph::Generator::Edge</a></li>
+<li><a href="Generator/Element.html">Sequel::Postgres::PropertyGraph::Generator::Element</a></li>
+<li><a href="Generator/Target.html">Sequel::Postgres::PropertyGraph::Generator::Target</a></li>
+<li><a href="Generator/Element.html">Sequel::Postgres::PropertyGraph::Generator::Vertex</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>Vertex</td>
+<td>=</td>
+<td class='context-item-value'>Element</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Base class for <a href="Generator/Element.html"><code>Vertex</code></a> and <a href="Generator/Edge.html"><code>Edge</code></a>.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(*args, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Instead of returning the <a href="Generator.html"><code>Generator</code></a> instance, return a frozen struct with data from the generator. This prevents accidentally calling the generator methods, and makes it possible for the generator class and result class to use the same method name in two different ways, with the generator setting data and the frozen struct method returning it. The frozen struct classes use the constant Data under each generator subclass.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">271</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">new</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">272</span>   <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">data</span>
+<span class="line-num">273</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

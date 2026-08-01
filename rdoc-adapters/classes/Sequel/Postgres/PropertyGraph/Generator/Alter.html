@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::PropertyGraph::Generator::Alter</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PropertyGraph::Generator::Alter
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>self</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="Alter.html"><code>Alter</code></a> is used to evaluate the block given to <a href="../../DatabaseMethods.html#method-i-alter_property_graph"><code>DatabaseMethods#alter_property_graph</code></a>, used to specify changes to an existing property graph.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-add_edge">add_edge</a></li>
+<li><a href="#method-i-add_vertex">add_vertex</a></li>
+<li><a href="#method-i-alter_edge_table">alter_edge_table</a></li>
+<li><a href="#method-i-alter_vertex_table">alter_vertex_table</a></li>
+<li><a href="#method-i-data">data</a></li>
+<li><a href="#method-i-drop_edge_tables">drop_edge_tables</a></li>
+<li><a href="#method-i-drop_vertex_tables">drop_vertex_tables</a></li>
+<li><a href="#method-i-set_owner">set_owner</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">527</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">528</span>   <span class="ruby-ivar">@operations</span> = []
+<span class="line-num">529</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">530</span> 
+<span class="line-num">531</span>   <span class="ruby-ivar">@operations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">op</span><span class="ruby-operator">|</span>
+<span class="line-num">532</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>[<span class="ruby-value">:op</span>]
+<span class="line-num">533</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:add_vertex_tables</span>, <span class="ruby-value">:add_edge_tables</span>
+<span class="line-num">534</span>       <span class="ruby-identifier">op</span>[<span class="ruby-value">:tables</span>].<span class="ruby-identifier">freeze</span>
+<span class="line-num">535</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">536</span>     <span class="ruby-identifier">op</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">537</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">538</span>   <span class="ruby-ivar">@operations</span>.<span class="ruby-identifier">freeze</span>
+<span class="line-num">539</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">540</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-add_edge'>
+<a name='method-i-add_edge'></a>
+<div class='synopsis'>
+<span class='name'>add_edge</span><span class='arguments'>(name, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Add an edge to the property graph, with the block used to configure the edge.</p>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">add_edge</span>(<span class="ruby-value">:e</span>){<span class="ruby-identifier">source</span> <span class="ruby-value">:v1</span>; <span class="ruby-identifier">destination</span> <span class="ruby-value">:v2</span>}
+<span class="ruby-comment"># ADD EDGE TABLES (e SOURCE v1 DESTINATION v2)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_edge-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-add_edge-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">560</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_edge</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">561</span>   <span class="ruby-identifier">add_tables_operation</span>(<span class="ruby-value">:add_edge_tables</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Edge</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">562</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">563</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-add_vertex'>
+<a name='method-i-add_vertex'></a>
+<div class='synopsis'>
+<span class='name'>add_vertex</span><span class='arguments'>(name, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Add a vertex to the property graph, with the block used to configure the vertex.</p>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">add_vertex</span>(<span class="ruby-value">:v</span>)
+<span class="ruby-comment"># ADD VERTEX TABLES (v)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_vertex-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-add_vertex-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">551</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_vertex</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">552</span>   <span class="ruby-identifier">add_tables_operation</span>(<span class="ruby-value">:add_vertex_tables</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Vertex</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">553</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">554</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-alter_edge_table'>
+<a name='method-i-alter_edge_table'></a>
+<div class='synopsis'>
+<span class='name'>alter_edge_table</span><span class='arguments'>(name, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Modify an existing edge table (referenced by its alias).</p>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">alter_edge_table</span>(<span class="ruby-value">:e</span>, <span class="ruby-value">properties:</span> <span class="ruby-value">:none</span>){<span class="ruby-identifier">drop_label</span> <span class="ruby-value">:l</span>}
+<span class="ruby-comment"># ALTER VERTEX TABLE e DROP LABEL l</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-alter_edge_table-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-alter_edge_table-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">600</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_edge_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">601</span>   <span class="ruby-ivar">@operations</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-constant">AlterElement</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:edge</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))
+<span class="line-num">602</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">603</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-alter_vertex_table'>
+<a name='method-i-alter_vertex_table'></a>
+<div class='synopsis'>
+<span class='name'>alter_vertex_table</span><span class='arguments'>(name, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Modify an existing vertex table (referenced by its alias).</p>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">alter_vertex_table</span>(<span class="ruby-value">:v</span>){<span class="ruby-identifier">add_label</span> <span class="ruby-value">:l</span>}
+<span class="ruby-comment"># ALTER VERTEX TABLE v ADD LABEL l PROPERTIES ALL COLUMNS</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-alter_vertex_table-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-alter_vertex_table-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">591</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_vertex_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">592</span>   <span class="ruby-ivar">@operations</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-constant">AlterElement</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:vertex</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))
+<span class="line-num">593</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">594</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-data'>
+<a name='method-i-data'></a>
+<div class='synopsis'>
+<span class='name'>data</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-data-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-data-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">542</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">data</span>
+<span class="line-num">543</span>   <span class="ruby-ivar">@operations</span>
+<span class="line-num">544</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-drop_edge_tables'>
+<a name='method-i-drop_edge_tables'></a>
+<div class='synopsis'>
+<span class='name'>drop_edge_tables</span><span class='arguments'>(aliases, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Remove edge tables (referenced by their aliases) from the property graph. See <a href="Alter.html#method-i-drop_vertex_tables"><code>drop_vertex_tables</code></a>.</p>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">drop_edge_tables</span>([<span class="ruby-value">:e1</span>, <span class="ruby-value">:e2</span>])
+<span class="ruby-comment"># DROP EDGE TABLES (e1, e2)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_edge_tables-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-drop_edge_tables-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">582</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_edge_tables</span>(<span class="ruby-identifier">aliases</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">583</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:drop_edge_tables</span>, <span class="ruby-value">:aliases</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Array</span>(<span class="ruby-identifier">aliases</span>), <span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:cascade</span>]}
+<span class="line-num">584</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">585</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-drop_vertex_tables'>
+<a name='method-i-drop_vertex_tables'></a>
+<div class='synopsis'>
+<span class='name'>drop_vertex_tables</span><span class='arguments'>(aliases, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Remove vertex tables (referenced by their aliases) from the property graph. <code>aliases</code> can be a single alias or an array. Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:cascade </td><td>
+<p>Use CASCADE instead of the default RESTRICT.</p>
+</td></tr></tbody></table>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">drop_vertex_tables</span>([<span class="ruby-value">:v1</span>, <span class="ruby-value">:v2</span>])
+<span class="ruby-comment"># DROP VERTEX TABLES (v1, v2)</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_vertex_tables-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-drop_vertex_tables-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">572</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_vertex_tables</span>(<span class="ruby-identifier">aliases</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">573</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:drop_vertex_tables</span>, <span class="ruby-value">:aliases</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Array</span>(<span class="ruby-identifier">aliases</span>), <span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:cascade</span>]}
+<span class="line-num">574</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">575</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-set_owner'>
+<a name='method-i-set_owner'></a>
+<div class='synopsis'>
+<span class='name'>set_owner</span><span class='arguments'>(new_owner)</span>
+
+</div>
+<div class='description'>
+
+<p>Change the owner of the property graph. <code>new_owner</code> is usually a Symbol or SQL::Identifier for the role name, but can be <code>Sequel.lit(&#39;CURRENT_USER&#39;)</code> or <code>Sequel.lit(&#39;SESSION_USER&#39;)</code>.</p>
+
+<pre class="ruby"><span class="ruby-identifier">alter_property_graph</span>.<span class="ruby-identifier">owner_to</span>(<span class="ruby-value">:new_owner</span>)
+<span class="ruby-comment"># OWNER TO new_owner</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_owner-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set_owner-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">612</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_owner</span>(<span class="ruby-identifier">new_owner</span>)
+<span class="line-num">613</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:set_owner</span>, <span class="ruby-value">:owner</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">new_owner</span>}
+<span class="line-num">614</span>   <span class="ruby-keyword">nil</span>
+<span class="line-num">615</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

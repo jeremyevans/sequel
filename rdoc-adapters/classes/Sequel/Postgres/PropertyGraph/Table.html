@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::PropertyGraph::Table</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PropertyGraph::Table
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Object</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Represents a GRAPH_TABLE expression, used to query a property graph via graph pattern matching. This is used in place of a table name expression or dataset in a SELECT query. These are created by calling graph_table on the related <a href="../Database.html"><code>Database</code></a> object.</p>
+
+<p><a href="Table.html"><code>Table</code></a> uses a method chaining design, similar to <a href="../Dataset.html"><code>Dataset</code></a>, where methods return modified frozen copies of the object.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-create">create</a></li>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-add_columns">add_columns</a></li>
+<li><a href="#attribute-i-columns">columns</a></li>
+<li><a href="#attribute-i-elements">elements</a></li>
+<li><a href="#method-i-from">from</a></li>
+<li><a href="#method-i-link">link</a></li>
+<li><a href="#attribute-i-name">name</a></li>
+<li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
+<li><a href="#method-i-to">to</a></li>
+</ol>
+</div>
+<div id='context'>
+<div id='includes'>
+<h2>Included modules</h2>
+<ol>
+<li>SQL::AliasMethods</li>
+</ol>
+</div>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-columns'>columns</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A frozen array of the columns used in the COLUMNS clause (aliased as <a href="Table.html#attribute-i-columns_used"><code>columns_used</code></a>, as <a href="Table.html#attribute-i-columns"><code>columns</code></a> is used to modify the columns).</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-columns_used'>columns_used</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A frozen array of the columns used in the COLUMNS clause (aliased as <a href="Table.html#attribute-i-columns_used"><code>columns_used</code></a>, as <a href="Table.html#attribute-i-columns"><code>columns</code></a> is used to modify the columns).</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-elements'>elements</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A frozen array of Element instances, representing the vertices and edges in the graph pattern.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-name'>name</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The name of the property graph the table is querying.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-create'>
+<a name='method-c-create'></a>
+<div class='synopsis'>
+<span class='name'>create</span><span class='arguments'>(graph_name, initial_vertex_label, initial_vertex_opts)</span>
+
+</div>
+<div class='description'>
+
+<p>Create a new <a href="Table.html"><code>Table</code></a> with the given <code>graph_name</code>, with <code>initial_vertex_label</code> and <code>initial_vertex_opts</code> being used to create the initial vertex. See <a href="Table.html#method-i-link"><code>Table#link</code></a> for which options are supported for the initial vertex.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-create-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-create-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">682</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">create</span>(<span class="ruby-identifier">graph_name</span>, <span class="ruby-identifier">initial_vertex_label</span>, <span class="ruby-identifier">initial_vertex_opts</span>)
+<span class="line-num">683</span>   <span class="ruby-identifier">vertex</span> = <span class="ruby-constant">Element</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:vertex</span>, <span class="ruby-string">&quot;&quot;</span>, <span class="ruby-identifier">initial_vertex_label</span>, <span class="ruby-identifier">initial_vertex_opts</span>)
+<span class="line-num">684</span>   <span class="ruby-identifier">new</span>(<span class="ruby-identifier">graph_name</span>, [<span class="ruby-identifier">vertex</span>].<span class="ruby-identifier">freeze</span>, [].<span class="ruby-identifier">freeze</span>)
+<span class="line-num">685</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(name, elements, columns)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">687</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">elements</span>, <span class="ruby-identifier">columns</span>)
+<span class="line-num">688</span>   <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">name</span>
+<span class="line-num">689</span>   <span class="ruby-ivar">@elements</span> = <span class="ruby-identifier">elements</span>
+<span class="line-num">690</span>   <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>
+<span class="line-num">691</span>   <span class="ruby-identifier">freeze</span>
+<span class="line-num">692</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-add_columns'>
+<a name='method-i-add_columns'></a>
+<div class='synopsis'>
+<span class='name'>add_columns</span><span class='arguments'>(*cols)</span>
+
+</div>
+<div class='description'>
+
+<p>Return a modified copy that adds the given columns to the existing list of columns for the graph table.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_columns-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-add_columns-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">745</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)
+<span class="line-num">746</span>   <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-ivar">@columns</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)
+<span class="line-num">747</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-from'>
+<a name='method-i-from'></a>
+<div class='synopsis'>
+<span class='name'>from</span><span class='arguments'>(label, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Similar to <a href="Table.html#method-i-link"><code>link</code></a>, but uses a directed link from the new element to the previous element (<code>&lt;-</code> in the graph pattern). Accepts same arguments and options as <a href="Table.html#method-i-link"><code>link</code></a>.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">graph_table</span>(<span class="ruby-value">:gn</span>, <span class="ruby-value">:v</span>).<span class="ruby-identifier">from</span>(<span class="ruby-value">:e</span>)
+<span class="ruby-comment"># GRAPH_TABLE (gn MATCH (IS v)&lt;-[IS e])</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-from-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-from-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">730</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from</span>(<span class="ruby-identifier">label</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">731</span>   <span class="ruby-identifier">append_element</span>(<span class="ruby-string">&#39;&lt;-&#39;</span>, <span class="ruby-identifier">label</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">732</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-link'>
+<a name='method-i-link'></a>
+<div class='synopsis'>
+<span class='name'>link</span><span class='arguments'>(label, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return a modified copy with an element added using a bidirectional link (<code>-</code> in the graph pattern). <code>label</code> specifies the label restriction for the element. This can be nil for no label restriction, or an array or set to restrict to the given labels.</p>
+
+<p>Options supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'><code>:var</code> </td><td>
+<p>Specifies a graph pattern variable name for the element, usable in the WHERE or COLUMNS clauses.</p>
+</td></tr><tr><td class='label'><code>:vertex</code> </td><td>
+<p>Specifies that the element being linked to is a vertex. This allows for direct vertex&lt;-&gt;vertex linking, instead of the default vertex&lt;-&gt;edge&lt;-&gt;vertex linking.</p>
+</td></tr><tr><td class='label'><code>:where</code> </td><td>
+<p>An expression to use for the WHERE clause for the element.</p>
+</td></tr></tbody></table>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">graph_table</span>(<span class="ruby-value">:gn</span>, <span class="ruby-value">:v</span>).<span class="ruby-identifier">link</span>(<span class="ruby-value">:e</span>)
+<span class="ruby-comment"># GRAPH_TABLE (gn MATCH (IS v)-[IS e])</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-link-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-link-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">710</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">link</span>(<span class="ruby-identifier">label</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">711</span>   <span class="ruby-identifier">append_element</span>(<span class="ruby-string">&#39;-&#39;</span>, <span class="ruby-identifier">label</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">712</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sql_literal_append'>
+<a name='method-i-sql_literal_append'></a>
+<div class='synopsis'>
+<span class='name'>sql_literal_append</span><span class='arguments'>(ds, sql)</span>
+
+</div>
+<div class='description'>
+
+<p>Append the SQL for the GRAPH_TABLE expression to the given SQL string. Requires graph table have at least one column set.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">751</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)
+<span class="line-num">752</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@columns</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">753</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot use graph_table in a query if it does not return any columns&quot;</span>
+<span class="line-num">754</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">755</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@elements</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:edge</span>
+<span class="line-num">756</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot use graph_table in a query if the last element is an edge&quot;</span>
+<span class="line-num">757</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">758</span> 
+<span class="line-num">759</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;GRAPH_TABLE (&quot;</span>
+<span class="line-num">760</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@name</span>)
+<span class="line-num">761</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; MATCH &quot;</span>
+<span class="line-num">762</span> 
+<span class="line-num">763</span>   <span class="ruby-ivar">@elements</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">element</span><span class="ruby-operator">|</span>
+<span class="line-num">764</span>     <span class="ruby-identifier">marker</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">marker</span>
+<span class="line-num">765</span>     <span class="ruby-identifier">var</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">var</span>
+<span class="line-num">766</span>     <span class="ruby-identifier">label</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">label</span>
+<span class="line-num">767</span>     <span class="ruby-identifier">where</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">where</span>
+<span class="line-num">768</span>     <span class="ruby-identifier">vertex</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:vertex</span>
+<span class="line-num">769</span> 
+<span class="line-num">770</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">marker</span>
+<span class="line-num">771</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">vertex</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39;(&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;[&#39;</span>)
+<span class="line-num">772</span> 
+<span class="line-num">773</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">var</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">var</span>
+<span class="line-num">774</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">label</span> 
+<span class="line-num">775</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">var</span> <span class="ruby-operator">?</span> <span class="ruby-string">&quot; IS &quot;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&quot;IS &quot;</span>)
+<span class="line-num">776</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">label</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+<span class="line-num">777</span>         <span class="ruby-identifier">label_sep</span> = <span class="ruby-string">&quot;&quot;</span>
+<span class="line-num">778</span>         <span class="ruby-identifier">label</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">l</span><span class="ruby-operator">|</span>
+<span class="line-num">779</span>           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">label_sep</span>
+<span class="line-num">780</span>           <span class="ruby-identifier">label_sep</span> = <span class="ruby-string">&quot;|&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">label_sep</span>.<span class="ruby-identifier">empty?</span>
+<span class="line-num">781</span>           <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">l</span>)
+<span class="line-num">782</span>         <span class="ruby-keyword">end</span>
+<span class="line-num">783</span>       <span class="ruby-keyword">else</span>
+<span class="line-num">784</span>         <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">label</span>)
+<span class="line-num">785</span>       <span class="ruby-keyword">end</span>
+<span class="line-num">786</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">787</span> 
+<span class="line-num">788</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">where</span>
+<span class="line-num">789</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> ((<span class="ruby-identifier">var</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">label</span>) <span class="ruby-operator">?</span> <span class="ruby-string">&quot; WHERE &quot;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&quot;WHERE &quot;</span>)
+<span class="line-num">790</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">where</span>)
+<span class="line-num">791</span>     <span class="ruby-keyword">end</span>
+<span class="line-num">792</span> 
+<span class="line-num">793</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">vertex</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39;)&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;]&#39;</span>)
+<span class="line-num">794</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">795</span> 
+<span class="line-num">796</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; COLUMNS &quot;</span>
+<span class="line-num">797</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@columns</span>)
+<span class="line-num">798</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>
+<span class="line-num">799</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-to'>
+<a name='method-i-to'></a>
+<div class='synopsis'>
+<span class='name'>to</span><span class='arguments'>(label, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Similar to <a href="Table.html#method-i-link"><code>link</code></a>, but uses a directed link from the previous element to the new element (<code>-&gt;</code> in the graph pattern). Accepts same arguments and options as <a href="Table.html#method-i-link"><code>link</code></a>.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">graph_table</span>(<span class="ruby-value">:gn</span>, <span class="ruby-value">:v</span>).<span class="ruby-identifier">to</span>(<span class="ruby-value">:e</span>)
+<span class="ruby-comment"># GRAPH_TABLE (gn MATCH (IS v)-&gt;[IS e])</span>
+</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-to-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">720</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to</span>(<span class="ruby-identifier">label</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)
+<span class="line-num">721</span>   <span class="ruby-identifier">append_element</span>(<span class="ruby-string">&#39;-&gt;&#39;</span>, <span class="ruby-identifier">label</span>, <span class="ruby-identifier">opts</span>)
+<span class="line-num">722</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>

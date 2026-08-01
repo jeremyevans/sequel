@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::PropertyGraph::Generator::Edge</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PropertyGraph::Generator::Edge
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="Element.html">Element</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="Edge.html"><code>Edge</code></a> is used for block passed to <a href="Create.html#method-i-edge"><code>Create#edge</code></a>, used to configure edges in the property graph.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-data">data</a></li>
+<li><a href="#method-i-destination">destination</a></li>
+<li><a href="#method-i-source">source</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>Data</td>
+<td>=</td>
+<td class='context-item-value'>Struct.new(:name, :key, :labels, :source, :destination)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span><span class='arguments'>(name, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>In addition to inherited behavior, raises an error if a block is not passed or source or destination is not called in the block.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">397</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">398</span>   <span class="ruby-keyword">super</span>
+<span class="line-num">399</span> 
+<span class="line-num">400</span>   <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@source</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@destination</span>
+<span class="line-num">401</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;source and/or destination not defined for property graph edge&quot;</span>
+<span class="line-num">402</span>   <span class="ruby-keyword">end</span>
+<span class="line-num">403</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-data'>
+<a name='method-i-data'></a>
+<div class='synopsis'>
+<span class='name'>data</span><span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-data-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-data-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">405</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">data</span>
+<span class="line-num">406</span>   <span class="ruby-constant">Data</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@name</span>, <span class="ruby-ivar">@key</span>, <span class="ruby-ivar">@labels</span>, <span class="ruby-ivar">@source</span>, <span class="ruby-ivar">@destination</span>).<span class="ruby-identifier">freeze</span>
+<span class="line-num">407</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-destination'>
+<a name='method-i-destination'></a>
+<div class='synopsis'>
+<span class='name'>destination</span><span class='arguments'>(name, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Specify the destination for the edge, with block evaluted by <a href="Target.html"><code>Target</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-destination-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-destination-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">416</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destination</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">417</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot specify multiple destinations for a property graph edge&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@destination</span>
+<span class="line-num">418</span>   <span class="ruby-ivar">@destination</span> = <span class="ruby-constant">Target</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">419</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-source'>
+<a name='method-i-source'></a>
+<div class='synopsis'>
+<span class='name'>source</span><span class='arguments'>(name, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Specify the source for the edge, with block evaluted by <a href="Target.html"><code>Target</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-source-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-source-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>
+<span class="line-num">410</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">source</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">411</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot specify multiple sources for a property graph edge&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@source</span>
+<span class="line-num">412</span>   <span class="ruby-ivar">@source</span> = <span class="ruby-constant">Target</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+<span class="line-num">413</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/jeremyevans/hanna"><strong>Hanna</strong> RDoc template</a>
+</div>
+</body>
+</html>
