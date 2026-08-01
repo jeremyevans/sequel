@@ -1,0 +1,51 @@
+= New Features
+
+* Support for property graphs has been added on PostgreSQL 19+. This
+  includes support for creating, altering, and dropping property
+  graphs:
+
+    DB.create_property_graph(:g) do
+      vertex :people
+      vertex :companies
+
+      edge :employment do
+        source :people
+        destination :companies
+      end
+    end
+    # CREATE PROPERTY GRAPH g
+    #   VERTEX TABLES (people, companies)
+    #   EDGE TABLES (employment SOURCE people DESTINATION companies)
+
+    DB.alter_property_graph(:g) do
+      add_vertex :v
+    end
+    # ALTER PROPERTY GRAPH g ADD VERTEX TABLES (v)
+
+    DB.rename_property_graph(:g, :g2)
+    # ALTER PROPERTY GRAPH g RENAME TO g2
+
+    DB.set_property_graph_schema(:g2, :other_schema, if_exists: true)
+    # ALTER PROPERTY GRAPH IF EXISTS g2 SET SCHEMA other_schema
+
+    DB.drop_property_graph(:g)
+    # DROP PROPERTY GRAPH g
+
+  Listing property graphs:
+
+    DB.property_graphs
+    # => [:property_graph_name_1, :property_graph_name_2]
+
+  As well as using GRAPH_TABLE in queries:
+
+    gt = DB.graph_table(:graph, :companies, var: :c).
+      from(:works_at, var: :w).
+      link(:people, var: :p, where: {Sequel[:p][:name] => 'Alice'}).
+      columns(Sequel[:p][:name].as(:person_name), Sequel[:w][:role].as(:role))
+    DB.from(gt).sql
+    # SELECT * FROM GRAPH_TABLE (graph
+    #   MATCH (c IS companies)<-[w IS works_at]-(p IS people WHERE (p.name = 'Alice'))
+    #   COLUMNS (p.name AS person_name, w.role AS role))
+
+* On SQLite, Dataset#explain now accepts a :query_plan option to use
+  EXPLAIN QUERY PLAN, which results in more user-friendly output.

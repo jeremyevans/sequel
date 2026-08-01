@@ -1,4 +1,4 @@
-=== master
+=== 5.107.0 (2026-08-01)
 
 * Support Dataset#explain :query_plan option on SQLite, for EXPLAIN QUERY PLAN (cllns)
 
