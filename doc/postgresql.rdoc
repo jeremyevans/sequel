@@ -17,7 +17,7 @@ rarely used PostgreSQL features that Sequel supports which are not mentioned her
 
 == Adapter/Driver Specific Support
 
-Some of this this support depends on the specific adapter or underlying driver in use.  
+Some of this support depends on the specific adapter or underlying driver in use.  
 <tt>postgres only</tt> will denote support specific to the postgres adapter (i.e.
 not available when connecting to PostgreSQL via the jdbc adapter).
 <tt>postgres/pg only</tt> will denote support specific to the postgres adapter when

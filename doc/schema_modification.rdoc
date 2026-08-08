@@ -325,7 +325,7 @@ to +create_table+, provide a dataset to the :as option:
 == +alter_table+
 
 +alter_table+ is used to alter existing tables, changing their columns, indexes,
-or constraints.  It it used just like +create_table+, accepting a block which
+or constraints.  It is used just like +create_table+, accepting a block which
 is instance_evaled, and providing its own methods:
 
 === +add_column+

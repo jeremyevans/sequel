@@ -30,7 +30,7 @@ then come back here.
 
 === Retrieving a Single Object
 
-Sequel offers quite a few ways to to retrieve a single object.
+Sequel offers quite a few ways to retrieve a single object.
 
 ==== Using a Primary Key [Sequel::Model]
 

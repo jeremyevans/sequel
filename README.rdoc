@@ -26,7 +26,7 @@ Archived Discussion Forum (sequel-talk Google Group) :: https://www.mail-archive
 
 If you have questions about how to use Sequel, please ask on
 GitHub Discussions.
-Only use the the bug tracker to report
+Only use the bug tracker to report
 bugs in Sequel, not to ask for help on using Sequel.
 
 To check out the source code:

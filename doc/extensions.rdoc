@@ -10,7 +10,7 @@ Global extensions are loaded via <tt>Sequel.extension</tt>:
 
   Sequel.extension :named_timezones
 
-All this does is require the relevent extension from <tt>sequel/extensions/named_timezones</tt> somewhere in the ruby path.  Global extensions are just a simpler, consistent way to require code that modifies Sequel.
+All this does is require the relevant extension from <tt>sequel/extensions/named_timezones</tt> somewhere in the ruby path.  Global extensions are just a simpler, consistent way to require code that modifies Sequel.
 
 == Database Extensions
 
@@ -18,7 +18,7 @@ Database extensions should add or modify the behavior of a single <tt>Sequel::Da
 
   DB.extension :server_block
 
-The first thing that this does is load the relevent extension globally.  However, Database extensions should be structured in a way that loading the relevent extension globally just adds a module with the related behavior, it doesn't modify any other state.  After loading the extension globally, it modifies the related <tt>Sequel::Database</tt> object to modify it's behavior, usually by extending it with a module.
+The first thing that this does is load the relevant extension globally.  However, Database extensions should be structured in a way that loading the relevant extension globally just adds a module with the related behavior, it doesn't modify any other state.  After loading the extension globally, it modifies the related <tt>Sequel::Database</tt> object to modify it's behavior, usually by extending it with a module.
 
 If you want a Database extension loaded into all future Database instances, you can use <tt>Sequel::Database.extension</tt>:
 
@@ -32,7 +32,7 @@ Dataset extensions should add or modify the behavior of a single <tt>Sequel::Dat
 
   ds = DB[:a].extension(:columns_introspection)
 
-The first thing loading a Dataset extension does is load the relevent extension globally.  Similar to Database extensions, loading a Dataset extension globally should not affect state other than maybe adding a module.  After loading the extension globally, it returned a modified copy of the <tt>Sequel::Dataset</tt> with the extension loaded into it.
+The first thing loading a Dataset extension does is load the relevant extension globally.  Similar to Database extensions, loading a Dataset extension globally should not affect state other than maybe adding a module.  After loading the extension globally, it returned a modified copy of the <tt>Sequel::Dataset</tt> with the extension loaded into it.
 
 If you want to load an extension into all future datasets for a given <tt>Sequel::Database</tt> instance, you can also load it as a Database extension:
 
