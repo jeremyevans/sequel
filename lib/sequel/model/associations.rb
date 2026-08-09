@@ -383,7 +383,7 @@ module Sequel
         end
 
         # Finalize the association by first attempting to populate the thread-safe cache,
-        # and then transfering the thread-safe cache value to the association itself,
+        # and then transferring the thread-safe cache value to the association itself,
         # so that a mutex is not needed to get the value.
         def finalize
           return unless cache = self[:cache]
@@ -1174,7 +1174,7 @@ module Sequel
         private
     
         # Use a correlated subquery to limit the dataset.  Note that this will not
-        # work correctly if the associated dataset uses qualified identifers in the WHERE clause,
+        # work correctly if the associated dataset uses qualified identifiers in the WHERE clause,
         # as they would reference the containing query instead of the subquery.
         def apply_correlated_subquery_limit_strategy(ds)
           table = ds.first_source_table
@@ -1191,7 +1191,7 @@ module Sequel
         end
 
         # Use a LATERAL subquery to limit the dataset.  Note that this will not
-        # work correctly if the associated dataset uses qualified identifers in the WHERE clause,
+        # work correctly if the associated dataset uses qualified identifiers in the WHERE clause,
         # as they would reference the containing query instead of the subquery.
         #
         # This does not contain the conditions that are necessary to join to the
@@ -1821,7 +1821,7 @@ module Sequel
         # The following options can be supplied:
         # === Multiple Types
         # :adder :: Proc used to define the private _add_* method for doing the database work
-        #           to associate the given object to the current object (*_to_many assocations).
+        #           to associate the given object to the current object (*_to_many associations).
         #           Set to nil to not define a add_* method for the association.
         # :after_add :: Symbol, Proc, or array of both/either specifying a callback to call
         #               after a new item is added to the association.
@@ -1852,7 +1852,7 @@ module Sequel
         # :class_namespace :: If :class is given as a string or symbol, sets the default namespace in which to look for
         #                     the class.  <tt>class: 'Foo', class_namespace: 'Bar'</tt> looks for <tt>::Bar::Foo</tt>.)
         # :clearer :: Proc used to define the private _remove_all_* method for doing the database work
-        #             to remove all objects associated to the current object (*_to_many assocations).
+        #             to remove all objects associated to the current object (*_to_many associations).
         #             Set to nil to not define a remove_all_* method for the association.
         # :clone :: Merge the current options and block into the options and block used in defining
         #           the given association.  Can be used to DRY up a bunch of similar associations that
@@ -1939,10 +1939,10 @@ module Sequel
         #               or add_/remove_/remove_all_ methods (for one_to_many and many_to_many associations).
         # :reciprocal :: the symbol name of the reciprocal association,
         #                if it exists.  By default, Sequel will try to determine it by looking at the
-        #                associated model's assocations for a association that matches
+        #                associated model's associations for a association that matches
         #                the current association's key(s).  Set to nil to not use a reciprocal.
         # :remover :: Proc used to define the private _remove_* method for doing the database work
-        #             to remove the association between the given object and the current object (*_to_many assocations).
+        #             to remove the association between the given object and the current object (*_to_many associations).
         #             Set to nil to not define a remove_* method for the association.
         # :select :: the columns to select.  Defaults to the associated class's table_name.* in an association
         #            that uses joins, which means it doesn't include the attributes from the
@@ -1950,7 +1950,7 @@ module Sequel
         #            use this option, but beware that the join table attributes can clash with
         #            attributes from the model table, so you should alias any attributes that have
         #            the same name in both the join table and the associated table.
-        # :setter :: Proc used to define the private _*= method for doing the work to setup the assocation
+        # :setter :: Proc used to define the private _*= method for doing the work to setup the association
         #            between the given object and the current object (*_to_one associations).
         #            Set to nil to not define a setter method for the association.
         # :subqueries_per_union :: The number of subqueries to use in each UNION query, for eager
@@ -3476,7 +3476,7 @@ module Sequel
         # :limit_strategy :: Use a strategy for handling limits on associations.
         #                    Appropriate :limit_strategy values are:
         #                    true :: Pick the most appropriate based on what the database supports
-        #                    :distinct_on :: Force use of DISTINCT ON stategy (*_one associations only)
+        #                    :distinct_on :: Force use of DISTINCT ON strategy (*_one associations only)
         #                    :correlated_subquery :: Force use of correlated subquery strategy (one_to_* associations only)
         #                    :window_function :: Force use of window function strategy
         #                    :ruby :: Don't modify the SQL, implement limits/offsets with array slicing

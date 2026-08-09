@@ -52,7 +52,7 @@
   know which shard they were retrieved from, so when you save
   the object, it is saved back to that shard.  The sharding plugin
   also works with associations, so associated records are retrieved
-  from the same shard the main object was retreived from.  The
+  from the same shard the main object was retrieved from.  The
   sharding plugin also works with both methods of eager loading, and
   provides methods that you can use to create objects on specific
   shards.

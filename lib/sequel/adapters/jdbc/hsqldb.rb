@@ -163,7 +163,7 @@ module Sequel
         end
 
         # HSQLDB does support common table expressions, but the support is broken.
-        # CTEs operate more like temprorary tables or views, lasting longer than the duration of the expression.
+        # CTEs operate more like temporary tables or views, lasting longer than the duration of the expression.
         # CTEs in earlier queries might take precedence over CTEs with the same name in later queries.
         # Also, if any CTE is recursive, all CTEs must be recursive.
         # If you want to use CTEs with HSQLDB, you'll have to manually modify the dataset to allow it.

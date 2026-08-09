@@ -87,7 +87,7 @@
 * A pg_range extension has been added, making it easy to deal
   with PostgreSQL 9.2+'s range types.  As ruby's Range class does
   not support all PostgreSQL range type values (such as empty ranges,
-  unbounded ranges, or ranges with an exlusive beginning), range
+  unbounded ranges, or ranges with an exclusive beginning), range
   types are returned as instances of Sequel::Postgres::PGRange, which
   has an API similar to Range.  You can turn a PGRange into a Range
   using PGRange#to_range, assuming that the range type value does not

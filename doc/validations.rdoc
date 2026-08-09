@@ -35,7 +35,7 @@ or you are using MySQL (which doesn't support CHECK constraints), it may be nece
 to enforce the database integrity.
 
 In some cases you may have data integrity requirements that are difficult to
-enforce via database constraints, especially if you are targetting multiple
+enforce via database constraints, especially if you are targeting multiple
 database types.
 
 Validations are generally easier to write than database constraints,

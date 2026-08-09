@@ -267,7 +267,7 @@ The following additional options are supported:
 :encoding :: Specify the encoding/character set to use for the connection.
 :fractional_seconds :: On MySQL 5.6.5+, this option is recognized and will include fractional seconds in
                        time/timestamp values, as well as have the schema method create columns that can contain
-                       fractional seconds by deafult.  This option is also supported on other adapters that connect
+                       fractional seconds by default.  This option is also supported on other adapters that connect
                        to MySQL.
 :socket :: Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
 :sql_mode :: Set the sql_mode(s) for a given connection.  Can be single symbol or string,

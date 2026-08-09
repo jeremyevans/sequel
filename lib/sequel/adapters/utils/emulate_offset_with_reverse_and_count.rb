@@ -49,7 +49,7 @@ module Sequel
       else
         # Sequel doesn't allow a nonpositive limit.  If the offset
         # is greater than the number of rows, the empty result set
-        # shuld be returned, so use a condition that is always false.
+        # should be returned, so use a condition that is always false.
         ds.where(1=>0)
       end
       sql = @opts[:append_sql] || String.new

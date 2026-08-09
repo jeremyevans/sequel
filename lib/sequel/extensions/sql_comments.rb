@@ -108,7 +108,7 @@ module Sequel
           # injection.
           #
           # Additionally, due to the use of an SQL comment, if any
-          # SQL is appened to the query after the comment is added,
+          # SQL is appended to the query after the comment is added,
           # it will become part of the comment unless it is preceded
           # by a newline.
           if sql.frozen?

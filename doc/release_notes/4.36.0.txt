@@ -47,7 +47,7 @@
      end
 
 * A string_agg extension has been added for aggregate string
-  concatentation support on PostgreSQL 9+, SQLAnywhere 12+,
+  concatenation support on PostgreSQL 9+, SQLAnywhere 12+,
   Oracle11g+, DB 9.7+, MySQL, HSQLDB, H2, and CUBRID:
 
     DB.extension :string_agg

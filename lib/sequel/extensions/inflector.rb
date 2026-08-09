@@ -31,7 +31,7 @@ class String
     @plurals, @singulars, @uncountables = [], [], []
 
     class << self
-      # Array of 2 element arrays, first containing a regex, and the second containing a substitution pattern, used for plurization.
+      # Array of 2 element arrays, first containing a regex, and the second containing a substitution pattern, used for pluralization.
       attr_reader :plurals
 
       # Array of 2 element arrays, first containing a regex, and the second containing a substitution pattern, used for singularization.
@@ -212,8 +212,8 @@ class String
   # Examples
   #   "posts".singularize #=> "post"
   #   "octopi".singularize #=> "octopus"
-  #   "sheep".singluarize #=> "sheep"
-  #   "word".singluarize #=> "word"
+  #   "sheep".singularize #=> "sheep"
+  #   "word".singularize #=> "word"
   #   "the blue mailmen".singularize #=> "the blue mailman"
   #   "CamelOctopi".singularize #=> "CamelOctopus"
   def singularize

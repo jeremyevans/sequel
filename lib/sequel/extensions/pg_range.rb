@@ -2,11 +2,11 @@
 #
 # The pg_range extension adds support for the PostgreSQL 9.2+ range
 # types to Sequel.  PostgreSQL range types are similar to ruby's
-# Range class, representating an array of values.  However, they
+# Range class, representing an array of values.  However, they
 # are more flexible than ruby's ranges, allowing exclusive beginnings
 # and endings (ruby's range only allows exclusive endings).
 #
-# When PostgreSQL range values are retreived, they are parsed and returned
+# When PostgreSQL range values are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::PGRange.  PGRange mostly acts
 # like a Range, but it's not a Range as not all PostgreSQL range
 # type values would be valid ruby ranges.  If the range type value

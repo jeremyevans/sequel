@@ -139,7 +139,7 @@ Other Improvements
   multiple search terms are used.
 
 * Altering a column's name, type, default, or NULL/NOT NULL status
-  on MySQL now keeps other relevent column information.  For example,
+  on MySQL now keeps other relevant column information.  For example,
   if you alter a column's type, it'll keep an existing default. This
   functionality isn't complete, there may be other column information
   that is lost.

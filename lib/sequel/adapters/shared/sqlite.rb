@@ -210,7 +210,7 @@ module Sequel
           if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint || op[:op] == :set_column_null}
             null_ops, ops = ops.partition{|op| op[:op] == :set_column_null}
 
-            # Apply NULL/NOT NULL ops first, since those should be purely idependent of the constraints.
+            # Apply NULL/NOT NULL ops first, since those should be purely independent of the constraints.
             null_ops.each{|op| alter_table_sql_list(table, [op]).flatten.each{|sql| execute_ddl(sql)}}
 
             # If you are just doing constraints, apply all of them at the same time,
@@ -730,7 +730,7 @@ module Sequel
 
       # Handle uniqueness violations when inserting, by using a specified
       # resolution algorithm. With no options, uses INSERT OR REPLACE. SQLite
-      # supports the following conflict resolution algoriths: ROLLBACK, ABORT,
+      # supports the following conflict resolution algorithms: ROLLBACK, ABORT,
       # FAIL, IGNORE and REPLACE.
       #
       # On SQLite 3.24.0+, you can pass a hash to use an ON CONFLICT clause.

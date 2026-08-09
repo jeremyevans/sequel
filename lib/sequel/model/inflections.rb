@@ -28,7 +28,7 @@ module Sequel
     @plurals, @singulars, @uncountables = [], [], []
 
     class << self
-      # Array of two element arrays, first containing a regex, and the second containing a substitution pattern, used for plurization.
+      # Array of two element arrays, first containing a regex, and the second containing a substitution pattern, used for pluralization.
       attr_reader :plurals
 
       # Array of two element arrays, first containing a regex, and the second containing a substitution pattern, used for singularization.

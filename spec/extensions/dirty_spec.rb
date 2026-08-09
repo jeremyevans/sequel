@@ -23,7 +23,7 @@ describe "Sequel::Plugins::Dirty" do
       @o.initial_value(:missing).must_be_nil
     end
 
-    it "initial_value should be the intial value if value has changed" do
+    it "initial_value should be the initial value if value has changed" do
       @o.initial_value(:initial_changed).must_equal 'ic'
       @o.initial_value(:missing_changed).must_be_nil
     end

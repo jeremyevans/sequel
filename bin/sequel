@@ -74,7 +74,7 @@ options = OptionParser.new do |opts|
     loggers << file
   end
   
-  opts.on("-L", "--load-dir DIR", "loads all *.rb under specifed directory") do |v|
+  opts.on("-L", "--load-dir DIR", "loads all *.rb under specified directory") do |v|
     load_dirs << v
   end
   

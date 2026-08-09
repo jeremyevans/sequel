@@ -78,7 +78,7 @@
   whether the code is currently inside a transaction.
 
 * The generic JDBC transaction support, used by 6 of Sequel's jdbc
-  subapters, now supports savepoints if the underlying JDBC driver
+  subadapters, now supports savepoints if the underlying JDBC driver
   supports savepoints.
 
 = Other New Features
@@ -269,7 +269,7 @@
   composite keys where one of the join tables requires an alias
   has been fixed.
 
-* Sequel's transaction internals have had substantial improvments.
+* Sequel's transaction internals have had substantial improvements.
   You can now open up simultaneous transactions on two separate
   shards of the same Database object in the same thread.  The new
   design allows for future support of connection pools that aren't
@@ -288,7 +288,7 @@
 
 * Dataset#columns now correctly handles the emulated offset support
   used on DB2, Oracle, and Microsoft SQL Server when using the
-  jdbc, odbc, ado, and dbi adapters.  Previously, Dataet#columns
+  jdbc, odbc, ado, and dbi adapters.  Previously, Dataset#columns
   could contain the row number column, which wasn't in the
   hashes yielded by Dataset#each.
 
@@ -368,7 +368,7 @@
   overriding #initialize and expecting the changes to affect model
   objects loaded from the database, you need to change your code.
 
-  Additionally, @new is no longer set to false for objects retieved
+  Additionally, @new is no longer set to false for objects retrieved
   from the database, since setting it to false hurts performance.
   Model#new? still returns true or false, so this only affects you
   if you are checking the instance variables directly.

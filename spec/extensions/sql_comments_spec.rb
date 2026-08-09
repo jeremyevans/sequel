@@ -42,7 +42,7 @@ shared_specs = Module.new do
     @ds.comment("Foo").comment("Some\nComment\r\n Here").select_sql.must_equal "SELECT * FROM t -- Some Comment Here\n"
   end
 
-  it "should allow disabling comments by overridding with nil" do
+  it "should allow disabling comments by overriding with nil" do
     @ds.comment("Foo").comment(nil).select_sql.must_equal "SELECT * FROM t"
   end
 
@@ -101,7 +101,7 @@ describe "sql_comments database extension" do
     end
   end
 
-  it "should support overridding values in nested blocks" do
+  it "should support overriding values in nested blocks" do
     @db.with_comments(:foo=>'bar', :baz=>'q') do
       @db.with_comments(:baz=>'quux') do
         @ds.select_sql.must_equal "SELECT * FROM t -- foo:bar,baz:quux\n"

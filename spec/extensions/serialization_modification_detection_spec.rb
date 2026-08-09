@@ -79,7 +79,7 @@ describe "serialization_modification_detection plugin" do
     @o1.changed_columns.must_equal [:h]
   end
 
-  it "should work with frozen objects when checking changed_colums during validation" do
+  it "should work with frozen objects when checking changed_columns during validation" do
     @c.send(:define_method, :validate){changed_columns}
     @o1.h[1] = 2
     @o1.freeze

@@ -49,7 +49,7 @@ module Sequel
     # Enable automatically parameterizing queries.
     module AutoParameterizeInArray
       module TreatStringListAsUntypedArray
-        # Sentinal value to use as an auto param type to use auto parameterization
+        # Sentinel value to use as an auto param type to use auto parameterization
         # of a string array without an explicit type cast.
         NO_EXPLICIT_CAST = Object.new.freeze
 
@@ -64,7 +64,7 @@ module Sequel
 
         private
 
-        # Recognize NO_EXPLICIT_CAST sentinal value and use wrapped
+        # Recognize NO_EXPLICIT_CAST sentinel value and use wrapped
         # PGArray that will be parameterized into the query.
         def _convert_array_to_pg_array_with_type(r, type)
           if NO_EXPLICIT_CAST.equal?(type)
@@ -158,7 +158,7 @@ module Sequel
         nil
       end
 
-      # The minimium size of array to auto parameterize.
+      # The minimum size of array to auto parameterize.
       def pg_auto_parameterize_min_array_size
         2
       end

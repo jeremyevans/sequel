@@ -20,7 +20,7 @@
   The nested attributes plugin now also supports a :transform option.
   If given, this option is called with the parent object and the
   input hash given for each associated record passed into the
-  nested atttributes setter.  The callable should return the hash
+  nested attributes setter.  The callable should return the hash
   of attributes to use.
 
 * Model#from_json in the json_serializer plugin now takes an options

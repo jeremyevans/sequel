@@ -242,7 +242,7 @@ Deprecated Features To Be Removed in Sequel 3.0
 * Sequel will no longer require bigdecimal/util, enumerator, or yaml
   in 3.0.  If you need them in your code, make sure you require
   them yourself.  Using features added by requiring these standard
-  libaries will not bring up a deprecation warning, for obvious
+  libraries will not bring up a deprecation warning, for obvious
   reasons.
   
 * Sequel::Error::InvalidTransform, Sequel::Error::NoExistingFilter,
@@ -373,7 +373,7 @@ New Features
     
 * MySQL adapter datasets now have on_duplicate_key_update and
   insert_ignore methods which modify the SQL used to support
-  ON DUPLICATE KEY UPDATE and INSERT INGORE syntax in multi_insert
+  ON DUPLICATE KEY UPDATE and INSERT IGNORE syntax in multi_insert
   and import.
   
 * If you use the MySQL native adapter, you can set:
@@ -483,7 +483,7 @@ Other Improvements
   call distinct on a dataset, instead of waiting until the SQL is
   generated.
 
-Backwards Compatibilty
+Backwards Compatibility
 ----------------------
 
 * Saving a newly inserted record in an after_create or after_save

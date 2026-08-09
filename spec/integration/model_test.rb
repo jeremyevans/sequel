@@ -75,7 +75,7 @@ describe "Sequel::Model basic support" do
     c.select_map(:name).must_equal ['A']
   end
 
-  it "should work correctly when a dataset restricts the colums it selects" do
+  it "should work correctly when a dataset restricts the columns it selects" do
     class ::Item::Thing < Sequel::Model(@db[:items].select(:name))
     end
     Item.create(:name=>'J')

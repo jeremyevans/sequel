@@ -162,7 +162,7 @@ module Sequel
         end
 
         # Filter the objects used when tactical eager loading.
-        # By default, this removes frozen objects and objects that alreayd have the association loaded,
+        # By default, this removes frozen objects and objects that already have the association loaded,
         # as well as objects where the reflection for the association is not the same as the receiver's
         # reflection for the association.
         def _filter_tactical_eager_load_objects(opts)

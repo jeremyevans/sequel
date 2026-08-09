@@ -1343,7 +1343,7 @@ module Sequel
       Sequel.|(*cond)
     end
 
-    # Downcase identifiers by default when outputing them from the database.
+    # Downcase identifiers by default when outputting them from the database.
     def output_identifier(v)
       v = 'untitled' if v == ''
       v.to_s.downcase.to_sym

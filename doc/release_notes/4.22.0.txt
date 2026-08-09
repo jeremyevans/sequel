@@ -12,7 +12,7 @@
 = Other Improvements
 
 * On Ruby 1.9+, Sequel now uses condition variables instead of busy
-  waiting for connections in the threaded conection pools.  This
+  waiting for connections in the threaded connection pools.  This
   can significantly decrease overhead when waiting for connections,
   which can improve performance on machines that are compute
   bottlenecked.  This also makes the connection pool checkouts more

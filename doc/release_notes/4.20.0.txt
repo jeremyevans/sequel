@@ -20,7 +20,7 @@
 = Other Improvements
 
 * Eager loading queries are now skipped if there are no matching keys.
-  There was code to check this previously, but it was accidently
+  There was code to check this previously, but it was accidentally
   removed in an earlier refactoring.
 
 * Eager loading an association with a limit and an eager block and

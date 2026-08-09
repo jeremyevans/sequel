@@ -5,7 +5,7 @@ module Sequel
     # The lazy_attributes plugin allows users to easily set that some attributes
     # should not be loaded by default when loading model objects.  If the attribute
     # is needed after the instance has been retrieved, a database query is made to
-    # retreive the value of the attribute.
+    # retrieve the value of the attribute.
     #
     # This plugin depends on the tactical_eager_loading plugin, and allows you to
     # eagerly load lazy attributes for all objects retrieved with the current object.

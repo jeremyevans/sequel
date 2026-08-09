@@ -98,7 +98,7 @@
 * Sequel now uses date and timestamp formats that are multilanguage
   and not DATEFORMAT dependent on Microsoft SQL Server.
 
-* Sequel now correctly escapes blackslash-carriage return-line feed
+* Sequel now correctly escapes backslash-carriage return-line feed
   on Microsoft SQL Server.
 
 * Parsing the column default values in the oracle adapter no longer

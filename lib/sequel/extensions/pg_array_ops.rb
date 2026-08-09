@@ -195,7 +195,7 @@ module Sequel
         bool_op(OVERLAPS, wrap_array(other))
       end
 
-      # Use the concatentation (||) operator:
+      # Use the concatenation (||) operator:
       #
       #   array_op.push(:a) # (array || a)
       #   array_op.concat(:a) # (array || a)
@@ -280,7 +280,7 @@ module Sequel
         function(:unnest, *args.map{|a| wrap_array(a)})
       end
       
-      # Use the concatentation (||) operator, reversing the order:
+      # Use the concatenation (||) operator, reversing the order:
       #
       #   array_op.unshift(:a) # (a || array)
       def unshift(other)

@@ -215,7 +215,7 @@
 * Database#pragma_get and #pragma_set on SQLite are now deprecated,
   along with any method that calls them, such as auto_vacuum,
   temp_store, foreign_keys, case_sensitive_like, synchronous, and
-  their setter methods.  To set these pragrams for all SQLite
+  their setter methods.  To set these pragmas for all SQLite
   database connections, the appropriate options should be passed
   when creating the Database instance.
 

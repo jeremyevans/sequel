@@ -10,7 +10,7 @@
   for parsing JSON to model objects via JSON.parse or #from_json.
   
 * An xml_serializer plugin was added that allows you to serialize
-  model instances or datasets to XML.  It requries the nokogiri
+  model instances or datasets to XML.  It requires the nokogiri
   library.  It has a similar API to the json_serializer plugin, using
   to_xml instead of to_json, and the from_xml class method instead
   of JSON.parse.

@@ -984,7 +984,7 @@ module Sequel
       on_delete_clause(action)
     end
     
-    # Add fragment for primary key specification, separated for easier overridding.
+    # Add fragment for primary key specification, separated for easier overriding.
     def primary_key_constraint_sql_fragment(_)
       'PRIMARY KEY'
     end
@@ -1144,7 +1144,7 @@ module Sequel
       "#{type}#{literal(Array(elements)) if elements}#{' UNSIGNED' if column[:unsigned]}"
     end
 
-    # Add fragment for unique specification, separated for easier overridding.
+    # Add fragment for unique specification, separated for easier overriding.
     def unique_constraint_sql_fragment(_)
       'UNIQUE'
     end

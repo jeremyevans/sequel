@@ -7,11 +7,11 @@ lazy_attributes.  These plugins don't add any real new features,
 since you can do most of what they allow before simply by being
 a little more explicit in your Sequel code. However, some people
 prefer a less explicit approach that uses a bit more magic, and
-now Sequel can accomodate them.
+now Sequel can accommodate them.
 
 * The identity_map plugin allows you to create a 1-1
   correspondence of model objects to database rows via a temporary
-  thread-local identity map.  It makes the following statment true:
+  thread-local identity map.  It makes the following statement true:
 
     Sequel::Model.with_identity_map do
       Album.filter{(id > 0) & (id < 2)}.first.object_id == \
@@ -72,7 +72,7 @@ now Sequel can accomodate them.
   it'll retrieve the value from the database.  If the object was
   retrieved with a group of other objects and an identity map is in
   use, it'll retrieve the lazy attribute for the entire group of
-  objects at once, similar to the tatical_eager_loading plugin:
+  objects at once, similar to the tactical_eager_loading plugin:
 
     # 2 queries total
     Sequel::Model.with_identity_map do
@@ -358,7 +358,7 @@ Other Improvements
 * An unlikely threading bug (race condition) was possible when using
   the validation_class_methods plugin. The plugin was refactored and
   now uses a mutex to avoid the issue.  One of the refactoring changes
-  makes it so that you can no longer use a class level vaildation
+  makes it so that you can no longer use a class level validation
   inside a Class.new block (since inherited isn't called until the
   block finishes).
 

@@ -28,7 +28,7 @@ module Sequel
       # :auto_is_null :: Set to true to use MySQL default behavior of having
       #                  a filter for an autoincrement column equals NULL to return the last
       #                  inserted row.
-      # :charset :: Same as :encoding (:encoding takes precendence)
+      # :charset :: Same as :encoding (:encoding takes precedence)
       # :encoding :: Set all the related character sets for this
       #              connection (connection, client, database, server, and results).
       #

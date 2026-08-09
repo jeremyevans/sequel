@@ -114,7 +114,7 @@
 * On DB2, Dataset#with_convert_smallint_to_bool has been added,
   which returns a modified dataset with the
   convert_smallint_to_bool setting changed.  Previously,
-  chaging the smallint_to_bool setting required mutating a
+  changing the smallint_to_bool setting required mutating a
   dataset.
 
 * The mock adapter now supports Dataset#with_{autoid,fetch,numrows},

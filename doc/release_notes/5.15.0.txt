@@ -5,7 +5,7 @@
   subclass tables with the same qualifier as the superclass table
   if the superclass table is qualified.
 
-* Model#save_validation_on_next_save! has been added, which skips all
+* Model#skip_validation_on_next_save! has been added, which skips all
   validation on the next save to the object, including the running
   of validation related hooks.  This method is designed for use only
   when Model#valid? is called on the object before saving, to avoid

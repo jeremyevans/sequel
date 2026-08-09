@@ -162,7 +162,7 @@
 * The deprecated firebird and informix adapters have been removed.
 
 * Calling prepare on a prepared statement now raises an exception.
-  It was supported accidently before, as prepared statements are
+  It was supported accidentally before, as prepared statements are
   dataset instances.
 
 * Model::DatasetModule#subset now calls Model.subset instead of

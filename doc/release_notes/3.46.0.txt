@@ -25,7 +25,7 @@
 
     create_table(:tab) do
       primary_key :id, :primary_key_constraint_name=>:pk_name
-      foriegn_key :t_id, :t, :foreign_key_constraint_name=>:fk_name,
+      foreign_key :t_id, :t, :foreign_key_constraint_name=>:fk_name,
         :unique=>true, :unique_constraint_name=>:uk_name
     end
 

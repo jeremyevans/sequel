@@ -153,7 +153,7 @@ module Sequel
       end
 
       # REORG the related table whenever it is altered.  This is not always
-      # required, but it is necessary for compatibilty with other Sequel
+      # required, but it is necessary for compatibility with other Sequel
       # code in many cases.
       def apply_alter_table(name, ops)
         alter_table_sql_list(name, ops).each do |sql|
@@ -437,7 +437,7 @@ module Sequel
         '1'
       end
 
-      # DB2 uses a literal hexidecimal number for blob strings
+      # DB2 uses a literal hexadecimal number for blob strings
       def literal_blob_append(sql, v)
         if db.use_clob_as_blob
           super

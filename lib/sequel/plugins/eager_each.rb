@@ -77,7 +77,7 @@ module Sequel
 
         private
 
-        # Wether to use all when each is called, true when eager loading
+        # Whether to use all when each is called, true when eager loading
         # unless the flag has already been set.
         def use_eager_all?
           (opts[:eager] || opts[:eager_graph]) && !opts[:all_called]

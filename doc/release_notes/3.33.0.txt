@@ -72,7 +72,7 @@
 
   That will make it so that a transaction is not used for that
   particular migration.  The second way is passing the
-  :use_tranctions=>false option when calling Migrator.run (using
+  :use_transactions=>false option when calling Migrator.run (using
   the API), which will completely disable transactions for all
   migrations during the migrator run.
 

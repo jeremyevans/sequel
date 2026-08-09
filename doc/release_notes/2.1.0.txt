@@ -135,7 +135,7 @@ Other Notable Changes
 
 * Symbol#qualify now exists, to specify the table name for a given
   symbol, similar to the use of #as to specify an alias.  This is
-  mainly helpful in conjuction with the #join_table block, as that
+  mainly helpful in conjunction with the #join_table block, as that
   provides the table aliases to use to qualify the columns inside
   the block.
 
@@ -206,7 +206,7 @@ Which will get you the first 5 records matching the condition.
 Backwards Incompatible Changes
 ------------------------------
 
-* To change the datetime classe used from Time to DateTime, you
+* To change the datetime class used from Time to DateTime, you
   now use:
 
     Sequel.datetime_class = DateTime # instead of Sequel.time_class

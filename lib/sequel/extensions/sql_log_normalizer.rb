@@ -14,7 +14,7 @@
 # The normalization is done by scanning the SQL string being executed
 # for literal strings and numbers, and replacing them with question
 # marks.  While this should work for all or almost all production queries,
-# there are pathlogical queries that will not be handled correctly, such as
+# there are pathological queries that will not be handled correctly, such as
 # the use of apostrophes in identifiers:
 #
 #   DB[:"asf'bar"].where(a: 1, b: 'something').first

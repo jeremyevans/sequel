@@ -36,7 +36,7 @@
     Album.one_to_many :artists,
       :dataset=>{|r| r.associated_dataset...}
 
-  This second form will preform better.
+  This second form will perform better.
 
 * Temporary views are now supported on PostgreSQL and SQLite using
   the :temp option to create_view.

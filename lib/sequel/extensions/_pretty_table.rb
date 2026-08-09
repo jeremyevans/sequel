@@ -74,7 +74,7 @@ module Sequel
       String.new << '|' << columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') << '|'
     end
 
-    # String for separtor line
+    # String for separator line
     def self.separator_line(columns, sizes) # :nodoc:
       String.new << '+' << columns.map {|c| '-' * sizes[c]}.join('+') << '+'
     end

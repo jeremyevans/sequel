@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require_relative "spec_helper"
 
-describe "arbtirary servers" do
+describe "arbitrary servers" do
   before do
     @db = Sequel.mock(:servers=>{})
     @db.extension :arbitrary_servers

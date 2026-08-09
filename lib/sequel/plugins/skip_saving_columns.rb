@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The skip_saving_columms plugin allows skipping specific columns when
+    # The skip_saving_columns plugin allows skipping specific columns when
     # saving.  By default, it skips columns that the database schema
     # indicates are generated columns:
     #

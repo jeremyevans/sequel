@@ -247,7 +247,7 @@ Instead, you should do:
   DB[:table].update(column: params[:value].to_s) # Safe
 
 Because using the auto_literal_strings extension makes SQL injection
-so much eaiser, it is recommended to not use it, and instead
+so much easier, it is recommended to not use it, and instead
 use Sequel.lit with placeholders.
  
 === SQL Identifier Injections
@@ -285,7 +285,7 @@ derived from user input unless absolutely necessary.
 Sequel also allows you to create identifiers using
 Sequel.identifier[rdoc-ref:Sequel::SQL::Builders#identifier] for plain identifiers,
 Sequel.qualify[rdoc-ref:Sequel::SQL::Builders#qualify] and
-Sequel::SQL::Indentifier#[][rdoc-ref:Sequel::SQL::QualifyingMethods#[]] for qualified identifiers, and
+Sequel::SQL::Identifier#[][rdoc-ref:Sequel::SQL::QualifyingMethods#[]] for qualified identifiers, and
 Sequel.as[rdoc-ref:Sequel::SQL::Builders#as] for aliased expressions.  So if you
 pass any of those values derived from user input, you are dealing with the same scenario.
 

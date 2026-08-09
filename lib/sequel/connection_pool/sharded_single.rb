@@ -38,7 +38,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   
   # Disconnects from the database. Once a connection is requested using
   # #hold, the connection is reestablished. Options:
-  # :server :: Should be a symbol specifing the server to disconnect from,
+  # :server :: Should be a symbol specifying the server to disconnect from,
   #            or an array of symbols to specify multiple servers.
   def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : servers).each do |s|

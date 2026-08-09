@@ -67,7 +67,7 @@ module Sequel
     #
     # You can use the output of the +unused_associations+ method to determine
     # which associations are not used at all in your application, and can
-    # be eliminiated.
+    # be eliminated.
     #
     # You can also take that unused association data and pass it to the
     # +unused_association_options+ method, which will return an array of
@@ -131,7 +131,7 @@ module Sequel
     # = Automatic Usage of Unused Association Data
     #
     # Since it can be a pain to manually update all of your code
-    # to remove unused assocations or add options to prevent the
+    # to remove unused associations or add options to prevent the
     # definition of unused associations, the unused_associations
     # plugin comes with support to take previously saved unused
     # association data, and use it to not create unused associations,
@@ -265,7 +265,7 @@ module Sequel
       module ClassMethods
         # Only the data is copied to subclasses, to allow the :modify_associations
         # plugin option to affect them.  The :file and :coverage_file are not copied
-        # to subclasses, as users are expected ot call methods such as
+        # to subclasses, as users are expected to call methods such as
         # unused_associations only on the class that is loading the plugin.
         Plugins.inherited_instance_variables(self, :@unused_associations_data=>nil)
 

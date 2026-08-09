@@ -2096,7 +2096,7 @@ describe "Schema Parser" do
     @db.schema(:x).first.last[:auto_increment].must_equal false
   end
 
-  it "should set :auto_increment to false by default if unset and a single nonintegery primary key is used" do
+  it "should set :auto_increment to false by default if unset and a single noninteger primary key is used" do
     @db.define_singleton_method(:schema_parse_table){|*| [[:a, {:primary_key=>true, :db_type=>'varchar'}]]}
     @db.schema(:x).first.last[:auto_increment].must_equal false
   end

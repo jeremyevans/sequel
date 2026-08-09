@@ -132,7 +132,7 @@ Other New Features
     coming out of the database.  If the object coming out of the
     database (usually a string) does not have an offset, assume it is
     already in the database_timezone.  Return a Time/DateTime object
-    (depending on Sequel.datetime_class), in the application_timzone.
+    (depending on Sequel.datetime_class), in the application_timezone.
 
   * Sequel.application_to_database_timestamp - Used when literalizing
     Time/DateTime objects into an SQL string.  Converts the object to

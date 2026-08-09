@@ -74,7 +74,7 @@ describe String do
     "fancyCategory".tableize.must_equal "fancy_categories"
   end
   
-  it "#classify should tranform table names to class names" do
+  it "#classify should transform table names to class names" do
     "egg_and_hams".classify.must_equal "EggAndHam"
     "post".classify.must_equal "Post"
   end

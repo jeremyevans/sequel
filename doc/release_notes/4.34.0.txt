@@ -31,7 +31,7 @@
   placed.  You can use this to have the values inserted into a
   custom hash, or another object responding to #[] and #[]=.
 
-* A validators_operator validation has been added to the
+* A validates_operator validation has been added to the
   validation_helpers plugin:
 
     class Example < Sequel::Model
@@ -51,7 +51,7 @@
   :dataset_associations_join association option on associations that
   use joined datasets.  This option will have the datasets returned
   by the dataset association methods join to the same tables that
-  would be joined when retriving the associated objects, allowing
+  would be joined when retrieving the associated objects, allowing
   selected columns, orders, and filters that reference columns in
   the joined tables to work correctly.
 

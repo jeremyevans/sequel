@@ -33,6 +33,6 @@
     Sequel::Postgres::PGRange.from_range(1...3, :int4).inspect
     # => "#<Sequel::Postgres::PGRange [1,3)::int4>"
 
-* BigDecimal typcasting when using the looser_typecasting extension
+* BigDecimal typecasting when using the looser_typecasting extension
   now works as expected when using newer bigdecimal gem with
   Ruby < 2.4.

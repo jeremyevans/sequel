@@ -48,7 +48,7 @@
 
 * Sequel now supports calling PostgreSQL procedures without arguments
   when using Database#call_procedure.  Previously, attempts to call
-  procuredures without arguments would call the procedure with a
+  procedures without arguments would call the procedure with a
   single NULL argument.
 
 * Sequel now uses defined?(yield) instead of block_given? internally

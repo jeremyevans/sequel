@@ -96,7 +96,7 @@ describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
     proc{@ds.on_duplicate_columns(:raise){:raise}}.must_raise(Sequel::Error)
   end
 
-  it "should warn by defaul if there is no database or dataset handler" do
+  it "should warn by default if there is no database or dataset handler" do
     @ds.send(:columns=, @cols)
     @warned.must_include("One or more duplicate columns present in #{@cols.inspect}")
   end

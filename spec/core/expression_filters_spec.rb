@@ -409,7 +409,7 @@ describe "Blockless Ruby Filters" do
     proc{Sequel::SQL::ComplexExpression.new(:BANG, 1, 2)}.must_raise(Sequel::Error)
   end
 
-  it "should use a string concatentation for + if given a string" do
+  it "should use a string concatenation for + if given a string" do
     @d.lit(Sequel.expr(:x) + '1').must_equal "(x || '1')"
     @d.lit(Sequel.expr(:x) + '1' + '1').must_equal "(x || '1' || '1')"
   end
@@ -1124,7 +1124,7 @@ describe "Sequel core extension replacements" do
     l(Sequel.identifier(Sequel.lit('t')), 't')
   end
 
-  it "Sequel::SQL::Identifier where tbale is Sequel::SQL::Identifier wrapping literal string should not quote table" do
+  it "Sequel::SQL::Identifier where table is Sequel::SQL::Identifier wrapping literal string should not quote table" do
     @ds = @ds.with_quote_identifiers(true)
     l(Sequel.identifier(:t)[:c], '"t"."c"')
     l(Sequel.identifier('t')[:c], '"t"."c"')
@@ -1220,7 +1220,7 @@ describe "Sequel core extension replacements" do
     l(b.cast(Integer), "CAST('a' AS integer)")
   end
 
-  it "SQL::Blob should be convertable to a literal string by default" do
+  it "SQL::Blob should be convertible to a literal string by default" do
     b = Sequel.blob('a ?').freeze
     l(b.lit, "a ?")
     l(b.lit(1), "a 1")

@@ -14,8 +14,8 @@
 
 = Backwards Compatibility
 
-* The Dataset::PlaceholderLiterlizer::Record.loader API has changed,
-  it now accepts the Dataset::PlaceholderLiterlizer class to use as
+* The Dataset::PlaceholderLiteralizer::Record.loader API has changed,
+  it now accepts the Dataset::PlaceholderLiteralizer class to use as
   the first argument.  This makes it easier to create
-  Dataset::PlaceholderLiterlizer subclasses, such as the one now used
+  Dataset::PlaceholderLiteralizer subclasses, such as the one now used
   by the pg_auto_parameterize extension.

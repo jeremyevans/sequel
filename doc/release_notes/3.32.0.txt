@@ -181,7 +181,7 @@
   downsides to this handling.  The first is that some databases with
   poor optimizers (e.g. MySQL) might do a full table scan with the
   default syntax.  The second is that the static boolean handling may
-  be generally perferable, if you believe that IN/NOT IN with an
+  be generally preferable, if you believe that IN/NOT IN with an
   empty array should always be true or false and never NULL even if
   the left hand argument is NULL.
 

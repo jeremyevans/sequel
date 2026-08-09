@@ -541,7 +541,7 @@ handle locking:
   # INSERT INTO "table" ("id") VALUES (2) RETURNING NULL;
   # COMMIT;
 
-=== GRAPH_TABLE support (PostgresSQL 19+)
+=== GRAPH_TABLE support (PostgreSQL 19+)
 
 +graph_table+ is supported on PostgreSQL Database objects. It returns a
 Sequel::PropertyGraph::Table object that uses a method chaining approach to

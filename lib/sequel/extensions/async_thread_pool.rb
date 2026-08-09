@@ -78,7 +78,7 @@
 #
 #   # ...
 #   if result 
-#     # will always execute this banch, since result is a proxy object
+#     # will always execute this branch, since result is a proxy object
 #   end
 #
 # In this case, you can call the +__value+ method to return the actual

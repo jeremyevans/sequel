@@ -6,7 +6,7 @@ module Sequel
     # in the following ways:
     #
     # * It automatically saves model instances back to the
-    #   shard they were retreived from.
+    #   shard they were retrieved from.
     # * It makes model associations use the same shard as the model object.
     # * It adds a slightly nicer API for creating model instances on
     #   specific shards.

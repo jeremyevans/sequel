@@ -381,7 +381,7 @@ module Sequel
         'AUTO_INCREMENT'
       end
       
-      # MySQL needs to set transaction isolation before begining a transaction
+      # MySQL needs to set transaction isolation before beginning a transaction
       def begin_new_transaction(conn, opts)
         set_transaction_isolation(conn, opts)
         log_connection_execute(conn, begin_transaction_sql)
@@ -937,7 +937,7 @@ module Sequel
       end
 
       # Check the database setting for whether fractional timestamps
-      # are suppported.
+      # are supported.
       def supports_timestamp_usecs?
         db.supports_timestamp_usecs?
       end

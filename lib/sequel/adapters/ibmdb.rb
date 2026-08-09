@@ -312,13 +312,13 @@ module Sequel
       # Don't convert smallint to boolean for the metadata
       # dataset, since the DB2 metadata does not use
       # boolean columns, and some smallint columns are
-      # accidently treated as booleans.
+      # accidentally treated as booleans.
       def _metadata_dataset
         super.with_convert_smallint_to_bool(false)
       end
 
       # Format Numeric, Date, and Time types specially for use
-      # as IBM_DB prepared statements argument vlaues.
+      # as IBM_DB prepared statements argument values.
       def prepared_statement_arg(v)
         case v
         when Numeric

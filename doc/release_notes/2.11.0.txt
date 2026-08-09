@@ -194,7 +194,7 @@ Other Improvements
   in the Sequel repository and the RDoc documentation, see
   http://sequel.rubyforge.org/rdoc/files/doc/release_notes/
 
-Backwards Compatibilty
+Backwards Compatibility
 ----------------------
 
 * The optimization of Model.[] may break if you modify the model's

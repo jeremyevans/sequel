@@ -14,7 +14,7 @@
 #
 #   # load model files
 #
-# Then, whenever database indicies are modified, write a new cached
+# Then, whenever database indices are modified, write a new cached
 # file.  You can do that with <tt>bin/sequel</tt>'s -X option:
 #
 #   bin/sequel -X /path/to/index_cache.dump postgres://...

@@ -279,7 +279,7 @@ module Sequel
     #
     # = Unsupported Features
     #
-    # The following features are delibrately not supported:
+    # The following features are deliberately not supported:
     #
     # == Compression
     #
@@ -493,7 +493,7 @@ module Sequel
           decode64(str.tr("-_", "+/"))
         end
 
-        # An array of strings, one for each configured encryption key, to find encypted values matching
+        # An array of strings, one for each configured encryption key, to find encrypted values matching
         # the given data and search format.
         def _search_prefixes(data, search_type)
           @key_map.map do |key_id, (key, _)|
@@ -610,7 +610,7 @@ module Sequel
         end
       end
 
-      # This stores four callables for handling encyption, decryption, data searching,
+      # This stores four callables for handling encryption, decryption, data searching,
       # and key searching.  One of these is created for each encrypted column.
       ColumnEncryptionMetadata = Struct.new(:encryptor, :decryptor, :data_searcher, :key_searcher) # :nodoc:
 
@@ -702,7 +702,7 @@ module Sequel
 
       module InstanceMethods
         # Reencrypt the model if needed.  Looks at all of the models encrypted columns
-        # and if any were encypted with older keys or a different format, reencrypt
+        # and if any were encrypted with older keys or a different format, reencrypt
         # with the current key and format and save the object.  Returns the object
         # if reencryption was needed, or nil if reencryption was not needed.
         def reencrypt

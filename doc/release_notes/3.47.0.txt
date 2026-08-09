@@ -75,7 +75,7 @@
   Sequel 4.
 
   validates_schema_type has been added to validation_class_methods,
-  which preforms the same validation, but it requires the columns
+  which performs the same validation, but it requires the columns
   be listed explicitly.
 
   validates_type in validation_helpers has been expanded to
@@ -200,7 +200,7 @@
   inherited touched associations.
 
 * Sequel no longer resets the conversion procs for the
-  Database instance when using Databaset#extension to load a
+  Database instance when using Database#extension to load a
   pg_* extension that adds global conversion procs.  Instead,
   the global conversion procs are added to the instance-specific
   conversion procs.  The result of this is that manually added
@@ -257,7 +257,7 @@
 * The default validation error message for validates_type has been
   modified.
 
-* Database#schema_column_type was made public accidently by an
+* Database#schema_column_type was made public accidentally by an
   adapter and a few extensions.  That has been fixed, but if you
   were calling it with an explicit receiver and it happened to
   work by accident before, you'll need to update your code.

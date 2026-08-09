@@ -165,7 +165,7 @@ module Sequel
               # columns in the subselect, qualified by the subselect alias.
               Sequel.qualify(qualifier, Sequel.identifier(column))
             else
-              # Initial dataset not wrapped in subslect, just make
+              # Initial dataset not wrapped in subselect, just make
               # sure columns are qualified in some way.
               qualified_expression(sel, qualifier)
             end

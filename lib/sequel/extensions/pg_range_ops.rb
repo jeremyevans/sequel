@@ -113,7 +113,7 @@ module Sequel
 
       private
 
-      # Create a boolen expression for the given type and argument.
+      # Create a boolean expression for the given type and argument.
       def operator(type, other)
         Sequel::SQL::BooleanExpression.new(:NOOP, Sequel::SQL::PlaceholderLiteralString.new(OPERATORS[type], [value, other]))
       end

@@ -79,7 +79,7 @@ module Sequel
     # subclass instances that only have column entries for the columns in the
     # superclass table.  Calling the column method on the subclass instance for
     # a column not in the superclass table will cause a query to the database
-    # to get the value for that column.  If the subclass instance was retreived
+    # to get the value for that column.  If the subclass instance was retrieved
     # using Dataset#all, the query to the database will attempt to load the column
     # values for all subclass instances that were retrieved.  For example:
     #

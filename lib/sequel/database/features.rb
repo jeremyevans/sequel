@@ -5,7 +5,7 @@ module Sequel
     # ---------------------
     # :section: 9 - Methods that describe what the database supports
     # These methods all return booleans, with most describing whether or not the
-    # database supprots a given feature.
+    # database supports a given feature.
     # ---------------------
     
     # Whether the database uses a global namespace for the index, true by default.  If

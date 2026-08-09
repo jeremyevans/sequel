@@ -156,7 +156,7 @@ describe "Model#save" do
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)", "SELECT * FROM items WHERE id = 13"]
   end
 
-  it "should allow you to skip refreshing by overridding _save_refresh" do
+  it "should allow you to skip refreshing by overriding _save_refresh" do
     @c.send(:define_method, :_save_refresh){}
     @c.create(:x => 11)
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)"]
@@ -447,7 +447,7 @@ describe "Model#freeze" do
     @o.this.frozen?.must_equal true
   end
 
-  it "should still have working class attr overriddable methods" do
+  it "should still have working class attr overridable methods" do
     [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions].each{|m| @o.send(m) == Album.send(m)}
   end
 
@@ -863,7 +863,7 @@ describe Sequel::Model, "#this" do
     instance.this.sql.must_equal "SELECT * FROM examples WHERE (id = 3) LIMIT 1"
   end
 
-  it "should support arbitary primary keys" do
+  it "should support arbitrary primary keys" do
     @example.set_primary_key :a
 
     instance = @example.load(:a => 3)
@@ -1125,7 +1125,7 @@ describe Sequel::Model, "#set" do
     @o1.values.must_equal(:x => 2, :z=>3)
   end
 
-  it "#set should correctly handle cases where the object extends a module with a setter method and primary keys are not restricint" do
+  it "#set should correctly handle cases where the object extends a module with a setter method and primary keys are not restricted" do
     @c.unrestrict_primary_key
     @o1.set(:x => 1)
     @o1.values.must_equal(:x => 1)

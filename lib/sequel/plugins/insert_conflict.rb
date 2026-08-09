@@ -19,7 +19,7 @@ module Sequel
     #
     # This example will try to insert the album, but if there is an existing
     # album with the name 'Foo', this will update the copies_sold attribute
-    # for that album.  See the PostgreSQL and SQLite adapter documention for
+    # for that album.  See the PostgreSQL and SQLite adapter documentation for
     # the options you can pass to the insert_conflict method.
     #
     # You should not attempt to use this plugin to ignore conflicts when

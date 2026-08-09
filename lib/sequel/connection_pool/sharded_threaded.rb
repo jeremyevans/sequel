@@ -95,7 +95,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database. Options:
-  # :server :: Should be a symbol specifing the server to disconnect from,
+  # :server :: Should be a symbol specifying the server to disconnect from,
   #            or an array of symbols to specify multiple servers.
   def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : sync{@servers.keys}).each do |s|

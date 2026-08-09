@@ -79,7 +79,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTestSub1, StiTestSub2]
   end 
 
-  it "should return rows with the correct class based on the polymorphic_key value when retreiving by primary key" do
+  it "should return rows with the correct class based on the polymorphic_key value when retrieving by primary key" do
     StiTest.dataset = StiTest.dataset.with_fetch([{:kind=>'StiTestSub1'}])
     StiTest[1].class.must_equal StiTestSub1
   end 
@@ -164,7 +164,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     DB.sqls.must_equal ["INSERT INTO sti_tests (type) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE id = 10"]
   end
 
-  it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
+  it "should add a filter to model datasets inside subclasses hook to only retrieve objects with the matching key" do
     StiTest.dataset.sql.must_equal "SELECT * FROM sti_tests"
     StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1'))"
     StiTestSub2.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2'))"

@@ -332,7 +332,7 @@ describe "pg_row extension" do
     @db.conversion_procs[3].must_be_nil
   end
 
-  it "should allow creating unregisted row types via Database#row_type" do
+  it "should allow creating unregistered row types via Database#row_type" do
     @db.literal(@db.row_type(:foo, [1, 2])).must_equal 'ROW(1, 2)::foo'
   end
 

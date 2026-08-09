@@ -98,7 +98,7 @@ describe "Sequel::Plugins::ClassTableInheritanceConstraintValidations" do
       {:allow_nil=>true, :from=>:values}
     ])
 
-    # granchild has grandchildren, children and parent constraints
+    # grandchild has grandchildren, children and parent constraints
     Grandchild.constraint_validations.must_include([
      :validates_includes,
       ["arg1", "arg2"],
@@ -121,8 +121,8 @@ describe "Sequel::Plugins::ClassTableInheritanceConstraintValidations" do
     ])
   end
 
-  it "does not include constraint_validations from singble tables in class_table_inheritance table hierarchy" do
-    # siblling does *not* have constraints from childen or grandchildren
+  it "does not include constraint_validations from single tables in class_table_inheritance table hierarchy" do
+    # sibling does *not* have constraints from children or grandchildren
     Sibling.constraint_validations.wont_include([
      :validates_includes,
       ["param1", "param2"],

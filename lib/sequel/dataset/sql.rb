@@ -1204,7 +1204,7 @@ module Sequel
       end
     end
 
-    # Append literalization of array of grouping elements to SQL string, seperating them with commas.
+    # Append literalization of array of grouping elements to SQL string, separating them with commas.
     def grouping_element_list_append(sql, columns)
       c = false
       co = ', '
@@ -1372,7 +1372,7 @@ module Sequel
       literal_string_append(sql, v)
     end
 
-    # Append literalization of dataset to SQL string.  Does a subselect inside parantheses.
+    # Append literalization of dataset to SQL string.  Does a subselect inside parentheses.
     def literal_dataset_append(sql, v)
       sql << 'LATERAL ' if v.opts[:lateral]
       sql << '('
@@ -1438,7 +1438,7 @@ module Sequel
     # Append a literalization of the object to the given SQL string.
     # Calls +sql_literal_append+ if object responds to it, otherwise
     # calls +sql_literal+ if object responds to it, otherwise raises an error.
-    # If a database specific type is allowed, this should be overriden in a subclass.
+    # If a database specific type is allowed, this should be overridden in a subclass.
     def literal_other_append(sql, v)
       if v.respond_to?(:sql_literal_append)
         v.sql_literal_append(self, sql)
@@ -1559,7 +1559,7 @@ module Sequel
     end
 
     # Modify the sql to add a dataset to the via an EXCEPT, INTERSECT, or UNION clause.
-    # This uses a subselect for the compound datasets used, because using parantheses doesn't
+    # This uses a subselect for the compound datasets used, because using parentheses doesn't
     # work on all databases.
     def select_compounds_sql(sql)
       return unless c = @opts[:compounds]

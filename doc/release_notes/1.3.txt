@@ -9,7 +9,7 @@ caution.
 The new implementation supports three kinds of relations: one_to_many,
 many_to_one and many_to_many, which correspond to has_many, belongs_to
 and has_and_belongs_to_many relations in ActiveRecord. In fact, the
-new implementation includes aliases for ActiveRecord assocation macros
+new implementation includes aliases for ActiveRecord association macros
 and is basically compatible with ActiveRecord conventions. It also
 supports DRY implicit class name references. Here's a simple example:
 

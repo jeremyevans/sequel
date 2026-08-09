@@ -63,7 +63,7 @@
 #   DB[:tab].update(h: Sequel.hstore_op(:h).delete('k1'))
 #  
 # On PostgreSQL 14+, The hstore <tt>[]</tt> method will use subscripts instead of being
-# the same as +get+, if the value being wrapped is an identifer:
+# the same as +get+, if the value being wrapped is an identifier:
 #
 #   Sequel.hstore_op(:hstore_column)['a']    # hstore_column['a']
 #   Sequel.hstore_op(Sequel[:h][:s])['a']      # h.s['a']

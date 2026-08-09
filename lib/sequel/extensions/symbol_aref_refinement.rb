@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 #
 # The symbol_aref_refinement extension adds a refinement that makes
-# Symbol#[] support Symbol, #Sequel::SQL::Indentifier, and
+# Symbol#[] support Symbol, #Sequel::SQL::Identifier, and
 # Sequel::SQL::QualifiedIdentifier instances, returning appropriate
 # Sequel::SQL::QualifiedIdentifier instances.  It's designed as a
 # shortcut so that instead of:

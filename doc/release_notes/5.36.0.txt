@@ -25,7 +25,7 @@
 
   * When loading plugins (Model.plugin)
 
-  * Class methods automically defined for methods defined in a
+  * Class methods automatically defined for methods defined in a
     Model.dataset_module block
 
   * Methods defined by Plugins.def_dataset_method

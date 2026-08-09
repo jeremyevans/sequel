@@ -561,7 +561,7 @@ describe Sequel::Model, " association reflection methods" do
     @c1.associations.sort_by{|x|x.to_s}.must_equal [:children, :parent]
   end
 
-  it "association reflections should be copied upon subclasing" do
+  it "association reflections should be copied upon subclassing" do
     @c1.associate :many_to_one, :parent, :class => @c1
     c = Class.new(@c1)
     @c1.associations.must_equal [:parent]

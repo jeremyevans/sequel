@@ -157,7 +157,7 @@
 
 = Backwards Compatibility
 
-* The filter by associations support breaks backward compatibilty for
+* The filter by associations support breaks backward compatibility for
   users who previously added an sql_literal instance method to
   Sequel::Model.  Usually, that was done to for reasons similar to
   but inferior than the filter by association support.  The following

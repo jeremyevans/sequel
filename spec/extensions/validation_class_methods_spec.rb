@@ -54,7 +54,7 @@ describe Sequel::Model do
     c.validation_reflections[:a].last.must_equal [:presence, {:tag=>:presence, :message=>"is not present"}]
   end
 
-  it "should acccept validation definitions using validates_each" do
+  it "should accept validation definitions using validates_each" do
     @c.validates_each(:xx, :yy) {|o, a, v| o.errors.add(a, 'too low') if v < 50}
     o = @c.new
     def o.xx; 40; end
@@ -1014,7 +1014,7 @@ describe Sequel::Model, "Validations" do
     @person2.valid?.must_equal true
   end
 
-  it "should allow 'longhand' validations direcly within the model." do
+  it "should allow 'longhand' validations directly within the model." do
     class ::Person < Sequel::Model
       validations.clear
       validates_length_of :first_name, :maximum => 30

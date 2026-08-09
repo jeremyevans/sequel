@@ -43,7 +43,7 @@ module Sequel
     private
 
     # Fetch the rows, split them into component table parts,
-    # tranform and run the row_proc on each part (if applicable),
+    # transform and run the row_proc on each part (if applicable),
     # and yield a hash of the parts.
     def graph_each(sql=select_sql)
       # Reject tables with nil datasets, as they are excluded from

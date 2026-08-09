@@ -38,7 +38,7 @@
 * SQLite generated columns now show up in Database#schema when using
   SQLite 3.37+.
 
-* Sequel now attempts to avoid an infinite loop in pathlogical cases
+* Sequel now attempts to avoid an infinite loop in pathological cases
   in the jdbc adapter, where the exception cause chain has a loop.
   Additionally, if an exception is already recognized as a disconnect,
   or an exception already responds to a getSQLState method, Sequel no

@@ -5,7 +5,7 @@ require_relative 'utils/stored_procedures'
 
 module Sequel
   module JDBC
-    # Make it accesing the java.sql hierarchy more ruby friendly.
+    # Make it accessing the java.sql hierarchy more ruby friendly.
     module JavaSQL
       include_package 'java.sql'
     end
@@ -361,7 +361,7 @@ module Sequel
       # The uri for this connection.  You can specify the uri
       # using the :uri, :url, or :database options.  You don't
       # need to worry about this if you use Sequel.connect
-      # with the JDBC connectrion strings.
+      # with the JDBC connection strings.
       def uri(opts=OPTS)
         opts = @opts.merge(opts)
         ur = opts[:uri] || opts[:url] || opts[:database]

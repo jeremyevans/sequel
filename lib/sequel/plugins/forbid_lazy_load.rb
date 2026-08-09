@@ -9,7 +9,7 @@ module Sequel
     # The main reason for doing this is it makes it easier to detect
     # N+1 query issues. Note that Sequel also offers a
     # tactical_eager_loading plugin which will automatically eagerly
-    # load associations for all objects retrived in the same query
+    # load associations for all objects retrieved in the same query
     # if any object would attempt to lazily load an association. That
     # approach may be simpler if you are trying to prevent N+1 issues,
     # though it does retain more objects in memory.

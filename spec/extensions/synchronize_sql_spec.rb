@@ -52,7 +52,7 @@ describe "synchronize_sql extension" do
     @db.pool.times_connection_acquired.must_equal 1
   end
 
-  it 'cheks out an extra connectrion on update_sql if there are no strings' do
+  it 'checks out an extra connection on update_sql if there are no strings' do
     @ds.where(:numeric_foo => [1, 2, 3, 4, 5]).update_sql(:numeric_foo => 99)
     @db.pool.times_connection_acquired.must_equal 0
 

@@ -69,7 +69,7 @@ module Sequel
       # :auto_is_null :: Set to true to use MySQL default behavior of having
       #                  a filter for an autoincrement column equals NULL to return the last
       #                  inserted row.
-      # :charset :: Same as :encoding (:encoding takes precendence)
+      # :charset :: Same as :encoding (:encoding takes precedence)
       # :compress :: Set to false to not compress results from the server
       # :config_default_group :: The default group to read from the in
       #                          the MySQL config file.

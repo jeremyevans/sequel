@@ -204,12 +204,12 @@ module Sequel
         @in = v
       end
 
-      # Assumes hash partitioning, sets the modulus for this parition.
+      # Assumes hash partitioning, sets the modulus for this partition.
       def modulus(v)
         @modulus = v
       end
 
-      # Assumes hash partitioning, sets the remainder for this parition.
+      # Assumes hash partitioning, sets the remainder for this partition.
       def remainder(v)
         @remainder = v
       end
@@ -406,13 +406,13 @@ module Sequel
             Data.new(@name, @key, @labels, @source, @destination).freeze
           end
 
-          # Specify the source for the edge, with block evaluted by Target.
+          # Specify the source for the edge, with block evaluated by Target.
           def source(name, &block)
             raise Error, "cannot specify multiple sources for a property graph edge" if @source
             @source = Target.new(name, &block)
           end
 
-          # Specify the destination for the edge, with block evaluted by Target.
+          # Specify the destination for the edge, with block evaluated by Target.
           def destination(name, &block)
             raise Error, "cannot specify multiple destinations for a property graph edge" if @destination
             @destination = Target.new(name, &block)
@@ -437,12 +437,12 @@ module Sequel
             Data.new(@vertices, @edges).freeze
           end
 
-          # Adds a vertex to the property graph, with the block evaluted by Vertex.
+          # Adds a vertex to the property graph, with the block evaluated by Vertex.
           def vertex(name, opts=OPTS, &block)
             @vertices << Vertex.new(name, opts, &block)
           end
 
-          # Adds an edge to the property graph, with the block evaluted by Edge.
+          # Adds an edge to the property graph, with the block evaluated by Edge.
           def edge(name, opts=OPTS, &block)
             @edges << Edge.new(name, opts, &block)
           end
@@ -962,7 +962,7 @@ module Sequel
       # Keys are CHECK constraint name symbols.  Values are hashes with the following keys:
       # :definition :: An SQL fragment for the definition of the constraint
       # :columns :: An array of column symbols for the columns referenced in the constraint,
-      #             can be an empty array if the database cannot deteremine the column symbols.
+      #             can be an empty array if the database cannot determine the column symbols.
       def check_constraints(table)
         m = output_identifier_meth
 
@@ -1354,7 +1354,7 @@ module Sequel
       #
       # link :: Add a bidirectional link to a new element (vertex or edge)
       # to :: Add a directional link from the last element to the new element
-      # from :: Add a direciton link from the new element to last element
+      # from :: Add a direction link from the new element to last element
       # columns :: Replace the columns the graph table returns
       # add_columns :: Append to the columns the graph table returns.
       #
@@ -1378,7 +1378,7 @@ module Sequel
       #   gt = gt.to(:v2)
       #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2") COLUMNS ("c", 1 AS "d"))
       #
-      #   # Adds bidirection link from vertex to vertex (overriding the default)
+      #   # Adds bidirectional link from vertex to vertex (overriding the default)
       #   gt = gt.link(:v3, vertex: true)
       #   # GRAPH_TABLE ("pgn" MATCH (IS "iv")-[IS "e1"]->(IS "v2")-(IS "v3") COLUMNS ("c", 1 AS "d"))
       #
@@ -2554,7 +2554,7 @@ module Sequel
         "#{super}#{create_table_suffix_sql(name, options)}"
       end
 
-      # Handle various PostgreSQl specific table extensions such as inheritance,
+      # Handle various PostgreSQL specific table extensions such as inheritance,
       # partitioning, tablespaces, and foreign tables.
       def create_table_suffix_sql(name, options)
         sql = String.new
@@ -3181,7 +3181,7 @@ module Sequel
       # Handle uniqueness violations when inserting, by updating the conflicting row, using
       # ON CONFLICT. With no options, uses ON CONFLICT DO NOTHING.  Options:
       # :conflict_where :: The index filter, when using a partial index to determine uniqueness.
-      # :constraint :: An explicit constraint name, has precendence over :target.
+      # :constraint :: An explicit constraint name, has precedence over :target.
       # :target :: The column name or expression to handle uniqueness violations on.
       # :update :: A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.
       # :update_where :: A WHERE condition to use for the update.

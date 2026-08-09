@@ -16,13 +16,13 @@ New Features
     ds1.intersect(ds2).union(ds3)
 
 * Exception classes ValidationFailure and BeforeHookFailure were
-  added so it is eaiser to catch a failed validation.  These are
+  added so it is easier to catch a failed validation.  These are
   both subclasses of Sequel::Error, so there shouldn't be any
   backwards compatibility issues.  Error messages are also improved,
   as the ValidationFailure message is a string containing all
   validation failures and the BeforeHookFailure message contains
   which hook type caused the failure (i.e. before_save,
-  before_create, or before_validate).
+  before_create, or before_validation).
 
 * The sequel command line tool now has a -L option to load
   all files in the given directory.  This is mainly useful for
@@ -66,7 +66,7 @@ Other Improvements
 * The SQLite adapter no longer loses primary key information when
   dropping columns.
 
-* The SQLite adapter now supports dropping indicies.
+* The SQLite adapter now supports dropping indices.
 
 * A bug in the MSSQL adapter's literalization of LiteralStrings has
   been fixed.
@@ -86,7 +86,7 @@ Other Improvements
 * Model#inspect now calls Model#inspect_values for easier
   overloading.
 
-Backwards Compatibilty
+Backwards Compatibility
 ----------------------
 
 * The API to Model#save_failure (a private method) was changed to

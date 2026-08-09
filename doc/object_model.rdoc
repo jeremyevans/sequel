@@ -257,7 +257,7 @@ Sequel::SQL::Identifier objects represent single identifiers.  The main reason f
 their existence is they support many additional Sequel specific methods that are
 not supported on plain symbols:
 
-  Sequel::SQL::Identifier.new(:colum) # "col"
+  Sequel::SQL::Identifier.new(:column) # "col"
 
 The following shortcuts exist for creating Sequel::SQL::Identifier objects:
 

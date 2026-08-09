@@ -53,7 +53,7 @@ module Sequel
       end
 
       module ClassMethods
-        # If true, ignores exceptions when gettings cached records (the memcached API).
+        # If true, ignores exceptions when getting cached records (the memcached API).
         attr_reader :cache_ignore_exceptions
         
         # The cache store object for the model, which should implement the

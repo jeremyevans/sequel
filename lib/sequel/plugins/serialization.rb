@@ -154,7 +154,7 @@ module Sequel
         
         private
 
-        # Add serializated attribute acessor methods to the serialization_module
+        # Add serializated attribute accessor methods to the serialization_module
         def define_serialized_attribute_accessor(serializer, deserializer, *columns)
           m = self
           include(@serialization_module ||= Sequel.set_temp_name(Module.new){"#{name}::@serialization_module"}) unless @serialization_module

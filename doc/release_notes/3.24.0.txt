@@ -189,7 +189,7 @@
   that uses static bound values and convert them to placeholders.
   Currently, the only cases handled are SQL::ComplexExpression
   objects that use a =, !=, <, >, <=, or >= operator where the first
-  argument is a Symbol, SQL::Indentifier, or
+  argument is a Symbol, SQL::Identifier, or
   SQL::QualifiedIdentifier, and the second argument is a Numeric,
   String, Date, or Time.  Dataset#unbind returns a two element array,
   where the first element is a modified copy of the receiver, and the

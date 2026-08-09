@@ -238,7 +238,7 @@ module Sequel
     # Splits the symbol into three parts, if symbol splitting is enabled (not the default).
     # Each part will either be a string or nil. If symbol splitting
     # is disabled, returns an array with the first and third parts
-    # being nil, and the second part beind a string version of the symbol.
+    # being nil, and the second part behind a string version of the symbol.
     #
     # For columns, these parts are the table, column, and alias.
     # For tables, these parts are the schema, table, and alias.
@@ -284,7 +284,7 @@ module Sequel
     #
     # Disabling symbol splitting will also disable the handling
     # of double underscores in virtual row methods, causing such methods to
-    # yield regular identifers instead of qualified identifiers:
+    # yield regular identifiers instead of qualified identifiers:
     #
     #   # Sequel.split_symbols = true
     #   Sequel.expr{table__column}  # table.column

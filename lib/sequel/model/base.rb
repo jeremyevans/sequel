@@ -1830,7 +1830,7 @@ END
         end
       end
 
-      # Internal destroy method, separted from destroy to
+      # Internal destroy method, separated from destroy to
       # allow running inside a transaction
       def _destroy(opts)
         called = false

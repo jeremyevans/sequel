@@ -33,7 +33,7 @@ module Sequel
     end
 
     # Rescue disconnect errors raised when beginning a new transaction.  If there
-    # is a disconnnect error, it should be safe to retry the transaction using a
+    # is a disconnect error, it should be safe to retry the transaction using a
     # new connection, as we haven't yielded control to the user yet.
     def transaction(opts=OPTS)
       super

@@ -74,7 +74,7 @@ describe "identifier_mangling extension" do
 end
 
 describe "Database#input_identifier_meth" do
-  it "should be the input_identifer method of a default dataset for this database" do
+  it "should be the input_identifier method of a default dataset for this database" do
     db = Sequel::Database.new.extension(:identifier_mangling)
     db.identifier_input_method = nil
     db.send(:input_identifier_meth).call(:a).must_equal 'a'
@@ -84,7 +84,7 @@ describe "Database#input_identifier_meth" do
 end
 
 describe "Database#output_identifier_meth" do
-  it "should be the output_identifer method of a default dataset for this database" do
+  it "should be the output_identifier method of a default dataset for this database" do
     db = Sequel::Database.new.extension(:identifier_mangling)
     db.identifier_output_method = nil
     db.send(:output_identifier_meth).call('A').must_equal :A

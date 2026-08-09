@@ -39,7 +39,7 @@ module Sequel
     # :skip_invalid :: Do not try to validate columns that are already invalid.
     #
     # The default validation options for all models can be modified by
-    # overridding the Model#default_validation_helpers_options private method.
+    # overriding the Model#default_validation_helpers_options private method.
     # By changing the default options, you can setup internationalization of the
     # error messages.  For example, you would modify the default options:
     #

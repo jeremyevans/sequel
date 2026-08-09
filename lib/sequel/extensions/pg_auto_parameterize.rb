@@ -56,7 +56,7 @@
 #      DB[:t].select{foo('a').as(:f)}.group{foo('a')}
 #      # SELECT foo('a') AS "f" FROM "t" GROUP BY foo('a')
 #
-#    Will get auto paramterized as:
+#    Will get auto parameterized as:
 #
 #      # SELECT foo($1) AS "f" FROM "t" GROUP BY foo($2)
 #
@@ -180,7 +180,7 @@ module Sequel
         end
       end
 
-      # PlacholderLiteralizer subclass with support for stored auto parameters.
+      # PlaceholderLiteralizer subclass with support for stored auto parameters.
       class PlaceholderLiteralizer < ::Sequel::Dataset::PlaceholderLiteralizer
         def initialize(dataset, fragments, final_sql, arity)
           s = dataset.sql.dup

@@ -46,7 +46,7 @@
 
 * The many_to_many setter method in the association_pks plugin now
   uses Dataset#import to insert many rows at once, instead of using
-  a seperate query per insert.
+  a separate query per insert.
 
 * The jdbc adapter's type conversion has been rewritten to be
   more similar to the other adapters, setting up the type

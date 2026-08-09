@@ -192,7 +192,7 @@ module Sequel
     
     # Disconnects all available connections from the connection pool.  Any
     # connections currently in use will not be disconnected. Options:
-    # :server :: Should be a symbol specifing the server to disconnect from,
+    # :server :: Should be a symbol specifying the server to disconnect from,
     #             or an array of symbols to specify multiple servers.
     #
     # Example:

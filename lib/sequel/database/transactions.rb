@@ -50,7 +50,7 @@ module Sequel
     # Options:
     # :savepoint :: If currently inside a savepoint, run this hook immediately when
     #               any enclosing savepoint is rolled back, which may be before the transaction
-    #               commits or rollsback.
+    #               commits or rolls back.
     # :server :: The server/shard to use.
     def after_rollback(opts=OPTS, &block)
       raise Error, "must provide block to after_rollback" unless block
@@ -69,7 +69,7 @@ module Sequel
     # When exiting the transaction block through methods other than an exception
     # (e.g. normal exit, non-local return, or throw), set the current transaction
     # to rollback instead of committing.  This is designed for use in cases where
-    # you want to preform a non-local return but also want to rollback instead of
+    # you want to perform a non-local return but also want to rollback instead of
     # committing.
     # Options:
     # :cancel :: Cancel the current rollback_on_exit setting, so exiting will commit instead
@@ -246,7 +246,7 @@ module Sequel
     # Internal generic transaction method.  Any exception raised by the given
     # block will cause the transaction to be rolled back.  If the exception is
     # not a Sequel::Rollback, the error will be reraised. If no exception occurs
-    # inside the block, the transaction is commited.
+    # inside the block, the transaction is committed.
     def _transaction(conn, opts=OPTS)
       rollback = opts[:rollback]
       begin
@@ -538,7 +538,7 @@ module Sequel
     end
 
     # Finish a subtransaction.  If savepoints are supported, pops the current
-    # tansaction off the savepoint stack.
+    # transaction off the savepoint stack.
     def transaction_finished?(conn)
       if supports_savepoints?
         stack = _trans(conn)[:savepoints]

@@ -179,7 +179,7 @@ describe "Simple Dataset operations" do
     rows.must_equal((1..100).map{|i| {:id=>i, :number=>i*10}})
 
     if DB.adapter_scheme == :jdbc
-      # check retrival with varying fetch sizes
+      # check retrieval with varying fetch sizes
       array = (1..100).to_a
       [1, 2, 5, 10, 33, 50, 100, 1000].each do |i|
         @ds.with_fetch_size(i).select_order_map(:id).must_equal array
@@ -287,7 +287,7 @@ describe "Simple Dataset operations" do
     @ds.order(:id).offset(2).all.must_equal []
   end
 
-  it "should fetch correctly with a limit and offset using seperate methods" do
+  it "should fetch correctly with a limit and offset using separate methods" do
     @ds.order(:id).limit(2).offset(0).all.must_equal [{:id=>1, :number=>10}]
     @ds.order(:id).limit(2).offset(1).all.must_equal []
     wait{@ds.insert(:number=>20)}
@@ -1711,7 +1711,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter{a <= b}.select_order_map(:a).must_equal [10, 11, 20]
   end
   
-  it "should work with casting and string concatentation" do
+  it "should work with casting and string concatenation" do
     wait{@ds.insert(20, 20)}
     @ds.get{Sequel.cast(a, String).sql_string + Sequel.cast(b, String)}.must_equal '2020'
   end

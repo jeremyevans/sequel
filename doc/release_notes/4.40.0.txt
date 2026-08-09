@@ -54,13 +54,13 @@
 
     Sequel.expr{table[:column]}
 
-  This offers a easy way to create qualified identifers when symbol
+  This offers a easy way to create qualified identifiers when symbol
   splitting has been disabled.
 
 * A symbol_aref extension has been added, allowing the use of
   Symbol#[] to create qualified identifiers if passed a Symbol,
   SQL::Identifier, or SQL::QualifiedIdentifier.  This doesn't
-  break any existing ruby behavior, as ruby currrently raises
+  break any existing ruby behavior, as ruby currently raises
   an exception in such cases.  Example:
   
     :table[:column] # "table"."column"

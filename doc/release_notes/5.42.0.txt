@@ -71,7 +71,7 @@
 
       DB[:table].async.insert(1)
 
-    is probablematic because without storing the return value, you
+    is problematic because without storing the return value, you
     have no way to block until the insert has been completed.
 
   * The returned object for Dataset methods executed asynchronously is

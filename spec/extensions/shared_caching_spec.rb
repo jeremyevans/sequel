@@ -48,43 +48,43 @@ describe "Shared caching behavior" do
       @c.load(:id=>4, :caching_model_id=>3).caching_model.must_be_nil
     end
 
-    it "should not use a simple primary key lookup if the assocation has a nil :key option" do
+    it "should not use a simple primary key lookup if the association has a nil :key option" do
       @c.many_to_one :caching_model, :key=>nil, :dataset=>proc{CachingModel.filter(:caching_model_id=>caching_model_id)}
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.wont_equal []
     end
 
-    it "should not use a simple primary key lookup if the assocation has a nil :key option" do
+    it "should not use a simple primary key lookup if the association has a nil :key option" do
       @c.many_to_one :caching_model, :many_to_one_pk_lookup=>false
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.wont_equal []
     end
 
-    it "should not use a simple primary key lookup if the assocation's :primary_key option doesn't match the primary key of the associated class" do
+    it "should not use a simple primary key lookup if the association's :primary_key option doesn't match the primary key of the associated class" do
       @c.many_to_one :caching_model, :primary_key=>:id2
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.wont_equal []
     end
 
-    it "should not use a simple primary key lookup if the assocation has :conditions" do
+    it "should not use a simple primary key lookup if the association has :conditions" do
       @c.many_to_one :caching_model, :conditions=>{:a=>1}
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.wont_equal []
     end
 
-    it "should not use a simple primary key lookup if the assocation has :select" do
+    it "should not use a simple primary key lookup if the association has :select" do
       @c.many_to_one :caching_model, :select=>[:a, :b]
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.wont_equal []
     end
 
-    it "should not use a simple primary key lookup if the assocation has a block" do
+    it "should not use a simple primary key lookup if the association has a block" do
       @c.many_to_one(:caching_model){|ds| ds.where{a > 1}}
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.wont_equal []
     end
 
-    it "should not use a simple primary key lookup if the assocation has a non-default :dataset option" do
+    it "should not use a simple primary key lookup if the association has a non-default :dataset option" do
       cc = @cc
       @c.many_to_one :caching_model, :dataset=>proc{cc.where(:id=>caching_model_id)}
       @c.load(:id=>3, :caching_model_id=>1).caching_model

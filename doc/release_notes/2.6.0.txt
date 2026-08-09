@@ -79,7 +79,7 @@ Other Improvements
 * The SQLite adapter now respects the Sequel.datetime_class option
   for timestamp and datetime columns.
 
-* Adding a unique constraint no longer explicity creates a unique
+* Adding a unique constraint no longer explicitly creates a unique
   index.  If you want a unique index, use index :unique=>true.
 
 * If no language is specified when creating a full text index on

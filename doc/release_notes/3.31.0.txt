@@ -23,7 +23,7 @@
 * PostgreSQL can now use Dataset#returning in conjunction with
   import/multi_insert to set a custom column to return.
   
-* Microsoft SQL Server can now use Dataset#output in conjection with
+* Microsoft SQL Server can now use Dataset#output in conjunction with
   import/multi_insert to set a custom column to return.
   
 * Dataset#import and #multi_insert now respect a :server option to

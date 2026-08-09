@@ -20,7 +20,7 @@ module Sequel
     #   # Persist changes
     #
     # Note that it uses the singular form of the association name. Also note
-    # that the setter both associates to new primary keys not in the assocation
+    # that the setter both associates to new primary keys not in the association
     # and disassociates from primary keys not provided to the method.
     #
     # This plugin makes modifications directly to the underlying tables,

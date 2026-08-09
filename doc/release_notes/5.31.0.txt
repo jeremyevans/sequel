@@ -1,7 +1,7 @@
 = New Features
 
 * A forbid_lazy_load plugin has been added to forbid the lazy loading
-  of model associations if the current object was retreived with other
+  of model associations if the current object was retrieved with other
   objects.  This plugin helps detect N+1 query issues.  This plugin
   will raise an error if a lazy load is detected in such cases:
 

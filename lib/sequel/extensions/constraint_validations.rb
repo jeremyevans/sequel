@@ -95,7 +95,7 @@
 #   integers, and a range of integers.
 # * There are like and ilike validations, which are similar to the format
 #   validation but use a case sensitive or case insensitive LIKE pattern. LIKE
-#   patters are very simple, so many regexp patterns cannot be expressed by
+#   patterns are very simple, so many regexp patterns cannot be expressed by
 #   them, but only a couple databases (PostgreSQL and MySQL) support regexp
 #   patterns.
 # * The operator validation only supports >, >=, <, and <= operators, and the

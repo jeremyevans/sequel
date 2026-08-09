@@ -42,7 +42,7 @@ module Sequel
       #
       # :result :: The result code of the stored procedure
       # :numrows :: The number of rows affected by the stored procedure
-      # output params :: Values for any output paramters, using the name given for the output parameter
+      # output params :: Values for any output parameters, using the name given for the output parameter
       #
       # Because Sequel datasets only support a single result set per query, and retrieving 
       # the result code and number of rows requires a query, this does not support
@@ -672,7 +672,7 @@ module Sequel
         end
       end
 
-      # MSSQL treats [] as a metacharacter in LIKE expresions.
+      # MSSQL treats [] as a metacharacter in LIKE expressions.
       def escape_like(string)
         string.gsub(/[\\%_\[\]]/){|m| "\\#{m}"}
       end
@@ -941,7 +941,7 @@ module Sequel
       # Allow update and delete for unordered, limited datasets only.
       def check_not_limited!(type)
         return if @opts[:skip_limit_check] && type != :truncate
-        raise Sequel::InvalidOperation, "Dataset##{type} not suppored on ordered, limited datasets" if opts[:order] && opts[:limit]
+        raise Sequel::InvalidOperation, "Dataset##{type} not supported on ordered, limited datasets" if opts[:order] && opts[:limit]
         super if type == :truncate || @opts[:offset]
       end
 
@@ -1040,7 +1040,7 @@ module Sequel
         end
       end
 
-      # MSSQL uses a literal hexidecimal number for blob strings
+      # MSSQL uses a literal hexadecimal number for blob strings
       def literal_blob_append(sql, v)
         sql << '0x' << v.unpack("H*").first
       end

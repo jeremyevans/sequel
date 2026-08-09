@@ -2889,7 +2889,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.new(:id => 1234).remove_all_attributes.must_be_nil
   end
 
-  it "remove_all should remove the current item from all reciprocal instance varaibles if it cached instance variable exists" do
+  it "remove_all should remove the current item from all reciprocal instance variables if it cached instance variable exists" do
     @c2.many_to_many :attributes, :class => @c1
     @c1.many_to_many :nodes, :class => @c2
     @c1.dataset = @c1.dataset.with_fetch([])
@@ -3112,7 +3112,7 @@ describe Sequel::Model, "many_to_many" do
     DB.sqls.must_equal ["DELETE FROM attributes_nodes WHERE (node_id = 1)"]
   end
 
-  it "should use assocation's dataset when grabbing a record to remove from the assocation by primary key" do
+  it "should use association's dataset when grabbing a record to remove from the association by primary key" do
     @c2.many_to_many :attributes, :class => @c1 do |ds|
       ds.filter(:join_table_att=>3)
     end

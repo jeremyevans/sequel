@@ -38,7 +38,7 @@ class Sequel::ConnectionPool
   POOL_CLASS_MAP.freeze
 
   # Class methods used to return an appropriate pool subclass, separated
-  # into a module for easier overridding by extensions.
+  # into a module for easier overriding by extensions.
   module ClassMethods
     # Return a pool subclass instance based on the given options.  If a <tt>:pool_class</tt>
     # option is provided is provided, use that pool class, otherwise

@@ -32,7 +32,7 @@
 * ASTTransformer now handles Sequel.extract, allowing Dataset#qualify
   and other uses of ASTTransformer to work with such values.
 
-* The create_view :columns option is now suppported on SQLite 3.9.0+.
+* The create_view :columns option is now supported on SQLite 3.9.0+.
 
 * An additional disconnect error is now recognized in the postgres
   adapter.

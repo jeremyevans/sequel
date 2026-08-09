@@ -1063,7 +1063,7 @@ If you just want to know whether the current dataset would return any rows, use 
 
 == Aggregate Calculations
 
-The SQL standard defines a few helpful methods to get aggreate information about
+The SQL standard defines a few helpful methods to get aggregate information about
 datasets, such as +count+, +sum+, +avg+, +min+, and +max+.  There are dataset methods
 for each of these aggregate functions.
 

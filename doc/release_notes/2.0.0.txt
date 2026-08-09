@@ -183,7 +183,7 @@ associated objects in a single query:
   # UPDATE albums SET artist_id = NULL WHERE artist_id = 1
 
 All associations can specify a :select option to change which columns
-are selected.  Previously only many to many associations suppported
+are selected.  Previously only many to many associations supported
 this.
 
 The SQL used when eagerly loading through eager_graph can be

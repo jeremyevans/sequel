@@ -131,7 +131,7 @@
   Switch to modifying the setting for each Database instance.
 
 * Sequel.identifier_input_method=, Sequel.identifier_output_method=,
-  and Sequel.quote_identifer= setter methods are now deprecated.
+  and Sequel.quote_identifier= setter methods are now deprecated.
   Switch to modifying the setting for each Database instance.
 
 * Calling Dataset#delete/update/truncate on datasets with limits
@@ -163,7 +163,7 @@
   has been used.
 
 * Model.dup/clone are now deprecated.  They have never been
-  handled correctly, as the default implemenation from Kernel/Module
+  handled correctly, as the default implementation from Kernel/Module
   has been used.
 
 * Database#use on MySQL is now deprecated.  Switch to creating a new

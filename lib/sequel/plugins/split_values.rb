@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The split_values plugin splits the values hash retreived from the
+    # The split_values plugin splits the values hash retrieved from the
     # database, and moves keys from the values hash that are not columns
     # in the model's dataset to a separate hash.  This makes it so the
     # values hash only stores columns from the model's dataset.

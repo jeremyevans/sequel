@@ -804,7 +804,7 @@ module Sequel
       end
       
       # Set the columns based on the result set, and return the array of
-      # field numers, type conversion procs, and name symbol arrays.
+      # field numbers, type conversion procs, and name symbol arrays.
       def fetch_rows_set_cols(res)
         cols = []
         procs = db.conversion_procs

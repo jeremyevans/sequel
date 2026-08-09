@@ -100,7 +100,7 @@
 = Backwards Compatibility
 
 * The switch to using identity columns instead of serial columns
-  by default on PostgreSQL 10.2+ may break backwards compatibilty
+  by default on PostgreSQL 10.2+ may break backwards compatibility
   in some situations, such as code that relies on what are generally
   considered bugs in serial columns, such as CREATE TABLE LIKE
   using the same sequence for the column in both the existing table

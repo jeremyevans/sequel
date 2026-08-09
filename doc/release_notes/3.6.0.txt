@@ -16,7 +16,7 @@ New Features
 
     DB['SELECT :n FROM t WHERE p > :q AND p < :r', :n=>1,:q=>2,:r=>3]
 
-  Sequel doesn't subsitute values that don't appear in the hash:
+  Sequel doesn't substitute values that don't appear in the hash:
 
     ds.where('price < :p AND id in :ids', :p=>100)
     # WHERE (price < 100 AND id in :ids)
@@ -210,7 +210,7 @@ Other Improvements
   to actively avoid calling the association method on new objects,
   or Sequel would raise an exception.
 
-* Dataset aggreate methods (sum/avg/min/max/range/interval) now
+* Dataset aggregate methods (sum/avg/min/max/range/interval) now
   work correctly with limited, grouped, or compound datasets.
   Previously, count worked with them, but other aggregate methods
   did not.  These methods now use a subquery if called on a

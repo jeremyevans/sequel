@@ -76,7 +76,7 @@
 
 * Use savepoints around index creation if creating table inside transaction if ignore_index_errors is used (jeremyevans)
 
-* Deprecate treating :natrual_inner join type on MySQL as NATURAL LEFT JOIN (jeremyevans)
+* Deprecate treating :natural_inner join type on MySQL as NATURAL LEFT JOIN (jeremyevans)
 
 * Deprecate Dataset#mssql_unicode_strings= on Microsoft SQL Server (jeremyevans)
 
@@ -226,7 +226,7 @@
 
 * Deprecate SQLite pragma getting and setting methods (jeremyevans)
 
-* Remove handling of EMULATED_FUNCTION_MAP from adapter dataset classes, overide Dataset#native_function_name instead (jeremyevans)
+* Remove handling of EMULATED_FUNCTION_MAP from adapter dataset classes, override Dataset#native_function_name instead (jeremyevans)
 
 * Deprecate {Integer,Timestamp}Migrator::DEFAULT_SCHEMA_{COLUMN,TABLE} (jeremyevans)
 
@@ -304,7 +304,7 @@
 
 * Do not raise MassAssignmentRestriction when setting nested attributes and using the :fields option, only check for fields given (jeremyevans)
 
-* Do not add class methods for private methods definined in dataset_module (jeremyevans)
+* Do not add class methods for private methods defined in dataset_module (jeremyevans)
 
 * Deprecate Model.def_dataset_method and Model.subset, move to def_dataset_method plugin (jeremyevans)
 
@@ -878,7 +878,7 @@
 
 * Raise an error if attempting to use a migration file not containing a single migration (jeremyevans) (#1127)
 
-* Automatically set referenced key for self referential foriegn key constraint for simple non-autoincrementing primary key on MySQL (jeremyevans) (#1126)
+* Automatically set referenced key for self referential foreign key constraint for simple non-autoincrementing primary key on MySQL (jeremyevans) (#1126)
 
 === 4.30.0 (2016-01-04)
 
@@ -1132,7 +1132,7 @@
 
 * Add support for set_column_type :auto_increment=>true to add AUTO_INCREMENT to existing column on MySQL (jeremyevans) (#959)
 
-* Add support for overridding the :instance_specific association option (jeremyevans)
+* Add support for overriding the :instance_specific association option (jeremyevans)
 
 * Recognize MSSQL bit type as boolean in the schema_dumper (jeremyevans)
 
@@ -1502,7 +1502,7 @@
 
 * Support :correlated_subquery as an eager_graph and filter by associations limit strategy for one_to_* associations (jeremyevans)
 
-* Support named paramters in call_mssql_sproc on Microsoft SQL Server (y.zemlyanukhin, jeremyevans) (#792)
+* Support named parameters in call_mssql_sproc on Microsoft SQL Server (y.zemlyanukhin, jeremyevans) (#792)
 
 * Handle placeholder literalizer arguments when emulating offsets (jeremyevans)
 
@@ -1642,7 +1642,7 @@
 
 * Make auto_validations uniqueness validations work correctly for STI subclasses (jeremyevans)
 
-* Support :dataset option to validates_unique vaildation (jeremyevans)
+* Support :dataset option to validates_unique validation (jeremyevans)
 
 === 4.6.0 (2014-01-02)
 
@@ -2292,7 +2292,7 @@
 
 * Switch query extension to use a proxy instead of Object#extend (chanks, jeremyevans)
 
-* Remove Dataset#def_mutiation_method instance method (jeremyevans)
+* Remove Dataset#def_mutation_method instance method (jeremyevans)
 
 * Make foreign key parsing on MySQL not pick up foreign keys in other databases (jeremyevans)
 
@@ -2372,7 +2372,7 @@
 
 * Handle schema-qualified row_types in the pg_array integration in the pg_row extension (jeremyevans) (#595)
 
-* Support default_schema when reseting primary key sequences on PostgreSQL (jeremyevans) (#596)
+* Support default_schema when resetting primary key sequences on PostgreSQL (jeremyevans) (#596)
 
 * Allow treating tinyint(1) unsigned columns as booleans in the mysql adapters (jeremyevans)
 
@@ -2506,7 +2506,7 @@
 
 * Handle sets of alter_table operations on MySQL and MSSQL where later operations depend on earlier ones (jeremyevans)
 
-* Add constraint_validations plugin for automatic validations of constaints defined by extension (jeremyevans)
+* Add constraint_validations plugin for automatic validations of constraints defined by extension (jeremyevans)
 
 * Add constraint_validations extension for defining database constraints similar to validations (jeremyevans)
 
@@ -2820,7 +2820,7 @@
 
 * No longer escape backslashes in strings by default, fixes doubled backslashes on some adapters (jeremyevans)
 
-* Escape blackslash-carriage return-line feed in strings on Microsoft SQL Server (mluu, jeremyevans) (#462, #461)
+* Escape backslash-carriage return-line feed in strings on Microsoft SQL Server (mluu, jeremyevans) (#462, #461)
 
 * Remove Array#all_two_pairs? (jeremyevans)
 
@@ -2874,7 +2874,7 @@
 
 * Add select_remove extension which adds Dataset#select_remove for removing columns/expressions from a dataset selection (jeremyevans)
 
-* Add static_cache plugin, for staticly caching all model instances, useful for model tables that don't change (jeremyevans)
+* Add static_cache plugin, for statically caching all model instances, useful for model tables that don't change (jeremyevans)
 
 * Add Model#freeze implementation to get a working frozen model object (jeremyevans)
 
@@ -3496,7 +3496,7 @@
 
 * Add Database#views for getting an array of symbols of view names for the database (jeremyevans, christian.michon)
 
-* Make Datbase#tables no longer include view names on MySQL (jeremyevans)
+* Make Database#tables no longer include view names on MySQL (jeremyevans)
 
 * Convert Java CLOB objects to ruby strings when using the JDBC JTDS subadapter (christian.michon)
 
@@ -3660,7 +3660,7 @@
 
 * Allow Dataset#(add|set)_graph_aliases to accept as hash values symbols and arrays with a single element (jeremyevans)
 
-* Add Databse#views and #view_exists? to the Oracle adapter (gpheruson)
+* Add Database#views and #view_exists? to the Oracle adapter (gpheruson)
 
 * Add Database#sql_log_level for changing the level at which SQL queries are logged (jeremyevans)
 
@@ -3980,7 +3980,7 @@
 
 * Add Dataset#for_update as a standard dataset method (jeremyevans)
 
-* Add composition plugin, simlar to ActiveRecord's composed_of (jeremyevans)
+* Add composition plugin, similar to ActiveRecord's composed_of (jeremyevans)
 
 * Combine multiple complex expressions for simpler SQL and object tree (jeremyevans)
 
@@ -4048,7 +4048,7 @@
 
 * Attempt to detect database disconnects in the JDBC adapter (john_firebaugh)
 
-* Add Sequel::SQL::Expression#==, so arbtirary expressions can be compared by value (dlee)
+* Add Sequel::SQL::Expression#==, so arbitrary expressions can be compared by value (dlee)
 
 * Respect the :size option for the generic File type on MySQL to create tinyblob, mediumblob, and longblob (ibc)
 
@@ -4370,7 +4370,7 @@
 
 === 3.3.0 (2009-08-03)
 
-* Add an assocation_proxies plugin that uses proxies for associations (jeremyevans)
+* Add an association_proxies plugin that uses proxies for associations (jeremyevans)
 
 * Have the add/remove/remove_all methods take additional arguments and pass them to the internal methods (clivecrous)
 
@@ -4672,7 +4672,7 @@
 
 * Deprecate Migration and Migrator, require 'sequel/extensions/migration' if you want them (jeremyevans)
 
-* Denamespace Sequel::Error decendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback) (jeremyevans)
+* Denamespace Sequel::Error descendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback) (jeremyevans)
 
 * Deprecate Error::InvalidTransform, Error::NoExistingFilter, and Error::InvalidStatement (jeremyevans)
 
@@ -4894,7 +4894,7 @@
 
 * Add H2 JDBC subadapter (logan_barnett, david_koontz, james_britt, jeremyevans)
 
-* Add identifer_output_method, used for converting identifiers coming out of the database, replacing the lowercase support on some databases (jeremyevans)
+* Add identifier_output_method, used for converting identifiers coming out of the database, replacing the lowercase support on some databases (jeremyevans)
 
 * Add identifier_input_method, used for converting identifiers going into the database, replacing upcase_identifiers (jeremyevans)
 
@@ -4952,7 +4952,7 @@
 
 * Make SQLite keep table's primary key information when dropping columns (jmhodges)
 
-* Support dropping indicies on SQLite (jmhodges)
+* Support dropping indices on SQLite (jmhodges)
 
 === 2.8.0 (2008-12-05)
 
@@ -5046,7 +5046,7 @@
 
 * Much better support for multiple schemas in PostgreSQL (jeremyevans) (#243)
 
-* The first argument to Model#initalize can no longer be nil, it must be a hash if it is given (jeremyevans)
+* The first argument to Model#initialize can no longer be nil, it must be a hash if it is given (jeremyevans)
 
 * Remove Sequel::Model.lazy_load_schema= setting (jeremyevans)
 
@@ -5580,7 +5580,7 @@
   
 * Fix Model#destroy so that it returns self, not the result of after_destroy (jeremyevans)
 
-* Define Model column accessors in set_dataset, so they should always be avaiable, deprecate Model#method_missing (jeremyevans)
+* Define Model column accessors in set_dataset, so they should always be available, deprecate Model#method_missing (jeremyevans)
 
 * Add eager loading of associations via new sequel_core object graphing feature (jeremyevans)
 
@@ -5750,7 +5750,7 @@
 
 * Added Dataset#reverse alias to Dataset#reverse_order (#174).
 
-* Fixed Dataset#transform_load and #transform_save to create a trasnformed copy of the supplied hash instead of transforming it in place (#184).
+* Fixed Dataset#transform_load and #transform_save to create a transformed copy of the supplied hash instead of transforming it in place (#184).
 
 * Implemented MySQL::Dataset#replace (#163).
 
@@ -5788,7 +5788,7 @@
 
 === 1.0.10 (2008-02-13)
 
-* Fixed Datset#group_and_count to work inside a query block (#152).
+* Fixed Dataset#group_and_count to work inside a query block (#152).
 
 * Changed datasets with transforms to automatically transform hash filters (#155).
 
@@ -6558,7 +6558,7 @@
 
 * Added support for polymorphic datasets.
 
-* The adapter dataset interface was simplified and standardized. Only four methods need be overriden: fetch_rows, update, insert and delete.
+* The adapter dataset interface was simplified and standardized. Only four methods need be overridden: fetch_rows, update, insert and delete.
 
 * The Dataset class was refactored. The bulk of the dataset code was moved into separate modules.
 
@@ -6807,7 +6807,7 @@
 
 * Renamed Model.schema to Model.set_schema and Model.get_schema to Model.schema.
 
-* Improved Model class to allow descendants of model clases (thanks Pedro Gutierrez.)
+* Improved Model class to allow descendants of model classes (thanks Pedro Gutierrez.)
 
 * Removed require 'postgres' in schema.rb (thanks Douglas Koszerek.)
 

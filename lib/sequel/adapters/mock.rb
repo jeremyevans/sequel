@@ -38,7 +38,7 @@ module Sequel
       #
       # nil :: Return nil for all inserts
       # Integer :: Starting integer for next insert, with
-      #            futher inserts getting an incremented
+      #            further inserts getting an incremented
       #            value
       # Array :: First insert gets the first value in the
       #          array, second gets the second value, etc.

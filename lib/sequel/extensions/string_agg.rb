@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 #
 # The string_agg extension adds the ability to perform database-independent
-# aggregate string concatentation.  For example, with a table like:
+# aggregate string concatenation.  For example, with a table like:
 #
 #   c1 | c2
 #   ---+---
@@ -28,7 +28,7 @@
 #   # or:
 #   sa = Sequel.string_agg(:column_name, '-') # custom separator
 #
-# You can specify the order in which the concatention happens by
+# You can specify the order in which the concatenation happens by
 # calling +order+ on the expression:
 #
 #   sa = Sequel.string_agg(:column_name).order(:other_column)
@@ -45,7 +45,7 @@
 #     select_group(:c1).
 #     select_append(Sequel.string_agg(:c2))
 #
-# This extension currenly supports the following databases:
+# This extension currently supports the following databases:
 #
 # * PostgreSQL 9+
 # * SQLAnywhere 12+
@@ -62,13 +62,13 @@
 module Sequel
   module SQL
     module Builders
-      # Return a StringAgg expression for an aggregate string concatentation.
+      # Return a StringAgg expression for an aggregate string concatenation.
       def string_agg(*a)
         StringAgg.new(*a)
       end
     end
 
-    # The StringAgg class represents an aggregate string concatentation.
+    # The StringAgg class represents an aggregate string concatenation.
     class StringAgg < GenericExpression
       include StringMethods
       include StringConcatenationMethods

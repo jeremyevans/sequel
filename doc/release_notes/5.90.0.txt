@@ -20,7 +20,7 @@
 
 * The pg_auto_parameterize_in_array extension now supports a
   :pg_auto_parameterize_min_array_size Database option to set
-  the minium array size to convert.  This defaults to 2, but it
+  the minimum array size to convert.  This defaults to 2, but it
   can be set to 1 to convert all non-empty arrays where the type
   is recognized.  These aren't converted by default, because
   PostgreSQL uses a different query plan for them.  However, it

@@ -399,7 +399,7 @@ Other Improvements
   !changed_columns.empty?, which was the historical way to handle
   the situation.
 
-* The DataObjects (do) adpater now supports DataObjects 0.10.
+* The DataObjects (do) adapter now supports DataObjects 0.10.
 
 * Dataset#select_more and Dataset#order_more no longer affect the
   receiver.  They are supposed to just return a modified copy of the
@@ -496,7 +496,7 @@ Backwards Compatibility
   and then filtering using the automatically generated aliases, you
   might need to modify your code.
 
-* The DataObjects (do) adpater no longer supports DataObjects 0.9.x.
+* The DataObjects (do) adapter no longer supports DataObjects 0.9.x.
 
 * The Dataset#virtual_row_block_call private instance method has
   been removed.

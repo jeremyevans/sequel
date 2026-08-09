@@ -32,7 +32,7 @@ module Sequel
 
         private
 
-        # When reseting the instance dataset, also reset the instance_insert_dataset.
+        # When resetting the instance dataset, also reset the instance_insert_dataset.
         def reset_instance_dataset
           ret = super
           return unless ds = @instance_dataset

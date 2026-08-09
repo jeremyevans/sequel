@@ -1087,7 +1087,7 @@ you want to DRY up:
   one_to_many :romaji_verses, clone: :english_verses, conditions: {languageid: 2}
   one_to_many :japanese_verses, clone: :english_verses, conditions: {languageid: 3}
 
-Note that for the final two asociations, you didn't have to specify the :class,
+Note that for the final two associations, you didn't have to specify the :class,
 :key, or :order options, as they were copied by the :clone option.  By specifying
 the :conditions option for the final two associations, it overrides the :conditions
 option of the first association, it doesn't attempt to merge them.

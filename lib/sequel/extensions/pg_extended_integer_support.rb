@@ -53,7 +53,7 @@
 #  # => "numeric"
 #
 # The +:raw+ behavior was Sequel's historical behavior, but unless
-# you fully understand the reprecussions of PostgreSQL using a
+# you fully understand the repercussions of PostgreSQL using a
 # numeric type for integer values, you should not use it.
 #
 # To get the current default behavior of raising an exception for

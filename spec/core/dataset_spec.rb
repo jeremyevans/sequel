@@ -2917,7 +2917,7 @@ describe "Dataset#join_table" do
     proc{@d.join(:categories, [:id]){|j,lj,js|}}.must_raise(Sequel::Error)
   end
 
-  with_symbol_splitting "should support using a block that receieves the join table/alias, last join table/alias, and array of previous joins when using splittable symbols" do
+  with_symbol_splitting "should support using a block that receives the join table/alias, last join table/alias, and array of previous joins when using splittable symbols" do
     @d.from(:items___i).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
       join_alias.must_equal :c
       last_join_alias.must_equal :i
@@ -2925,7 +2925,7 @@ describe "Dataset#join_table" do
     end
   end
 
-  it "should support using a block that receieves the join table/alias, last join table/alias, and array of previous joins" do
+  it "should support using a block that receives the join table/alias, last join table/alias, and array of previous joins" do
     @d.join(:categories) do |join_alias, last_join_alias, joins| 
       join_alias.must_equal :categories
       last_join_alias.must_equal :items
@@ -5317,7 +5317,7 @@ describe "Sequel::Dataset#select_hash" do
     @ds.db.sqls.must_equal ['SELECT t.a, t.b FROM t']
   end
 
-  it "should handle aliased expresssions in arguments" do
+  it "should handle aliased expressions in arguments" do
     @ds.select_hash(Sequel[:c].as(:a), Sequel[:d].as(:b)).must_equal(1=>2, 3=>4)
     @ds.db.sqls.must_equal ['SELECT c AS a, d AS b FROM t']
   end

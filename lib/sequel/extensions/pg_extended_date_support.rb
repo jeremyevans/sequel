@@ -31,7 +31,7 @@ module Sequel
       RATIONAL_60 = Rational(60)
       TIME_CAN_PARSE_BC = RUBY_VERSION >= '2.5'
 
-      # Add dataset methods and update the conversion proces for dates and timestamps.
+      # Add dataset methods and update the conversion process for dates and timestamps.
       def self.extended(db)
         db.extend_datasets(DatasetMethods)
         procs = db.conversion_procs

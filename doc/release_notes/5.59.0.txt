@@ -5,7 +5,7 @@
   classes are not required to have valid schema, because it is
   allowed to have model classes based on arbitrary datasets (such
   as those using joins or set-returning functions), and it is not
-  possible to determine the schema for arbitary datasets.
+  possible to determine the schema for arbitrary datasets.
 
   Sequel swallows non-connection errors when trying to parse schema
   for a model's dataset, but if schema parsing fails when you would

@@ -180,7 +180,7 @@
 
 * Support :no_inherit option for NOT NULL constraints on PostgreSQL 18+ (jeremyevans)
 
-* Support not_null: {name: "constaint_name"} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)
+* Support not_null: {name: "constraint_name"} column option for naming NOT NULL constraints on PostgreSQL 18+ (jeremyevans)
 
 * Support :period foreign_key option for PERIOD on PostgreSQL 18+ (jeremyevans)
 
@@ -1548,7 +1548,7 @@
 
 * Make schema_caching extension work with :callable_default schema values (jeremyevans)
 
-* Freeze string valuse in hashes returned by Database#schema when using the schema_caching extension (jeremyevans)
+* Freeze string values in hashes returned by Database#schema when using the schema_caching extension (jeremyevans)
 
 * Protect migration file loading with a mutex to not break when multiple threads load migration files simultaneously (jeremyevans)
 
@@ -1684,7 +1684,7 @@
 
 * Don't create empty arrays for unused association callbacks (jeremyevans)
 
-* Cache association method name symbols instead of recomputing them everytime (jeremyevans)
+* Cache association method name symbols instead of recomputing them every time (jeremyevans)
 
 * Raise an exception if attempting to create a prepared statement using a dataset with a delayed evaluation (jeremyevans)
 

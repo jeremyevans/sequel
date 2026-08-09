@@ -19,5 +19,5 @@
   update.
 
 * Database#create_function on PostgreSQL now supports a :parallel
-  option to set the thread safety of the funciton.  The value should
+  option to set the thread safety of the function.  The value should
   be :safe, :unsafe, or :restricted.

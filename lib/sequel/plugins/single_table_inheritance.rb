@@ -194,7 +194,7 @@ module Sequel
         end
 
         # Copy the necessary attributes to the subclasses, and filter the
-        # subclass's dataset based on the sti_kep_map entry for the class.
+        # subclass's dataset based on the sti_key_map entry for the class.
         def inherited(subclass)
           super
           key = Array(sti_key_map[subclass]).dup

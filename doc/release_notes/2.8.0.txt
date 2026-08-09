@@ -151,7 +151,7 @@ Other Improvements
 
     Sequel.odbc(..., :db_type=>'mssql')
 
-Backwards Compatibilty
+Backwards Compatibility
 ----------------------
 
 * The hash returned by Database#schema when no table name is provided

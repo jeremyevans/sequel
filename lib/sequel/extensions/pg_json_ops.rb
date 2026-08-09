@@ -103,7 +103,7 @@
 #   j.path_query_first_tz('$.foo') # jsonb_path_query_first_tz(jsonb_column, '$.foo')
 #
 # On PostgreSQL 14+, The JSONB <tt>[]</tt> method will use subscripts instead of being
-# the same as +get+, if the value being wrapped is an identifer:
+# the same as +get+, if the value being wrapped is an identifier:
 #
 #   Sequel.pg_jsonb_op(:jsonb_column)[1]       # jsonb_column[1]
 #   Sequel.pg_jsonb_op(:jsonb_column)[1][2]    # jsonb_column[1][2]
@@ -173,7 +173,7 @@
 #
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
-# JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
+# JSONHash, JSONArray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
 # on json/jsonb literals.
 #
 # In order to get the automatic conversion from a ruby array to a PostgreSQL array
@@ -1074,7 +1074,7 @@ module Sequel
         end
       end
 
-      # Do not auto paramterize default value, as PostgreSQL doesn't allow it.
+      # Do not auto parameterize default value, as PostgreSQL doesn't allow it.
       def default_literal_append(ds, sql, v)
         if sql.respond_to?(:skip_auto_param)
           sql.skip_auto_param do
@@ -1341,7 +1341,7 @@ module Sequel
         end
       end
 
-      # Append path caluse to the SQL
+      # Append path clause to the SQL
       def to_s_append_path(ds, sql, path)
         if path
           sql << ' PATH '
@@ -1349,7 +1349,7 @@ module Sequel
         end
       end
 
-      # Do not auto paramterize default value or path value, as PostgreSQL doesn't allow it.
+      # Do not auto parameterize default value or path value, as PostgreSQL doesn't allow it.
       def default_literal_append(ds, sql, v)
         if sql.respond_to?(:skip_auto_param)
           sql.skip_auto_param do

@@ -371,7 +371,7 @@ module Sequel
         SQL::CaseExpression.new(*args)
       end
 
-      # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
+      # Cast the receiver to the given SQL type.  You can specify a ruby class as a type,
       # and it is handled similarly to using a database independent type in the schema methods.
       #
       #   Sequel.cast(:a, :integer) # CAST(a AS integer)
@@ -380,7 +380,7 @@ module Sequel
         SQL::Cast.new(arg, sql_type)
       end
 
-      # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
+      # Cast the receiver to the given SQL type (or the database's default Integer type if none given),
       # and return the result as a +NumericExpression+, so you can use the bitwise operators
       # on the result. 
       #
@@ -390,7 +390,7 @@ module Sequel
         cast(arg, sql_type || Integer).sql_number
       end
 
-      # Cast the reciever to the given SQL type (or the database's default String type if none given),
+      # Cast the receiver to the given SQL type (or the database's default String type if none given),
       # and return the result as a +StringExpression+, so you can use +
       # directly on the result for SQL string concatenation.
       #
@@ -687,7 +687,7 @@ module Sequel
 
     # Holds methods that are used to cast objects to different SQL types.
     module CastMethods 
-      # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
+      # Cast the receiver to the given SQL type.  You can specify a ruby class as a type,
       # and it is handled similarly to using a database independent type in the schema methods.
       #
       #   Sequel.function(:func).cast(:integer) # CAST(func() AS integer)
@@ -696,7 +696,7 @@ module Sequel
         Cast.new(self, sql_type)
       end
 
-      # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
+      # Cast the receiver to the given SQL type (or the database's default Integer type if none given),
       # and return the result as a +NumericExpression+, so you can use the bitwise operators
       # on the result. 
       #
@@ -706,7 +706,7 @@ module Sequel
         Cast.new(self, sql_type || Integer).sql_number
       end
 
-      # Cast the reciever to the given SQL type (or the database's default String type if none given),
+      # Cast the receiver to the given SQL type (or the database's default String type if none given),
       # and return the result as a +StringExpression+, so you can use +
       # directly on the result for SQL string concatenation.
       #
@@ -1620,13 +1620,13 @@ module Sequel
       # of strings, where each arg in args goes between the string elements. 
       attr_reader :str
 
-      # The arguments that will be subsituted into the placeholders.
+      # The arguments that will be substituted into the placeholders.
       # Either an array of unnamed placeholders (which will be substituted in
       # order for ? characters), or a hash of named placeholders (which will be
       # substituted for :key phrases).
       attr_reader :args
 
-      # Whether to surround the expression with parantheses
+      # Whether to surround the expression with parentheses
       attr_reader :parens
 
       # Create an object with the given string, placeholder arguments, and parens flag.
@@ -1637,7 +1637,7 @@ module Sequel
         freeze
       end
 
-      # Return a copy of the that will be surrounded by parantheses.
+      # Return a copy of the that will be surrounded by parentheses.
       def with_parens
         @parens ? self : self.class.new(@str, @args, true)
       end
@@ -1749,11 +1749,11 @@ module Sequel
       include StringConcatenationMethods
       include InequalityMethods
 
-      # Map of [regexp, case_insenstive] to +ComplexExpression+ operator symbol
+      # Map of [regexp, case_insensitive] to +ComplexExpression+ operator symbol
       LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}.freeze
       LIKE_MAP.each_key(&:freeze)
       
-      # Creates a SQL pattern match exprssion. left (l) is the SQL string we
+      # Creates a SQL pattern match expression. left (l) is the SQL string we
       # are matching against, and ces are the patterns we are matching.
       # The match succeeds if any of the patterns match (SQL OR).
       #

@@ -297,7 +297,7 @@ module Sequel
               end
             end
           rescue
-            # If there is an error trying to conver the constraint violation
+            # If there is an error trying to convert the constraint violation
             # into a validation failure, it's best to just raise the constraint
             # violation.  This can make debugging the above block of code more
             # difficult.

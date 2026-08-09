@@ -210,7 +210,7 @@ Other Improvements
   
     Person.create(:kind => "Manager")
     
-* When altering colums on MySQL, :unsigned, :elements, :size and other
+* When altering columns on MySQL, :unsigned, :elements, :size and other
   options given are no longer ignored.
 
 * The PostgreSQL shared adapter's explain and analyze methods have

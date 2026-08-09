@@ -17,7 +17,7 @@
 
     DB[:people].insert(:name=>'Me', :address=>ad)
   
-  If you are using the native postgres adapter, when retreiving
+  If you are using the native postgres adapter, when retrieving
   row type values, they will be returned as instances of the row
   type, which are hash-like objects:
 
@@ -206,7 +206,7 @@
   PostgreSQL's output format.  It's unlikely that a user would
   provide that format for typecasting, and while there aren't known
   security issues with the parsers, they were not designed to handle
-  arbtirary user input, so typecasting from string is no longer
+  arbitrary user input, so typecasting from string is no longer
   allowed and will now raise an error.
 
   The only reason such typecasting was allowed in the first place

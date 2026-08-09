@@ -69,8 +69,8 @@ module Sequel
     # To keep things simple, you can use +Sequel.synchronize_with+ to only
     # use this mutex if it is available.  You want to use the mutex around the
     # code that initializes the associations (usually to +nil+ or <tt>[]</tt>),
-    # and also around the code that sets the associatied objects appropriately
-    # after they have been retreived.  You do not want to use the mutex around
+    # and also around the code that sets the associated objects appropriately
+    # after they have been retrieved.  You do not want to use the mutex around
     # the code that loads the objects, since that will prevent concurrent loading.
     # So after the changes, the custom eager loader would look like this:
     #

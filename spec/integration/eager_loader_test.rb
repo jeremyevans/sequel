@@ -29,7 +29,7 @@ describe "Eagerly loading a tree structure" do
           id_map = {}
           # Create an map of parent_ids to nodes that have that parent id
           non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) << n}
-          # Doesn't cause an infinte loop, because when only the root node
+          # Doesn't cause an infinite loop, because when only the root node
           # is left, this is not called.
           Node.filter(Node.primary_key=>id_map.keys.sort).eager(:ancestors).all do |node|
             # Populate the parent association for each node

@@ -46,7 +46,7 @@ module Sequel
   class LiteralString
     # The string used when creating the literal string (first argument to
     # Sequel::LiteralString.new). This may be nil if no string was provided,
-    # or if the litral string was created before this extension was required.
+    # or if the literal string was created before this extension was required.
     attr_reader :source
 
     def initialize(*a)

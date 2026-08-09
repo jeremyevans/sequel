@@ -115,7 +115,7 @@ Other Improvements
 
 * The numeric(x,y) type is now interpreted as decimal.
 
-Backwards Compatibilty
+Backwards Compatibility
 ----------------------
 
 * The first argument to Model#initialize must be a hash, you can no

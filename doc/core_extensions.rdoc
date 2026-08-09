@@ -341,7 +341,7 @@ Alternative:
 
 ==== sql_or
 
-Array#sql_or nd Hash#sql_or treat the receiver as a conditions specifier, matching any of the conditions in the array:
+Array#sql_or and Hash#sql_or treat the receiver as a conditions specifier, matching any of the conditions in the array:
 
   {a: 1, b: [2, 3]}.sql_or       # SQL: a = 1 OR b IN (2, 3)
   [[:a, 1], [:b, [2, 3]]].sql_or # SQL: a = 1 OR b IN (2, 3)
@@ -365,7 +365,7 @@ Alternative:
 
 ==== sql_string_join
 
-Array#sql_string_join joins all of the elements in the array in an SQL string concatentation expression:
+Array#sql_string_join joins all of the elements in the array in an SQL string concatenation expression:
 
   [:a].sql_string_join           # SQL: a
   [:a, :b].sql_string_join       # SQL: a || b

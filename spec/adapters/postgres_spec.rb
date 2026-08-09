@@ -1977,7 +1977,7 @@ describe "A PostgreSQL dataset" do
     @db.alter_table(:atest){alter_constraint(:atest_fk, :deferrable=>false)}
     @db.foreign_key_list(:atest).must_equal [{name: :atest_fk, columns: [:fk], key: [:id], on_update: :no_action, on_delete: :no_action, deferrable: false, table: :atest, schema: :public, validated: true, enforced: true}]
 
-    # Deferrable constraints that are initialially immediate are reported as not deferrable,
+    # Deferrable constraints that are initially immediate are reported as not deferrable,
     # because they are not deferred unless SET CONSTRAINTS is used. If this actually 
     # causes an issue, we can add an :initially_immediate key so the information can be
     # tracked separately.
@@ -3280,7 +3280,7 @@ describe "PostgreSQL tsearch2" do
     @ds.full_text_search(:title, "oopsla").all.must_equal [record]
   end
 
-  it "should join multiple coumns with spaces to search by last words in row" do
+  it "should join multiple columns with spaces to search by last words in row" do
     record = {:title => "multiple words", :body => "are easy to search"}
     @ds.insert(record)
     @ds.full_text_search([:title, :body], "words").all.must_equal [record]
@@ -5500,7 +5500,7 @@ describe 'PostgreSQL inet/cidr types' do
     end
   end
 
-  it 'allow overridding type conversions of inet/cidr types' do
+  it 'allow overriding type conversions of inet/cidr types' do
     cp = @db.conversion_procs[869]
     acp = @db.conversion_procs[1041]
     begin

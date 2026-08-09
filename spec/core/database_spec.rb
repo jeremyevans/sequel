@@ -1138,7 +1138,7 @@ database_transaction_specs = Module.new do
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
   end
 
-  it "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
+  it "should raise database errors when committing a transaction as Sequel::DatabaseError" do
     @db.define_singleton_method(:commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.must_raise(ArgumentError)
 
@@ -1576,7 +1576,7 @@ describe "Sequel.transaction" do
     @db3 = Sequel.mock(:append=>'3', :sqls=>@sqls)
   end
   
-  it "should run the block inside transacitons on all three databases" do
+  it "should run the block inside transactions on all three databases" do
     Sequel.transaction([@db1, @db2, @db3]){1}.must_equal 1
     @sqls.must_equal ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'COMMIT -- 3', 'COMMIT -- 2', 'COMMIT -- 1']
   end
@@ -1709,7 +1709,7 @@ describe "Database#transaction with savepoints" do
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE a', 'ROLLBACK TO SAVEPOINT autopoint_1', 'DROP TABLE b', 'COMMIT']
   end
   
-  it "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
+  it "should raise database errors when committing a transaction as Sequel::DatabaseError" do
     @db.define_singleton_method(:commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.must_raise(ArgumentError)
     lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.must_raise(ArgumentError)
@@ -1829,7 +1829,7 @@ describe "A Database adapter with a scheme" do
     c.opts[:database].must_equal 'b'
   end
   
-  it "should have hash options take predence over URL parameters or parts" do
+  it "should have hash options take precedence over URL parameters or parts" do
     c = Sequel.connect 'ccc://localhost/db?host=/tmp', :host=>'a', :database=>'b', :user=>'c'
     c.must_be_kind_of(@ccc)
     c.opts[:host].must_equal 'a'
@@ -2144,7 +2144,7 @@ describe "Database#server_opts" do
     Sequel::Database.new(opts).send(:server_opts, :server1)[:host].must_equal 3
   end
   
-  it "should return the sgeneral opts merged with the specific opts if given as a proc" do
+  it "should return the general opts merged with the specific opts if given as a proc" do
     opts = {:host=>1, :database=>2, :servers=>{:server1=>proc{|db| {:host=>4}}}}
     Sequel::Database.new(opts).send(:server_opts, :server1)[:host].must_equal 4
   end

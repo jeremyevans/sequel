@@ -48,7 +48,7 @@
   so no existing applications are affected by the default switch.
   This should hopefully allow ample testing of the timed_queue
   connection pool.  At some point in the future, if no problems
-  are repoted, Sequel will likely switch to using the timed_queue
+  are reported, Sequel will likely switch to using the timed_queue
   connection pool by default on Ruby 3.2+.
 
 = Backwards Compatibility

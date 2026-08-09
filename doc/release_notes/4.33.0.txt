@@ -36,7 +36,7 @@
   columns as the value for the :target option.
 
 * You can now pass a Sequel::SQL::Identifier or a
-  Sequel::SQL::QualifiedIdentifer as the table argument when creating
+  Sequel::SQL::QualifiedIdentifier as the table argument when creating
   a foreign key.  Previously, only symbols were supported, and using
   other values required specifying the :table option.  So this will
   now work to reference a table that includes a double underscore:

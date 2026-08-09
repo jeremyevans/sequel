@@ -6,7 +6,7 @@
 
     Sequel.expr{a - 1}
 
-  This is because a in this case returns a Sequel::SQL::Indentifier,
+  This is because a in this case returns a Sequel::SQL::Identifier,
   which defines #- to return a Sequel::SQL::NumericExpression.  By
   supporting #coerce, the following code now also works:
 

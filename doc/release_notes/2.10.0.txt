@@ -56,7 +56,7 @@ New Core Features
   accept one of the above classes.
 
 * A ton of internal work was done to better support databases that
-  fold unqouted identifiers to uppercase (which is the SQL standard).
+  fold unquoted identifiers to uppercase (which is the SQL standard).
   Sequel now allows you to set a method to call on identifiers going
   both into and out of the database.  The default is to downcase
   identifiers coming out, and upcase identifiers going in, though
@@ -270,7 +270,7 @@ Other Improvements
 * Sequel no longer modifies the MySQL::Result class when using the
   MySQL adapter.
 
-Backwards Compatibilty
+Backwards Compatibility
 ----------------------
 
 * If you were previously using a database that returned uppercase

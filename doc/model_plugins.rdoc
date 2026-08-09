@@ -153,7 +153,7 @@ Some plugins require more than just adding methods.  Any plugin that requires st
     end
   end
 
-The other method is called configure, and it is called everytime the plugin is loaded into the class, after it is loaded into the class:
+The other method is called configure, and it is called every time the plugin is loaded into the class, after it is loaded into the class:
 
   module Sequel::Plugins::Foo
     def self.configure(model)

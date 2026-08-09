@@ -48,7 +48,7 @@
   are now deprecated.  Undeprecated copies are now available in the
   new sequel_4_dataset_methods extension.
 
-* Model.<< is now deprecated.  Intuitivately, you would except this
+* Model.<< is now deprecated.  Intuitively, you would expect this
   to call Model.create and return the Model class, but it calls <<
   on the model's dataset and returns the dataset.
 
@@ -108,7 +108,7 @@
   custom conversion procs should be modified.
 
 * Having the pg_row extension respect conversion procs for subtypes
-  added after the registeration of the composite type is now deprecated.
+  added after the registration of the composite type is now deprecated.
   Now, all subtypes should have the appropriate conversion proc added
   before the composite type is registered.
 

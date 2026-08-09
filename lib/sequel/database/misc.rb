@@ -98,7 +98,7 @@ module Sequel
     # The options hash for this database
     attr_reader :opts
     
-    # Set the timezone to use for this database, overridding <tt>Sequel.database_timezone</tt>.
+    # Set the timezone to use for this database, overriding <tt>Sequel.database_timezone</tt>.
     attr_writer :timezone
     
     # The specific default size of string columns for this Sequel::Database, usually 255 by default.

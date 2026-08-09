@@ -109,7 +109,7 @@
   transaction commit.
 
 * When using the IntegerMigrator, attempting to migrate to a
-  migration number above the maximum will now migrate to the lastest
+  migration number above the maximum will now migrate to the latest
   version, and attempting to migrate to a migration number below 0
   will now migrate all the way down.
 

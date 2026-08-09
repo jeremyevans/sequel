@@ -259,7 +259,7 @@ module Sequel
     # underscore are reserved for internal use.
     attr_reader :cache
 
-    # Retreive a value from the dataset's cache in a thread safe manner.
+    # Retrieve a value from the dataset's cache in a thread safe manner.
     def cache_get(k)
       Sequel.synchronize{@cache[k]}
     end

@@ -9,7 +9,7 @@
   auto_validations plugin is used.
 
 * A datetime_parse_to_time extension has been added, which parses
-  strings without timezone offsets using DateTime.parse intead of
+  strings without timezone offsets using DateTime.parse instead of
   Time.parse.  This can fix problems when the string being parsed
   represents a time not valid in the local timezone due to daylight
   savings time shifts.  Time.parse silently shifts such times by 1

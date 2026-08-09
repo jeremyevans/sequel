@@ -12,8 +12,8 @@
   refinement that added the method.
 
 * When typecasting strings to integer, strings such as -0xa are now
-  treated as negative hexidecimal strings, similar to how 0xa is
-  treated as a positive hexidecimal string.
+  treated as negative hexadecimal strings, similar to how 0xa is
+  treated as a positive hexadecimal string.
 
 * Database#foreign_key_list now returns results for partitioned
   tables on PostgreSQL 11+.

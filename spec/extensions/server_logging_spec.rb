@@ -28,7 +28,7 @@ describe "server_logging extension" do
     log.must_include "SELECT * FROM a"
   end
 
-  it "should not turn on logging connction info if it was turned off" do
+  it "should not turn on logging connection info if it was turned off" do
     @db.log_connection_info = false
     @db.extension :server_logging
     @db[:a].all

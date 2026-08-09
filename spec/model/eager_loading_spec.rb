@@ -286,7 +286,7 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
-  it "should automatically use an eager limit stategy if the association has an offset" do
+  it "should automatically use an eager limit strategy if the association has an offset" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1]
     EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 4, :album_id=>1}])
     a = EagerAlbum.eager(:track).all
@@ -296,7 +296,7 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
-  it "should handle offsets when using the :ruby eager limit stategy" do
+  it "should handle offsets when using the :ruby eager limit strategy" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :eager_limit_strategy=>:ruby
     EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}])
     a = EagerAlbum.eager(:track).all
@@ -306,7 +306,7 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
-  it "should handle :ruby eager limit stategy without a limit or offset" do
+  it "should handle :ruby eager limit strategy without a limit or offset" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:ruby
     EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}])
     a = EagerAlbum.eager(:track).all
@@ -428,7 +428,7 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
-  it "should automatically use an eager limit stategy if the association has an offset" do
+  it "should automatically use an eager limit strategy if the association has an offset" do
     EagerGenre.dataset = EagerGenre.dataset.with_fetch([{:id => 3, :x_foreign_key_x=>1}, {:id => 4, :x_foreign_key_x=>1}])
     a = EagerAlbum.eager(:genre).all
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
