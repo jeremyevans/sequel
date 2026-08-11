@@ -1943,7 +1943,7 @@ END
               columns = opts[:columns]
               if columns.nil?
                 columns_updated = if opts[:changed]
-                  _save_update_changed_colums_hash
+                  _save_update_changed_columns_hash
                 else
                   _save_update_all_columns_hash
                 end
@@ -1995,10 +1995,18 @@ END
         v
       end
 
+      def _save_update_changed_colums_hash # :nodoc:
+        # SEQUEL6: Remove
+        # :nocov:
+        Sequel::Deprecation.deprecate("Model#_save_update_changed_colums_hash", "Use #_save_update_changed_columns_hash instead")
+        _save_update_changed_columns_hash
+        # :nocov:
+      end
+
       # Return a hash of values used when saving changed columns of an
       # existing object.  Defaults to all of the objects current values
       # that are recorded as modified.
-      def _save_update_changed_colums_hash
+      def _save_update_changed_columns_hash
         cc = changed_columns
         @values.reject{|k,v| !cc.include?(k)}
       end

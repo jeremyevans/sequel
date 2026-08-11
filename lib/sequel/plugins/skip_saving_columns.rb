@@ -90,7 +90,7 @@ module Sequel
 
         # Skip the columns the model has marked to skip when updating
         # only changed columns.
-        def _save_update_changed_colums_hash
+        def _save_update_changed_columns_hash
           _save_removed_skipped_columns(super)
         end
 
