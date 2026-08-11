@@ -1022,11 +1022,19 @@ module Sequel
     # order if not. Also removes the row_proc, which isn't needed
     # for aggregate calculations.
     def aggregate_dataset
-      (aggreate_dataset_use_from_self? ? from_self : unordered).naked
+      (aggregate_dataset_use_from_self? ? from_self : unordered).naked
+    end
+
+    def aggreate_dataset_use_from_self? # :nodoc:
+      # SEQUEL6: Remove
+      # :nocov:
+      Sequel::Deprecation.deprecate("Dataset#aggreate_dataset_use_from_self", "Use #aggregate_dataset_use_from_self? instead")
+      aggregate_dataset_use_from_self?
+      # :nocov:
     end
 
     # Whether to use from_self for an aggregate dataset.
-    def aggreate_dataset_use_from_self?
+    def aggregate_dataset_use_from_self?
       options_overlap(COUNT_FROM_SELF_OPTS)
     end
 

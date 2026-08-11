@@ -1,3 +1,7 @@
+=== master
+
+* Replace Dataset#aggreate_dataset_use_from_self? with #aggregate_dataset_use_from_self? (jeremyevans) (#2379)
+
 === 5.107.0 (2026-08-01)
 
 * Support Dataset#explain :query_plan option on SQLite, for EXPLAIN QUERY PLAN (cllns)

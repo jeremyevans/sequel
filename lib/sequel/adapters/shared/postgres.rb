@@ -3576,7 +3576,7 @@ module Sequel
       end
 
       # Use from_self for aggregate dataset using VALUES.
-      def aggreate_dataset_use_from_self?
+      def aggregate_dataset_use_from_self?
         super || @opts[:values]
       end
       
