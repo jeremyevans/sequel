@@ -4170,6 +4170,11 @@ describe 'PostgreSQL array handling' do
     @ds.all.must_equal rs
   end
 
+  it 'cast and alias PGArray instances' do
+    @db.get(Sequel.pg_array([1], :integer).cast("text[]")).must_equal ["1"]
+    @db.select(Sequel.pg_array([1], :integer).as(:b)).all.must_equal [{b: [1]}]
+  end
+
   it 'use arrays in bound variables' do
     @db.create_table!(:items) do
       column :i, 'int4[]'

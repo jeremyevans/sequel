@@ -77,6 +77,7 @@ module Sequel
     # Represents a PostgreSQL array column value.
     class PGArray < DelegateClass(Array)
       include Sequel::SQL::AliasMethods
+      include Sequel::SQL::CastMethods
 
       module DatabaseMethods
         BLOB_RANGE = 1...-1
