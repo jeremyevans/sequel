@@ -457,15 +457,15 @@ module Sequel
   end
   extend SequelMethods
 
-    require_relative "deprecated"
-    require_relative "sql"
-    require_relative "connection_pool"
-    require_relative "exceptions"
-    require_relative "dataset"
-    require_relative "database"
-    require_relative "timezones"
-    require_relative "ast_transformer"
-    require_relative "version"
+  require_relative "deprecated"
+  require_relative "sql"
+  require_relative "connection_pool"
+  require_relative "exceptions"
+  require_relative "dataset"
+  require_relative "database"
+  require_relative "timezones"
+  require_relative "ast_transformer"
+  require_relative "version"
 
   class << self
     # Allow nicer syntax for creating Sequel expressions:
