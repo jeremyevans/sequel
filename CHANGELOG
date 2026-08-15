@@ -26,7 +26,7 @@
 
 === 5.106.0 (2026-07-01)
 
-* Add Sequel::Constants::ALL to support GROUP BY ALL via group(Sequel::ALL) on PostgreSQL 19+ (jeremyevans)
+* Add Sequel::Constants::ALL (jeremyevans)
 
 * Support :ignore_nulls window function option on PostgreSQL 19+ (jeremyevans)
 
