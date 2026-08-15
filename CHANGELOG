@@ -1,5 +1,7 @@
 === master
 
+* Support :select and :select_where options for Postgres Dataset#insert_conflict on PostgreSQL 19+ (jeremyevans)
+
 * Support cast* methods directly on Postgres::PGArray instances (jeremyevans)
 
 * Replace Model#_save_update_changed_colums_hash with #_save_update_changed_columns_hash (jeremyevans) (#2379)

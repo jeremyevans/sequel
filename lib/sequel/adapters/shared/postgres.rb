@@ -3183,6 +3183,9 @@ module Sequel
       # :conflict_where :: The index filter, when using a partial index to determine uniqueness.
       # :constraint :: An explicit constraint name, has precedence over :target.
       # :target :: The column name or expression to handle uniqueness violations on.
+      # :select :: Use ON CONFLICT DO SELECT. This will use the dataset's lock style.
+      #            You must use #returning on this dataset when using this option.
+      # :select_where :: A WHERE condition to use for the select.
       # :update :: A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.
       # :update_where :: A WHERE condition to use for the update.
       #
@@ -3213,7 +3216,21 @@ module Sequel
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT ON CONSTRAINT table_a_uidx
       #   # DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
+      #   
+      #   DB[:table].returning(:a).insert_conflict(target: :a, select: true).insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) DO SELECT RETURNING a
+      #   
+      #   DB[:table].returning(:a).for_update.
+      #     insert_conflict(target: :a, select: true, select_where: {Sequel[:excluded][:b] => 3}).
+      #     insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) DO SELECT FOR UPDATE WHERE (excluded.b = 3) RETURNING a
       def insert_conflict(opts=OPTS)
+        if opts[:select] && opts[:update]
+          raise Error, "Cannot provide both :select and :update options to insert_conflict"
+        end
+
         clone(:insert_conflict => opts)
       end
 
@@ -3726,12 +3743,18 @@ module Sequel
           if values = opts[:update]
             sql << " DO UPDATE SET "
             update_sql_values_hash(sql, values)
-            if update_where = opts[:update_where]
-              sql << " WHERE "
-              literal_append(sql, update_where)
-            end
+            where = opts[:update_where]
+          elsif opts[:select]
+            sql << " DO SELECT"
+            select_lock_sql(sql)
+            where = opts[:select_where]
           else
             sql << " DO NOTHING"
+          end
+
+          if where
+            sql << " WHERE "
+            literal_append(sql, where)
           end
         end
       end

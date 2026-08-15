@@ -1462,6 +1462,24 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.insert_conflict(:target=>:a, :update=>{:b=>Sequel[:foo][:c] + Sequel[:excluded][:c]}).insert(1, 7, 10)
     @ds.all.must_equal [{:a=>1, :b=>15, :c=>5, :c_is_unique=>false}]
   end
+
+  it "Dataset#insert_conflict should support DO SELECT ... RETURNING" do
+    @ds = @db[Sequel[:ic_test]]
+    @ds.insert(1, 2, 5)
+    ds = @ds.returning(Sequel::OLD[:b], Sequel::NEW[:b].as(:c))
+    ds.insert_conflict(:target=>:a, :select=>true).insert(1, 7, 10).must_equal [{b: 2, c: 2}]
+    ds.select_map([:a, :b, :c]).must_equal [[1, 2, 5]]
+    ds.insert_conflict(:target=>:a, :select=>true, :select_where=>{Sequel[:excluded][:b] => 7}).insert(1, 7, 10).must_equal [{b: 2, c: 2}]
+    ds.select_map([:a, :b, :c]).must_equal [[1, 2, 5]]
+    ds.insert_conflict(:target=>:a, :select=>true, :select_where=>{Sequel[:excluded][:b] => 3}).insert(1, 7, 10).must_equal []
+    ds.select_map([:a, :b, :c]).must_equal [[1, 2, 5]]
+    ds = ds.for_update
+    ds.insert_conflict(:target=>:a, :select=>true).insert(1, 7, 10).must_equal [{b: 2, c: 2}]
+    ds.select_map([:a, :b, :c]).must_equal [[1, 2, 5]]
+    ds.insert_conflict(:target=>:a, :select=>true, :select_where=>{Sequel[:excluded][:b] => 7}).insert(1, 7, 10).must_equal [{b: 2, c: 2}]
+    ds.select_map([:a, :b, :c]).must_equal [[1, 2, 5]]
+    proc{@ds.insert_conflict(:target=>:a, :select=>true, :update=>{b: 3})}.must_raise Sequel::Error
+  end if DB.server_version >= 190000
 end if DB.server_version >= 90500
 
 describe "A PostgreSQL database" do
