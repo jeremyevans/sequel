@@ -59,18 +59,15 @@
 #   ia.position(3, 2)  # array_position(int_array_column, 3, 2)
 #   ia.positions(3)    # array_positions(int_array_column, 3)
 #   ia.prepend(3)      # array_prepend(3, int_array_column)
+#   ia.reverse             # array_reverse(int_array_column)
 #   ia.sample(3)       # array_sample(int_array_column, 3)
 #   ia.shuffle         # array_shuffle(int_array_column)
-#   ia.trim(1)         # trim_array(int_array_column, 1)
-#   ia.unnest          # unnest(int_array_column)
-#   ia.unnest(:b)      # unnest(int_array_column, b)
-#
-# On PostgreSQL 18+, the following are supported:
-#
 #   ia.sort                # array_sort(int_array_column)
 #   ia.sort(desc: true)    # array_sort(int_array_column, true)
 #   ia.sort(nulls: :first) # array_sort(int_array_column, false, true)
-#   ia.reverse             # array_reverse(int_array_column)
+#   ia.trim(1)         # trim_array(int_array_column, 1)
+#   ia.unnest          # unnest(int_array_column)
+#   ia.unnest(:b)      # unnest(int_array_column, b)
 # 
 # See the PostgreSQL array function and operator documentation for more
 # details on what these functions and operators do.
