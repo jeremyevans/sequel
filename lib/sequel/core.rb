@@ -232,6 +232,8 @@ module Sequel
 
     # For backwards compatibility only.  require_relative should be used instead.
     def require(files, subdir=nil)
+      # SEQUEL6: Remove
+      Sequel::Deprecation.deprecate("Sequel.require is deprecated and will be removed in Sequel 6.")
       # Use Kernel.require_relative to work around JRuby 9.0 bug
       Array(files).each{|f| Kernel.require_relative "#{"#{subdir}/" if subdir}#{f}"}
     end

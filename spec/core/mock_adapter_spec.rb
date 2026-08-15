@@ -40,8 +40,11 @@ describe "Sequel Mock Adapter" do
   end
 
   it "should have constructor accept no arguments" do
-    Sequel.require 'adapters/mock'
+    require_relative '../../lib/sequel/adapters/mock'
     Sequel::Mock::Database.new.must_be_kind_of(Sequel::Mock::Database)
+  end
+  
+  deprecated "use with Sequel.require" do
     Sequel.require 'mock', 'adapters'
     Sequel::Mock::Database.new.must_be_kind_of(Sequel::Mock::Database)
   end
