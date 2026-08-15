@@ -1,5 +1,7 @@
 === master
 
+* Add ndims, position, positions, prepend, sample, shuffle, and trim to pg_array_ops extension (jeremyevans)
+
 * Support :select and :select_where options for Postgres Dataset#insert_conflict on PostgreSQL 19+ (jeremyevans)
 
 * Support cast* methods directly on Postgres::PGArray instances (jeremyevans)

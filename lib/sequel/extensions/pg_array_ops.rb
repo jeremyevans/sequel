@@ -54,6 +54,14 @@
 #   ia.join            # array_to_string(int_array_column, '')
 #   ia.join(':')       # array_to_string(int_array_column, ':')
 #   ia.join(':', ' ')  # array_to_string(int_array_column, ':', ' ')
+#   ia.ndims           # array_ndims(int_array_column)
+#   ia.position(3)     # array_position(int_array_column, 3, 1)
+#   ia.position(3, 2)  # array_position(int_array_column, 3, 2)
+#   ia.positions(3)    # array_positions(int_array_column, 3)
+#   ia.prepend(3)      # array_prepend(3, int_array_column)
+#   ia.sample(3)       # array_sample(int_array_column, 3)
+#   ia.shuffle         # array_shuffle(int_array_column)
+#   ia.trim(1)         # trim_array(int_array_column, 1)
 #   ia.unnest          # unnest(int_array_column)
 #   ia.unnest(:b)      # unnest(int_array_column, b)
 #
@@ -153,6 +161,13 @@ module Sequel
         function(:array_dims)
       end
 
+      # Call the array_ndims method:
+      #
+      #   array_op.ndims # array_ndims(array)
+      def ndims
+        function(:array_ndims)
+      end
+
       # Convert the array into an hstore using the hstore function.
       # If given an argument, use the two array form:
       #
@@ -186,6 +201,28 @@ module Sequel
       #   array_op.lower(2) # array_lower(array, 2)
       def lower(dimension = 1)
         function(:array_lower, dimension)
+      end
+      
+      # Call the array_position method:
+      #
+      #   array_op.position(1)    # array_position(array, 1, 1)
+      #   array_op.position(1, 2) # array_position(array, 1, 2)
+      def position(element, offset = 1)
+        function(:array_position, element, offset)
+      end
+      
+      # Call the array_positions method:
+      #
+      #   array_op.positions(1) # array_positions(array, 1)
+      def positions(element)
+        function(:array_positions, element)
+      end
+      
+      # Call the array_prepend method:
+      #
+      #   array_op.prepend(1) # array_prepend(1, array)
+      def prepend(element)
+        SQL::Function.new(:array_prepend, element, self)
       end
       
       # Use the overlaps (&&) operator:
@@ -231,6 +268,20 @@ module Sequel
         function(:array_reverse)
       end
       
+      # Call the array_sample method:
+      #
+      #   array_op.sample(1) # array_sample(array, 1)
+      def sample(element)
+        function(:array_sample, element)
+      end
+      
+      # Call the array_shuffle method:
+      #
+      #   array_op.shuffle # array_shuffle
+      def shuffle
+        function(:array_shuffle)
+      end
+      
       # Call the array_sort method. Options:
       #
       # :desc :: Sort in descending order instead of ascending order.
@@ -272,6 +323,13 @@ module Sequel
         end
       end
       alias join to_string
+      
+      # Call the trim_array method:
+      #
+      #   array_op.trim(1) # array_trim(array, 1)
+      def trim(number)
+        function(:trim_array, number)
+      end
       
       # Call the unnest method:
       #

@@ -4345,7 +4345,9 @@ describe 'PostgreSQL array handling' do
     @ds.get(Sequel.pg_array(:i).overlaps(:i2)).must_equal true
     @ds.get(Sequel.pg_array(:i2).overlaps(:i3)).must_equal false
 
+    @ds.get(Sequel.pg_array(:i).prepend(4)).must_equal [4, 1, 2, 3]
     @ds.get(Sequel.pg_array(:i).dims).must_equal '[1:3]'
+    @ds.get(Sequel.pg_array(:i).ndims).must_equal 1
     @ds.get(Sequel.pg_array(:i).length).must_equal 3
     @ds.get(Sequel.pg_array(:i).lower).must_equal 1
 
@@ -4368,6 +4370,22 @@ describe 'PostgreSQL array handling' do
       @ds.get(Sequel.pg_array(:i5).cardinality).must_equal 3
 
       @ds.from{Sequel.pg_array([1,2,3]).op.unnest([4,5,6], [7,8]).as(:t1, [:a, :b, :c])}.select_order_map([:a, :b, :c]).must_equal [[1, 4, 7], [2, 5, 8], [3, 6, nil]]
+    end
+    if @db.server_version >= 90500
+      @ds.get(Sequel.pg_array(:i5).position(1)).must_equal 1
+      @ds.get(Sequel.pg_array(:i5).position(5)).must_equal 3
+      @ds.get(Sequel.pg_array(:i5).position(1, 2)).must_be_nil
+      @ds.get(Sequel.pg_array(:i5).positions(1)).must_equal [1]
+      @ds.get(Sequel.pg_array(:i5).positions(5)).must_equal [3]
+    end
+    if @db.server_version >= 140000
+      @ds.get(Sequel.pg_array(:i).trim(1)).must_equal [1, 2]
+      @ds.get(Sequel.pg_array(:i).trim(2)).must_equal [1]
+    end
+    if @db.server_version >= 160000
+      [1, 2, 3].must_include @ds.get(Sequel.pg_array(:i).sample(1))[0]
+      @ds.get(Sequel.pg_array(:i).sample(3)).sort.must_equal [1, 2, 3]
+      @ds.get(Sequel.pg_array(:i).shuffle).sort.must_equal [1, 2, 3]
     end
     if @db.server_version >= 180000
       @ds.get(Sequel.pg_array(:i5).sort).must_equal [1, 5, nil]

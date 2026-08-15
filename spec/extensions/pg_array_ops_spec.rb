@@ -85,6 +85,35 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(@a.sort).must_equal "array_sort(a)"
   end
 
+  it "#ndims should call the array_ndims function" do
+    @db.literal(@a.ndims).must_equal "array_ndims(a)"
+  end
+
+  it "#position should call the array_position function" do
+    @db.literal(@a.position(1)).must_equal "array_position(a, 1, 1)"
+    @db.literal(@a.position(1, 2)).must_equal "array_position(a, 1, 2)"
+  end
+
+  it "#positions should call the array_positions function" do
+    @db.literal(@a.positions(1)).must_equal "array_positions(a, 1)"
+  end
+
+  it "#prepend should call the array_prepend function" do
+    @db.literal(@a.prepend(1)).must_equal "array_prepend(1, a)"
+  end
+
+  it "#sample should call the array_sample function" do
+    @db.literal(@a.sample(1)).must_equal "array_sample(a, 1)"
+  end
+
+  it "#shuffle should call the array_shuffle function" do
+    @db.literal(@a.shuffle).must_equal "array_shuffle(a)"
+  end
+
+  it "#trim should call the trim_array function" do
+    @db.literal(@a.trim(1)).must_equal "trim_array(a, 1)"
+  end
+
   it "#unshift should use the || operator in prepend mode" do
     @db.literal(@a.unshift(:b)).must_equal "(b || a)"
   end
