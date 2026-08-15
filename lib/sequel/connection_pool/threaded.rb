@@ -1,9 +1,11 @@
 # frozen-string-literal: true
 
+# SEQUEL6: Remove, deprecation: add warning if used on Ruby 3.2+
+
 # A connection pool allowing multi-threaded access to a pool of connections.
 # This is the default connection pool used by Sequel.
 class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
-  USE_WAITER = true # SEQUEL6: Remove
+  USE_WAITER = true
   Sequel::Deprecation.deprecate_constant(self, :USE_WAITER)
 
   # The maximum number of connections this pool will create (per shard/server
@@ -12,11 +14,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   
   # An array of connections that are available for use by the pool.
   # The calling code should already have the mutex before calling this.
-  attr_reader :available_connections # SEQUEL6: Remove
+  attr_reader :available_connections
   
   # A hash with thread/fiber keys and connection values for currently allocated connections.
   # The calling code should already have the mutex before calling this.
-  attr_reader :allocated # SEQUEL6: Remove
+  attr_reader :allocated
 
   # The following additional options are respected:
   # :max_connections :: The maximum number of connections the connection pool

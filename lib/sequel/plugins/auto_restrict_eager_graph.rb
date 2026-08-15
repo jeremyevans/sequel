@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+# SEQUEL6: Merge into default associations code
+
 module Sequel
   module Plugins
     # The auto_restrict_eager_graph plugin will automatically disallow the use

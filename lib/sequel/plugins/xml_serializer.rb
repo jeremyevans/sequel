@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+# SEQUEL6: Remove
+
 require 'nokogiri'
 
 module Sequel

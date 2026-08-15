@@ -21,6 +21,8 @@
 #
 # Related module: Sequel::Sequel4DatasetMethods
 
+# SEQUEL6: Remove
+
 #
 module Sequel
   module Sequel4DatasetMethods

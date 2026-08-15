@@ -26,8 +26,8 @@
 # For a quicker introduction, see the {cheat sheet}[rdoc-ref:doc/cheat_sheet.rdoc].
 module Sequel
   @convert_two_digit_years = true
-  @datetime_class = Time
-  @split_symbols = false
+  @datetime_class = Time # SEQUEL6: Remove
+  @split_symbols = false # SEQUEL6: Remove
   @single_threaded = false
 
   # Mutex used to protect mutable data structures
@@ -36,7 +36,7 @@ module Sequel
   # Frozen hash used as the default options hash for most options.
   OPTS = {}.freeze
 
-  SPLIT_SYMBOL_CACHE = {}
+  SPLIT_SYMBOL_CACHE = {}  # SEQUEL6: Remove
 
   module SequelMethods
     # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
@@ -56,6 +56,8 @@ module Sequel
     # cases where they implement the same methods, they often implement them
     # differently (e.g. + using seconds on +Time+ and days on +DateTime+).
     attr_accessor :datetime_class
+    # SEQUEL6: Remove datetime_class=
+    # SEQUEL6.1: Remove datetime_class
 
     # Set whether Sequel is being used in single threaded mode. By default,
     # Sequel uses a thread-safe connection pool, which isn't as fast as the
@@ -66,8 +68,7 @@ module Sequel
     #   Sequel.single_threaded = true
     attr_accessor :single_threaded
 
-    # Alias of original require method, as Sequel.require does a relative
-    # require for backwards compatibility.
+    # # SEQUEL6: Remove
     alias orig_require require
     private :orig_require
 
@@ -243,6 +244,7 @@ module Sequel
     # For columns, these parts are the table, column, and alias.
     # For tables, these parts are the schema, table, and alias.
     def split_symbol(sym)
+      # SEQUEL6.1: Remove
       unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym]}
         if split_symbols?
           v = case s = sym.to_s
@@ -294,12 +296,14 @@ module Sequel
     #   Sequel.expr{table__column}  # table__column
     #   Sequel.expr{table[:column]} # table.column
     def split_symbols=(v)
+      # SEQUEL6: Remove
       Sequel.synchronize{SPLIT_SYMBOL_CACHE.clear}
       @split_symbols = v
     end
 
     # Whether Sequel currently splits symbols into qualified/aliased identifiers.
     def split_symbols?
+      # SEQUEL6.1: Remove
       @split_symbols
     end
 

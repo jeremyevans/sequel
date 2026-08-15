@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+# SEQUEL6: Remove, deprecation: add warning if used on Ruby 3.2+
+
 require_relative 'threaded'
 
 # The slowest and most advanced connection pool, dealing with both multi-threaded
