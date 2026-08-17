@@ -1059,6 +1059,42 @@ if DB.adapter_scheme == :mysql2
   end
 end
 
+if [:mysql, :mysql2].include?(DB.adapter_scheme)
+  describe "MySQL disconnect detection" do
+    def driver_error_class
+      DB.adapter_scheme == :mysql2 ? ::Mysql2::Error : ::Mysql::Error
+    end
+
+    def disconnect_error?(message, errno)
+      e = driver_error_class.new(message)
+      e.define_singleton_method(:errno){errno}
+      !!DB.send(:disconnect_error?, e, {})
+    end
+
+    it "should be able to get the client error code from the driver" do
+      driver_error_class.new("").must_respond_to(:errno)
+    end
+
+    it "should handle client error codes as disconnects" do
+      # Wordings used by libmysqlclient
+      disconnect_error?("MySQL server has gone away", 2006).must_equal true
+      disconnect_error?("Lost connection to MySQL server during query", 2013).must_equal true
+
+      # Wordings used by MariaDB Connector/C and ruby-mysql for the same error codes
+      disconnect_error?("Server has gone away", 2006).must_equal true
+      disconnect_error?("Lost connection to server during query", 2013).must_equal true
+    end
+
+    it "should handle errors raised by the driver without a client error code as disconnects" do
+      disconnect_error?("MySQL client is not connected", nil).must_equal true
+    end
+
+    it "should not handle server errors as disconnects" do
+      disconnect_error?("Table 'test.foo' doesn't exist", 1146).must_equal false
+    end
+  end
+end
+
 describe "MySQL joined datasets" do
   before do
     @db = DB

@@ -284,8 +284,13 @@ module Sequel
         Dataset
       end
 
+      # If the error is a Mysql::Error, check the client error code and exception
+      # message for disconnects.
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::Mysql::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
+        super ||
+          (e.is_a?(::Mysql::Error) &&
+            (MYSQL_DISCONNECT_ERROR_CODES.include?(e.errno) ||
+             MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)))
       end
       
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
