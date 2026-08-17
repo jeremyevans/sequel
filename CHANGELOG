@@ -1,5 +1,7 @@
 === master
 
+* Recognize additional disconnect errors in the mysql and mysql2 adapters (sdalu) (#2382)
+
 * Deprecate Sequel.require (jeremyevans)
 
 * Add ndims, position, positions, prepend, sample, shuffle, and trim to pg_array_ops extension (jeremyevans)

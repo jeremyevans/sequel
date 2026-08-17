@@ -22,7 +22,17 @@ module Sequel
         END
         # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
         MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/
-       
+
+        # 2027 (CR_MALFORMED_PACKET) deliberately not included (protocol error, not connection error)
+        MYSQL_DISCONNECT_ERROR_CODES = [
+          2002, # CR_CONNECTION_ERROR
+          2006, # CR_SERVER_GONE_ERROR
+          2013, # CR_SERVER_LOST
+          2014, # CR_COMMANDS_OUT_OF_SYNC
+          2055, # CR_SERVER_LOST_EXTENDED
+        ].freeze
+        private_constant :MYSQL_DISCONNECT_ERROR_CODES
+
         # Support stored procedures on MySQL
         def call_sproc(name, opts=OPTS, &block)
           args = opts[:args] || [] 

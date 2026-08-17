@@ -215,13 +215,14 @@ module Sequel
       end
 
       # If a connection object is available, try pinging it.  Otherwise, if the
-      # error is a Mysql2::Error, check the SQL state and exception message for
-      # disconnects.
+      # error is a Mysql2::Error, check the client error code, SQL state, and
+      # exception message for disconnects.
       def disconnect_error?(e, opts)
         super ||
           ((conn = opts[:conn]) && !conn.ping) ||
           (e.is_a?(::Mysql2::Error) &&
-            ((e.sql_state && e.sql_state.start_with?("08")) ||
+            (MYSQL_DISCONNECT_ERROR_CODES.include?(e.errno) ||
+             (e.sql_state && e.sql_state.start_with?("08")) ||
              MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)))
       end
 
