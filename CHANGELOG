@@ -1,6 +1,6 @@
 === master
 
-* Recognize disconnects using client error codes in the mysql and mysql2 adapters, fixing disconnect detection when the client library or driver does not use libmysqlclient's error messages (sdalu) (#2382)
+* Recognize additional disconnect errors in the mysql and mysql2 adapters (sdalu) (#2382)
 
 * Deprecate Sequel.require (jeremyevans)
 
