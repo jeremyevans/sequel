@@ -23,11 +23,7 @@ module Sequel
         # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
         MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/
 
-        # Client error codes for mysql and mysql2 that indicate the current connection
-        # should be disconnected.  Unlike the related error messages, these do not
-        # differ between client libraries.  2027 (CR_MALFORMED_PACKET) is deliberately
-        # not included, as it indicates a protocol error and not necessarily a lost
-        # connection.
+        # 2027 (CR_MALFORMED_PACKET) deliberately not included (protocol error, not connection error)
         MYSQL_DISCONNECT_ERROR_CODES = [
           2002, # CR_CONNECTION_ERROR
           2006, # CR_SERVER_GONE_ERROR
