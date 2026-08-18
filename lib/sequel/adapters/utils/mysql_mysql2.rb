@@ -31,6 +31,7 @@ module Sequel
           2014, # CR_COMMANDS_OUT_OF_SYNC
           2055, # CR_SERVER_LOST_EXTENDED
         ].freeze
+        private_constant :MYSQL_DISCONNECT_ERROR_CODES
 
         # Support stored procedures on MySQL
         def call_sproc(name, opts=OPTS, &block)
