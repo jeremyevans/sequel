@@ -8,3 +8,4 @@
 /spec/spec_config.rb
 /www/public/*.html
 /www/public/rdoc*
+/www/public/doc*

@@ -7,6 +7,7 @@ erb = ERB.new(File.read('layout.html.erb'))
 Dir['pages/*.html.erb'].each do |page|
   public_loc = "#{page.gsub(/\Apages\//, 'public/').sub('.erb', '')}"
   content = content = ERB.new(File.read(page)).result(binding)
-  title = title = File.basename(page.sub('.html.erb', ''))
+  stylesheet = stylesheet = File.basename(page, '.html.erb')
+  title = title = ('index' == stylesheet ? nil : stylesheet.capitalize)
   File.open(public_loc, 'wb'){|f| f.write(erb.result(binding))}
 end
