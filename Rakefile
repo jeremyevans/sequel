@@ -6,7 +6,7 @@ VERS = lambda do
   require File.expand_path("../lib/sequel/version", __FILE__)
   Sequel.version
 end
-CLEAN.include ["sequel-*.gem", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", "spec/bin-sequel-*"]
+CLEAN.include ["sequel-*.gem", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", "www/public/doc*", "spec/bin-sequel-*"]
 
 # Gem Packaging
 
@@ -18,13 +18,23 @@ end
 ### Website
 
 desc "Make local version of website"
-task :website do
+task :website=>:website_guides do
   sh %{#{FileUtils::RUBY} www/make_www.rb}
 end
 
 ### RDoc
 
-def self.rdoc_task(rdoc_dir, main, files)
+def self.rdoc_task(name, rdoc_dir, main, files)
+  index = File.join(rdoc_dir, 'index.html')
+
+  task name=>index
+
+  file index=>files do
+    generate_rdoc(rdoc_dir, main, files)
+  end
+end
+
+def self.generate_rdoc(rdoc_dir, main, files)
   rdoc_opts = ["--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
 
   begin
@@ -42,44 +52,55 @@ def self.rdoc_task(rdoc_dir, main, files)
 end
 
 desc "Generate rdoc"
-task :rdoc do
-  rdoc_task("rdoc", 'README.rdoc',
+rdoc_task(:rdoc, "rdoc", 'README.rdoc',
     %w"README.rdoc CHANGELOG doc/CHANGELOG.old MIT-LICENSE" +
     Dir["lib/**/*.rb"] +
     Dir["doc/*.rdoc"] +
     Dir['doc/release_notes/*.txt']
   )
-end
 
 desc "Generate all rdoc for Sequel website"
-task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins]
+task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_plugins, :website_guides]
 
 desc "Generate rdoc for core/model for Sequel website"
-task :website_rdoc_main do
-  rdoc_task("www/public/rdoc", 'README.rdoc',
+rdoc_task(:website_rdoc_main, "www/public/rdoc", 'README.rdoc',
     %w"README.rdoc CHANGELOG doc/CHANGELOG.old MIT-LICENSE" +
     Dir["lib/*.rb"] +
     Dir["lib/sequel/*.rb"] +
     Dir["lib/sequel/{connection_pool,dataset,database,model}/*.rb"] +
     ["lib/sequel/extensions/migration.rb"] +
-    Dir["doc/*.rdoc"] + 
+    Dir["doc/*.rdoc"] +
     Dir["doc/release_notes/*.txt"]
   )
-end
 
 desc "Generate rdoc for adapters for Sequel website"
-task :website_rdoc_adapters do
-  rdoc_task("www/public/rdoc-adapters", 'Sequel',
+rdoc_task(:website_rdoc_adapters, "www/public/rdoc-adapters", 'Sequel',
     Dir["lib/sequel/adapters/**/*.rb"]
   )
-end
 
 desc "Generate rdoc for plugins/extensions for Sequel website"
-task :website_rdoc_plugins do
-  rdoc_task("www/public/rdoc-plugins", 'Sequel',
+rdoc_task(:website_rdoc_plugins, "www/public/rdoc-plugins", 'Sequel',
     Dir["lib/sequel/{extensions,plugins}/**/*.rb"] +
     Dir["doc/{advanced_associations,association_basics,core_extensions,reflection,schema_modification}.rdoc"]
   )
+
+desc "Generate the guides for the website from the rdoc pages"
+task :website_guides=>:website_rdoc_main do
+  require_relative 'www/make_guides'
+  src_dir = 'www/public/rdoc/files'
+  target_dir = 'www/public/doc'
+
+  unless File.directory?(src_dir)
+    raise "#{src_dir} does not exist. The guides need rdoc generated with the hanna formatter. Install the hanna gem, do rake clean and run this task again."
+  end
+
+  # the 'main' page is index on rdoc 8+ and README_rdoc otherwise
+  main_page = File.join(src_dir, 'index.html')
+  main_page = File.join(src_dir, 'README_rdoc.html') unless File.file?(main_page)
+
+  FileUtils.mkdir_p target_dir
+  rdoc_pages = Dir[File.join(src_dir, 'doc/*_rdoc.html')]
+  MakeGuides.new(target_dir, rdoc_pages, main_page).execute
 end
 
 ### Specs
