@@ -90,6 +90,7 @@ These options are shared by all adapters unless otherwise noted.
 :log_connection_info :: Whether to include connection information in log messages (false by default)
 :log_warn_duration :: The amount of seconds after which the queries are logged at :warn level
 :password :: The password for the user account
+:port :: The port of the database server to which to connect
 :preconnect :: Whether to automatically make the maximum number of connections when setting up the pool.
                Can be set to "concurrently" to connect in parallel.
 :preconnect_extensions :: Similar to the :extensions option, but loads the extensions before the
