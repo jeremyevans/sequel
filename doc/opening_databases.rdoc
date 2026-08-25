@@ -68,7 +68,6 @@ multiple times (say once per request), can result in a memory leak.  For any app
 database access is needed for a long period of time, it's best to store the result of
 +Sequel.connect+ in a constant, as recommended above.
 
-== Using the Sequel.connect method
 == General connection options
 
 These options are shared by all adapters unless otherwise noted.
