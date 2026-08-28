@@ -1043,4 +1043,18 @@ describe "Sequel::TimestampMigrator" do
 
     @db.sqls.map{|x| x =~ /\ACREATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal []
   end
+
+  it "should support :allow_migration_number option" do
+    @dir = 'spec/files/timestamped_migrations'
+    @m.run(@db, @dir, :allow_migration_number=>lambda{|v| v >= 1273253849 && v <= 1273253853})
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    @m.apply(@db, @dir, 0)
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal []
+
+    proc do
+      @m.run(@db, @dir, :allow_migration_number=>lambda{|v| v >= 1273253849 && v < 1273253853})
+    end.must_raise Sequel::Migrator::Error
+  end
 end

@@ -410,6 +410,11 @@ module Sequel
     private_constant :MIGRATION_ADVISORY_LOCK_ID
 
     # Migrates the supplied database using the migration files in the specified directory. Options:
+    # :allow_migration_number :: Set to check each migration number. If set, calls the
+    #                            <tt>===</tt> method on the object with the migration number,
+    #                            allowing it to work with both ranges and procs. If the
+    #                            <tt>===</tt> method returns false, an exception is raised
+    #                            (TimestampMigrator only).
     # :allow_missing_migration_files :: Don't raise an error if there are missing migration files.
     #                                   It is very risky to use this option, since it can result in
     #                                   the database schema version number not matching the expected
@@ -699,6 +704,7 @@ module Sequel
 
     # Set up all state for the migrator instance
     def initialize(db, directory, opts=OPTS)
+      @allow_migration_number = opts[:allow_migration_number]
       super
       @target = opts[:target]
       @applied_migrations = get_applied_migrations
@@ -788,20 +794,28 @@ module Sequel
     # Returns any migration files found in the migrator's directory.
     def get_migration_files
       files = []
+      allow_migration_number = @allow_migration_number
+
       Dir.new(directory).each do |file|
         next unless MIGRATION_FILE_PATTERN.match(file)
         files << File.join(directory, file)
       end
-      files.sort! do |a, b|
-        a_ver, a_name = split_migration_filename(a)
-        b_ver, b_name = split_migration_filename(b)
+
+      files.map! do |f|
+        ver, = split = split_migration_filename(f)
+        if allow_migration_number && !(allow_migration_number === ver)
+          raise Error, "Migration filename uses version number that is not allowed: #{f}"
+        end
+        [f, *split]
+      end.sort! do |a, b|
+        _, a_ver, a_name = a
+        _, b_ver, b_name = b
         x = a_ver <=> b_ver
         if x.zero?
           x = a_name <=> b_name
         end
         x
-      end
-      files
+      end.map!(&:first)
     end
 
     # Return an integer and name (without extension) for the given path.

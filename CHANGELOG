@@ -1,5 +1,7 @@
 === master
 
+* Support :allow_migration_number option for TimestampMigrator (jeremyevans)
+
 * Recognize additional disconnect errors in the mysql and mysql2 adapters (sdalu) (#2382)
 
 * Deprecate Sequel.require (jeremyevans)
