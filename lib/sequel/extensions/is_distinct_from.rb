@@ -124,7 +124,7 @@ module Sequel
   Dataset.register_extension(:is_distinct_from, SQL::IsDistinctFrom::DatasetMethods)
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::SQL::IsDistinctFrom::Methods
@@ -138,4 +138,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

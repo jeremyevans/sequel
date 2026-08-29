@@ -170,14 +170,14 @@ module Sequel
       def array_or_set_join(obj, arg)
         obj.join(arg)
       end
-    # :nocov:
+    # simplecov:disable
     else
       def array_or_set_join(obj, arg)
         obj = obj.to_a if obj.is_a?(Set)
         obj.join(arg)
       end
     end
-    # :nocov:
+    # simplecov:enable
 
     if RUBY_VERSION >= '3.3'
       # Create a new module using the block, and set the temporary name
@@ -186,13 +186,13 @@ module Sequel
         mod.set_temporary_name(yield)
         mod
       end
-    # :nocov:
+    # simplecov:disable
     else
       def set_temp_name(mod)
         mod
       end
     end
-    # :nocov:
+    # simplecov:enable
 
     # Convert given object to json and return the result.
     # This can be overridden to use an alternative json implementation.
@@ -235,7 +235,9 @@ module Sequel
       # SEQUEL6: Remove
       Sequel::Deprecation.deprecate("Sequel.require is deprecated and will be removed in Sequel 6.")
       # Use Kernel.require_relative to work around JRuby 9.0 bug
+      # simplecov:disable
       Array(files).each{|f| Kernel.require_relative "#{"#{subdir}/" if subdir}#{f}"}
+      # simplecov:enable
     end
 
     # Splits the symbol into three parts, if symbol splitting is enabled (not the default).
@@ -358,11 +360,11 @@ module Sequel
         Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
     else
-      # :nocov:
+      # simplecov:disable
       def start_timer # :nodoc:
         Time.now
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     # The elapsed seconds since the given timer object was created.  The

@@ -244,9 +244,9 @@ module Sequel
       def method_missing(*args, &block)
         __value.public_send(*args, &block)
       end
-      # :nocov:
+      # simplecov:disable
       ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
-      # :nocov:
+      # simplecov:enable
 
       # Delegate respond_to? calls to the returned result.
       def respond_to_missing?(*args)

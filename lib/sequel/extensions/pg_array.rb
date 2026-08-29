@@ -363,18 +363,18 @@ module Sequel
             raise Sequel::Error, "invalid array, empty string" if eos?
             raise Sequel::Error, "invalid array, doesn't start with {" unless scan(/((\[\d+:\d+\])+=)?\{/)
 
-            # :nocov:
+            # simplecov:disable
             while !eos?
-            # :nocov:
+            # simplecov:enable
               char = scan(/[{}",]|[^{}",]+/)
               if char == ','
                 # Comma outside quoted string indicates end of current entry
                 new_entry
               elsif char == '"'
                 raise Sequel::Error, "invalid array, opening quote with existing recorded data" unless @recorded.empty?
-                # :nocov:
+                # simplecov:disable
                 while true
-                # :nocov:
+                # simplecov:enable
                   char = scan(/["\\]|[^"\\]+/)
                   if char == '\\'
                     @recorded << getch
@@ -435,12 +435,12 @@ module Sequel
         end
 
         if Sequel::Postgres.respond_to?(:parse_pg_array)
-        # :nocov:
+        # simplecov:disable
           # Use sequel_pg's C-based parser if it has already been defined.
           def call(string)
             PGArray.new(Sequel::Postgres.parse_pg_array(string, @converter), @type)
           end
-        # :nocov:
+        # simplecov:enable
         else
           # Parse the string using Parser with the appropriate
           # converter, and return a PGArray with the appropriate database
@@ -532,7 +532,7 @@ module Sequel
   Database.register_extension(:pg_array, Postgres::PGArray::DatabaseMethods)
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Array
     # Return a PGArray proxy to the receiver, using a
@@ -554,4 +554,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

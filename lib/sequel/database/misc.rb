@@ -26,9 +26,9 @@ module Sequel
       :time=>Sequel::SQLTime, :boolean=>[TrueClass, FalseClass].freeze, :float=>Float, :decimal=>BigDecimal,
       :blob=>Sequel::SQL::Blob}.freeze
 
-    # :nocov:
+    # simplecov:disable
     URI_PARSER = defined?(::URI::RFC2396_PARSER) ? ::URI::RFC2396_PARSER : ::URI::DEFAULT_PARSER
-    # :nocov:
+    # simplecov:enable
     private_constant :URI_PARSER
 
     # Nested hook Proc; each new hook Proc just wraps the previous one.
@@ -230,9 +230,9 @@ module Sequel
 
     # Disallow dup/clone for Database instances
     undef_method :dup, :clone, :initialize_copy
-    # :nocov:
+    # simplecov:disable
     if RUBY_VERSION >= '1.9.3'
-    # :nocov:
+    # simplecov:enable
       undef_method :initialize_clone, :initialize_dup
     end
 
@@ -580,7 +580,7 @@ module Sequel
       # Typecast a string to a BigDecimal
       alias _typecast_value_string_to_decimal BigDecimal
     else
-      # :nocov:
+      # simplecov:disable
       def _typecast_value_string_to_decimal(value)
         d = BigDecimal(value)
         if d.zero?
@@ -595,7 +595,7 @@ module Sequel
         end
         d
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     # Typecast the value to a BigDecimal

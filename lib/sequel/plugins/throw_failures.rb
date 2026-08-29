@@ -86,7 +86,7 @@ module Sequel
           # UncaughtThrowError was added in Ruby 2.2.  Older Ruby versions
           # used ArgumentError with "uncaught throw" at the start of the message
 
-          # :nocov:
+          # simplecov:disable
           def hook_failed_error(msg)
             e = super
             throw HookFailed, e
@@ -102,7 +102,7 @@ module Sequel
             raise e2 unless e2.message.start_with?('uncaught throw')
             e
           end
-          # :nocov:
+          # simplecov:enable
         end
       end
     end

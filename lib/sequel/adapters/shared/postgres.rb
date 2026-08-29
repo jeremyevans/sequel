@@ -1556,12 +1556,12 @@ module Sequel
           seq_ds = metadata_dataset.from(:pg_sequence).where(:seqrelid=>regclass_oid(LiteralString.new(seq.freeze)))
           increment_by = :seqincrement
           min_value = :seqmin
-        # :nocov:
+        # simplecov:disable
         else
           seq_ds = metadata_dataset.from(LiteralString.new(seq))
           increment_by = :increment_by
           min_value = :min_value
-        # :nocov:
+        # simplecov:enable
         end
 
         get{setval(seq, db[table].select(coalesce(max(pk)+seq_ds.select(increment_by), seq_ds.select(min_value))), false)}
@@ -1574,9 +1574,9 @@ module Sequel
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
-        # :nocov:
+        # simplecov:disable
         auto_increment_key = server_version >= 100002 ? :identity : :serial
-        # :nocov:
+        # simplecov:enable
         {:primary_key => true, auto_increment_key => true, :type=>Integer}
       end
 
@@ -1773,12 +1773,12 @@ module Sequel
         if server_version >= 90500
           cpos = Sequel.expr{array_position(co[:conkey], ctable[:attnum])}
           rpos = Sequel.expr{array_position(co[:confkey], rtable[:attnum])}
-        # :nocov:
+        # simplecov:disable
         else
           range = 0...32
           cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, ctable[:attnum])}
           rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, rtable[:attnum])}
-        # :nocov:
+        # simplecov:enable
         end
 
         ds = metadata_dataset.
@@ -1815,19 +1815,19 @@ module Sequel
       def _add_validated_enforced_constraint_columns(ds)
         validated_cond = if server_version >= 90100
           Sequel[:convalidated]
-        # :nocov:
+        # simplecov:disable
         else
           Sequel.cast(true, TrueClass)
-        # :nocov:
+        # simplecov:enable
         end
         ds = ds.select_append(validated_cond.as(:validated))
 
         enforced_cond = if server_version >= 180000
           Sequel[:conenforced]
-        # :nocov:
+        # simplecov:disable
         else
           Sequel.cast(true, TrueClass)
-        # :nocov:
+        # simplecov:enable
         end
         ds = ds.select_append(enforced_cond.as(:enforced))
 
@@ -1839,11 +1839,11 @@ module Sequel
         @_indexes_ds ||= begin
           if server_version >= 90500
             order = [Sequel[:indc][:relname], Sequel.function(:array_position, Sequel[:ind][:indkey], Sequel[:att][:attnum])]
-          # :nocov:
+          # simplecov:disable
           else
             range = 0...32
             order = [Sequel[:indc][:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(Sequel[:ind][:indkey], [x]), x]}, 32, Sequel[:att][:attnum])]
-          # :nocov:
+          # simplecov:enable
           end
 
           attnums = SQL::Function.new(:ANY, Sequel[:ind][:indkey])
@@ -1861,10 +1861,10 @@ module Sequel
             order(*order).
             select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
-          # :nocov:
+          # simplecov:disable
           ds = ds.where(:indisready=>true) if server_version >= 80300
           ds = ds.where(:indislive=>true) if server_version >= 90300
-          # :nocov:
+          # simplecov:enable
 
           ds
         end
@@ -1957,14 +1957,14 @@ module Sequel
             where{pg_attribute[:attnum] > 0}.
             order{pg_attribute[:attnum]}
 
-          # :nocov:
+          # simplecov:disable
           if server_version > 100000
-          # :nocov:
+          # simplecov:enable
             ds = ds.select_append{pg_attribute[:attidentity]}
 
-            # :nocov:
+            # simplecov:disable
             if server_version > 120000
-            # :nocov:
+            # simplecov:enable
               ds = ds.select_append{Sequel.~(pg_attribute[:attgenerated]=>'').as(:generated)}
             end
           end
@@ -2858,9 +2858,9 @@ module Sequel
             row[:auto_increment] = !!(row[:default] =~ /\A(?:nextval)/i) || identity == 'a' || identity == 'd'
           end
 
-          # :nocov:
+          # simplecov:disable
           if server_version >= 90600
-          # :nocov:
+          # simplecov:enable
             case row[:oid]
             when 1082
               row[:min_value] = MIN_DATE
@@ -2949,9 +2949,9 @@ module Sequel
     
       # PostgreSQL 9.4+ supports views with check option.
       def view_with_check_option_support
-        # :nocov:
+        # simplecov:disable
         :local if server_version >= 90400
-        # :nocov:
+        # simplecov:enable
       end
     end
 
@@ -3054,12 +3054,12 @@ module Sequel
           rows[0]
         elsif rows.all?{|row| String === row}
           rows.join("\r\n") 
-        # :nocov:
+        # simplecov:disable
         else
           # This branch is unreachable in tests, but it seems better to just return
           # all rows than throw in error if this case actually happens.
           rows
-        # :nocov:
+        # simplecov:enable
         end
       end
 
@@ -3471,14 +3471,14 @@ module Sequel
         server_version >= 90500
       end
 
-      # :nocov:
+      # simplecov:disable
 
       # PostgreSQL supports timezones in literal timestamps
       def supports_timestamp_timezones?
         # SEQUEL6: Remove
         true
       end
-      # :nocov:
+      # simplecov:enable
 
       # PostgreSQL 8.4+ supports WINDOW clause.
       def supports_window_clause?
@@ -3655,7 +3655,7 @@ module Sequel
         origin = String.new
         origin << 'EXPLAIN '
 
-        # :nocov:
+        # simplecov:disable
         if server_version < 90000
           if opts[:analyze]
             origin << 'ANALYZE '
@@ -3663,7 +3663,7 @@ module Sequel
 
           return origin
         end
-        # :nocov:
+        # simplecov:enable
 
         comma = nil
         paren = "("

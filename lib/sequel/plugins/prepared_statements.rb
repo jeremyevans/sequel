@@ -181,11 +181,11 @@ module Sequel
             # Disabling usage of prepared statements for insert_select on SQLite seems to be the
             # simplest way to workaround the problem.
             db.database_type != :sqlite
-          # :nocov:
+          # simplecov:disable
           when :delete, :refresh
             Sequel::Deprecation.deprecate("The :delete and :refresh prepared statement types", "There should be no need to check if these types are supported")
             false
-          # :nocov:
+          # simplecov:enable
           else
             raise Error, "unsupported type used: #{type.inspect}"
           end

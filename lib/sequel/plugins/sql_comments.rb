@@ -63,9 +63,9 @@ module Sequel
             super(*a, &block)
           end
         end
-        # :nocov:
+        # simplecov:disable
         mod.send(:ruby2_keywords, meth) if mod.respond_to?(:ruby2_keywords, true)
-        # :nocov:
+        # simplecov:enable
       end
 
       def self.apply(model)
@@ -101,9 +101,9 @@ module Sequel
               super(*a, &block)
             end
           end
-          # :nocov:
+          # simplecov:disable
           ruby2_keywords(meth) if respond_to?(:ruby2_keywords, true)
-          # :nocov:
+          # simplecov:enable
         end
 
         private
@@ -133,9 +133,9 @@ module Sequel
               super(*a, &block)
             end
           end
-          # :nocov:
+          # simplecov:disable
           ruby2_keywords(meth) if respond_to?(:ruby2_keywords, true)
-          # :nocov:
+          # simplecov:enable
         end
 
         private
@@ -163,9 +163,9 @@ module Sequel
               super(*a, &block)
             end
           end
-          # :nocov:
+          # simplecov:disable
           ruby2_keywords(meth) if respond_to?(:ruby2_keywords, true)
-          # :nocov:
+          # simplecov:enable
         end
 
         private

@@ -64,7 +64,7 @@ module Sequel
         array = [].freeze
 
         if RUBY_VERSION < '2.6'
-          # :nocov:
+          # simplecov:disable
 
           # Default proc used to determine whether to send the method to the dataset.
           # If the array would respond to it, sends it to the array instead of the dataset.
@@ -75,7 +75,7 @@ module Sequel
             end
             !array_method
           end
-          # :nocov:
+          # simplecov:enable
         else
           DEFAULT_PROXY_TO_DATASET = proc{|opts| !array.respond_to?(opts[:method])}
         end
@@ -99,9 +99,9 @@ module Sequel
           end
           v.public_send(meth, *args, &block)
         end
-        # :nocov:
+        # simplecov:disable
         ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
-        # :nocov:
+        # simplecov:enable
       end
 
       module ClassMethods

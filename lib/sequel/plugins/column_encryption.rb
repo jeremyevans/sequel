@@ -1,8 +1,8 @@
 # frozen-string-literal: true
 
-# :nocov:
+# simplecov:disable
 raise(Sequel::Error, "Sequel column_encryption plugin requires ruby 2.3 or greater") unless RUBY_VERSION >= '2.3'
-# :nocov:
+# simplecov:enable
 
 require 'openssl'
 
@@ -22,13 +22,13 @@ begin
   cipher.key = '1'*32
   cipher.auth_data = ''
   cipher.auth_tag = auth_tag
-  # :nocov:
+  # simplecov:disable
   unless (cipher.update(cipher_text) << cipher.final) == '2'
     raise OpenSSL::Cipher::CipherError
   end
 rescue RuntimeError, OpenSSL::Cipher::CipherError
   raise LoadError, "Sequel column_encryption plugin requires a working aes-256-gcm cipher"
-  # :nocov:
+  # simplecov:enable
 end
 
 require 'securerandom'
@@ -475,12 +475,12 @@ module Sequel
           def decode64(str)
             str.unpack1("m0")
           end
-        # :nocov:
+        # simplecov:disable
         else
           def decode64(str)
             str.unpack("m0")[0]
           end
-        # :nocov:
+        # simplecov:enable
         end
 
         def urlsafe_encode64(bin)

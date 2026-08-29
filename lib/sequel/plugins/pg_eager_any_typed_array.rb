@@ -45,7 +45,7 @@ module Sequel
               key = key.column
             end
 
-            # :nocov:
+            # simplecov:disable
             # many_to_pg_array association type does not need changes, as it
             # already converts the values to a typed postgres array, it does
             # not call the code that uses :eager_loading_predicate_transform.
@@ -54,7 +54,7 @@ module Sequel
             # unless it is one of these types, but external association types
             # could potentially reach it.
             sch = case ref[:type]
-            # :nocov:
+            # simplecov:enable
             when :many_to_one, :one_to_one, :one_to_many, :pg_array_to_many
               ref.associated_class.db_schema
             when :many_to_many, :one_through_one

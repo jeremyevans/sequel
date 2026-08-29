@@ -8,9 +8,9 @@ module Sequel
     # exception is held here.
     attr_accessor :wrapped_exception
 
-    # :nocov:
+    # simplecov:disable
     if RUBY_VERSION >= '2.1'
-    # :nocov:
+    # simplecov:enable
       # Returned the wrapped exception if one exists, otherwise use
       # ruby's default behavior.
       def cause

@@ -459,10 +459,10 @@ module Sequel
         return @range if @range
         raise(Error, "cannot create ruby range for an empty PostgreSQL range") if empty?
         raise(Error, "cannot create ruby range when PostgreSQL range excludes beginning element") if exclude_begin?
-        # :nocov:
+        # simplecov:disable
         raise(Error, "cannot create ruby range when PostgreSQL range has unbounded beginning") if STARTLESS_RANGE_NOT_SUPPORTED && !self.begin
         raise(Error, "cannot create ruby range when PostgreSQL range has unbounded ending") if ENDLESS_RANGE_NOT_SUPPORTED && !self.end
-        # :nocov:
+        # simplecov:enable
         @range = Range.new(self.begin, self.end, exclude_end?)
       end
 
@@ -549,7 +549,7 @@ module Sequel
   Database.register_extension(:pg_range, Postgres::PGRange::DatabaseMethods)
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Range 
     # Create a new PGRange using the receiver as the input range,
@@ -569,4 +569,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

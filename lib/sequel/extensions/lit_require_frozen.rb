@@ -53,9 +53,9 @@ module Sequel
       @source = a.first
       super
     end
-    # :nocov:
+    # simplecov:disable
     ruby2_keywords :initialize if respond_to?(:ruby2_keywords, true)
-    # :nocov:
+    # simplecov:enable
   end
 
   module LitRequireFrozen

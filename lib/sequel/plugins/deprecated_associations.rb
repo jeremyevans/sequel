@@ -105,9 +105,9 @@ module Sequel
                 end
                 super(*a, &b)
               end
-              # :nocov:
+              # simplecov:disable
               ruby2_keywords(name) if respond_to?(:ruby2_keywords, true)
-              # :nocov:
+              # simplecov:enable
               alias_method(name, name)
             end
           end

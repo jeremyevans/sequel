@@ -205,7 +205,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
 
     until conn = assign_connection(thread, server)
       elapsed = Sequel.elapsed_seconds_since(timer)
-      # :nocov:
+      # simplecov:disable
       raise_pool_timeout(elapsed, server) if elapsed > timeout
 
       # It's difficult to get to this point, it can only happen if there is a race condition
@@ -213,7 +213,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       if conn = acquire_available(thread, server, timeout - elapsed)
         return conn
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     conn
@@ -225,11 +225,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       # Check if connection was checked in between when assign_connection failed and now.
       # This is very unlikely, but necessary to prevent a situation where the waiter
       # will wait for a connection even though one has already been checked in.
-      # :nocov:
+      # simplecov:disable
       if conn = next_available(server)
         return(allocated(server)[thread] = conn)
       end
-      # :nocov:
+      # simplecov:enable
 
       @waiters[server].wait(@mutex, timeout)
 

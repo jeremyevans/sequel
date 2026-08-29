@@ -40,9 +40,9 @@
 
 module Sequel
   module DuplicateColumnsHandler
-    # :nocov:
+    # simplecov:disable
     CALLER_ARGS = (RUBY_VERSION >= '2.0' ? [0,1] : [0]).freeze
-    # :nocov:
+    # simplecov:enable
 
     # Customize handling of duplicate columns for this dataset.
     def on_duplicate_columns(handler = (raise Error, "Must provide either an argument or a block to on_duplicate_columns" unless defined?(yield); nil), &block)

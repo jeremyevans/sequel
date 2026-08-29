@@ -74,9 +74,9 @@ module Sequel
         raise(Sequel::Error, "method #{method.inspect} did not return a dataset") unless @dataset.is_a?(Dataset)
         self
       end
-      # :nocov:
+      # simplecov:disable
       ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
-      # :nocov:
+      # simplecov:enable
     end
   end
 

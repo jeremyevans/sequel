@@ -46,11 +46,11 @@ module Sequel
           super(provenance_opts(opts))
         end
       else
-        # :nocov:
+        # simplecov:disable
         def clone(opts = OPTS) # :nodoc:
           super(provenance_opts(opts))
         end
-        # :nocov:
+        # simplecov:enable
       end
 
       %w'select insert update delete'.each do |type|

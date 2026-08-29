@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-# :nocov:
+# simplecov:disable
 
 # This entire file is excluded from coverage testing.  This is because it
 # requires coverage testing to work, and if you've already loaded Sequel
@@ -526,4 +526,4 @@ module Sequel
     end
   end
 end
-# :nocov:
+# simplecov:enable

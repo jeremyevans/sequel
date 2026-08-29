@@ -1027,10 +1027,10 @@ module Sequel
 
     def aggreate_dataset_use_from_self? # :nodoc:
       # SEQUEL6: Remove
-      # :nocov:
+      # simplecov:disable
       Sequel::Deprecation.deprecate("Dataset#aggreate_dataset_use_from_self", "Use #aggregate_dataset_use_from_self? instead")
       aggregate_dataset_use_from_self?
-      # :nocov:
+      # simplecov:enable
     end
 
     # Whether to use from_self for an aggregate dataset.
@@ -1128,9 +1128,9 @@ module Sequel
     # operators unsupported by some databases. Used by adapters for databases
     # that don't support the operators natively.
     def complex_expression_emulate_append(sql, op, args)
-      # :nocov:
+      # simplecov:disable
       case op
-      # :nocov:
+      # simplecov:enable
       when :%
         complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:MOD, a, b)}
       when :>>
@@ -1237,7 +1237,7 @@ module Sequel
       db.from_application_timestamp(v).strftime(default_timestamp_format)
     end
     
-    # :nocov:
+    # simplecov:disable
 
     # Return the SQL timestamp fragment to use for the fractional time part.
     # Should start with the decimal point.  Uses 6 decimal places by default.
@@ -1248,7 +1248,7 @@ module Sequel
       end
       sprintf(".%0#{ts}d", usec)
     end
-    # :nocov:
+    # simplecov:enable
 
     # Append literalization of identifier to SQL string, considering regular strings
     # as SQL identifiers instead of SQL strings.

@@ -13,9 +13,9 @@ module Sequel
       def _merge_column_options(defaults, opts)
         defaults.merge!(opts) do |k, defv, v|
           unless defv == v
-            # :nocov:
+            # simplecov:disable
             if RUBY_VERSION >= "3.2"
-            # :nocov:
+            # simplecov:enable
               caller_loc = Thread.each_caller_location do |loc|
                 # Skip core library methods implemented in Ruby
                 path = loc.path

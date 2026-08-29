@@ -114,10 +114,10 @@ module Sequel
               DateTime.parse(value)
             elsif TIME_CAN_PARSE_BC
               Time.parse(value)
-            # :nocov:
+            # simplecov:disable
             else
               DateTime.parse(value).to_time
-            # :nocov:
+            # simplecov:enable
             end
 
             Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
@@ -219,7 +219,7 @@ module Sequel
         end
 
         if RUBY_ENGINE == 'jruby'
-          # :nocov:
+          # simplecov:disable
 
           ExtendedDateSupport::CONVERT_TYPES = [Java::JavaSQL::Types::DATE, Java::JavaSQL::Types::TIMESTAMP]
 
@@ -241,7 +241,7 @@ module Sequel
               super
             end
           end
-          # :nocov:
+          # simplecov:enable
         else
           # Handle BC Time objects.
           def literal_time(time)

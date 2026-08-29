@@ -45,7 +45,7 @@
 #
 module Sequel
   module AutoCastDateAndTime
-    # :nocov:
+    # simplecov:disable
 
     # Mark the datasets as requiring sql standard date times.  This is only needed
     # for backwards compatibility.  
@@ -53,7 +53,7 @@ module Sequel
       # SEQUEL6: Remove
       true
     end
-    # :nocov:
+    # simplecov:enable
 
     private
 

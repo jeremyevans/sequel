@@ -3,19 +3,23 @@ require 'simplecov'
 
 def SimpleCov.sequel_coverage(opts = {})
   start do
-    enable_coverage :branch
     command_name SEQUEL_COVERAGE unless SEQUEL_COVERAGE == "1"
-    add_filter{|f| f.filename.match(%r{\A#{Regexp.escape(File.dirname(__FILE__))}/})}
+    coverage :line
+    coverage :branch
+    cover "lib/**/*.rb", "bin/sequel"
+    group('Missing'){|src| src.covered_percent < 100}
 
     if ENV['SEQUEL_MERGE_COVERAGE']
       filter = %r{bin/sequel\z|lib/sequel/(\w+\.rb|(dataset|database|model|connection_pool|extensions|plugins)/\w+\.rb|adapters/(mock|(shared/)?postgres)\.rb)\z}
-      add_filter{|src| src.filename !~ filter}
+      exclude = %r{lib/sequel/(extensions/(from_block|mssql_emulate_lateral_with_apply|no_auto_literal_strings)|plugins/before_after_save).rb}
+      skip{|src| src.filename !~ filter || src.filename =~ exclude}
+      merge_timeout 600
     elsif opts[:filter]
-      add_filter{|src| src.filename !~ opts[:filter]}
+      skip{|src| src.filename !~ opts[:filter]}
     end
 
     if opts[:subprocesses]
-      enable_for_subprocesses true
+      merge_subprocesses true
       ENV['COVERAGE'] = 'subprocess'
       ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r ./spec/sequel_coverage"
     elsif SEQUEL_COVERAGE == 'subprocess'

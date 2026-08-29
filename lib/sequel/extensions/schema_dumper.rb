@@ -27,9 +27,9 @@ Sequel.extension :eval_inspect
 
 module Sequel
   module SchemaDumper
-    # :nocov:
+    # simplecov:disable
     IGNORE_INDEX_ERRORS_KEY = RUBY_VERSION >= '3.4' ? 'ignore_index_errors: ' : ':ignore_index_errors=>'
-    # :nocov:
+    # simplecov:enable
     private_constant :IGNORE_INDEX_ERRORS_KEY
 
     # Convert the column schema information to a hash of column options, one of which must
@@ -430,10 +430,10 @@ END_MIG
 
   module Schema
     class CreateTableGenerator
-      # :nocov:
+      # simplecov:disable
       DEFAULT_KEY = RUBY_VERSION >= '3.4' ? 'default: ' : ':default=>'
       IGNORE_ERRORS_KEY = RUBY_VERSION >= '3.4' ? 'ignore_errors: ' : ':ignore_errors=>'
-      # :nocov:
+      # simplecov:enable
       private_constant :DEFAULT_KEY
       private_constant :IGNORE_ERRORS_KEY
 

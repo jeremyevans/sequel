@@ -25,9 +25,9 @@
 #
 # Related module: Sequel::SymbolAref
 
-# :nocov:
+# simplecov:disable
 raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VERSION >= '2.0.0'
-# :nocov:
+# simplecov:enable
 
 module Sequel::SymbolAref
   refine Symbol do

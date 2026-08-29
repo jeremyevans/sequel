@@ -1,8 +1,8 @@
 # frozen-string-literal: true
 
-# :nocov:
+# simplecov:disable
 raise LoadError, "Sequel::TimedQueueConnectionPool is only available on Ruby 3.2+" unless RUBY_VERSION >= '3.2'
-# :nocov:
+# simplecov:enable
 
 # A connection pool allowing multi-threaded access to a pool of connections,
 # using a timed queue (only available in Ruby 3.2+).

@@ -326,7 +326,7 @@ module Sequel
   Database.register_extension(:pg_hstore, Postgres::HStore::DatabaseMethods)
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Hash
     # Create a new HStore using the receiver as the input
@@ -350,4 +350,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

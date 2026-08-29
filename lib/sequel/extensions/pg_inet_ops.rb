@@ -187,7 +187,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::InetOpMethods
@@ -201,4 +201,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

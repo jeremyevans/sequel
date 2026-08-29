@@ -35,7 +35,7 @@ if RUBY_VERSION >= '2.0'
   class Symbol
     prepend Sequel::SymbolAref
   end
-# :nocov:
+# simplecov:disable
 else
   class Symbol
     if method_defined?(:[])
@@ -52,4 +52,4 @@ else
     end
   end
 end
-# :nocov:
+# simplecov:enable

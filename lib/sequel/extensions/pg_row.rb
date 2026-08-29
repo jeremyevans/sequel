@@ -247,9 +247,9 @@ module Sequel
           if skip(/\)/)
             values << nil
           else
-            # :nocov:
+            # simplecov:disable
             until eos?
-            # :nocov:
+            # simplecov:enable
               if skip(/"/)
                 values << scan(/(\\.|""|[^"])*/).gsub(/\\(.)|"(")/, '\1\2')
                 skip(/"[,)]/)
@@ -563,7 +563,7 @@ module Sequel
   Database.register_extension(:pg_row, Postgres::PGRow::DatabaseMethods)
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Array
     # Wraps the receiver in an anonymous Sequel::Postgres::PGRow::ArrayRow instance.
@@ -582,4 +582,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

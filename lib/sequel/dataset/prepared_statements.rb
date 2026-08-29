@@ -206,9 +206,9 @@ module Sequel
         when :insert_pk, :single_value
           with_sql_single_value(prepared_sql)
         when Array
-          # :nocov:
+          # simplecov:disable
           case type[0]
-          # :nocov:
+          # simplecov:enable
           when :map, :as_hash, :to_hash, :to_hash_groups
             force_prepared_sql.public_send(*type, &block) 
           end

@@ -20,10 +20,10 @@ module Sequel::DateTimeParseToTime
   # be in UTC and there is no offset information in the string.
   def convert_input_timestamp(v, input_timezone)
     if v.is_a?(String) && datetime_class == Time && input_timezone == :utc && !_date_parse(v).has_key?(:offset)
-      # :nocov:
+      # simplecov:disable
       # Whether this is fully branch covered depends on the order in which the specs are run.
       v = handle_date_parse_input(v) if respond_to?(:handle_date_parse_input, true)
-      # :nocov:
+      # simplecov:enable
       t = DateTime.parse(v).to_time
       case application_timezone
       when nil, :local

@@ -2208,9 +2208,9 @@ module Sequel
         def association_module_delegate_def(name, opts, &block)
           mod = association_module(opts)
           mod.send(:define_method, name, &block)
-          # :nocov:
+          # simplecov:disable
           mod.send(:ruby2_keywords, name) if mod.respond_to?(:ruby2_keywords, true)
-          # :nocov:
+          # simplecov:enable
           mod.send(:alias_method, name, name)
         end
       
@@ -2819,9 +2819,9 @@ module Sequel
           run_association_callbacks(opts, :after_add, o)
           o
         end
-        # :nocov:
+        # simplecov:disable
         ruby2_keywords(:add_associated_object) if respond_to?(:ruby2_keywords, true)
-        # :nocov:
+        # simplecov:enable
 
         # Add/Set the current object to/as the given object's reciprocal association.
         def add_reciprocal_object(opts, o)
@@ -2964,9 +2964,9 @@ module Sequel
           associations[opts[:name]] = []
           ret
         end
-        # :nocov:
+        # simplecov:disable
         ruby2_keywords(:remove_all_associated_objects) if respond_to?(:ruby2_keywords, true)
-        # :nocov:
+        # simplecov:enable
 
         # Remove the given associated object from the given association
         def remove_associated_object(opts, o, *args)
@@ -2988,9 +2988,9 @@ module Sequel
           run_association_callbacks(opts, :after_remove, o)
           o
         end
-        # :nocov:
+        # simplecov:disable
         ruby2_keywords(:remove_associated_object) if respond_to?(:ruby2_keywords, true)
-        # :nocov:
+        # simplecov:enable
 
         # Check that the object from the associated table specified by the primary key
         # is currently associated to the receiver.  If it is associated, return the object, otherwise

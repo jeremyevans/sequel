@@ -82,13 +82,13 @@ module Sequel
           end
         END
       else
-        # :nocov:
+        # simplecov:disable
         # :nodoc:
         def self.csv_call(*args, opts, &block)
           CSV.send(*args, opts, &block)
         end
         # :nodoc:
-        # :nocov:
+        # simplecov:enable
       end
 
       module ClassMethods

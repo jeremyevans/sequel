@@ -49,10 +49,10 @@ module Sequel::S
     Sequel.expr(*a, &block)
   end
 
-  # :nocov:
+  # simplecov:disable
   if RUBY_VERSION >= '2.0.0'
     include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
-  # :nocov:
+  # simplecov:enable
     refine Object do
       send include_meth, Sequel::S
     end

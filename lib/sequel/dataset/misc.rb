@@ -76,7 +76,7 @@ module Sequel
         super
       end
     else
-      # :nocov:
+      # simplecov:disable
       def freeze # :nodoc:
         self
       end
@@ -84,7 +84,7 @@ module Sequel
       def frozen?  # :nodoc:
         true
       end
-      # :nocov:
+      # simplecov:enable
     end
    
     # Alias of +first_source_alias+

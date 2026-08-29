@@ -176,9 +176,9 @@ module Sequel
         else
           Sequel.function(:hstore, self, wrap_array(arg))
         end
-        # :nocov:
+        # simplecov:disable
         if Sequel.respond_to?(:hstore_op)
-        # :nocov:
+        # simplecov:enable
           v = Sequel.hstore_op(v)
         end
         v
@@ -381,9 +381,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(PGArray)
-    # :nocov:
+    # simplecov:enable
       class PGArray
         # Wrap the PGArray instance in an ArrayOp, allowing you to easily use
         # the PostgreSQL array functions and operators with literal arrays.
@@ -415,7 +415,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::ArrayOpMethods
@@ -429,4 +429,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

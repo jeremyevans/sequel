@@ -80,10 +80,10 @@ module Sequel
         raise unless disamb = tzinfo_disambiguator_for(v)
         period = input_timezone.period_for_local(v, &disamb)
         offset = period.utc_total_offset
-        # :nocov:
+        # simplecov:disable
         if BROKEN_TIME_AT_WITH_NSEC
           Time.at(v.to_i - offset, :in => input_timezone) + v.nsec/1000000000.0
-        # :nocov:
+        # simplecov:enable
         else
           Time.at(v.to_i - offset, v.nsec, :nsec, :in => input_timezone)
         end
@@ -92,16 +92,16 @@ module Sequel
       # Convert the given input Time to the given output timezone,
       # which should be a TZInfo::Timezone instance.
       def convert_output_time_other(v, output_timezone)
-        # :nocov:
+        # simplecov:disable
         if BROKEN_TIME_AT_WITH_NSEC
           Time.at(v.to_i, :in => output_timezone) + v.nsec/1000000000.0
-        # :nocov:
+        # simplecov:enable
         else
           Time.at(v.to_i, v.nsec, :nsec, :in => output_timezone)
         end
       end
       # :nodoc:
-      # :nocov:
+      # simplecov:disable
     else
       def convert_input_time_other(v, input_timezone)
         local_offset = input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset
@@ -122,7 +122,7 @@ module Sequel
         end
       end
       # :nodoc:
-      # :nocov:
+      # simplecov:enable
     end
 
     # Handle both TZInfo 1 and TZInfo 2
@@ -139,7 +139,7 @@ module Sequel
         DateTime.civil(v.year, v.month, v.day, v.hour, v.minute, v.second + v.sec_fraction, v.offset, v.start)
       end
       # :nodoc:
-      # :nocov:
+      # simplecov:disable
     else
       # Assume the given DateTime has a correct time but a wrong timezone.  It is
       # currently in UTC timezone, but it should be converted to the input_timezone.
@@ -161,7 +161,7 @@ module Sequel
         (v - local_offset).new_offset(local_offset)
       end
       # :nodoc:
-      # :nocov:
+      # simplecov:enable
     end
     
     # Returns TZInfo::Timezone instance if given a String.

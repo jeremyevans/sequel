@@ -206,12 +206,12 @@ module Sequel
     }
 
     if RUBY_VERSION < '2.4'
-      # :nocov:
+      # simplecov:disable
       JSON_PRIMITIVE_WRAPPER_MAPPING[Fixnum] = JSONInteger
       JSON_PRIMITIVE_WRAPPER_MAPPING[Bignum] = JSONInteger
       JSONB_PRIMITIVE_WRAPPER_MAPPING[Fixnum] = JSONBInteger
       JSONB_PRIMITIVE_WRAPPER_MAPPING[Bignum] = JSONBInteger
-      # :nocov:
+      # simplecov:enable
     end
 
     JSON_PRIMITIVE_WRAPPER_MAPPING.freeze
@@ -583,7 +583,7 @@ module Sequel
   Database.register_extension(:pg_json, Postgres::JSONDatabaseMethods)
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Array
     # Return a Sequel::Postgres::JSONArray proxy to the receiver.
@@ -641,4 +641,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

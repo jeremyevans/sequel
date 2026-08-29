@@ -40,9 +40,9 @@ module Sequel
 
       # Initialize the subclasses instance variable for the model.
       def self.apply(model, &block)
-        # :nocov:
+        # simplecov:disable
         model.instance_variable_set(:@subclasses, [])  if NEED_SUBCLASSES
-        # :nocov:
+        # simplecov:enable
         model.instance_variable_set(:@on_subclass, block)
       end
 
@@ -51,13 +51,13 @@ module Sequel
         # class created.
         attr_reader :on_subclass
 
-        # :nocov:
+        # simplecov:disable
         if NEED_SUBCLASSES
           # All subclasses for the current model.  Does not
           # include the model itself.
           attr_reader :subclasses
         end
-        # :nocov:
+        # simplecov:enable
 
         # All descendent classes of this model.
         def descendants
@@ -85,9 +85,9 @@ module Sequel
         # in the subclass.
         def inherited(subclass)
           super
-          # :nocov:
+          # simplecov:disable
           Sequel.synchronize{subclasses << subclass} if NEED_SUBCLASSES
-          # :nocov:
+          # simplecov:enable
           on_subclass.call(subclass) if on_subclass
         end
       end

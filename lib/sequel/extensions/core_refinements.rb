@@ -10,14 +10,14 @@
 #
 #   using Sequel::CoreRefinements
 
-# :nocov:
+# simplecov:disable
 raise(Sequel::Error, "Refinements require ruby 2.0.0 or greater") unless RUBY_VERSION >= '2.0.0'
-# :nocov:
+# simplecov:enable
 
 module Sequel::CoreRefinements
-  # :nocov:
+  # simplecov:disable
   include_meth = RUBY_VERSION >= '3.1' ? :import_methods : :include
-  # :nocov:
+  # simplecov:enable
   INCLUDE_METH = include_meth
   private_constant :INCLUDE_METH
 
@@ -201,16 +201,16 @@ module Sequel::CoreRefinements
     send include_meth, Sequel::SQL::BooleanMethods
     send include_meth, Sequel::SQL::NumericMethods
 
-    # :nocov:
+    # simplecov:disable
     remove_method :* if RUBY_VERSION >= '3.1'
-    # :nocov:
+    # simplecov:enable
 
     send include_meth, Sequel::SQL::QualifyingMethods
     send include_meth, Sequel::SQL::StringMethods
     send include_meth, Sequel::SQL::SubscriptMethods
     send include_meth, Sequel::SQL::ComplexExpressionMethods
 
-    # :nocov:
+    # simplecov:disable
     if RUBY_VERSION >= '3.1'
       remove_method :*
       def *(ce=(arg=false;nil))
@@ -222,7 +222,7 @@ module Sequel::CoreRefinements
       end
 
     end
-    # :nocov:
+    # simplecov:enable
 
     # Returns receiver wrapped in an <tt>Sequel::SQL::Identifier</tt>.
     #

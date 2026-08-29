@@ -107,11 +107,11 @@ class String
   end
   
   %w'classify constantize dasherize demodulize foreign_key humanize pluralize singularize tableize underscore'.each do |m|
-    # :nocov:
+    # simplecov:disable
     if method_defined?(m)
       alias_method(m, m)
     end
-    # :nocov:
+    # simplecov:enable
   end
 
   # By default, camelize converts the string to UpperCamelCase. If the argument to camelize

@@ -114,13 +114,13 @@ module Sequel
           end
         else
           # Cannot bind module method to arbitrary objects in Ruby 1.9.
-          # :nocov:
+          # simplecov:disable
           def _where_any_all(meth, name, args)
             ds = model.dataset.clone
             ds.extend(self)
             where(name, Sequel.send(meth, *args.map{|a| ds.send(:"#{a}_conditions")}))
           end
-          # :nocov:
+          # simplecov:enable
         end
       end
     end

@@ -296,7 +296,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::SQLite::JSONOpMethods
@@ -310,4 +310,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

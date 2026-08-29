@@ -35,12 +35,12 @@
 require 'active_support'
 require 'active_support/duration'
 
-# :nocov:
+# simplecov:disable
 begin
   require 'active_support/version'
 rescue LoadError
 end
-# :nocov:
+# simplecov:enable
 
 module Sequel
   module Postgres
@@ -75,11 +75,11 @@ module Sequel
         if defined?(ActiveSupport::Duration::SECONDS_PER_MONTH)
           SECONDS_PER_MONTH = ActiveSupport::Duration::SECONDS_PER_MONTH
           SECONDS_PER_YEAR = ActiveSupport::Duration::SECONDS_PER_YEAR
-        # :nocov:
+        # simplecov:disable
         else
           SECONDS_PER_MONTH = 2592000
           SECONDS_PER_YEAR = 31557600
-        # :nocov:
+        # simplecov:enable
         end
 
         # Parse the interval input string into an ActiveSupport::Duration instance.
@@ -125,11 +125,11 @@ module Sequel
             parts[:seconds] = seconds
           end
 
-          # :nocov:
+          # simplecov:disable
           if USE_PARTS_ARRAY
             parts = parts.to_a
           end
-          # :nocov:
+          # simplecov:enable
 
           ActiveSupport::Duration.new(value, parts)
         end

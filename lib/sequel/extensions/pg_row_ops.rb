@@ -159,9 +159,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(PGRow::ArrayRow)
-    # :nocov:
+    # simplecov:enable
       class PGRow::ArrayRow
         # Wrap the PGRow::ArrayRow instance in an PGRowOp, allowing you to easily use
         # the PostgreSQL row functions and operators with literal rows.
@@ -171,9 +171,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(PGRow::HashRow)
-    # :nocov:
+    # simplecov:enable
       class PGRow::HashRow
         # Wrap the PGRow::ArrayRow instance in an PGRowOp, allowing you to easily use
         # the PostgreSQL row functions and operators with literal rows.
@@ -200,7 +200,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::PGRowOp::ExpressionMethods
@@ -214,4 +214,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

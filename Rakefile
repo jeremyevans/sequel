@@ -88,7 +88,7 @@ run_spec = proc do |file|
   lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
   rubylib = ENV['RUBYLIB']
   ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
-  sh "#{FileUtils::RUBY} #{"-w" if RUBY_VERSION >= '3'} #{'-W:strict_unused_block' if RUBY_VERSION >= '3.4'} #{file}"
+  sh "#{FileUtils::RUBY} #{"-w" if RUBY_VERSION >= '3'} #{'-W:strict_unused_block' if RUBY_VERSION >= '3.4' && !ENV['SEQUEL_MERGE_COVERAGE']} #{file}"
   ENV['RUBYLIB'] = rubylib
 end
 

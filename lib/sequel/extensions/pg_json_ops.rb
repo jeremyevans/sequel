@@ -843,9 +843,9 @@ module Sequel
 
       # Wrap argument in a PGArray if it is an array or a set
       def wrap_input_array(obj)
-        # :nocov:
+        # simplecov:disable
         if Sequel.respond_to?(:pg_array)
-        # :nocov:
+        # simplecov:enable
           case obj
           when Array
             return Sequel.pg_array(obj)
@@ -1375,9 +1375,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(JSONArray)
-    # :nocov:
+    # simplecov:enable
       class JSONArray
         # Wrap the JSONArray instance in an JSONOp, allowing you to easily use
         # the PostgreSQL json functions and operators with literal jsons.
@@ -1443,7 +1443,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::JSONOpMethods
@@ -1457,4 +1457,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

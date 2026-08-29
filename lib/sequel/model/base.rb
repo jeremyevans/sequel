@@ -518,9 +518,9 @@ module Sequel
 
         m.configure(self, *args, &block) if m.respond_to?(:configure)
       end
-      # :nocov:
+      # simplecov:disable
       ruby2_keywords(:plugin) if respond_to?(:ruby2_keywords, true)
-      # :nocov:
+      # simplecov:enable
 
       # Returns primary key attribute hash.  If using a composite primary key
       # value such be an array with values for each primary key in the correct
@@ -828,9 +828,9 @@ ruby2_keywords :#{meth} if respond_to?(:ruby2_keywords, true)
 END
         else
           mod.send(:define_method, meth){|*args, &block| dataset.public_send(meth, *args, &block)}
-          # :nocov:
+          # simplecov:disable
           mod.send(:ruby2_keywords, meth) if respond_to?(:ruby2_keywords, true)
-          # :nocov:
+          # simplecov:enable
         end
         mod.send(:alias_method, meth, meth)
       end
@@ -1997,10 +1997,10 @@ END
 
       def _save_update_changed_colums_hash # :nodoc:
         # SEQUEL6: Remove
-        # :nocov:
+        # simplecov:disable
         Sequel::Deprecation.deprecate("Model#_save_update_changed_colums_hash", "Use #_save_update_changed_columns_hash instead")
         _save_update_changed_columns_hash
-        # :nocov:
+        # simplecov:enable
       end
 
       # Return a hash of values used when saving changed columns of an
@@ -2434,13 +2434,13 @@ END
     def_initialize_nil_instance_variables
 
     singleton_class.send(:undef_method, :dup, :clone, :initialize_copy)
-    # :nocov:
+    # simplecov:disable
     if RUBY_VERSION >= '1.9.3'
-    # :nocov:
+    # simplecov:enable
       singleton_class.send(:undef_method, :initialize_clone, :initialize_dup)
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(Sequel::Postgres::SEQUEL_PG_VERSION_INTEGER) && Sequel::Postgres::SEQUEL_PG_VERSION_INTEGER >= 11800
       # Automatically optimize model loading when sequel/core was loaded,
       # then sequel/adapters/postgres (with sequel_pg), then sequel/model
@@ -2450,6 +2450,6 @@ END
         # nothing
       end
     end
-    # :nocov:
+    # simplecov:enable
   end
 end

@@ -98,7 +98,7 @@ module Sequel
         c.freeze
       end
     else
-      # :nocov:
+      # simplecov:disable
       def clone(opts = OPTS) # :nodoc:
         c = super()
         c.opts.merge!(opts)
@@ -108,7 +108,7 @@ module Sequel
         c.opts.freeze
         c
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     # Returns a copy of the dataset with the SQL DISTINCT clause. The DISTINCT
@@ -213,13 +213,13 @@ module Sequel
         end
       end
     else
-      # :nocov:
+      # simplecov:disable
       def extension(*exts) # :nodoc:
         c = clone
         c.send(:_extension!, exts)
         c
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     # Alias for where.
@@ -1250,14 +1250,14 @@ module Sequel
         o.freeze
       end
     else
-      # :nocov:
+      # simplecov:disable
       def with_extend(*mods, &block) # :nodoc:
         c = clone
         c.extend(*mods) unless mods.empty?
         c.extend(DatasetModule.new(&block)) if block
         c
       end
-      # :nocov:
+      # simplecov:enable
     end
 
     # Returns a cloned dataset with the given row_proc.
@@ -1354,7 +1354,7 @@ module Sequel
 
     private
 
-    # :nocov:
+    # simplecov:disable
     unless TRUE_FREEZE
       # Load the extensions into the receiver, without checking if the receiver is frozen.
       def _extension!(exts)
@@ -1373,7 +1373,7 @@ module Sequel
         self
       end
     end
-    # :nocov:
+    # simplecov:enable
 
     # A frozen array for the currently selected columns.
     def _current_select(allow_plain_wildcard)

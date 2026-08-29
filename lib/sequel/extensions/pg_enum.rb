@@ -180,9 +180,9 @@ module Sequel
   end
 
   # support reversible create_enum statements if the migration extension is loaded
-  # :nocov:
+  # simplecov:disable
   if defined?(MigrationReverser)
-  # :nocov:
+  # simplecov:enable
     class MigrationReverser
       private
       def create_enum(name, _)

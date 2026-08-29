@@ -132,9 +132,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(PGRange)
-    # :nocov:
+    # simplecov:enable
       class PGRange
         # Wrap the PGRange instance in an RangeOp, allowing you to easily use
         # the PostgreSQL range functions and operators with literal ranges.
@@ -144,9 +144,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(PGMultiRange)
-    # :nocov:
+    # simplecov:enable
       class PGMultiRange
         # Wrap the PGRange instance in an RangeOp, allowing you to easily use
         # the PostgreSQL range functions and operators with literal ranges.
@@ -178,7 +178,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::RangeOpMethods
@@ -192,4 +192,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

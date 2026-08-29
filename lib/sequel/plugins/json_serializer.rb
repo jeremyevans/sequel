@@ -128,7 +128,7 @@ module Sequel
       end
       
       # SEQUEL6: Remove
-      # :nocov:
+      # simplecov:disable
       class Literal
         def initialize(json)
           @json = json
@@ -138,7 +138,7 @@ module Sequel
           @json
         end
       end
-      # :nocov:
+      # simplecov:enable
       Sequel::Deprecation.deprecate_constant(self, :Literal)
 
       # Convert the given object to a JSON data structure using the given arguments.
@@ -151,11 +151,11 @@ module Sequel
           else
             begin
               Sequel.parse_json(Sequel.object_to_json(obj, *args, &block))
-            # :nocov:
+            # simplecov:disable
             rescue Sequel.json_parser_error_class
               # Support for old Ruby code that only supports parsing JSON object/array
               Sequel.parse_json(Sequel.object_to_json([obj], *args, &block))[0]
-            # :nocov:
+            # simplecov:enable
             end
           end
         end

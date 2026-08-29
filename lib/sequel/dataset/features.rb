@@ -25,7 +25,7 @@ module Sequel
       false
     end
 
-    # :nocov:
+    # simplecov:disable
 
     # Whether the dataset requires SQL standard datetimes. False by default,
     # as most allow strings with ISO 8601 format. Only for backwards compatibility,
@@ -34,7 +34,7 @@ module Sequel
       # SEQUEL6: Remove
       false
     end
-    # :nocov:
+    # simplecov:enable
 
     # Whether type specifiers are required for prepared statement/bound
     # variable argument placeholders (i.e. :bv__integer), false by default.
@@ -188,14 +188,14 @@ module Sequel
       true
     end
 
-    # :nocov:
+    # simplecov:disable
 
     # Whether the dataset supports timezones in literal timestamps, false by default.
     def supports_timestamp_timezones?
       # SEQUEL6: Remove
       false
     end
-    # :nocov:
+    # simplecov:enable
     
     # Whether the dataset supports fractional seconds in literal timestamps, true by default.
     def supports_timestamp_usecs?

@@ -367,9 +367,9 @@ module Sequel
       end
     end
 
-    # :nocov:
+    # simplecov:disable
     if defined?(HStore)
-    # :nocov:
+    # simplecov:enable
       class HStore
         # Wrap the receiver in an HStoreOp so you can easily use the PostgreSQL
         # hstore functions and operators with it.
@@ -401,7 +401,7 @@ module Sequel
   end
 end
 
-# :nocov:
+# simplecov:disable
 if Sequel.core_extensions?
   class Symbol
     include Sequel::Postgres::HStoreOpMethods
@@ -415,4 +415,4 @@ if defined?(Sequel::CoreRefinements)
     end
   end
 end
-# :nocov:
+# simplecov:enable

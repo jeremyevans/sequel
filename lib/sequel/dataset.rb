@@ -54,7 +54,7 @@ module Sequel
   require_relative "dataset/placeholder_literalizer"
   require_relative "dataset/dataset_module"
 
-  # :nocov:
+  # simplecov:disable
   require_relative "dataset/deprecated_singleton_class_methods" if Dataset::TRUE_FREEZE
-  # :nocov:
+  # simplecov:enable
 end

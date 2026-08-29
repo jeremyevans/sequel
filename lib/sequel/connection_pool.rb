@@ -72,11 +72,11 @@ class Sequel::ConnectionPool
           opts[:servers] ? :sharded_single : :single
         elsif RUBY_VERSION >= '3.2'
           opts[:servers] ? :sharded_timed_queue : :timed_queue
-        # :nocov:
+        # simplecov:disable
         else
           opts[:servers] ? :sharded_threaded : :threaded
         end
-        # :nocov:
+        # simplecov:enable
 
         connection_pool_class(:pool_class=>pc)
       end
