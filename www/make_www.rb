@@ -9,5 +9,6 @@ Dir['pages/*.html.erb'].each do |page|
   content = content = ERB.new(File.read(page)).result(binding)
   stylesheet = stylesheet = File.basename(page, '.html.erb')
   title = title = ('index' == stylesheet ? nil : stylesheet.capitalize)
+  link_prefix = link_prefix = ''
   File.open(public_loc, 'wb'){|f| f.write(erb.result(binding))}
 end

@@ -46,7 +46,7 @@ class MakeGuides
 
     guide = guide_path(rdoc_page)
     content = update_relative_links(body, File.dirname(rdoc_page))
-    File.open(guide, 'wb'){|f| f.write(@layout.result_with_hash({content:, :stylesheet=>'guide', :title=>guide_title(guide, content)}))}
+    File.open(guide, 'wb'){|f| f.write(@layout.result_with_hash({content:, :stylesheet=>'guide', :link_prefix=>'../', :title=>guide_title(guide, content)}))}
   end
 
   def guide_title(guide, content)
@@ -71,6 +71,7 @@ class MakeGuides
     target = File.expand_path(path, url(rdoc_dir))
     rdoc_page = @rdoc_pages.find{|p| url(p) == target}
     target = url(guide_path(rdoc_page)) if rdoc_page
+    target = "../#{target}"
 
     fragment ? "#{target}##{fragment}" : target
   end
